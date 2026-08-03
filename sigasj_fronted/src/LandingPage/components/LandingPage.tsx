@@ -1,5 +1,6 @@
 import Header from './Header'
 import Footer from './Footer'
+import ContactSection from './ContactSection'
 
 const sections = [
   { id: 'sobre-nosotros', title: 'Sobre nosotros' },
@@ -19,12 +20,25 @@ const LandingPage = () => (
         <p>Información, proyectos y atención en un mismo lugar.</p>
       </section>
 
-      {sections.map(({ id, title }) => (
-        <section className="landing-section" id={id} key={id} aria-labelledby={`${id}-title`}>
-          <h2 id={`${id}-title`}>{title}</h2>
-          <p>Próximamente encontrarás aquí la información de esta sección.</p>
-        </section>
-      ))}
+      {sections.map(({ id, title }) => {
+        if (id === 'contacto') {
+          return (
+            <ContactSection
+              key={id}
+              id={id}
+              title={title}
+              mapUrl="https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA"
+            />
+          )
+        }
+
+        return (
+          <section className="landing-section" id={id} key={id} aria-labelledby={`${id}-title`}>
+            <h2 id={`${id}-title`}>{title}</h2>
+            <p>Próximamente encontrarás aquí la información de esta sección.</p>
+          </section>
+        )
+      })}
     </main>
     <Footer />
   </>

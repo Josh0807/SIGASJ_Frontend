@@ -1,0 +1,1 @@
+/* Todo relacionado con el Reporte de Averías */

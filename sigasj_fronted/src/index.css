@@ -57,6 +57,26 @@ body { margin: 0; min-width: 320px; }
 .landing-section:nth-child(odd) { background: #e9f4fd; }
 .landing-section h2 { color: #1e5a9c; font-size: 2rem; }
 
+.contact-section { background: linear-gradient(135deg, #f8fcff 0%, #ebf6ff 100%); }
+.contact-section__content { width: min(100%, 1180px); margin: 0 auto; display: grid; gap: 28px; }
+.contact-section__intro { max-width: 760px; }
+.contact-section__eyebrow { margin: 0 0 10px; color: #1e5a9c; font-size: .85rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+.contact-section__grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: stretch; }
+.contact-section__card { padding: 24px; border: 1px solid #d5e9f8; border-radius: 20px; background: white; box-shadow: 0 16px 40px rgba(18, 63, 112, 0.08); }
+.contact-section__card--map { display: flex; flex-direction: column; }
+.contact-section__item { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid #eef6fc; }
+.contact-section__item:last-child { border-bottom: 0; padding-bottom: 0; }
+.contact-section__icon { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #eaf5ff; font-size: 1.2rem; }
+.contact-section__item h3 { margin: 0 0 6px; color: #123f70; font-size: 1rem; }
+.contact-section__item p, .contact-section__item address { margin: 0; color: #516779; line-height: 1.6; font-style: normal; }
+.contact-section__list { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: #516779; }
+.contact-section__link { color: #1e5a9c; font-weight: 700; text-decoration: none; }
+.contact-section__link:hover { text-decoration: underline; }
+.contact-section__map-link { display: inline-flex; margin-bottom: 14px; color: #1e5a9c; font-weight: 700; text-decoration: none; }
+.contact-section__map-link:hover { text-decoration: underline; }
+.contact-section__map-placeholder { flex: 1; display: grid; place-items: center; min-height: 220px; border: 1px dashed #9ec8e9; border-radius: 16px; color: #4d6c8b; background: #f7fbff; text-align: center; padding: 24px; }
+.contact-section__reference { margin: 14px 0 0; color: #516779; line-height: 1.6; }
+
 .footer { color: #eaf4ff; background: #123f70; }
 .footer__content { width: min(100% - 40px, 1180px); margin: 0 auto; padding: 52px 0 40px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; }
 .footer__brand { display: flex; align-items: center; gap: 15px; }
@@ -94,6 +114,7 @@ body { margin: 0; min-width: 320px; }
 }
 
 @media (max-width: 760px) {
+  .contact-section__grid { grid-template-columns: 1fr; }
   .footer__content { grid-template-columns: 1fr; gap: 32px; }
 }
 
