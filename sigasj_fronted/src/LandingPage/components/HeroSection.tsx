@@ -1,0 +1,1 @@
+/*Aquí va todo lo relacionado con el inicio de la página*/

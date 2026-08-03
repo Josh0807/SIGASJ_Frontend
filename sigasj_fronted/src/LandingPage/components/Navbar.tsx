@@ -1,3 +1,5 @@
+import type { NavbarProps } from '../Props/NavbarProps'
+
 type NavigationItem = {
   label: string
   href: `#${string}`
@@ -11,11 +13,6 @@ const navigationItems: NavigationItem[] = [
   { label: 'Proyectos', href: '#proyectos' },
   { label: 'Contacto', href: '#contacto' },
 ]
-
-type NavbarProps = {
-  className?: string
-  onNavigate?: () => void
-}
 
 const Navbar = ({ className = '', onNavigate }: NavbarProps) => (
   <nav className={className} aria-label="Navegación principal">
