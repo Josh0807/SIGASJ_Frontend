@@ -1,0 +1,13 @@
+# Mantener finales de línea consistentes en todos los sistemas operativos.
+* text=auto eol=lf
+
+# Los scripts nativos de Windows requieren CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Los archivos binarios no deben normalizarse.
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.svg text eol=lf
