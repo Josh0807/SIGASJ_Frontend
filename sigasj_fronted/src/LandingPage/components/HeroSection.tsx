@@ -39,8 +39,8 @@ const HeroSection = ({
           className="hero__image"
           src={imageSrc}
           alt={imageAlt}
-          width={420}
-          height={420}
+          width={300}
+          height={300}
           decoding="async"
         />
       </div>
