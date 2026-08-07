@@ -1,6 +1,7 @@
 import Header from './Header'
 import Footer from './Footer'
 import ContactSection from './ContactSection'
+import ReceiptPaymentSection from './ReceiptPaymentSection'
 
 const sections = [
   { id: 'sobre-nosotros', title: 'Sobre nosotros' },
@@ -19,6 +20,8 @@ const LandingPage = () => (
         <h1 id="hero-title">Gestión de agua al servicio de nuestra comunidad</h1>
         <p>Información, proyectos y atención en un mismo lugar.</p>
       </section>
+
+      <ReceiptPaymentSection />
 
       {sections.map(({ id, title }) => {
         if (id === 'contacto') {

@@ -7,6 +7,7 @@ type NavigationItem = {
 
 const navigationItems: NavigationItem[] = [
   { label: 'Inicio', href: '#inicio' },
+  { label: 'Recibos y pagos', href: '#pagos' },
   { label: 'Sobre nosotros', href: '#sobre-nosotros' },
   { label: 'Comunicados', href: '#comunicados' },
   { label: 'Reporte de averías', href: '#reporte-averias' },
