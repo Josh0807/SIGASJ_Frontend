@@ -1,5 +1,12 @@
+import { Link } from 'react-router-dom'
 import gotinLogo from '../../assets/Logo Gotin sin fondo.png'
 import type { HeroSectionProps } from '../Props/HeroSectionProps'
+
+/** Destino público actual del reporte de averías (sección en la Landing Page). */
+const REPORT_FAULTS_HREF = '#reporte-averias'
+
+/** Destino de AnnouncementsSection en la Landing Page. */
+const ANNOUNCEMENTS_HREF = '#comunicados'
 
 const HeroSection = ({
   id = 'inicio',
@@ -10,9 +17,9 @@ const HeroSection = ({
   loginLabel = 'Iniciar sesión',
   loginHref = '/login',
   reportLabel = 'Reportar una avería',
-  reportHref = '#reporte-averias',
+  reportHref = REPORT_FAULTS_HREF,
   announcementsLabel = 'Ver comunicados',
-  announcementsHref = '#comunicados',
+  announcementsHref = ANNOUNCEMENTS_HREF,
 }: HeroSectionProps) => (
   <section className="hero" id={id} aria-labelledby="hero-title">
     <div className="hero__content">
@@ -21,17 +28,17 @@ const HeroSection = ({
         <h1 id="hero-title">{title}</h1>
         <p className="hero__description">{description}</p>
 
-        <div className="hero__actions">
-          <a className="hero__button hero__button--primary" href={loginHref}>
+        <nav className="hero__actions" aria-label="Acciones principales">
+          <Link className="hero__button hero__button--primary" to={loginHref}>
             {loginLabel}
-          </a>
+          </Link>
           <a className="hero__button hero__button--secondary" href={reportHref}>
             {reportLabel}
           </a>
           <a className="hero__button hero__button--secondary" href={announcementsHref}>
             {announcementsLabel}
           </a>
-        </div>
+        </nav>
       </div>
 
       <div className="hero__visual">
