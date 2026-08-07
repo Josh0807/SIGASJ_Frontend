@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Header from './Header'
 import Footer from './Footer'
 import ContactSection from './ContactSection'
@@ -21,17 +22,17 @@ const LandingPage = () => (
         <p>Información, proyectos y atención en un mismo lugar.</p>
       </section>
 
-      <ReceiptPaymentSection />
-
       {sections.map(({ id, title }) => {
         if (id === 'contacto') {
           return (
-            <ContactSection
-              key={id}
-              id={id}
-              title={title}
-              mapUrl="https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA"
-            />
+            <Fragment key={id}>
+              <ReceiptPaymentSection />
+              <ContactSection
+                id={id}
+                title={title}
+                mapUrl="https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA"
+              />
+            </Fragment>
           )
         }
 
