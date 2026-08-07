@@ -133,6 +133,10 @@ body { margin: 0; min-width: 320px; }
   text-decoration: none;
   text-align: center;
   white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease, color .2s ease;
 }
 .hero__button--primary {
@@ -170,6 +174,13 @@ body { margin: 0; min-width: 320px; }
   background: rgba(255, 255, 255, .1);
   box-shadow: none;
   transform: translateY(0);
+}
+.hero__button:focus {
+  outline: 3px solid #7db7ed;
+  outline-offset: 3px;
+}
+.hero__button:focus:not(:focus-visible) {
+  outline: none;
 }
 .hero__button:focus-visible {
   outline: 3px solid #7db7ed;
@@ -428,6 +439,7 @@ body { margin: 0; min-width: 320px; }
     width: 100%;
     min-width: 0;
     min-height: 48px;
+    padding: 14px 20px;
   }
   .hero__visual {
     max-width: min(100%, 180px);

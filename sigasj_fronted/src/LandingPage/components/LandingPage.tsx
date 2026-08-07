@@ -4,6 +4,7 @@ import HeroSection from './HeroSection'
 import Footer from './Footer'
 import ContactSection from './ContactSection'
 import ReceiptPaymentSection from './ReceiptPaymentSection'
+import AnnouncementsSection from './AnnouncementsSection'
 
 const sections = [
   { id: 'sobre-nosotros', title: 'Sobre nosotros' },
@@ -20,6 +21,10 @@ const LandingPage = () => (
       <HeroSection />
 
       {sections.map(({ id, title }) => {
+        if (id === 'comunicados') {
+          return <AnnouncementsSection key={id} />
+        }
+
         if (id === 'contacto') {
           return (
             <Fragment key={id}>
