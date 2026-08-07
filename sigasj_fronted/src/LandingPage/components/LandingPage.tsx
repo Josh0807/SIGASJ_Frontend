@@ -1,4 +1,5 @@
 import Header from './Header'
+import HeroSection from './HeroSection'
 import Footer from './Footer'
 import ContactSection from './ContactSection'
 
@@ -14,11 +15,7 @@ const LandingPage = () => (
   <>
     <Header />
     <main>
-      <section id="inicio" className="hero" aria-labelledby="hero-title">
-        <p className="hero__eyebrow">ASADA San Juan de Santa Cruz</p>
-        <h1 id="hero-title">Gestión de agua al servicio de nuestra comunidad</h1>
-        <p>Información, proyectos y atención en un mismo lugar.</p>
-      </section>
+      <HeroSection />
 
       {sections.map(({ id, title }) => {
         if (id === 'contacto') {

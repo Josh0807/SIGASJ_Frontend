@@ -53,10 +53,103 @@ body { margin: 0; min-width: 320px; }
 .menu-toggle, .mobile-menu { display: none; }
 
 .hero, .landing-section { scroll-margin-top: 104px; }
-.hero { min-height: 520px; padding: 120px max(24px, calc((100% - 1180px) / 2)); display: flex; flex-direction: column; justify-content: center; color: white; background: linear-gradient(120deg, #123f70, #1e5a9c 58%, #3987c6); }
-.hero__eyebrow { margin: 0 0 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.hero h1 { max-width: 760px; margin: 0; font-size: clamp(2.3rem, 6vw, 4.6rem); line-height: 1.05; }
-.hero > p:last-child { font-size: 1.2rem; }
+.hero {
+  min-height: 560px;
+  padding: 72px max(24px, calc((100% - 1180px) / 2));
+  display: flex;
+  align-items: center;
+  color: white;
+  background: linear-gradient(120deg, #123f70, #1e5a9c 58%, #3987c6);
+}
+.hero__content {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+.hero__copy { min-width: 0; }
+.hero__eyebrow {
+  margin: 0 0 12px;
+  color: #d7ebff;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 18ch;
+  margin: 0;
+  color: white;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.hero__description {
+  max-width: 54ch;
+  margin: 18px 0 0;
+  color: #eaf4ff;
+  font-size: clamp(1rem, 2.1vw, 1.18rem);
+  line-height: 1.65;
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.hero__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: .95rem;
+  font-weight: 750;
+  text-decoration: none;
+  text-align: center;
+  white-space: normal;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease, color .2s ease;
+}
+.hero__button--primary {
+  border: 1px solid white;
+  color: #123f70;
+  background: white;
+  box-shadow: 0 6px 16px rgba(8, 34, 64, .18);
+}
+.hero__button--primary:hover {
+  background: #eef6fc;
+  box-shadow: 0 8px 18px rgba(8, 34, 64, .24);
+  transform: translateY(-1px);
+}
+.hero__button--secondary {
+  border: 1px solid rgba(255, 255, 255, .72);
+  color: white;
+  background: rgba(255, 255, 255, .12);
+  backdrop-filter: blur(6px);
+}
+.hero__button--secondary:hover {
+  border-color: white;
+  background: rgba(255, 255, 255, .22);
+  transform: translateY(-1px);
+}
+.hero__button:focus-visible {
+  outline: 3px solid #7db7ed;
+  outline-offset: 3px;
+}
+.hero__visual {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+.hero__image {
+  display: block;
+  width: min(100%, 420px);
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 28px rgba(8, 34, 64, .28));
+}
 .landing-section { min-height: 420px; padding: 80px max(24px, calc((100% - 1180px) / 2)); }
 .landing-section:nth-child(odd) { background: #e9f4fd; }
 .landing-section h2 { color: #1e5a9c; font-size: 2rem; }
@@ -124,6 +217,26 @@ body { margin: 0; min-width: 320px; }
   .navbar--mobile .navbar__login { width: 100%; margin-top: 10px; justify-content: center; }
 }
 
+@media (max-width: 980px) {
+  .hero {
+    min-height: auto;
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+  .hero__content {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .hero h1 { max-width: none; }
+  .hero__visual { order: -1; }
+  .hero__image {
+    width: min(100%, 280px);
+    max-height: 280px;
+  }
+  .hero__actions { width: 100%; }
+  .hero__button { flex: 1 1 220px; }
+}
+
 @media (max-width: 520px) {
   .header__inner { width: calc(100% - 28px); min-height: 74px; gap: 12px; }
   .brand { gap: 9px; }
@@ -133,6 +246,13 @@ body { margin: 0; min-width: 320px; }
   .menu-toggle { width: 43px; height: 43px; padding: 10px; }
   .navbar--mobile .navbar__list { width: calc(100% - 28px); padding-bottom: 18px; }
   .hero, .landing-section { scroll-margin-top: 90px; }
+  .hero { padding-right: 18px; padding-left: 18px; }
+  .hero__actions { flex-direction: column; }
+  .hero__button { flex: 1 1 auto; width: 100%; }
+  .hero__image {
+    width: min(100%, 220px);
+    max-height: 220px;
+  }
 }
 
 @media (max-width: 360px) {
