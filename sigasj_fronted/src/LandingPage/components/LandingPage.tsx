@@ -1,6 +1,8 @@
+import { Fragment } from 'react'
 import Header from './Header'
 import Footer from './Footer'
 import ContactSection from './ContactSection'
+import ReceiptPaymentSection from './ReceiptPaymentSection'
 
 const sections = [
   { id: 'sobre-nosotros', title: 'Sobre nosotros' },
@@ -23,12 +25,14 @@ const LandingPage = () => (
       {sections.map(({ id, title }) => {
         if (id === 'contacto') {
           return (
-            <ContactSection
-              key={id}
-              id={id}
-              title={title}
-              mapUrl="https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA"
-            />
+            <Fragment key={id}>
+              <ReceiptPaymentSection />
+              <ContactSection
+                id={id}
+                title={title}
+                mapUrl="https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA"
+              />
+            </Fragment>
           )
         }
 
