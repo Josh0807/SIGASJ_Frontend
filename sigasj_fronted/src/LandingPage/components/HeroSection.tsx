@@ -10,7 +10,7 @@ const ANNOUNCEMENTS_HREF = '#comunicados'
 
 const HeroSection = ({
   id = 'inicio',
-  title = 'SIGASJ – Sistema de Gestión ASADA San Juan',
+  title = 'SIGASJ – Sistema de Gestión del Acueducto de ASADA San Juan',
   description = 'Una plataforma diseñada para acercar los servicios de la ASADA San Juan a nuestra comunidad, facilitando el acceso a información, comunicados y servicios importantes.',
   imageSrc = gotinLogo,
   imageAlt = 'Gotín, mascota de la ASADA San Juan de Santa Cruz relacionada con el servicio de agua potable',

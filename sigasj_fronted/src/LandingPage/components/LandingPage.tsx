@@ -5,10 +5,13 @@ import Footer from './Footer'
 import ContactSection from './ContactSection'
 import ReceiptPaymentSection from './ReceiptPaymentSection'
 import AnnouncementsSection from './AnnouncementsSection'
+import AccountSection from './AccountSection'
+import RequestsSection from './RequestsSection'
 
 const sections = [
   { id: 'sobre-nosotros', title: 'Sobre nosotros' },
   { id: 'comunicados', title: 'Comunicados' },
+  { id: 'solicitudes-servicio', title: 'Solicitudes de servicio' },
   { id: 'reporte-averias', title: 'Reporte de averías' },
   { id: 'proyectos', title: 'Proyectos' },
   { id: 'contacto', title: 'Contacto' },
@@ -23,6 +26,14 @@ const LandingPage = () => (
       {sections.map(({ id, title }) => {
         if (id === 'comunicados') {
           return <AnnouncementsSection key={id} />
+        }
+
+        if (id === 'reporte-averias') {
+          return <AccountSection key={id} />
+        }
+
+        if (id === 'solicitudes-servicio') {
+          return <RequestsSection key={id} />
         }
 
         if (id === 'contacto') {
