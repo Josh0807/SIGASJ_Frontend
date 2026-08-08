@@ -10,6 +10,7 @@ const navigationItems: NavigationItem[] = [
   { label: 'Recibos y pagos', href: '#pagos' },
   { label: 'Sobre nosotros', href: '#sobre-nosotros' },
   { label: 'Comunicados', href: '#comunicados' },
+  { label: 'Solicitudes', href: '#solicitudes-servicio' },
   { label: 'Reporte de averías', href: '#reporte-averias' },
   { label: 'Proyectos', href: '#proyectos' },
   { label: 'Contacto', href: '#contacto' },
