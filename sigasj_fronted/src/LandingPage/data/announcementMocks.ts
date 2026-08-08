@@ -43,4 +43,9 @@ export const announcementMocks: Announcement[] = [
     publishedAt: '2026-08-03',
     type: 'Aviso',
   },
+  {
+    id: 'aviso-opcionales-ausentes',
+    title: 'Comunicado con campos opcionales ausentes',
+    summary: 'Solo título y descripción; sin tipo, fecha, imagen ni Ver más.',
+  },
 ]

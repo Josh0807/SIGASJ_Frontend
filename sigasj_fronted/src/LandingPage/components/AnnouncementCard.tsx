@@ -207,9 +207,16 @@ const buildImageAlt = (title: string, type?: string) => {
 /**
  * Formato de fecha del proyecto: ej. "8 de agosto de 2026" (es-CR).
  * Devuelve undefined si el valor no es una fecha válida (evita Invalid Date).
+ * Las fechas solo-día (YYYY-MM-DD) se interpretan en calendario local para
+ * evitar que el offset UTC reste un día.
  */
 const formatAnnouncementDate = (value: string): string | undefined => {
-  const date = new Date(value)
+  const trimmed = value.trim()
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
+
+  const date = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(trimmed)
 
   if (Number.isNaN(date.getTime())) {
     return undefined
