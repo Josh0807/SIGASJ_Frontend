@@ -31,8 +31,6 @@ export function usePublicAnnouncements(enabled: boolean): UsePublicAnnouncements
     const controller = new AbortController()
     let cancelled = false
 
-    setStatus('loading')
-
     getPublicAnnouncements({ signal: controller.signal })
       .then((result) => {
         if (cancelled) {
