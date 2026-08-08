@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom'
 import gotinLogo from '../../assets/Logo Gotin sin fondo.png'
 import type { HeroSectionProps } from '../Props/HeroSectionProps'
+import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
 
 /** Destino público actual del reporte de averías (sección en la Landing Page). */
 const REPORT_FAULTS_HREF = '#reporte-averias'
-
-/** Destino de AnnouncementsSection en la Landing Page. */
-const ANNOUNCEMENTS_HREF = '#comunicados'
 
 const HeroSection = ({
   id = 'inicio',
