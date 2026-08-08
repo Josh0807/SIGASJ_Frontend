@@ -14,18 +14,13 @@ export type Announcement = {
   fileUrl?: string
 }
 
-export type AnnouncementCardProps = {
-  id: string
-  title: string
-  summary?: string
-  content?: string
-  publishedAt?: string
-  type?: string
-  urgent?: boolean
-  moreHref?: string
-  moreLabel?: string
-  imageUrl?: string
-  fileUrl?: string
+/** Props de presentación; incluye acción opcional sin mezclarse con el DTO del API. */
+export type AnnouncementCardProps = Announcement & {
+  /**
+   * Callback para “Ver más” cuando no hay ruta pública (p. ej. modal futuro).
+   * Pendiente de cablear desde AnnouncementsSection cuando exista el mecanismo.
+   */
+  onMoreClick?: () => void
 }
 
 export type AnnouncementsSectionProps = {
@@ -49,3 +44,4 @@ export type AnnouncementsSectionProps = {
   hasMoreAnnouncements?: boolean
   moreAnnouncementsLabel?: string
 }
+
