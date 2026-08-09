@@ -1,21 +1,29 @@
 import AnnouncementCard from './AnnouncementCard'
 import type { AnnouncementsSectionProps } from '../Props/AnnouncementsSectionProps'
 import { ANNOUNCEMENTS_SECTION_ID } from '../config/landingAnchors'
-import { announcementMocks } from '../data/announcementMocks'
+import { usePublicAnnouncements } from '../hooks/usePublicAnnouncements'
 
 /**
  * Sección pública de comunicados.
- * Por ahora usa una colección temporal para validar AnnouncementCard.
- * El consumo del API se retoma en la tarea de integración correspondiente.
+ * Sin `announcements` en props consulta GET /api/public/comunicados.
+ * Con `announcements` (modo controlado) no llama al API.
  */
 const AnnouncementsSection = ({
   id = ANNOUNCEMENTS_SECTION_ID,
   title = 'Comunicados',
   description = 'Mantente informado sobre avisos importantes, mantenimientos, cortes de agua y otras comunicaciones de la ASADA San Juan.',
-  announcements = announcementMocks,
+  announcements: announcementsProp,
   emptyMessage = 'Actualmente no hay comunicados públicos disponibles.',
+  errorMessage = 'No fue posible cargar los comunicados. Intenta de nuevo más tarde.',
 }: AnnouncementsSectionProps) => {
+  const fetchFromApi = announcementsProp === undefined
+  const { status, announcements: fetched, retry } =
+    usePublicAnnouncements(fetchFromApi)
+
+  const announcements = announcementsProp ?? fetched
   const hasAnnouncements = announcements.length > 0
+  const showLoading = fetchFromApi && status === 'loading'
+  const showError = fetchFromApi && status === 'error'
 
   return (
     <section
@@ -30,7 +38,18 @@ const AnnouncementsSection = ({
           <p>{description}</p>
         </header>
 
-        {hasAnnouncements ? (
+        {showLoading ? (
+          <p className="announcements-section__empty" role="status">
+            Cargando comunicados…
+          </p>
+        ) : showError ? (
+          <div className="announcements-section__empty" role="alert">
+            <p>{errorMessage}</p>
+            <button type="button" onClick={retry}>
+              Reintentar
+            </button>
+          </div>
+        ) : hasAnnouncements ? (
           <div className="announcements-section__grid">
             {announcements.map((announcement) => (
               <AnnouncementCard
