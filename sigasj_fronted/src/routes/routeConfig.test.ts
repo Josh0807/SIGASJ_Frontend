@@ -30,6 +30,7 @@ describe('route configuration', () => {
         '/admin/averias',
         '/admin/reportes',
         '/admin/galeria',
+        '/admin/transparencia',
       ]),
     )
   })

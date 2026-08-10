@@ -48,3 +48,11 @@ export function getAdminGalleryPath(): string {
     import.meta.env.VITE_ADMIN_GALLERY_PATH?.trim() || '/api/admin/galeria'
   return path.startsWith('/') ? path : `/${path}`
 }
+
+/** Ruta administrativa de transparencia relativa a la base. */
+export function getAdminTransparenciaPath(): string {
+  const path =
+    import.meta.env.VITE_ADMIN_TRANSPARENCIA_PATH?.trim() ||
+    '/api/admin/transparencia'
+  return path.startsWith('/') ? path : `/${path}`
+}

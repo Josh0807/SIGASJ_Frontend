@@ -1874,6 +1874,17 @@ button.announcements-section__more {
   height: 100%;
   object-fit: cover;
 }
+.gallery-admin__doc-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #1e5a9c;
+  background: linear-gradient(180deg, #eef5fb 0%, #dcecf8 100%);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
 .gallery-admin__meta h2 {
   margin: 0 0 6px;
   color: #123f70;
