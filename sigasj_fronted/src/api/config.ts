@@ -33,3 +33,10 @@ export function getPublicGalleryPath(): string {
     import.meta.env.VITE_PUBLIC_GALLERY_PATH?.trim() || '/api/public/galeria'
   return path.startsWith('/') ? path : `/${path}`
 }
+
+/** Ruta administrativa de la galería relativa a la base. */
+export function getAdminGalleryPath(): string {
+  const path =
+    import.meta.env.VITE_ADMIN_GALLERY_PATH?.trim() || '/api/admin/galeria'
+  return path.startsWith('/') ? path : `/${path}`
+}
