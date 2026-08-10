@@ -4,3 +4,6 @@ export const ANNOUNCEMENTS_HREF = `#${ANNOUNCEMENTS_SECTION_ID}` as const
 
 export const GALLERY_SECTION_ID = 'galeria'
 export const GALLERY_HREF = `#${GALLERY_SECTION_ID}` as const
+
+export const TRANSPARENCY_SECTION_ID = 'transparencia'
+export const TRANSPARENCY_HREF = `#${TRANSPARENCY_SECTION_ID}` as const
