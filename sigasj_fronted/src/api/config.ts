@@ -1,17 +1,21 @@
 import { ApiError } from './ApiError'
 
-/** URL base del Back-end (sin barra final). Requiere VITE_API_BASE_URL. */
+/** URL base del Back-end (sin barra final). */
 export function getApiBaseUrl(): string {
-  const base = import.meta.env.VITE_API_BASE_URL?.trim()
+  const configured = import.meta.env.VITE_API_BASE_URL
+  // Vacío / ausente en DEV: same-origin + proxy de Vite → /api/...
+  if (configured === undefined || configured.trim() === '') {
+    if (import.meta.env.DEV) {
+      return ''
+    }
 
-  if (!base) {
     throw new ApiError(
       'La URL base de la API no está configurada.',
       'CONFIG',
     )
   }
 
-  return base.replace(/\/$/, '')
+  return configured.trim().replace(/\/$/, '')
 }
 
 /**
@@ -20,5 +24,19 @@ export function getApiBaseUrl(): string {
  */
 export function getPublicAnnouncementsPath(): string {
   const path = import.meta.env.VITE_PUBLIC_ANNOUNCEMENTS_PATH?.trim() || '/comunicados'
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+/** Ruta pública de la galería relativa a la base. */
+export function getPublicGalleryPath(): string {
+  const path =
+    import.meta.env.VITE_PUBLIC_GALLERY_PATH?.trim() || '/api/public/galeria'
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+/** Ruta administrativa de la galería relativa a la base. */
+export function getAdminGalleryPath(): string {
+  const path =
+    import.meta.env.VITE_ADMIN_GALLERY_PATH?.trim() || '/api/admin/galeria'
   return path.startsWith('/') ? path : `/${path}`
 }

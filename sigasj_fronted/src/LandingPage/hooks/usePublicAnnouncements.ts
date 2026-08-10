@@ -12,6 +12,14 @@ type UsePublicAnnouncementsResult = {
   retry: () => void
 }
 
+function isAbortError(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === 'AbortError') {
+    return true
+  }
+
+  return error instanceof Error && error.name === 'AbortError'
+}
+
 /**
  * Consulta comunicados públicos. Los errores no se propagan: quedan en status "error".
  */
@@ -33,7 +41,7 @@ export function usePublicAnnouncements(enabled: boolean): UsePublicAnnouncements
 
     getPublicAnnouncements({ signal: controller.signal })
       .then((result) => {
-        if (cancelled) {
+        if (cancelled || controller.signal.aborted) {
           return
         }
 
@@ -42,11 +50,7 @@ export function usePublicAnnouncements(enabled: boolean): UsePublicAnnouncements
         setStatus('success')
       })
       .catch((error: unknown) => {
-        if (cancelled) {
-          return
-        }
-
-        if (error instanceof DOMException && error.name === 'AbortError') {
+        if (cancelled || controller.signal.aborted || isAbortError(error)) {
           return
         }
 
