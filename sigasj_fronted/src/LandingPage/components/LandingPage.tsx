@@ -5,6 +5,7 @@ import Footer from './Footer'
 import ContactSection from './ContactSection'
 import ReceiptPaymentSection from './ReceiptPaymentSection'
 import AnnouncementsSection from './AnnouncementsSection'
+import GallerySection from './GallerySection'
 import AccountSection from './AccountSection'
 import RequestsSection from './RequestsSection'
 
@@ -13,7 +14,7 @@ const sections = [
   { id: 'comunicados', title: 'Comunicados' },
   { id: 'solicitudes-servicio', title: 'Solicitudes de servicio' },
   { id: 'reporte-averias', title: 'Reporte de averías' },
-  { id: 'proyectos', title: 'Proyectos' },
+  { id: 'galeria', title: 'Galería' },
   { id: 'contacto', title: 'Contacto' },
 ]
 
@@ -34,6 +35,10 @@ const LandingPage = () => (
 
         if (id === 'solicitudes-servicio') {
           return <RequestsSection key={id} />
+        }
+
+        if (id === 'galeria') {
+          return <GallerySection key={id} />
         }
 
         if (id === 'contacto') {

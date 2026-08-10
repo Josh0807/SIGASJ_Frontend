@@ -547,6 +547,132 @@ button.announcements-section__more {
   max-width: 100%;
   box-sizing: border-box;
 }
+.gallery-section {
+  min-width: 0;
+  max-width: 100%;
+  background: linear-gradient(180deg, #f4f9ff 0%, #e6f1fa 100%);
+}
+.gallery-section__content {
+  width: min(100%, 1180px);
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 auto;
+}
+.gallery-section__heading {
+  min-width: 0;
+  max-width: min(720px, 100%);
+  margin-bottom: clamp(24px, 4vw, 36px);
+  overflow-wrap: anywhere;
+}
+.gallery-section__eyebrow {
+  margin: 0 0 9px;
+  color: #2470ad;
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.gallery-section__heading h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 4vw, 2.35rem);
+  overflow-wrap: anywhere;
+}
+.gallery-section__heading > p:last-child {
+  margin: 0;
+  color: #516779;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.gallery-section__grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2.4vw, 22px);
+  align-items: stretch;
+}
+.gallery-section__grid:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: min(34rem, 100%);
+}
+.gallery-section__grid:has(> :nth-child(2):last-child) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gallery-section__card {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  gap: 0;
+  padding: clamp(14px, 2vw, 18px);
+  border: 1px solid #d5e6f4;
+  border-top: 4px solid #2c7bb8;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 12px 30px rgba(18, 63, 112, .08);
+  box-sizing: border-box;
+}
+.gallery-section__media {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  max-height: 260px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #eef5fb;
+  flex: 0 0 auto;
+}
+.gallery-section__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.gallery-section__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 14px;
+}
+.gallery-section__title {
+  margin: 0;
+  color: #123f70;
+  font-size: 1.08rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.gallery-section__description {
+  margin: 0;
+  color: #516779;
+  font-size: .98rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.gallery-section__empty {
+  margin: 0;
+  padding: 28px 24px;
+  border: 1px dashed #8ebce0;
+  border-radius: 16px;
+  color: #3f6281;
+  background: linear-gradient(145deg, #f7fbff, #eaf5fd);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 .announcements-section__error {
   display: flex;
   flex-direction: column;
@@ -972,6 +1098,7 @@ button.announcements-section__more {
 @media (max-width: 960px) {
   .requests-section__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .announcements-section__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gallery-section__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .announcements-section__card { padding: 20px; }
   .announcements-section__title {
     -webkit-line-clamp: 3;
@@ -996,6 +1123,7 @@ button.announcements-section__more {
 @media (max-width: 760px) {
   .requests-section__grid { grid-template-columns: 1fr; }
   .announcements-section__grid { grid-template-columns: 1fr; }
+  .gallery-section__grid { grid-template-columns: 1fr; }
   .receipt-payment__cards { grid-template-columns: 1fr; }
   .receipt-payment__card--ventanilla { grid-column: auto; }
   .contact-section__grid { grid-template-columns: 1fr; }
@@ -1008,7 +1136,9 @@ button.announcements-section__more {
   .requests-section__card { padding: 22px; }
   .requests-section__button { width: 100%; }
   .announcements-section { padding-right: 18px; padding-left: 18px; }
+  .gallery-section { padding-right: 18px; padding-left: 18px; }
   .announcements-section__grid:has(> :only-child) { max-width: none; }
+  .gallery-section__grid:has(> :only-child) { max-width: none; }
   .announcements-section__card { padding: 18px; border-radius: 16px; }
   .announcements-section__card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
   .announcements-section__media {
