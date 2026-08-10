@@ -8,6 +8,7 @@ import AnnouncementsSection from './AnnouncementsSection'
 import GallerySection from './GallerySection'
 import AccountSection from './AccountSection'
 import RequestsSection from './RequestsSection'
+import AboutSection from './AboutSection'
 
 const sections = [
   { id: 'sobre-nosotros', title: 'Sobre nosotros' },
@@ -25,6 +26,10 @@ const LandingPage = () => (
       <HeroSection />
 
       {sections.map(({ id, title }) => {
+        if (id === 'sobre-nosotros') {
+          return <AboutSection key={id} />
+        }
+
         if (id === 'comunicados') {
           return <AnnouncementsSection key={id} />
         }

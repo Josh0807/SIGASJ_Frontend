@@ -1,17 +1,21 @@
 import { ApiError } from './ApiError'
 
-/** URL base del Back-end (sin barra final). Requiere VITE_API_BASE_URL. */
+/** URL base del Back-end (sin barra final). */
 export function getApiBaseUrl(): string {
-  const base = import.meta.env.VITE_API_BASE_URL?.trim()
+  const configured = import.meta.env.VITE_API_BASE_URL
+  // Vacío / ausente en DEV: same-origin + proxy de Vite → /api/...
+  if (configured === undefined || configured.trim() === '') {
+    if (import.meta.env.DEV) {
+      return ''
+    }
 
-  if (!base) {
     throw new ApiError(
       'La URL base de la API no está configurada.',
       'CONFIG',
     )
   }
 
-  return base.replace(/\/$/, '')
+  return configured.trim().replace(/\/$/, '')
 }
 
 /**
