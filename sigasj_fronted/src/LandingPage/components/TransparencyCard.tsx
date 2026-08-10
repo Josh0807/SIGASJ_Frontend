@@ -1,7 +1,11 @@
 import type {
   TransparencyCardProps,
-  TransparencyFileType,
 } from '../Props/TransparencySectionProps'
+import {
+  getTransparencyActionLabel,
+  TRANSPARENCY_FILE_LINK_REL,
+  TRANSPARENCY_FILE_LINK_TARGET,
+} from './transparencyCard.utils'
 
 /**
  * Tarjeta reutilizable de una publicación de transparencia.
@@ -23,12 +27,13 @@ const TransparencyCard = ({
   }
 
   const titleId = `transparency-title-${id}`
-  const actionLabel = getActionLabel(fileType)
+  const actionLabel = getTransparencyActionLabel(fileType)
 
   return (
     <article
       className="transparency-section__card"
       data-transparency-id={id}
+      data-file-type={fileType}
       aria-labelledby={titleId}
     >
       <h3 className="transparency-section__title" id={titleId}>
@@ -41,22 +46,14 @@ const TransparencyCard = ({
         <a
           className="transparency-section__action"
           href={safeFileUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          target={TRANSPARENCY_FILE_LINK_TARGET}
+          rel={TRANSPARENCY_FILE_LINK_REL}
         >
           {actionLabel}
         </a>
       </footer>
     </article>
   )
-}
-
-const getActionLabel = (fileType: TransparencyFileType) => {
-  if (fileType === 'pdf') {
-    return 'Ver documento'
-  }
-
-  return 'Ver imagen'
 }
 
 export default TransparencyCard

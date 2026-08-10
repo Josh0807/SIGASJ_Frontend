@@ -591,6 +591,7 @@ button.announcements-section__more {
 .transparency-section {
   min-width: 0;
   max-width: 100%;
+  overflow-x: clip;
   background: linear-gradient(180deg, #f7fbff 0%, #eef6fc 100%);
 }
 .transparency-section__content {
@@ -673,11 +674,14 @@ button.announcements-section__more {
   overflow: hidden;
   flex: 1 1 auto;
   min-width: 0;
+  max-width: 100%;
+  min-height: calc(1.65em * 4);
   margin: 0;
   color: #516779;
   font-size: 1rem;
   line-height: 1.65;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .transparency-section__card-actions {
   display: flex;
@@ -689,7 +693,10 @@ button.announcements-section__more {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
+  box-sizing: border-box;
   min-height: 48px;
+  max-width: 100%;
   padding: 12px 18px;
   border: 1px solid #1e5a9c;
   border-radius: 10px;
@@ -1437,6 +1444,10 @@ button.announcements-section__more {
   .transparency-section__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gallery-section__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .announcements-section__card { padding: 20px; }
+  .transparency-section__card { padding: 20px; }
+  .transparency-section__title {
+    font-size: clamp(1.05rem, 2.2vw, 1.15rem);
+  }
   .announcements-section__title {
     -webkit-line-clamp: 3;
     line-clamp: 3;
@@ -1464,6 +1475,10 @@ button.announcements-section__more {
   .announcements-section__grid { grid-template-columns: 1fr; }
   .transparency-section__grid { grid-template-columns: 1fr; }
   .gallery-section__grid { grid-template-columns: 1fr; }
+  .transparency-section__action {
+    width: 100%;
+    align-self: stretch;
+  }
   .receipt-payment__cards { grid-template-columns: 1fr; }
   .receipt-payment__card--ventanilla { grid-column: auto; }
   .contact-section__grid { grid-template-columns: 1fr; }
