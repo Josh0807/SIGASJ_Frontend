@@ -1,22 +1,29 @@
 import GalleryCard from './GalleryCard'
 import type { GallerySectionProps } from '../Props/GallerySectionProps'
 import { GALLERY_SECTION_ID } from '../config/landingAnchors'
-import { galleryMocks } from '../data/galleryMocks'
+import { usePublicGallery } from '../hooks/usePublicGallery'
 
 /**
  * Sección pública de la galería fotográfica.
- * Por ahora usa una colección temporal para validar GalleryCard.
- * El consumo del API se retoma en la tarea de integración correspondiente.
+ * Sin `photos` en props consulta GET /api/public/galeria.
+ * Con `photos` (modo controlado) no llama al API.
  */
 const GallerySection = ({
   id = GALLERY_SECTION_ID,
   title = 'Galería',
   description =
     'Conoce imágenes de proyectos, obras y actividades realizadas por la ASADA San Juan de Santa Cruz.',
-  photos = galleryMocks,
+  photos: photosProp,
   emptyMessage = 'Próximamente publicaremos fotografías de la comunidad.',
+  errorMessage = 'No fue posible cargar la galería. Intenta de nuevo más tarde.',
 }: GallerySectionProps) => {
+  const fetchFromApi = photosProp === undefined
+  const { status, photos: fetched, retry } = usePublicGallery(fetchFromApi)
+
+  const photos = photosProp ?? fetched
   const hasPhotos = photos.length > 0
+  const showLoading = fetchFromApi && status === 'loading'
+  const showError = fetchFromApi && status === 'error'
 
   return (
     <section
@@ -31,7 +38,18 @@ const GallerySection = ({
           <p>{description}</p>
         </header>
 
-        {hasPhotos ? (
+        {showLoading ? (
+          <p className="gallery-section__empty" role="status">
+            Cargando galería…
+          </p>
+        ) : showError ? (
+          <div className="gallery-section__empty" role="alert">
+            <p>{errorMessage}</p>
+            <button type="button" onClick={retry}>
+              Reintentar
+            </button>
+          </div>
+        ) : hasPhotos ? (
           <div className="gallery-section__grid">
             {photos.map((photo) => (
               <GalleryCard
