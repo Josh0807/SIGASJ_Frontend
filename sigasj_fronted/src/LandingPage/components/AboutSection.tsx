@@ -27,12 +27,12 @@ const AboutSection = () => (
 
       <div className="about-section__grid">
         <article className="about-section__card">
-          <h3>Misión</h3>
+          <h3>Visión</h3>
           <p>{PENDING_INSTITUTIONAL_INFORMATION}</p>
         </article>
 
         <article className="about-section__card">
-          <h3>Visión</h3>
+          <h3>Misión</h3>
           <p>{PENDING_INSTITUTIONAL_INFORMATION}</p>
         </article>
 
