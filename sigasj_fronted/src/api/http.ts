@@ -1,4 +1,5 @@
 import { ApiError } from '../api/ApiError'
+import { extractHttpErrorMessage } from './extractHttpErrorMessage'
 import { getApiBaseUrl } from './config'
 
 type RequestOptions = {
@@ -32,6 +33,25 @@ function buildHeaders(token?: string | null, contentType?: string): HeadersInit 
   }
 
   return headers
+}
+
+async function throwHttpError(
+  response: Response,
+  fallbackMessage: string,
+): Promise<never> {
+  let message = fallbackMessage
+
+  try {
+    const text = await response.text()
+    const extracted = extractHttpErrorMessage(text)
+    if (extracted) {
+      message = extracted
+    }
+  } catch {
+    // Mantener el mensaje genérico si no se puede leer el cuerpo.
+  }
+
+  throw new ApiError(message, 'HTTP', response.status)
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
@@ -83,10 +103,9 @@ export async function fetchJson<T>(
   })
 
   if (!response.ok) {
-    throw new ApiError(
+    await throwHttpError(
+      response,
       'El servidor respondió con un error al consultar los datos.',
-      'HTTP',
-      response.status,
     )
   }
 
@@ -106,10 +125,9 @@ export async function requestJson<T>(
   })
 
   if (!response.ok) {
-    throw new ApiError(
+    await throwHttpError(
+      response,
       'El servidor respondió con un error al procesar la solicitud.',
-      'HTTP',
-      response.status,
     )
   }
 
@@ -129,10 +147,9 @@ export async function requestFormData<T>(
   })
 
   if (!response.ok) {
-    throw new ApiError(
+    await throwHttpError(
+      response,
       'El servidor respondió con un error al procesar la solicitud.',
-      'HTTP',
-      response.status,
     )
   }
 
@@ -152,10 +169,9 @@ export async function requestVoid(
   })
 
   if (!response.ok) {
-    throw new ApiError(
+    await throwHttpError(
+      response,
       'El servidor respondió con un error al procesar la solicitud.',
-      'HTTP',
-      response.status,
     )
   }
 }

@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { ApiError } from '../../api/ApiError'
 import type { TransparenciaFormValues } from './types'
 import {
   describeTransparenciaFile,
@@ -113,8 +114,12 @@ const TransparenciaAdminForm = ({
         },
         file,
       )
-    } catch {
-      setFormError('No fue posible guardar la publicación.')
+    } catch (error) {
+      setFormError(
+        error instanceof ApiError
+          ? error.message
+          : 'No fue posible guardar la publicación.',
+      )
     }
   }
 

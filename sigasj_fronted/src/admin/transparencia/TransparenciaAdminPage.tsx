@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { ApiError } from '../../api/ApiError'
 import {
   createAdminTransparenciaPublication,
   deleteAdminTransparenciaPublication,
@@ -23,6 +24,14 @@ type LoadStatus = 'loading' | 'success' | 'error'
 const formatFileTypeLabel = (tipoArchivo: AdminTransparenciaPublication['tipoArchivo']) =>
   tipoArchivo.toUpperCase()
 
+const resolveActionError = (error: unknown, fallback: string) => {
+  if (error instanceof ApiError) {
+    return error.message
+  }
+
+  return fallback
+}
+
 const TransparenciaAdminPage = () => {
   const navigate = useNavigate()
   const token = getAccessToken()
@@ -40,6 +49,12 @@ const TransparenciaAdminPage = () => {
     useState<AdminTransparenciaPublication | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null)
+
+  const showSuccess = (message: string) => {
+    setActionSuccess(message)
+    setActionError(null)
+  }
 
   const filters = useMemo(
     () => ({
@@ -78,11 +93,13 @@ const TransparenciaAdminPage = () => {
   const openCreateForm = () => {
     setEditingPublication(null)
     setFormMode('create')
+    setActionSuccess(null)
   }
 
   const openEditForm = (publication: AdminTransparenciaPublication) => {
     setEditingPublication(publication)
     setFormMode('edit')
+    setActionSuccess(null)
   }
 
   const closeForm = () => {
@@ -127,6 +144,11 @@ const TransparenciaAdminPage = () => {
       }
 
       closeForm()
+      showSuccess(
+        formMode === 'create'
+          ? 'Publicación registrada correctamente.'
+          : 'Publicación actualizada correctamente.',
+      )
       await loadPublications()
     } finally {
       setSubmitting(false)
@@ -142,9 +164,15 @@ const TransparenciaAdminPage = () => {
 
     try {
       await updateAdminTransparenciaEstado(token, publication.id, !publication.activo)
+      showSuccess('Estado de la publicación actualizado.')
       await loadPublications()
-    } catch {
-      setActionError('No fue posible cambiar el estado de la publicación.')
+    } catch (error) {
+      setActionError(
+        resolveActionError(
+          error,
+          'No fue posible cambiar el estado de la publicación.',
+        ),
+      )
     }
   }
 
@@ -165,9 +193,12 @@ const TransparenciaAdminPage = () => {
 
     try {
       await deleteAdminTransparenciaPublication(token, publication.id)
+      showSuccess('Publicación eliminada correctamente.')
       await loadPublications()
-    } catch {
-      setActionError('No fue posible eliminar la publicación.')
+    } catch (error) {
+      setActionError(
+        resolveActionError(error, 'No fue posible eliminar la publicación.'),
+      )
     }
   }
 
@@ -194,9 +225,12 @@ const TransparenciaAdminPage = () => {
 
     try {
       await reorderAdminTransparenciaPublications(token, payload)
+      showSuccess('Orden de publicaciones actualizado.')
       await loadPublications()
-    } catch {
-      setActionError('No fue posible reorganizar las publicaciones.')
+    } catch (error) {
+      setActionError(
+        resolveActionError(error, 'No fue posible reorganizar las publicaciones.'),
+      )
     }
   }
 
@@ -273,6 +307,15 @@ const TransparenciaAdminPage = () => {
             </select>
           </label>
         </section>
+
+        {actionSuccess ? (
+          <p
+            className="gallery-admin__banner gallery-admin__banner--success"
+            role="status"
+          >
+            {actionSuccess}
+          </p>
+        ) : null}
 
         {actionError ? (
           <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">

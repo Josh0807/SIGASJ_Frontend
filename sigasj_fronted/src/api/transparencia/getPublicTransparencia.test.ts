@@ -96,6 +96,42 @@ describe('getPublicTransparencia', () => {
     expect(result.publications[0]?.fileType).toBe('jpg')
   })
 
+  it('conserva el orden recibido del backend', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            data: [
+              {
+                id: 1,
+                nombre: 'Primera',
+                descripcion: 'A',
+                archivoUrl: '/uploads/transparencia/a.pdf',
+                tipo: 'pdf',
+              },
+              {
+                id: 2,
+                nombre: 'Segunda',
+                descripcion: 'B',
+                archivoUrl: '/uploads/transparencia/b.jpg',
+                tipo: 'jpg',
+              },
+            ],
+            total: 2,
+          }),
+      }),
+    )
+
+    const result = await getPublicTransparencia()
+
+    expect(result.publications.map((item) => item.name)).toEqual([
+      'Primera',
+      'Segunda',
+    ])
+  })
+
   it('lanza ApiError cuando la respuesta HTTP falla', async () => {
     vi.stubGlobal(
       'fetch',

@@ -1826,6 +1826,10 @@ button.announcements-section__more {
   border-radius: 10px;
   background: #fff1f1;
 }
+.gallery-admin__banner--success {
+  color: #136734;
+  background: #edf9f0;
+}
 .gallery-admin__empty {
   padding: 28px 24px;
   border: 1px dashed #8ebce0;

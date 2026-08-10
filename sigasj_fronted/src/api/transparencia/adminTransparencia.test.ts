@@ -1,9 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ApiError } from '../ApiError'
 import {
+  createAdminTransparenciaPublication,
   deleteAdminTransparenciaPublication,
   listAdminTransparenciaPublications,
   reorderAdminTransparenciaPublications,
+  replaceAdminTransparenciaFile,
   updateAdminTransparenciaEstado,
+  updateAdminTransparenciaPublication,
 } from './adminTransparencia'
 
 const token = 'test-token'
@@ -149,5 +153,134 @@ describe('adminTransparencia API', () => {
         method: 'DELETE',
       }),
     )
+  })
+
+  it('registra una publicación con multipart/form-data y token', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            idPublicacionTransparencia: 5,
+            nombre: 'Informe nuevo',
+            descripcionBreve: 'Resumen',
+            archivoUrl: '/uploads/transparencia/nuevo.pdf',
+            tipoArchivo: 'pdf',
+            ordenVisualizacion: 0,
+            activo: true,
+          }),
+      }),
+    )
+
+    const formData = new FormData()
+    formData.set('nombre', 'Informe nuevo')
+    formData.set('descripcionBreve', 'Resumen')
+    formData.set('archivo', new File(['pdf'], 'nuevo.pdf', { type: 'application/pdf' }))
+
+    const publication = await createAdminTransparenciaPublication(token, formData)
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/admin/transparencia',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: `Bearer ${token}`,
+        }),
+        body: formData,
+      }),
+    )
+    expect(publication.nombre).toBe('Informe nuevo')
+  })
+
+  it('actualiza nombre y descripción con PUT autenticado', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            idPublicacionTransparencia: 6,
+            nombre: 'Informe editado',
+            descripcionBreve: 'Nuevo resumen',
+            archivoUrl: '/uploads/transparencia/informe.pdf',
+            tipoArchivo: 'pdf',
+            ordenVisualizacion: 1,
+            activo: true,
+          }),
+      }),
+    )
+
+    const publication = await updateAdminTransparenciaPublication(token, 6, {
+      nombre: 'Informe editado',
+      descripcionBreve: 'Nuevo resumen',
+    })
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/admin/transparencia/6',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({
+          nombre: 'Informe editado',
+          descripcionBreve: 'Nuevo resumen',
+        }),
+      }),
+    )
+    expect(publication.descripcionBreve).toBe('Nuevo resumen')
+  })
+
+  it('reemplaza el archivo con PATCH multipart', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            idPublicacionTransparencia: 7,
+            nombre: 'Foto',
+            descripcionBreve: 'Imagen',
+            archivoUrl: '/uploads/transparencia/nueva.jpg',
+            tipoArchivo: 'jpg',
+            ordenVisualizacion: 0,
+            activo: true,
+          }),
+      }),
+    )
+
+    const formData = new FormData()
+    formData.set('archivo', new File(['img'], 'nueva.jpg', { type: 'image/jpeg' }))
+
+    await replaceAdminTransparenciaFile(token, 7, formData)
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/admin/transparencia/7/archivo',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: formData,
+      }),
+    )
+  })
+
+  it('propaga el mensaje de error del backend', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        text: async () =>
+          JSON.stringify({
+            statusCode: 400,
+            message: 'Debe enviar un archivo.',
+          }),
+      }),
+    )
+
+    await expect(
+      createAdminTransparenciaPublication(token, new FormData()),
+    ).rejects.toMatchObject({
+      message: 'Debe enviar un archivo.',
+      code: 'HTTP',
+      status: 400,
+    } satisfies Partial<ApiError>)
   })
 })
