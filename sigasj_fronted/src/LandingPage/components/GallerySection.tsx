@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import GalleryCard from './GalleryCard'
+import GalleryLightbox from './GalleryLightbox'
 import type { GallerySectionProps } from '../Props/GallerySectionProps'
 import { GALLERY_SECTION_ID } from '../config/landingAnchors'
 import { usePublicGallery } from '../hooks/usePublicGallery'
@@ -17,6 +19,7 @@ const GallerySection = ({
   emptyMessage = 'Próximamente publicaremos fotografías de la comunidad.',
   errorMessage = 'No fue posible cargar la galería. Intenta de nuevo más tarde.',
 }: GallerySectionProps) => {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const fetchFromApi = photosProp === undefined
   const { status, photos: fetched, retry } = usePublicGallery(fetchFromApi)
 
@@ -51,7 +54,7 @@ const GallerySection = ({
           </div>
         ) : hasPhotos ? (
           <div className="gallery-section__grid">
-            {photos.map((photo) => (
+            {photos.map((photo, index) => (
               <GalleryCard
                 key={photo.id}
                 id={photo.id}
@@ -59,6 +62,7 @@ const GallerySection = ({
                 altText={photo.altText}
                 title={photo.title}
                 description={photo.description}
+                onExpand={() => setLightboxIndex(index)}
               />
             ))}
           </div>
@@ -68,6 +72,15 @@ const GallerySection = ({
           </p>
         )}
       </div>
+
+      {lightboxIndex !== null && hasPhotos ? (
+        <GalleryLightbox
+          photos={photos}
+          activeIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onNavigate={setLightboxIndex}
+        />
+      ) : null}
     </section>
   )
 }

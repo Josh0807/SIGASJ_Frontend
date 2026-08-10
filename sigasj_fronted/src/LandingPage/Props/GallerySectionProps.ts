@@ -9,7 +9,9 @@ export type GalleryPhoto = {
 export type GalleryCardProps = Pick<
   GalleryPhoto,
   'id' | 'imageUrl' | 'altText' | 'title' | 'description'
->
+> & {
+  onExpand?: () => void
+}
 
 export type GallerySectionProps = {
   id?: string

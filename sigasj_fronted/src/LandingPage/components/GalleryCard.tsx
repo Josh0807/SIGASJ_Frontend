@@ -10,6 +10,7 @@ const GalleryCard = ({
   altText,
   title,
   description,
+  onExpand,
 }: GalleryCardProps) => {
   const safeImageUrl = asPublicAssetUrl(imageUrl)
   const safeAltText = asNonEmptyString(altText) ?? 'Fotografía de la galería'
@@ -21,21 +22,43 @@ const GalleryCard = ({
   }
 
   const titleId = `gallery-photo-title-${id}`
+  const expandLabel = safeTitle
+    ? `Ver imagen ampliada: ${safeTitle}`
+    : `Ver imagen ampliada: ${safeAltText}`
 
   return (
     <article
       className="gallery-section__card"
       aria-labelledby={safeTitle ? titleId : undefined}
     >
-      <div className="gallery-section__media">
-        <img
-          className="gallery-section__image"
-          src={safeImageUrl}
-          alt={safeAltText}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      {onExpand ? (
+        <button
+          type="button"
+          className="gallery-section__open"
+          onClick={onExpand}
+          aria-label={expandLabel}
+        >
+          <div className="gallery-section__media">
+            <img
+              className="gallery-section__image"
+              src={safeImageUrl}
+              alt={safeAltText}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </button>
+      ) : (
+        <div className="gallery-section__media">
+          <img
+            className="gallery-section__image"
+            src={safeImageUrl}
+            alt={safeAltText}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      )}
 
       {(safeTitle || safeDescription) && (
         <div className="gallery-section__caption">
