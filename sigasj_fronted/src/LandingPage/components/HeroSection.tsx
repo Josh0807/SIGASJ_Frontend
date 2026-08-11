@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import gotinLogo from '../../assets/Logo Gotin sin fondo.png'
 import type { HeroSectionProps } from '../Props/HeroSectionProps'
 import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
@@ -12,8 +11,6 @@ const HeroSection = ({
   description = 'Una plataforma diseñada para acercar los servicios de la ASADA San Juan a nuestra comunidad, facilitando el acceso a información, comunicados y servicios importantes.',
   imageSrc = gotinLogo,
   imageAlt = 'Gotín, mascota de la ASADA San Juan de Santa Cruz relacionada con el servicio de agua potable',
-  loginLabel = 'Iniciar sesión',
-  loginHref = '/login',
   reportLabel = 'Reportar una avería',
   reportHref = REPORT_FAULTS_HREF,
   announcementsLabel = 'Ver comunicados',
@@ -27,9 +24,6 @@ const HeroSection = ({
         <p className="hero__description">{description}</p>
 
         <nav className="hero__actions" aria-label="Acciones principales">
-          <Link className="hero__button hero__button--primary" to={loginHref}>
-            {loginLabel}
-          </Link>
           <a className="hero__button hero__button--secondary" href={reportHref}>
             {reportLabel}
           </a>
