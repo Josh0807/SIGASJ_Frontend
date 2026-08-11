@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import GalleryAdminPage from '../admin/galeria/GalleryAdminPage'
+import GalleryAdminPage from '../features/galeria/pages/GalleryAdminPage'
 import PrivateModulePlaceholder from './PrivateModulePlaceholder'
 
 export type PrivateRouteDefinition = {
