@@ -34,9 +34,25 @@ export function getPublicGalleryPath(): string {
   return path.startsWith('/') ? path : `/${path}`
 }
 
+/** Ruta pública de transparencia relativa a la base. */
+export function getPublicTransparenciaPath(): string {
+  const path =
+    import.meta.env.VITE_PUBLIC_TRANSPARENCIA_PATH?.trim() ||
+    '/api/public/transparencia'
+  return path.startsWith('/') ? path : `/${path}`
+}
+
 /** Ruta administrativa de la galería relativa a la base. */
 export function getAdminGalleryPath(): string {
   const path =
     import.meta.env.VITE_ADMIN_GALLERY_PATH?.trim() || '/api/admin/galeria'
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+/** Ruta administrativa de transparencia relativa a la base. */
+export function getAdminTransparenciaPath(): string {
+  const path =
+    import.meta.env.VITE_ADMIN_TRANSPARENCIA_PATH?.trim() ||
+    '/api/admin/transparencia'
   return path.startsWith('/') ? path : `/${path}`
 }
