@@ -261,6 +261,29 @@ describe('adminTransparencia API', () => {
     )
   })
 
+  it('propaga error 403 cuando el usuario no tiene permisos', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        text: async () =>
+          JSON.stringify({
+            statusCode: 403,
+            message: 'Forbidden resource',
+          }),
+      }),
+    )
+
+    await expect(
+      listAdminTransparenciaPublications(token),
+    ).rejects.toMatchObject({
+      message: 'Forbidden resource',
+      code: 'HTTP',
+      status: 403,
+    } satisfies Partial<ApiError>)
+  })
+
   it('propaga el mensaje de error del backend', async () => {
     vi.stubGlobal(
       'fetch',
