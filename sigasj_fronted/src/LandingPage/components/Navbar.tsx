@@ -1,5 +1,5 @@
 import type { NavbarProps } from '../Props/NavbarProps'
-import { ANNOUNCEMENTS_HREF, GALLERY_HREF } from '../config/landingAnchors'
+import { GALLERY_HREF } from '../config/landingAnchors'
 
 type NavigationItem = {
   label: string
@@ -8,12 +8,10 @@ type NavigationItem = {
 
 const navigationItems: NavigationItem[] = [
   { label: 'Inicio', href: '#inicio' },
-  { label: 'Recibos y pagos', href: '#pagos' },
   { label: 'Sobre nosotros', href: '#sobre-nosotros' },
-  { label: 'Comunicados', href: ANNOUNCEMENTS_HREF },
   { label: 'Solicitudes', href: '#solicitudes-servicio' },
-  { label: 'Reporte de averías', href: '#reporte-averias' },
   { label: 'Galería', href: GALLERY_HREF },
+  { label: 'Recibos y pagos', href: '#pagos' },
   { label: 'Contacto', href: '#contacto' },
 ]
 
