@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import type { ContactIconProps, ContactIconType } from '../props/ContactIconProps'
-import type { ContactSectionProps } from '../props/ContactSectionProps'
+import type { ContactIconProps, ContactIconType } from '../Props/ContactIconProps'
+import type { ContactSectionProps } from '../Props/ContactSectionProps'
 
 const iconPaths: Record<ContactIconType, ReactNode> = {
   phone: <path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24c1.1.36 2.27.54 3.46.54A1.14 1.14 0 0 1 21 16.64v3.22A1.14 1.14 0 0 1 19.86 21C10.55 21 3 13.45 3 4.14A1.14 1.14 0 0 1 4.14 3h3.22A1.14 1.14 0 0 1 8.5 4.14c0 1.2.18 2.36.54 3.46a1 1 0 0 1-.24 1Z" />,

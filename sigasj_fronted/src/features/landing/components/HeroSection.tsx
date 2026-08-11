@@ -1,5 +1,5 @@
-import gotinLogo from '../../../assets/Logo Gotin sin fondo.png'
-import type { HeroSectionProps } from '../props/HeroSectionProps'
+﻿import gotinLogo from '../../../assets/Logo Gotin sin fondo.png'
+import type { HeroSectionProps } from '../Props/HeroSectionProps'
 import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
 
 /** Destino público actual del reporte de averías (sección en la Landing Page). */

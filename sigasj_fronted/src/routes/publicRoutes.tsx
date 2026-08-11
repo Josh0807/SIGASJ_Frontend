@@ -1,14 +1,17 @@
 import type { ReactElement } from 'react'
-import LoginPage from '../features/auth/pages/LoginPage'
+import LoginPage from '../features/auth/LoginPage'
+import LandingPage from '../features/landing/components/LandingPage'
 import { PUBLIC_SERVICE_REQUEST_ROUTES } from '../features/landing/config/serviceRequestRoutes'
-import LandingPage from '../features/landing/pages/LandingPage'
-import PublicFormPlaceholder from './PublicFormPlaceholder'
 
 export type PublicRouteDefinition = {
   path: string
   element: ReactElement
   label: string
 }
+
+const PublicFormPlaceholder = ({ label }: { label: string }) => (
+  <main aria-label={label} />
+)
 
 export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
   {

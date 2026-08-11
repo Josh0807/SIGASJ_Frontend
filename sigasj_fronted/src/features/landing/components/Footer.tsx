@@ -1,4 +1,4 @@
-import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
+﻿import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()

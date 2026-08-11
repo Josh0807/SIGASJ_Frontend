@@ -1,7 +1,6 @@
-import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
 import { ApiError } from './ApiError'
-import { getApiBaseUrl } from './config'
 import { extractHttpErrorMessage } from './extractHttpErrorMessage'
+import { getApiBaseUrl } from './config'
 
 type RequestOptions = {
   method?: string
@@ -16,53 +15,74 @@ type FormDataRequestOptions = {
   signal?: AbortSignal
 }
 
-function messageFromAxiosData(data: unknown): string | null {
-  if (typeof data === 'string') {
-    return extractHttpErrorMessage(data)
-  }
-
-  if (data && typeof data === 'object') {
-    return extractHttpErrorMessage(JSON.stringify(data))
-  }
-
-  return null
+function buildUrl(path: string): string {
+  return `${getApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
 }
 
-function isCanceled(error: unknown): boolean {
-  return axios.isCancel(error) || (error instanceof AxiosError && error.code === 'ERR_CANCELED')
-}
-
-function httpErrorMessage(kind: 'query' | 'command'): string {
-  return kind === 'query'
-    ? 'El servidor respondió con un error al consultar los datos.'
-    : 'El servidor respondió con un error al procesar la solicitud.'
-}
-
-function toApiError(error: unknown, kind: 'query' | 'command'): never {
-  if (isCanceled(error)) {
-    throw error
+function buildHeaders(token?: string | null, contentType?: string): HeadersInit {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
   }
 
-  if (error instanceof ApiError) {
-    throw error
+  if (contentType) {
+    headers['Content-Type'] = contentType
   }
 
-  if (error instanceof AxiosError) {
-    if (error.response) {
-      const extracted = messageFromAxiosData(error.response.data)
-      throw new ApiError(
-        extracted ?? httpErrorMessage(kind),
-        'HTTP',
-        error.response.status,
-      )
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  return headers
+}
+
+async function throwHttpError(
+  response: Response,
+  fallbackMessage: string,
+): Promise<never> {
+  let message = fallbackMessage
+
+  try {
+    const text = await response.text()
+    const extracted = extractHttpErrorMessage(text)
+    if (extracted) {
+      message = extracted
     }
+  } catch {
+    // Mantener el mensaje genérico si no se puede leer el cuerpo.
+  }
 
-    const message = error.message.toLowerCase()
-    if (message.includes('json') || error.code === 'ERR_BAD_RESPONSE') {
-      throw new ApiError(
-        'La respuesta del servidor no tiene un formato válido.',
-        'PARSE',
-      )
+  throw new ApiError(message, 'HTTP', response.status)
+}
+
+async function parseResponse<T>(response: Response): Promise<T> {
+  if (response.status === 204) {
+    return undefined as T
+  }
+
+  const text = await response.text()
+  if (!text) {
+    return undefined as T
+  }
+
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    throw new ApiError(
+      'La respuesta del servidor no tiene un formato válido.',
+      'PARSE',
+    )
+  }
+}
+
+async function request(
+  path: string,
+  init: RequestInit,
+): Promise<Response> {
+  try {
+    return await fetch(buildUrl(path), init)
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
     }
 
     throw new ApiError(
@@ -70,77 +90,48 @@ function toApiError(error: unknown, kind: 'query' | 'command'): never {
       'NETWORK',
     )
   }
-
-  throw new ApiError(
-    'No fue posible comunicarse con el servidor.',
-    'NETWORK',
-  )
-}
-
-function buildConfig(options: {
-  method?: string
-  token?: string | null
-  signal?: AbortSignal
-  data?: unknown
-  contentType?: string
-}): AxiosRequestConfig {
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-  }
-
-  if (options.contentType) {
-    headers['Content-Type'] = options.contentType
-  }
-
-  if (options.token) {
-    headers.Authorization = `Bearer ${options.token}`
-  }
-
-  return {
-    baseURL: getApiBaseUrl(),
-    method: options.method ?? 'GET',
-    headers,
-    data: options.data,
-    signal: options.signal,
-  }
 }
 
 export async function fetchJson<T>(
   path: string,
   options: { signal?: AbortSignal } = {},
 ): Promise<T> {
-  try {
-    const response = await axios.request<T>({
-      ...buildConfig({ method: 'GET', signal: options.signal }),
-      url: path,
-    })
+  const response = await request(path, {
+    method: 'GET',
+    headers: buildHeaders(),
+    signal: options.signal,
+  })
 
-    return response.data
-  } catch (error) {
-    toApiError(error, 'query')
+  if (!response.ok) {
+    await throwHttpError(
+      response,
+      'El servidor respondió con un error al consultar los datos.',
+    )
   }
+
+  return parseResponse<T>(response)
 }
 
 export async function requestJson<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  try {
-    const response = await axios.request<T>({
-      ...buildConfig({
-        method: options.method ?? 'GET',
-        token: options.token,
-        signal: options.signal,
-        data: options.body,
-        contentType: 'application/json',
-      }),
-      url: path,
-    })
+  const response = await request(path, {
+    method: options.method ?? 'GET',
+    headers: buildHeaders(options.token, 'application/json'),
+    body:
+      options.body === undefined ? undefined : JSON.stringify(options.body),
+    signal: options.signal,
+  })
 
-    return response.data
-  } catch (error) {
-    toApiError(error, 'command')
+  if (!response.ok) {
+    await throwHttpError(
+      response,
+      'El servidor respondió con un error al procesar la solicitud.',
+    )
   }
+
+  return parseResponse<T>(response)
 }
 
 export async function requestFormData<T>(
@@ -148,39 +139,39 @@ export async function requestFormData<T>(
   formData: FormData,
   options: FormDataRequestOptions = {},
 ): Promise<T> {
-  try {
-    const response = await axios.request<T>({
-      ...buildConfig({
-        method: options.method ?? 'POST',
-        token: options.token,
-        signal: options.signal,
-        data: formData,
-      }),
-      url: path,
-    })
+  const response = await request(path, {
+    method: options.method ?? 'POST',
+    headers: buildHeaders(options.token),
+    body: formData,
+    signal: options.signal,
+  })
 
-    return response.data
-  } catch (error) {
-    toApiError(error, 'command')
+  if (!response.ok) {
+    await throwHttpError(
+      response,
+      'El servidor respondió con un error al procesar la solicitud.',
+    )
   }
+
+  return parseResponse<T>(response)
 }
 
 export async function requestVoid(
   path: string,
   options: RequestOptions = {},
 ): Promise<void> {
-  try {
-    await axios.request({
-      ...buildConfig({
-        method: options.method ?? 'DELETE',
-        token: options.token,
-        signal: options.signal,
-        data: options.body,
-        contentType: options.body === undefined ? undefined : 'application/json',
-      }),
-      url: path,
-    })
-  } catch (error) {
-    toApiError(error, 'command')
+  const response = await request(path, {
+    method: options.method ?? 'DELETE',
+    headers: buildHeaders(options.token, 'application/json'),
+    body:
+      options.body === undefined ? undefined : JSON.stringify(options.body),
+    signal: options.signal,
+  })
+
+  if (!response.ok) {
+    await throwHttpError(
+      response,
+      'El servidor respondió con un error al procesar la solicitud.',
+    )
   }
 }

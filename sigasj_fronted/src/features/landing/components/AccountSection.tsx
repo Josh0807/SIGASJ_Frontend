@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import type { AccountSectionProps } from '../props/AccountSectionProps'
+import type { AccountSectionProps } from '../Props/AccountSectionProps'
 
 const AccountSection = ({ formHref = '/reportar-averia' }: AccountSectionProps) => (
   <section

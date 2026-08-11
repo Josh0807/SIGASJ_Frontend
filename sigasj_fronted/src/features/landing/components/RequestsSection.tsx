@@ -4,7 +4,7 @@ import type {
   RequestService,
   RequestServiceIcon,
   RequestsSectionProps,
-} from '../props/RequestsSectionProps'
+} from '../Props/RequestsSectionProps'
 import { SERVICE_REQUEST_ROUTES } from '../config/serviceRequestRoutes'
 
 const defaultServices: RequestService[] = [

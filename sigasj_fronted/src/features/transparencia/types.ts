@@ -1,34 +1,9 @@
-import type { TransparencyFileType } from '../landing/props/TransparencySectionProps'
+export type TransparencyFileType = 'pdf' | 'jpg' | 'jpeg' | 'png'
 
-export type AdminTransparenciaPublication = {
-  id: number
-  nombre: string
-  descripcionBreve: string
-  archivoUrl: string
-  tipoArchivo: TransparencyFileType
-  ordenVisualizacion: number
-  activo: boolean
+export type TransparencyPublication = {
+  id: string
+  name: string
+  description: string
+  fileUrl: string
+  fileType: TransparencyFileType
 }
-
-export type AdminTransparenciaFilters = {
-  nombre?: string
-  activo?: boolean
-}
-
-export type TransparenciaFormValues = {
-  nombre: string
-  descripcionBreve: string
-  ordenVisualizacion: number
-  activo: boolean
-}
-
-export const emptyTransparenciaFormValues = (): TransparenciaFormValues => ({
-  nombre: '',
-  descripcionBreve: '',
-  ordenVisualizacion: 0,
-  activo: true,
-})
-
-export const isTransparenciaImageType = (
-  fileType: TransparencyFileType,
-): boolean => fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png'

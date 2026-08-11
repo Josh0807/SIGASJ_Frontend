@@ -1,12 +1,12 @@
 import type { ComponentType } from 'react'
-import AnnouncementsSection from '../../comunicados/components/AnnouncementsSection'
-import GallerySection from '../../galeria/components/GallerySection'
 import AboutSection from '../components/AboutSection'
+import AnnouncementsSection from '../../announcements/public/AnnouncementsSection'
+import GallerySection from '../../gallery/public/GallerySection'
 import LandingContactBlock from '../components/LandingContactBlock'
 import ProjectsPreview from '../components/ProjectsPreview'
 import ReportFaultSection from '../components/ReportFaultSection'
 import RequestsSection from '../components/RequestsSection'
-import TransparencySection from '../components/TransparencySection'
+import TransparencySection from '../../transparencia/public/TransparencySection'
 
 export type LandingSectionDefinition = {
   id: string

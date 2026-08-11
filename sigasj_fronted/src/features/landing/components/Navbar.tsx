@@ -1,9 +1,5 @@
-import type { NavbarProps } from '../props/NavbarProps'
-import {
-  ANNOUNCEMENTS_HREF,
-  GALLERY_HREF,
-  TRANSPARENCY_HREF,
-} from '../config/landingAnchors'
+import type { NavbarProps } from '../Props/NavbarProps'
+import { ANNOUNCEMENTS_HREF, GALLERY_HREF, TRANSPARENCY_HREF } from '../config/landingAnchors'
 
 type NavigationItem = {
   label: string
