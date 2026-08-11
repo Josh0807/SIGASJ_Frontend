@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import ProtectedRoute from '../auth/ProtectedRoute'
+import ProtectedRoute from '../features/auth/ProtectedRoute'
 import { PRIVATE_ROUTES } from './privateRoutes'
 import { PUBLIC_ROUTES } from './publicRoutes'
 
