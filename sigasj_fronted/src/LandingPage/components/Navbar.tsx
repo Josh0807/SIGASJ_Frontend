@@ -1,5 +1,4 @@
 import type { NavbarProps } from '../Props/NavbarProps'
-import { GALLERY_HREF } from '../config/landingAnchors'
 import { ANNOUNCEMENTS_HREF, GALLERY_HREF, TRANSPARENCY_HREF } from '../config/landingAnchors'
 
 type NavigationItem = {
