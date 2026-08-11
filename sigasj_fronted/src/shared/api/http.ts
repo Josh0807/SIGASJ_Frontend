@@ -1,6 +1,7 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
 import { ApiError } from './ApiError'
 import { getApiBaseUrl } from './config'
+import { extractHttpErrorMessage } from './extractHttpErrorMessage'
 
 type RequestOptions = {
   method?: string
@@ -13,6 +14,18 @@ type FormDataRequestOptions = {
   method?: string
   token?: string | null
   signal?: AbortSignal
+}
+
+function messageFromAxiosData(data: unknown): string | null {
+  if (typeof data === 'string') {
+    return extractHttpErrorMessage(data)
+  }
+
+  if (data && typeof data === 'object') {
+    return extractHttpErrorMessage(JSON.stringify(data))
+  }
+
+  return null
 }
 
 function isCanceled(error: unknown): boolean {
@@ -36,7 +49,12 @@ function toApiError(error: unknown, kind: 'query' | 'command'): never {
 
   if (error instanceof AxiosError) {
     if (error.response) {
-      throw new ApiError(httpErrorMessage(kind), 'HTTP', error.response.status)
+      const extracted = messageFromAxiosData(error.response.data)
+      throw new ApiError(
+        extracted ?? httpErrorMessage(kind),
+        'HTTP',
+        error.response.status,
+      )
     }
 
     const message = error.message.toLowerCase()

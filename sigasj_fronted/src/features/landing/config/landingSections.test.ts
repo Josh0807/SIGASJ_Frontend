@@ -6,6 +6,7 @@ describe('landingSections', () => {
     expect(LANDING_SECTION_IDS).toEqual([
       'sobre-nosotros',
       'comunicados',
+      'transparencia',
       'solicitudes-servicio',
       'reporte-averias',
       'proyectos',

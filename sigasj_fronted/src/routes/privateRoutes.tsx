@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import GalleryAdminPage from '../features/galeria/pages/GalleryAdminPage'
+import TransparenciaAdminPage from '../features/transparencia/pages/TransparenciaAdminPage'
 import PrivateModulePlaceholder from './PrivateModulePlaceholder'
 
 export type PrivateRouteDefinition = {
@@ -69,6 +70,11 @@ export const PRIVATE_ROUTES: PrivateRouteDefinition[] = [
     path: '/admin/galeria',
     title: 'Galería de fotografías',
     element: <GalleryAdminPage />,
+  },
+  {
+    path: '/admin/transparencia',
+    title: 'Transparencia y calidad del agua',
+    element: <TransparenciaAdminPage />,
   },
 ]
 

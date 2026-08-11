@@ -209,6 +209,9 @@ const GalleryAdminPage = () => {
             <Link className="gallery-admin__link" to="/">
               Ver sitio público
             </Link>
+            <Link className="gallery-admin__link" to="/admin/transparencia">
+              Ir a transparencia
+            </Link>
             <button
               type="button"
               className="gallery-admin__button"

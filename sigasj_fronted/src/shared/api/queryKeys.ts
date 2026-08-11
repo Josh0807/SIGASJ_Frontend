@@ -7,4 +7,7 @@ export const queryKeys = {
   comunicados: {
     public: ['comunicados', 'public'] as const,
   },
+  transparencia: {
+    public: ['transparencia', 'public'] as const,
+  },
 }

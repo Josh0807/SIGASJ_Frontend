@@ -6,6 +6,7 @@ import LandingContactBlock from '../components/LandingContactBlock'
 import ProjectsPreview from '../components/ProjectsPreview'
 import ReportFaultSection from '../components/ReportFaultSection'
 import RequestsSection from '../components/RequestsSection'
+import TransparencySection from '../components/TransparencySection'
 
 export type LandingSectionDefinition = {
   id: string
@@ -23,6 +24,11 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
     id: 'comunicados',
     title: 'Comunicados',
     Component: AnnouncementsSection,
+  },
+  {
+    id: 'transparencia',
+    title: 'Transparencia y calidad del agua',
+    Component: TransparencySection,
   },
   {
     id: 'solicitudes-servicio',
