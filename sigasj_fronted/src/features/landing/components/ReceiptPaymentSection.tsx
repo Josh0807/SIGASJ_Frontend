@@ -112,8 +112,7 @@ const ReceiptPaymentSection = () => (
                     <strong>0000-0000</strong>
                   </p>
                   <p className="receipt-payment__warning" role="note">
-                    Este número es ficticio y debe reemplazarse por el número oficial antes de
-                    publicar el sistema.
+                    Todo pago realizado por SinpeMóvil debe ser enviado al WhastApp de la ASADA San Juan.
                   </p>
                 </div>
               ) : null}

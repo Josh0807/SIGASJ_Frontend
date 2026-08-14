@@ -17,6 +17,15 @@ const ContactIcon = ({ type }: ContactIconProps) => (
 )
 
 const phoneHref = (phone: string) => `tel:${phone.replace(/[^+\d]/g, '')}`
+const whatsappHref = (phone: string) => {
+  const digits = phone.replace(/\D/g, '')
+  const internationalNumber = digits.length === 8 ? `506${digits}` : digits
+
+  return `https://wa.me/${internationalNumber}`
+}
+
+const gmailComposeHref = (email: string) =>
+  `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`
 
 const ContactSection = ({
   id = 'contacto',
@@ -29,6 +38,9 @@ const ContactSection = ({
   address = 'Costado norte de la Plaza de Deportes, San Juan, Santa Cruz.',
   locationReference,
   mapUrl,
+  mapLatitude,
+  mapLongitude,
+  mapZoom = 18,
   embeddedMap,
   showMapEmbed = false,
 }: ContactSectionProps) => {
@@ -39,6 +51,13 @@ const ContactSection = ({
           [address, locationReference].filter(Boolean).join(' '),
         )}`
       : undefined)
+  const hasExactCoordinates = mapLatitude !== undefined && mapLongitude !== undefined
+  const mapQuery = hasExactCoordinates
+    ? `${mapLatitude},${mapLongitude}`
+    : [address, locationReference].filter(Boolean).join(' ')
+  const mapEmbedUrl = mapQuery
+    ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=k&z=${mapZoom}&output=embed`
+    : undefined
 
   return (
     <section className="landing-section contact-section" id={id} aria-labelledby={`${id}-title`}>
@@ -56,7 +75,15 @@ const ContactSection = ({
                 <span className="contact-section__icon"><ContactIcon type="phone" /></span>
                 <div className="contact-section__item-content">
                   <h3>Teléfono principal:</h3>
-                  <a className="contact-section__link" href={phoneHref(phonePrimary)}>{phonePrimary}</a>
+                  <a
+                    className="contact-section__link"
+                    href={whatsappHref(phonePrimary)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Contactar por WhatsApp al ${phonePrimary}`}
+                  >
+                    {phonePrimary}
+                  </a>
                 </div>
               </div>
             ) : null}
@@ -78,7 +105,15 @@ const ContactSection = ({
                 <span className="contact-section__icon"><ContactIcon type="mail" /></span>
                 <div className="contact-section__item-content">
                   <h3>Correo electrónico:</h3>
-                  <a className="contact-section__link" href={`mailto:${email}`}>{email}</a>
+                  <a
+                    className="contact-section__link"
+                    href={gmailComposeHref(email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Enviar un correo a ${email}`}
+                  >
+                    {email}
+                  </a>
                 </div>
               </div>
             ) : null}
@@ -104,8 +139,26 @@ const ContactSection = ({
               <div><h3>Ubicación</h3><p>Encuentra nuestra oficina en San Juan de Santa Cruz.</p></div>
             </div>
 
-            {showMapEmbed && embeddedMap ? (
-              <div className="contact-section__map-embed">{embeddedMap}</div>
+            {(showMapEmbed && embeddedMap) || mapEmbedUrl ? (
+              <div className="contact-section__map-embed">
+                {showMapEmbed && embeddedMap ? embeddedMap : (
+                  <iframe
+                    src={mapEmbedUrl}
+                    title="Mapa de la oficina de ASADA San Juan de Santa Cruz"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                )}
+                {resolvedMapUrl ? (
+                  <a
+                    className="contact-section__map-overlay"
+                    href={resolvedMapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Abrir esta ubicación en Google Maps"
+                  />
+                ) : null}
+              </div>
             ) : (
               <div className="contact-section__map-placeholder">
                 <ContactIcon type="location" />
