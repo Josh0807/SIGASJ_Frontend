@@ -8,7 +8,7 @@ import {
   setAccessToken,
 } from '../features/auth/authStorage'
 import AppRoutes from './AppRoutes'
-import { ADMIN_BASE_PATH, ADMIN_HOME_PATH } from './privateRoutes'
+import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
 
 const LocationProbe = ({ onPath }: { onPath: (path: string) => void }) => {
@@ -134,6 +134,158 @@ describe('acceso directo a rutas administrativas', () => {
       )
     } finally {
       await reload.cleanup()
+    }
+  })
+
+  it('Prueba 1 — acceso directo a /admin/abonados con sesión carga layout y Outlet', async () => {
+    setAccessToken('token-de-prueba')
+    const errors: unknown[] = []
+    const warnings: unknown[] = []
+    const originalError = console.error
+    const originalWarn = console.warn
+    console.error = (...args: unknown[]) => {
+      errors.push(args)
+    }
+    console.warn = (...args: unknown[]) => {
+      warnings.push(args)
+    }
+
+    const app = await mountApp('/admin/abonados')
+
+    try {
+      expect(getAccessToken()).toBe('token-de-prueba')
+      expect(app.currentPath()).toBe('/admin/abonados')
+      expect(app.container.innerHTML).toContain('admin-layout')
+      expect(app.container.innerHTML).toContain('admin-sidebar')
+      expect(app.container.innerHTML).toContain('admin-header')
+      expect(app.container.querySelector('.admin-main__content')?.textContent).toContain(
+        'Gestión de abonados',
+      )
+      expect(app.container.querySelector('.admin-sidebar h1')).toBeNull()
+      expect(app.container.innerHTML).not.toContain('No se encontró')
+      expect(errors).toEqual([])
+      expect(warnings).toEqual([])
+    } finally {
+      console.error = originalError
+      console.warn = originalWarn
+      await app.cleanup()
+    }
+  })
+
+  it('Prueba 2 — recargar /admin/abonados conserva layout y contenido', async () => {
+    setAccessToken('token-de-prueba')
+    const firstLoad = await mountApp('/admin/abonados')
+
+    try {
+      expect(firstLoad.currentPath()).toBe('/admin/abonados')
+      expect(firstLoad.container.querySelector('.admin-main__content')?.textContent).toContain(
+        'Gestión de abonados',
+      )
+    } finally {
+      await firstLoad.cleanup()
+    }
+
+    const errors: unknown[] = []
+    const warnings: unknown[] = []
+    const originalError = console.error
+    const originalWarn = console.warn
+    console.error = (...args: unknown[]) => {
+      errors.push(args)
+    }
+    console.warn = (...args: unknown[]) => {
+      warnings.push(args)
+    }
+
+    const reload = await mountApp('/admin/abonados')
+
+    try {
+      expect(getAccessToken()).toBe('token-de-prueba')
+      expect(reload.currentPath()).toBe('/admin/abonados')
+      expect(reload.container.innerHTML.trim()).not.toBe('')
+      expect(reload.container.innerHTML).toContain('admin-layout')
+      expect(reload.container.innerHTML).toContain('admin-sidebar')
+      expect(reload.container.innerHTML).toContain('admin-header')
+      expect(reload.container.querySelector('.admin-main__content')?.textContent).toContain(
+        'Gestión de abonados',
+      )
+      expect(reload.container.innerHTML).not.toContain('auth-page')
+      expect(errors).toEqual([])
+      expect(warnings).toEqual([])
+    } finally {
+      console.error = originalError
+      console.warn = originalWarn
+      await reload.cleanup()
+    }
+  })
+
+  it('redirige una ruta administrativa inexistente al dashboard sin romper el panel', async () => {
+    setAccessToken('token-de-prueba')
+    const errors: unknown[] = []
+    const warnings: unknown[] = []
+    const originalError = console.error
+    const originalWarn = console.warn
+    console.error = (...args: unknown[]) => {
+      errors.push(args)
+    }
+    console.warn = (...args: unknown[]) => {
+      warnings.push(args)
+    }
+
+    const app = await mountApp('/admin/ruta-inexistente')
+
+    try {
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+      expect(app.container.innerHTML.trim()).not.toBe('')
+      expect(app.container.innerHTML).toContain('admin-layout')
+      expect(app.container.innerHTML).toContain('admin-sidebar')
+      expect(app.container.innerHTML).toContain('admin-header')
+      expect(app.container.querySelector('.admin-main__content')?.textContent).toContain(
+        'Dashboard administrativo',
+      )
+      expect(app.container.querySelector('.admin-main__content')?.textContent).not.toContain(
+        'Gestión de abonados',
+      )
+      expect(app.container.innerHTML).not.toContain('auth-page')
+      expect(errors).toEqual([])
+      expect(warnings).toEqual([])
+    } finally {
+      console.error = originalError
+      console.warn = originalWarn
+      await app.cleanup()
+    }
+  })
+
+  it('audita la consola al cargar cada ruta administrativa existente', async () => {
+    setAccessToken('token-de-prueba')
+    const findings: Record<string, { errors: unknown[]; warnings: unknown[] }> = {}
+
+    for (const path of PRIVATE_ROUTE_PATHS) {
+      const errors: unknown[] = []
+      const warnings: unknown[] = []
+      const originalError = console.error
+      const originalWarn = console.warn
+      console.error = (...args: unknown[]) => {
+        errors.push(args)
+      }
+      console.warn = (...args: unknown[]) => {
+        warnings.push(args)
+      }
+
+      const app = await mountApp(path)
+
+      try {
+        findings[path] = { errors: [...errors], warnings: [...warnings] }
+        expect(app.container.innerHTML).toContain('admin-layout')
+      } finally {
+        console.error = originalError
+        console.warn = originalWarn
+        await app.cleanup()
+      }
+    }
+
+    for (const path of PRIVATE_ROUTE_PATHS) {
+      expect(findings[path].errors, path).toEqual([])
+      expect(findings[path].warnings, path).toEqual([])
     }
   })
 
