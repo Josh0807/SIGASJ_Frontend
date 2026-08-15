@@ -1,7 +1,11 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import AdminLayout from '../features/admin/AdminLayout'
 import ProtectedRoute from '../features/auth/ProtectedRoute'
-import { PRIVATE_ROUTES } from './privateRoutes'
+import {
+  ADMIN_CHILD_ROUTES,
+  ADMIN_HOME_PATH,
+  ADMIN_ROUTE_SEGMENT,
+} from './privateRoutes'
 import { PUBLIC_ROUTES } from './publicRoutes'
 
 const AdminProtectedLayout = () => (
@@ -16,9 +20,12 @@ const AppRoutes = () => (
       <Route path={path} element={element} key={path} />
     ))}
 
-    <Route element={<AdminProtectedLayout />}>
-      {PRIVATE_ROUTES.map(({ path, element }) => (
-        <Route path={path.replace(/^\//, '')} element={element} key={path} />
+    <Route path="dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+
+    <Route path={ADMIN_ROUTE_SEGMENT} element={<AdminProtectedLayout />}>
+      <Route index element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+      {ADMIN_CHILD_ROUTES.map(({ segment, element }) => (
+        <Route path={segment} element={element} key={segment} />
       ))}
     </Route>
   </Routes>
