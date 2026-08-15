@@ -41,6 +41,30 @@ describe('AdminLayout', () => {
     expect(second).not.toContain('Pantalla A')
   })
 
+  it('renderiza las rutas hijas solo en el area de contenido', () => {
+    const markup = renderAdminRoute('/admin/a')
+    const contentStart = markup.indexOf('admin-main__content')
+    const beforeContent = markup.slice(0, contentStart)
+    const content = markup.slice(contentStart)
+
+    expect(beforeContent).toContain('admin-sidebar')
+    expect(beforeContent).toContain('admin-header')
+    expect(beforeContent).not.toContain('Pantalla A')
+    expect(content).toContain('Pantalla A')
+  })
+
+  it('mantiene los enlaces del sidebar al cambiar la ruta hija', () => {
+    const first = renderAdminRoute('/admin/a')
+    const second = renderAdminRoute('/admin/b')
+
+    expect(first).toContain('admin-sidebar__link')
+    expect(second).toContain('admin-sidebar__link')
+    expect(first).toContain('href="/admin/dashboard"')
+    expect(second).toContain('href="/admin/dashboard"')
+    expect(first).toContain('Pantalla A')
+    expect(second).toContain('Pantalla B')
+  })
+
   it('mantiene el orden estructural sidebar, encabezado y contenido', () => {
     const markup = renderAdminRoute('/admin/a')
     const sidebar = markup.indexOf('admin-sidebar')
