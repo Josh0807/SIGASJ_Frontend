@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import AdminLayout from '../features/admin/AdminLayout'
 import ProtectedRoute from '../features/auth/ProtectedRoute'
 import {
@@ -8,6 +8,8 @@ import {
 } from './privateRoutes'
 import { PUBLIC_ROUTES } from './publicRoutes'
 
+const PublicRouteLayout = () => <Outlet />
+
 const AdminProtectedLayout = () => (
   <ProtectedRoute>
     <AdminLayout />
@@ -16,9 +18,11 @@ const AdminProtectedLayout = () => (
 
 const AppRoutes = () => (
   <Routes>
-    {PUBLIC_ROUTES.map(({ path, element }) => (
-      <Route path={path} element={element} key={path} />
-    ))}
+    <Route element={<PublicRouteLayout />}>
+      {PUBLIC_ROUTES.map(({ path, element }) => (
+        <Route path={path} element={element} key={path} />
+      ))}
+    </Route>
 
     <Route path="dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
 

@@ -68,6 +68,22 @@ const mountApp = async (path: string) => {
 
       return event
     },
+    clickLink: async (href: string) => {
+      const link = container.querySelector<HTMLAnchorElement>(`a[href="${href}"]`)
+      expect(link).not.toBeNull()
+
+      const event = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      })
+
+      await act(async () => {
+        link?.dispatchEvent(event)
+      })
+
+      return event
+    },
     cleanup: async () => {
       await act(async () => {
         root.unmount()
@@ -154,9 +170,12 @@ describe('navegación de rutas administrativas anidadas', () => {
     try {
       expect(app.currentPath()).toBe('/')
       expect(app.container.innerHTML).toContain('hero')
+      expect(app.container.innerHTML).toContain('header__inner')
+      expect(app.container.innerHTML).toContain('footer')
       expect(app.container.innerHTML).not.toContain('admin-layout')
       expect(app.container.innerHTML).not.toContain('admin-sidebar')
       expect(app.container.innerHTML).not.toContain('admin-header')
+      expect(app.container.innerHTML).not.toContain('Panel administrativo')
     } finally {
       await app.cleanup()
     }
@@ -173,6 +192,87 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(app.container.innerHTML).not.toContain('admin-header')
     } finally {
       await app.cleanup()
+    }
+  })
+
+  it('navega entre Landing, login y panel sin mezclar layouts', async () => {
+    const toLogin = await mountApp('/')
+
+    try {
+      const loginClick = await toLogin.clickLink('/login')
+      expect(loginClick.defaultPrevented).toBe(true)
+      expect(toLogin.currentPath()).toBe('/login')
+      expect(toLogin.container.innerHTML).toContain('auth-page')
+      expect(toLogin.container.innerHTML).not.toContain('admin-layout')
+      expect(toLogin.container.innerHTML).not.toContain('admin-sidebar')
+      expect(toLogin.container.innerHTML).not.toContain('admin-header')
+
+      const backClick = await toLogin.clickLink('/')
+      expect(backClick.defaultPrevented).toBe(true)
+      expect(toLogin.currentPath()).toBe('/')
+      expect(toLogin.container.innerHTML).toContain('hero')
+      expect(toLogin.container.innerHTML).toContain('header__inner')
+      expect(hasAdminChrome(toLogin.container)).toBe(false)
+    } finally {
+      await toLogin.cleanup()
+    }
+
+    setAccessToken('token-de-prueba')
+    const fromAdmin = await mountApp('/admin/dashboard')
+
+    try {
+      expect(hasAdminChrome(fromAdmin.container)).toBe(true)
+      expect(outletTitle(fromAdmin.container)).toBe('Dashboard administrativo')
+    } finally {
+      await fromAdmin.cleanup()
+    }
+
+    const publicFromAdminLink = await mountApp('/admin/galeria')
+
+    try {
+      const publicClick = await publicFromAdminLink.clickLink('/')
+      expect(publicClick.defaultPrevented).toBe(true)
+      expect(publicFromAdminLink.currentPath()).toBe('/')
+      expect(publicFromAdminLink.container.innerHTML).toContain('hero')
+      expect(publicFromAdminLink.container.innerHTML).not.toContain('admin-layout')
+      expect(publicFromAdminLink.container.innerHTML).not.toContain('admin-sidebar')
+      expect(publicFromAdminLink.container.innerHTML).not.toContain('admin-header')
+    } finally {
+      await publicFromAdminLink.cleanup()
+    }
+  })
+
+  it('navega desde la Landing a formularios públicos sin AdminLayout', async () => {
+    const app = await mountApp('/')
+
+    try {
+      const reportClick = await app.clickLink('/reportar-averia')
+      expect(reportClick.defaultPrevented).toBe(true)
+      expect(app.currentPath()).toBe('/reportar-averia')
+      expect(app.container.innerHTML).toContain(
+        'Formulario público de reporte de averías',
+      )
+      expect(hasAdminChrome(app.container)).toBe(false)
+      expect(app.container.innerHTML).not.toContain('admin-sidebar')
+      expect(app.container.innerHTML).not.toContain('admin-header')
+    } finally {
+      await app.cleanup()
+    }
+
+    const requests = await mountApp('/')
+
+    try {
+      const requestClick = await requests.clickLink('/solicitudes/afiliacion')
+      expect(requestClick.defaultPrevented).toBe(true)
+      expect(requests.currentPath()).toBe('/solicitudes/afiliacion')
+      expect(requests.container.innerHTML).toContain(
+        'Formulario público de afiliación',
+      )
+      expect(hasAdminChrome(requests.container)).toBe(false)
+      expect(requests.container.innerHTML).not.toContain('admin-sidebar')
+      expect(requests.container.innerHTML).not.toContain('Panel administrativo')
+    } finally {
+      await requests.cleanup()
     }
   })
 })
