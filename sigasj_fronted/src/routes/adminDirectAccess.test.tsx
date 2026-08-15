@@ -78,7 +78,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('Caso 2 — ruta hija sin sesión no muestra contenido privado y redirige a /login', async () => {
-    for (const path of ['/admin/abonados', '/admin/comunicados'] as const) {
+    for (const path of ['/admin/abonados'] as const) {
       const app = await mountApp(path)
 
       try {

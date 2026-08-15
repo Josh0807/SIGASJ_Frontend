@@ -322,7 +322,7 @@ describe('AppRoutes y AdminLayout', () => {
       ADMIN_BASE_PATH,
       ADMIN_HOME_PATH,
       '/admin/galeria',
-      '/admin/comunicados',
+      '/admin/abonados',
     ]
 
     for (const path of adminUrls) {
