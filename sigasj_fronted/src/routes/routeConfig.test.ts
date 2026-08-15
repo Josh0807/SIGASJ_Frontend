@@ -12,10 +12,18 @@ describe('route configuration', () => {
   it('expone la landing y formularios públicos sin autenticación', () => {
     expect(LANDING_ROUTE_PATH).toBe('/')
     expect(LANDING_ROUTE?.path).toBe('/')
-    expect(PUBLIC_ROUTE_PATHS).toContain('/')
-    expect(PUBLIC_ROUTE_PATHS).toContain('/login')
-    expect(PUBLIC_ROUTE_PATHS).toContain('/reportar-averia')
-    expect(PUBLIC_ROUTE_PATHS).toContain('/solicitudes/afiliacion')
+    expect(PUBLIC_ROUTE_PATHS).toEqual([
+      '/',
+      '/reportar-averia',
+      '/solicitudes/constancia-servicio',
+      '/solicitudes/afiliacion',
+      '/solicitudes/arreglo-pago',
+      '/solicitudes/cambio-titular',
+      '/login',
+    ])
+    expect(PUBLIC_ROUTE_PATHS).not.toContain('/comunicados')
+    expect(PUBLIC_ROUTE_PATHS).not.toContain('/dashboard')
+    expect(PUBLIC_ROUTE_PATHS).not.toContain(ADMIN_BASE_PATH)
   })
 
   it('no incluye rutas privadas entre las públicas', () => {

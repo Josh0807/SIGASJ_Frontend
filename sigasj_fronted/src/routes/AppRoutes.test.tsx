@@ -1,12 +1,66 @@
-import { act } from 'react'
+import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { clearAccessToken, setAccessToken } from '../features/auth/authStorage'
 import AppRoutes from './AppRoutes'
-import { ADMIN_BASE_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
-import { PUBLIC_ROUTE_PATHS, PUBLIC_VISITOR_FORM_ROUTES } from './publicRoutes'
+import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
+import {
+  LOGIN_ROUTE_PATH,
+  PUBLIC_ROUTE_PATHS,
+  PUBLIC_VISITOR_FORM_ROUTES,
+} from './publicRoutes'
+
+type RouteLocation = {
+  pathname: string
+  state: unknown
+}
+
+const LocationProbe = ({
+  onLocation,
+}: {
+  onLocation: (location: RouteLocation) => void
+}) => {
+  const location = useLocation()
+
+  useEffect(() => {
+    onLocation({ pathname: location.pathname, state: location.state })
+  }, [location, onLocation])
+
+  return null
+}
+
+const mountApp = async (path: string) => {
+  const container = document.createElement('div')
+  document.body.appendChild(container)
+  const root = createRoot(container)
+  let current: RouteLocation = { pathname: path, state: null }
+
+  await act(async () => {
+    root.render(
+      <MemoryRouter initialEntries={[path]}>
+        <LocationProbe
+          onLocation={(next) => {
+            current = next
+          }}
+        />
+        <AppRoutes />
+      </MemoryRouter>,
+    )
+  })
+
+  return {
+    container,
+    location: () => current,
+    cleanup: async () => {
+      await act(async () => {
+        root.unmount()
+      })
+      container.remove()
+    },
+  }
+}
 
 const renderPath = (path: string) =>
   renderToStaticMarkup(
@@ -106,6 +160,49 @@ describe('AppRoutes y AdminLayout', () => {
   it('no muestra el panel administrativo sin el guard actual', () => {
     expect(renderPath('/admin/dashboard')).not.toContain('admin-layout')
     expect(renderPath('/admin/abonados')).not.toContain('admin-layout')
+  })
+
+  it('muestra AdminLayout con sesión válida y redirige a /login sin ella', async () => {
+    for (const path of PRIVATE_ROUTE_PATHS) {
+      const markup = renderPath(path)
+      expect(markup).not.toContain('admin-layout')
+      expect(markup).not.toContain('admin-sidebar')
+      expect(markup).not.toContain('admin-header')
+      expect(markup).not.toContain('admin-main__content')
+    }
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    try {
+      await act(async () => {
+        root.render(
+          <MemoryRouter initialEntries={['/admin/dashboard']}>
+            <AppRoutes />
+          </MemoryRouter>,
+        )
+      })
+
+      expect(container.innerHTML).toContain('auth-page')
+      expect(container.innerHTML).not.toContain('admin-layout')
+      expect(container.innerHTML).not.toContain('admin-sidebar')
+      expect(container.innerHTML).not.toContain('admin-header')
+    } finally {
+      await act(async () => {
+        root.unmount()
+      })
+      container.remove()
+    }
+
+    setAccessToken('token-de-prueba')
+
+    const dashboard = renderPath('/admin/dashboard')
+    expect(dashboard).toContain('admin-layout')
+    expect(dashboard).toContain('admin-sidebar')
+    expect(dashboard).toContain('admin-header')
+    expect(dashboard).toContain('admin-main__content')
+    expect(dashboard).toContain('Dashboard administrativo')
   })
 
   it('reutiliza AdminLayout en todas las rutas privadas existentes', () => {
@@ -217,6 +314,77 @@ describe('AppRoutes y AdminLayout', () => {
         root.unmount()
       })
       container.remove()
+    }
+  })
+
+  it('redirige a /login al escribir una URL administrativa sin sesión', async () => {
+    const adminUrls = [
+      ADMIN_BASE_PATH,
+      ADMIN_HOME_PATH,
+      '/admin/galeria',
+      '/admin/comunicados',
+    ]
+
+    for (const path of adminUrls) {
+      const app = await mountApp(path)
+
+      try {
+        expect(app.location().pathname).toBe(LOGIN_ROUTE_PATH)
+        expect(app.location().state).toEqual({ from: path })
+        expect(app.container.innerHTML).toContain('auth-page')
+        expect(app.container.innerHTML).not.toContain('admin-layout')
+        expect(app.container.innerHTML).not.toContain('admin-sidebar')
+        expect(app.container.innerHTML).not.toContain('admin-header')
+      } finally {
+        await app.cleanup()
+      }
+    }
+  })
+
+  it('mantiene /login pública y no entra en un bucle de redirección', async () => {
+    const app = await mountApp(LOGIN_ROUTE_PATH)
+
+    try {
+      expect(app.location().pathname).toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('auth-page')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('deja las rutas públicas accesibles sin sesión', async () => {
+    for (const path of PUBLIC_ROUTE_PATHS) {
+      const app = await mountApp(path)
+
+      try {
+        expect(app.location().pathname).toBe(path)
+        expect(app.container.innerHTML).not.toContain('admin-layout')
+        expect(app.container.innerHTML).not.toContain('admin-sidebar')
+        expect(app.container.innerHTML).not.toContain('admin-header')
+        expect(app.container.innerHTML).not.toContain('Panel administrativo')
+      } finally {
+        await app.cleanup()
+      }
+    }
+  })
+
+  it('carga la Landing en / sin autenticación ni redirección a login', async () => {
+    const app = await mountApp('/')
+
+    try {
+      expect(app.location().pathname).toBe('/')
+      expect(app.container.innerHTML).toContain('hero')
+      expect(app.container.innerHTML).toContain('header__inner')
+      expect(app.container.innerHTML).toContain('navbar')
+      expect(app.container.innerHTML).toContain('id="comunicados"')
+      expect(app.container.innerHTML).toContain('footer')
+      expect(app.container.innerHTML).not.toContain('auth-page')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
+      expect(app.container.innerHTML).not.toContain('admin-sidebar')
+      expect(app.container.innerHTML).not.toContain('admin-header')
+    } finally {
+      await app.cleanup()
     }
   })
 })
