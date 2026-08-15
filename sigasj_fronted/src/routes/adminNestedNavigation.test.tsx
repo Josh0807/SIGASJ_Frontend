@@ -100,14 +100,39 @@ describe('navegación de rutas administrativas anidadas', () => {
 
   it('carga AdminLayout, chrome y dashboard al entrar a /admin', async () => {
     setAccessToken('token-de-prueba')
+    const errors: unknown[] = []
+    const warnings: unknown[] = []
+    const originalError = console.error
+    const originalWarn = console.warn
+    console.error = (...args: unknown[]) => {
+      errors.push(args)
+    }
+    console.warn = (...args: unknown[]) => {
+      warnings.push(args)
+    }
+
     const app = await mountApp(ADMIN_BASE_PATH)
 
     try {
+      const html = app.container.innerHTML
+      const sidebar = html.indexOf('admin-sidebar')
+      const header = html.indexOf('admin-header')
+      const content = html.indexOf('admin-main__content')
+
       expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(hasAdminChrome(app.container)).toBe(true)
+      expect(html).toContain('admin-main')
       expect(outletTitle(app.container)).toBe('Dashboard administrativo')
       expect(app.container.querySelector('.admin-sidebar h1')).toBeNull()
+      expect(app.container.querySelector('.admin-header h1')).toBeNull()
+      expect(sidebar).toBeGreaterThan(-1)
+      expect(sidebar).toBeLessThan(header)
+      expect(header).toBeLessThan(content)
+      expect(errors).toEqual([])
+      expect(warnings).toEqual([])
     } finally {
+      console.error = originalError
+      console.warn = originalWarn
       await app.cleanup()
     }
   })
@@ -127,19 +152,38 @@ describe('navegación de rutas administrativas anidadas', () => {
     }
 
     try {
+      const sidebar = app.container.querySelector('.admin-sidebar')
+      const header = app.container.querySelector('.admin-header')
+      const content = app.container.querySelector('.admin-main__content')
+
+      expect(sidebar).not.toBeNull()
+      expect(header).not.toBeNull()
+      expect(content).not.toBeNull()
       expect(outletTitle(app.container)).toBe('Dashboard administrativo')
+      expect(header?.textContent).toContain('Panel administrativo')
 
       const firstClick = await app.clickSidebarLink('/admin/abonados')
       expect(firstClick.defaultPrevented).toBe(true)
       expect(app.currentPath()).toBe('/admin/abonados')
+      expect(app.container.querySelector('.admin-sidebar')).toBe(sidebar)
+      expect(app.container.querySelector('.admin-header')).toBe(header)
+      expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(hasAdminChrome(app.container)).toBe(true)
       expect(outletTitle(app.container)).toBe('Gestión de abonados')
+      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.textContent).not.toContain('Gestión de abonados')
+      expect(sidebar?.querySelector('h1')).toBeNull()
 
       const secondClick = await app.clickSidebarLink('/admin/averias')
       expect(secondClick.defaultPrevented).toBe(true)
       expect(app.currentPath()).toBe('/admin/averias')
+      expect(app.container.querySelector('.admin-sidebar')).toBe(sidebar)
+      expect(app.container.querySelector('.admin-header')).toBe(header)
+      expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(hasAdminChrome(app.container)).toBe(true)
       expect(outletTitle(app.container)).toBe('Gestión de averías')
+      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.textContent).not.toContain('Gestión de averías')
 
       expect(errors).toEqual([])
       expect(warnings).toEqual([])
