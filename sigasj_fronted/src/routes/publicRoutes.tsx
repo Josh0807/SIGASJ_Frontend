@@ -2,6 +2,7 @@ import type { ReactElement } from 'react'
 import LoginPage from '../features/auth/LoginPage'
 import LandingPage from '../features/landing/components/LandingPage'
 import { PUBLIC_SERVICE_REQUEST_ROUTES } from '../features/landing/config/serviceRequestRoutes'
+import PublicFormPlaceholder from './PublicFormPlaceholder'
 
 export type PublicRouteDefinition = {
   path: string
@@ -9,13 +10,12 @@ export type PublicRouteDefinition = {
   label: string
 }
 
-const PublicFormPlaceholder = ({ label }: { label: string }) => (
-  <main aria-label={label} />
-)
+export const LANDING_ROUTE_PATH = '/'
+export const LOGIN_ROUTE_PATH = '/login'
 
 export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
   {
-    path: '/',
+    path: LANDING_ROUTE_PATH,
     element: <LandingPage />,
     label: 'Landing Page pública de SIGASJ',
   },
@@ -32,10 +32,22 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
     label,
   })),
   {
-    path: '/login',
+    path: LOGIN_ROUTE_PATH,
     element: <LoginPage />,
     label: 'Inicio de sesión',
   },
 ]
 
 export const PUBLIC_ROUTE_PATHS = PUBLIC_ROUTES.map(({ path }) => path)
+
+export const LANDING_ROUTE = PUBLIC_ROUTES.find(
+  (route) => route.path === LANDING_ROUTE_PATH,
+)
+
+export const PUBLIC_VISITOR_FORM_ROUTES = PUBLIC_ROUTES.filter(
+  (route) => route.path !== LANDING_ROUTE_PATH && route.path !== LOGIN_ROUTE_PATH,
+)
+
+export const PUBLIC_VISITOR_FORM_PATHS = PUBLIC_VISITOR_FORM_ROUTES.map(
+  ({ path }) => path,
+)

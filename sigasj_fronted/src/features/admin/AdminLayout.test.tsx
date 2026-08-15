@@ -76,6 +76,18 @@ describe('AdminLayout', () => {
     expect(header).toBeLessThan(content)
   })
 
+  it('muestra sidebar y encabezado en cualquier ruta hija sin ocultarlos', () => {
+    const first = renderAdminRoute('/admin/a')
+    const second = renderAdminRoute('/admin/b')
+
+    expect(first).toContain('admin-sidebar')
+    expect(first).toContain('admin-header')
+    expect(first).toContain('Pantalla A')
+    expect(second).toContain('admin-sidebar')
+    expect(second).toContain('admin-header')
+    expect(second).toContain('Pantalla B')
+  })
+
   it('no emite errores de consola al renderizar el layout', () => {
     const errors: unknown[] = []
     const originalError = console.error

@@ -6,10 +6,12 @@ import {
   ADMIN_NAV_ITEMS,
   PRIVATE_ROUTE_PATHS,
 } from './privateRoutes'
-import { PUBLIC_ROUTE_PATHS } from './publicRoutes'
+import { LANDING_ROUTE, LANDING_ROUTE_PATH, PUBLIC_ROUTE_PATHS, PUBLIC_VISITOR_FORM_PATHS } from './publicRoutes'
 
 describe('route configuration', () => {
   it('expone la landing y formularios públicos sin autenticación', () => {
+    expect(LANDING_ROUTE_PATH).toBe('/')
+    expect(LANDING_ROUTE?.path).toBe('/')
     expect(PUBLIC_ROUTE_PATHS).toContain('/')
     expect(PUBLIC_ROUTE_PATHS).toContain('/login')
     expect(PUBLIC_ROUTE_PATHS).toContain('/reportar-averia')
@@ -22,6 +24,28 @@ describe('route configuration', () => {
     )
 
     expect(overlap).toEqual([])
+  })
+
+  it('mantiene las rutas públicas fuera del prefijo administrativo', () => {
+    expect(
+      PUBLIC_ROUTE_PATHS.every(
+        (path) => path === '/' || !path.startsWith(`${ADMIN_BASE_PATH}/`),
+      ),
+    ).toBe(true)
+    expect(PUBLIC_ROUTE_PATHS).not.toContain(ADMIN_BASE_PATH)
+  })
+
+  it('expone los formularios públicos de visitante fuera de /admin', () => {
+    expect(PUBLIC_VISITOR_FORM_PATHS).toEqual([
+      '/reportar-averia',
+      '/solicitudes/constancia-servicio',
+      '/solicitudes/afiliacion',
+      '/solicitudes/arreglo-pago',
+      '/solicitudes/cambio-titular',
+    ])
+    expect(
+      PUBLIC_VISITOR_FORM_PATHS.every((path) => !path.startsWith(`${ADMIN_BASE_PATH}/`)),
+    ).toBe(true)
   })
 
   it('protege los módulos administrativos principales', () => {

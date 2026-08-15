@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { NavbarProps } from '../Props/NavbarProps'
 import { ANNOUNCEMENTS_HREF, GALLERY_HREF, TRANSPARENCY_HREF } from '../config/landingAnchors'
 
@@ -30,9 +31,9 @@ const Navbar = ({ className = '', onNavigate }: NavbarProps) => (
         </li>
       ))}
       <li>
-        <a className="navbar__login" href="/login" onClick={onNavigate}>
+        <Link className="navbar__login" to="/login" onClick={onNavigate}>
           Iniciar sesión
-        </a>
+        </Link>
       </li>
     </ul>
   </nav>
