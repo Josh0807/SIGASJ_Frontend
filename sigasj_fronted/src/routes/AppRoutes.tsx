@@ -10,12 +10,6 @@ import { PUBLIC_ROUTES } from './publicRoutes'
 
 const PublicRouteLayout = () => <Outlet />
 
-const AdminProtectedLayout = () => (
-  <ProtectedRoute>
-    <AdminLayout />
-  </ProtectedRoute>
-)
-
 const AppRoutes = () => (
   <Routes>
     <Route element={<PublicRouteLayout />}>
@@ -24,13 +18,21 @@ const AppRoutes = () => (
       ))}
     </Route>
 
-    <Route path="dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
-
-    <Route path={ADMIN_ROUTE_SEGMENT} element={<AdminProtectedLayout />}>
-      <Route index element={<Navigate to={ADMIN_HOME_PATH} replace />} />
-      {ADMIN_CHILD_ROUTES.map(({ segment, element }) => (
-        <Route path={segment} element={element} key={segment} />
-      ))}
+    <Route
+      element={
+        <ProtectedRoute>
+          <Outlet />
+        </ProtectedRoute>
+      }
+    >
+      <Route path="dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+      <Route path={ADMIN_ROUTE_SEGMENT} element={<AdminLayout />}>
+        <Route index element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+        {ADMIN_CHILD_ROUTES.map(({ segment, element }) => (
+          <Route path={segment} element={element} key={segment} />
+        ))}
+        <Route path="*" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+      </Route>
     </Route>
   </Routes>
 )
