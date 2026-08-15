@@ -50,6 +50,17 @@ const mountApp = async (path: string) => {
   const root = createRoot(container)
   let pathname = path
   const snapshots: string[] = []
+  const errors: unknown[] = []
+  const warnings: unknown[] = []
+  const originalError = console.error
+  const originalWarn = console.warn
+
+  console.error = (...args: unknown[]) => {
+    errors.push(args)
+  }
+  console.warn = (...args: unknown[]) => {
+    warnings.push(args)
+  }
 
   const observer = new MutationObserver(() => {
     snapshots.push(container.innerHTML)
@@ -79,8 +90,12 @@ const mountApp = async (path: string) => {
     container,
     currentPath: () => pathname,
     snapshots,
+    errors,
+    warnings,
     cleanup: async () => {
       observer.disconnect()
+      console.error = originalError
+      console.warn = originalWarn
       await act(async () => {
         root.unmount()
       })
@@ -102,6 +117,8 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(publicArea.container.innerHTML).toContain('hero')
       expect(publicArea.container.innerHTML).toContain('header__inner')
       expect(hasAdminChrome(publicArea.container.innerHTML)).toBe(false)
+      expect(publicArea.errors).toEqual([])
+      expect(publicArea.warnings).toEqual([])
 
       const toLogin = await clickHref(publicArea.container, LOGIN_ROUTE_PATH)
       expect(toLogin.defaultPrevented).toBe(true)
@@ -120,6 +137,8 @@ describe('navegación conjunta entre área pública y administrativa', () => {
         'Formulario público de reporte de averías',
       )
       expect(hasAdminChrome(publicArea.container.innerHTML)).toBe(false)
+      expect(publicArea.errors).toEqual([])
+      expect(publicArea.warnings).toEqual([])
     } finally {
       await publicArea.cleanup()
     }
@@ -132,6 +151,8 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(requests.currentPath()).toBe('/solicitudes/afiliacion')
       expect(requests.container.innerHTML).toContain('Formulario público de afiliación')
       expect(hasAdminChrome(requests.container.innerHTML)).toBe(false)
+      expect(requests.errors).toEqual([])
+      expect(requests.warnings).toEqual([])
     } finally {
       await requests.cleanup()
     }
@@ -145,6 +166,8 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(
         adminAttempt.snapshots.some((html) => hasAdminChrome(html)),
       ).toBe(false)
+      expect(adminAttempt.errors).toEqual([])
+      expect(adminAttempt.warnings).toEqual([])
     } finally {
       await adminAttempt.cleanup()
     }
@@ -175,6 +198,8 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(app.container.innerHTML).toContain('admin-sidebar')
       expect(app.container.innerHTML).toContain('admin-header')
       expect(outletTitle(app.container)).toBe('Gestión de averías')
+      expect(app.errors).toEqual([])
+      expect(app.warnings).toEqual([])
     } finally {
       await app.cleanup()
     }
@@ -198,6 +223,8 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(app.snapshots.every((html) => !hasAdminChrome(html))).toBe(true)
       expect(app.container.innerHTML).toContain('auth-page')
       expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.errors).toEqual([])
+      expect(app.warnings).toEqual([])
     } finally {
       await app.cleanup()
     }
