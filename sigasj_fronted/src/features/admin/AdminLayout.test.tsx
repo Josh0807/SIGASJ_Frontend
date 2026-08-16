@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { act } from 'react'
+import { createRoot } from 'react-dom/client'
+import { afterEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AdminLayout from './AdminLayout'
@@ -103,5 +105,157 @@ describe('AdminLayout', () => {
     }
 
     expect(errors).toEqual([])
+  })
+
+  it('incluye el boton de menu con atributos de accesibilidad', () => {
+    const markup = renderAdminRoute('/admin/a')
+
+    expect(markup).toContain('admin-menu-toggle')
+    expect(markup).toContain('aria-controls="admin-navigation"')
+    expect(markup).toContain('aria-expanded="false"')
+    expect(markup).toContain('id="admin-navigation"')
+    expect(markup).toContain('Abrir menú administrativo')
+    expect(markup).not.toContain('admin-layout--nav-open')
+    expect(markup).not.toContain('admin-nav-backdrop')
+  })
+})
+
+const mountAdminRoute = async (path: string) => {
+  const container = document.createElement('div')
+  document.body.appendChild(container)
+  const root = createRoot(container)
+
+  await act(async () => {
+    root.render(
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/a" element={<p>Pantalla A</p>} />
+            <Route path="/admin/dashboard" element={<p>Dashboard</p>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+  })
+
+  return {
+    container,
+    unmount: async () => {
+      await act(async () => {
+        root.unmount()
+      })
+      container.remove()
+    },
+  }
+}
+
+const click = async (element: Element) => {
+  await act(async () => {
+    element.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }),
+    )
+  })
+}
+
+describe('AdminLayout menu movil', () => {
+  const originalMatchMedia = window.matchMedia
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia
+    document.body.style.overflow = ''
+  })
+
+  const mockMobileNav = (matches: boolean) => {
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes('760px') ? matches : false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia
+  }
+
+  it('abre y cierra el menu desde el boton', async () => {
+    mockMobileNav(true)
+    const app = await mountAdminRoute('/admin/a')
+    const toggle = app.container.querySelector<HTMLButtonElement>('.admin-menu-toggle')
+
+    expect(toggle).not.toBeNull()
+    expect(toggle?.getAttribute('aria-expanded')).toBe('false')
+    expect(app.container.querySelector('.admin-layout--nav-open')).toBeNull()
+
+    await click(toggle!)
+
+    expect(toggle?.getAttribute('aria-expanded')).toBe('true')
+    expect(app.container.querySelector('.admin-layout--nav-open')).not.toBeNull()
+    expect(app.container.querySelector('.admin-nav-backdrop')).not.toBeNull()
+    expect(app.container.textContent).toContain('Pantalla A')
+
+    await click(toggle!)
+
+    expect(toggle?.getAttribute('aria-expanded')).toBe('false')
+    expect(app.container.querySelector('.admin-layout--nav-open')).toBeNull()
+    expect(app.container.querySelector('.admin-nav-backdrop')).toBeNull()
+    expect(app.container.textContent).toContain('Pantalla A')
+
+    await app.unmount()
+  })
+
+  it('cierra el menu al pulsar el fondo exterior', async () => {
+    mockMobileNav(true)
+    const app = await mountAdminRoute('/admin/a')
+    const toggle = app.container.querySelector<HTMLButtonElement>('.admin-menu-toggle')
+
+    await click(toggle!)
+    expect(app.container.querySelector('.admin-layout--nav-open')).not.toBeNull()
+
+    await click(app.container.querySelector('.admin-nav-backdrop')!)
+
+    expect(app.container.querySelector('.admin-layout--nav-open')).toBeNull()
+    expect(app.container.textContent).toContain('Pantalla A')
+
+    await app.unmount()
+  })
+
+  it('cierra el menu al seleccionar una opcion', async () => {
+    mockMobileNav(true)
+    const app = await mountAdminRoute('/admin/a')
+    const toggle = app.container.querySelector<HTMLButtonElement>('.admin-menu-toggle')
+
+    await click(toggle!)
+    expect(app.container.querySelector('.admin-layout--nav-open')).not.toBeNull()
+
+    const dashboardLink = app.container.querySelector<HTMLAnchorElement>(
+      '.admin-sidebar__link[href="/admin/dashboard"]',
+    )
+    expect(dashboardLink).not.toBeNull()
+    await click(dashboardLink!)
+
+    expect(app.container.querySelector('.admin-layout--nav-open')).toBeNull()
+    expect(app.container.textContent).toContain('Dashboard')
+
+    await app.unmount()
+  })
+
+  it('cierra el menu con Escape y mantiene el contenido accesible', async () => {
+    mockMobileNav(true)
+    const app = await mountAdminRoute('/admin/a')
+    const toggle = app.container.querySelector<HTMLButtonElement>('.admin-menu-toggle')
+
+    await click(toggle!)
+    expect(app.container.querySelector('.admin-layout--nav-open')).not.toBeNull()
+
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    })
+
+    expect(app.container.querySelector('.admin-layout--nav-open')).toBeNull()
+    expect(app.container.textContent).toContain('Pantalla A')
+    expect(document.activeElement).toBe(toggle)
+
+    await app.unmount()
   })
 })

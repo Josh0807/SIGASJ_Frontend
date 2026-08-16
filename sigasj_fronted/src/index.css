@@ -2051,9 +2051,17 @@ button.announcements-section__more {
   align-items: stretch;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background: #f5faff;
   color: #17324d;
+}
+
+.admin-nav-backdrop,
+.admin-menu-toggle,
+.admin-sidebar__close {
+  display: none;
 }
 
 .admin-sidebar {
@@ -2223,11 +2231,13 @@ button.announcements-section__more {
   min-width: 0;
   min-height: 72px;
   padding: 16px 28px;
+  overflow-x: hidden;
   border-bottom: 1px solid #d7e5f1;
   background: white;
 }
 
 .admin-header__title {
+  flex: 1 1 auto;
   margin: 0;
   min-width: 0;
   color: #123f70;
@@ -2274,31 +2284,152 @@ button.announcements-section__more {
 
 @media (max-width: 760px) {
   .admin-layout {
+    overflow-x: hidden;
+  }
+
+  .admin-menu-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
     flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border: 1px solid #d5e4f0;
+    border-radius: 10px;
+    color: #1e5a9c;
+    background: #f4f9fd;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: border-color .2s ease, background .2s ease;
+  }
+
+  .admin-menu-toggle:hover {
+    border-color: #a9cbe5;
+    background: #e9f4fc;
+  }
+
+  .admin-menu-toggle:focus-visible {
+    outline: 3px solid #7db7ed;
+    outline-offset: 2px;
+  }
+
+  .admin-menu-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform .22s ease, opacity .18s ease;
+  }
+
+  .admin-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .admin-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .admin-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .admin-sidebar__close {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .28);
+    border-radius: 10px;
+    color: white;
+    background: rgba(255, 255, 255, .08);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .admin-sidebar__close:hover,
+  .admin-sidebar__close:focus-visible {
+    background: rgba(255, 255, 255, .16);
+  }
+
+  .admin-sidebar__close:focus-visible {
+    outline: 3px solid #7db7ed;
+    outline-offset: 2px;
+  }
+
+  .admin-sidebar__close span {
+    position: absolute;
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  .admin-sidebar__close span:first-child {
+    transform: rotate(45deg);
+  }
+
+  .admin-sidebar__close span:last-child {
+    transform: rotate(-45deg);
   }
 
   .admin-sidebar {
-    flex: 0 0 auto;
+    position: fixed;
+    z-index: 40;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    flex: none;
+    width: min(280px, 86vw);
+    max-width: 86vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: none;
+    transition: transform .22s ease, visibility .22s ease;
+  }
+
+  .admin-layout--nav-open .admin-sidebar {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    box-shadow: 12px 0 32px rgba(18, 63, 112, .28);
+  }
+
+  .admin-layout--nav-open .admin-nav-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 30;
+    inset: 0;
     width: 100%;
-    border-right: 0;
-    border-bottom: 1px solid #d7e5f1;
+    max-width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(18, 63, 112, .45);
+    cursor: pointer;
+    touch-action: manipulation;
   }
 
   .admin-sidebar__brand {
-    margin-bottom: 12px;
-  }
-
-  .admin-sidebar__nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .admin-sidebar__link {
-    flex: 1 1 180px;
+    position: relative;
+    margin-bottom: 16px;
   }
 
   .admin-main {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

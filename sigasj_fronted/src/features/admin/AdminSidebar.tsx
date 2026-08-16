@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { NavLink } from 'react-router-dom'
 import asadaLogo from '../../assets/ASADA LOGO.jpeg'
 import { ADMIN_NAV_ITEMS, type AdminNavItem } from '../../routes/privateRoutes'
@@ -9,10 +10,29 @@ export type AdminSidebarItem = AdminNavItem & {
 
 type AdminSidebarProps = {
   items?: AdminSidebarItem[]
+  isDrawer?: boolean
+  isOpen?: boolean
+  onNavigate?: () => void
+  onClose?: () => void
+  closeButtonRef?: Ref<HTMLButtonElement>
 }
 
-const AdminSidebar = ({ items = ADMIN_NAV_ITEMS }: AdminSidebarProps) => (
-  <aside className="admin-sidebar" aria-label="Menú administrativo">
+const AdminSidebar = ({
+  items = ADMIN_NAV_ITEMS,
+  isDrawer = false,
+  isOpen = false,
+  onNavigate,
+  onClose,
+  closeButtonRef,
+}: AdminSidebarProps) => (
+  <aside
+    id="admin-navigation"
+    className="admin-sidebar"
+    aria-label="Menú administrativo"
+    role={isDrawer && isOpen ? 'dialog' : undefined}
+    aria-modal={isDrawer && isOpen ? true : undefined}
+    inert={isDrawer && !isOpen ? true : undefined}
+  >
     <div className="admin-sidebar__brand">
       <span className="admin-sidebar__logo">
         <img src={asadaLogo} alt="" />
@@ -21,6 +41,16 @@ const AdminSidebar = ({ items = ADMIN_NAV_ITEMS }: AdminSidebarProps) => (
         <strong>SIGASJ</strong>
         <span>ASADA San Juan</span>
       </span>
+      <button
+        ref={closeButtonRef}
+        className="admin-sidebar__close"
+        type="button"
+        aria-label="Cerrar menú administrativo"
+        onClick={onClose}
+      >
+        <span aria-hidden="true" />
+        <span aria-hidden="true" />
+      </button>
     </div>
     <nav className="admin-sidebar__nav" aria-label="Navegación administrativa">
       {items.map(({ path, title, icon }) => (
@@ -32,6 +62,7 @@ const AdminSidebar = ({ items = ADMIN_NAV_ITEMS }: AdminSidebarProps) => (
               ? 'admin-sidebar__link admin-sidebar__link--active'
               : 'admin-sidebar__link'
           }
+          onClick={onNavigate}
         >
           {({ isActive }) => (
             <>
