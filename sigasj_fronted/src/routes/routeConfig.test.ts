@@ -85,9 +85,11 @@ describe('route configuration', () => {
     expect(PRIVATE_ROUTE_PATHS).toContain(ADMIN_HOME_PATH)
   })
 
-  it('deriva la navegación del sidebar desde las rutas hijas existentes', () => {
+  it('deriva la navegación del sidebar desde las rutas hijas disponibles', () => {
     expect(ADMIN_NAV_ITEMS).toEqual(
-      ADMIN_CHILD_ROUTES.map(({ path, title }) => ({ path, title })),
+      ADMIN_CHILD_ROUTES.filter(({ availableInNav }) => availableInNav).map(
+        ({ path, title, icon }) => ({ path, title, icon }),
+      ),
     )
     expect(
       ADMIN_CHILD_ROUTES.every(
@@ -96,13 +98,33 @@ describe('route configuration', () => {
     ).toBe(true)
   })
 
+  it('centraliza nombre, ruta e icono de cada opcion visible', () => {
+    expect(ADMIN_NAV_ITEMS.length).toBeGreaterThan(1)
+    for (const item of ADMIN_NAV_ITEMS) {
+      expect(item.path.startsWith(`${ADMIN_BASE_PATH}/`)).toBe(true)
+      expect(item.title.trim().length).toBeGreaterThan(0)
+      expect(item.icon).toBeTruthy()
+    }
+  })
+
   it('no duplica segmentos ni rutas administrativas', () => {
     const segments = ADMIN_CHILD_ROUTES.map(({ segment }) => segment)
     const paths = ADMIN_CHILD_ROUTES.map(({ path }) => path)
+    const navPaths = ADMIN_NAV_ITEMS.map(({ path }) => path)
 
     expect(new Set(segments).size).toBe(segments.length)
     expect(new Set(paths).size).toBe(paths.length)
+    expect(new Set(navPaths).size).toBe(navPaths.length)
     expect(paths).not.toContain('/admin/comunicados')
+    expect(navPaths).not.toContain('/admin/comunicados')
     expect(segments).not.toContain('comunicados')
+  })
+
+  it('omite del menu los módulos marcados como no disponibles', () => {
+    expect(
+      ADMIN_CHILD_ROUTES.filter(({ availableInNav }) => !availableInNav).every(
+        (route) => !ADMIN_NAV_ITEMS.some((item) => item.path === route.path),
+      ),
+    ).toBe(true)
   })
 })

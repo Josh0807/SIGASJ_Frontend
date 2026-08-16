@@ -39,12 +39,24 @@ describe('AdminSidebar', () => {
 
     expect(iconCount).toBe(ADMIN_NAV_ITEMS.length)
     expect(labelCount).toBe(ADMIN_NAV_ITEMS.length)
+    for (const { path, icon } of ADMIN_NAV_ITEMS) {
+      expect(markup).toContain(`href="${path}"`)
+      expect(markup).toContain(`data-icon="${icon}"`)
+    }
+  })
+
+  it('usa NavLink internos y no recarga la aplicacion', () => {
+    const markup = renderSidebar()
+
+    expect(markup).toContain('admin-sidebar__link')
+    expect(markup).not.toContain('target="_blank"')
+    expect(markup).not.toContain('http://')
   })
 
   it('puede recibir un conjunto distinto de opciones segun el usuario', () => {
     const markup = renderSidebar([
-      { path: '/admin/dashboard', title: 'Dashboard' },
-      { path: '/admin/abonados', title: 'Abonados' },
+      { path: '/admin/dashboard', title: 'Dashboard', icon: 'dashboard' },
+      { path: '/admin/abonados', title: 'Abonados', icon: 'abonados' },
     ])
 
     expect(markup).toContain('href="/admin/dashboard"')
@@ -58,7 +70,7 @@ describe('AdminSidebar', () => {
   it('permite agregar un modulo nuevo desde la configuracion', () => {
     const markup = renderSidebar([
       ...ADMIN_NAV_ITEMS,
-      { path: '/admin/nuevo-modulo', title: 'Nuevo módulo' },
+      { path: '/admin/nuevo-modulo', title: 'Nuevo módulo', icon: 'dashboard' },
     ])
 
     expect(markup).toContain('href="/admin/nuevo-modulo"')

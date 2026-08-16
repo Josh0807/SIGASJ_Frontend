@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+import type { AdminNavIconName } from '../features/admin/AdminNavIcon'
 import GalleryAdminPage from '../features/gallery/admin/GalleryAdminPage'
 import TransparenciaAdminPage from '../features/transparencia/admin/TransparenciaAdminPage'
 import PrivateModulePlaceholder from './PrivateModulePlaceholder'
@@ -7,12 +8,19 @@ export type PrivateRouteDefinition = {
   segment: string
   path: string
   title: string
+  icon: AdminNavIconName
+  availableInNav: boolean
   element: ReactElement
 }
 
 export type AdminNavItem = {
   path: string
   title: string
+  icon: AdminNavIconName
+}
+
+type AdminChildRouteOptions = {
+  availableInNav?: boolean
 }
 
 export const ADMIN_ROUTE_SEGMENT = 'admin'
@@ -21,13 +29,16 @@ export const ADMIN_HOME_SEGMENT = 'dashboard'
 export const ADMIN_HOME_PATH = `${ADMIN_BASE_PATH}/${ADMIN_HOME_SEGMENT}`
 
 const adminChildRoute = (
-  segment: string,
+  segment: AdminNavIconName,
   title: string,
   element: ReactElement,
+  options: AdminChildRouteOptions = {},
 ): PrivateRouteDefinition => ({
   segment,
   path: `${ADMIN_BASE_PATH}/${segment}`,
   title,
+  icon: segment,
+  availableInNav: options.availableInNav ?? true,
   element,
 })
 
@@ -88,6 +99,6 @@ export const PRIVATE_ROUTE_PATHS = PRIVATE_ROUTES.map(({ path }) => path)
 
 export const ADMIN_CHILD_ROUTES = PRIVATE_ROUTES
 
-export const ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_CHILD_ROUTES.map(
-  ({ path, title }) => ({ path, title }),
-)
+export const ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_CHILD_ROUTES.filter(
+  ({ availableInNav }) => availableInNav,
+).map(({ path, title, icon }) => ({ path, title, icon }))
