@@ -4,9 +4,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { ADMIN_NAV_ITEMS } from '../../routes/privateRoutes'
 import AdminSidebar from './AdminSidebar'
 
-const renderSidebar = (items?: Parameters<typeof AdminSidebar>[0]['items']) =>
+const renderSidebar = (
+  path = '/',
+  items?: Parameters<typeof AdminSidebar>[0]['items'],
+) =>
   renderToStaticMarkup(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <AdminSidebar items={items} />
     </MemoryRouter>,
   )
@@ -54,7 +57,7 @@ describe('AdminSidebar', () => {
   })
 
   it('puede recibir un conjunto distinto de opciones segun el usuario', () => {
-    const markup = renderSidebar([
+    const markup = renderSidebar('/', [
       { path: '/admin/dashboard', title: 'Dashboard', icon: 'dashboard' },
       { path: '/admin/abonados', title: 'Abonados', icon: 'abonados' },
     ])
@@ -68,7 +71,7 @@ describe('AdminSidebar', () => {
   })
 
   it('permite agregar un modulo nuevo desde la configuracion', () => {
-    const markup = renderSidebar([
+    const markup = renderSidebar('/', [
       ...ADMIN_NAV_ITEMS,
       { path: '/admin/nuevo-modulo', title: 'Nuevo módulo', icon: 'dashboard' },
     ])
@@ -83,5 +86,49 @@ describe('AdminSidebar', () => {
     expect(markup).toContain('admin-sidebar')
     expect(markup).not.toContain('admin-main__content')
     expect(markup).not.toContain('admin-header')
+  })
+
+  it('marca visualmente la opcion de la ruta activa', () => {
+    const markup = renderSidebar('/admin/abonados')
+    const abonadosStart = markup.indexOf('href="/admin/abonados"')
+    const dashboardStart = markup.indexOf('href="/admin/dashboard"')
+    const abonadosLink = markup.slice(abonadosStart - 180, abonadosStart + 220)
+    const dashboardLink = markup.slice(dashboardStart - 180, dashboardStart + 220)
+
+    expect(markup).toContain('admin-sidebar__link--active')
+    expect(markup).toContain('admin-sidebar__active-mark')
+    expect(abonadosLink).toContain('aria-current="page"')
+    expect(abonadosLink).toContain('admin-sidebar__link--active')
+    expect(dashboardLink).not.toContain('aria-current="page"')
+    expect(dashboardLink).not.toContain('admin-sidebar__link--active')
+  })
+
+  it('cambia el indicador al navegar a otro modulo', () => {
+    const abonados = renderSidebar('/admin/abonados')
+    const averias = renderSidebar('/admin/averias')
+
+    expect(abonados).toContain('href="/admin/abonados"')
+    expect(abonados).toContain('aria-current="page"')
+    expect(averias).toContain('href="/admin/averias"')
+    expect(averias).toContain('aria-current="page"')
+    expect(abonados.split('aria-current="page"').length - 1).toBe(1)
+    expect(averias.split('aria-current="page"').length - 1).toBe(1)
+  })
+
+  it('mantiene activo el modulo en rutas secundarias', () => {
+    const markup = renderSidebar('/admin/galeria/foto-12')
+    const galeriaStart = markup.indexOf('href="/admin/galeria"')
+    const galeriaLink = markup.slice(galeriaStart - 180, galeriaStart + 260)
+
+    expect(galeriaLink).toContain('admin-sidebar__link--active')
+    expect(galeriaLink).toContain('aria-current="page"')
+    expect(markup).toContain('admin-sidebar__active-mark')
+  })
+
+  it('permite enfocar los enlaces con teclado', () => {
+    const markup = renderSidebar('/admin/dashboard')
+
+    expect(markup).toContain('admin-sidebar__link')
+    expect(markup).not.toContain('tabindex="-1"')
   })
 })

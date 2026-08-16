@@ -24,11 +24,26 @@ const AdminSidebar = ({ items = ADMIN_NAV_ITEMS }: AdminSidebarProps) => (
     </div>
     <nav className="admin-sidebar__nav" aria-label="Navegación administrativa">
       {items.map(({ path, title, icon }) => (
-        <NavLink key={path} to={path} end className="admin-sidebar__link">
-          <span className="admin-sidebar__icon" aria-hidden="true" data-icon={icon}>
-            <AdminNavIcon name={icon} />
-          </span>
-          <span className="admin-sidebar__label">{title}</span>
+        <NavLink
+          key={path}
+          to={path}
+          className={({ isActive }) =>
+            isActive
+              ? 'admin-sidebar__link admin-sidebar__link--active'
+              : 'admin-sidebar__link'
+          }
+        >
+          {({ isActive }) => (
+            <>
+              <span className="admin-sidebar__icon" aria-hidden="true" data-icon={icon}>
+                <AdminNavIcon name={icon} />
+              </span>
+              <span className="admin-sidebar__label">{title}</span>
+              {isActive ? (
+                <span className="admin-sidebar__active-mark" aria-hidden="true" />
+              ) : null}
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

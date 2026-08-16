@@ -2128,12 +2128,13 @@ button.announcements-section__more {
 }
 
 .admin-sidebar__link {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
   min-height: 44px;
-  padding: 8px 12px;
+  padding: 8px 12px 8px 14px;
   border-radius: 8px;
   color: inherit;
   font-size: .9rem;
@@ -2162,14 +2163,46 @@ button.announcements-section__more {
   overflow-wrap: anywhere;
 }
 
-.admin-sidebar__link:hover,
-.admin-sidebar__link:focus-visible {
+.admin-sidebar__link:hover {
   background: rgba(255, 255, 255, .1);
 }
 
-.admin-sidebar__link.active {
-  background: rgba(255, 255, 255, .16);
+.admin-sidebar__link:focus-visible {
+  outline: 3px solid #7db7ed;
+  outline-offset: 2px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.admin-sidebar__link.active,
+.admin-sidebar__link--active {
+  background: rgba(255, 255, 255, .2);
+  color: white;
   font-weight: 750;
+}
+
+.admin-sidebar__link.active::before,
+.admin-sidebar__link--active::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #7db7ed;
+}
+
+.admin-sidebar__link--active .admin-sidebar__icon {
+  color: white;
+}
+
+.admin-sidebar__active-mark {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #7db7ed;
 }
 
 .admin-main {
