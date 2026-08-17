@@ -1,46 +1,49 @@
 import { Link } from 'react-router-dom'
+import asadaLogo from '../../assets/ASADA LOGO.jpeg'
+import { LANDING_ROUTE_PATH, LOGIN_ROUTE_PATH } from '../../routes/routePaths'
 import { getDefaultAdminHomePath } from './adminNavigation'
 import { useAuth } from './AuthContext'
-import { LOGIN_ROUTE_PATH } from '../../routes/routePaths'
+
+const AuthPageBrand = () => (
+  <div className="auth-page__brand">
+    <span className="auth-page__brand-logo">
+      <img src={asadaLogo} alt="" />
+    </span>
+    <span className="auth-page__brand-text">
+      <strong>SIGASJ</strong>
+      <span>ASADA San Juan</span>
+    </span>
+  </div>
+)
 
 const UnauthorizedPage = () => {
   const { isAuthenticated, user } = useAuth()
   const homePath = getDefaultAdminHomePath(user)
 
-  if (!isAuthenticated) {
-    return (
-      <main className="auth-page">
-        <div className="auth-page__card">
-          <h1>Acceso no autorizado</h1>
-          <p className="auth-page__hint">
-            Debes iniciar sesión para acceder a esta sección.
-          </p>
-          <Link className="auth-page__submit" to={LOGIN_ROUTE_PATH}>
-            Ir a iniciar sesión
-          </Link>
-          <Link className="auth-page__back" to="/">
-            Volver a la página principal
-          </Link>
-        </div>
-      </main>
-    )
-  }
+  const hint = isAuthenticated
+    ? 'Tu cuenta no tiene permiso para acceder a esta función del panel administrativo. Si crees que se trata de un error, contacta a la administración de la ASADA.'
+    : 'Debes iniciar sesión para acceder a esta sección.'
+
+  const primaryAction = isAuthenticated
+    ? homePath
+      ? { to: homePath, label: 'Volver al panel' }
+      : null
+    : { to: LOGIN_ROUTE_PATH, label: 'Ir a iniciar sesión' }
 
   return (
     <main className="auth-page">
       <div className="auth-page__card">
+        <AuthPageBrand />
         <h1>Acceso no autorizado</h1>
-        <p className="auth-page__hint">
-          Tu cuenta no tiene permiso para acceder a esta función del panel
-          administrativo. Si crees que se trata de un error, contacta a la
-          administración de la ASADA.
+        <p className="auth-page__hint" role="alert">
+          {hint}
         </p>
-        {homePath ? (
-          <Link className="auth-page__submit" to={homePath}>
-            Volver al panel
+        {primaryAction ? (
+          <Link className="auth-page__submit" to={primaryAction.to}>
+            {primaryAction.label}
           </Link>
         ) : null}
-        <Link className="auth-page__back" to="/">
+        <Link className="auth-page__back" to={LANDING_ROUTE_PATH}>
           Volver a la página principal
         </Link>
       </div>
