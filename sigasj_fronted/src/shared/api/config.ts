@@ -23,7 +23,7 @@ export function getApiBaseUrl(): string {
  * Se puede sobrescribir con VITE_PUBLIC_ANNOUNCEMENTS_PATH cuando el backend la defina.
  */
 export function getPublicAnnouncementsPath(): string {
-  const path = import.meta.env.VITE_PUBLIC_ANNOUNCEMENTS_PATH?.trim() || '/comunicados'
+  const path = import.meta.env.VITE_PUBLIC_ANNOUNCEMENTS_PATH?.trim() || '/api/public/comunicados'
   return path.startsWith('/') ? path : `/${path}`
 }
 
