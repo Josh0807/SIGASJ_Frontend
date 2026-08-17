@@ -7,8 +7,8 @@ import { usePublicGallery } from './usePublicGallery'
 
 /**
  * Sección pública de la galería fotográfica.
- * Sin `photos` en props consulta GET /api/public/galeria.
- * Con `photos` (modo controlado) no llama al API.
+ * Sin `photos` en props usa la colección de ejemplo.
+ * Con `photos` (modo controlado) muestra exactamente esos datos.
  */
 const GallerySection = ({
   id = GALLERY_SECTION_ID,
@@ -20,13 +20,13 @@ const GallerySection = ({
   errorMessage = 'No fue posible cargar la galería. Intenta de nuevo más tarde.',
 }: GallerySectionProps) => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const fetchFromApi = photosProp === undefined
-  const { status, photos: fetched, retry } = usePublicGallery(fetchFromApi)
+  const useDefaultItems = photosProp === undefined
+  const { status, photos: fetched, retry } = usePublicGallery(useDefaultItems)
 
   const photos = photosProp ?? fetched
   const hasPhotos = photos.length > 0
-  const showLoading = fetchFromApi && status === 'loading'
-  const showError = fetchFromApi && status === 'error'
+  const showLoading = useDefaultItems && status === 'loading'
+  const showError = useDefaultItems && status === 'error'
 
   return (
     <section

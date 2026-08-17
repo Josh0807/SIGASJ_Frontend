@@ -6,10 +6,10 @@ import { ANNOUNCEMENTS_HREF } from './landingAnchors'
  * Estado actual de la arquitectura SIGASJ (revisión):
  * - Existe ancla de sección en Landing: {@link ANNOUNCEMENTS_HREF} (`#comunicados`).
  * - No existe ruta SPA pública de listado completo de comunicados.
- * - No existe paginación ni mecanismo de “cargar más” en el Back-end.
+ * - No existe paginación ni mecanismo de “cargar más” en el listado público.
  *
  * Pendiente: cuando el producto defina Opción A (ruta pública) u Opción C
- * (paginación del endpoint), asignar aquí la ruta SPA pública o cablear la
+ * (paginación), asignar aquí la ruta SPA pública o cablear la
  * carga de la siguiente página en el hook. No usar /login ni rutas admin.
  *
  * Mientras sea `null`, el botón no se muestra al visitante (no se inventa navegación).

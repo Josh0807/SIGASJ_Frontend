@@ -5,8 +5,8 @@ import { usePublicTransparencia } from './usePublicTransparencia'
 
 /**
  * Sección pública de transparencia y calidad del agua.
- * Sin `publications` en props consulta GET /api/public/transparencia.
- * Con `publications` (modo controlado) no llama al API.
+ * Sin `publications` en props usa la colección de ejemplo.
+ * Con `publications` (modo controlado) muestra exactamente esos datos.
  */
 const TransparencySection = ({
   id = TRANSPARENCY_SECTION_ID,
@@ -17,14 +17,14 @@ const TransparencySection = ({
   emptyMessage = 'Próximamente publicaremos documentos e informes en esta sección.',
   errorMessage = 'No fue posible cargar la documentación. Intenta de nuevo más tarde.',
 }: TransparencySectionProps) => {
-  const fetchFromApi = publicationsProp === undefined
+  const useDefaultItems = publicationsProp === undefined
   const { status, publications: fetched, retry } =
-    usePublicTransparencia(fetchFromApi)
+    usePublicTransparencia(useDefaultItems)
 
   const publications = publicationsProp ?? fetched
   const hasPublications = publications.length > 0
-  const showLoading = fetchFromApi && status === 'loading'
-  const showError = fetchFromApi && status === 'error'
+  const showLoading = useDefaultItems && status === 'loading'
+  const showError = useDefaultItems && status === 'error'
 
   return (
     <section

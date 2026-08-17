@@ -1,6 +1,6 @@
 import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { clearAccessToken, setAccessToken } from '../auth/authStorage'
 import AppRoutes from '../../routes/AppRoutes'
@@ -121,20 +121,11 @@ describe('navegación del menú administrativo', () => {
     clearAccessToken()
     setAccessToken('token-de-prueba')
     mockMobileNav(false)
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        text: async () => '[]',
-      }),
-    )
   })
 
   afterEach(() => {
     window.matchMedia = originalMatchMedia
     document.body.style.overflow = ''
-    vi.unstubAllGlobals()
     clearAccessToken()
   })
 

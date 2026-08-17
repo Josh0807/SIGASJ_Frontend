@@ -2,7 +2,7 @@
 
 /**
  * Tarjeta reutilizable de una fotografía pública.
- * Solo presenta datos recibidos por props; no consulta API ni administra la galería.
+ * Solo presenta datos recibidos por props.
  */
 const GalleryCard = ({
   id,

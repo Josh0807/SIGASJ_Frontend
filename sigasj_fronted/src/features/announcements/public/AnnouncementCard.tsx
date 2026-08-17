@@ -3,7 +3,7 @@ import type { AnnouncementCardProps } from './AnnouncementsSectionProps'
 
 /**
  * Tarjeta reutilizable de un comunicado público.
- * Solo presenta datos recibidos por props; no consulta API ni administra comunicados.
+ * Solo presenta datos recibidos por props.
  */
 const AnnouncementCard = ({
   id,
