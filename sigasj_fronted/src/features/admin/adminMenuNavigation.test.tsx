@@ -2,6 +2,7 @@ import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
+import { AuthProvider } from '../auth/AuthContext'
 import { clearAccessToken, setAccessToken } from '../auth/authStorage'
 import AppRoutes from '../../routes/AppRoutes'
 import {
@@ -93,7 +94,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })

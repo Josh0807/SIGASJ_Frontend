@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, useLocation } from 'react-router-dom'
+import { AuthProvider } from '../features/auth/AuthContext'
 import { clearAccessToken, setAccessToken } from '../features/auth/authStorage'
 import AppRoutes from './AppRoutes'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
@@ -45,7 +46,9 @@ const mountApp = async (path: string) => {
             current = next
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -65,7 +68,9 @@ const mountApp = async (path: string) => {
 const renderPath = (path: string) =>
   renderToStaticMarkup(
     <MemoryRouter initialEntries={[path]}>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </MemoryRouter>,
   )
 
@@ -179,7 +184,9 @@ describe('AppRoutes y AdminLayout', () => {
       await act(async () => {
         root.render(
           <MemoryRouter initialEntries={['/admin/dashboard']}>
-            <AppRoutes />
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
           </MemoryRouter>,
         )
       })
@@ -277,7 +284,9 @@ describe('AppRoutes y AdminLayout', () => {
       await act(async () => {
         root.render(
           <MemoryRouter initialEntries={[ADMIN_BASE_PATH]}>
-            <AppRoutes />
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
           </MemoryRouter>,
         )
       })
@@ -301,7 +310,9 @@ describe('AppRoutes y AdminLayout', () => {
       await act(async () => {
         root.render(
           <MemoryRouter initialEntries={[ADMIN_BASE_PATH]}>
-            <AppRoutes />
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
           </MemoryRouter>,
         )
       })

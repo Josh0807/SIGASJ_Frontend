@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, useLocation } from 'react-router-dom'
+import { AuthProvider } from '../features/auth/AuthContext'
 import { clearAccessToken, setAccessToken } from '../features/auth/authStorage'
 import AppRoutes from './AppRoutes'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH } from './privateRoutes'
@@ -79,7 +80,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -208,7 +211,9 @@ describe('navegación conjunta entre área pública y administrativa', () => {
   it('no muestra contenido administrativo ni un instante al redirigir sin sesión', async () => {
     const staticMarkup = renderToStaticMarkup(
       <MemoryRouter initialEntries={[ADMIN_BASE_PATH]}>
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
 

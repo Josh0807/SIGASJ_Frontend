@@ -1757,6 +1757,22 @@ button.announcements-section__more {
   flex-direction: column;
   gap: 12px;
 }
+.auth-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #123f70;
+  font-weight: 600;
+}
+.auth-page__select {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #c5d9ea;
+  border-radius: 10px;
+  background: white;
+  color: #123f70;
+  font: inherit;
+}
 .auth-page__submit,
 .gallery-admin__button {
   min-height: 44px;
