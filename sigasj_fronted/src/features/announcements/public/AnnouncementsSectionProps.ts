@@ -14,7 +14,7 @@ export type Announcement = {
   fileUrl?: string
 }
 
-/** Props de presentación; incluye acción opcional sin mezclarse con el DTO del API. */
+/** Props de presentación de la tarjeta de comunicado. */
 export type AnnouncementCardProps = Announcement & {
   /**
    * Callback para “Ver más” cuando no hay ruta pública (p. ej. modal futuro).
@@ -27,7 +27,7 @@ export type AnnouncementsSectionProps = {
   id?: string
   title?: string
   description?: string
-  /** Si se pasa, la sección no consulta al API (útil para pruebas). */
+  /** Si se pasa, la sección muestra exactamente esos comunicados (útil para pruebas). */
   announcements?: Announcement[]
   emptyMessage?: string
   errorMessage?: string
@@ -38,7 +38,7 @@ export type AnnouncementsSectionProps = {
    */
   moreAnnouncementsHref?: string | null
   /**
-   * Indica si hay más registros (solo con metadatos reales del API o override de prueba).
+   * Indica si hay más registros (override de prueba).
    * En modo controlado, si no se pasa, el CTA no asume que hay más.
    */
   hasMoreAnnouncements?: boolean

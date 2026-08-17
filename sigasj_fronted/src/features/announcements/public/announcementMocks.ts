@@ -2,8 +2,7 @@
 import sampleImage from '../../../assets/Logo Gotin sin fondo.png'
 
 /**
- * Colección temporal de desarrollo para probar AnnouncementCard en la sección.
- * Sustituir por datos del API en la tarea de integración correspondiente.
+ * Colección de ejemplo para probar AnnouncementCard en la sección.
  */
 export const announcementMocks: Announcement[] = [
   {

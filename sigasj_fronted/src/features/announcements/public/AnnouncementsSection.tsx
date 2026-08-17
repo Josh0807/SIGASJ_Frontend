@@ -5,8 +5,8 @@ import { usePublicAnnouncements } from './usePublicAnnouncements'
 
 /**
  * Sección pública de comunicados.
- * Sin `announcements` en props consulta GET /api/public/comunicados.
- * Con `announcements` (modo controlado) no llama al API.
+ * Sin `announcements` en props usa la colección de ejemplo.
+ * Con `announcements` (modo controlado) muestra exactamente esos datos.
  */
 const AnnouncementsSection = ({
   id = ANNOUNCEMENTS_SECTION_ID,
@@ -16,14 +16,14 @@ const AnnouncementsSection = ({
   emptyMessage = 'Actualmente no hay comunicados públicos disponibles.',
   errorMessage = 'No fue posible cargar los comunicados. Intenta de nuevo más tarde.',
 }: AnnouncementsSectionProps) => {
-  const fetchFromApi = announcementsProp === undefined
+  const useDefaultItems = announcementsProp === undefined
   const { status, announcements: fetched, retry } =
-    usePublicAnnouncements(fetchFromApi)
+    usePublicAnnouncements(useDefaultItems)
 
   const announcements = announcementsProp ?? fetched
   const hasAnnouncements = announcements.length > 0
-  const showLoading = fetchFromApi && status === 'loading'
-  const showError = fetchFromApi && status === 'error'
+  const showLoading = useDefaultItems && status === 'loading'
+  const showError = useDefaultItems && status === 'error'
 
   return (
     <section

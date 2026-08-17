@@ -17,7 +17,7 @@ export type GallerySectionProps = {
   id?: string
   title?: string
   description?: string
-  /** Si se pasa, la sección no consulta al API (útil para pruebas). */
+  /** Si se pasa, la sección muestra exactamente esas fotografías (útil para pruebas). */
   photos?: GalleryPhoto[]
   emptyMessage?: string
   errorMessage?: string

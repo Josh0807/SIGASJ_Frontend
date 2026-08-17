@@ -1,3 +1,5 @@
+import type { TransparencyFileType } from '../types'
+
 export const TRANSPARENCIA_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 
 export const TRANSPARENCIA_ALLOWED_MIME_TYPES = [
@@ -36,6 +38,24 @@ export function validateTransparenciaFile(file: File): string | null {
   }
 
   return null
+}
+
+export function inferTransparenciaFileType(file: File): TransparencyFileType {
+  const extension = file.name.split('.').pop()?.toLowerCase()
+
+  if (extension === 'pdf' || file.type === 'application/pdf') {
+    return 'pdf'
+  }
+
+  if (extension === 'png' || file.type === 'image/png') {
+    return 'png'
+  }
+
+  if (extension === 'jpeg') {
+    return 'jpeg'
+  }
+
+  return 'jpg'
 }
 
 export function formatTransparenciaMaxSizeLabel(): string {

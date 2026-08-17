@@ -63,7 +63,7 @@ describe('TransparencySection', () => {
     expect(markup).toContain('Ver imagen')
   })
 
-  it('muestra estado de carga cuando consulta el API', () => {
+  it('muestra estado de carga cuando los datos aún no están listos', () => {
     mockUsePublicTransparencia.mockReturnValue({
       status: 'loading',
       publications: [],

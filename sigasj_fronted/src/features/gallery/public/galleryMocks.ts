@@ -2,8 +2,7 @@
 import sampleImage from '../../../assets/ASADA LOGO.jpeg'
 
 /**
- * Colección temporal de desarrollo para probar GallerySection.
- * Sustituir por datos del API en la tarea de integración correspondiente.
+ * Colección de ejemplo para probar GallerySection.
  */
 export const galleryMocks: GalleryPhoto[] = [
   {
