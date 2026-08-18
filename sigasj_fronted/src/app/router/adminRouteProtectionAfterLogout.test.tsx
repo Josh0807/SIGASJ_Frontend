@@ -118,7 +118,7 @@ describe('protección de rutas administrativas después del logout', () => {
     document.body.innerHTML = ''
   })
 
-  it('flujo completo: login → panel → cerrar sesión → redirección al login', async () => {
+  it('Prueba 1 — logout desde diálogo invalida sesión y redirige a /login', async () => {
     const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
     try {
@@ -145,7 +145,7 @@ describe('protección de rutas administrativas después del logout', () => {
     }
   })
 
-  it('bloquea acceso directo a /admin y /admin/dashboard tras cerrar sesión', async () => {
+  it('Prueba 2 — acceso directo a ruta administrativa principal bloqueado tras logout', async () => {
     const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
     try {
@@ -165,7 +165,7 @@ describe('protección de rutas administrativas después del logout', () => {
     }
   })
 
-  it('bloquea acceso directo a rutas administrativas hijas tras cerrar sesión', async () => {
+  it('Prueba 3 — acceso directo a rutas administrativas hijas bloqueado tras logout', async () => {
     const childPaths = [
       '/admin/abonados',
       '/admin/averias',
@@ -189,28 +189,54 @@ describe('protección de rutas administrativas después del logout', () => {
     }
   })
 
-  it('impide volver al panel con el botón Atrás cuando el historial contiene una URL administrativa', async () => {
-    clearAccessToken()
-
-    const app = await mountInteractiveApp(
-      [ADMIN_HOME_PATH, LOGIN_ROUTE_PATH],
-      1,
-    )
+  it('Prueba 4 — acceso directo a Mi perfil bloqueado tras logout', async () => {
+    const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
     try {
-      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
-      expect(isAuthenticated()).toBe(false)
+      await submitLogin(app.container)
+      await logoutFromAccountMenu(app.container)
 
-      await app.goBack()
+      expect(isAuthenticated()).toBe(false)
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+
+      await app.navigate(ADMIN_PROFILE_PATH)
 
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       assertBlockedAdminAccess(app.container)
+      expect(app.container.innerHTML).not.toContain('Mi perfil')
     } finally {
       await app.cleanup()
     }
   })
 
-  it('revalida ProtectedRoute al retroceder desde login hacia una ruta hija administrativa', async () => {
+  it('Prueba 5 — botón Atrás no recupera acceso al panel tras logout', async () => {
+    const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
+
+    try {
+      await submitLogin(app.container)
+
+      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(isAuthenticated()).toBe(true)
+      expect(app.container.innerHTML).toContain('admin-layout')
+
+      await logoutFromAccountMenu(app.container)
+
+      expect(isAuthenticated()).toBe(false)
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      assertBlockedAdminAccess(app.container)
+
+      await app.goBack()
+
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      assertBlockedAdminAccess(app.container)
+      expect(app.container.innerHTML).not.toContain('Galería de fotografías')
+      expect(app.container.innerHTML).not.toContain('Panel administrativo')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('Prueba 5b — historial con URL admin sin sesión sigue bloqueado al retroceder', async () => {
     clearAccessToken()
 
     const app = await mountInteractiveApp(
