@@ -90,6 +90,14 @@ describe('AdminLayout', () => {
     expect(second).toContain('Pantalla B')
   })
 
+  it('renderiza un único encabezado administrativo para todas las rutas hijas', () => {
+    const first = renderAdminRoute('/admin/a')
+    const second = renderAdminRoute('/admin/b')
+
+    expect(first.match(/class="admin-header"/g)?.length).toBe(1)
+    expect(second.match(/class="admin-header"/g)?.length).toBe(1)
+  })
+
   it('no emite errores de consola al renderizar el layout', () => {
     const errors: unknown[] = []
     const originalError = console.error

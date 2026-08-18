@@ -47,7 +47,6 @@ const AnnouncementsSection = ({
   const hasAnnouncements = announcements.length > 0
   const showLoading = useDefaultItems && status === 'loading'
   const showError = useDefaultItems && status === 'error'
-  const urgentCount = announcements.filter((item) => item.urgent).length
   const titleId = `${id}-title`
 
   return (
@@ -60,20 +59,7 @@ const AnnouncementsSection = ({
 
       <div className="announcements-section__content">
         <header className="announcements-section__heading">
-          <div className="announcements-section__heading-top">
-            <p className="announcements-section__eyebrow">Información oficial</p>
-            {hasAnnouncements && !showLoading ? (
-              <p className="announcements-section__count" role="status">
-                {announcements.length}{' '}
-                {announcements.length === 1
-                  ? 'comunicado publicado'
-                  : 'comunicados publicados'}
-                {urgentCount > 0
-                  ? ` · ${urgentCount} de prioridad alta`
-                  : ''}
-              </p>
-            ) : null}
-          </div>
+          <p className="announcements-section__eyebrow">Información oficial</p>
 
           <h2 id={titleId}>{title}</h2>
           <p className="announcements-section__lead">{description}</p>

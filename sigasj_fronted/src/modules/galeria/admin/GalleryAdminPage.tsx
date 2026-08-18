@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { clearAccessToken } from '../../auth/utils/authStorage'
+import { Link } from 'react-router-dom'
 import GalleryAdminForm from './GalleryAdminForm'
 import { adminGalleryMocks } from './adminGalleryMocks'
 import {
@@ -10,7 +9,6 @@ import {
 } from './types'
 
 const GalleryAdminPage = () => {
-  const navigate = useNavigate()
   const nextIdRef = useRef(
     Math.max(0, ...adminGalleryMocks.map((photo) => photo.id)) + 1,
   )
@@ -141,11 +139,6 @@ const GalleryAdminPage = () => {
     )
   }
 
-  const handleLogout = () => {
-    clearAccessToken()
-    navigate('/login', { replace: true })
-  }
-
   const formInitialValues =
     formMode === 'edit' && editingPhoto
       ? {
@@ -173,13 +166,6 @@ const GalleryAdminPage = () => {
             <Link className="gallery-admin__link" to="/admin/transparencia">
               Ir a transparencia
             </Link>
-            <button
-              type="button"
-              className="gallery-admin__button"
-              onClick={handleLogout}
-            >
-              Cerrar sesión
-            </button>
             <button
               type="button"
               className="gallery-admin__button gallery-admin__button--primary"

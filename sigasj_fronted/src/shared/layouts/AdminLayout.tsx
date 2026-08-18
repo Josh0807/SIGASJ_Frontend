@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Outlet } from 'react-router-dom'
-import AdminMain from '../../modules/admin-panel/components/AdminMain'
+import AdminHeader from '../../modules/admin-panel/components/AdminHeader'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
 
 const MOBILE_NAV_QUERY = '(max-width: 760px)'
@@ -77,13 +77,16 @@ const AdminLayout = () => {
         onClose={closeNav}
         closeButtonRef={closeRef}
       />
-      <AdminMain
-        menuOpen={isNavOpen}
-        onToggleMenu={() => setIsNavOpen((open) => !open)}
-        menuToggleRef={toggleRef}
-      >
-        <Outlet />
-      </AdminMain>
+      <div className="admin-main">
+        <AdminHeader
+          menuOpen={isNavOpen}
+          onToggleMenu={() => setIsNavOpen((open) => !open)}
+          menuToggleRef={toggleRef}
+        />
+        <div className="admin-main__content" aria-label="Contenido administrativo">
+          <Outlet />
+        </div>
+      </div>
     </div>
   )
 }
