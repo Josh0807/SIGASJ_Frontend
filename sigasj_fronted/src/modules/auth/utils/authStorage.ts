@@ -102,6 +102,7 @@ export function getAccessToken(): string | null {
 
 export function setAccessToken(token: string): void {
   localStorage.setItem(TOKEN_STORAGE_KEY, token)
+  notifyAuthUserChange()
 }
 
 export function getAuthUser(): AuthUser | null {

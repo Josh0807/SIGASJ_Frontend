@@ -61,6 +61,7 @@ describe('useAuthUser', () => {
     })
 
     expect(container.querySelector('[data-testid="user-name"]')?.textContent).toBe('')
+    expect(container.querySelector('[data-testid="user-role"]')?.textContent).toBe('')
   })
 
   it('reemplaza nombre y rol al iniciar sesión con otro usuario', () => {
