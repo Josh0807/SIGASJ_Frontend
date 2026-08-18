@@ -12,6 +12,8 @@ import {
 import AdminHeader from './AdminHeader'
 import {
   clearAccessToken,
+  getAuthUser,
+  isAuthenticated,
   setAccessToken,
   setAuthUser,
 } from '../../auth/utils/authStorage'
@@ -245,6 +247,49 @@ describe('AdminHeader', () => {
     container.remove()
   })
 
+  it('elimina nombre y rol del usuario al cerrar sesión', async () => {
+    setAccessToken('local-admin-session')
+    setAuthUser({
+      name: 'María',
+      lastName: 'Solís',
+      role: 'ADMINISTRADORA',
+    })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    const readUserSection = () =>
+      container.querySelector('.admin-header__user')?.textContent ?? ''
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter>
+          <AdminHeader />
+        </MemoryRouter>,
+      )
+    })
+
+    expect(readUserSection()).toContain('María Solís')
+    expect(readUserSection()).toContain('Administradora')
+
+    await act(async () => {
+      clearAccessToken()
+    })
+
+    expect(readUserSection()).toContain('Usuario')
+    expect(readUserSection()).not.toContain('María Solís')
+    expect(readUserSection()).not.toContain('Administradora')
+    expect(
+      container.querySelector('.admin-header__user-detail'),
+    ).toBeNull()
+
+    await act(async () => {
+      root.unmount()
+    })
+    container.remove()
+  })
+
   it('abre el menú de cuenta, navega a Mi perfil y conserva la información del usuario', async () => {
     setAccessToken('local-admin-session')
     setAuthUser({
@@ -359,6 +404,8 @@ describe('AdminHeader', () => {
 
     expect(localStorage.getItem('sigasj_access_token')).toBeNull()
     expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
+    expect(isAuthenticated()).toBe(false)
+    expect(getAuthUser()).toBeNull()
     expect(container.textContent).toContain('Pantalla login')
   })
 })

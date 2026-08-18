@@ -9,6 +9,7 @@ import {
   ADMIN_PROFILE_PATH,
   ADMIN_PROFILE_TITLE,
 } from '../../../app/router/privateRoutes'
+import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
 import AdminAccountMenu from './AdminAccountMenu'
 import {
   clearAccessToken,
@@ -61,6 +62,8 @@ describe('AdminAccountMenu', () => {
     expect(markup).toContain('Próximamente')
     expect(markup).not.toContain('Ver perfil')
     expect(markup).toContain('Cerrar sesión')
+    expect(markup).toContain('type="button"')
+    expect(markup).toContain('admin-account-menu__item--danger')
     expect(markup).toContain('aria-haspopup="menu"')
     expect(markup).toContain('aria-expanded="false"')
     expect(markup).toContain('aria-label="Opciones de cuenta"')
@@ -162,6 +165,124 @@ describe('AdminAccountMenu', () => {
 
     logoutItem.focus()
     expect(document.activeElement).toBe(logoutItem)
+  })
+
+  it('permite cerrar sesión únicamente con teclado', async () => {
+    setAccessToken('local-admin-session')
+    setAuthUser({ name: 'Ana' })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
+          <AppRoutes />
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+    const publicLink = container.querySelector(
+      '.admin-header__action--public',
+    ) as HTMLAnchorElement
+
+    expect(trigger.type).toBe('button')
+    expect(publicLink).not.toBeNull()
+
+    publicLink.focus()
+    trigger.focus()
+
+    await act(async () => {
+      pressKey(trigger, 'Enter', { activate: true })
+    })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(trigger.getAttribute('aria-controls')).toBeTruthy()
+
+    const profileLink = container.querySelector(
+      `.admin-account-menu__item--link[href="${ADMIN_PROFILE_PATH}"]`,
+    ) as HTMLAnchorElement
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    expect(profileLink).not.toBeNull()
+    expect(logoutItem).not.toBeNull()
+    expect(logoutItem.type).toBe('button')
+    expect(logoutItem.getAttribute('role')).toBe('menuitem')
+    expect(document.activeElement).toBe(profileLink)
+
+    await act(async () => {
+      pressKey(profileLink, 'ArrowDown')
+    })
+
+    expect(document.activeElement).toBe(logoutItem)
+
+    await act(async () => {
+      pressKey(logoutItem, 'Enter', { activate: true })
+    })
+
+    expect(localStorage.getItem('sigasj_access_token')).toBeNull()
+    expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
+    expect(container.textContent).toContain('Iniciar sesión')
+    expect(container.innerHTML).not.toContain('admin-header')
+  })
+
+  it('activa Cerrar sesión con Space cuando tiene el foco', async () => {
+    setAccessToken('local-admin-session')
+    setAuthUser({ name: 'Ana' })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={['/admin/dashboard']}>
+          <Routes>
+            <Route path="/admin/dashboard" element={<AdminAccountMenu />} />
+            <Route path={LOGIN_ROUTE_PATH} element={<p>Pantalla login</p>} />
+          </Routes>
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      trigger.focus()
+      pressKey(trigger, ' ', { activate: true })
+    })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+
+    const profileLink = container.querySelector(
+      `.admin-account-menu__item--link[href="${ADMIN_PROFILE_PATH}"]`,
+    ) as HTMLAnchorElement
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    expect(document.activeElement).toBe(profileLink)
+
+    await act(async () => {
+      pressKey(profileLink, 'End')
+    })
+
+    expect(document.activeElement).toBe(logoutItem)
+
+    await act(async () => {
+      pressKey(logoutItem, ' ', { activate: true })
+    })
+
+    expect(localStorage.getItem('sigasj_access_token')).toBeNull()
+    expect(container.textContent).toContain('Pantalla login')
   })
 
   it('cierra el menú con Escape y devuelve el foco al trigger', async () => {
@@ -304,6 +425,45 @@ describe('AdminAccountMenu', () => {
     expect(container.querySelector('.admin-main__content .admin-sidebar')).toBeNull()
   })
 
+  it('cierra el menú antes de ejecutar logout', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter>
+          <AdminAccountMenu />
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+    const panel = container.querySelector(
+      '.admin-account-menu__panel',
+    ) as HTMLDivElement
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(panel.hasAttribute('hidden')).toBe(false)
+
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      logoutItem.click()
+    })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(panel.hasAttribute('hidden')).toBe(true)
+  })
+
   it('cierra sesión desde el menú de cuenta', async () => {
     setAccessToken('local-admin-session')
     setAuthUser({ name: 'Ana' })
@@ -317,7 +477,7 @@ describe('AdminAccountMenu', () => {
         <MemoryRouter initialEntries={['/admin/dashboard']}>
           <Routes>
             <Route path="/admin/dashboard" element={<AdminAccountMenu />} />
-            <Route path="/login" element={<p>Pantalla login</p>} />
+            <Route path={LOGIN_ROUTE_PATH} element={<p>Pantalla login</p>} />
           </Routes>
         </MemoryRouter>,
       )
@@ -340,6 +500,16 @@ describe('AdminAccountMenu', () => {
     })
 
     expect(localStorage.getItem('sigasj_access_token')).toBeNull()
+    expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
     expect(container.textContent).toContain('Pantalla login')
+  })
+
+  it('no manipula la sesión directamente y delega en useAdminLogout', () => {
+    const source = AdminAccountMenu.toString()
+
+    expect(source).toContain('useAdminLogout')
+    expect(source).not.toContain('localStorage')
+    expect(source).not.toContain('clearAccessToken')
+    expect(source).not.toContain('removeItem')
   })
 })
