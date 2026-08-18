@@ -11,7 +11,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:roles": "vitest run src/routes/adminRoleAccess.test.tsx src/features/auth/roleAccessMatrix.test.ts src/features/auth/backendRoleAuthorization.test.ts",
+    "test:roles": "vitest run src/app/router/adminRoleAccess.test.tsx src/modules/auth/utils/roleAccessMatrix.test.ts src/modules/auth/utils/backendRoleAuthorization.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {
