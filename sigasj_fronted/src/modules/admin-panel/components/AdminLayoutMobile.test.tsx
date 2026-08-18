@@ -4,9 +4,11 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
 import AdminDashboard from '../../dashboard/AdminDashboard'
+import { loginWithAdminSession } from '../../../test/authTestHelpers'
 
 describe('AdminLayout Mobile Integration', () => {
   beforeEach(() => {
+    loginWithAdminSession()
     // Simular pantalla móvil (< 760px)
     window.matchMedia = ((query: string) => ({
       matches: query.includes('760px'),

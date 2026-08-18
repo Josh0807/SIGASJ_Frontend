@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
+import { loginWithAdminSession } from '../../../test/authTestHelpers'
 
 describe('AdminLayout Structure & Styling Integration', () => {
-  const renderLayout = (path = '/admin/dashboard') =>
-    renderToStaticMarkup(
+  const renderLayout = (path = '/admin/dashboard') => {
+    loginWithAdminSession()
+    return renderToStaticMarkup(
       <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route element={<AdminLayout />}>
@@ -15,6 +17,7 @@ describe('AdminLayout Structure & Styling Integration', () => {
         </Routes>
       </MemoryRouter>,
     )
+  }
 
   it('1. Renderiza el contenedor principal admin-layout con fondo y flexbox', () => {
     const markup = renderLayout()

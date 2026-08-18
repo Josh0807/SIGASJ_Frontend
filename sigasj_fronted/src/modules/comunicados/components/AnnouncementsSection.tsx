@@ -1,20 +1,43 @@
-﻿import AnnouncementCard from './AnnouncementCard'
+﻿import AnnouncementsCarousel from './AnnouncementsCarousel'
+import { AlertIcon, EmptyInboxIcon } from './announcementIcons'
 import type { AnnouncementsSectionProps } from '../types/AnnouncementsSectionProps'
 import { ANNOUNCEMENTS_SECTION_ID } from '../../landing/config/landingAnchors'
 import { usePublicAnnouncements } from '../hooks/usePublicAnnouncements'
 
-/**
- * Sección pública de comunicados.
- * Sin `announcements` en props usa la colección de ejemplo.
- * Con `announcements` (modo controlado) muestra exactamente esos datos.
- */
+const AnnouncementsSkeleton = () => (
+  <div className="announcements-carousel announcements-carousel--loading" aria-hidden="true">
+    <div className="announcements-carousel__viewport">
+      <div className="announcements-carousel__track announcements-carousel__track--static">
+        {Array.from({ length: 2 }, (_, index) => (
+          <div
+            key={`announcement-skeleton-${index}`}
+            className="announcements-carousel__slide"
+          >
+            <div className="announcements-section__card announcements-section__card--skeleton">
+              <div
+                className="announcements-section__media announcements-section__media--skeleton"
+                aria-hidden="true"
+              />
+              <div className="announcements-section__skeleton-line announcements-section__skeleton-line--title" />
+              <div className="announcements-section__skeleton-line" />
+              <div className="announcements-section__skeleton-line announcements-section__skeleton-line--short" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)
+
 const AnnouncementsSection = ({
   id = ANNOUNCEMENTS_SECTION_ID,
   title = 'Comunicados',
-  description = 'Mantente informado sobre avisos importantes, mantenimientos, cortes de agua y otras comunicaciones de la ASADA San Juan.',
+  description =
+    'Consulte avisos oficiales sobre mantenimientos, interrupciones del servicio, asambleas y demás comunicaciones institucionales de la ASADA San Juan.',
   announcements: announcementsProp,
-  emptyMessage = 'Actualmente no hay comunicados públicos disponibles.',
-  errorMessage = 'No fue posible cargar los comunicados. Intenta de nuevo más tarde.',
+  emptyMessage = 'No se registran comunicados públicos disponibles en este momento.',
+  errorMessage =
+    'No fue posible cargar los comunicados. Por favor, intente nuevamente más tarde.',
 }: AnnouncementsSectionProps) => {
   const useDefaultItems = announcementsProp === undefined
   const { status, announcements: fetched, retry } =
@@ -24,54 +47,55 @@ const AnnouncementsSection = ({
   const hasAnnouncements = announcements.length > 0
   const showLoading = useDefaultItems && status === 'loading'
   const showError = useDefaultItems && status === 'error'
+  const titleId = `${id}-title`
 
   return (
     <section
       className="landing-section announcements-section"
       id={id}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={titleId}
     >
+      <div className="announcements-section__backdrop" aria-hidden="true" />
+
       <div className="announcements-section__content">
         <header className="announcements-section__heading">
           <p className="announcements-section__eyebrow">Información oficial</p>
-          <h2 id={`${id}-title`}>{title}</h2>
-          <p>{description}</p>
+
+          <h2 id={titleId}>{title}</h2>
+          <p className="announcements-section__lead">{description}</p>
         </header>
 
         {showLoading ? (
-          <p className="announcements-section__empty" role="status">
-            Cargando comunicados…
-          </p>
+          <div role="status" aria-live="polite" aria-busy="true">
+            <span className="visually-hidden">Cargando comunicados…</span>
+            <AnnouncementsSkeleton />
+          </div>
         ) : showError ? (
-          <div className="announcements-section__empty" role="alert">
-            <p>{errorMessage}</p>
-            <button type="button" onClick={retry}>
-              Reintentar
+          <div className="announcements-section__error" role="alert">
+            <span className="announcements-section__state-icon">
+              <AlertIcon />
+            </span>
+            <p className="announcements-section__error-message">{errorMessage}</p>
+            <button
+              type="button"
+              className="announcements-section__retry"
+              onClick={retry}
+            >
+              Reintentar consulta
             </button>
           </div>
         ) : hasAnnouncements ? (
-          <div className="announcements-section__grid">
-            {announcements.map((announcement) => (
-              <AnnouncementCard
-                key={announcement.id}
-                id={announcement.id}
-                title={announcement.title}
-                summary={announcement.summary}
-                content={announcement.content}
-                publishedAt={announcement.publishedAt}
-                type={announcement.type}
-                urgent={announcement.urgent}
-                moreHref={announcement.moreHref}
-                moreLabel={announcement.moreLabel}
-                imageUrl={announcement.imageUrl}
-                fileUrl={announcement.fileUrl}
-              />
-            ))}
-          </div>
+          <AnnouncementsCarousel
+            announcements={announcements}
+            labelledBy={titleId}
+          />
         ) : (
-          <p className="announcements-section__empty" role="status">
-            {emptyMessage}
-          </p>
+          <div className="announcements-section__empty" role="status">
+            <span className="announcements-section__state-icon">
+              <EmptyInboxIcon />
+            </span>
+            <p>{emptyMessage}</p>
+          </div>
         )}
       </div>
     </section>

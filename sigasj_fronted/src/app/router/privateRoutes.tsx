@@ -1,8 +1,11 @@
-import type { ReactElement } from 'react'
+﻿import type { ReactElement } from 'react'
 import type { AdminNavIconName } from '../../modules/admin-panel/components/AdminNavIcon'
+import { ADMIN_MODULE_ACCESS } from '../../modules/auth/config/adminNavigation.config'
+import type { InternalAdminRole } from '../../modules/auth/utils/internalRoles'
 import AdminDashboard from '../../modules/dashboard/AdminDashboard'
 import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
+import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
 
 export type PrivateRouteDefinition = {
@@ -11,6 +14,8 @@ export type PrivateRouteDefinition = {
   title: string
   icon: AdminNavIconName
   availableInNav: boolean
+  allowedRoles: readonly InternalAdminRole[]
+  requiredPermissions: readonly string[]
   element: ReactElement
 }
 
@@ -20,81 +25,42 @@ export type AdminNavItem = {
   icon: AdminNavIconName
 }
 
-type AdminChildRouteOptions = {
-  availableInNav?: boolean
+const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
+  dashboard: <AdminDashboard />,
+  usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
+  abonados: <PrivateModulePlaceholder title="Gestión de abonados" />,
+  inventario: <PrivateModulePlaceholder title="Gestión de inventario" />,
+  solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
+  lecturas: <PrivateModulePlaceholder title="Gestión de lecturas" />,
+  averias: <PrivateModulePlaceholder title="Gestión de averías" />,
+  reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,
+  galeria: <GalleryAdminPage />,
+  transparencia: <TransparenciaAdminPage />,
+  perfil: <ProfilePage />,
+  menu: <PrivateModulePlaceholder title="Menú" />,
+  menuClose: <PrivateModulePlaceholder title="Cerrar menú" />,
 }
 
 export const ADMIN_ROUTE_SEGMENT = 'admin'
 export const ADMIN_BASE_PATH = `/${ADMIN_ROUTE_SEGMENT}`
 export const ADMIN_HOME_SEGMENT = 'dashboard'
 export const ADMIN_HOME_PATH = `${ADMIN_BASE_PATH}/${ADMIN_HOME_SEGMENT}`
+export const ADMIN_PROFILE_SEGMENT = 'perfil'
+export const ADMIN_PROFILE_TITLE = 'Mi perfil'
+export const ADMIN_PROFILE_PATH = `${ADMIN_BASE_PATH}/${ADMIN_PROFILE_SEGMENT}`
 
-const adminChildRoute = (
-  segment: AdminNavIconName,
-  title: string,
-  element: ReactElement,
-  options: AdminChildRouteOptions = {},
-): PrivateRouteDefinition => ({
-  segment,
-  path: `${ADMIN_BASE_PATH}/${segment}`,
-  title,
-  icon: segment,
-  availableInNav: options.availableInNav ?? true,
-  element,
-})
-
-export const PRIVATE_ROUTES: PrivateRouteDefinition[] = [
-  adminChildRoute(
-    'dashboard',
-    'Dashboard',
-    <AdminDashboard />,
-  ),
-  adminChildRoute(
-    'usuarios',
-    'Gestión de usuarios',
-    <PrivateModulePlaceholder title="Gestión de usuarios" />,
-  ),
-  adminChildRoute(
-    'abonados',
-    'Gestión de abonados',
-    <PrivateModulePlaceholder title="Gestión de abonados" />,
-  ),
-  adminChildRoute(
-    'inventario',
-    'Gestión de inventario',
-    <PrivateModulePlaceholder title="Gestión de inventario" />,
-  ),
-  adminChildRoute(
-    'solicitudes',
-    'Gestión de solicitudes',
-    <PrivateModulePlaceholder title="Gestión de solicitudes" />,
-  ),
-  adminChildRoute(
-    'lecturas',
-    'Gestión de lecturas',
-    <PrivateModulePlaceholder title="Gestión de lecturas" />,
-  ),
-  adminChildRoute(
-    'averias',
-    'Gestión de averías',
-    <PrivateModulePlaceholder title="Gestión de averías" />,
-  ),
-  adminChildRoute(
-    'reportes',
-    'Gestión de reportes',
-    <PrivateModulePlaceholder title="Gestión de reportes" />,
-  ),
-  adminChildRoute(
-    'galeria',
-    'Galería de fotografías',
-    <GalleryAdminPage />,
-  ),
-  adminChildRoute(
-    'transparencia',
-    'Transparencia y calidad del agua',
-    <TransparenciaAdminPage />,
-  ),
-]
+export const PRIVATE_ROUTES: PrivateRouteDefinition[] = ADMIN_MODULE_ACCESS.map(
+  (module) => ({
+    segment: module.segment,
+    path: `${ADMIN_BASE_PATH}/${module.segment}`,
+    title: module.title,
+    icon: module.segment,
+    availableInNav: module.availableInNav,
+    allowedRoles: module.allowedRoles,
+    requiredPermissions: module.requiredPermissions,
+    element: ADMIN_MODULE_ELEMENTS[module.segment],
+  }),
+)
 
 export const PRIVATE_ROUTE_PATHS = PRIVATE_ROUTES.map(({ path }) => path)
 

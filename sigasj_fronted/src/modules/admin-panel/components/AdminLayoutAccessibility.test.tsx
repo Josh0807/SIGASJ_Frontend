@@ -5,10 +5,12 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
 import AdminDashboard from '../../dashboard/AdminDashboard'
 import AdminUserMenu from './AdminUserMenu'
+import { loginWithAdminSession } from '../../../test/authTestHelpers'
 
 describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    loginWithAdminSession()
   })
 
   it('1. Todos los botones e íconos interactivos poseen nombres accesibles (aria-label o aria-expanded)', () => {

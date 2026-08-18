@@ -1,10 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { AnnouncementCardProps } from '../types/AnnouncementsSectionProps'
 
-/**
- * Tarjeta reutilizable de un comunicado público.
- * Solo presenta datos recibidos por props.
- */
 const AnnouncementCard = ({
   id,
   title,
@@ -14,7 +10,7 @@ const AnnouncementCard = ({
   type,
   urgent = false,
   moreHref,
-  moreLabel = 'Ver más',
+  moreLabel = 'Consultar detalle',
   onMoreClick,
   imageUrl,
   fileUrl,
@@ -26,7 +22,6 @@ const AnnouncementCard = ({
 
   const safeSummary = typeof summary === 'string' ? summary.trim() : ''
   const safeContent = typeof content === 'string' ? content.trim() : ''
-  // Descripción breve prioritaria; el contenido completo solo como respaldo visual.
   const bodyText = safeSummary || safeContent
 
   if (!bodyText) {
@@ -43,88 +38,88 @@ const AnnouncementCard = ({
     ? formatAnnouncementDate(safePublishedAt)
     : undefined
 
-  const hasFullContent = Boolean(safeContent)
-  const hasMoreThanBrief =
-    hasFullContent && (!safeSummary || safeContent !== safeSummary)
-
-  const hasMoreTarget =
-    Boolean(safeMoreHref) || typeof onMoreClick === 'function'
-  // Solo si hay destino/callback real. Contenido adicional solo no inventa UI.
-  const showMoreAction = hasMoreTarget
-
   const titleId = `announcement-title-${id}`
-  const showHeader = Boolean(safeType || urgent || formattedDate)
-  const showActions = Boolean(showMoreAction || safeFileUrl)
-  const imageAlt = buildImageAlt(safeTitle, safeType)
+  const showMeta = Boolean(safeType || formattedDate || urgent)
 
-  const cardClassName = urgent
-    ? 'announcements-section__card announcements-section__card--urgent'
-    : 'announcements-section__card'
+  const cardClassName = [
+    'announcements-section__card',
+    urgent ? 'announcements-section__card--urgent' : '',
+    safeImageUrl ? 'announcements-section__card--with-media' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const imageAlt = `Ilustración del comunicado: ${safeTitle}`
 
   return (
     <article
       className={cardClassName}
       data-announcement-id={id}
-      data-has-full-content={hasFullContent ? 'true' : 'false'}
-      data-has-more-than-brief={hasMoreThanBrief ? 'true' : 'false'}
       aria-labelledby={titleId}
     >
+      <div className="announcements-section__card-accent" aria-hidden="true" />
+
       {safeImageUrl ? (
         <div className="announcements-section__media">
-          <img
-            className="announcements-section__image"
-            src={safeImageUrl}
-            alt={imageAlt}
-            loading="lazy"
-            decoding="async"
-          />
+          <a
+            className="announcements-section__media-link"
+            href={safeImageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ver imagen ampliada: ${safeTitle}`}
+          >
+            <img
+              className="announcements-section__image"
+              src={safeImageUrl}
+              alt={imageAlt}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
         </div>
       ) : null}
 
-      {showHeader ? (
-        <header className="announcements-section__card-header">
-          <div className="announcements-section__badges">
-            {safeType ? (
-              <p className="announcements-section__type">{safeType}</p>
+      <div className="announcements-section__card-body">
+        {showMeta ? (
+          <p className="announcements-section__meta">
+            {safeType ? <span>{safeType}</span> : null}
+            {formattedDate ? (
+              <time dateTime={safePublishedAt}>{formattedDate}</time>
             ) : null}
             {urgent ? (
-              <p className="announcements-section__urgent" role="status">
-                <span
-                  className="announcements-section__urgent-mark"
-                  aria-hidden="true"
-                >
-                  !
-                </span>
-                Urgente
-              </p>
+              <span className="announcements-section__meta-urgent">
+                Prioridad alta
+              </span>
             ) : null}
-          </div>
-          {formattedDate ? (
-            <time
-              className="announcements-section__date"
-              dateTime={safePublishedAt}
-            >
-              {formattedDate}
-            </time>
-          ) : null}
-        </header>
-      ) : null}
+          </p>
+        ) : null}
 
-      <h3 className="announcements-section__title" id={titleId}>
-        {safeTitle}
-      </h3>
+        <h3 className="announcements-section__title" id={titleId}>
+          {safeTitle}
+        </h3>
 
-      <p className="announcements-section__summary">{bodyText}</p>
+        <p className="announcements-section__summary">{bodyText}</p>
 
-      {showActions ? (
         <footer className="announcements-section__card-actions">
-          {showMoreAction ? (
-            <MoreAction
+          {safeImageUrl ? (
+            <a
+              className="announcements-section__more"
+              href={safeImageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ver imagen
+            </a>
+          ) : null}
+
+          {!safeImageUrl && (safeMoreHref || typeof onMoreClick === 'function') ? (
+            <CardAction
               label={moreLabel}
               href={safeMoreHref}
               onClick={onMoreClick}
             />
           ) : null}
+
           {safeFileUrl ? (
             <a
               className="announcements-section__file"
@@ -132,16 +127,16 @@ const AnnouncementCard = ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              Ver archivo
+              Ver documento
             </a>
           ) : null}
         </footer>
-      ) : null}
+      </div>
     </article>
   )
 }
 
-type MoreActionProps = {
+type CardActionProps = {
   label: string
   href?: string
   onClick?: () => void
@@ -150,8 +145,7 @@ type MoreActionProps = {
 const isInternalSpaPath = (href: string) =>
   href.startsWith('/') && !href.startsWith('//')
 
-/** Enlace para navegación; botón para acción (p. ej. modal futuro). */
-const MoreAction = ({ label, href, onClick }: MoreActionProps) => {
+const CardAction = ({ label, href, onClick }: CardActionProps) => {
   if (href) {
     if (isInternalSpaPath(href)) {
       return (
@@ -196,20 +190,6 @@ const asPublicAssetUrl = (value: unknown): string | undefined => {
   return trimmed
 }
 
-const buildImageAlt = (title: string, type?: string) => {
-  if (type) {
-    return `Imagen del comunicado «${title}» (${type})`
-  }
-
-  return `Imagen del comunicado «${title}»`
-}
-
-/**
- * Formato de fecha del proyecto: ej. "8 de agosto de 2026" (es-CR).
- * Devuelve undefined si el valor no es una fecha válida (evita Invalid Date).
- * Las fechas solo-día (YYYY-MM-DD) se interpretan en calendario local para
- * evitar que el offset UTC reste un día.
- */
 const formatAnnouncementDate = (value: string): string | undefined => {
   const trimmed = value.trim()
   const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)

@@ -2,7 +2,9 @@ import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { clearAccessToken, setAccessToken } from '../../auth/utils/authStorage'
+import { AuthProvider } from '../../auth/components/AuthContext'
+import { clearAccessToken } from '../../auth/utils/authStorage'
+import { loginWithAdminSession } from '../../../test/authTestHelpers'
 import AppRoutes from '../../../app/router/AppRoutes'
 import {
   ADMIN_HOME_PATH,
@@ -93,7 +95,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -119,7 +123,7 @@ describe('navegación del menú administrativo', () => {
 
   beforeEach(() => {
     clearAccessToken()
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     mockMobileNav(false)
   })
 

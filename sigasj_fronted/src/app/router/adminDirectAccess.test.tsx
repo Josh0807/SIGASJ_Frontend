@@ -2,11 +2,12 @@ import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
 import {
   clearAccessToken,
   getAccessToken,
-  setAccessToken,
 } from '../../modules/auth/utils/authStorage'
+import { loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
@@ -40,7 +41,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -94,7 +97,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('Caso 3 — con sesión válida muestra AdminLayout, sidebar, header y contenido', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp(ADMIN_HOME_PATH)
 
     try {
@@ -111,7 +114,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('Caso 4 — recargar una ruta administrativa conserva el panel si el token sigue en storage', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const firstLoad = await mountApp(ADMIN_HOME_PATH)
 
     try {
@@ -138,7 +141,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('Prueba 1 — acceso directo a /admin/abonados con sesión carga layout y Outlet', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const errors: unknown[] = []
     const warnings: unknown[] = []
     const originalError = console.error
@@ -173,7 +176,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('Prueba 2 — recargar /admin/abonados conserva layout y contenido', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const firstLoad = await mountApp('/admin/abonados')
 
     try {
@@ -219,7 +222,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('redirige una ruta administrativa inexistente al dashboard sin romper el panel', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const errors: unknown[] = []
     const warnings: unknown[] = []
     const originalError = console.error
@@ -256,7 +259,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('audita la consola al cargar cada ruta administrativa existente', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const findings: Record<string, { errors: unknown[]; warnings: unknown[] }> = {}
 
     for (const path of PRIVATE_ROUTE_PATHS) {
@@ -290,7 +293,7 @@ describe('acceso directo a rutas administrativas', () => {
   })
 
   it('Caso 5 — al eliminar la sesión el panel deja de ser accesible', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const withSession = await mountApp(ADMIN_HOME_PATH)
 
     try {

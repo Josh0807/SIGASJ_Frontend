@@ -2,7 +2,9 @@ import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { clearAccessToken, setAccessToken } from '../../modules/auth/utils/authStorage'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
+import { clearAccessToken } from '../../modules/auth/utils/authStorage'
+import { loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
 import { PRIVATE_ROUTE_PATHS } from './privateRoutes'
 import { PUBLIC_ROUTE_PATHS } from './publicRoutes'
@@ -47,7 +49,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -148,7 +152,7 @@ describe('separación entre interfaz pública y administrativa', () => {
   })
 
   it('Prueba 5 — Ruta administrativa existente carga AdminLayout', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp('/admin/dashboard')
 
     try {
@@ -165,7 +169,7 @@ describe('separación entre interfaz pública y administrativa', () => {
   })
 
   it('Prueba 6 — Navegación entre módulos mantiene sidebar y header', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp('/admin/dashboard')
 
     try {
@@ -193,7 +197,7 @@ describe('separación entre interfaz pública y administrativa', () => {
   })
 
   it('Prueba 7 — Al volver al sitio público deja de usarse AdminLayout', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp('/admin/galeria')
 
     try {
@@ -222,7 +226,7 @@ describe('separación entre interfaz pública y administrativa', () => {
   })
 
   it('Prueba 9 — URL directa administrativa carga AdminLayout con acceso', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
 
     for (const path of ['/admin/abonados', '/admin/averias'] as const) {
       const app = await mountApp(path)

@@ -4,6 +4,7 @@ import {
   ADMIN_CHILD_ROUTES,
   ADMIN_HOME_PATH,
   ADMIN_NAV_ITEMS,
+  ADMIN_PROFILE_PATH,
   PRIVATE_ROUTE_PATHS,
 } from './privateRoutes'
 import { LANDING_ROUTE, LANDING_ROUTE_PATH, PUBLIC_ROUTE_PATHS, PUBLIC_VISITOR_FORM_PATHS } from './publicRoutes'
@@ -20,6 +21,7 @@ describe('route configuration', () => {
       '/solicitudes/arreglo-pago',
       '/solicitudes/cambio-titular',
       '/login',
+      '/unauthorized',
     ])
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/comunicados')
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/dashboard')
@@ -69,6 +71,7 @@ describe('route configuration', () => {
         '/admin/reportes',
         '/admin/galeria',
         '/admin/transparencia',
+        ADMIN_PROFILE_PATH,
       ]),
     )
   })
@@ -83,6 +86,14 @@ describe('route configuration', () => {
   it('usa el dashboard existente como destino inicial de /admin', () => {
     expect(ADMIN_HOME_PATH).toBe('/admin/dashboard')
     expect(PRIVATE_ROUTE_PATHS).toContain(ADMIN_HOME_PATH)
+  })
+
+  it('expone la ruta de perfil como módulo administrativo protegido', () => {
+    expect(ADMIN_PROFILE_PATH).toBe('/admin/perfil')
+    expect(PRIVATE_ROUTE_PATHS).toContain(ADMIN_PROFILE_PATH)
+    expect(ADMIN_NAV_ITEMS.some((item) => item.path === ADMIN_PROFILE_PATH)).toBe(
+      false,
+    )
   })
 
   it('deriva la navegación del sidebar desde las rutas hijas disponibles', () => {

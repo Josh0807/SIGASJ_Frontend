@@ -3,10 +3,12 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
 import AdminDashboard from '../../dashboard/AdminDashboard'
+import { loginWithAdminSession } from '../../../test/authTestHelpers'
 
 describe('AdminLayout Responsive Integration', () => {
-  const renderDashboardLayout = () =>
-    renderToStaticMarkup(
+  const renderDashboardLayout = () => {
+    loginWithAdminSession()
+    return renderToStaticMarkup(
       <MemoryRouter initialEntries={['/admin/dashboard']}>
         <Routes>
           <Route element={<AdminLayout />}>
@@ -15,6 +17,7 @@ describe('AdminLayout Responsive Integration', () => {
         </Routes>
       </MemoryRouter>,
     )
+  }
 
   it('1. Renderiza los contenedores de cuadrícula responsivos para indicadores y widgets operativos', () => {
     const markup = renderDashboardLayout()

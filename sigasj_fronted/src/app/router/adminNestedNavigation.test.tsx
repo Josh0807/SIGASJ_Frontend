@@ -2,9 +2,12 @@ import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { clearAccessToken, setAccessToken } from '../../modules/auth/utils/authStorage'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
+import { clearAccessToken } from '../../modules/auth/utils/authStorage'
+import { loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
-import { ADMIN_BASE_PATH, ADMIN_HOME_PATH } from './privateRoutes'
+import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, ADMIN_PROFILE_PATH, ADMIN_PROFILE_TITLE } from './privateRoutes'
+import { LOGIN_ROUTE_PATH } from './publicRoutes'
 
 const LocationProbe = ({ onPath }: { onPath: (path: string) => void }) => {
   const location = useLocation()
@@ -42,7 +45,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -90,7 +95,43 @@ const mountApp = async (path: string) => {
       })
       container.remove()
     },
+    openAccountMenu: async () => {
+      const trigger = container.querySelector<HTMLButtonElement>(
+        '.admin-account-menu__trigger',
+      )
+      expect(trigger).not.toBeNull()
+
+      await act(async () => {
+        trigger?.click()
+      })
+    },
+    clickAccountMenuProfile: async () => {
+      const profileLink = container.querySelector<HTMLAnchorElement>(
+        `.admin-account-menu__item--link[href="${ADMIN_PROFILE_PATH}"]`,
+      )
+      expect(profileLink).not.toBeNull()
+
+      const event = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      })
+
+      await act(async () => {
+        profileLink?.dispatchEvent(event)
+      })
+
+      return event
+    },
   }
+}
+
+const assertProfileOutletOnly = (container: HTMLElement) => {
+  const content = container.querySelector('.admin-main__content')
+
+  expect(content?.querySelector('.admin-header')).toBeNull()
+  expect(content?.querySelector('.admin-sidebar')).toBeNull()
+  expect(content?.querySelector('h1')?.textContent).toBe(ADMIN_PROFILE_TITLE)
 }
 
 describe('navegación de rutas administrativas anidadas', () => {
@@ -99,7 +140,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('carga AdminLayout, chrome y dashboard al entrar a /admin', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const errors: unknown[] = []
     const warnings: unknown[] = []
     const originalError = console.error
@@ -138,7 +179,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('cambia solo el Outlet al navegar entre rutas hijas existentes', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp(ADMIN_HOME_PATH)
     const errors: unknown[] = []
     const warnings: unknown[] = []
@@ -195,7 +236,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('abre una ruta hija existente por URL directa dentro del layout', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp('/admin/abonados')
 
     try {
@@ -203,6 +244,63 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(hasAdminChrome(app.container)).toBe(true)
       expect(outletTitle(app.container)).toBe('Gestión de abonados')
       expect(app.container.querySelector('.admin-sidebar h1')).toBeNull()
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('carga Mi perfil dentro de AdminLayout al acceder por URL directa', async () => {
+    loginWithAdminSession()
+    const app = await mountApp(ADMIN_PROFILE_PATH)
+
+    try {
+      expect(app.currentPath()).toBe(ADMIN_PROFILE_PATH)
+      expect(hasAdminChrome(app.container)).toBe(true)
+      assertProfileOutletOnly(app.container)
+      expect(app.container.querySelector('.admin-header h1')).toBeNull()
+      expect(app.container.querySelector('.admin-sidebar h1')).toBeNull()
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('navega a Mi perfil desde el menú de cuenta sin reemplazar AdminLayout', async () => {
+    loginWithAdminSession()
+    const app = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      const sidebar = app.container.querySelector('.admin-sidebar')
+      const header = app.container.querySelector('.admin-header')
+      const content = app.container.querySelector('.admin-main__content')
+
+      expect(outletTitle(app.container)).toBe('Dashboard administrativo')
+      expect(header?.textContent).toContain('Panel administrativo')
+
+      await app.openAccountMenu()
+      const profileClick = await app.clickAccountMenuProfile()
+
+      expect(profileClick.defaultPrevented).toBe(true)
+      expect(app.currentPath()).toBe(ADMIN_PROFILE_PATH)
+      expect(app.container.querySelector('.admin-sidebar')).toBe(sidebar)
+      expect(app.container.querySelector('.admin-header')).toBe(header)
+      expect(app.container.querySelector('.admin-main__content')).toBe(content)
+      expect(hasAdminChrome(app.container)).toBe(true)
+      assertProfileOutletOnly(app.container)
+      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.querySelector('h1')).toBeNull()
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('protege /admin/perfil con ProtectedRoute cuando no hay sesión', async () => {
+    const app = await mountApp(ADMIN_PROFILE_PATH)
+
+    try {
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      expect(hasAdminChrome(app.container)).toBe(false)
+      expect(app.container.innerHTML).toContain('auth-page')
+      expect(app.container.innerHTML).not.toContain(ADMIN_PROFILE_TITLE)
     } finally {
       await app.cleanup()
     }
@@ -261,7 +359,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       await toLogin.cleanup()
     }
 
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const fromAdmin = await mountApp('/admin/dashboard')
 
     try {

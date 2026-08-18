@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import AdminMain from '../../modules/admin-panel/components/AdminMain'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
+import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigation'
+import { useAuthUser } from '../../modules/auth/hooks/useAuthUser'
+import { UNAUTHORIZED_ROUTE_PATH } from '../../app/router/routePaths'
 
 const MOBILE_NAV_QUERY = '(max-width: 760px)'
 
@@ -19,6 +22,8 @@ const getMobileNavSnapshot = () =>
   typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_NAV_QUERY).matches
 
 const AdminLayout = () => {
+  const user = useAuthUser()
+  const navItems = getAdminNavItemsForUser(user)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const isMobileNav = useSyncExternalStore(
     subscribeToMobileNav,
@@ -59,6 +64,10 @@ const AdminLayout = () => {
     }
   }, [isNavOpen, isMobileNav])
 
+  if (navItems.length === 0) {
+    return <Navigate to={UNAUTHORIZED_ROUTE_PATH} replace />
+  }
+
   return (
     <div className={`admin-layout${isNavOpen ? ' admin-layout--nav-open' : ''}`}>
       {isNavOpen ? (
@@ -71,6 +80,7 @@ const AdminLayout = () => {
         />
       ) : null}
       <AdminSidebar
+        items={navItems}
         isDrawer={isMobileNav}
         isOpen={isNavOpen}
         onNavigate={closeNav}

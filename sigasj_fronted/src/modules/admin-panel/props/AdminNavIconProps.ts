@@ -9,6 +9,9 @@ export type AdminNavIconName =
   | 'reportes'
   | 'galeria'
   | 'transparencia'
+  | 'perfil'
+  | 'menu'
+  | 'menuClose'
 
 export type AdminNavIconProps = {
   name: AdminNavIconName
