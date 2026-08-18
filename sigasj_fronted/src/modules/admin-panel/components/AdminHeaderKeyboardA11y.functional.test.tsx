@@ -12,9 +12,9 @@ import {
 } from '../../../app/router/privateRoutes'
 import {
   clearAccessToken,
-  setAccessToken,
-  setAuthUser,
+  setAuthSession,
 } from '../../auth/utils/authStorage'
+import { AuthProvider } from '../../auth/components/AuthContext'
 
 const pressKey = (
   element: Element,
@@ -87,7 +87,9 @@ const mountApp = async (path: string) => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -166,8 +168,10 @@ describe('AdminHeader — accesibilidad por teclado (pruebas funcionales)', () =
 
   beforeEach(() => {
     clearAccessToken()
-    setAccessToken('token-keyboard-a11y')
-    setAuthUser({ name: 'Ana', role: 'SECRETARIA' })
+    setAuthSession({
+      accessToken: 'token-keyboard-a11y',
+      user: { name: 'Ana', role: 'Secretaria' },
+    })
   })
 
   afterEach(() => {

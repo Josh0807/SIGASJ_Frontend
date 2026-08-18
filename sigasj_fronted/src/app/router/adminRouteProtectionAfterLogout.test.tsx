@@ -219,7 +219,7 @@ describe('protección de rutas administrativas después del logout', () => {
     try {
       await submitLogin(app.container)
 
-      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(isAuthenticated()).toBe(true)
       expect(app.container.innerHTML).toContain('admin-layout')
 
@@ -233,7 +233,7 @@ describe('protección de rutas administrativas después del logout', () => {
 
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       assertBlockedAdminAccess(app.container)
-      expect(app.container.innerHTML).not.toContain('Galería de fotografías')
+      expect(app.container.innerHTML).not.toContain('Dashboard administrativo')
       expect(app.container.innerHTML).not.toContain('Panel administrativo')
     } finally {
       await app.cleanup()

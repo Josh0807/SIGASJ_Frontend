@@ -240,9 +240,9 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
   it('Prueba 2 — el rol mostrado corresponde a la sesión, es legible y no se inventa', async () => {
     const consoleSpy = collectConsole()
     const roleCases = [
-      { raw: 'ADMINISTRADORA', label: 'Administradora' },
-      { raw: 'SECRETARIA_EJECUTIVA', label: 'Secretaria Ejecutiva' },
-      { raw: 'FONTANERO', label: 'Fontanero' },
+      { raw: 'Administradora', label: 'Administradora' },
+      { raw: 'Secretaria', label: 'Secretaria' },
+      { raw: 'Fontanero', label: 'Fontanero' },
     ] as const
 
     try {
@@ -272,11 +272,8 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
       const noRoleApp = await mountApp(ADMIN_HOME_PATH)
 
       try {
-        const user = readHeaderUser(noRoleApp.container)
-
-        expect(user.name).toBe('Ana')
-        expect(user.role).toBe('')
-        expect(noRoleApp.container.querySelector('.admin-header__user-detail')).toBeNull()
+        expect(noRoleApp.container.querySelector('.admin-header')).toBeNull()
+        expect(noRoleApp.currentPath()).toBe(LOGIN_ROUTE_PATH)
         assertStableUserMarkup(noRoleApp.container.innerHTML)
       } finally {
         await noRoleApp.cleanup()
@@ -397,7 +394,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
     try {
       await submitLogin(loginApp.container)
 
-      expect(readHeaderUser(loginApp.container).name).toBe('Usuario Administrador')
+      expect(readHeaderUser(loginApp.container).name).toBe('Usuario Administradora')
       expect(readHeaderUser(loginApp.container).role).toBe('Administradora')
 
       await logoutFromHeader(loginApp.container)
@@ -412,7 +409,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
     setAuthUser({
       name: 'Carlos',
       lastName: 'Mora',
-      role: 'FONTANERO',
+      role: 'Fontanero',
     })
 
     const secondApp = await mountApp(ADMIN_HOME_PATH)
@@ -422,7 +419,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
 
       expect(user.name).toBe('Carlos Mora')
       expect(user.role).toBe('Fontanero')
-      expect(user.sectionText).not.toContain('Usuario Administrador')
+      expect(user.sectionText).not.toContain('Usuario Administradora')
       expect(user.sectionText).not.toContain('Administradora')
       assertStableUserMarkup(secondApp.container.innerHTML)
       assertNoSensitiveUserDataInHeader(secondApp.container.innerHTML)

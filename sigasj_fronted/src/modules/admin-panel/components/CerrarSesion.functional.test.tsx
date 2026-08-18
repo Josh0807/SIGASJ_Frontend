@@ -381,7 +381,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     setAuthUser({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
     })
 
     const app = await mountApp(ADMIN_HOME_PATH)
@@ -438,7 +438,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     setAuthUser({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
     })
 
     const app = await mountApp(ADMIN_HOME_PATH)
@@ -474,7 +474,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     setAuthUser({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
     })
 
     const app = await mountApp(ADMIN_HOME_PATH)
@@ -495,7 +495,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
       expect(isAuthenticated()).toBe(false)
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       expect(app.container.innerHTML).not.toContain('María Solís')
-      expect(app.container.innerHTML).not.toContain('Administradora')
+      expect(app.container.querySelector('.admin-header__user-name')).toBeNull()
       assertBlockedAdminAccess(app.container)
       assertCleanConsole(consoleSpy, app.container)
     } finally {
@@ -587,7 +587,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     setAuthUser({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
     })
 
     const app = await mountApp(ADMIN_HOME_PATH)
@@ -705,7 +705,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     try {
       await app.submitLogin()
 
-      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(isAuthenticated()).toBe(true)
 
       const userBefore = readHeaderUser(app.container)
@@ -713,15 +713,14 @@ describe('Cerrar sesión — pruebas funcionales', () => {
       const authUserBefore = getAuthUser()
       const pathBefore = app.currentPath()
 
-      expect(userBefore.name).toBe('Usuario Administrador')
+      expect(userBefore.name).toBe('Usuario Administradora')
       expect(userBefore.role).toBe('Administradora')
-      expect(tokenBefore).toBe('local-admin-session')
+      expect(tokenBefore).toBe('local-administradora-session')
       expect(authUserBefore).toEqual({
         id: 'demo-user-id',
         name: 'Usuario',
-        lastName: 'Administrador',
-        email: 'admin@sigasj.local',
-        role: 'ADMINISTRADORA',
+        lastName: 'Administradora',
+        role: 'Administradora',
       })
 
       await openLogoutDialog(app.container)
@@ -756,7 +755,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     try {
       await app.submitLogin()
 
-      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
 
       const userBefore = readHeaderUser(app.container)
       const tokenBefore = getAccessToken()

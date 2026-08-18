@@ -8,9 +8,9 @@ import AppRoutes from '../../../app/router/AppRoutes'
 import { ADMIN_HOME_PATH } from '../../../app/router/privateRoutes'
 import {
   clearAccessToken,
-  setAccessToken,
-  setAuthUser,
+  setAuthSession,
 } from '../../auth/utils/authStorage'
+import { AuthProvider } from '../../auth/components/AuthContext'
 
 const MOBILE_NAV_QUERY = '(max-width: 760px)'
 
@@ -40,7 +40,9 @@ const mountApp = async (path: string) => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -69,8 +71,10 @@ describe('AdminHeader — menú móvil (pruebas funcionales)', () => {
 
   beforeEach(() => {
     clearAccessToken()
-    setAccessToken('token-mobile-menu')
-    setAuthUser({ name: 'Ana', role: 'SECRETARIA' })
+    setAuthSession({
+      accessToken: 'token-mobile-menu',
+      user: { name: 'Ana', role: 'Secretaria' },
+    })
   })
 
   afterEach(() => {

@@ -10,9 +10,9 @@ import {
 } from '../../../app/router/privateRoutes'
 import {
   clearAccessToken,
-  setAccessToken,
-  setAuthUser,
+  setAuthSession,
 } from '../../auth/utils/authStorage'
+import { AuthProvider } from '../../auth/components/AuthContext'
 
 const collectConsole = () => {
   const errors: unknown[] = []
@@ -126,7 +126,9 @@ const mountApp = async (path: string) => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -147,8 +149,10 @@ describe('AdminHeader — auditoría de consola del navegador', () => {
 
   beforeEach(() => {
     clearAccessToken()
-    setAccessToken('token-console-audit')
-    setAuthUser({ name: 'Ana', role: 'SECRETARIA' })
+    setAuthSession({
+      accessToken: 'token-console-audit',
+      user: { name: 'Ana', role: 'Secretaria' },
+    })
   })
 
   afterEach(() => {
