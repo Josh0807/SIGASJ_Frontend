@@ -6,6 +6,7 @@ import {
   isAuthenticated,
   setAccessToken,
   setAuthUser,
+  subscribeAuthUser,
 } from './authStorage'
 
 describe('authStorage', () => {
@@ -44,5 +45,18 @@ describe('authStorage', () => {
     expect(getAccessToken()).toBeNull()
     expect(getAuthUser()).toBeNull()
     expect(isAuthenticated()).toBe(false)
+  })
+
+  it('notifica cambios del usuario autenticado a los suscriptores', () => {
+    let notifications = 0
+    const unsubscribe = subscribeAuthUser(() => {
+      notifications += 1
+    })
+
+    setAuthUser({ name: 'Ana' })
+    clearAccessToken()
+    unsubscribe()
+
+    expect(notifications).toBe(2)
   })
 })

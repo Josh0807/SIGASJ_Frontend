@@ -4,10 +4,10 @@ import { useAuthUser } from '../../auth/hooks/useAuthUser'
 import AdminAccountMenu from './AdminAccountMenu'
 import AdminHeaderMenuToggle from './AdminHeaderMenuToggle'
 import {
-  getAuthUserAvatarUrl,
-  getAuthUserDisplayName,
+  getAuthUserHeaderAvatarUrl,
   getAuthUserInitials,
   getAuthUserRoleLabel,
+  resolveAuthUserHeaderName,
 } from '../../auth/utils/authUserDisplay'
 
 export type AdminHeaderProps = {
@@ -16,16 +16,12 @@ export type AdminHeaderProps = {
   menuToggleRef?: Ref<HTMLButtonElement>
 }
 
-const FALLBACK_USER_NAME = 'Sesión administrativa'
-const FALLBACK_USER_DETAIL = 'SIGASJ'
-
 const AdminHeaderUser = () => {
   const user = useAuthUser()
-  const displayName = getAuthUserDisplayName(user) ?? FALLBACK_USER_NAME
+  const displayName = resolveAuthUserHeaderName(user)
   const roleLabel = getAuthUserRoleLabel(user)
-  const avatarUrl = getAuthUserAvatarUrl(user)
+  const avatarUrl = getAuthUserHeaderAvatarUrl(user)
   const initials = getAuthUserInitials(displayName)
-  const showDetail = Boolean(roleLabel) || !user
   const accessibleSummary = roleLabel
     ? `${displayName}, ${roleLabel}`
     : displayName
@@ -48,10 +44,8 @@ const AdminHeaderUser = () => {
 
       <span className="admin-header__user-copy" aria-hidden="true">
         <span className="admin-header__user-name">{displayName}</span>
-        {showDetail ? (
-          <span className="admin-header__user-detail">
-            {roleLabel ?? FALLBACK_USER_DETAIL}
-          </span>
+        {roleLabel ? (
+          <span className="admin-header__user-detail">{roleLabel}</span>
         ) : null}
       </span>
     </div>

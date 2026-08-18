@@ -3,6 +3,23 @@ import type { AuthUser } from '../types/authUser'
 const TOKEN_STORAGE_KEY = 'sigasj_access_token'
 const USER_STORAGE_KEY = 'sigasj_auth_user'
 
+type AuthUserListener = () => void
+const authUserListeners = new Set<AuthUserListener>()
+
+const notifyAuthUserChange = (): void => {
+  authUserListeners.forEach((listener) => {
+    listener()
+  })
+}
+
+export function subscribeAuthUser(listener: AuthUserListener): () => void {
+  authUserListeners.add(listener)
+
+  return () => {
+    authUserListeners.delete(listener)
+  }
+}
+
 const isPresent = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0
 
@@ -41,6 +58,33 @@ const sanitizeAuthUser = (value: unknown): AuthUser | null => {
   return Object.keys(user).length > 0 ? user : null
 }
 
+let cachedAuthUser: AuthUser | null = null
+let cachedAuthUserRaw: string | null | undefined = undefined
+
+const syncAuthUserCache = (raw: string | null, user: AuthUser | null): AuthUser | null => {
+  cachedAuthUserRaw = raw
+  cachedAuthUser = user
+  return user
+}
+
+const readAuthUserFromStorage = (): AuthUser | null => {
+  try {
+    const raw = localStorage.getItem(USER_STORAGE_KEY)
+
+    if (raw === cachedAuthUserRaw) {
+      return cachedAuthUser
+    }
+
+    if (!raw) {
+      return syncAuthUserCache(null, null)
+    }
+
+    return syncAuthUserCache(raw, sanitizeAuthUser(JSON.parse(raw)))
+  } catch {
+    return syncAuthUserCache(null, null)
+  }
+}
+
 export function getAccessToken(): string | null {
   try {
     return localStorage.getItem(TOKEN_STORAGE_KEY)
@@ -54,17 +98,7 @@ export function setAccessToken(token: string): void {
 }
 
 export function getAuthUser(): AuthUser | null {
-  try {
-    const raw = localStorage.getItem(USER_STORAGE_KEY)
-
-    if (!raw) {
-      return null
-    }
-
-    return sanitizeAuthUser(JSON.parse(raw))
-  } catch {
-    return null
-  }
+  return readAuthUserFromStorage()
 }
 
 export function setAuthUser(user: AuthUser): void {
@@ -72,15 +106,22 @@ export function setAuthUser(user: AuthUser): void {
 
   if (!sanitized) {
     localStorage.removeItem(USER_STORAGE_KEY)
+    syncAuthUserCache(null, null)
+    notifyAuthUserChange()
     return
   }
 
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(sanitized))
+  const serialized = JSON.stringify(sanitized)
+  localStorage.setItem(USER_STORAGE_KEY, serialized)
+  syncAuthUserCache(serialized, sanitized)
+  notifyAuthUserChange()
 }
 
 export function clearAccessToken(): void {
   localStorage.removeItem(TOKEN_STORAGE_KEY)
   localStorage.removeItem(USER_STORAGE_KEY)
+  syncAuthUserCache(null, null)
+  notifyAuthUserChange()
 }
 
 export function isAuthenticated(): boolean {
