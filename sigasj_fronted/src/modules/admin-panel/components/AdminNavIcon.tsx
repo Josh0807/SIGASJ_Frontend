@@ -9,6 +9,8 @@ export type AdminNavIconName =
   | 'reportes'
   | 'galeria'
   | 'transparencia'
+  | 'menu'
+  | 'menuClose'
 
 type AdminNavIconProps = {
   name: AdminNavIconName
@@ -37,6 +39,8 @@ const ICONS: Record<AdminNavIconName, string> = {
   reportes: 'M5.5 4.5h6l3 3v8H5.5z M11.5 4.5v3h3 M7.5 11h5 M7.5 13.5h3.5',
   galeria: 'M4 5.5h12v9H4z M4 12.2l3.2-3.2 2.8 2.8 2-2 3.5 3.5 M8 8.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
   transparencia: 'M10 3.5 16 7v6l-6 3.5L4 13V7z M10 10.2V16.5',
+  menu: 'M4 6h12 M4 10h12 M4 14h12',
+  menuClose: 'M6 6l8 8 M14 6l-8 8',
 }
 
 const AdminNavIcon = ({ name }: AdminNavIconProps) => icon(ICONS[name])

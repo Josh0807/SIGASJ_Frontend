@@ -1,6 +1,6 @@
 import { type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { setAccessToken } from '../utils/authStorage'
+import { setAccessToken, setAuthUser } from '../utils/authStorage'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -11,6 +11,13 @@ const LoginPage = () => {
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setAccessToken('local-admin-session')
+    setAuthUser({
+      id: 'demo-user-id',
+      name: 'Usuario',
+      lastName: 'Administrador',
+      email: 'admin@sigasj.local',
+      role: 'ADMINISTRADORA',
+    })
     navigate(redirectTo, { replace: true })
   }
 

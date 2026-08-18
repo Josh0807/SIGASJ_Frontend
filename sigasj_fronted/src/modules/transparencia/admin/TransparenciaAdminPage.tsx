@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { clearAccessToken } from '../../auth/utils/authStorage'
+import { Link } from 'react-router-dom'
 import TransparenciaAdminForm from './TransparenciaAdminForm'
 import { adminTransparenciaMocks } from './adminTransparenciaMocks'
 import {
@@ -16,7 +15,6 @@ const formatFileTypeLabel = (
 ) => tipoArchivo.toUpperCase()
 
 const TransparenciaAdminPage = () => {
-  const navigate = useNavigate()
   const nextIdRef = useRef(
     Math.max(0, ...adminTransparenciaMocks.map((item) => item.id)) + 1,
   )
@@ -172,11 +170,6 @@ const TransparenciaAdminPage = () => {
     showSuccess('Orden de publicaciones actualizado.')
   }
 
-  const handleLogout = () => {
-    clearAccessToken()
-    navigate('/login', { replace: true })
-  }
-
   const formInitialValues =
     formMode === 'edit' && editingPublication
       ? {
@@ -203,13 +196,6 @@ const TransparenciaAdminPage = () => {
             <Link className="gallery-admin__link" to="/admin/galeria">
               Ir a galería
             </Link>
-            <button
-              type="button"
-              className="gallery-admin__button"
-              onClick={handleLogout}
-            >
-              Cerrar sesión
-            </button>
             <button
               type="button"
               className="gallery-admin__button gallery-admin__button--primary"
