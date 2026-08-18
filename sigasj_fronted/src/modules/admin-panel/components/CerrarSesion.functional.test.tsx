@@ -142,6 +142,28 @@ const confirmLogoutInDialog = async (container: HTMLElement) => {
   })
 }
 
+const openLogoutDialog = async (container: HTMLElement) => {
+  const trigger = container.querySelector<HTMLButtonElement>(
+    '.admin-account-menu__trigger',
+  )
+  expect(trigger).not.toBeNull()
+
+  await act(async () => {
+    trigger?.click()
+  })
+
+  const logoutItem = container.querySelector<HTMLButtonElement>(
+    '.admin-account-menu__item--danger',
+  )
+  expect(logoutItem).not.toBeNull()
+
+  await act(async () => {
+    logoutItem?.click()
+  })
+
+  expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+}
+
 const cancelLogoutInDialog = async (container: HTMLElement) => {
   const cancelButton = container.querySelector(
     '.confirm-dialog__button--secondary',
@@ -222,24 +244,7 @@ const mountApp = async (path: string): Promise<MountedApp> => {
       await confirmLogoutInDialog(container)
     },
     cancelLogoutDialog: async () => {
-      const trigger = container.querySelector<HTMLButtonElement>(
-        '.admin-account-menu__trigger',
-      )
-      expect(trigger).not.toBeNull()
-
-      await act(async () => {
-        trigger?.click()
-      })
-
-      const logoutItem = container.querySelector<HTMLButtonElement>(
-        '.admin-account-menu__item--danger',
-      )
-      expect(logoutItem).not.toBeNull()
-
-      await act(async () => {
-        logoutItem?.click()
-      })
-
+      await openLogoutDialog(container)
       await cancelLogoutInDialog(container)
     },
     cleanup: async () => {
@@ -368,7 +373,64 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
-  it('Prueba 2 — logout normal invalida la sesión y redirige al login', async () => {
+  it('Prueba 2 — abrir confirmación sin ejecutar logout inmediatamente', async () => {
+    const consoleSpy = collectConsole()
+    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+
+    setAccessToken('token-funcional')
+    setAuthUser({
+      name: 'María',
+      lastName: 'Solís',
+      role: 'Administradora',
+    })
+
+    const app = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      expect(readHeaderUser(app.container).name).toBe('María Solís')
+      expect(readHeaderUser(app.container).role).toBe('Administradora')
+
+      await app.openAccountMenu()
+
+      const logoutItem = app.container.querySelector(
+        '.admin-account-menu__item--danger',
+      ) as HTMLButtonElement
+
+      await act(async () => {
+        logoutItem.click()
+      })
+
+      expect(clearSpy).not.toHaveBeenCalled()
+      expect(isAuthenticated()).toBe(true)
+      expect(getAccessToken()).toBe('token-funcional')
+      expect(getAuthUser()?.name).toBe('María')
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+      expect(app.container.querySelector('.confirm-dialog')).not.toBeNull()
+      expect(
+        app.container.querySelector('.confirm-dialog__title')?.textContent,
+      ).toBe('Cerrar sesión')
+      expect(
+        app.container.querySelector('.confirm-dialog__message')?.textContent,
+      ).toContain('Confirme si desea cerrar sesión')
+      expect(
+        app.container.querySelector('.confirm-dialog__message')?.textContent,
+      ).toContain('iniciar sesión nuevamente')
+      expect(app.container.textContent).toContain('Cancelar')
+      expect(app.container.textContent).toContain('Cerrar sesión')
+      expect(
+        app.container.querySelector('.confirm-dialog__button--secondary')?.textContent,
+      ).toBe('Cancelar')
+      expect(
+        app.container.querySelector('.confirm-dialog__button--danger')?.textContent,
+      ).toBe('Cerrar sesión')
+      assertCleanConsole(consoleSpy, app.container)
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+
+  it('Prueba 3 — confirmar cierre ejecuta logout, invalida sesión y redirige al login', async () => {
     const consoleSpy = collectConsole()
     const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
 
@@ -376,7 +438,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     setAuthUser({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
     })
 
     const app = await mountApp(ADMIN_HOME_PATH)
@@ -404,7 +466,45 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
-  it('Prueba 3 — rutas privadas bloqueadas después del logout', async () => {
+  it('Prueba 4 — AdminHeader no conserva nombre, rol ni sesión anterior tras logout', async () => {
+    const consoleSpy = collectConsole()
+    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+
+    setAccessToken('token-usuario-a')
+    setAuthUser({
+      name: 'María',
+      lastName: 'Solís',
+      role: 'Administradora',
+    })
+
+    const app = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      expect(readHeaderUser(app.container).name).toBe('María Solís')
+      expect(readHeaderUser(app.container).role).toBe('Administradora')
+
+      await app.openAccountMenu()
+      await app.logoutFromMenu()
+
+      expect(clearSpy).toHaveBeenCalledTimes(1)
+      expect(app.container.querySelector('.admin-header')).toBeNull()
+      expect(app.container.querySelector('.admin-header__user-name')).toBeNull()
+      expect(app.container.querySelector('.admin-header__user-detail')).toBeNull()
+      expect(getAccessToken()).toBeNull()
+      expect(getAuthUser()).toBeNull()
+      expect(isAuthenticated()).toBe(false)
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).not.toContain('María Solís')
+      expect(app.container.querySelector('.admin-header__user-name')).toBeNull()
+      assertBlockedAdminAccess(app.container)
+      assertCleanConsole(consoleSpy, app.container)
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+
+  it('Prueba 5 — rutas privadas bloqueadas después del logout', async () => {
     const consoleSpy = collectConsole()
     const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
@@ -428,7 +528,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
-  it('Prueba 4 — botón Atrás no recupera acceso al contenido privado', async () => {
+  it('Prueba 6 — botón Atrás no recupera acceso al contenido privado', async () => {
     const consoleSpy = collectConsole()
     const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
@@ -452,7 +552,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
-  it('Prueba 5 — recargar o escribir URL administrativa permanece bloqueada', async () => {
+  it('Prueba 7 — recargar o escribir URL administrativa permanece bloqueada', async () => {
     const consoleSpy = collectConsole()
     const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
@@ -481,13 +581,13 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
-  it('Prueba 6 — nueva sesión reemplaza datos del usuario anterior', async () => {
+  it('Prueba 8 — nueva sesión reemplaza datos del usuario anterior', async () => {
     const consoleSpy = collectConsole()
     setAccessToken('token-usuario-a')
     setAuthUser({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
     })
 
     const app = await mountApp(ADMIN_HOME_PATH)
@@ -519,7 +619,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
-  it('Prueba 7 — logout completo utilizando solamente el teclado', async () => {
+  it('Prueba 9 — logout completo utilizando solamente el teclado', async () => {
     const consoleSpy = collectConsole()
     setAccessToken('token-funcional')
     setAuthUser({ name: 'Ana', role: 'ADMINISTRADORA' })
@@ -596,6 +696,101 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     }
   })
 
+  it('Cancelar cierra el diálogo sin afectar sesión, layout ni ruta actual', async () => {
+    const consoleSpy = collectConsole()
+    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+
+    const app = await mountApp(LOGIN_ROUTE_PATH)
+
+    try {
+      await app.submitLogin()
+
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+      expect(isAuthenticated()).toBe(true)
+
+      const userBefore = readHeaderUser(app.container)
+      const tokenBefore = getAccessToken()
+      const authUserBefore = getAuthUser()
+      const pathBefore = app.currentPath()
+
+      expect(userBefore.name).toBe('Usuario Administradora')
+      expect(userBefore.role).toBe('Administradora')
+      expect(tokenBefore).toBe('local-administradora-session')
+      expect(authUserBefore).toEqual({
+        id: 'demo-user-id',
+        name: 'Usuario',
+        lastName: 'Administradora',
+        role: 'Administradora',
+      })
+
+      await openLogoutDialog(app.container)
+      await cancelLogoutInDialog(app.container)
+
+      expect(clearSpy).not.toHaveBeenCalled()
+      expect(app.container.querySelector('.confirm-dialog')).toBeNull()
+      expect(isAuthenticated()).toBe(true)
+      expect(getAccessToken()).toBe(tokenBefore)
+      expect(getAuthUser()).toEqual(authUserBefore)
+      expect(app.currentPath()).toBe(pathBefore)
+      expect(readHeaderUser(app.container)).toEqual(userBefore)
+      expect(app.container.querySelector('.admin-header')).not.toBeNull()
+      expect(app.container.innerHTML).toContain('admin-layout')
+      expect(app.container.innerHTML).toContain('admin-sidebar')
+      expect(app.container.innerHTML).toContain('admin-header')
+      expect(app.container.innerHTML).not.toContain('auth-page')
+      expect(app.container.innerHTML).not.toContain('Iniciar sesión')
+      assertCleanConsole(consoleSpy, app.container)
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+
+  it('Escape en el diálogo se comporta como Cancelar', async () => {
+    const consoleSpy = collectConsole()
+    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+
+    const app = await mountApp(LOGIN_ROUTE_PATH)
+
+    try {
+      await app.submitLogin()
+
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+
+      const userBefore = readHeaderUser(app.container)
+      const tokenBefore = getAccessToken()
+      const authUserBefore = getAuthUser()
+      const pathBefore = app.currentPath()
+
+      await openLogoutDialog(app.container)
+
+      const cancelButton = app.container.querySelector(
+        '.confirm-dialog__button--secondary',
+      ) as HTMLButtonElement
+
+      expect(document.activeElement).toBe(cancelButton)
+
+      await act(async () => {
+        pressKey(cancelButton, 'Escape')
+      })
+
+      expect(clearSpy).not.toHaveBeenCalled()
+      expect(app.container.querySelector('.confirm-dialog')).toBeNull()
+      expect(isAuthenticated()).toBe(true)
+      expect(getAccessToken()).toBe(tokenBefore)
+      expect(getAuthUser()).toEqual(authUserBefore)
+      expect(app.currentPath()).toBe(pathBefore)
+      expect(readHeaderUser(app.container)).toEqual(userBefore)
+      expect(app.container.innerHTML).toContain('admin-layout')
+      expect(app.container.innerHTML).toContain('admin-header')
+      expect(app.container.innerHTML).not.toContain('auth-page')
+      assertCleanConsole(consoleSpy, app.container)
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+
   it('Cancelar en el diálogo mantiene la sesión activa y la ruta administrativa', async () => {
     const consoleSpy = collectConsole()
     setAccessToken('token-funcional')
@@ -618,6 +813,8 @@ describe('Cerrar sesión — pruebas funcionales', () => {
       })
       expect(isAuthenticated()).toBe(true)
       expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+      expect(readHeaderUser(app.container).name).toBe('María Solís')
+      expect(readHeaderUser(app.container).role).toBe('Administradora')
       expect(app.container.querySelector('.confirm-dialog')).toBeNull()
       expect(app.container.innerHTML).toContain('admin-layout')
       expect(app.container.innerHTML).toContain('admin-sidebar')
