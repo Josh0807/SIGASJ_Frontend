@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import type { AdminNavIconName } from '../../modules/admin-panel/components/AdminNavIcon'
+import AdminDashboard from '../../modules/dashboard/AdminDashboard'
 import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
@@ -46,7 +47,7 @@ export const PRIVATE_ROUTES: PrivateRouteDefinition[] = [
   adminChildRoute(
     'dashboard',
     'Dashboard',
-    <PrivateModulePlaceholder title="Dashboard administrativo" />,
+    <AdminDashboard />,
   ),
   adminChildRoute(
     'usuarios',
