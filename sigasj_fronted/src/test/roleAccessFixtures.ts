@@ -1,6 +1,6 @@
-import type { InternalAdminRole } from '../features/auth/auth.types'
-import { ADMIN_MODULE_ACCESS } from '../features/auth/adminNavigation.config'
-import { ADMIN_BASE_PATH } from '../routes/privateRoutes'
+import type { InternalAdminRole } from '../modules/auth/utils/internalRoles'
+import { ADMIN_MODULE_ACCESS } from '../modules/auth/config/adminNavigation.config'
+import { ADMIN_BASE_PATH } from '../app/router/privateRoutes'
 
 /** En SIGASJ el rol técnico es `Secretaria` (equivalente a “Secretaria Ejecutiva” en la tarea). */
 export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
@@ -9,13 +9,15 @@ export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
   Fontanero: 'Fontanero',
 }
 
-export const ALL_ADMIN_MODULE_PATHS = ADMIN_MODULE_ACCESS.map(
-  (module) => `${ADMIN_BASE_PATH}/${module.segment}`,
-)
+export const ALL_ADMIN_MODULE_PATHS = ADMIN_MODULE_ACCESS.filter(
+  (module) => module.availableInNav,
+).map((module) => `${ADMIN_BASE_PATH}/${module.segment}`)
 
 const pathsForRoles = (...roles: InternalAdminRole[]) =>
-  ADMIN_MODULE_ACCESS.filter((module) =>
-    module.allowedRoles.some((role) => roles.includes(role)),
+  ADMIN_MODULE_ACCESS.filter(
+    (module) =>
+      module.availableInNav &&
+      module.allowedRoles.some((role) => roles.includes(role)),
   ).map((module) => `${ADMIN_BASE_PATH}/${module.segment}`)
 
 export const EXPECTED_NAV_PATHS: Record<InternalAdminRole, readonly string[]> = {

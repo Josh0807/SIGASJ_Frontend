@@ -1,8 +1,8 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter } from 'react-router-dom'
-import { AuthProvider } from '../features/auth/AuthContext'
-import AppRoutes from '../routes/AppRoutes'
+import { AuthProvider } from '../modules/auth/components/AuthContext'
+import AppRoutes from '../app/router/AppRoutes'
 import { LocationProbe, type RouteLocation } from './location-probe'
 
 export type { RouteLocation }
