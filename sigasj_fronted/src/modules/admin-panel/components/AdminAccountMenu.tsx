@@ -13,6 +13,11 @@ import {
 } from '../../../app/router/privateRoutes'
 import { useAdminLogout } from '../../auth/hooks/useAdminLogout'
 import { ADMIN_ACCOUNT_MENU_PLACEHOLDER_ITEMS } from '../config/adminAccountMenuConfig'
+import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+
+const LOGOUT_DIALOG_TITLE = 'Cerrar sesión'
+const LOGOUT_DIALOG_MESSAGE =
+  'Confirme si desea cerrar sesión. Deberá iniciar sesión nuevamente para acceder al panel administrativo.'
 
 const AdminAccountMenu = () => {
   const menuId = useId()
@@ -22,6 +27,8 @@ const AdminAccountMenu = () => {
   const logoutButtonRef = useRef<HTMLButtonElement>(null)
   const openedViaKeyboardRef = useRef(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
+  const isLogoutConfirmingRef = useRef(false)
   const logout = useAdminLogout()
 
   const closeMenu = useCallback(() => {
@@ -131,12 +138,27 @@ const AdminAccountMenu = () => {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogoutRequest = () => {
     closeMenu()
-    logout()
+    setIsLogoutDialogOpen(true)
   }
 
+  const handleLogoutCancel = useCallback(() => {
+    setIsLogoutDialogOpen(false)
+  }, [])
+
+  const handleLogoutConfirm = useCallback(() => {
+    if (isLogoutConfirmingRef.current) {
+      return
+    }
+
+    isLogoutConfirmingRef.current = true
+    setIsLogoutDialogOpen(false)
+    logout()
+  }, [logout])
+
   return (
+    <>
     <div
       ref={containerRef}
       className={`admin-account-menu${isOpen ? ' admin-account-menu--open' : ''}`}
@@ -208,12 +230,25 @@ const AdminAccountMenu = () => {
           type="button"
           className="admin-account-menu__item admin-account-menu__item--danger"
           role="menuitem"
-          onClick={handleLogout}
+          onClick={handleLogoutRequest}
         >
           Cerrar sesión
         </button>
       </div>
     </div>
+
+    <ConfirmDialog
+      isOpen={isLogoutDialogOpen}
+      title={LOGOUT_DIALOG_TITLE}
+      message={LOGOUT_DIALOG_MESSAGE}
+      cancelLabel="Cancelar"
+      confirmLabel={LOGOUT_DIALOG_TITLE}
+      confirmDanger
+      returnFocusRef={triggerRef}
+      onCancel={handleLogoutCancel}
+      onConfirm={handleLogoutConfirm}
+    />
+    </>
   )
 }
 
