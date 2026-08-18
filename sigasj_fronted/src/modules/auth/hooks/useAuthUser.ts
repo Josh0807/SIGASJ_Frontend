@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useSyncExternalStore } from 'react'
 import type { AuthUser } from '../types/authUser'
-import { getAuthUser } from '../utils/authStorage'
+import { getAuthUser, subscribeAuthUser } from '../utils/authStorage'
 
 export function useAuthUser(): AuthUser | null {
-  return useMemo(() => getAuthUser(), [])
+  return useSyncExternalStore(subscribeAuthUser, getAuthUser, getAuthUser)
 }

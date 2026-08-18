@@ -116,6 +116,279 @@ const mockMobileNav = (matches: boolean) => {
   }
 }
 
+const readHeaderUser = (container: HTMLElement) => ({
+  sectionText: container.querySelector('.admin-header__user')?.textContent ?? '',
+  name: container.querySelector('.admin-header__user-name')?.textContent ?? '',
+  role: container.querySelector('.admin-header__user-detail')?.textContent ?? '',
+})
+
+const assertStableUserMarkup = (html: string) => {
+  expect(html).not.toMatch(/\bundefined\b/i)
+  expect(html).not.toMatch(/\bnull\b/i)
+  expect(html).not.toContain('[object Object]')
+}
+
+const assertNoSensitiveUserDataInHeader = (html: string) => {
+  assertStableUserMarkup(html)
+  expect(html).not.toContain('local-admin-session')
+  expect(html).not.toContain('token-de-prueba')
+  expect(html).not.toContain('token-usuario-a')
+  expect(html).not.toContain('token-usuario-b')
+  expect(html).not.toContain('demo-user-id')
+  expect(html).not.toContain('refreshToken')
+  expect(html).not.toContain('accessToken')
+  expect(html).not.toContain('sigasj_access_token')
+  expect(html).not.toContain('admin@sigasj.local')
+  expect(html).not.toMatch(/Bearer\s+/i)
+}
+
+const submitLogin = async (container: HTMLElement) => {
+  const submit = container.querySelector<HTMLButtonElement>('.auth-page__submit')
+  expect(submit).not.toBeNull()
+
+  await act(async () => {
+    submit?.click()
+  })
+}
+
+const logoutFromHeader = async (container: HTMLElement) => {
+  const trigger = container.querySelector<HTMLButtonElement>(
+    '.admin-account-menu__trigger',
+  )
+  expect(trigger).not.toBeNull()
+
+  await act(async () => {
+    trigger?.click()
+  })
+
+  const logoutItem = container.querySelector<HTMLButtonElement>(
+    '.admin-account-menu__item--danger',
+  )
+  expect(logoutItem).not.toBeNull()
+
+  await act(async () => {
+    logoutItem?.click()
+  })
+}
+
+describe('AdminHeader — información del usuario (pruebas funcionales)', () => {
+  beforeEach(() => {
+    clearAccessToken()
+  })
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
+  })
+
+  it('Prueba 1 — usuario autenticado muestra AdminHeader con nombre y rol correctos', async () => {
+    const consoleSpy = collectConsole()
+    const app = await mountApp(LOGIN_ROUTE_PATH)
+
+    try {
+      expect(app.container.querySelector('.admin-header')).toBeNull()
+
+      await submitLogin(app.container)
+
+      expect(app.container.querySelector('.admin-header')).not.toBeNull()
+      expect(app.currentPath()).toBe('/admin/galeria')
+
+      const user = readHeaderUser(app.container)
+
+      expect(user.name).toBe('Usuario Administrador')
+      expect(user.role).toBe('Administradora')
+      expect(app.container.querySelector('.admin-header')?.textContent).toContain(
+        'Panel administrativo',
+      )
+      assertNoSensitiveUserDataInHeader(app.container.innerHTML)
+      expect(consoleSpy.errors).toEqual([])
+      expect(consoleSpy.warnings).toEqual([])
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+
+  it('Prueba 2 — datos opcionales ausentes mantienen la interfaz estable', async () => {
+    const consoleSpy = collectConsole()
+    const scenarios = [
+      {
+        label: 'sin perfil de usuario',
+        setup: () => {
+          setAccessToken('token-sin-perfil')
+        },
+        expectedName: 'Usuario',
+        expectedRole: '',
+      },
+      {
+        label: 'solo nombre',
+        setup: () => {
+          setAccessToken('token-nombre-solo')
+          setAuthUser({ name: 'Ana' })
+        },
+        expectedName: 'Ana',
+        expectedRole: '',
+      },
+      {
+        label: 'nombre inválido y rol inválido',
+        setup: () => {
+          setAccessToken('token-parcial')
+          setAuthUser({
+            name: 'undefined',
+            lastName: 'null',
+            role: 'undefined',
+            email: 'admin@sigasj.local',
+            id: 'user-id-interno',
+          })
+        },
+        expectedName: 'Usuario',
+        expectedRole: '',
+      },
+    ] as const
+
+    try {
+      for (const scenario of scenarios) {
+        clearAccessToken()
+        scenario.setup()
+
+        const app = await mountApp(ADMIN_HOME_PATH)
+
+        try {
+          expect(app.container.querySelector('.admin-header')).not.toBeNull()
+
+          const user = readHeaderUser(app.container)
+
+          expect(user.name).toBe(scenario.expectedName)
+          expect(user.role).toBe(scenario.expectedRole)
+          assertStableUserMarkup(app.container.innerHTML)
+        } finally {
+          await app.cleanup()
+        }
+      }
+
+      expect(consoleSpy.errors).toEqual([])
+      expect(consoleSpy.warnings).toEqual([])
+    } finally {
+      consoleSpy.restore()
+    }
+  })
+
+  it('Prueba 3 — recuperación de sesión mantiene nombre y rol tras recargar', async () => {
+    setAccessToken('token-de-prueba')
+    setAuthUser({
+      name: 'María',
+      lastName: 'Solís',
+      role: 'ADMINISTRADORA',
+    })
+
+    const consoleSpy = collectConsole()
+    const firstLoad = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      expect(readHeaderUser(firstLoad.container).name).toBe('María Solís')
+      expect(readHeaderUser(firstLoad.container).role).toBe('Administradora')
+    } finally {
+      await firstLoad.cleanup()
+    }
+
+    const reloadedApp = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      const user = readHeaderUser(reloadedApp.container)
+
+      expect(user.name).toBe('María Solís')
+      expect(user.role).toBe('Administradora')
+      expect(user.name).not.toBe('Usuario')
+      assertNoSensitiveUserDataInHeader(reloadedApp.container.innerHTML)
+      expect(consoleSpy.errors).toEqual([])
+      expect(consoleSpy.warnings).toEqual([])
+    } finally {
+      consoleSpy.restore()
+      await reloadedApp.cleanup()
+    }
+  })
+
+  it('Prueba 4 — cambio de usuario reemplaza nombre y rol en AdminHeader', async () => {
+    const consoleSpy = collectConsole()
+
+    setAccessToken('token-usuario-a')
+    setAuthUser({
+      name: 'María',
+      lastName: 'Solís',
+      role: 'ADMINISTRADORA',
+    })
+
+    const app = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      expect(readHeaderUser(app.container).name).toBe('María Solís')
+      expect(readHeaderUser(app.container).role).toBe('Administradora')
+
+      await logoutFromHeader(app.container)
+
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.querySelector('.admin-header')).toBeNull()
+    } finally {
+      await app.cleanup()
+    }
+
+    setAccessToken('token-usuario-b')
+    setAuthUser({
+      name: 'Carlos',
+      lastName: 'Mora',
+      role: 'FONTANERO',
+    })
+
+    const secondApp = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      const user = readHeaderUser(secondApp.container)
+
+      expect(user.name).toBe('Carlos Mora')
+      expect(user.role).toBe('Fontanero')
+      expect(user.sectionText).not.toContain('María Solís')
+      expect(user.sectionText).not.toContain('Administradora')
+      assertStableUserMarkup(secondApp.container.innerHTML)
+      expect(consoleSpy.errors).toEqual([])
+      expect(consoleSpy.warnings).toEqual([])
+    } finally {
+      consoleSpy.restore()
+      await secondApp.cleanup()
+    }
+  })
+
+  it('Prueba 5 — AdminHeader no expone datos sensibles de sesión', async () => {
+    setAccessToken('secreto-access-token-no-visible')
+    setAuthUser({
+      id: 'user-id-interno',
+      name: 'María',
+      lastName: 'Solís',
+      role: 'SECRETARIA_EJECUTIVA',
+      email: 'maria@sigasj.local',
+      avatar: 'https://cdn.example.com/avatar.jpg?accessToken=secreto',
+    })
+
+    const consoleSpy = collectConsole()
+    const app = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      const headerHtml = app.container.querySelector('.admin-header')?.innerHTML ?? ''
+
+      expect(readHeaderUser(app.container).name).toBe('María Solís')
+      expect(readHeaderUser(app.container).role).toBe('Secretaria Ejecutiva')
+      assertNoSensitiveUserDataInHeader(headerHtml)
+      expect(headerHtml).not.toContain('password')
+      expect(headerHtml).not.toContain('secreto-access-token-no-visible')
+      expect(headerHtml).not.toContain('user-id-interno')
+      expect(consoleSpy.errors).toEqual([])
+      expect(consoleSpy.warnings).toEqual([])
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+})
+
 describe('AdminHeader — pruebas funcionales', () => {
   beforeEach(() => {
     clearAccessToken()
@@ -227,9 +500,8 @@ describe('AdminHeader — pruebas funcionales', () => {
 
     try {
       const header = partialUserApp.container.querySelector('.admin-header')
-      expect(header?.textContent).toContain('Sesión administrativa')
-      expect(header?.textContent).toContain('SIGASJ')
-      expect(header?.querySelector('.admin-header__user-detail')).not.toBeNull()
+      expect(header?.textContent).toContain('Usuario')
+      expect(header?.querySelector('.admin-header__user-detail')).toBeNull()
     } finally {
       await partialUserApp.cleanup()
     }

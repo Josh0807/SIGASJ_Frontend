@@ -53,10 +53,23 @@ describe('AdminHeader', () => {
   it('usa valores por defecto cuando no hay datos de usuario', () => {
     const markup = renderHeader()
 
-    expect(markup).toContain('Sesión administrativa')
-    expect(markup).toContain('SIGASJ')
+    expect(markup).toContain('Usuario')
+    expect(markup).not.toContain('admin-header__user-detail')
     expect(markup).toContain('visually-hidden')
-    expect(markup).toContain('>SA<')
+    expect(markup).toContain('>US<')
+  })
+
+  it('muestra el rol formateado cuando está disponible', () => {
+    setAuthUser({
+      name: 'Carlos',
+      role: 'SECRETARIA_EJECUTIVA',
+    })
+
+    const markup = renderHeader()
+
+    expect(markup).toContain('Carlos')
+    expect(markup).toContain('Secretaria Ejecutiva')
+    expect(markup).toContain('visually-hidden">Carlos, Secretaria Ejecutiva<')
   })
 
   it('oculta el detalle visual cuando hay nombre pero no rol', () => {
@@ -67,6 +80,62 @@ describe('AdminHeader', () => {
     expect(markup).toContain('Ana')
     expect(markup).not.toContain('admin-header__user-detail')
     expect(markup).toContain('visually-hidden">Ana<')
+  })
+
+  it('permanece estable cuando la sesión no tiene perfil de usuario', () => {
+    setAccessToken('token-sin-perfil')
+
+    const markup = renderHeader()
+
+    expect(markup).toContain('Usuario')
+    expect(markup).not.toContain('admin-header__user-detail')
+    expect(markup).not.toMatch(/\bundefined\b/i)
+    expect(markup).not.toMatch(/\bnull\b/i)
+    expect(markup).not.toContain('[object Object]')
+  })
+
+  it('muestra rol sin inventar nombre cuando falta el nombre', () => {
+    setAuthUser({ role: 'FONTANERO' })
+
+    const markup = renderHeader()
+
+    expect(markup).toContain('Usuario')
+    expect(markup).toContain('Fontanero')
+    expect(markup).not.toMatch(/\bundefined\b/i)
+    expect(markup).not.toMatch(/\bnull\b/i)
+  })
+
+  it('ignora valores técnicos inválidos en nombre y rol', () => {
+    setAuthUser({
+      name: 'undefined',
+      lastName: 'null',
+      role: 'undefined',
+    })
+
+    const markup = renderHeader()
+
+    expect(markup).toContain('Usuario')
+    expect(markup).not.toContain('admin-header__user-detail')
+    expect(markup).not.toMatch(/\bundefined\b/i)
+    expect(markup).not.toMatch(/\bnull\b/i)
+  })
+
+  it('no expone email, id, token ni datos internos de sesión', () => {
+    setAccessToken('secreto-no-debe-aparecer')
+    setAuthUser({
+      id: 'user-id-interno',
+      email: 'admin@sigasj.local',
+      role: 'ADMINISTRADORA',
+    })
+
+    const markup = renderHeader()
+
+    expect(markup).toContain('Usuario')
+    expect(markup).toContain('Administradora')
+    expect(markup).not.toContain('secreto-no-debe-aparecer')
+    expect(markup).not.toContain('user-id-interno')
+    expect(markup).not.toContain('admin@sigasj.local')
+    expect(markup).not.toContain('sigasj_access_token')
   })
 
   it('muestra avatar cuando está disponible', () => {
@@ -116,6 +185,58 @@ describe('AdminHeader', () => {
     })
 
     expect(onToggleMenu).toHaveBeenCalledTimes(1)
+  })
+
+  it('actualiza nombre y rol cuando cambia la sesión autenticada', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    const readUserSection = () =>
+      container.querySelector('.admin-header__user')?.textContent ?? ''
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter>
+          <AdminHeader />
+        </MemoryRouter>,
+      )
+    })
+
+    expect(readUserSection()).toContain('Usuario')
+
+    await act(async () => {
+      setAccessToken('token-usuario-a')
+      setAuthUser({
+        name: 'María',
+        lastName: 'Solís',
+        role: 'ADMINISTRADORA',
+      })
+    })
+
+    expect(readUserSection()).toContain('María Solís')
+    expect(readUserSection()).toContain('Administradora')
+    expect(readUserSection()).not.toContain('Carlos')
+
+    await act(async () => {
+      clearAccessToken()
+      setAccessToken('token-usuario-b')
+      setAuthUser({
+        name: 'Carlos',
+        lastName: 'Mora',
+        role: 'FONTANERO',
+      })
+    })
+
+    expect(readUserSection()).toContain('Carlos Mora')
+    expect(readUserSection()).toContain('Fontanero')
+    expect(readUserSection()).not.toContain('María Solís')
+    expect(readUserSection()).not.toContain('Administradora')
+
+    await act(async () => {
+      root.unmount()
+    })
+    container.remove()
   })
 
   it('cierra sesión desde el menú de cuenta', async () => {
