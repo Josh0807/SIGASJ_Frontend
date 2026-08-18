@@ -2618,6 +2618,12 @@ button.announcements-section__more {
   transition: background .2s ease, color .2s ease;
 }
 
+.admin-account-menu__item--link {
+  box-sizing: border-box;
+  color: inherit;
+  text-decoration: none;
+}
+
 .admin-account-menu__item:hover:not(:disabled) {
   background: #eef5fb;
 }

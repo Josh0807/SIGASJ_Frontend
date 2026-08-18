@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import AppRoutes from '../../../app/router/AppRoutes'
+import {
+  ADMIN_HOME_PATH,
+  ADMIN_PROFILE_PATH,
+  ADMIN_PROFILE_TITLE,
+} from '../../../app/router/privateRoutes'
 import AdminHeader from './AdminHeader'
 import {
   clearAccessToken,
@@ -237,6 +243,83 @@ describe('AdminHeader', () => {
       root.unmount()
     })
     container.remove()
+  })
+
+  it('abre el menú de cuenta, navega a Mi perfil y conserva la información del usuario', async () => {
+    setAccessToken('local-admin-session')
+    setAuthUser({
+      name: 'María',
+      lastName: 'Solís',
+      role: 'ADMINISTRADORA',
+    })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    const readUserSection = () =>
+      container.querySelector('.admin-header__user')?.textContent ?? ''
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
+          <AppRoutes />
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+    const panel = container.querySelector(
+      '.admin-account-menu__panel',
+    ) as HTMLDivElement
+
+    expect(readUserSection()).toContain('María Solís')
+    expect(readUserSection()).toContain('Administradora')
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(panel.hasAttribute('hidden')).toBe(false)
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(panel.hasAttribute('hidden')).toBe(true)
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    const profileLink = container.querySelector(
+      `.admin-account-menu__item--link[href="${ADMIN_PROFILE_PATH}"]`,
+    ) as HTMLAnchorElement
+    const configItem = container.querySelector(
+      '.admin-account-menu__item--disabled',
+    ) as HTMLButtonElement
+
+    expect(profileLink).not.toBeNull()
+    expect(configItem?.textContent).toContain('Configuración')
+    expect(configItem?.textContent).toContain('Próximamente')
+    expect(configItem?.disabled).toBe(true)
+
+    await act(async () => {
+      profileLink.click()
+    })
+
+    expect(
+      container.querySelector('.admin-main__content h1')?.textContent,
+    ).toBe(ADMIN_PROFILE_TITLE)
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(panel.hasAttribute('hidden')).toBe(true)
+    expect(readUserSection()).toContain('María Solís')
+    expect(readUserSection()).toContain('Administradora')
+    expect(container.querySelector('.admin-header')).not.toBeNull()
   })
 
   it('cierra sesión desde el menú de cuenta', async () => {
