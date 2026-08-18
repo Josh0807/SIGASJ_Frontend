@@ -3951,6 +3951,136 @@ html, body, #root {
   text-align: center;
 }
 
+/* Dashboard responsive safeguards.
+   These rules live after the widget styles so their mobile overrides are not
+   undone by the base declarations above. */
+.admin-dashboard,
+.admin-dashboard__shell,
+.admin-dashboard__section,
+.admin-dashboard__section-header,
+.admin-dashboard__indicators-grid,
+.admin-dashboard__widgets-grid,
+.indicator-card,
+.dashboard-widget,
+.dashboard-widget__header,
+.dashboard-widget__title-group,
+.recent-alerts-widget__item,
+.recent-alerts-widget__item-main,
+.recent-alerts-widget__info,
+.recent-activity-widget__content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admin-dashboard__indicators-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-dashboard__widgets-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+
+.dashboard-widget__title-group > div,
+.admin-dashboard__section-header--with-action > div {
+  min-width: 0;
+}
+
+.dashboard-widget__title,
+.dashboard-widget__subtitle,
+.admin-dashboard__section-header h2,
+.admin-dashboard__section-header p,
+.indicator-card__title,
+.indicator-card__description,
+.recent-activity-widget__text {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 761px) and (max-width: 1199px) {
+  .admin-dashboard__indicators-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-dashboard__shell {
+    gap: 24px;
+  }
+
+  .admin-dashboard__section {
+    gap: 16px;
+  }
+
+  .admin-dashboard__indicators-grid,
+  .admin-dashboard__widgets-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .admin-dashboard__widgets-grid {
+    margin-top: 0;
+  }
+
+  .admin-dashboard__section-header--with-action,
+  .admin-dashboard__global-error {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-dashboard__refresh-btn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .dashboard-widget {
+    width: 100%;
+    padding: 18px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard__welcome h1 {
+    font-size: 1.45rem;
+  }
+
+  .dashboard-widget__header {
+    flex-wrap: wrap;
+  }
+
+  .reading-progress-widget__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    padding-inline: 6px;
+  }
+
+  .reading-progress-widget__stat-value {
+    font-size: 0.95rem;
+  }
+
+  .reading-progress-widget__stat-label {
+    font-size: 0.65rem;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .reading-progress-widget__stat-divider {
+    display: none;
+  }
+
+  .recent-alerts-widget__item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .recent-alerts-widget__item-main {
+    width: 100%;
+  }
+
+  .recent-alerts-widget__time {
+    padding-left: 0;
+  }
+}
+
 /* Error Boundary Fallback */
 .error-boundary-fallback {
   background: #fff1f2;
@@ -4003,5 +4133,4 @@ html, body, #root {
 .error-boundary-fallback__btn:hover {
   background: #be123c;
 }
-
 
