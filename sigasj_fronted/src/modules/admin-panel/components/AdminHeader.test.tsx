@@ -405,6 +405,13 @@ describe('AdminHeader', () => {
       logoutItem.click()
     })
 
+    await act(async () => {
+      const confirmButton = container.querySelector(
+        '.confirm-dialog__button--danger',
+      ) as HTMLButtonElement
+      confirmButton.click()
+    })
+
     expect(localStorage.getItem('sigasj_access_token')).toBeNull()
     expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
     expect(isAuthenticated()).toBe(false)

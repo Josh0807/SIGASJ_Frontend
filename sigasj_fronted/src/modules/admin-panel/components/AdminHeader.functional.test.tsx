@@ -164,6 +164,16 @@ const submitLogin = async (container: HTMLElement) => {
   })
 }
 
+const confirmLogoutInDialog = async (container: HTMLElement) => {
+  const confirmButton = container.querySelector(
+    '.confirm-dialog__button--danger',
+  ) as HTMLButtonElement
+
+  await act(async () => {
+    confirmButton?.click()
+  })
+}
+
 const logoutFromHeader = async (container: HTMLElement) => {
   const trigger = container.querySelector<HTMLButtonElement>(
     '.admin-account-menu__trigger',
@@ -182,6 +192,8 @@ const logoutFromHeader = async (container: HTMLElement) => {
   await act(async () => {
     logoutItem?.click()
   })
+
+  await confirmLogoutInDialog(container)
 }
 
 describe('AdminHeader — información del usuario (pruebas funcionales)', () => {

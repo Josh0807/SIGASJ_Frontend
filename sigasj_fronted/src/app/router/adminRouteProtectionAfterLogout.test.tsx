@@ -101,6 +101,15 @@ const logoutFromAccountMenu = async (container: HTMLElement) => {
   await act(async () => {
     logoutItem?.click()
   })
+
+  const confirmButton = container.querySelector(
+    '.confirm-dialog__button--danger',
+  ) as HTMLButtonElement | null
+  expect(confirmButton).not.toBeNull()
+
+  await act(async () => {
+    confirmButton?.click()
+  })
 }
 
 describe('protección de rutas administrativas después del logout', () => {

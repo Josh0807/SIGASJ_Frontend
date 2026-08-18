@@ -128,12 +128,40 @@ const pressKey = (
   }
 }
 
+const confirmLogoutInDialog = async (container: HTMLElement) => {
+  expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+
+  const confirmButton = container.querySelector(
+    '.confirm-dialog__button--danger',
+  ) as HTMLButtonElement
+
+  expect(confirmButton).not.toBeNull()
+
+  await act(async () => {
+    confirmButton.click()
+  })
+}
+
+const cancelLogoutInDialog = async (container: HTMLElement) => {
+  const cancelButton = container.querySelector(
+    '.confirm-dialog__button--secondary',
+  ) as HTMLButtonElement
+
+  expect(cancelButton).not.toBeNull()
+  expect(cancelButton.type).toBe('button')
+
+  await act(async () => {
+    cancelButton.click()
+  })
+}
+
 type MountedApp = {
   container: HTMLDivElement
   root: Root
   currentPath: () => string
   openAccountMenu: () => Promise<void>
   logoutFromMenu: () => Promise<void>
+  cancelLogoutDialog: () => Promise<void>
   submitLogin: () => Promise<void>
   cleanup: () => Promise<void>
 }
@@ -190,6 +218,29 @@ const mountApp = async (path: string): Promise<MountedApp> => {
       await act(async () => {
         logoutItem?.click()
       })
+
+      await confirmLogoutInDialog(container)
+    },
+    cancelLogoutDialog: async () => {
+      const trigger = container.querySelector<HTMLButtonElement>(
+        '.admin-account-menu__trigger',
+      )
+      expect(trigger).not.toBeNull()
+
+      await act(async () => {
+        trigger?.click()
+      })
+
+      const logoutItem = container.querySelector<HTMLButtonElement>(
+        '.admin-account-menu__item--danger',
+      )
+      expect(logoutItem).not.toBeNull()
+
+      await act(async () => {
+        logoutItem?.click()
+      })
+
+      await cancelLogoutInDialog(container)
     },
     cleanup: async () => {
       await act(async () => {
@@ -247,6 +298,8 @@ const mountInteractiveApp = async (
     await act(async () => {
       logoutItem?.click()
     })
+
+    await confirmLogoutInDialog(container)
   }
 
   return {
@@ -510,11 +563,67 @@ describe('Cerrar sesión — pruebas funcionales', () => {
         pressKey(logoutItem, 'Enter', { activate: true })
       })
 
+      expect(app.container.querySelector('.confirm-dialog')).not.toBeNull()
+
+      const cancelButton = app.container.querySelector(
+        '.confirm-dialog__button--secondary',
+      ) as HTMLButtonElement
+      const confirmButton = app.container.querySelector(
+        '.confirm-dialog__button--danger',
+      ) as HTMLButtonElement
+
+      expect(document.activeElement).toBe(cancelButton)
+
+      await act(async () => {
+        pressKey(cancelButton, 'Tab')
+      })
+
+      expect(document.activeElement).toBe(confirmButton)
+
+      await act(async () => {
+        pressKey(confirmButton, 'Enter', { activate: true })
+      })
+
       expect(getAccessToken()).toBeNull()
       expect(getAuthUser()).toBeNull()
       expect(isAuthenticated()).toBe(false)
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       assertBlockedAdminAccess(app.container)
+      assertCleanConsole(consoleSpy, app.container)
+    } finally {
+      consoleSpy.restore()
+      await app.cleanup()
+    }
+  })
+
+  it('Cancelar en el diálogo mantiene la sesión activa y la ruta administrativa', async () => {
+    const consoleSpy = collectConsole()
+    setAccessToken('token-funcional')
+    setAuthUser({ name: 'María', lastName: 'Solís', role: 'ADMINISTRADORA' })
+
+    const app = await mountApp(ADMIN_HOME_PATH)
+
+    try {
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+      expect(isAuthenticated()).toBe(true)
+      expect(getAuthUser()?.name).toBe('María')
+
+      await app.cancelLogoutDialog()
+
+      expect(getAccessToken()).toBe('token-funcional')
+      expect(getAuthUser()).toEqual({
+        name: 'María',
+        lastName: 'Solís',
+        role: 'Administradora',
+      })
+      expect(isAuthenticated()).toBe(true)
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
+      expect(app.container.querySelector('.confirm-dialog')).toBeNull()
+      expect(app.container.innerHTML).toContain('admin-layout')
+      expect(app.container.innerHTML).toContain('admin-sidebar')
+      expect(app.container.innerHTML).toContain('admin-header')
+      expect(app.container.innerHTML).not.toContain('auth-page')
+      expect(app.container.innerHTML).not.toContain('hero')
       assertCleanConsole(consoleSpy, app.container)
     } finally {
       consoleSpy.restore()
