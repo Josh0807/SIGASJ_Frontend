@@ -3,6 +3,7 @@ import type { AdminNavIconName } from '../../modules/admin-panel/components/Admi
 import AdminDashboard from '../../modules/dashboard/AdminDashboard'
 import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
+import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
 
 export type PrivateRouteDefinition = {
@@ -28,6 +29,9 @@ export const ADMIN_ROUTE_SEGMENT = 'admin'
 export const ADMIN_BASE_PATH = `/${ADMIN_ROUTE_SEGMENT}`
 export const ADMIN_HOME_SEGMENT = 'dashboard'
 export const ADMIN_HOME_PATH = `${ADMIN_BASE_PATH}/${ADMIN_HOME_SEGMENT}`
+export const ADMIN_PROFILE_SEGMENT = 'perfil'
+export const ADMIN_PROFILE_TITLE = 'Mi perfil'
+export const ADMIN_PROFILE_PATH = `${ADMIN_BASE_PATH}/${ADMIN_PROFILE_SEGMENT}`
 
 const adminChildRoute = (
   segment: AdminNavIconName,
@@ -93,6 +97,12 @@ export const PRIVATE_ROUTES: PrivateRouteDefinition[] = [
     'transparencia',
     'Transparencia y calidad del agua',
     <TransparenciaAdminPage />,
+  ),
+  adminChildRoute(
+    ADMIN_PROFILE_SEGMENT,
+    ADMIN_PROFILE_TITLE,
+    <ProfilePage />,
+    { availableInNav: false },
   ),
 ]
 
