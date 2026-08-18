@@ -1,6 +1,6 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AppRoutes from '../../../app/router/AppRoutes'
@@ -11,8 +11,12 @@ import {
 } from '../../../app/router/privateRoutes'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
 import AdminAccountMenu from './AdminAccountMenu'
+import * as authStorage from '../../auth/utils/authStorage'
 import {
   clearAccessToken,
+  getAccessToken,
+  getAuthUser,
+  isAuthenticated,
   setAccessToken,
   setAuthUser,
 } from '../../auth/utils/authStorage'
@@ -41,10 +45,40 @@ const pressKey = (
   }
 }
 
+const confirmLogoutInDialog = async (container: HTMLElement) => {
+  expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+
+  const confirmButton = container.querySelector(
+    '.confirm-dialog__button--danger',
+  ) as HTMLButtonElement
+
+  expect(confirmButton).not.toBeNull()
+
+  await act(async () => {
+    confirmButton.click()
+  })
+}
+
+const cancelLogoutInDialog = async (container: HTMLElement) => {
+  expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+
+  const cancelButton = container.querySelector(
+    '.confirm-dialog__button--secondary',
+  ) as HTMLButtonElement
+
+  expect(cancelButton).not.toBeNull()
+  expect(cancelButton.type).toBe('button')
+
+  await act(async () => {
+    cancelButton.click()
+  })
+}
+
 describe('AdminAccountMenu', () => {
   afterEach(() => {
     clearAccessToken()
     document.body.innerHTML = ''
+    vi.restoreAllMocks()
   })
 
   it('renderiza Mi perfil y opciones futuras en el menú de cuenta', () => {
@@ -226,6 +260,27 @@ describe('AdminAccountMenu', () => {
       pressKey(logoutItem, 'Enter', { activate: true })
     })
 
+    expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+
+    const cancelButton = container.querySelector(
+      '.confirm-dialog__button--secondary',
+    ) as HTMLButtonElement
+    const confirmButton = container.querySelector(
+      '.confirm-dialog__button--danger',
+    ) as HTMLButtonElement
+
+    expect(document.activeElement).toBe(cancelButton)
+
+    await act(async () => {
+      pressKey(cancelButton, 'Tab')
+    })
+
+    expect(document.activeElement).toBe(confirmButton)
+
+    await act(async () => {
+      pressKey(confirmButton, 'Enter', { activate: true })
+    })
+
     expect(localStorage.getItem('sigasj_access_token')).toBeNull()
     expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
     expect(container.textContent).toContain('Iniciar sesión')
@@ -280,6 +335,8 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       pressKey(logoutItem, ' ', { activate: true })
     })
+
+    await confirmLogoutInDialog(container)
 
     expect(localStorage.getItem('sigasj_access_token')).toBeNull()
     expect(container.textContent).toContain('Pantalla login')
@@ -462,6 +519,161 @@ describe('AdminAccountMenu', () => {
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(panel.hasAttribute('hidden')).toBe(true)
+    expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+  })
+
+  it('expone el diálogo de cerrar sesión con semántica y textos accesibles', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter>
+          <AdminAccountMenu />
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      logoutItem.click()
+    })
+
+    const panel = container.querySelector('[role="alertdialog"]') as HTMLElement
+    const title = container.querySelector('.confirm-dialog__title') as HTMLHeadingElement
+    const message = container.querySelector('.confirm-dialog__message') as HTMLParagraphElement
+    const cancelButton = container.querySelector(
+      '.confirm-dialog__button--secondary',
+    ) as HTMLButtonElement
+    const confirmButton = container.querySelector(
+      '.confirm-dialog__button--danger',
+    ) as HTMLButtonElement
+
+    expect(panel).not.toBeNull()
+    expect(panel.getAttribute('aria-modal')).toBe('true')
+    expect(panel.getAttribute('aria-labelledby')).toBe(title.id)
+    expect(panel.getAttribute('aria-describedby')).toBe(message.id)
+    expect(title.textContent).toBe('Cerrar sesión')
+    expect(message.textContent).toContain('Confirme si desea cerrar sesión')
+    expect(message.textContent).toContain('iniciar sesión nuevamente')
+    expect(cancelButton.textContent).toBe('Cancelar')
+    expect(confirmButton.textContent).toBe('Cerrar sesión')
+  })
+
+  it('no cierra sesión si el usuario cancela el diálogo', async () => {
+    setAccessToken('local-admin-session')
+    setAuthUser({ name: 'Ana', role: 'ADMINISTRADORA' })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
+          <AppRoutes />
+        </MemoryRouter>,
+      )
+    })
+
+    expect(isAuthenticated()).toBe(true)
+    expect(getAuthUser()?.name).toBe('Ana')
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      logoutItem.click()
+    })
+
+    await cancelLogoutInDialog(container)
+
+    expect(getAccessToken()).toBe('local-admin-session')
+    expect(getAuthUser()).toEqual({ name: 'Ana', role: 'ADMINISTRADORA' })
+    expect(isAuthenticated()).toBe(true)
+    expect(container.querySelector('.confirm-dialog')).toBeNull()
+    expect(container.innerHTML).toContain('admin-layout')
+    expect(container.innerHTML).toContain('admin-header')
+    expect(container.innerHTML).not.toContain('auth-page')
+    expect(container.textContent).not.toContain('Pantalla login')
+    expect(
+      container.querySelector('.admin-main__content h1')?.textContent,
+    ).toBe('Dashboard administrativo')
+  })
+
+  it('no cierra sesión si el usuario cancela el diálogo con Escape', async () => {
+    setAccessToken('local-admin-session')
+    setAuthUser({ name: 'Ana' })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
+          <AppRoutes />
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      logoutItem.click()
+    })
+
+    expect(container.querySelector('.confirm-dialog')).not.toBeNull()
+
+    const cancelButton = container.querySelector(
+      '.confirm-dialog__button--secondary',
+    ) as HTMLButtonElement
+
+    expect(document.activeElement).toBe(cancelButton)
+
+    await act(async () => {
+      pressKey(cancelButton, 'Escape')
+    })
+
+    expect(getAccessToken()).toBe('local-admin-session')
+    expect(isAuthenticated()).toBe(true)
+    expect(container.querySelector('.confirm-dialog')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+    expect(container.innerHTML).toContain('admin-layout')
+    expect(
+      container.querySelector('.admin-main__content h1')?.textContent,
+    ).toBe('Dashboard administrativo')
   })
 
   it('cierra sesión desde el menú de cuenta', async () => {
@@ -499,9 +711,66 @@ describe('AdminAccountMenu', () => {
       logoutItem.click()
     })
 
+    await confirmLogoutInDialog(container)
+
     expect(localStorage.getItem('sigasj_access_token')).toBeNull()
     expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
     expect(container.textContent).toContain('Pantalla login')
+  })
+
+  it('ejecuta logout únicamente al confirmar el diálogo con el botón Cerrar sesión', async () => {
+    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    setAccessToken('local-admin-session')
+    setAuthUser({ name: 'Ana', role: 'ADMINISTRADORA' })
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
+          <AppRoutes />
+        </MemoryRouter>,
+      )
+    })
+
+    const trigger = container.querySelector(
+      '.admin-account-menu__trigger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      trigger.click()
+    })
+
+    const logoutItem = container.querySelector(
+      '.admin-account-menu__item--danger',
+    ) as HTMLButtonElement
+
+    await act(async () => {
+      logoutItem.click()
+    })
+
+    expect(clearSpy).not.toHaveBeenCalled()
+    expect(isAuthenticated()).toBe(true)
+
+    const confirmButton = container.querySelector(
+      '.confirm-dialog__button--danger',
+    ) as HTMLButtonElement
+
+    expect(confirmButton.textContent).toBe('Cerrar sesión')
+    expect(confirmButton.type).toBe('button')
+
+    await act(async () => {
+      confirmButton.click()
+      confirmButton.click()
+    })
+
+    expect(clearSpy).toHaveBeenCalledTimes(1)
+    expect(getAccessToken()).toBeNull()
+    expect(getAuthUser()).toBeNull()
+    expect(isAuthenticated()).toBe(false)
+    expect(container.innerHTML).toContain('auth-page')
   })
 
   it('no manipula la sesión directamente y delega en useAdminLogout', () => {
