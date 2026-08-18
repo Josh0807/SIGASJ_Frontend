@@ -1,10 +1,6 @@
-import type { Ref } from 'react'
+import type { AdminHeaderProps } from '../props'
 
-type AdminHeaderProps = {
-  menuOpen?: boolean
-  onToggleMenu?: () => void
-  menuToggleRef?: Ref<HTMLButtonElement>
-}
+export type { AdminHeaderProps }
 
 const AdminHeader = ({
   menuOpen = false,

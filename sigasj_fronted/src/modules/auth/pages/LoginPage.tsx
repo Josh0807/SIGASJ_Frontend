@@ -1,12 +1,13 @@
 import { type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ADMIN_HOME_PATH } from '../../../app/router/privateRoutes'
 import { setAccessToken } from '../utils/authStorage'
 
 const LoginPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const redirectTo =
-    (location.state as { from?: string } | null)?.from ?? '/admin/galeria'
+    (location.state as { from?: string } | null)?.from ?? ADMIN_HOME_PATH
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

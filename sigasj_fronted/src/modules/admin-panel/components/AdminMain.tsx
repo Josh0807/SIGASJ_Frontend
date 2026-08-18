@@ -1,12 +1,8 @@
-import type { ReactNode, Ref } from 'react'
 import AdminHeader from './AdminHeader'
+import ErrorBoundary from '../../../shared/components/ErrorBoundary'
+import type { AdminMainProps } from '../props'
 
-type AdminMainProps = {
-  children: ReactNode
-  menuOpen?: boolean
-  onToggleMenu?: () => void
-  menuToggleRef?: Ref<HTMLButtonElement>
-}
+export type { AdminMainProps }
 
 const AdminMain = ({
   children,
@@ -21,7 +17,9 @@ const AdminMain = ({
       menuToggleRef={menuToggleRef}
     />
     <div className="admin-main__content" aria-label="Contenido administrativo">
-      {children}
+      <div className="admin-main__inner">
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </div>
     </div>
   </div>
 )
