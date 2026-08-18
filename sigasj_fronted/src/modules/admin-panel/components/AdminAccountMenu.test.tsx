@@ -11,6 +11,7 @@ import {
 } from '../../../app/router/privateRoutes'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
 import AdminAccountMenu from './AdminAccountMenu'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import * as authStorage from '../../auth/utils/authStorage'
 import {
   clearAccessToken,
@@ -106,7 +107,7 @@ describe('AdminAccountMenu', () => {
 
   it('permite abrir el menú y activar Mi perfil únicamente con teclado', async () => {
     setAccessToken('local-admin-session')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'Administradora' })
 
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -115,7 +116,9 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -203,7 +206,7 @@ describe('AdminAccountMenu', () => {
 
   it('permite cerrar sesión únicamente con teclado', async () => {
     setAccessToken('local-admin-session')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'ADMINISTRADORA' })
 
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -212,7 +215,9 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -384,7 +389,7 @@ describe('AdminAccountMenu', () => {
 
   it('navega a Mi perfil desde el menú de cuenta', async () => {
     setAccessToken('local-admin-session')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'Administradora' })
 
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -434,7 +439,7 @@ describe('AdminAccountMenu', () => {
 
   it('navega a la ruta de perfil registrada mediante AppRoutes', async () => {
     setAccessToken('local-admin-session')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'Administradora' })
 
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -443,7 +448,9 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -583,7 +590,9 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -610,7 +619,7 @@ describe('AdminAccountMenu', () => {
     await cancelLogoutInDialog(container)
 
     expect(getAccessToken()).toBe('local-admin-session')
-    expect(getAuthUser()).toEqual({ name: 'Ana', role: 'ADMINISTRADORA' })
+    expect(getAuthUser()).toEqual({ name: 'Ana', role: 'Administradora' })
     expect(isAuthenticated()).toBe(true)
     expect(container.querySelector('.confirm-dialog')).toBeNull()
     expect(container.innerHTML).toContain('admin-layout')
@@ -624,7 +633,7 @@ describe('AdminAccountMenu', () => {
 
   it('no cierra sesión si el usuario cancela el diálogo con Escape', async () => {
     setAccessToken('local-admin-session')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'ADMINISTRADORA' })
 
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -633,7 +642,9 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -678,7 +689,7 @@ describe('AdminAccountMenu', () => {
 
   it('cierra sesión desde el menú de cuenta', async () => {
     setAccessToken('local-admin-session')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'Administradora' })
 
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -730,7 +741,9 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })

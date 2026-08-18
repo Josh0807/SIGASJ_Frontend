@@ -5,6 +5,7 @@ import {
   getAuthUser,
   isAuthenticated,
   setAccessToken,
+  setAuthSession,
   setAuthUser,
   subscribeAuthUser,
 } from './authStorage'
@@ -32,7 +33,7 @@ describe('authStorage', () => {
     expect(getAuthUser()).toEqual({
       name: 'María',
       lastName: 'Solís',
-      role: 'ADMINISTRADORA',
+      role: 'Administradora',
       email: 'maria@sigasj.local',
     })
   })
@@ -45,6 +46,20 @@ describe('authStorage', () => {
     expect(getAccessToken()).toBeNull()
     expect(getAuthUser()).toBeNull()
     expect(isAuthenticated()).toBe(false)
+  })
+
+  it('guarda sesión completa con setAuthSession', () => {
+    setAuthSession({
+      accessToken: 'token-demo',
+      user: { role: 'Secretaria', id: '42', name: 'Ana' },
+    })
+
+    expect(getAccessToken()).toBe('token-demo')
+    expect(getAuthUser()).toEqual({
+      role: 'Secretaria',
+      id: '42',
+      name: 'Ana',
+    })
   })
 
   it('invalida por completo la sesión persistida sin usar localStorage.clear()', () => {

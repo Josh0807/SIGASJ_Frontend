@@ -21,6 +21,7 @@ describe('route configuration', () => {
       '/solicitudes/arreglo-pago',
       '/solicitudes/cambio-titular',
       '/login',
+      '/unauthorized',
     ])
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/comunicados')
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/dashboard')

@@ -8,6 +8,7 @@ import {
   isAuthenticated,
 } from '../../modules/auth/utils/authStorage'
 import AppRoutes from './AppRoutes'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
 import {
   ADMIN_BASE_PATH,
   ADMIN_HOME_PATH,
@@ -34,10 +35,13 @@ const mountInteractiveApp = async (
   initialEntries: string[],
   initialIndex = initialEntries.length - 1,
 ) => {
-  const router = createMemoryRouter([{ path: '/*', element: <AppRoutes /> }], {
+  const router = createMemoryRouter(
+    [{ path: '/*', element: <AuthProvider><AppRoutes /></AuthProvider> }],
+    {
     initialEntries,
     initialIndex,
-  })
+    },
+  )
 
   const container = document.createElement('div')
   document.body.appendChild(container)
@@ -128,8 +132,8 @@ describe('protección de rutas administrativas después del logout', () => {
       await submitLogin(app.container)
 
       expect(isAuthenticated()).toBe(true)
-      expect(getAccessToken()).toBe('local-admin-session')
-      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(getAccessToken()).toBe('local-administradora-session')
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(app.container.innerHTML).toContain('admin-layout')
       expect(app.container.innerHTML).toContain('admin-sidebar')
       expect(app.container.innerHTML).toContain('admin-header')
