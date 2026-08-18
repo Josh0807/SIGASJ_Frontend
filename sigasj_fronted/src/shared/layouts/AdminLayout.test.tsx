@@ -1,23 +1,35 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
+import { clearAccessToken } from '../../modules/auth/utils/authStorage'
+import { loginWithAdminSession } from '../../test/authTestHelpers'
 import AdminLayout from './AdminLayout'
 
 const renderAdminRoute = (path: string) =>
   renderToStaticMarkup(
     <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route element={<AdminLayout />}>
-          <Route path="/admin/a" element={<p>Pantalla A</p>} />
-          <Route path="/admin/b" element={<p>Pantalla B</p>} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/a" element={<p>Pantalla A</p>} />
+            <Route path="/admin/b" element={<p>Pantalla B</p>} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>,
   )
 
 describe('AdminLayout', () => {
+  beforeEach(() => {
+    loginWithAdminSession()
+  })
+
+  afterEach(() => {
+    clearAccessToken()
+  })
   it('organiza sidebar, encabezado y área de contenido de la ruta', () => {
     const markup = renderAdminRoute('/admin/a')
 
@@ -136,12 +148,14 @@ const mountAdminRoute = async (path: string) => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/a" element={<p>Pantalla A</p>} />
-            <Route path="/admin/dashboard" element={<p>Dashboard</p>} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/a" element={<p>Pantalla A</p>} />
+              <Route path="/admin/dashboard" element={<p>Dashboard</p>} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -168,7 +182,12 @@ const click = async (element: Element) => {
 describe('AdminLayout menu movil', () => {
   const originalMatchMedia = window.matchMedia
 
+  beforeEach(() => {
+    loginWithAdminSession()
+  })
+
   afterEach(() => {
+    clearAccessToken()
     window.matchMedia = originalMatchMedia
     document.body.style.overflow = ''
   })

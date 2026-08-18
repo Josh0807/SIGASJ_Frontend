@@ -10,6 +10,7 @@ import {
   ADMIN_PROFILE_TITLE,
 } from '../../../app/router/privateRoutes'
 import AdminHeader from './AdminHeader'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import {
   clearAccessToken,
   getAuthUser,
@@ -308,7 +309,9 @@ describe('AdminHeader', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={[ADMIN_HOME_PATH]}>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })

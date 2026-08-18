@@ -1,4 +1,10 @@
 import type { AuthUser } from '../types/authUser'
+import { normalizeInternalRole } from './internalRoles'
+
+export type AuthSession = {
+  accessToken: string
+  user: AuthUser
+}
 
 const TOKEN_STORAGE_KEY = 'sigasj_access_token'
 const USER_STORAGE_KEY = 'sigasj_auth_user'
@@ -48,7 +54,8 @@ const sanitizeAuthUser = (value: unknown): AuthUser | null => {
   }
 
   if (isPresent(candidate.role)) {
-    user.role = candidate.role.trim()
+    const normalizedRole = normalizeInternalRole(candidate.role)
+    user.role = normalizedRole ?? candidate.role.trim()
   }
 
   if (isPresent(candidate.avatar)) {
@@ -127,4 +134,9 @@ export function clearAccessToken(): void {
 
 export function isAuthenticated(): boolean {
   return Boolean(getAccessToken()?.trim())
+}
+
+export function setAuthSession(session: AuthSession): void {
+  setAccessToken(session.accessToken)
+  setAuthUser(session.user)
 }

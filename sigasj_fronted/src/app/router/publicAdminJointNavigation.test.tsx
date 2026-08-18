@@ -3,7 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { clearAccessToken, setAccessToken } from '../../modules/auth/utils/authStorage'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
+import { clearAccessToken } from '../../modules/auth/utils/authStorage'
+import { loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
@@ -79,7 +81,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -174,7 +178,7 @@ describe('navegación conjunta entre área pública y administrativa', () => {
   })
 
   it('con sesión abre /admin, carga la hija en AdminLayout y cambia solo el contenido', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp(ADMIN_BASE_PATH)
 
     try {
@@ -208,7 +212,9 @@ describe('navegación conjunta entre área pública y administrativa', () => {
   it('no muestra contenido administrativo ni un instante al redirigir sin sesión', async () => {
     const staticMarkup = renderToStaticMarkup(
       <MemoryRouter initialEntries={[ADMIN_BASE_PATH]}>
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
 

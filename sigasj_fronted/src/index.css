@@ -1904,6 +1904,40 @@ button.announcements-section__more {
   background: white;
   box-shadow: 0 12px 30px rgba(18, 63, 112, .08);
 }
+.auth-page__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.auth-page__brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid #d5e6f4;
+}
+.auth-page__brand-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.auth-page__brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #123f70;
+  line-height: 1.25;
+}
+.auth-page__brand-text strong {
+  font-size: 1.05rem;
+}
+.auth-page__brand-text span {
+  color: #516779;
+  font-size: .92rem;
+}
 .auth-page__card h1 {
   margin: 0 0 10px;
   color: #123f70;
@@ -1917,6 +1951,22 @@ button.announcements-section__more {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+.auth-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #123f70;
+  font-weight: 600;
+}
+.auth-page__select {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #c5d9ea;
+  border-radius: 10px;
+  background: white;
+  color: #123f70;
+  font: inherit;
 }
 .auth-page__submit,
 .gallery-admin__button {
@@ -1939,6 +1989,20 @@ button.announcements-section__more {
 .auth-page__submit:disabled {
   opacity: .7;
   cursor: wait;
+}
+a.auth-page__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  text-decoration: none;
+}
+.auth-page__submit:focus-visible,
+.auth-page__back:focus-visible,
+.auth-page__select:focus-visible {
+  outline: 2px solid #1e5a9c;
+  outline-offset: 2px;
 }
 .auth-page__error {
   margin: 14px 0 0;

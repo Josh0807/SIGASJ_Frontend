@@ -2,7 +2,9 @@ import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { clearAccessToken, setAccessToken } from '../../modules/auth/utils/authStorage'
+import { AuthProvider } from '../../modules/auth/components/AuthContext'
+import { clearAccessToken } from '../../modules/auth/utils/authStorage'
+import { loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, ADMIN_PROFILE_PATH, ADMIN_PROFILE_TITLE } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
@@ -43,7 +45,9 @@ const mountApp = async (path: string) => {
             pathname = nextPath
           }}
         />
-        <AppRoutes />
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -136,7 +140,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('carga AdminLayout, chrome y dashboard al entrar a /admin', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const errors: unknown[] = []
     const warnings: unknown[] = []
     const originalError = console.error
@@ -175,7 +179,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('cambia solo el Outlet al navegar entre rutas hijas existentes', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp(ADMIN_HOME_PATH)
     const errors: unknown[] = []
     const warnings: unknown[] = []
@@ -232,7 +236,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('abre una ruta hija existente por URL directa dentro del layout', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp('/admin/abonados')
 
     try {
@@ -246,7 +250,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('carga Mi perfil dentro de AdminLayout al acceder por URL directa', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp(ADMIN_PROFILE_PATH)
 
     try {
@@ -261,7 +265,7 @@ describe('navegación de rutas administrativas anidadas', () => {
   })
 
   it('navega a Mi perfil desde el menú de cuenta sin reemplazar AdminLayout', async () => {
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const app = await mountApp(ADMIN_HOME_PATH)
 
     try {
@@ -355,7 +359,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       await toLogin.cleanup()
     }
 
-    setAccessToken('token-de-prueba')
+    loginWithAdminSession()
     const fromAdmin = await mountApp('/admin/dashboard')
 
     try {

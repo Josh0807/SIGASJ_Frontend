@@ -8,9 +8,18 @@ import {
   setAccessToken,
   setAuthUser,
 } from '../../auth/utils/authStorage'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import AppRoutes from '../../../app/router/AppRoutes'
+import AdminHeader from './AdminHeader'
 import { ADMIN_HOME_PATH } from '../../../app/router/privateRoutes'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
+
+const renderHeader = () =>
+  renderToStaticMarkup(
+    <MemoryRouter>
+      <AdminHeader />
+    </MemoryRouter>,
+  )
 
 const LocationProbe = ({ onPath }: { onPath: (path: string) => void }) => {
   const location = useLocation()
@@ -57,12 +66,14 @@ const mountApp = async (path: string) => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <LocationProbe
-          onPath={(nextPath) => {
-            pathname = nextPath
-          }}
-        />
-        <AppRoutes />
+        <AuthProvider>
+          <LocationProbe
+            onPath={(nextPath) => {
+              pathname = nextPath
+            }}
+          />
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -94,7 +105,9 @@ const mountApp = async (path: string) => {
 const renderPath = (path: string) =>
   renderToStaticMarkup(
     <MemoryRouter initialEntries={[path]}>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </MemoryRouter>,
   )
 
@@ -206,11 +219,11 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
       await submitLogin(app.container)
 
       expect(app.container.querySelector('.admin-header')).not.toBeNull()
-      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(app.currentPath()).toBe('/admin/dashboard')
 
       const user = readHeaderUser(app.container)
 
-      expect(user.name).toBe('Usuario Administrador')
+      expect(user.name).toBe('Usuario Administradora')
       expect(user.role).toBe('Administradora')
       expect(app.container.querySelector('.admin-header')?.textContent).toContain(
         'Panel administrativo',
@@ -283,18 +296,19 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
         label: 'sin perfil de usuario',
         setup: () => {
           setAccessToken('token-sin-perfil')
+          setAuthUser({ role: 'Administradora' })
         },
         expectedName: 'Usuario',
-        expectedRole: '',
+        expectedRole: 'Administradora',
       },
       {
         label: 'solo nombre',
         setup: () => {
           setAccessToken('token-nombre-solo')
-          setAuthUser({ name: 'Ana' })
+          setAuthUser({ name: 'Ana', role: 'Administradora' })
         },
         expectedName: 'Ana',
-        expectedRole: '',
+        expectedRole: 'Administradora',
       },
       {
         label: 'nombre inválido y rol inválido',
@@ -303,13 +317,13 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
           setAuthUser({
             name: 'undefined',
             lastName: 'null',
-            role: 'undefined',
+            role: 'Administradora',
             email: 'admin@sigasj.local',
             id: 'user-id-interno',
           })
         },
         expectedName: 'Usuario',
-        expectedRole: '',
+        expectedRole: 'Administradora',
       },
     ] as const
 
@@ -426,7 +440,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
       id: 'user-id-interno',
       name: 'María',
       lastName: 'Solís',
-      role: 'SECRETARIA_EJECUTIVA',
+      role: 'Secretaria',
       email: 'maria@sigasj.local',
       avatar: 'https://cdn.example.com/avatar.jpg?accessToken=secreto',
     })
@@ -438,7 +452,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
       const headerHtml = app.container.querySelector('.admin-header')?.innerHTML ?? ''
 
       expect(readHeaderUser(app.container).name).toBe('María Solís')
-      expect(readHeaderUser(app.container).role).toBe('Secretaria Ejecutiva')
+      expect(readHeaderUser(app.container).role).toBe('Secretaria')
       assertNoSensitiveUserDataInHeader(headerHtml)
       expect(headerHtml).not.toContain('password')
       expect(headerHtml).not.toContain('secreto-access-token-no-visible')
@@ -558,33 +572,28 @@ describe('AdminHeader — pruebas funcionales', () => {
 
     clearAccessToken()
     setAccessToken('token-sin-perfil')
+    setAuthUser({ role: 'Administradora' })
 
     const partialUserApp = await mountApp(ADMIN_HOME_PATH)
 
     try {
       const header = partialUserApp.container.querySelector('.admin-header')
       expect(header?.textContent).toContain('Usuario')
-      expect(header?.querySelector('.admin-header__user-detail')).toBeNull()
+      expect(header?.querySelector('.admin-header__user-detail')?.textContent).toBe(
+        'Administradora',
+      )
     } finally {
       await partialUserApp.cleanup()
     }
 
     clearAccessToken()
-    setAccessToken('token-nombre-solo')
     setAuthUser({ name: 'Ana' })
 
-    const nameOnlyApp = await mountApp(ADMIN_HOME_PATH)
+    const nameOnlyMarkup = renderHeader()
 
-    try {
-      const header = nameOnlyApp.container.querySelector('.admin-header')
-      expect(header?.textContent).toContain('Ana')
-      expect(header?.querySelector('.admin-header__user-detail')).toBeNull()
-      expect(
-        nameOnlyApp.container.querySelector('.visually-hidden')?.textContent,
-      ).toBe('Ana')
-    } finally {
-      await nameOnlyApp.cleanup()
-    }
+    expect(nameOnlyMarkup).toContain('Ana')
+    expect(nameOnlyMarkup).not.toContain('admin-header__user-detail')
+    expect(nameOnlyMarkup).toContain('visually-hidden">Ana<')
   })
 
   it('Prueba 4 — menú móvil invoca el sidebar y actualiza aria-expanded', async () => {
@@ -632,7 +641,7 @@ describe('AdminHeader — pruebas funcionales', () => {
 
   it('Prueba 5 — Landing Page no muestra AdminHeader', () => {
     setAccessToken('token-de-prueba')
-    setAuthUser({ name: 'Ana' })
+    setAuthUser({ name: 'Ana', role: 'Administradora' })
 
     const consoleSpy = collectConsole()
 

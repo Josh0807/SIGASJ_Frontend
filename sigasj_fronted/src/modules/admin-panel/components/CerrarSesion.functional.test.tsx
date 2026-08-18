@@ -3,6 +3,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryRouter, MemoryRouter, RouterProvider, useLocation } from 'react-router-dom'
 import AppRoutes from '../../../app/router/AppRoutes'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import {
   ADMIN_BASE_PATH,
   ADMIN_HOME_PATH,
@@ -196,12 +197,14 @@ const mountApp = async (path: string): Promise<MountedApp> => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <LocationProbe
-          onPath={(nextPath) => {
-            pathname = nextPath
-          }}
-        />
-        <AppRoutes />
+        <AuthProvider>
+          <LocationProbe
+            onPath={(nextPath) => {
+              pathname = nextPath
+            }}
+          />
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
@@ -257,10 +260,13 @@ const mountInteractiveApp = async (
   initialEntries: string[],
   initialIndex = initialEntries.length - 1,
 ) => {
-  const router = createMemoryRouter([{ path: '/*', element: <AppRoutes /> }], {
+  const router = createMemoryRouter(
+    [{ path: '/*', element: <AuthProvider><AppRoutes /></AuthProvider> }],
+    {
     initialEntries,
     initialIndex,
-  })
+    },
+  )
 
   const container = document.createElement('div')
   document.body.appendChild(container)
@@ -528,7 +534,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
     try {
       await app.submitLogin()
-      expect(app.currentPath()).toBe('/admin/galeria')
+      expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(hasAdminChrome(app.container.innerHTML)).toBe(true)
 
       await app.logoutFromMenu()
@@ -602,7 +608,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
       const user = readHeaderUser(app.container)
 
-      expect(user.name).toBe('Usuario Administrador')
+      expect(user.name).toBe('Usuario Administradora')
       expect(user.role).toBe('Administradora')
       expect(user.name).not.toBe('María Solís')
       expect(app.container.innerHTML).not.toContain('María Solís')
@@ -804,7 +810,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
       expect(getAuthUser()).toEqual({
         name: 'María',
         lastName: 'Solís',
-        role: 'ADMINISTRADORA',
+        role: 'Administradora',
       })
       expect(isAuthenticated()).toBe(true)
       expect(app.currentPath()).toBe(ADMIN_HOME_PATH)

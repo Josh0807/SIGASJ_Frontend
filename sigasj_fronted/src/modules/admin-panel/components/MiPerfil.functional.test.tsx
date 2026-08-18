@@ -9,6 +9,7 @@ import {
   ADMIN_PROFILE_TITLE,
 } from '../../../app/router/privateRoutes'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import {
   clearAccessToken,
   setAccessToken,
@@ -102,12 +103,14 @@ const mountApp = async (path: string): Promise<MountedApp> => {
   await act(async () => {
     root.render(
       <MemoryRouter initialEntries={[path]}>
-        <LocationProbe
-          onPath={(nextPath) => {
-            pathname = nextPath
-          }}
-        />
-        <AppRoutes />
+        <AuthProvider>
+          <LocationProbe
+            onPath={(nextPath) => {
+              pathname = nextPath
+            }}
+          />
+          <AppRoutes />
+        </AuthProvider>
       </MemoryRouter>,
     )
   })
