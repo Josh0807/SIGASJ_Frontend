@@ -1,7 +1,6 @@
-type PrivateModulePlaceholderProps = {
-  title: string
-  description?: string
-}
+import type { PrivateModulePlaceholderProps } from '../props'
+
+export type { PrivateModulePlaceholderProps }
 
 const PrivateModulePlaceholder = ({
   title,

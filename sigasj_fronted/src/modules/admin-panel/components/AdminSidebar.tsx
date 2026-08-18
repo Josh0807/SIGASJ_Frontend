@@ -1,21 +1,11 @@
-import type { Ref } from 'react'
 import { NavLink } from 'react-router-dom'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
-import { ADMIN_NAV_ITEMS, type AdminNavItem } from '../../../app/router/privateRoutes'
-import AdminNavIcon, { type AdminNavIconName } from './AdminNavIcon'
+import { ADMIN_NAV_ITEMS } from '../../../app/router/privateRoutes'
+import AdminNavIcon from './AdminNavIcon'
+import AdminUserMenu from './AdminUserMenu'
+import type { AdminSidebarItem, AdminSidebarProps } from '../props'
 
-export type AdminSidebarItem = AdminNavItem & {
-  icon: AdminNavIconName
-}
-
-type AdminSidebarProps = {
-  items?: AdminSidebarItem[]
-  isDrawer?: boolean
-  isOpen?: boolean
-  onNavigate?: () => void
-  onClose?: () => void
-  closeButtonRef?: Ref<HTMLButtonElement>
-}
+export type { AdminSidebarItem, AdminSidebarProps }
 
 const AdminSidebar = ({
   items = ADMIN_NAV_ITEMS,
@@ -78,6 +68,9 @@ const AdminSidebar = ({
         </NavLink>
       ))}
     </nav>
+    <div className="admin-sidebar__footer">
+      <AdminUserMenu variant="sidebar" />
+    </div>
   </aside>
 )
 

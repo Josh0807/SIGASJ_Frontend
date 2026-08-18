@@ -1,4 +1,4 @@
-import type { Ref } from 'react'
+import type { AdminHeaderProps } from '../props'
 import { Link } from 'react-router-dom'
 import { useAuthUser } from '../../auth/hooks/useAuthUser'
 import AdminAccountMenu from './AdminAccountMenu'
@@ -10,11 +10,7 @@ import {
   resolveAuthUserHeaderName,
 } from '../../auth/utils/authUserDisplay'
 
-export type AdminHeaderProps = {
-  menuOpen?: boolean
-  onToggleMenu?: () => void
-  menuToggleRef?: Ref<HTMLButtonElement>
-}
+export type { AdminHeaderProps }
 
 const AdminHeaderUser = () => {
   const user = useAuthUser()
