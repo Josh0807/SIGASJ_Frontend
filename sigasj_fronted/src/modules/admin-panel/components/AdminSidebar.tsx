@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
-import { ADMIN_NAV_ITEMS } from '../../../app/router/privateRoutes'
 import AdminNavIcon from './AdminNavIcon'
 import AdminUserMenu from './AdminUserMenu'
 import type { AdminSidebarItem, AdminSidebarProps } from '../props'
@@ -8,7 +7,7 @@ import type { AdminSidebarItem, AdminSidebarProps } from '../props'
 export type { AdminSidebarItem, AdminSidebarProps }
 
 const AdminSidebar = ({
-  items = ADMIN_NAV_ITEMS,
+  items = [],
   isDrawer = false,
   isOpen = false,
   onNavigate,

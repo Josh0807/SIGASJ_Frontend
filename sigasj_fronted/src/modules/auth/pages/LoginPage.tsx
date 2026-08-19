@@ -4,6 +4,7 @@ import { useAuth } from '../components/AuthContext'
 import { resolvePostLoginAdminPath } from '../utils/adminNavigation'
 import {
   INTERNAL_ADMIN_ROLES,
+  InternalAdminRoleName,
   type InternalAdminRole,
 } from '../utils/internalRoles'
 
@@ -23,7 +24,9 @@ const LoginPage = () => {
   const redirectTo =
     (location.state as { from?: string } | null)?.from ?? undefined
 
-  const [selectedRole, setSelectedRole] = useState<InternalAdminRole>('Administradora')
+  const [selectedRole, setSelectedRole] = useState<InternalAdminRole>(
+    InternalAdminRoleName.Administradora,
+  )
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 

@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { AuthProvider } from '../../modules/auth/components/AuthContext'
 import { clearAccessToken } from '../../modules/auth/utils/authStorage'
-import { loginWithAdminSession } from '../../test/authTestHelpers'
+import { loginAsRole, loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
 import {
   ADMIN_BASE_PATH,
@@ -17,6 +17,7 @@ import {
   LOGIN_ROUTE_PATH,
   PUBLIC_ROUTE_PATHS,
   PUBLIC_VISITOR_FORM_ROUTES,
+  UNAUTHORIZED_ROUTE_PATH,
 } from './publicRoutes'
 
 type RouteLocation = {
@@ -371,7 +372,11 @@ describe('AppRoutes y AdminLayout', () => {
   })
 
   it('deja las rutas públicas accesibles sin sesión', async () => {
-    for (const path of PUBLIC_ROUTE_PATHS) {
+    const visitorPaths = PUBLIC_ROUTE_PATHS.filter(
+      (path) => path !== UNAUTHORIZED_ROUTE_PATH,
+    )
+
+    for (const path of visitorPaths) {
       const app = await mountApp(path)
 
       try {
@@ -383,6 +388,45 @@ describe('AppRoutes y AdminLayout', () => {
       } finally {
         await app.cleanup()
       }
+    }
+  })
+
+  it('sin sesión, /unauthorized redirige al login en lugar de mostrar Acceso denegado', async () => {
+    const app = await mountApp(UNAUTHORIZED_ROUTE_PATH)
+
+    try {
+      expect(app.location().pathname).toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).not.toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('Gestión de Abonados autoriza por rol al escribir la URL, no por visibilidad de menú', async () => {
+    loginAsRole('Abonado')
+    const abonado = await mountApp('/admin/abonados')
+
+    try {
+      expect(abonado.location().pathname).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(abonado.container.innerHTML).toContain('Acceso denegado')
+      expect(abonado.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(abonado.container.innerHTML).not.toContain('Iniciar sesión')
+      expect(abonado.container.innerHTML).not.toContain('href="/admin/abonados"')
+    } finally {
+      await abonado.cleanup()
+    }
+
+    loginAsRole('Administradora')
+    const administradora = await mountApp('/admin/abonados')
+
+    try {
+      expect(administradora.location().pathname).toBe('/admin/abonados')
+      expect(administradora.container.innerHTML).toContain('Gestión de abonados')
+      expect(administradora.container.innerHTML).toContain('href="/admin/abonados"')
+      expect(administradora.container.innerHTML).not.toContain('Acceso denegado')
+    } finally {
+      await administradora.cleanup()
     }
   })
 

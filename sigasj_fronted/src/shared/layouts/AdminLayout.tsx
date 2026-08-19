@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import AdminMain from '../../modules/admin-panel/components/AdminMain'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
 import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigation'
-import { useAuthUser } from '../../modules/auth/hooks/useAuthUser'
+import { useAuth } from '../../modules/auth/components/AuthContext'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../app/router/routePaths'
 
 const MOBILE_NAV_QUERY = '(max-width: 760px)'
@@ -22,7 +22,7 @@ const getMobileNavSnapshot = () =>
   typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_NAV_QUERY).matches
 
 const AdminLayout = () => {
-  const user = useAuthUser()
+  const { user } = useAuth()
   const navItems = getAdminNavItemsForUser(user)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const isMobileNav = useSyncExternalStore(
@@ -65,6 +65,7 @@ const AdminLayout = () => {
   }, [isNavOpen, isMobileNav])
 
   if (navItems.length === 0) {
+    // Menú vacío: experiencia. La autorización de cada ruta está en AuthorizedRoute.
     return <Navigate to={UNAUTHORIZED_ROUTE_PATH} replace />
   }
 

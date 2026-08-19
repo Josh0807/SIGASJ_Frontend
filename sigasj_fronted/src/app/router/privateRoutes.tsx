@@ -2,6 +2,7 @@
 import type { AdminNavIconName } from '../../modules/admin-panel/components/AdminNavIcon'
 import { ADMIN_MODULE_ACCESS } from '../../modules/auth/config/adminNavigation.config'
 import type { InternalAdminRole } from '../../modules/auth/utils/internalRoles'
+import { ADMIN_BASE_PATH, ADMIN_ROUTE_SEGMENT } from './adminPaths'
 import AdminDashboard from '../../modules/dashboard/AdminDashboard'
 import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
@@ -41,8 +42,7 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   menuClose: <PrivateModulePlaceholder title="Cerrar menú" />,
 }
 
-export const ADMIN_ROUTE_SEGMENT = 'admin'
-export const ADMIN_BASE_PATH = `/${ADMIN_ROUTE_SEGMENT}`
+export { ADMIN_BASE_PATH, ADMIN_ROUTE_SEGMENT }
 export const ADMIN_HOME_SEGMENT = 'dashboard'
 export const ADMIN_HOME_PATH = `${ADMIN_BASE_PATH}/${ADMIN_HOME_SEGMENT}`
 export const ADMIN_PROFILE_SEGMENT = 'perfil'

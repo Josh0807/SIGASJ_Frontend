@@ -4,11 +4,18 @@ import {
 } from '../../../app/router/routePaths'
 import type { AuthUser } from '../types/authUser'
 import {
+  ABONADO_PERSONAL_ROUTE_PATHS,
+  isListedAbonadoPersonalRoute,
+} from './abonadoAccess'
+import {
   canAccessAdminRoute,
+  getAllowedRolesForAdminPath,
   getDefaultAdminHomePath,
   hasAnyAdminAccess,
   isInternalAdminRole,
+  userHasAllowedRole,
 } from './adminNavigation'
+import { isAbonadoRole } from './internalRoles'
 
 export type AdminAccessRedirect = {
   to: string
@@ -34,6 +41,10 @@ export function evaluateAdminAreaAccess(
     return loginRedirect()
   }
 
+  if (isAbonadoRole(user.role)) {
+    return unauthorizedRedirect()
+  }
+
   if (!isInternalAdminRole(user.role) || !hasAnyAdminAccess(user)) {
     return loginRedirect()
   }
@@ -45,16 +56,90 @@ export function evaluateAdminAreaAccess(
   return 'allow'
 }
 
-export function evaluateAdminRouteAccess(
+/**
+ * Autorización reutilizable: sesión + roles permitidos + destino.
+ * El rol proviene del usuario autenticado (AuthContext), no del JWT.
+ */
+export function evaluateRoleAccess(
+  isAuthenticated: boolean,
+  user: AuthUser | null,
+  allowedRoles: readonly string[],
+  fromPath?: string,
+): AdminAccessDecision {
+  if (!isAuthenticated || !user) {
+    return loginRedirect(fromPath)
+  }
+
+  if (userHasAllowedRole(user, allowedRoles)) {
+    return 'allow'
+  }
+
+  if (isInternalAdminRole(user.role) || isAbonadoRole(user.role)) {
+    return unauthorizedRedirect()
+  }
+
+  return loginRedirect(fromPath)
+}
+
+/**
+ * Acceso directo por URL (no usa el menú).
+ * - Sin sesión → login, también en rutas personales del Abonado.
+ * - Sesión válida de Abonado en ruta administrativa → Acceso denegado (nunca login).
+ * - Sesión de Abonado en ruta personal autorizada → allow.
+ */
+export function evaluateDirectRouteAccess(
   isAuthenticated: boolean,
   user: AuthUser | null,
   path: string,
+  allowedRoles?: readonly string[],
+  personalPaths: readonly string[] = ABONADO_PERSONAL_ROUTE_PATHS,
 ): AdminAccessDecision {
   if (!isAuthenticated || !user) {
     return loginRedirect(path)
   }
 
-  if (!isInternalAdminRole(user.role) || !hasAnyAdminAccess(user)) {
+  if (isListedAbonadoPersonalRoute(path, personalPaths)) {
+    return isAbonadoRole(user.role) ? 'allow' : unauthorizedRedirect()
+  }
+
+  if (isAbonadoRole(user.role)) {
+    return unauthorizedRedirect()
+  }
+
+  return evaluateAdminRouteAccess(true, user, path, allowedRoles)
+}
+
+export function evaluateAdminRouteAccess(
+  isAuthenticated: boolean,
+  user: AuthUser | null,
+  path: string,
+  allowedRoles?: readonly string[],
+): AdminAccessDecision {
+  if (!isAuthenticated || !user) {
+    return loginRedirect(path)
+  }
+
+  if (isListedAbonadoPersonalRoute(path)) {
+    return isAbonadoRole(user.role) ? 'allow' : unauthorizedRedirect()
+  }
+
+  if (isAbonadoRole(user.role)) {
+    return unauthorizedRedirect()
+  }
+
+  const declaredRoles = allowedRoles ?? getAllowedRolesForAdminPath(path)
+
+  if (declaredRoles && declaredRoles.length > 0) {
+    const roleDecision = evaluateRoleAccess(
+      true,
+      user,
+      declaredRoles,
+      path,
+    )
+    if (roleDecision !== 'allow') {
+      return roleDecision
+    }
+  } else if (!isInternalAdminRole(user.role) || !hasAnyAdminAccess(user)) {
     return loginRedirect(path)
   }
 
