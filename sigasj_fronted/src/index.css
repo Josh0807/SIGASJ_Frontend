@@ -3323,6 +3323,31 @@ html, body, #root {
   text-decoration: none;
   color: inherit;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  animation: dashboard-card-reveal 0.48s ease-out both;
+}
+
+.admin-dashboard__indicators-grid .indicator-card:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.admin-dashboard__indicators-grid .indicator-card:nth-child(3) {
+  animation-delay: 140ms;
+}
+
+.admin-dashboard__indicators-grid .indicator-card:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+@keyframes dashboard-card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .indicator-card--interactive {
@@ -3443,16 +3468,21 @@ html, body, #root {
 }
 
 /* Skeleton Loading & Error States for IndicatorCard */
-@keyframes indicator-skeleton-pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 0.3; }
-  100% { opacity: 0.6; }
+@keyframes indicator-skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }
 
 .indicator-card__skeleton {
-  background-color: #e2e8f0;
+  background: linear-gradient(90deg, #e8edf3 25%, #f8fafc 45%, #e8edf3 65%);
+  background-size: 300% 100%;
   border-radius: 6px;
-  animation: indicator-skeleton-pulse 1.5s infinite ease-in-out;
+  animation: indicator-skeleton-shimmer 1.6s infinite linear;
+}
+
+.indicator-card--loading {
+  min-height: 272px;
+  overflow: hidden;
 }
 
 .indicator-card__skeleton--icon {
@@ -3547,6 +3577,29 @@ html, body, #root {
 .admin-dashboard__refresh-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.admin-dashboard__refresh-icon {
+  display: inline-flex;
+  font-size: 1rem;
+  line-height: 1;
+  transform-origin: center;
+}
+
+.admin-dashboard__refresh-icon--loading {
+  animation: dashboard-refresh-spin 0.85s linear infinite;
+}
+
+@keyframes dashboard-refresh-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator-card,
+  .indicator-card__skeleton,
+  .admin-dashboard__refresh-icon--loading {
+    animation: none;
+  }
 }
 
 .admin-dashboard__global-error {
@@ -4621,4 +4674,3 @@ html, body, #root {
 .error-boundary-fallback__btn:hover {
   background: #be123c;
 }
-

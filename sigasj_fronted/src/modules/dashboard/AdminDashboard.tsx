@@ -92,7 +92,15 @@ const AdminDashboard = () => {
               disabled={isLoading}
               aria-label="Actualizar datos del dashboard"
             >
-              &#x21bb; {isLoading ? 'Cargando...' : 'Actualizar datos'}
+              <span
+                className={`admin-dashboard__refresh-icon ${
+                  isLoading ? 'admin-dashboard__refresh-icon--loading' : ''
+                }`}
+                aria-hidden="true"
+              >
+                &#x21bb;
+              </span>
+              {isLoading ? 'Cargando...' : 'Actualizar datos'}
             </button>
           </div>
 
