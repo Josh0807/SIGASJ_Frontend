@@ -2,6 +2,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
 import AdminDashboard from '../../dashboard/AdminDashboard'
 import AdminUserMenu from './AdminUserMenu'
@@ -21,11 +22,13 @@ describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
     act(() => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
-          <Routes>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route element={<AdminLayout />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -102,11 +105,13 @@ describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
-          <Routes>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route element={<AdminLayout />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -134,11 +139,13 @@ describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
     act(() => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
-          <Routes>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route element={<AdminLayout />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -174,11 +181,13 @@ describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
       act(() => {
         root.render(
           <MemoryRouter initialEntries={['/admin/dashboard']}>
-            <Routes>
-              <Route element={<AdminLayout />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              </Route>
-            </Routes>
+            <AuthProvider>
+              <Routes>
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                </Route>
+              </Routes>
+            </AuthProvider>
           </MemoryRouter>,
         )
       })

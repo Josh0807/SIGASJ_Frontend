@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:roles": "vitest run src/app/router/adminRoleAccess.test.tsx src/modules/auth/utils/roleAccessMatrix.test.ts src/modules/auth/utils/backendRoleAuthorization.test.ts",
+    "test:qa": "vitest run src/app/router/qaPanelAcceptance.test.tsx src/app/router/adminDirectAccess.test.tsx src/app/router/adminRoleAccess.test.tsx src/modules/admin-panel/components/adminMenuNavigation.test.tsx",
     "preview": "vite preview"
   },
   "dependencies": {

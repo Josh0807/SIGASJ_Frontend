@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
 import AdminDashboard from '../../dashboard/AdminDashboard'
 import { loginWithAdminSession } from '../../../test/authTestHelpers'
@@ -10,11 +11,13 @@ describe('AdminLayout Responsive Corrections & Modal Utilities', () => {
     loginWithAdminSession()
     return renderToStaticMarkup(
       <MemoryRouter initialEntries={['/admin/dashboard']}>
-        <Routes>
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </MemoryRouter>,
     )
   }
@@ -49,6 +52,7 @@ describe('AdminLayout Responsive Corrections & Modal Utilities', () => {
 
     expect(markup).toContain('admin-header')
     expect(markup).toContain('admin-user-menu')
+    expect(markup).toContain('admin-account-menu')
     expect(markup).toContain('admin-header__actions')
   })
 
