@@ -129,6 +129,9 @@ describe('route configuration', () => {
     expect(paths).not.toContain('/admin/comunicados')
     expect(navPaths).not.toContain('/admin/comunicados')
     expect(segments).not.toContain('comunicados')
+    expect(paths).not.toContain('/admin/abonados/:id')
+    expect(paths).not.toContain('/admin/abonados/me')
+    expect(PRIVATE_ROUTE_PATHS.every((path) => !path.includes(':id'))).toBe(true)
   })
 
   it('omite del menu los módulos marcados como no disponibles', () => {
@@ -137,5 +140,17 @@ describe('route configuration', () => {
         (route) => !ADMIN_NAV_ITEMS.some((item) => item.path === route.path),
       ),
     ).toBe(true)
+  })
+
+  it('Gestión de Abonados autoriza por rol en la ruta, no solo por visibilidad de menú', () => {
+    const abonados = ADMIN_CHILD_ROUTES.find((route) => route.segment === 'abonados')
+
+    expect(abonados).toBeDefined()
+    expect(abonados?.path).toBe('/admin/abonados')
+    expect(abonados?.allowedRoles).toEqual(['Administradora', 'Secretaria'])
+    expect(abonados?.allowedRoles).not.toContain('Abonado')
+    expect(abonados?.allowedRoles).not.toContain('Fontanero')
+    expect(PUBLIC_ROUTE_PATHS).not.toContain('/admin/abonados')
+    expect(PRIVATE_ROUTE_PATHS).toContain('/admin/abonados')
   })
 })

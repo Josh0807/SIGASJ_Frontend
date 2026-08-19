@@ -5,6 +5,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import {
   clearAccessToken,
   getAccessToken,
+  getAuthUser,
   isAuthenticated,
 } from '../../modules/auth/utils/authStorage'
 import AppRoutes from './AppRoutes'
@@ -277,5 +278,125 @@ describe('protección de rutas administrativas después del logout', () => {
     } finally {
       await app.cleanup()
     }
+  })
+
+  describe('Gestión de Abonados tras cerrar sesión', () => {
+    const ABONADOS_PATHS = ['/admin/abonados', '/admin/abonados/11'] as const
+
+    const assertLoggedOutFromAbonados = (container: HTMLElement) => {
+      expect(isAuthenticated()).toBe(false)
+      expect(getAccessToken()).toBeNull()
+      expect(getAuthUser()).toBeNull()
+      assertBlockedAdminAccess(container)
+      expect(container.innerHTML).not.toContain('Gestión de abonados')
+    }
+
+    it('invalida la sesión al cerrar sesión desde Gestión de Abonados', async () => {
+      const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
+
+      try {
+        await submitLogin(app.container)
+        await app.navigate('/admin/abonados')
+
+        expect(isAuthenticated()).toBe(true)
+        expect(getAuthUser()).not.toBeNull()
+        expect(app.currentPath()).toBe('/admin/abonados')
+        expect(app.container.innerHTML).toContain('admin-layout')
+        expect(app.container.innerHTML).toContain('Gestión de abonados')
+
+        await logoutFromAccountMenu(app.container)
+
+        expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+        assertLoggedOutFromAbonados(app.container)
+      } finally {
+        await app.cleanup()
+      }
+    })
+
+    it('bloquea el acceso directo a Gestión de Abonados después del logout', async () => {
+      const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
+
+      try {
+        await submitLogin(app.container)
+        await app.navigate('/admin/abonados')
+        await logoutFromAccountMenu(app.container)
+
+        for (const path of ABONADOS_PATHS) {
+          await app.navigate(path)
+
+          expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+          assertLoggedOutFromAbonados(app.container)
+        }
+      } finally {
+        await app.cleanup()
+      }
+    })
+
+    it('el botón Atrás no recupera Gestión de Abonados aunque la URL anterior reaparezca', async () => {
+      const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
+
+      try {
+        await submitLogin(app.container)
+        await app.navigate('/admin/abonados')
+        expect(app.container.innerHTML).toContain('Gestión de abonados')
+
+        await logoutFromAccountMenu(app.container)
+        expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+
+        await app.goBack()
+
+        expect(isAuthenticated()).toBe(false)
+        expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+        expect(app.container.innerHTML).not.toContain('admin-layout')
+        expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      } finally {
+        await app.cleanup()
+      }
+    })
+
+    it('ProtectedRoute vuelve a comprobar la sesión al volver a /admin/abonados sin autenticación', async () => {
+      clearAccessToken()
+
+      const app = await mountInteractiveApp(
+        ['/admin/abonados', LOGIN_ROUTE_PATH],
+        1,
+      )
+
+      try {
+        expect(isAuthenticated()).toBe(false)
+        expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+
+        await app.goBack()
+
+        expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+        assertLoggedOutFromAbonados(app.container)
+      } finally {
+        await app.cleanup()
+      }
+    })
+
+    it('recargar una URL de Gestión de Abonados tras logout sigue bloqueada', async () => {
+      const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
+
+      try {
+        await submitLogin(app.container)
+        await app.navigate('/admin/abonados')
+        await logoutFromAccountMenu(app.container)
+        expect(isAuthenticated()).toBe(false)
+      } finally {
+        await app.cleanup()
+      }
+
+      for (const path of ABONADOS_PATHS) {
+        const reloaded = await mountInteractiveApp([path])
+
+        try {
+          expect(reloaded.currentPath()).toBe(LOGIN_ROUTE_PATH)
+          assertLoggedOutFromAbonados(reloaded.container)
+        } finally {
+          await reloaded.cleanup()
+        }
+      }
+    })
   })
 })

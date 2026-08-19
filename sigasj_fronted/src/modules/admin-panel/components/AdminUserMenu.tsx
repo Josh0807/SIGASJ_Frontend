@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { clearAccessToken } from '../../auth/utils/authStorage'
+import { useAdminLogout } from '../../auth/hooks/useAdminLogout'
 import type { AdminUserMenuProps } from '../props'
 
 export type { AdminUserMenuProps }
@@ -16,12 +15,12 @@ const AdminUserMenu = ({
   userInitials = 'AD',
   variant = 'sidebar',
 }: AdminUserMenuProps) => {
-  const navigate = useNavigate()
+  const logout = useAdminLogout()
   const [isOpen, setIsOpen] = useState(false)
 
   const handleLogout = () => {
-    clearAccessToken()
-    navigate('/login')
+    setIsOpen(false)
+    logout()
   }
 
   useEffect(() => {

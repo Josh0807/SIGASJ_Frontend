@@ -1,5 +1,8 @@
 import type { AdminNavIconName } from '../../admin-panel/components/AdminNavIcon'
-import type { InternalAdminRole } from '../utils/internalRoles'
+import {
+  InternalAdminRoleName,
+  type InternalAdminRole,
+} from '../utils/internalRoles'
 
 /**
  * Permisos SIGASJ (`recurso.accion`) asignados por rol interno.
@@ -11,7 +14,7 @@ import type { InternalAdminRole } from '../utils/internalRoles'
  * 3. Actualiza allowedRoles en ADMIN_MODULE_ACCESS
  */
 export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
-  Administradora: [
+  [InternalAdminRoleName.Administradora]: [
     'subscribers.read',
     'subscribers.create',
     'subscribers.update',
@@ -26,7 +29,7 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
     'roles.manage',
     'audit.read',
   ],
-  Secretaria: [
+  [InternalAdminRoleName.Secretaria]: [
     'subscribers.read',
     'subscribers.create',
     'subscribers.update',
@@ -37,7 +40,10 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
     'institutional_content.manage',
     'projects.manage',
   ],
-  Fontanero: ['fault_reports.read', 'fault_reports.update_status'],
+  [InternalAdminRoleName.Fontanero]: [
+    'fault_reports.read',
+    'fault_reports.update_status',
+  ],
 }
 
 export type AdminModuleAccessDefinition = {
@@ -57,77 +63,108 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'dashboard',
     title: 'Dashboard',
-    allowedRoles: ['Administradora', 'Secretaria', 'Fontanero'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+      InternalAdminRoleName.Fontanero,
+    ],
     requiredPermissions: [],
     availableInNav: true,
   },
   {
     segment: 'usuarios',
     title: 'Gestión de usuarios',
-    allowedRoles: ['Administradora'],
+    allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['users.manage'],
     availableInNav: true,
   },
   {
     segment: 'abonados',
     title: 'Gestión de abonados',
-    allowedRoles: ['Administradora', 'Secretaria'],
+    // Abonado no está aquí: no ve el padrón ni entra por URL. No hay pantallas personales en este módulo.
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: ['subscribers.read'],
     availableInNav: true,
   },
   {
     segment: 'inventario',
     title: 'Gestión de inventario',
-    allowedRoles: ['Administradora', 'Secretaria'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: ['subscribers.read'],
     availableInNav: true,
   },
   {
     segment: 'solicitudes',
     title: 'Gestión de solicitudes',
-    allowedRoles: ['Administradora', 'Secretaria'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: ['subscribers.read'],
     availableInNav: true,
   },
   {
     segment: 'lecturas',
     title: 'Gestión de lecturas',
-    allowedRoles: ['Administradora', 'Secretaria'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: ['subscribers.read'],
     availableInNav: true,
   },
   {
     segment: 'averias',
     title: 'Gestión de averías',
-    allowedRoles: ['Administradora', 'Secretaria', 'Fontanero'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+      InternalAdminRoleName.Fontanero,
+    ],
     requiredPermissions: ['fault_reports.read'],
     availableInNav: true,
   },
   {
     segment: 'reportes',
     title: 'Gestión de reportes',
-    allowedRoles: ['Administradora'],
+    allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['audit.read'],
     availableInNav: true,
   },
   {
     segment: 'galeria',
     title: 'Galería de fotografías',
-    allowedRoles: ['Administradora', 'Secretaria'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: ['institutional_content.manage'],
     availableInNav: true,
   },
   {
     segment: 'transparencia',
     title: 'Transparencia y calidad del agua',
-    allowedRoles: ['Administradora', 'Secretaria'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: ['institutional_content.manage'],
     availableInNav: true,
   },
   {
     segment: 'perfil',
     title: 'Mi perfil',
-    allowedRoles: ['Administradora', 'Secretaria', 'Fontanero'],
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+      InternalAdminRoleName.Fontanero,
+    ],
     requiredPermissions: [],
     availableInNav: false,
   },
@@ -136,3 +173,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
 export const ADMIN_MODULE_ACCESS_BY_SEGMENT = Object.fromEntries(
   ADMIN_MODULE_ACCESS.map((module) => [module.segment, module]),
 ) as Record<AdminNavIconName, AdminModuleAccessDefinition>
+
+/** Roles del grupo de rutas de Gestión de Abonados (fuente única para el guard). */
+export const ABONADOS_ALLOWED_ROLES =
+  ADMIN_MODULE_ACCESS_BY_SEGMENT.abonados.allowedRoles

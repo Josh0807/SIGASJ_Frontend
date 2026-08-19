@@ -209,7 +209,7 @@ describe('navegación del menú administrativo', () => {
     act(() => {
       root.render(
         <MemoryRouter initialEntries={['/admin/galeria/foto-12']}>
-          <AdminSidebar />
+          <AdminSidebar items={ADMIN_NAV_ITEMS} />
         </MemoryRouter>,
       )
     })

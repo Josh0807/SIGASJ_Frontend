@@ -1,6 +1,6 @@
 ﻿import { describe, expect, it } from 'vitest'
-import { ADMIN_MODULE_ACCESS, ROLE_PERMISSIONS } from './adminNavigation.config'
-import { INTERNAL_ADMIN_ROLES } from '../utils/internalRoles'
+import { ADMIN_MODULE_ACCESS, ROLE_PERMISSIONS, ABONADOS_ALLOWED_ROLES } from './adminNavigation.config'
+import { INTERNAL_ADMIN_ROLES, InternalAdminRoleName, ABONADO_ROLE } from '../utils/internalRoles'
 
 describe('adminNavigation.config', () => {
   it('centraliza segmento, titulo, roles y permisos por modulo', () => {
@@ -39,5 +39,33 @@ describe('adminNavigation.config', () => {
 
     expect(usuarios?.allowedRoles).toEqual(['Administradora'])
     expect(reportes?.allowedRoles).toEqual(['Administradora'])
+  })
+
+  it('autoriza a Administradora en Gestión de abonados (ruta y menú)', () => {
+    const abonados = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'abonados')
+
+    expect(abonados?.title).toBe('Gestión de abonados')
+    expect(abonados?.allowedRoles).toContain(InternalAdminRoleName.Administradora)
+    expect(abonados?.availableInNav).toBe(true)
+    expect(abonados?.requiredPermissions).toContain('subscribers.read')
+    expect(ROLE_PERMISSIONS[InternalAdminRoleName.Administradora]).toEqual(
+      expect.arrayContaining([
+        'subscribers.read',
+        'subscribers.create',
+        'subscribers.update',
+        'subscribers.deactivate',
+      ]),
+    )
+    expect(abonados?.allowedRoles).not.toContain(ABONADO_ROLE)
+    expect(abonados?.allowedRoles).not.toContain('ABONADO')
+    expect(abonados?.allowedRoles).not.toContain(InternalAdminRoleName.Fontanero)
+    expect(abonados?.allowedRoles).toContain(InternalAdminRoleName.Secretaria)
+  })
+
+  it('no otorga al Abonado pantallas administrativas del módulo', () => {
+    const abonados = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'abonados')
+
+    expect(abonados?.allowedRoles).toEqual(ABONADOS_ALLOWED_ROLES)
+    expect(ROLE_PERMISSIONS).not.toHaveProperty(ABONADO_ROLE)
   })
 })

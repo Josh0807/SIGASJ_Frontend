@@ -6,7 +6,7 @@ import AdminSidebar from './AdminSidebar'
 
 const renderSidebar = (
   path = '/',
-  items?: Parameters<typeof AdminSidebar>[0]['items'],
+  items: Parameters<typeof AdminSidebar>[0]['items'] = ADMIN_NAV_ITEMS,
 ) =>
   renderToStaticMarkup(
     <MemoryRouter initialEntries={[path]}>
@@ -68,6 +68,14 @@ describe('AdminSidebar', () => {
     expect(markup).toContain('Abonados')
     expect(markup).not.toContain('href="/admin/inventario"')
     expect(markup).not.toContain('Gestión de inventario')
+  })
+
+  it('sin ítems no expone el catálogo administrativo completo', () => {
+    const markup = renderSidebar('/', [])
+
+    expect(markup).toContain('admin-sidebar__nav')
+    expect(markup).not.toContain('href="/admin/abonados"')
+    expect(markup).not.toContain('Gestión de abonados')
   })
 
   it('permite agregar un modulo nuevo desde la configuracion', () => {
