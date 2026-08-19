@@ -5,53 +5,74 @@ import ReadingProgressWidget from './components/ReadingProgressWidget'
 import RecentAlertsWidget from './components/RecentAlertsWidget'
 import RecentActivityWidget from './components/RecentActivityWidget'
 import { useDashboardMetrics } from './hooks/useDashboardMetrics'
+import { useAuth } from '../auth/components/AuthContext'
+import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
 import type { DashboardIndicator } from './props'
 
+const DASHBOARD_INDICATORS: DashboardIndicator[] = [
+  {
+    id: 'abonados',
+    label: 'Abonados activos',
+    value: null,
+    detail: 'Padrón actualizado',
+    badgeText: 'Activos',
+    badgeType: 'success',
+    icon: 'abonados',
+    link: '/admin/abonados',
+  },
+  {
+    id: 'lecturas',
+    label: 'Lecturas pendientes',
+    value: null,
+    detail: 'Ciclo del mes actual',
+    badgeText: 'En curso',
+    badgeType: 'warning',
+    icon: 'lecturas',
+    link: '/admin/lecturas',
+  },
+  {
+    id: 'averias',
+    label: 'Averías reportadas',
+    value: null,
+    detail: 'Requieren atención',
+    badgeText: 'Pendientes',
+    badgeType: 'alert',
+    icon: 'averias',
+    link: '/admin/averias',
+  },
+  {
+    id: 'solicitudes',
+    label: 'Solicitudes en trámite',
+    value: null,
+    detail: 'Nuevos servicios',
+    badgeText: 'En revisión',
+    badgeType: 'info',
+    icon: 'solicitudes',
+    link: '/admin/solicitudes',
+  },
+]
+
 const AdminDashboard = () => {
+  const { user } = useAuth()
   const { metrics, isLoading, isError, refetch } = useDashboardMetrics()
 
-  const indicators: DashboardIndicator[] = [
-    {
-      id: 'abonados',
-      label: 'Abonados activos',
-      value: metrics.abonadosActivos ?? null,
-      detail: 'Padrón actualizado',
-      badgeText: 'Activos',
-      badgeType: 'success',
-      icon: 'abonados',
-      link: '/admin/abonados',
-    },
-    {
-      id: 'lecturas',
-      label: 'Lecturas pendientes',
-      value: metrics.lecturasPendientes ?? null,
-      detail: 'Ciclo del mes actual',
-      badgeText: 'En curso',
-      badgeType: 'warning',
-      icon: 'lecturas',
-      link: '/admin/lecturas',
-    },
-    {
-      id: 'averias',
-      label: 'Averías reportadas',
-      value: metrics.averiasReportadas ?? null,
-      detail: 'Requieren atención',
-      badgeText: 'Pendientes',
-      badgeType: 'alert',
-      icon: 'averias',
-      link: '/admin/averias',
-    },
-    {
-      id: 'solicitudes',
-      label: 'Solicitudes en trámite',
-      value: metrics.solicitudesEnTramite ?? null,
-      detail: 'Nuevos servicios',
-      badgeText: 'En revisión',
-      badgeType: 'info',
-      icon: 'solicitudes',
-      link: '/admin/solicitudes',
-    },
-  ]
+  const indicators: DashboardIndicator[] = DASHBOARD_INDICATORS.filter(
+    (indicator) => !indicator.link || canAccessAdminRoute(user, indicator.link),
+  ).map((indicator) => {
+    if (indicator.id === 'abonados') {
+      return { ...indicator, value: metrics.abonadosActivos ?? null }
+    }
+    if (indicator.id === 'lecturas') {
+      return { ...indicator, value: metrics.lecturasPendientes ?? null }
+    }
+    if (indicator.id === 'averias') {
+      return { ...indicator, value: metrics.averiasReportadas ?? null }
+    }
+    if (indicator.id === 'solicitudes') {
+      return { ...indicator, value: metrics.solicitudesEnTramite ?? null }
+    }
+    return indicator
+  })
 
   return (
     <section className="admin-dashboard" aria-labelledby="admin-dashboard-title">

@@ -44,7 +44,7 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
   {
     path: UNAUTHORIZED_ROUTE_PATH,
     element: <UnauthorizedPage />,
-    label: 'Acceso no autorizado',
+    label: 'Acceso denegado',
   },
 ]
 

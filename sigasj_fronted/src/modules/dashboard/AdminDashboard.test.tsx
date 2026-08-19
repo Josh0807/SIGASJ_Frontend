@@ -3,16 +3,24 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter } from 'react-router-dom'
 import AdminDashboard from './AdminDashboard'
 import * as useDashboardMetricsModule from './hooks/useDashboardMetrics'
+import { AuthProvider } from '../auth/components/AuthContext'
+import { setAuthSession } from '../auth/utils/authStorage'
 
 describe('AdminDashboard - Pruebas Integrales', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    setAuthSession({
+      accessToken: 'token-admin',
+      user: { id: '1', role: 'Administradora' },
+    })
   })
 
   const renderDashboard = () =>
     renderToStaticMarkup(
       <MemoryRouter>
-        <AdminDashboard />
+        <AuthProvider>
+          <AdminDashboard />
+        </AuthProvider>
       </MemoryRouter>,
     )
 
@@ -129,5 +137,18 @@ describe('AdminDashboard - Pruebas Integrales', () => {
       console.error = originalError
       console.warn = originalWarn
     }
+  })
+
+  it('Fontanero no ve el acceso a Gestión de Abonados en el dashboard', () => {
+    setAuthSession({
+      accessToken: 'token-fontanero',
+      user: { id: '3', role: 'Fontanero' },
+    })
+
+    const markup = renderDashboard()
+
+    expect(markup).toContain('href="/admin/averias"')
+    expect(markup).not.toContain('href="/admin/abonados"')
+    expect(markup).not.toContain('Abonados activos')
   })
 })

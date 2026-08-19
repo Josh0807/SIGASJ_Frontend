@@ -1,7 +1,11 @@
 import type { AdminNavIconName } from '../../admin-panel/components/AdminNavIcon'
 import type { AdminNavItem } from '../../../app/router/privateRoutes'
-import { ADMIN_BASE_PATH } from '../../../app/router/privateRoutes'
-import { LANDING_ROUTE_PATH } from '../../../app/router/routePaths'
+import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
+import {
+  LANDING_ROUTE_PATH,
+  UNAUTHORIZED_ROUTE_PATH,
+} from '../../../app/router/routePaths'
+import { isAdministrativeAbonadosPath } from './abonadoAccess'
 import {
   ADMIN_MODULE_ACCESS,
   ADMIN_MODULE_ACCESS_BY_SEGMENT,
@@ -10,13 +14,21 @@ import {
 import type { AuthUser } from '../types/authUser'
 import {
   INTERNAL_ADMIN_ROLES,
+  InternalAdminRoleName,
   isInternalAdminRole,
   normalizeInternalRole,
   type InternalAdminRole,
+  ABONADO_ROLE,
+  isAbonadoRole,
 } from './internalRoles'
 
-export { isInternalAdminRole, normalizeInternalRole }
-export { INTERNAL_ADMIN_ROLES, type InternalAdminRole }
+export {
+  isInternalAdminRole,
+  normalizeInternalRole,
+  InternalAdminRoleName,
+  isAbonadoRole,
+}
+export { INTERNAL_ADMIN_ROLES, type InternalAdminRole, ABONADO_ROLE }
 
 export function getPermissionsForRole(role: string): readonly string[] {
   const normalized = normalizeInternalRole(role)
@@ -43,17 +55,29 @@ export function canAccessAdminModule(
   user: AuthUser | null,
   segment: AdminNavIconName,
 ): boolean {
-  const role = normalizeInternalRole(user?.role)
-  if (!user || !role) {
+  if (!user) {
     return false
   }
 
   const module = ADMIN_MODULE_ACCESS_BY_SEGMENT[segment]
-  if (!module.allowedRoles.includes(role)) {
+  if (!userHasAllowedRole(user, module.allowedRoles)) {
     return false
   }
 
   return userHasPermissions(user, module.requiredPermissions)
+}
+
+/** Comprueba el rol del usuario autenticado contra una lista declarada. No usa JWT. */
+export function userHasAllowedRole(
+  user: AuthUser | null,
+  allowedRoles: readonly string[],
+): boolean {
+  const userRole = normalizeInternalRole(user?.role)
+  if (!userRole || allowedRoles.length === 0) {
+    return false
+  }
+
+  return allowedRoles.some((allowed) => normalizeInternalRole(allowed) === userRole)
 }
 
 const normalizeAdminPath = (path: string): string =>
@@ -66,20 +90,46 @@ const ADMIN_MODULE_BY_PATH = new Map(
   ]),
 )
 
+function resolveAdminModuleFromPath(path: string) {
+  const normalized = normalizeAdminPath(path)
+  const exact = ADMIN_MODULE_BY_PATH.get(normalized)
+  if (exact) {
+    return exact
+  }
+
+  let matchedPath = ''
+  for (const modulePath of ADMIN_MODULE_BY_PATH.keys()) {
+    if (
+      normalized.startsWith(`${modulePath}/`) &&
+      modulePath.length > matchedPath.length
+    ) {
+      matchedPath = modulePath
+    }
+  }
+
+  return matchedPath ? ADMIN_MODULE_BY_PATH.get(matchedPath) : undefined
+}
+
 export function canAccessAdminRoute(
   user: AuthUser | null,
   path: string,
 ): boolean {
-  if (!user) {
+  if (!user || isAbonadoRole(user.role)) {
     return false
   }
 
-  const module = ADMIN_MODULE_BY_PATH.get(normalizeAdminPath(path))
+  const module = resolveAdminModuleFromPath(path)
   if (!module) {
     return false
   }
 
   return canAccessAdminModule(user, module.segment)
+}
+
+export function getAllowedRolesForAdminPath(
+  path: string,
+): readonly InternalAdminRole[] | undefined {
+  return resolveAdminModuleFromPath(path)?.allowedRoles
 }
 
 export function getAdminNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
@@ -96,6 +146,13 @@ export function getAdminNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
   }))
 }
 
+/** Opciones de menú de Gestión de Abonados según el rol autenticado. */
+export function getAbonadosNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
+  return getAdminNavItemsForUser(user).filter(
+    (item) => item.path === `${ADMIN_BASE_PATH}/abonados`,
+  )
+}
+
 export function getDefaultAdminHomePath(user: AuthUser | null): string | null {
   const navItems = getAdminNavItemsForUser(user)
   return navItems[0]?.path ?? null
@@ -110,6 +167,14 @@ export function resolvePostLoginAdminPath(
   user: AuthUser,
   requestedPath?: string,
 ): string {
+  if (isAbonadoRole(user.role)) {
+    if (requestedPath && isAdministrativeAbonadosPath(requestedPath)) {
+      return UNAUTHORIZED_ROUTE_PATH
+    }
+
+    return LANDING_ROUTE_PATH
+  }
+
   if (requestedPath && canAccessAdminRoute(user, requestedPath)) {
     return requestedPath
   }

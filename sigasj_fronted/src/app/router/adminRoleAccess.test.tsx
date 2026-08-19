@@ -50,6 +50,11 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
         expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
         const links = sidebarLinks(app.container.innerHTML)
         expect(links).toEqual([...EXPECTED_NAV_PATHS[rol]])
+        if (rol === 'Administradora' || rol === 'Secretaria') {
+          expect(links).toContain('/admin/abonados')
+        } else {
+          expect(links).not.toContain('/admin/abonados')
+        }
       } finally {
         await app.cleanup()
       }
@@ -82,7 +87,7 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
 
         try {
           expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
-          expect(app.container.innerHTML).toContain('Acceso no autorizado')
+          expect(app.container.innerHTML).toContain('Acceso denegado')
           expect(app.container.innerHTML).not.toContain(
             SAMPLE_ALLOWED_CONTENT[path] ?? '',
           )
@@ -99,6 +104,10 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
 
     try {
       expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).toContain(
+        'No tiene permisos para acceder a esta sección.',
+      )
       expect(app.container.innerHTML).toContain('Volver al panel')
       expect(app.container.innerHTML).toContain('href="/admin/dashboard"')
     } finally {
@@ -111,8 +120,89 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
     const app = await mountAppRoutes(ADMIN_HOME_PATH)
 
     try {
-      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
-      expect(app.container.innerHTML).toContain('Iniciar sesión')
+      expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Iniciar sesión')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
+      expect(app.container.innerHTML).not.toContain('Dashboard administrativo')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('ocultar Gestión de Abonados del menú no sustituye el guard: Abonado denegado por URL', async () => {
+    loginAs('Abonado')
+    const app = await mountAppRoutes('/admin/abonados')
+
+    try {
+      expect(sidebarLinks(app.container.innerHTML)).not.toContain('/admin/abonados')
+      expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Iniciar sesión')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('Abonado autenticado recibe acceso denegado en Gestión de abonados', async () => {
+    loginAs('Abonado')
+    const app = await mountAppRoutes('/admin/abonados')
+
+    try {
+      expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Iniciar sesión')
+      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
+      expect(app.container.innerHTML).not.toContain('admin-sidebar')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('Abonado no consulta otro abonado pasando un ID en la URL', async () => {
+    loginAs('Abonado')
+    const app = await mountAppRoutes('/admin/abonados/11')
+
+    try {
+      expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Iniciar sesión')
+      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('Abonado autenticado recibe acceso denegado al escribir /admin/abonados/nuevo', async () => {
+    loginAs('ABONADO')
+    const app = await mountAppRoutes('/admin/abonados/nuevo')
+
+    try {
+      expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Iniciar sesión')
+      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(sidebarLinks(app.container.innerHTML)).not.toContain('/admin/abonados')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('Fontanero tampoco entra a Gestión de abonados con un ID en la URL', async () => {
+    loginAs('Fontanero')
+    const app = await mountAppRoutes('/admin/abonados/11')
+
+    try {
+      expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
     } finally {
       await app.cleanup()
     }
@@ -124,6 +214,20 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
     try {
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('auth-page')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('sin sesión redirige al login desde Gestión de abonados', async () => {
+    const app = await mountAppRoutes('/admin/abonados')
+
+    try {
+      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      expect(app.container.innerHTML).toContain('Iniciar sesión')
+      expect(app.container.innerHTML).not.toContain('Acceso denegado')
+      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {
       await app.cleanup()
     }

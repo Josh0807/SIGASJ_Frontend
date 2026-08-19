@@ -57,6 +57,14 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     ])
   })
 
+  it('Gestión de Abonados aparece en el menú solo con permiso definido', () => {
+    expect(EXPECTED_NAV_PATHS.Administradora).toContain('/admin/abonados')
+    expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/abonados')
+    expect(EXPECTED_NAV_PATHS.Fontanero).not.toContain('/admin/abonados')
+    expect(canAccessAdminRoute(userFor('Fontanero'), '/admin/abonados')).toBe(false)
+    expect(getAdminNavItemsForUser({ role: 'Abonado', id: '4' })).toEqual([])
+  })
+
   it('permisos backend alineados: Fontanero sin users.manage ni audit.read', () => {
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('audit.read')
