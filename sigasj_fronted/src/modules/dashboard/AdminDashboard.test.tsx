@@ -48,19 +48,14 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('href="/admin/solicitudes"')
   })
 
-  it('4. Renderiza los accesos rápidos navegables con React Router', () => {
+  it('4. Renderiza los widgets operativos en tiempo real (Ciclo de lecturas, Averías recientes y Bitácora)', () => {
     const markup = renderDashboard()
-    expect(markup).toContain('Accesos rápidos')
-    expect(markup).toContain('Usuarios y roles')
-    expect(markup).toContain('Padrón de abonados')
-    expect(markup).toContain('Lecturas de medidores')
-    expect(markup).toContain('Reportes de averías')
-    expect(markup).toContain('Galería de fotos')
-    expect(markup).toContain('Informes de transparencia')
-    expect(markup).toContain('Estadísticas y reportes')
-    expect(markup).toContain('href="/admin/usuarios"')
-    expect(markup).toContain('href="/admin/galeria"')
-    expect(markup).toContain('href="/admin/transparencia"')
+    expect(markup).toContain('Operaciones en tiempo real')
+    expect(markup).toContain('Ciclo de Lecturas')
+    expect(markup).toContain('Averías Recientes')
+    expect(markup).toContain('Bitácora de Actividad')
+    expect(markup).toContain('href="/admin/lecturas"')
+    expect(markup).toContain('href="/admin/averias"')
     expect(markup).toContain('href="/admin/reportes"')
   })
 
@@ -92,7 +87,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('Reintentar')
     expect(markup).toContain('N/D')
     // El dashboard no se bloqueó y sigue mostrando el resto del contenido
-    expect(markup).toContain('Accesos rápidos')
+    expect(markup).toContain('Operaciones en tiempo real')
   })
 
   it('7. Diferencia correctamente una métrica en cero (0) de un dato no disponible (null)', () => {

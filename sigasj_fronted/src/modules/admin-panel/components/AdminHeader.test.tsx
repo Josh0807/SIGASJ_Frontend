@@ -52,11 +52,9 @@ describe('AdminHeader', () => {
     expect(markup).toContain('admin-header__start')
     expect(markup).toContain('admin-header__account')
     expect(markup).toContain('Panel administrativo')
-    expect(markup).toContain('href="/"')
-    expect(markup).toContain('aria-label="Ver sitio público"')
-    expect(markup).toContain('Ver sitio público')
-    expect(markup).toContain('Opciones de cuenta')
-    expect(markup).toContain('admin-account-menu')
+    expect(markup).not.toContain('Ver sitio público')
+    expect(markup).not.toContain('Opciones de cuenta')
+    expect(markup).not.toContain('admin-account-menu')
   })
 
   it('usa valores por defecto cuando no hay datos de usuario', () => {

@@ -153,6 +153,9 @@ const assertNoSensitiveUserDataInHeader = (html: string) => {
   expect(html).not.toContain('sigasj_access_token')
   expect(html).not.toContain('admin@sigasj.local')
   expect(html).not.toMatch(/Bearer\s+/i)
+  expect(html).not.toMatch(/\beyJ[A-Za-z0-9_-]{10,}/)
+  expect(html).not.toContain('password')
+  expect(html).not.toContain('contraseña')
 }
 
 const submitLogin = async (container: HTMLElement) => {
@@ -234,7 +237,56 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
     }
   })
 
-  it('Prueba 2 — datos opcionales ausentes mantienen la interfaz estable', async () => {
+  it('Prueba 2 — el rol mostrado corresponde a la sesión, es legible y no se inventa', async () => {
+    const consoleSpy = collectConsole()
+    const roleCases = [
+      { raw: 'Administradora', label: 'Administradora' },
+      { raw: 'Secretaria', label: 'Secretaria' },
+      { raw: 'Fontanero', label: 'Fontanero' },
+    ] as const
+
+    try {
+      for (const roleCase of roleCases) {
+        clearAccessToken()
+        setAccessToken(`token-rol-${roleCase.raw}`)
+        setAuthUser({ name: 'Ana', lastName: 'López', role: roleCase.raw })
+
+        const app = await mountApp(ADMIN_HOME_PATH)
+
+        try {
+          const user = readHeaderUser(app.container)
+
+          expect(user.name).toBe('Ana López')
+          expect(user.role).toBe(roleCase.label)
+          expect(user.role).not.toMatch(/undefined|null/i)
+          assertNoSensitiveUserDataInHeader(app.container.innerHTML)
+        } finally {
+          await app.cleanup()
+        }
+      }
+
+      clearAccessToken()
+      setAccessToken('token-sin-rol')
+      setAuthUser({ name: 'Ana', role: 'undefined' })
+
+      const noRoleApp = await mountApp(ADMIN_HOME_PATH)
+
+      try {
+        expect(noRoleApp.container.querySelector('.admin-header')).toBeNull()
+        expect(noRoleApp.currentPath()).toBe(LOGIN_ROUTE_PATH)
+        assertStableUserMarkup(noRoleApp.container.innerHTML)
+      } finally {
+        await noRoleApp.cleanup()
+      }
+
+      expect(consoleSpy.errors).toEqual([])
+      expect(consoleSpy.warnings).toEqual([])
+    } finally {
+      consoleSpy.restore()
+    }
+  })
+
+  it('Prueba 2b — datos opcionales ausentes mantienen la interfaz estable', async () => {
     const consoleSpy = collectConsole()
     const scenarios = [
       {
@@ -337,32 +389,27 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
   it('Prueba 4 — cambio de usuario reemplaza nombre y rol en AdminHeader', async () => {
     const consoleSpy = collectConsole()
 
-    setAccessToken('token-usuario-a')
-    setAuthUser({
-      name: 'María',
-      lastName: 'Solís',
-      role: 'ADMINISTRADORA',
-    })
-
-    const app = await mountApp(ADMIN_HOME_PATH)
+    const loginApp = await mountApp(LOGIN_ROUTE_PATH)
 
     try {
-      expect(readHeaderUser(app.container).name).toBe('María Solís')
-      expect(readHeaderUser(app.container).role).toBe('Administradora')
+      await submitLogin(loginApp.container)
 
-      await logoutFromHeader(app.container)
+      expect(readHeaderUser(loginApp.container).name).toBe('Usuario Administradora')
+      expect(readHeaderUser(loginApp.container).role).toBe('Administradora')
 
-      expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
-      expect(app.container.querySelector('.admin-header')).toBeNull()
+      await logoutFromHeader(loginApp.container)
+
+      expect(loginApp.currentPath()).toBe(LOGIN_ROUTE_PATH)
+      expect(loginApp.container.querySelector('.admin-header')).toBeNull()
     } finally {
-      await app.cleanup()
+      await loginApp.cleanup()
     }
 
     setAccessToken('token-usuario-b')
     setAuthUser({
       name: 'Carlos',
       lastName: 'Mora',
-      role: 'FONTANERO',
+      role: 'Fontanero',
     })
 
     const secondApp = await mountApp(ADMIN_HOME_PATH)
@@ -372,9 +419,10 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
 
       expect(user.name).toBe('Carlos Mora')
       expect(user.role).toBe('Fontanero')
-      expect(user.sectionText).not.toContain('María Solís')
+      expect(user.sectionText).not.toContain('Usuario Administradora')
       expect(user.sectionText).not.toContain('Administradora')
       assertStableUserMarkup(secondApp.container.innerHTML)
+      assertNoSensitiveUserDataInHeader(secondApp.container.innerHTML)
       expect(consoleSpy.errors).toEqual([])
       expect(consoleSpy.warnings).toEqual([])
     } finally {

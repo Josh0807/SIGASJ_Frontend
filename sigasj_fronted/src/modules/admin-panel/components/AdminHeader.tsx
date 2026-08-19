@@ -1,7 +1,5 @@
-import type { Ref } from 'react'
-import { Link } from 'react-router-dom'
+import type { AdminHeaderProps } from '../props'
 import { useAuthUser } from '../../auth/hooks/useAuthUser'
-import AdminAccountMenu from './AdminAccountMenu'
 import AdminHeaderMenuToggle from './AdminHeaderMenuToggle'
 import {
   getAuthUserHeaderAvatarUrl,
@@ -10,11 +8,7 @@ import {
   resolveAuthUserHeaderName,
 } from '../../auth/utils/authUserDisplay'
 
-export type AdminHeaderProps = {
-  menuOpen?: boolean
-  onToggleMenu?: () => void
-  menuToggleRef?: Ref<HTMLButtonElement>
-}
+export type { AdminHeaderProps }
 
 const AdminHeaderUser = () => {
   const user = useAuthUser()
@@ -71,28 +65,6 @@ const AdminHeader = ({
 
       <div className="admin-header__account">
         <AdminHeaderUser />
-
-        <div className="admin-header__actions">
-          <Link
-            className="admin-header__action admin-header__action--public"
-            to="/"
-            aria-label="Ver sitio público"
-          >
-            <span
-              className="admin-header__action-label admin-header__action-label--full"
-              aria-hidden="true"
-            >
-              Ver sitio público
-            </span>
-            <span
-              className="admin-header__action-label admin-header__action-label--short"
-              aria-hidden="true"
-            >
-              Público
-            </span>
-          </Link>
-          <AdminAccountMenu />
-        </div>
       </div>
     </header>
   )

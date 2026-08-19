@@ -1,25 +1,14 @@
-import AdminNavIcon, { type AdminNavIconName } from '../admin-panel/components/AdminNavIcon'
+import AdminNavIcon from '../admin-panel/components/AdminNavIcon'
 import IndicatorCard from '../../shared/components/IndicatorCard'
-import QuickAccessCard from '../../shared/components/QuickAccessCard'
-import { ADMIN_NAV_ITEMS } from '../../app/router/privateRoutes'
-import { getAuthorizedQuickAccessItems } from './config/quickAccessConfig'
+import ErrorBoundary from '../../shared/components/ErrorBoundary'
+import ReadingProgressWidget from './components/ReadingProgressWidget'
+import RecentAlertsWidget from './components/RecentAlertsWidget'
+import RecentActivityWidget from './components/RecentActivityWidget'
 import { useDashboardMetrics } from './hooks/useDashboardMetrics'
-
-type DashboardIndicator = {
-  id: string
-  label: string
-  value: string | number | null
-  detail: string
-  badgeText: string
-  badgeType: 'success' | 'warning' | 'info' | 'alert'
-  icon: AdminNavIconName
-  link: string
-}
+import type { DashboardIndicator } from './props'
 
 const AdminDashboard = () => {
   const { metrics, isLoading, isError, refetch } = useDashboardMetrics()
-  const allowedPaths = ADMIN_NAV_ITEMS.map((item) => item.path)
-  const quickAccessItems = getAuthorizedQuickAccessItems(allowedPaths)
 
   const indicators: DashboardIndicator[] = [
     {
@@ -103,7 +92,15 @@ const AdminDashboard = () => {
               disabled={isLoading}
               aria-label="Actualizar datos del dashboard"
             >
-              &#x21bb; {isLoading ? 'Cargando...' : 'Actualizar datos'}
+              <span
+                className={`admin-dashboard__refresh-icon ${
+                  isLoading ? 'admin-dashboard__refresh-icon--loading' : ''
+                }`}
+                aria-hidden="true"
+              >
+                &#x21bb;
+              </span>
+              {isLoading ? 'Cargando...' : 'Actualizar datos'}
             </button>
           </div>
 
@@ -134,23 +131,22 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Sección de Accesos Rápido */}
+        {/* Sección de Operaciones y Estado en Tiempo Real (Widgets) */}
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header">
-            <h2>Accesos rápidos</h2>
-            <p>Accede directamente a los diferentes módulos de administración.</p>
+            <h2>Operaciones en tiempo real</h2>
+            <p>Monitoreo operativo del acueducto, lecturas del ciclo y bitácora reciente.</p>
           </div>
-          <div className="admin-dashboard__quick-access-grid">
-            {quickAccessItems.map((item) => (
-              <QuickAccessCard
-                key={item.id}
-                title={item.title}
-                description={item.description}
-                path={item.path}
-                icon={<AdminNavIcon name={item.icon} />}
-                badgeText={item.badgeText}
-              />
-            ))}
+          <div className="admin-dashboard__widgets-grid">
+            <ErrorBoundary>
+              <ReadingProgressWidget />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <RecentAlertsWidget />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <RecentActivityWidget />
+            </ErrorBoundary>
           </div>
         </div>
       </div>

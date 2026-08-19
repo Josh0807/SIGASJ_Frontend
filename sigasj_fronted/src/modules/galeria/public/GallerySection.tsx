@@ -14,7 +14,7 @@ const GallerySection = ({
   id = GALLERY_SECTION_ID,
   title = 'Galería',
   description =
-    'Conoce imágenes de proyectos, obras y actividades realizadas por la ASADA San Juan de Santa Cruz.',
+    'Aquí encontrara imágenes de la ASADA San Juan de Santa Cruz.',
   photos: photosProp,
   emptyMessage = 'Próximamente publicaremos fotografías de la comunidad.',
   errorMessage = 'No fue posible cargar la galería. Intenta de nuevo más tarde.',

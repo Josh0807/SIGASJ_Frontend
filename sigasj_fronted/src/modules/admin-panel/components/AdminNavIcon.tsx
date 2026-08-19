@@ -1,21 +1,6 @@
-export type AdminNavIconName =
-  | 'dashboard'
-  | 'usuarios'
-  | 'abonados'
-  | 'inventario'
-  | 'solicitudes'
-  | 'lecturas'
-  | 'averias'
-  | 'reportes'
-  | 'galeria'
-  | 'transparencia'
-  | 'perfil'
-  | 'menu'
-  | 'menuClose'
+import type { AdminNavIconName, AdminNavIconProps } from '../props'
 
-type AdminNavIconProps = {
-  name: AdminNavIconName
-}
+export type { AdminNavIconName, AdminNavIconProps }
 
 const icon = (paths: string) => (
   <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">

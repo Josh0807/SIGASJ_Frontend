@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import AdminHeader from '../../modules/admin-panel/components/AdminHeader'
+import AdminMain from '../../modules/admin-panel/components/AdminMain'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
 import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigation'
-import { useAuth } from '../../modules/auth/components/AuthContext'
+import { useAuthUser } from '../../modules/auth/hooks/useAuthUser'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../app/router/routePaths'
 
 const MOBILE_NAV_QUERY = '(max-width: 760px)'
@@ -22,7 +22,7 @@ const getMobileNavSnapshot = () =>
   typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_NAV_QUERY).matches
 
 const AdminLayout = () => {
-  const { user } = useAuth()
+  const user = useAuthUser()
   const navItems = getAdminNavItemsForUser(user)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const isMobileNav = useSyncExternalStore(
@@ -87,16 +87,13 @@ const AdminLayout = () => {
         onClose={closeNav}
         closeButtonRef={closeRef}
       />
-      <div className="admin-main">
-        <AdminHeader
-          menuOpen={isNavOpen}
-          onToggleMenu={() => setIsNavOpen((open) => !open)}
-          menuToggleRef={toggleRef}
-        />
-        <div className="admin-main__content" aria-label="Contenido administrativo">
-          <Outlet />
-        </div>
-      </div>
+      <AdminMain
+        menuOpen={isNavOpen}
+        onToggleMenu={() => setIsNavOpen((open) => !open)}
+        menuToggleRef={toggleRef}
+      >
+        <Outlet />
+      </AdminMain>
     </div>
   )
 }
