@@ -5,6 +5,7 @@ import GallerySection from '../../galeria/public/GallerySection'
 import LandingContactBlock from '../components/LandingContactBlock'
 import ProjectsPreview from '../components/ProjectsPreview'
 import ReportFaultSection from '../components/ReportFaultSection'
+import ComplaintsSection from '../components/ComplaintsSection'
 import RequestsSection from '../components/RequestsSection'
 import TransparencySection from '../../transparencia/public/TransparencySection'
 
@@ -27,7 +28,7 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
   },
   {
     id: 'transparencia',
-    title: 'Transparencia y calidad del agua',
+    title: 'Transparencia',
     Component: TransparencySection,
   },
   {
@@ -39,6 +40,11 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
     id: 'reporte-averias',
     title: 'Reporte de averías',
     Component: ReportFaultSection,
+  },
+  {
+    id: 'quejas',
+    title: 'Quejas',
+    Component: ComplaintsSection,
   },
   {
     id: 'proyectos',
