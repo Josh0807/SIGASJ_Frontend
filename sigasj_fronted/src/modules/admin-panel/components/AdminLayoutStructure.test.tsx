@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from '../../auth/components/AuthContext'
 import AdminLayout from '../../../shared/layouts/AdminLayout'
 import { loginWithAdminSession } from '../../../test/authTestHelpers'
 
@@ -9,12 +10,14 @@ describe('AdminLayout Structure & Styling Integration', () => {
     loginWithAdminSession()
     return renderToStaticMarkup(
       <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<h1>Inicio Dashboard</h1>} />
-            <Route path="/admin/usuarios" element={<h1>Gestión de Usuarios</h1>} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<h1>Inicio Dashboard</h1>} />
+              <Route path="/admin/usuarios" element={<h1>Gestión de Usuarios</h1>} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </MemoryRouter>,
     )
   }
