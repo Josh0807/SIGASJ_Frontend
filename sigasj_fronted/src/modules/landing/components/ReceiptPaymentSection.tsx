@@ -1,5 +1,8 @@
+import { useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { BANCO_NACIONAL_URL, SADA_WEB_RECEIPT_URL } from '../config/externalLinks'
+
+import { BANCO_NACIONAL_URL } from '../config/externalLinks'
+
 
 type PaymentMethod = {
   id: 'sinpe' | 'banco-nacional' | 'ventanilla'
@@ -51,43 +54,36 @@ const PaymentIcon = ({ name, children }: { name: string; children: ReactNode }) 
   </svg>
 )
 
-const ReceiptPaymentSection = () => (
-  <section
-    className="landing-section receipt-payment"
-    id="pagos"
-    aria-labelledby="receipt-payment-title"
-  >
-    <div className="receipt-payment__content">
-      <article className="receipt-payment__consultation">
-        <div>
-          <p className="receipt-payment__eyebrow">Consulta en línea</p>
-          <h2 id="receipt-payment-title">Consulta tu recibo</h2>
-          <p>Revisa de forma rápida la información de tu recibo de agua.</p>
-        </div>
-        <div className="receipt-payment__action">
-          {SADA_WEB_RECEIPT_URL ? (
-            <a
+const ReceiptPaymentSection = () => {
+  const navigate = useNavigate()
+
+  return (
+    <section
+      className="landing-section receipt-payment"
+      id="pagos"
+      aria-labelledby="receipt-payment-title"
+    >
+      <div className="receipt-payment__content">
+        <article className="receipt-payment__consultation">
+          <div>
+            <p className="receipt-payment__eyebrow">Consulta en línea</p>
+            <h2 id="receipt-payment-title">Consulta tu recibo</h2>
+            <p>Revisa de forma rápida la información de tu recibo de agua.</p>
+          </div>
+          <div className="receipt-payment__action">
+            <button
+              type="button"
               className="receipt-payment__button"
-              href={SADA_WEB_RECEIPT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-describedby="receipt-payment-external-note"
+              onClick={() => navigate('/consulta-recibo')}
             >
-              Consultar mi recibo <span aria-hidden="true">&#8599;</span>
-            </a>
-          ) : (
-            <span
-              className="receipt-payment__button receipt-payment__button--disabled"
-              aria-disabled="true"
-            >
-              Consulta no disponible
-            </span>
-          )}
-          <p id="receipt-payment-external-note" className="receipt-payment__external-note">
-            Toca el botón para consultar tu recibo en SADA Web.
-          </p>
-        </div>
-      </article>
+              Consultar recibo <span aria-hidden="true">&#8594;</span>
+            </button>
+            <p id="receipt-payment-note" className="receipt-payment__external-note">
+              Haz clic en el botón para realizar la consulta en la plataforma de SIGASJ.
+            </p>
+          </div>
+        </article>
+
 
       <div className="receipt-payment__methods" aria-labelledby="payment-methods-title">
         <div className="receipt-payment__heading">
@@ -145,8 +141,9 @@ const ReceiptPaymentSection = () => (
           ))}
         </div>
       </div>
-    </div>
-  </section>
-)
+      </div>
+    </section>
+  )
+}
 
 export default ReceiptPaymentSection

@@ -4,6 +4,8 @@ const getApiBaseUrl = (): string => {
   return import.meta.env?.VITE_API_URL ?? '/api'
 }
 
+
+
 export type FetchOptions = RequestInit & {
   params?: Record<string, string | number | boolean | undefined>
 }
@@ -18,7 +20,14 @@ export async function fetchWithAuth<T>(
 ): Promise<T> {
   const { params, headers: customHeaders, ...restOptions } = options
   const baseUrl = getApiBaseUrl().replace(/\/$/, '')
-  const formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+  let formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+
+  if (baseUrl.endsWith('/v1') && formattedEndpoint.startsWith('/v1/')) {
+    formattedEndpoint = formattedEndpoint.substring(3)
+  }
+  if (baseUrl.endsWith('/api') && formattedEndpoint.startsWith('/api/')) {
+    formattedEndpoint = formattedEndpoint.substring(4)
+  }
 
   let url = `${baseUrl}${formattedEndpoint}`
 
@@ -51,10 +60,19 @@ export async function fetchWithAuth<T>(
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Error en solicitud HTTP ${response.status}: ${response.statusText || 'Respuesta no exitosa'}`,
-    )
+    const errorBody = await response.text().catch(() => '')
+    let detail = response.statusText || 'Respuesta no exitosa'
+    if (errorBody) {
+      try {
+        const parsed = JSON.parse(errorBody)
+        detail = parsed.message || parsed.error || errorBody
+      } catch {
+        detail = errorBody.slice(0, 150)
+      }
+    }
+    throw new Error(`HTTP ${response.status}: ${detail}`)
   }
+
 
   // Manejar respuestas vacías (204 No Content)
   if (response.status === 204) {
