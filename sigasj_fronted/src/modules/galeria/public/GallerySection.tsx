@@ -5,6 +5,8 @@ import type { GallerySectionProps } from './GallerySectionProps'
 import { GALLERY_SECTION_ID } from '../../landing/config/landingAnchors'
 import { usePublicGallery } from './usePublicGallery'
 
+const SKELETON_COUNT = 3
+
 /**
  * Sección pública de la galería fotográfica.
  * Sin `photos` en props usa la colección de ejemplo.
@@ -14,7 +16,7 @@ const GallerySection = ({
   id = GALLERY_SECTION_ID,
   title = 'Galería',
   description =
-    'Aquí encontrara imágenes de la ASADA San Juan de Santa Cruz.',
+    'Aquí encontrará imágenes de la ASADA San Juan de Santa Cruz.',
   photos: photosProp,
   emptyMessage = 'Próximamente publicaremos fotografías de la comunidad.',
   errorMessage = 'No fue posible cargar la galería. Intenta de nuevo más tarde.',
@@ -36,17 +38,45 @@ const GallerySection = ({
     >
       <div className="gallery-section__content">
         <header className="gallery-section__heading">
-          <p className="gallery-section__eyebrow">Nuestra comunidad</p>
-          <h2 id={`${id}-title`}>{title}</h2>
-          <p>{description}</p>
+          <div className="gallery-section__heading-copy">
+            <p className="gallery-section__eyebrow">Nuestra comunidad</p>
+            <h2 id={`${id}-title`}>{title}</h2>
+            <p>{description}</p>
+          </div>
+
+          {hasPhotos ? (
+            <p className="gallery-section__count" aria-live="polite">
+              <span className="gallery-section__count-value">{photos.length}</span>
+              {photos.length === 1 ? ' fotografía' : ' fotografías'}
+            </p>
+          ) : null}
         </header>
 
         {showLoading ? (
-          <p className="gallery-section__empty" role="status">
-            Cargando galería…
-          </p>
+          <div
+            className="gallery-section__grid gallery-section__grid--loading"
+            role="status"
+            aria-busy="true"
+            aria-label="Cargando galería"
+          >
+            {Array.from({ length: SKELETON_COUNT }, (_, index) => (
+              <div
+                className="gallery-section__skeleton"
+                key={`gallery-skeleton-${index}`}
+                aria-hidden="true"
+              >
+                <div className="gallery-section__skeleton-media" />
+                <div className="gallery-section__skeleton-line gallery-section__skeleton-line--short" />
+                <div className="gallery-section__skeleton-line" />
+              </div>
+            ))}
+            <p className="gallery-section__loading-text">Cargando galería…</p>
+          </div>
         ) : showError ? (
-          <div className="gallery-section__empty" role="alert">
+          <div className="gallery-section__empty gallery-section__empty--error" role="alert">
+            <span className="gallery-section__empty-icon" aria-hidden="true">
+              !
+            </span>
             <p>{errorMessage}</p>
             <button type="button" onClick={retry}>
               Reintentar
@@ -67,9 +97,12 @@ const GallerySection = ({
             ))}
           </div>
         ) : (
-          <p className="gallery-section__empty" role="status">
-            {emptyMessage}
-          </p>
+          <div className="gallery-section__empty" role="status">
+            <span className="gallery-section__empty-icon" aria-hidden="true">
+              🖼
+            </span>
+            <p>{emptyMessage}</p>
+          </div>
         )}
       </div>
 

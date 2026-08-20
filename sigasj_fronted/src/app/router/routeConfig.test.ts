@@ -15,6 +15,7 @@ describe('route configuration', () => {
     expect(LANDING_ROUTE?.path).toBe('/')
     expect(PUBLIC_ROUTE_PATHS).toEqual([
       '/',
+      '/consulta-recibo',
       '/reportar-averia',
       '/solicitudes/constancia-servicio',
       '/solicitudes/afiliacion',
@@ -47,6 +48,7 @@ describe('route configuration', () => {
 
   it('expone los formularios públicos de visitante fuera de /admin', () => {
     expect(PUBLIC_VISITOR_FORM_PATHS).toEqual([
+      '/consulta-recibo',
       '/reportar-averia',
       '/solicitudes/constancia-servicio',
       '/solicitudes/afiliacion',

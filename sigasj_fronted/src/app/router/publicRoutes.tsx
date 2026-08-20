@@ -29,7 +29,7 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
   {
     path: RECEIPT_QUERY_ROUTE_PATH,
     element: <ReceiptQueryPage />,
-    label: 'Consulta pública de recibos',
+    label: 'Formulario de consulta de recibos',
   },
   {
     path: '/reportar-averia',

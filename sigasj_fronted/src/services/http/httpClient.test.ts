@@ -45,11 +45,12 @@ describe('httpClient (fetchWithAuth)', () => {
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
+      text: async () => '',
     })
     vi.stubGlobal('fetch', mockFetch)
 
     await expect(fetchWithAuth('/error-endpoint')).rejects.toThrow(
-      'Error en solicitud HTTP 500: Internal Server Error',
+      'HTTP 500: Internal Server Error',
     )
   })
 })
