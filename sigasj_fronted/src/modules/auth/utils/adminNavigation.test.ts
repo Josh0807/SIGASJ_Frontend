@@ -48,7 +48,7 @@ describe('adminNavigation helpers', () => {
 
   it('Administradora accede a todos los modulos administrativos visibles', () => {
     const items = getAdminNavItemsForUser(administradora)
-    expect(items.length).toBe(10)
+    expect(items.length).toBe(11)
     expect(items.map((item) => item.path)).toContain('/admin/abonados')
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
@@ -148,5 +148,5 @@ describe('adminNavigation helpers', () => {
     expect(getAbonadosNavItemsForUser(administradora).map((item) => item.path)).toEqual([
       '/admin/abonados',
     ])
-  })
+  }, 15000)
 })

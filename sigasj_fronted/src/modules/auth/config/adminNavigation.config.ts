@@ -148,6 +148,16 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     availableInNav: true,
   },
   {
+    segment: 'contacto',
+    title: 'Contacto y ubicación',
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
+    requiredPermissions: ['institutional_content.manage'],
+    availableInNav: true,
+  },
+  {
     segment: 'transparencia',
     title: 'Transparencia y calidad del agua',
     allowedRoles: [

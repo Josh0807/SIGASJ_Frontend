@@ -38,10 +38,10 @@ const AboutSection = () => (
   <section id="sobre-nosotros" className="about-section" aria-labelledby="sobre-nosotros-title">
     <div className="about-section__content">
       <div className="about-section__overview">
-        <header className="about-section__heading">
-          <p className="about-section__eyebrow">Nuestra identidad</p>
+        <header className="about-section__heading landing-section__heading">
+          <p className="landing-eyebrow">Nuestra identidad</p>
           <h2 id="sobre-nosotros-title">Sobre nosotros</h2>
-          <p className="about-section__intro">
+          <p className="landing-section__lead">
             ASADA San Juan de Santa Cruz es una organización comunal encargada de la gestión y
             operación del acueducto de San Juan de Santa Cruz, Guanacaste.
           </p>

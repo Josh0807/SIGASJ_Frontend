@@ -32,6 +32,27 @@ vi.stubGlobal(
           ? input.href
           : input.url
 
+    if (url.includes('/public/contacto')) {
+      return Response.json({
+        telefono: '8560-7584',
+        telefonosAdicionales: [],
+        email: 'asadasanjuan24@gmail.com',
+        horarioAtencion: 'Lunes a sábado de 7:30 a.m. – 11:30 a.m.',
+        horarioVentanilla: 'Lunes a sábado de 7:30 a.m. – 11:30 a.m.',
+        direccion: 'Costado norte de la Plaza de Deportes, San Juan, Santa Cruz.',
+        referenciaUbicacion: null,
+        regionResumen: 'San Juan de Santa Cruz, Guanacaste',
+        mapaUrl: 'https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA',
+        mapaLatitud: 10.2188017,
+        mapaLongitud: -85.5565018,
+        mapaZoom: 19,
+        textoUbicacionMapa: 'Encuentra nuestra oficina en San Juan de Santa Cruz.',
+        urlFacebook: 'https://www.facebook.com/share/14kJoKE9tLm/',
+        descripcionContacto: 'Estamos para atenderte.',
+        actualizadoEn: '2026-01-01T00:00:00.000Z',
+      })
+    }
+
     if (url.includes('/auth/dev-token') && init?.method?.toUpperCase() === 'POST') {
       try {
         const body = JSON.parse(String(init.body ?? '{}')) as { rol?: string }

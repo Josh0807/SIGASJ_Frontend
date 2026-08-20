@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 
+import whatsappLogo from '../../../assets/LogoWhatsApp.png'
+import { whatsappHrefFromPhone } from '../../contacto/types/contacto.types'
 import { BANCO_NACIONAL_URL } from '../config/externalLinks'
-
 
 type PaymentMethod = {
   id: 'sinpe' | 'banco-nacional' | 'ventanilla'
@@ -54,20 +55,54 @@ const PaymentIcon = ({ name, children }: { name: string; children: ReactNode }) 
   </svg>
 )
 
-const ReceiptPaymentSection = () => {
+const ReceiptPaymentSection = ({
+  telefono = '8560-7584',
+  ventanillaHours = 'Lunes a sábado de 7:30 a.m. – 11:30 a.m.',
+  layout = 'standalone',
+}: {
+  telefono?: string
+  ventanillaHours?: string
+  layout?: 'standalone' | 'hub'
+}) => {
   const navigate = useNavigate()
+  const whatsappUrl = whatsappHrefFromPhone(telefono)
+  const isHub = layout === 'hub'
+  const RootTag = isHub ? 'div' : 'section'
+  const sectionTitleId = 'pagos-title'
+  const consultationTitleId = 'pagos-consulta-title'
+  const methodsTitleId = 'pagos-methods-title'
 
   return (
-    <section
-      className="landing-section receipt-payment"
+    <RootTag
+      className={`receipt-payment${isHub ? ' receipt-payment--hub' : ' landing-section'}`}
       id="pagos"
-      aria-labelledby="receipt-payment-title"
+      aria-labelledby={sectionTitleId}
     >
       <div className="receipt-payment__content">
-        <article className="receipt-payment__consultation">
+        {isHub ? (
+          <header className="landing-section__subheading">
+            <h3 id={sectionTitleId}>Recibos y métodos de pago</h3>
+            <p className="landing-section__lead">
+              Consulta tu recibo en línea y elige la forma de pago que prefieras.
+            </p>
+          </header>
+        ) : null}
+
+        <article
+          className="receipt-payment__consultation"
+          aria-labelledby={consultationTitleId}
+        >
           <div>
-            <p className="receipt-payment__eyebrow">Consulta en línea</p>
-            <h2 id="receipt-payment-title">Consulta tu recibo</h2>
+            {!isHub ? (
+              <header className="landing-section__heading landing-section__heading--inverse">
+                <p className="landing-eyebrow landing-eyebrow--inverse">Consulta en línea</p>
+                <h2 id={sectionTitleId}>Consulta tu recibo</h2>
+              </header>
+            ) : (
+              <h4 id={consultationTitleId} className="receipt-payment__panel-title">
+                Consulta en línea
+              </h4>
+            )}
             <p>Revisa de forma rápida la información de tu recibo de agua.</p>
           </div>
           <div className="receipt-payment__action">
@@ -84,65 +119,86 @@ const ReceiptPaymentSection = () => {
           </div>
         </article>
 
+        <div className="receipt-payment__methods" aria-labelledby={methodsTitleId}>
+          <header className="receipt-payment__heading">
+            {!isHub ? (
+              <>
+                <p className="landing-eyebrow">Opciones disponibles</p>
+                <h2 id={methodsTitleId}>Métodos de pago</h2>
+              </>
+            ) : (
+              <h4 id={methodsTitleId} className="receipt-payment__panel-title">
+                Métodos de pago
+              </h4>
+            )}
+            <p className="landing-section__lead">
+              Elige la alternativa que mejor se adapte a tus necesidades.
+            </p>
+          </header>
 
-      <div className="receipt-payment__methods" aria-labelledby="payment-methods-title">
-        <div className="receipt-payment__heading">
-          <p className="receipt-payment__eyebrow">Opciones disponibles</p>
-          <h2 id="payment-methods-title">Métodos de pago</h2>
-          <p>Elige la alternativa que mejor se adapte a tus necesidades.</p>
-        </div>
-
-        <div className="receipt-payment__cards">
-          {paymentMethods.map(({ id, name, description, icon }) => (
-            <article className={`receipt-payment__card receipt-payment__card--${id}`} key={name}>
-              <div className="receipt-payment__icon-wrap">
-                <PaymentIcon name={name}>{icon}</PaymentIcon>
-              </div>
-              <h3>{name}</h3>
-              <p>{description}</p>
-
-              {id === 'sinpe' ? (
-                <div className="receipt-payment__details">
-                  <p className="receipt-payment__sinpe-number">
-                    <span>Número demostrativo</span>
-                    <strong>0000-0000</strong>
-                  </p>
-                  <p className="receipt-payment__warning" role="note">
-                    Todo pago realizado por SinpeMóvil debe ser enviado al WhastApp de la ASADA San Juan.
-                  </p>
+          <div className="receipt-payment__cards">
+            {paymentMethods.map(({ id, name, description, icon }) => (
+              <article
+                className={`receipt-payment__card receipt-payment__card--${id}`}
+                key={id}
+                aria-labelledby={`pagos-method-${id}-title`}
+              >
+                <div className="receipt-payment__icon-wrap">
+                  <PaymentIcon name={name}>{icon}</PaymentIcon>
                 </div>
-              ) : null}
+                <h5 id={`pagos-method-${id}-title`} className="receipt-payment__card-title">
+                  {name}
+                </h5>
+                <p>{description}</p>
 
-              {id === 'banco-nacional' ? (
-                <a
-                  className="receipt-payment__method-link"
-                  href={BANCO_NACIONAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Ir al Banco Nacional (abre una plataforma externa en una pestaña nueva)"
-                >
-                  Ir al Banco Nacional <span aria-hidden="true">&#8599;</span>
-                </a>
-              ) : null}
+                {id === 'sinpe' ? (
+                  <div className="receipt-payment__details">
+                    <p className="receipt-payment__sinpe-number">
+                      <span>Número SINPE Móvil</span>
+                      <strong>{telefono}</strong>
+                    </p>
+                    <p className="receipt-payment__warning" role="note">
+                      Envía el comprobante de tu pago por SINPE Móvil al WhatsApp oficial de la
+                      ASADA.
+                    </p>
+                    <a
+                      className="receipt-payment__whatsapp-link"
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img src={whatsappLogo} alt="" aria-hidden="true" />
+                      Enviar comprobante por WhatsApp
+                    </a>
+                  </div>
+                ) : null}
 
-              {id === 'ventanilla' ? (
-                <dl className="receipt-payment__schedule">
-                  <div>
-                    <dt>Horario</dt>
-                    <dd>Lunes a sábado</dd>
-                  </div>
-                  <div>
-                    <dt>Atención</dt>
-                    <dd>7:30 a. m. a 11:30 a. m.</dd>
-                  </div>
-                </dl>
-              ) : null}
-            </article>
-          ))}
+                {id === 'banco-nacional' ? (
+                  <a
+                    className="receipt-payment__method-link"
+                    href={BANCO_NACIONAL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Ir al Banco Nacional (abre una plataforma externa en una pestaña nueva)"
+                  >
+                    Ir al Banco Nacional <span aria-hidden="true">&#8599;</span>
+                  </a>
+                ) : null}
+
+                {id === 'ventanilla' ? (
+                  <dl className="receipt-payment__schedule">
+                    <div>
+                      <dt>Horario</dt>
+                      <dd>{ventanillaHours}</dd>
+                    </div>
+                  </dl>
+                ) : null}
+              </article>
+            ))}
+          </div>
         </div>
       </div>
-      </div>
-    </section>
+    </RootTag>
   )
 }
 

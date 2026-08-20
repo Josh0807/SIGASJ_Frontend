@@ -12,10 +12,10 @@ const ProjectsPreview = ({
     id={id}
     aria-labelledby={`${id}-title`}
   >
-    <div className="projects-preview__content">
-      <p className="projects-preview__eyebrow">Proyectos</p>
+    <div className="projects-preview__content landing-section__heading">
+      <p className="landing-eyebrow">Proyectos</p>
       <h2 id={`${id}-title`}>{title}</h2>
-      <p>
+      <p className="landing-section__lead">
         Próximamente encontrarás aquí un resumen de los proyectos futuros y obras
         destacadas de la ASADA San Juan de Santa Cruz.
       </p>

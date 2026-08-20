@@ -72,6 +72,7 @@ describe('route configuration', () => {
         '/admin/averias',
         '/admin/reportes',
         '/admin/galeria',
+        '/admin/contacto',
         '/admin/transparencia',
         ADMIN_PROFILE_PATH,
       ]),

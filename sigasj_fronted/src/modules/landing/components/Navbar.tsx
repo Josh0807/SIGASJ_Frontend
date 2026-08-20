@@ -16,8 +16,8 @@ const navigationItems: NavigationItem[] = [
 
   { label: 'Solicitudes', href: '#solicitudes-servicio' },
   { label: 'Galería', href: GALLERY_HREF },
-  { label: 'Recibos y pagos', href: '#pagos' },
   { label: 'Contacto', href: '#contacto' },
+  { label: 'Recibos y pagos', href: '#pagos' },
 ]
 
 const Navbar = ({ className = '', onNavigate }: NavbarProps) => (

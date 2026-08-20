@@ -33,10 +33,10 @@ const TransparencySection = ({
       aria-labelledby={`${id}-title`}
     >
       <div className="transparency-section__content">
-        <header className="transparency-section__heading">
-          <p className="transparency-section__eyebrow">Documentación</p>
+        <header className="transparency-section__heading landing-section__heading">
+          <p className="landing-eyebrow">Documentación</p>
           <h2 id={`${id}-title`}>{title}</h2>
-          <p>{description}</p>
+          <p className="landing-section__lead">{description}</p>
         </header>
 
         {showLoading ? (

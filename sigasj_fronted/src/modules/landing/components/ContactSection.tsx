@@ -1,4 +1,12 @@
 import type { ReactNode } from 'react'
+import whatsappLogo from '../../../assets/LogoWhatsApp.png'
+import {
+  buildGoogleMapsEmbedUrl,
+  buildGoogleMapsSearchUrl,
+  gmailComposeHref,
+  telHrefFromPhone,
+  whatsappHrefFromPhone,
+} from '../../contacto/types/contacto.types'
 import type { ContactIconProps, ContactIconType } from '../types/ContactIconProps'
 import type { ContactSectionProps } from '../types/ContactSectionProps'
 
@@ -16,17 +24,6 @@ const ContactIcon = ({ type }: ContactIconProps) => (
   </svg>
 )
 
-const phoneHref = (phone: string) => `tel:${phone.replace(/[^+\d]/g, '')}`
-const whatsappHref = (phone: string) => {
-  const digits = phone.replace(/\D/g, '')
-  const internationalNumber = digits.length === 8 ? `506${digits}` : digits
-
-  return `https://wa.me/${internationalNumber}`
-}
-
-const gmailComposeHref = (email: string) =>
-  `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`
-
 const ContactSection = ({
   id = 'contacto',
   title = 'Contacto',
@@ -41,142 +38,235 @@ const ContactSection = ({
   mapLatitude,
   mapLongitude,
   mapZoom = 18,
+  mapDescription = 'Encuentra nuestra oficina en San Juan de Santa Cruz.',
+  loading = false,
   embeddedMap,
   showMapEmbed = false,
+  layout = 'standalone',
 }: ContactSectionProps) => {
-  const resolvedMapUrl =
-    mapUrl ??
-    (address || locationReference
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          [address, locationReference].filter(Boolean).join(' '),
-        )}`
-      : undefined)
-  const hasExactCoordinates = mapLatitude !== undefined && mapLongitude !== undefined
-  const mapQuery = hasExactCoordinates
-    ? `${mapLatitude},${mapLongitude}`
-    : [address, locationReference].filter(Boolean).join(' ')
-  const mapEmbedUrl = mapQuery
-    ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=k&z=${mapZoom}&output=embed`
-    : undefined
+  const mapOptions = {
+    latitude: mapLatitude,
+    longitude: mapLongitude,
+    address,
+    locationReference,
+    zoom: mapZoom,
+  }
+  const resolvedMapUrl = mapUrl ?? buildGoogleMapsSearchUrl(mapOptions)
+  const mapEmbedUrl = buildGoogleMapsEmbedUrl(mapOptions)
+  const whatsappUrl = phonePrimary ? whatsappHrefFromPhone(phonePrimary) : undefined
+  const isHub = layout === 'hub'
+  const RootTag = isHub ? 'div' : 'section'
+  const sectionTitleId = `${id}-title`
+  const mapTitleId = `${id}-map-title`
+  const channelsTitleId = `${id}-channels-title`
 
   return (
-    <section className="landing-section contact-section" id={id} aria-labelledby={`${id}-title`}>
+    <RootTag
+      className={`contact-section${isHub ? ' contact-section--hub' : ' landing-section'}`}
+      id={id}
+      aria-labelledby={sectionTitleId}
+    >
       <div className="contact-section__content">
-        <div className="contact-section__intro">
-          <p className="contact-section__eyebrow">Canal de atención</p>
-          <h2 id={`${id}-title`}>{title}</h2>
-          <p>{description}</p>
-        </div>
+        {!isHub ? (
+          <header className="landing-section__heading">
+            <p className="landing-eyebrow">Canal de atención</p>
+            <h2 id={sectionTitleId}>{title}</h2>
+            <p className="landing-section__lead">{description}</p>
+          </header>
+        ) : (
+          <header className="landing-section__subheading">
+            <h3 id={sectionTitleId}>Información de contacto</h3>
+            <p className="landing-section__lead">{description}</p>
+          </header>
+        )}
 
-        <div className="contact-section__grid">
-          <div className="contact-section__card contact-section__card--details">
-            {phonePrimary ? (
-              <div className="contact-section__item">
-                <span className="contact-section__icon"><ContactIcon type="phone" /></span>
-                <div className="contact-section__item-content">
-                  <h3>Teléfono principal:</h3>
-                  <a
-                    className="contact-section__link"
-                    href={whatsappHref(phonePrimary)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Contactar por WhatsApp al ${phonePrimary}`}
-                  >
-                    {phonePrimary}
-                  </a>
-                </div>
-              </div>
-            ) : null}
-
-            {phoneNumbers?.length ? (
-              <div className="contact-section__item">
-                <span className="contact-section__icon"><ContactIcon type="phone" /></span>
-                <div className="contact-section__item-content">
-                  <h3>Teléfonos adicionales</h3>
-                  <ul className="contact-section__list">
-                    {phoneNumbers.map((phone) => <li key={phone}><a className="contact-section__link" href={phoneHref(phone)}>{phone}</a></li>)}
-                  </ul>
-                </div>
-              </div>
-            ) : null}
-
-            {email ? (
-              <div className="contact-section__item">
-                <span className="contact-section__icon"><ContactIcon type="mail" /></span>
-                <div className="contact-section__item-content">
-                  <h3>Correo electrónico:</h3>
-                  <a
-                    className="contact-section__link"
-                    href={gmailComposeHref(email)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Enviar un correo a ${email}`}
-                  >
-                    {email}
-                  </a>
-                </div>
-              </div>
-            ) : null}
-
-            {attentionHours ? (
-              <div className="contact-section__item">
-                <span className="contact-section__icon"><ContactIcon type="clock" /></span>
-                <div className="contact-section__item-content"><h3>Horario de atención:</h3><p>{attentionHours}</p></div>
-              </div>
-            ) : null}
-
-            {address ? (
-              <div className="contact-section__item">
-                <span className="contact-section__icon"><ContactIcon type="location" /></span>
-                <div className="contact-section__item-content"><h3>Dirección física:</h3><address>{address}</address></div>
-              </div>
-            ) : null}
+        {loading ? (
+          <div className="contact-section__loading" aria-live="polite">
+            Cargando información de contacto…
           </div>
+        ) : (
+          <div className="contact-section__grid">
+            <div
+              className="contact-section__card contact-section__card--details"
+              aria-labelledby={channelsTitleId}
+            >
+              <h4 id={channelsTitleId} className="contact-section__panel-title">
+                Canales de atención
+              </h4>
 
-          <div className="contact-section__card contact-section__card--map">
-            <div className="contact-section__map-heading">
-              <span className="contact-section__icon"><ContactIcon type="map" /></span>
-              <div><h3>Ubicación</h3><p>Encuentra nuestra oficina en San Juan de Santa Cruz.</p></div>
-            </div>
+              {phonePrimary || email ? (
+                <div className="contact-section__actions" aria-label="Accesos rápidos de contacto">
+                  {phonePrimary && whatsappUrl ? (
+                    <a
+                      className="contact-section__action contact-section__action--whatsapp"
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img src={whatsappLogo} alt="" aria-hidden="true" />
+                      WhatsApp
+                    </a>
+                  ) : null}
+                  {phonePrimary ? (
+                    <a
+                      className="contact-section__action contact-section__action--call"
+                      href={telHrefFromPhone(phonePrimary)}
+                    >
+                      <ContactIcon type="phone" />
+                      Llamar
+                    </a>
+                  ) : null}
+                  {email ? (
+                    <a
+                      className="contact-section__action contact-section__action--mail"
+                      href={gmailComposeHref(email)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ContactIcon type="mail" />
+                      Correo
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
 
-            {(showMapEmbed && embeddedMap) || mapEmbedUrl ? (
-              <div className="contact-section__map-embed">
-                {showMapEmbed && embeddedMap ? embeddedMap : (
-                  <iframe
-                    src={mapEmbedUrl}
-                    title="Mapa de la oficina de ASADA San Juan de Santa Cruz"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                )}
-                {resolvedMapUrl ? (
-                  <a
-                    className="contact-section__map-overlay"
-                    href={resolvedMapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Abrir esta ubicación en Google Maps"
-                  />
+              <div className="contact-section__tiles">
+                {phonePrimary ? (
+                  <article className="contact-section__tile">
+                    <span className="contact-section__icon"><ContactIcon type="phone" /></span>
+                    <div>
+                      <p className="contact-section__field-label">Teléfono</p>
+                      <a className="contact-section__link" href={telHrefFromPhone(phonePrimary)}>
+                        {phonePrimary}
+                      </a>
+                    </div>
+                  </article>
+                ) : null}
+
+                {email ? (
+                  <article className="contact-section__tile">
+                    <span className="contact-section__icon"><ContactIcon type="mail" /></span>
+                    <div>
+                      <p className="contact-section__field-label">Correo</p>
+                      <a
+                        className="contact-section__link"
+                        href={gmailComposeHref(email)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {email}
+                      </a>
+                    </div>
+                  </article>
+                ) : null}
+
+                {attentionHours ? (
+                  <article className="contact-section__tile contact-section__tile--wide">
+                    <span className="contact-section__icon"><ContactIcon type="clock" /></span>
+                    <div>
+                      <p className="contact-section__field-label">Horario de atención</p>
+                      <p className="contact-section__field-value">{attentionHours}</p>
+                    </div>
+                  </article>
                 ) : null}
               </div>
-            ) : (
-              <div className="contact-section__map-placeholder">
-                <ContactIcon type="location" />
-                <span>Consulta la ubicación exacta en Google Maps.</span>
+
+              {phoneNumbers?.length ? (
+                <div className="contact-section__extras">
+                  <p className="contact-section__field-label">Teléfonos adicionales</p>
+                  <ul className="contact-section__list">
+                    {phoneNumbers.map((phone) => (
+                      <li key={phone} className="contact-section__list-item">
+                        <a className="contact-section__link" href={telHrefFromPhone(phone)}>
+                          {phone}
+                        </a>
+                        <a
+                          className="contact-section__list-whatsapp"
+                          href={whatsappHrefFromPhone(phone)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`WhatsApp ${phone}`}
+                        >
+                          WhatsApp
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+
+            <div
+              className="contact-section__card contact-section__card--map"
+              aria-labelledby={mapTitleId}
+            >
+              <div className="contact-section__map-heading">
+                <span className="contact-section__icon"><ContactIcon type="map" /></span>
+                <div>
+                  <h4 id={mapTitleId} className="contact-section__panel-title">
+                    Ubicación de la oficina
+                  </h4>
+                  <p>{mapDescription}</p>
+                </div>
               </div>
-            )}
 
-            {resolvedMapUrl ? (
-              <a className="contact-section__map-link" href={resolvedMapUrl} target="_blank" rel="noopener noreferrer">
-                Ver ubicación <span aria-hidden="true">&#8599;</span>
-              </a>
-            ) : null}
+              {(showMapEmbed && embeddedMap) || mapEmbedUrl ? (
+                <div className="contact-section__map-shell">
+                  <div className="contact-section__map-embed">
+                    {showMapEmbed && embeddedMap ? embeddedMap : (
+                      <iframe
+                        src={mapEmbedUrl}
+                        title="Mapa de la oficina de ASADA San Juan de Santa Cruz"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        allowFullScreen
+                      />
+                    )}
+                  </div>
 
-            {locationReference ? <p className="contact-section__reference">Referencia: {locationReference}</p> : null}
+                  <div className="contact-section__map-caption">
+                    <div className="contact-section__map-caption-text">
+                      <strong>ASADA San Juan de Santa Cruz</strong>
+                      {address ? <p>{address}</p> : null}
+                      {locationReference ? (
+                        <span className="contact-section__map-caption-ref">
+                          {locationReference}
+                        </span>
+                      ) : null}
+                    </div>
+                    {resolvedMapUrl ? (
+                      <a
+                        className="contact-section__map-open"
+                        href={resolvedMapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Abrir en Maps <span aria-hidden="true">&#8599;</span>
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              ) : (
+                <div className="contact-section__map-placeholder">
+                  <ContactIcon type="location" />
+                  <span>Consulta la ubicación exacta en Google Maps.</span>
+                  {resolvedMapUrl ? (
+                    <a
+                      className="contact-section__map-link"
+                      href={resolvedMapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Ver ubicación <span aria-hidden="true">&#8599;</span>
+                    </a>
+                  ) : null}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </section>
+    </RootTag>
   )
 }
 

@@ -37,11 +37,11 @@ const GallerySection = ({
       aria-labelledby={`${id}-title`}
     >
       <div className="gallery-section__content">
-        <header className="gallery-section__heading">
+        <header className="gallery-section__heading landing-section__heading">
           <div className="gallery-section__heading-copy">
-            <p className="gallery-section__eyebrow">Nuestra comunidad</p>
+            <p className="landing-eyebrow">Nuestra comunidad</p>
             <h2 id={`${id}-title`}>{title}</h2>
-            <p>{description}</p>
+            <p className="landing-section__lead">{description}</p>
           </div>
 
           {hasPhotos ? (
