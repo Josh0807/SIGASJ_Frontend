@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
-
-const PENDING_INSTITUTIONAL_INFORMATION =
-  'Información pendiente de confirmación por la ASADA San Juan de Santa Cruz.'
+import asadaPhoto from '../../../assets/FOTOASADA.png'
 
 const AboutIcon = ({ children }: { children: ReactNode }) => (
   <span className="about-section__icon" aria-hidden="true">
@@ -23,33 +21,16 @@ const AboutSection = () => (
         </header>
 
         <figure className="about-section__visual">
-          <div
-            className="about-section__placeholder"
-            role="img"
-            aria-label="Fotografía institucional pendiente"
-          >
-            <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M32 8c.6 0 8.2 10.4 13.2 20.2C50.4 38.2 48 52 32 52S13.6 38.2 18.8 28.2C23.8 18.4 31.4 8 32 8Z"
-                opacity=".92"
-              />
-              <path
-                fill="#fff"
-                d="M24.5 34.5c2.4-6.2 5.6-11.8 7.5-15.2 1.9 3.4 5.1 9 7.5 15.2-1.8 5.2-5 8.3-7.5 8.3s-5.7-3.1-7.5-8.3Z"
-                opacity=".35"
-              />
-            </svg>
-            <span>Fotografía institucional</span>
-          </div>
-          <figcaption>
-            Fotografía institucional pendiente de confirmación por la ASADA San Juan de Santa Cruz.
-          </figcaption>
+          <img
+            className="about-section__image"
+            src={asadaPhoto}
+            alt="Instalaciones de la ASADA San Juan"
+          />
         </figure>
       </div>
 
       <div className="about-section__grid">
-        <article className="about-section__card">
+        <article className="about-section__card about-section__card--compact">
           <AboutIcon>
             <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
               <path
@@ -61,10 +42,10 @@ const AboutSection = () => (
             </svg>
           </AboutIcon>
           <h3>Visión</h3>
-          <p>{PENDING_INSTITUTIONAL_INFORMATION}</p>
+          <p>Ser una ASADA líder y reconocida por la excelencia en la gestión del agua, la protección del recurso hídrico, la innovación, la transparencia y el compromiso con el desarrollo sostenible de la comunidad y las futuras generaciones.</p>
         </article>
 
-        <article className="about-section__card">
+        <article className="about-section__card about-section__card--compact">
           <AboutIcon>
             <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
               <path
@@ -76,10 +57,10 @@ const AboutSection = () => (
             </svg>
           </AboutIcon>
           <h3>Misión</h3>
-          <p>{PENDING_INSTITUTIONAL_INFORMATION}</p>
+          <p>Brindar un servicio de agua potable de calidad a la comunidad de San Juan de Santa Cruz, administrando el recurso hídrico de manera eficiente, transparente y sostenible, promoviendo su uso responsable y contribuyendo al bienestar de todos los usuarios.</p>
         </article>
 
-        <article className="about-section__card">
+        <article className="about-section__card about-section__card--history">
           <AboutIcon>
             <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
               <path
@@ -93,7 +74,11 @@ const AboutSection = () => (
             </svg>
           </AboutIcon>
           <h3>Reseña histórica</h3>
-          <p>{PENDING_INSTITUTIONAL_INFORMATION}</p>
+          <p>La Asociación Administradora del Sistema de Acueducto y Alcantarillado Sanitario (ASADA) de San Juan de Santa Cruz, Guanacaste, tiene sus orígenes en el año 2003, cuando el 24 de septiembre, un grupo de 53 vecinos fundadores se reunió en el salón comunal con el propósito de constituir una organización encargada de administrar, operar y proteger el sistema de abastecimiento de agua potable de la comunidad. 
+El acueducto que abastece a la comunidad había sido construido en 1977, respondiendo a las necesidades de la población de aquella época. Con el paso de los años, el crecimiento poblacional y el aumento en la demanda del servicio hicieron necesaria una administración comunal organizada que garantizara el acceso al agua potable y el mantenimiento de la infraestructura. 
+Desde su creación, la ASADA San Juan ha trabajado en el mejoramiento continuo del servicio, velando por la conservación de las fuentes de agua, el mantenimiento de la red de distribución y la promoción del uso responsable del recurso hídrico. Gracias al esfuerzo conjunto de sus juntas directivas, personal administrativo, fontaneros y usuarios, la asociación se ha consolidado como una organización comprometida con el bienestar y el desarrollo de la comunidad.
+En la actualidad, la ASADA continúa enfrentando el reto de modernizar y ampliar su infraestructura para responder al crecimiento de la población y garantizar un servicio de agua potable eficiente, seguro y sostenible para las generaciones presentes y futuras.
+</p>
         </article>
       </div>
     </div>

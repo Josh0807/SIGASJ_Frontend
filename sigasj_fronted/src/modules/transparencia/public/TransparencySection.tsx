@@ -10,7 +10,7 @@ import { usePublicTransparencia } from './usePublicTransparencia'
  */
 const TransparencySection = ({
   id = TRANSPARENCY_SECTION_ID,
-  title = 'Transparencia y calidad del agua',
+  title = 'Transparencia',
   description =
     'Consulta informes, documentos e imágenes oficiales sobre la gestión del servicio y la calidad del agua en la ASADA San Juan.',
   publications: publicationsProp,
