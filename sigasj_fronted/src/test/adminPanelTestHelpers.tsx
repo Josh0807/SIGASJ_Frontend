@@ -1,7 +1,8 @@
 import { act } from 'react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
-import { expect } from 'vitest'
+import { expect, vi } from 'vitest'
+import { isAuthenticated } from '../modules/auth/utils/authStorage'
 import AppRoutes from '../app/router/AppRoutes'
 import { AuthProvider } from '../modules/auth/components/AuthContext'
 import { ADMIN_PROFILE_PATH } from '../app/router/privateRoutes'
@@ -71,7 +72,10 @@ export const submitLoginForm = async (container: HTMLElement) => {
 
   await act(async () => {
     form?.requestSubmit()
-    await new Promise((resolve) => setTimeout(resolve, 50))
+  })
+
+  await vi.waitFor(() => {
+    expect(isAuthenticated()).toBe(true)
   })
 }
 

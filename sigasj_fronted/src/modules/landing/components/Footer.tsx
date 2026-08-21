@@ -2,9 +2,19 @@ import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 
 import facebookLogo from '../../../assets/LogoFacebook.avif'
 import whatsappLogo from '../../../assets/LogoWhatsApp.png'
+import { usePublicContact } from '../../contacto/hooks/usePublicContact'
+import {
+  gmailComposeHref,
+  telHrefFromPhone,
+  whatsappHrefFromPhone,
+} from '../../contacto/types/contacto.types'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  const { contacto } = usePublicContact()
+  const facebookUrl =
+    contacto.urlFacebook ?? 'https://www.facebook.com/share/14kJoKE9tLm/'
+  const whatsappUrl = whatsappHrefFromPhone(contacto.telefono)
 
   return (
     <footer className="footer">
@@ -17,33 +27,54 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="footer__contact">
-          <h2>Contacto y Horario</h2>
+        <div className="footer__contact" aria-labelledby="footer-contact-title">
+          <p id="footer-contact-title" className="footer__heading">
+            Contacto y horario
+          </p>
           <address>
-            <span>San Juan de Santa Cruz, Guanacaste</span>
-            <span>Horario: Lunes a sábado de 7:30 a.m. – 11:30 a.m.</span>
-            <a href="#contacto">Ver información de contacto</a>
+            <span className="footer__region">{contacto.regionResumen}</span>
+            <a className="footer__contact-line" href={telHrefFromPhone(contacto.telefono)}>
+              {contacto.telefono}
+            </a>
+            <a
+              className="footer__contact-line footer__contact-line--muted"
+              href={gmailComposeHref(contacto.email)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {contacto.email}
+            </a>
+            <span className="footer__schedule">Horario: {contacto.horarioAtencion}</span>
+            <a className="footer__contact-link" href="#contacto">
+              Ver mapa y detalles
+            </a>
           </address>
         </div>
 
-        <div className="footer__social">
-          <h2>Redes sociales</h2>
-          <a
-            href="https://www.facebook.com/share/14kJoKE9tLm/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src={facebookLogo} alt="" aria-hidden="true" />
-            Facebook
-          </a>
-          <a
-            href="https://wa.me/50685607584"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src={whatsappLogo} alt="" aria-hidden="true" />
-            WhatsApp
-          </a>
+        <div className="footer__social" aria-labelledby="footer-social-title">
+          <p id="footer-social-title" className="footer__heading">
+            Redes y mensajería
+          </p>
+          <div className="footer__social-links">
+            <a
+              className="footer__social-pill footer__social-pill--facebook"
+              href={facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={facebookLogo} alt="" aria-hidden="true" />
+              Facebook
+            </a>
+            <a
+              className="footer__social-pill footer__social-pill--whatsapp"
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={whatsappLogo} alt="" aria-hidden="true" />
+              WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 

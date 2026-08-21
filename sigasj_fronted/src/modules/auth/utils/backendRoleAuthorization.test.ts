@@ -14,12 +14,11 @@ describe('contrato de autorización con Backend (11.4.5)', () => {
         ok: false,
         status: 403,
         statusText: 'Forbidden',
+        text: async () => '',
       }),
     )
 
-    await expect(fetchWithAuth('/admin/usuarios')).rejects.toThrow(
-      'Error en solicitud HTTP 403',
-    )
+    await expect(fetchWithAuth('/admin/usuarios')).rejects.toThrow('HTTP 403: Forbidden')
   })
 
   it('Fontanero no posee permisos para operaciones de usuarios en el contrato SIGASJ', () => {
