@@ -39,8 +39,8 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     )
   })
 
-  it('cubre los módulos administrativos configurados', () => {
-    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(11)
+  it('cubre los diez módulos administrativos configurados', () => {
+    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(10)
   })
 
   it('Secretaria Ejecutiva no incluye usuarios ni reportes', () => {

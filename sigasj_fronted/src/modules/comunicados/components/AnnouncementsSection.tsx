@@ -58,11 +58,11 @@ const AnnouncementsSection = ({
       <div className="announcements-section__backdrop" aria-hidden="true" />
 
       <div className="announcements-section__content">
-        <header className="announcements-section__heading landing-section__heading">
-          <p className="landing-eyebrow">Información oficial</p>
+        <header className="announcements-section__heading">
+          <p className="announcements-section__eyebrow">Información oficial</p>
 
           <h2 id={titleId}>{title}</h2>
-          <p className="landing-section__lead">{description}</p>
+          <p className="announcements-section__lead">{description}</p>
         </header>
 
         {showLoading ? (

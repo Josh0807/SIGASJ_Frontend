@@ -18,7 +18,6 @@ const GalleryLightbox = ({
   const photo = photos[activeIndex]
   const hasPrev = activeIndex > 0
   const hasNext = activeIndex < photos.length - 1
-  const captionId = photo ? `gallery-lightbox-caption-${photo.id}` : undefined
 
   useEffect(() => {
     closeRef.current?.focus()
@@ -61,80 +60,67 @@ const GalleryLightbox = ({
         role="dialog"
         aria-modal="true"
         aria-label="Vista ampliada de la galería"
-        aria-describedby={captionId}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="gallery-lightbox__toolbar">
-          {photos.length > 1 ? (
-            <p className="gallery-lightbox__counter" aria-live="polite">
-              {activeIndex + 1} / {photos.length}
-            </p>
-          ) : (
-            <span />
-          )}
+        <button
+          ref={closeRef}
+          type="button"
+          className="gallery-lightbox__close"
+          onClick={onClose}
+          aria-label="Cerrar vista ampliada"
+        >
+          ×
+        </button>
+
+        {photos.length > 1 ? (
+          <p className="gallery-lightbox__counter" aria-live="polite">
+            {activeIndex + 1} de {photos.length}
+          </p>
+        ) : null}
+
+        {hasPrev ? (
           <button
-            ref={closeRef}
             type="button"
-            className="gallery-lightbox__close"
-            onClick={onClose}
-            aria-label="Cerrar vista ampliada"
+            className="gallery-lightbox__nav gallery-lightbox__nav--prev"
+            onClick={() => onNavigate(activeIndex - 1)}
+            aria-label="Fotografía anterior"
           >
-            <span aria-hidden="true">×</span>
-            <span className="gallery-lightbox__close-label">Cerrar</span>
+            ‹
           </button>
-        </div>
+        ) : null}
 
-        <div className="gallery-lightbox__stage">
-          {hasPrev ? (
-            <button
-              type="button"
-              className="gallery-lightbox__nav gallery-lightbox__nav--prev"
-              onClick={() => onNavigate(activeIndex - 1)}
-              aria-label="Fotografía anterior"
-            >
-              ‹
-            </button>
-          ) : (
-            <span className="gallery-lightbox__nav-spacer" aria-hidden="true" />
-          )}
+        <figure className="gallery-lightbox__figure">
+          <img
+            className="gallery-lightbox__image"
+            src={photo.imageUrl}
+            alt={photo.altText}
+          />
+          {photo.title || photo.description ? (
+            <figcaption className="gallery-lightbox__caption">
+              {photo.title ? (
+                <strong className="gallery-lightbox__caption-title">
+                  {photo.title}
+                </strong>
+              ) : null}
+              {photo.description ? (
+                <p className="gallery-lightbox__caption-text">
+                  {photo.description}
+                </p>
+              ) : null}
+            </figcaption>
+          ) : null}
+        </figure>
 
-          <figure className="gallery-lightbox__figure">
-            <div className="gallery-lightbox__image-wrap">
-              <img
-                className="gallery-lightbox__image"
-                src={photo.imageUrl}
-                alt={photo.altText}
-              />
-            </div>
-            {photo.title || photo.description ? (
-              <figcaption className="gallery-lightbox__caption" id={captionId}>
-                {photo.title ? (
-                  <strong className="gallery-lightbox__caption-title">
-                    {photo.title}
-                  </strong>
-                ) : null}
-                {photo.description ? (
-                  <p className="gallery-lightbox__caption-text">
-                    {photo.description}
-                  </p>
-                ) : null}
-              </figcaption>
-            ) : null}
-          </figure>
-
-          {hasNext ? (
-            <button
-              type="button"
-              className="gallery-lightbox__nav gallery-lightbox__nav--next"
-              onClick={() => onNavigate(activeIndex + 1)}
-              aria-label="Fotografía siguiente"
-            >
-              ›
-            </button>
-          ) : (
-            <span className="gallery-lightbox__nav-spacer" aria-hidden="true" />
-          )}
-        </div>
+        {hasNext ? (
+          <button
+            type="button"
+            className="gallery-lightbox__nav gallery-lightbox__nav--next"
+            onClick={() => onNavigate(activeIndex + 1)}
+            aria-label="Fotografía siguiente"
+          >
+            ›
+          </button>
+        ) : null}
       </div>
     </div>
   )

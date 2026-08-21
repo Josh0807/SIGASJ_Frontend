@@ -85,23 +85,17 @@ const RequestsSection = ({
 }: RequestsSectionProps) => (
   <section className="landing-section requests-section" id={id} aria-labelledby={`${id}-title`}>
     <div className="requests-section__content">
-      <header className="landing-section__heading">
-        <p className="landing-eyebrow">Trámites en línea</p>
+      <header className="requests-section__heading">
+        <p className="requests-section__eyebrow">Trámites en línea</p>
         <h2 id={`${id}-title`}>{title}</h2>
-        <p className="landing-section__lead">{description}</p>
+        <p>{description}</p>
       </header>
 
       <div className="requests-section__grid">
         {services.map(({ id: serviceId, name, description: serviceDescription, formHref, icon }) => (
-          <article
-            className="requests-section__card"
-            key={serviceId}
-            aria-labelledby={`${id}-service-${serviceId}-title`}
-          >
+          <article className="requests-section__card" key={serviceId}>
             <ServiceIcon type={icon} name={name} />
-            <h3 id={`${id}-service-${serviceId}-title`} className="requests-section__card-title">
-              {name}
-            </h3>
+            <h3>{name}</h3>
             <p>{serviceDescription}</p>
             <Link className="requests-section__button" to={formHref}>
               Realizar solicitud

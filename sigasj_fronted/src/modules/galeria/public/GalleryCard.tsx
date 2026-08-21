@@ -26,24 +26,6 @@ const GalleryCard = ({
     ? `Ver imagen ampliada: ${safeTitle}`
     : `Ver imagen ampliada: ${safeAltText}`
 
-  const media = (
-    <div className="gallery-section__media">
-      <img
-        className="gallery-section__image"
-        src={safeImageUrl}
-        alt={safeAltText}
-        loading="lazy"
-        decoding="async"
-      />
-      {onExpand ? (
-        <span className="gallery-section__overlay" aria-hidden="true">
-          <span className="gallery-section__overlay-icon">⤢</span>
-          <span className="gallery-section__overlay-text">Ver ampliada</span>
-        </span>
-      ) : null}
-    </div>
-  )
-
   return (
     <article
       className="gallery-section__card"
@@ -56,10 +38,26 @@ const GalleryCard = ({
           onClick={onExpand}
           aria-label={expandLabel}
         >
-          {media}
+          <div className="gallery-section__media">
+            <img
+              className="gallery-section__image"
+              src={safeImageUrl}
+              alt={safeAltText}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
         </button>
       ) : (
-        media
+        <div className="gallery-section__media">
+          <img
+            className="gallery-section__image"
+            src={safeImageUrl}
+            alt={safeAltText}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
       )}
 
       {(safeTitle || safeDescription) && (

@@ -1,6 +1,5 @@
-﻿import { useEffect, useState } from 'react'
-import { fetchPublicGallery } from '../services/galleryService'
-import type { GalleryPhoto } from './GallerySectionProps'
+﻿import type { GalleryPhoto } from './GallerySectionProps'
+import { galleryMocks } from './galleryMocks'
 
 export type PublicGalleryQueryStatus = 'loading' | 'success' | 'error'
 
@@ -12,48 +11,15 @@ type UsePublicGalleryResult = {
 }
 
 /**
- * Carga la galería pública desde GET /api/v1/public/galeria.
+ * Entrega fotografías de ejemplo para la sección pública.
  */
 export function usePublicGallery(enabled: boolean): UsePublicGalleryResult {
-  const [status, setStatus] = useState<PublicGalleryQueryStatus>(
-    enabled ? 'loading' : 'success',
-  )
-  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
-  const [retryKey, setRetryKey] = useState(0)
-
-  useEffect(() => {
-    if (!enabled) {
-      setPhotos([])
-      setStatus('success')
-      return
-    }
-
-    let cancelled = false
-    setStatus('loading')
-
-    fetchPublicGallery()
-      .then((items) => {
-        if (!cancelled) {
-          setPhotos(items)
-          setStatus('success')
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setPhotos([])
-          setStatus('error')
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [enabled, retryKey])
+  const photos = enabled ? galleryMocks : []
 
   return {
-    status,
+    status: 'success',
     photos,
     total: photos.length,
-    retry: () => setRetryKey((current) => current + 1),
+    retry: () => {},
   }
 }

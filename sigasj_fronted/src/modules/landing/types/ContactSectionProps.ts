@@ -14,9 +14,6 @@ export interface ContactSectionProps {
   mapLatitude?: number
   mapLongitude?: number
   mapZoom?: number
-  mapDescription?: string
-  loading?: boolean
   embeddedMap?: ReactNode
   showMapEmbed?: boolean
-  layout?: 'standalone' | 'hub'
 }
