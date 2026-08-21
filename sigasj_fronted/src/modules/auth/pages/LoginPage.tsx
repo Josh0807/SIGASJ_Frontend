@@ -1,21 +1,35 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../components/AuthContext'
+import { fetchWithAuth } from '../../../services/http/httpClient'
 import { resolvePostLoginAdminPath } from '../utils/adminNavigation'
 import {
   INTERNAL_ADMIN_ROLES,
   InternalAdminRoleName,
+  normalizeInternalRole,
   type InternalAdminRole,
 } from '../utils/internalRoles'
 
-type DevTokenResponse = {
+type AuthLoginResponse = {
   accessToken: string
-  tokenType: string
-  rol: string
-  idUsuario: number
+  user: { id: string; email: string; role: string; name?: string }
 }
 
-const getApiBaseUrl = (): string => import.meta.env?.VITE_API_URL ?? '/api'
+const DEMO_LOGIN: Record<InternalAdminRole, { email: string; password: string }> =
+  {
+    Administradora: {
+      email: 'admin@asadasanjuan.cr',
+      password: 'Password123!',
+    },
+    Secretaria: {
+      email: 'secretaria@asadasanjuan.cr',
+      password: 'Password123!',
+    },
+    Fontanero: {
+      email: 'fontanero@asadasanjuan.cr',
+      password: 'Password123!',
+    },
+  }
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -47,36 +61,24 @@ const LoginPage = () => {
     setLoading(true)
 
     try {
-      const url = `${getApiBaseUrl().replace(/\/$/, '')}/api/auth/dev-token`
-      const response = await fetch(url, {
+      const credentials = DEMO_LOGIN[selectedRole]
+      const payload = await fetchWithAuth<AuthLoginResponse>('/v1/auth/login', {
         method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rol: selectedRole }),
+        body: JSON.stringify(credentials),
       })
 
-      if (response.ok) {
-        const payload = (await response.json()) as DevTokenResponse
-        completeLogin(
-          payload.accessToken,
-          payload.rol,
-          String(payload.idUsuario),
-        )
-        return
+      if (!payload.accessToken) {
+        throw new Error('El servidor no devolvió un token de acceso.')
       }
 
       completeLogin(
-        `local-${selectedRole.toLowerCase()}-session`,
-        selectedRole,
-        'demo-user-id',
+        payload.accessToken,
+        normalizeInternalRole(payload.user.role) ?? selectedRole,
+        payload.user.id,
       )
     } catch {
-      completeLogin(
-        `local-${selectedRole.toLowerCase()}-session`,
-        selectedRole,
-        'demo-user-id',
+      setError(
+        'No fue posible iniciar sesión con el backend. Verifique que el servidor esté en ejecución.',
       )
     } finally {
       setLoading(false)
@@ -88,9 +90,9 @@ const LoginPage = () => {
       <div className="auth-page__card">
         <h1>Iniciar sesión</h1>
         <p className="auth-page__hint">
-          Acceso administrativo de SIGASJ. Selecciona un rol interno; en
-          desarrollo se intenta un token de prueba del backend y, si no está
-          disponible, se usa una sesión local de demostración.
+          Acceso administrativo de SIGASJ. Selecciona un rol interno; el
+          backend emite un token JWT de ese rol para consultar y guardar el
+          contenido de la landing.
         </p>
 
         <form className="auth-page__form" onSubmit={onSubmit}>

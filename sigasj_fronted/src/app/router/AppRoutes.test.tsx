@@ -277,7 +277,7 @@ describe('AppRoutes y AdminLayout', () => {
     }
 
     expect(markup).toContain('admin-sidebar__link')
-    expect(markup).not.toContain('href="/admin/comunicados"')
+    expect(markup).toContain('href="/admin/comunicados"')
   })
 
   it('muestra el dashboard existente al entrar a /admin', async () => {

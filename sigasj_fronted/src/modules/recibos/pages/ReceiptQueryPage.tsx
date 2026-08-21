@@ -41,7 +41,7 @@ export const ReceiptQueryPage = () => {
   }
 
   return (
-    <div className="receipt-query-page">
+    <div className="receipt-query-page" aria-label="Consulta pública de recibos">
       <PublicReceiptNavbar />
 
       <main className="receipt-query-page__main">

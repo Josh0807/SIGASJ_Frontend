@@ -8,6 +8,8 @@ export type AdminNavIconName =
   | 'averias'
   | 'reportes'
   | 'galeria'
+  | 'comunicados'
+  | 'contacto'
   | 'transparencia'
   | 'perfil'
   | 'menu'

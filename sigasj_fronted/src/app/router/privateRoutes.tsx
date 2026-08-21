@@ -1,10 +1,12 @@
-﻿import type { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import type { AdminNavIconName } from '../../modules/admin-panel/components/AdminNavIcon'
 import { ADMIN_MODULE_ACCESS } from '../../modules/auth/config/adminNavigation.config'
 import type { InternalAdminRole } from '../../modules/auth/utils/internalRoles'
 import { ADMIN_BASE_PATH, ADMIN_ROUTE_SEGMENT } from './adminPaths'
 import AdminDashboard from '../../modules/dashboard/AdminDashboard'
 import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
+import ComunicadosAdminPage from '../../modules/comunicados/admin/ComunicadosAdminPage'
+import ContactoAdminPage from '../../modules/contacto/admin/ContactoAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
 import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
@@ -36,6 +38,8 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   averias: <PrivateModulePlaceholder title="Gestión de averías" />,
   reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,
   galeria: <GalleryAdminPage />,
+  comunicados: <ComunicadosAdminPage />,
+  contacto: <ContactoAdminPage />,
   transparencia: <TransparenciaAdminPage />,
   perfil: <ProfilePage />,
   menu: <PrivateModulePlaceholder title="Menú" />,

@@ -1,22 +1,28 @@
 import ContactSection from './ContactSection'
 import ReceiptPaymentSection from './ReceiptPaymentSection'
+import { usePublicContacto } from '../hooks/usePublicContacto'
 
-const CONTACT_MAP_URL = 'https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA'
-const CONTACT_MAP_LATITUDE = 10.2188017
-const CONTACT_MAP_LONGITUDE = -85.5565018
+const LandingContactBlock = () => {
+  const { contacto } = usePublicContacto()
 
-const LandingContactBlock = () => (
-  <>
-    <ReceiptPaymentSection />
-    <ContactSection
-      id="contacto"
-      title="Contacto"
-      mapUrl={CONTACT_MAP_URL}
-      mapLatitude={CONTACT_MAP_LATITUDE}
-      mapLongitude={CONTACT_MAP_LONGITUDE}
-      mapZoom={19}
-    />
-  </>
-)
+  return (
+    <>
+      <ReceiptPaymentSection />
+      <ContactSection
+        id="contacto"
+        title="Contacto"
+        phonePrimary={contacto.telefono}
+        email={contacto.email}
+        attentionHours={contacto.horarioAtencion}
+        address={contacto.direccion}
+        locationReference={contacto.referenciaUbicacion || undefined}
+        mapUrl={contacto.mapaUrl}
+        mapLatitude={contacto.latitud}
+        mapLongitude={contacto.longitud}
+        mapZoom={contacto.zoomMapa}
+      />
+    </>
+  )
+}
 
 export default LandingContactBlock

@@ -55,5 +55,7 @@ export const SAMPLE_ALLOWED_CONTENT: Record<string, string> = {
   '/admin/averias': 'Gestión de averías',
   '/admin/reportes': 'Gestión de reportes',
   '/admin/galeria': 'Galería de fotografías',
+  '/admin/comunicados': 'Gestión de Comunicados',
+  '/admin/contacto': 'Información de Contacto y Ubicación',
   '/admin/transparencia': 'Transparencia y calidad del agua',
 }

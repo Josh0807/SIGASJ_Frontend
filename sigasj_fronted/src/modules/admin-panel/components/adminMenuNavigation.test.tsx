@@ -319,7 +319,6 @@ describe('navegación del menú administrativo', () => {
   it('redirige rutas administrativas inexistentes al dashboard sin errores', async () => {
     const consoleProbe = captureConsole()
     const unknownPaths = [
-      '/admin/comunicados',
       '/admin/no-existe',
       '/admin/galeria/foto-12',
     ]
@@ -362,7 +361,7 @@ describe('navegación del menú administrativo', () => {
           ({ path }) => path,
         ),
       )
-      expect(hrefs).not.toContain('/admin/comunicados')
+      expect(hrefs).toContain('/admin/comunicados')
     } finally {
       await app.cleanup()
     }
