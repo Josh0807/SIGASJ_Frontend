@@ -42,11 +42,25 @@ export const ALL_QUICK_ACCESS_ITEMS: QuickAccessConfigItem[] = [
     icon: 'averias',
   },
   {
+    id: 'comunicados',
+    title: 'Gestión de comunicados',
+    description: 'Publicar y actualizar avisos oficiales de la ASADA.',
+    path: '/admin/comunicados',
+    icon: 'comunicados',
+  },
+  {
     id: 'galeria',
     title: 'Galería de fotos',
     description: 'Gestionar imágenes para el portal web institucional.',
     path: '/admin/galeria',
     icon: 'galeria',
+  },
+  {
+    id: 'contacto',
+    title: 'Contacto y ubicación',
+    description: 'Actualizar teléfono, correo, horario y mapa público.',
+    path: '/admin/contacto',
+    icon: 'contacto',
   },
   {
     id: 'transparencia',

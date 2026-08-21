@@ -15,6 +15,8 @@ type AnnouncementsCarouselProps = {
   labelledBy: string
 }
 
+const AUTOPLAY_MS = 7000
+
 const getSlidesPerView = (width: number) => {
   if (width < 640) {
     return 1
@@ -29,6 +31,11 @@ const AnnouncementsCarousel = ({
 }: AnnouncementsCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [slidesPerView, setSlidesPerView] = useState(2)
+  const [paused, setPaused] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const [cycleKey, setCycleKey] = useState(0)
+  const [pageHidden, setPageHidden] = useState(false)
+  const isAutoplayStopped = paused || reducedMotion || pageHidden
 
   useEffect(() => {
     const updateSlidesPerView = () => {
@@ -43,6 +50,32 @@ const AnnouncementsCarousel = ({
     }
   }, [])
 
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') {
+      return
+    }
+
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setReducedMotion(media.matches)
+
+    sync()
+    media.addEventListener('change', sync)
+
+    return () => {
+      media.removeEventListener('change', sync)
+    }
+  }, [])
+
+  useEffect(() => {
+    const sync = () => setPageHidden(document.hidden)
+    sync()
+    document.addEventListener('visibilitychange', sync)
+
+    return () => {
+      document.removeEventListener('visibilitychange', sync)
+    }
+  }, [])
+
   const maxIndex = Math.max(0, announcements.length - slidesPerView)
   const totalPages = maxIndex + 1
   const canNavigate = announcements.length > slidesPerView
@@ -52,24 +85,48 @@ const AnnouncementsCarousel = ({
   }, [maxIndex])
 
   const goTo = useCallback(
-    (index: number) => {
-      setCurrentIndex(Math.max(0, Math.min(index, maxIndex)))
+    (index: number, fromUser = false) => {
+      if (maxIndex === 0) {
+        setCurrentIndex(0)
+        return
+      }
+
+      const wrapped = ((index % (maxIndex + 1)) + (maxIndex + 1)) % (maxIndex + 1)
+      setCurrentIndex(wrapped)
+
+      if (fromUser) {
+        setCycleKey((key) => key + 1)
+      }
     },
     [maxIndex],
   )
 
+  useEffect(() => {
+    if (!canNavigate || isAutoplayStopped) {
+      return
+    }
+
+    const timer = window.setInterval(() => {
+      setCurrentIndex((index) => (index >= maxIndex ? 0 : index + 1))
+    }, AUTOPLAY_MS)
+
+    return () => {
+      window.clearInterval(timer)
+    }
+  }, [canNavigate, cycleKey, isAutoplayStopped, maxIndex])
+
   const goPrevious = useCallback(() => {
-    goTo(currentIndex - 1)
+    goTo(currentIndex - 1, true)
   }, [currentIndex, goTo])
 
   const goNext = useCallback(() => {
-    goTo(currentIndex + 1)
+    goTo(currentIndex + 1, true)
   }, [currentIndex, goTo])
 
   const statusLabel = useMemo(() => {
     const first = currentIndex + 1
     const last = Math.min(currentIndex + slidesPerView, announcements.length)
-    return `Comunicados ${first} a ${last} de ${announcements.length}`
+    return `${first}–${last} / ${announcements.length}`
   }, [announcements.length, currentIndex, slidesPerView])
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -102,6 +159,14 @@ const AnnouncementsCarousel = ({
       aria-roledescription="carrusel"
       aria-labelledby={labelledBy}
       onKeyDown={onKeyDown}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setPaused(false)
+        }
+      }}
       tabIndex={canNavigate ? 0 : -1}
     >
       {canNavigate ? (
@@ -115,7 +180,6 @@ const AnnouncementsCarousel = ({
               type="button"
               className="announcements-carousel__control"
               onClick={goPrevious}
-              disabled={currentIndex === 0}
               aria-label="Comunicado anterior"
             >
               <ChevronLeftIcon />
@@ -124,7 +188,6 @@ const AnnouncementsCarousel = ({
               type="button"
               className="announcements-carousel__control"
               onClick={goNext}
-              disabled={currentIndex >= maxIndex}
               aria-label="Comunicado siguiente"
             >
               <ChevronRightIcon />
@@ -162,7 +225,7 @@ const AnnouncementsCarousel = ({
         <div
           className="announcements-carousel__dots"
           role="tablist"
-          aria-label="Paginas del carrusel de comunicados"
+          aria-label="Páginas del carrusel de comunicados"
         >
           {Array.from({ length: totalPages }, (_, pageIndex) => (
             <button
@@ -176,7 +239,7 @@ const AnnouncementsCarousel = ({
               role="tab"
               aria-selected={pageIndex === currentIndex}
               aria-label={`Ir al grupo ${pageIndex + 1} de ${totalPages}`}
-              onClick={() => goTo(pageIndex)}
+              onClick={() => goTo(pageIndex, true)}
             />
           ))}
         </div>

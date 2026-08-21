@@ -1,19 +1,22 @@
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import GalleryAdminForm from './GalleryAdminForm'
-import { adminGalleryMocks } from './adminGalleryMocks'
 import {
   emptyGalleryFormValues,
   type AdminGalleryPhoto,
   type GalleryFormValues,
 } from './types'
+import {
+  createGaleriaPhoto,
+  deleteGaleriaPhoto,
+  getAdminGaleria,
+  updateGaleriaPhoto,
+} from '../services/galeriaApi'
 
 const GalleryAdminPage = () => {
-  const nextIdRef = useRef(
-    Math.max(0, ...adminGalleryMocks.map((photo) => photo.id)) + 1,
-  )
-
-  const [photos, setPhotos] = useState<AdminGalleryPhoto[]>(adminGalleryMocks)
+  const [photos, setPhotos] = useState<AdminGalleryPhoto[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchTitle, setSearchTitle] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>(
     'all',
@@ -21,6 +24,23 @@ const GalleryAdminPage = () => {
   const [formMode, setFormMode] = useState<'hidden' | 'create' | 'edit'>('hidden')
   const [editingPhoto, setEditingPhoto] = useState<AdminGalleryPhoto | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const loadPhotos = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      setPhotos(await getAdminGaleria())
+    } catch {
+      setError('No fue posible cargar la galería.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadPhotos()
+  }, [loadPhotos])
 
   const visiblePhotos = useMemo(() => {
     const query = searchTitle.trim().toLowerCase()
@@ -60,50 +80,34 @@ const GalleryAdminPage = () => {
           return
         }
 
-        const nextPhoto: AdminGalleryPhoto = {
-          id: nextIdRef.current,
-          titulo: values.titulo || null,
-          descripcion: values.descripcion || null,
-          imagenUrl: URL.createObjectURL(file),
-          textoAlternativo: values.textoAlternativo,
-          ordenVisualizacion: values.ordenVisualizacion,
-          activo: values.activo,
-        }
-        nextIdRef.current += 1
-        setPhotos((current) => [...current, nextPhoto])
+        await createGaleriaPhoto(values, file)
       } else if (editingPhoto) {
-        setPhotos((current) =>
-          current.map((photo) =>
-            photo.id === editingPhoto.id
-              ? {
-                  ...photo,
-                  titulo: values.titulo || null,
-                  descripcion: values.descripcion || null,
-                  textoAlternativo: values.textoAlternativo,
-                  ordenVisualizacion: values.ordenVisualizacion,
-                  activo: values.activo,
-                  imagenUrl: file ? URL.createObjectURL(file) : photo.imagenUrl,
-                }
-              : photo,
-          ),
-        )
+        await updateGaleriaPhoto(editingPhoto.id, values, file)
       }
 
       closeForm()
+      await loadPhotos()
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleToggleEstado = (photo: AdminGalleryPhoto) => {
-    setPhotos((current) =>
-      current.map((item) =>
-        item.id === photo.id ? { ...item, activo: !item.activo } : item,
-      ),
+  const handleToggleEstado = async (photo: AdminGalleryPhoto) => {
+    await updateGaleriaPhoto(
+      photo.id,
+      {
+        titulo: photo.titulo ?? '',
+        descripcion: photo.descripcion ?? '',
+        textoAlternativo: photo.textoAlternativo,
+        ordenVisualizacion: photo.ordenVisualizacion,
+        activo: !photo.activo,
+      },
+      null,
     )
+    await loadPhotos()
   }
 
-  const handleDelete = (photo: AdminGalleryPhoto) => {
+  const handleDelete = async (photo: AdminGalleryPhoto) => {
     const confirmed = window.confirm(
       `¿Eliminar la fotografía${photo.titulo ? ` «${photo.titulo}»` : ''}? Esta acción no se puede deshacer.`,
     )
@@ -112,10 +116,11 @@ const GalleryAdminPage = () => {
       return
     }
 
-    setPhotos((current) => current.filter((item) => item.id !== photo.id))
+    await deleteGaleriaPhoto(photo.id)
+    await loadPhotos()
   }
 
-  const movePhoto = (index: number, direction: -1 | 1) => {
+  const movePhoto = async (index: number, direction: -1 | 1) => {
     const targetIndex = index + direction
     if (targetIndex < 0 || targetIndex >= visiblePhotos.length) {
       return
@@ -124,19 +129,23 @@ const GalleryAdminPage = () => {
     const reordered = [...visiblePhotos]
     const [moved] = reordered.splice(index, 1)
     reordered.splice(targetIndex, 0, moved)
-    const orderById = new Map(
-      reordered.map((photo, orderIndex) => [photo.id, orderIndex]),
-    )
 
-    setPhotos((current) =>
-      current
-        .map((photo) =>
-          orderById.has(photo.id)
-            ? { ...photo, ordenVisualizacion: orderById.get(photo.id)! }
-            : photo,
-        )
-        .sort((left, right) => left.ordenVisualizacion - right.ordenVisualizacion),
+    await Promise.all(
+      reordered.map((photo, orderIndex) =>
+        updateGaleriaPhoto(
+          photo.id,
+          {
+            titulo: photo.titulo ?? '',
+            descripcion: photo.descripcion ?? '',
+            textoAlternativo: photo.textoAlternativo,
+            ordenVisualizacion: orderIndex,
+            activo: photo.activo,
+          },
+          null,
+        ),
+      ),
     )
+    await loadPhotos()
   }
 
   const formInitialValues =
@@ -213,7 +222,15 @@ const GalleryAdminPage = () => {
           />
         ) : null}
 
-        {visiblePhotos.length === 0 ? (
+        {loading ? (
+          <p className="gallery-admin__empty" role="status">
+            Cargando fotografías…
+          </p>
+        ) : error ? (
+          <p className="gallery-admin__empty" role="alert">
+            {error}
+          </p>
+        ) : visiblePhotos.length === 0 ? (
           <p className="gallery-admin__empty" role="status">
             No hay fotografías registradas con los filtros actuales.
           </p>
@@ -238,27 +255,27 @@ const GalleryAdminPage = () => {
                   <button type="button" onClick={() => openEditForm(photo)}>
                     Editar
                   </button>
-                  <button type="button" onClick={() => handleToggleEstado(photo)}>
+                  <button type="button" onClick={() => void handleToggleEstado(photo)}>
                     {photo.activo ? 'Desactivar' : 'Activar'}
                   </button>
                   <button
                     type="button"
                     disabled={index === 0}
-                    onClick={() => movePhoto(index, -1)}
+                    onClick={() => void movePhoto(index, -1)}
                   >
                     Subir
                   </button>
                   <button
                     type="button"
                     disabled={index === visiblePhotos.length - 1}
-                    onClick={() => movePhoto(index, 1)}
+                    onClick={() => void movePhoto(index, 1)}
                   >
                     Bajar
                   </button>
                   <button
                     type="button"
                     className="gallery-admin__danger"
-                    onClick={() => handleDelete(photo)}
+                    onClick={() => void handleDelete(photo)}
                   >
                     Eliminar
                   </button>

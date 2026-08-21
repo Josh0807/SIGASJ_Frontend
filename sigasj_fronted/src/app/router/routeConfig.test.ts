@@ -15,6 +15,7 @@ describe('route configuration', () => {
     expect(LANDING_ROUTE?.path).toBe('/')
     expect(PUBLIC_ROUTE_PATHS).toEqual([
       '/',
+      '/consulta-recibo',
       '/reportar-averia',
       '/solicitudes/constancia-servicio',
       '/solicitudes/afiliacion',
@@ -47,6 +48,7 @@ describe('route configuration', () => {
 
   it('expone los formularios públicos de visitante fuera de /admin', () => {
     expect(PUBLIC_VISITOR_FORM_PATHS).toEqual([
+      '/consulta-recibo',
       '/reportar-averia',
       '/solicitudes/constancia-servicio',
       '/solicitudes/afiliacion',
@@ -70,6 +72,8 @@ describe('route configuration', () => {
         '/admin/averias',
         '/admin/reportes',
         '/admin/galeria',
+        '/admin/comunicados',
+        '/admin/contacto',
         '/admin/transparencia',
         ADMIN_PROFILE_PATH,
       ]),
@@ -126,9 +130,10 @@ describe('route configuration', () => {
     expect(new Set(segments).size).toBe(segments.length)
     expect(new Set(paths).size).toBe(paths.length)
     expect(new Set(navPaths).size).toBe(navPaths.length)
-    expect(paths).not.toContain('/admin/comunicados')
-    expect(navPaths).not.toContain('/admin/comunicados')
-    expect(segments).not.toContain('comunicados')
+    expect(paths).toContain('/admin/comunicados')
+    expect(navPaths).toContain('/admin/comunicados')
+    expect(segments).toContain('comunicados')
+    expect(paths).toContain('/admin/contacto')
     expect(paths).not.toContain('/admin/abonados/:id')
     expect(paths).not.toContain('/admin/abonados/me')
     expect(PRIVATE_ROUTE_PATHS.every((path) => !path.includes(':id'))).toBe(true)
