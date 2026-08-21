@@ -22,9 +22,9 @@ const ComplaintsSection = () => (
       </svg>
 
       <div className="account-section__copy">
-        <p className="landing-eyebrow">Atención al usuario</p>
-        <h2 id="quejas-title">Sugerencias y quejas</h2>
-        <p className="landing-section__lead">
+        <p className="account-section__eyebrow">Atención al usuario</p>
+        <h2 id="quejas-title">Sugerencias y Quejas</h2>
+        <p>
           Envíanos tus sugerencias y quejas por correo electrónico para que podamos conocerlas y brindarles la
           atención correspondiente.
         </p>

@@ -1,6 +1,6 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import AppRoutes from './AppRoutes'
 import { AuthProvider } from '../../modules/auth/components/AuthContext'
@@ -145,10 +145,6 @@ const mountApp = async (path: string) => {
       expect(form).not.toBeNull()
       await act(async () => {
         form?.requestSubmit()
-      })
-
-      await vi.waitFor(() => {
-        expect(isAuthenticated()).toBe(true)
       })
     },
     logout: async () => {

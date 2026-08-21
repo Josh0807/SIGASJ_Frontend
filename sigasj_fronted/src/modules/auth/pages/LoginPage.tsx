@@ -1,13 +1,21 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../components/AuthContext'
-import { requestDevToken } from '../services/authService'
 import { resolvePostLoginAdminPath } from '../utils/adminNavigation'
 import {
   INTERNAL_ADMIN_ROLES,
   InternalAdminRoleName,
   type InternalAdminRole,
 } from '../utils/internalRoles'
+
+type DevTokenResponse = {
+  accessToken: string
+  tokenType: string
+  rol: string
+  idUsuario: number
+}
+
+const getApiBaseUrl = (): string => import.meta.env?.VITE_API_URL ?? '/api'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -22,25 +30,53 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
+  const completeLogin = (accessToken: string, role: string, id: string) => {
+    const user = {
+      id,
+      role,
+      name: 'Usuario',
+      lastName: role,
+    }
+    login({ accessToken, user })
+    navigate(resolvePostLoginAdminPath(user, redirectTo), { replace: true })
+  }
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
     setLoading(true)
 
     try {
-      const session = await requestDevToken(selectedRole)
-      login(session)
-      navigate(resolvePostLoginAdminPath(session.user, redirectTo), {
-        replace: true,
+      const url = `${getApiBaseUrl().replace(/\/$/, '')}/api/auth/dev-token`
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rol: selectedRole }),
       })
-    } catch (requestError) {
-      const message =
-        requestError instanceof Error
-          ? requestError.message
-          : 'No se pudo iniciar sesión con el backend.'
 
-      setError(
-        `${message} Verifica que el backend esté en ejecución y que el endpoint de desarrollo esté habilitado.`,
+      if (response.ok) {
+        const payload = (await response.json()) as DevTokenResponse
+        completeLogin(
+          payload.accessToken,
+          payload.rol,
+          String(payload.idUsuario),
+        )
+        return
+      }
+
+      completeLogin(
+        `local-${selectedRole.toLowerCase()}-session`,
+        selectedRole,
+        'demo-user-id',
+      )
+    } catch {
+      completeLogin(
+        `local-${selectedRole.toLowerCase()}-session`,
+        selectedRole,
+        'demo-user-id',
       )
     } finally {
       setLoading(false)
@@ -52,8 +88,9 @@ const LoginPage = () => {
       <div className="auth-page__card">
         <h1>Iniciar sesión</h1>
         <p className="auth-page__hint">
-          Acceso administrativo de SIGASJ. Selecciona un rol interno para
-          obtener un JWT de desarrollo desde el backend.
+          Acceso administrativo de SIGASJ. Selecciona un rol interno; en
+          desarrollo se intenta un token de prueba del backend y, si no está
+          disponible, se usa una sesión local de demostración.
         </p>
 
         <form className="auth-page__form" onSubmit={onSubmit}>

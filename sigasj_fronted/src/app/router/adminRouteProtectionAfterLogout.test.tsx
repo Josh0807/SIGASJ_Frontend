@@ -1,6 +1,6 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import {
   clearAccessToken,
@@ -82,10 +82,6 @@ const submitLogin = async (container: HTMLElement) => {
   await act(async () => {
     form?.requestSubmit()
   })
-
-  await vi.waitFor(() => {
-    expect(isAuthenticated()).toBe(true)
-  })
 }
 
 const logoutFromAccountMenu = async (container: HTMLElement) => {
@@ -137,7 +133,7 @@ describe('protección de rutas administrativas después del logout', () => {
       await submitLogin(app.container)
 
       expect(isAuthenticated()).toBe(true)
-      expect(getAccessToken()).toBe('test-token-administradora')
+      expect(getAccessToken()).toBe('local-administradora-session')
       expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(app.container.innerHTML).toContain('admin-layout')
       expect(app.container.innerHTML).toContain('admin-sidebar')

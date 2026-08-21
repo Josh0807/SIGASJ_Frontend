@@ -46,12 +46,8 @@ export async function fetchWithAuth<T>(
 
   const token = getAccessToken()
   const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
     ...(customHeaders as Record<string, string>),
-  }
-
-  const bodyIsFormData = restOptions.body instanceof FormData
-  if (!bodyIsFormData && !headers['Content-Type'] && !headers['content-type']) {
-    headers['Content-Type'] = 'application/json'
   }
 
   if (token?.trim()) {

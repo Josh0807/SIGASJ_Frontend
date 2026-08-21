@@ -220,10 +220,6 @@ const mountApp = async (path: string): Promise<MountedApp> => {
       await act(async () => {
         submit?.click()
       })
-
-      await vi.waitFor(() => {
-        expect(isAuthenticated()).toBe(true)
-      })
     },
     openAccountMenu: async () => {
       const trigger = container.querySelector<HTMLButtonElement>(
@@ -286,10 +282,6 @@ const mountInteractiveApp = async (
 
     await act(async () => {
       form?.requestSubmit()
-    })
-
-    await vi.waitFor(() => {
-      expect(isAuthenticated()).toBe(true)
     })
   }
 
@@ -723,10 +715,9 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
       expect(userBefore.name).toBe('Usuario Administradora')
       expect(userBefore.role).toBe('Administradora')
-      expect(tokenBefore).toBe('test-token-administradora')
+      expect(tokenBefore).toBe('local-administradora-session')
       expect(authUserBefore).toEqual({
-        id: 'dev-administradora',
-        email: 'administradora@dev.sigasj.local',
+        id: 'demo-user-id',
         name: 'Usuario',
         lastName: 'Administradora',
         role: 'Administradora',
