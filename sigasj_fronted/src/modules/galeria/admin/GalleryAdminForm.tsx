@@ -33,7 +33,7 @@ const GalleryAdminForm = ({
     setFile(null)
     setFileError(null)
     setFormError(null)
-  }, [initialValues, mode])
+  }, [mode])
 
   useEffect(() => {
     if (!file) {
