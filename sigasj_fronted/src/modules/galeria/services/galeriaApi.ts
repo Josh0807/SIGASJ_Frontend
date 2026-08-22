@@ -51,15 +51,19 @@ const toFormData = (values: GalleryFormValues, file: File | null) => {
   return form
 }
 
+const isPubliclyActive = (item: BackendGaleriaFoto) =>
+  item.activa !== false && item.activo !== false
+
 export async function getPublicGaleria(): Promise<GalleryPhoto[]> {
   const data = await fetchPublicApi<BackendGaleriaFoto[]>(PUBLIC_PATHS)
   return (Array.isArray(data) ? data : [])
+    .filter(isPubliclyActive)
     .map(mapPublicGalleryPhoto)
     .filter((photo) => photo.imageUrl.length > 0)
 }
 
 export async function getAdminGaleria(): Promise<AdminGalleryPhoto[]> {
-  const data = await fetchPublicApi<BackendGaleriaFoto[]>(ADMIN_PATHS)
+  const data = await fetchWithAuth<BackendGaleriaFoto[]>(ADMIN_PATHS[0])
   return (Array.isArray(data) ? data : []).map(mapAdminGalleryPhoto)
 }
 
@@ -81,11 +85,33 @@ export async function updateGaleriaPhoto(
 ): Promise<AdminGalleryPhoto> {
   const updated = await fetchWithAuth<BackendGaleriaFoto>(`${ADMIN_PATHS[0]}/${id}`, {
     method: 'PATCH',
-    body: toFormData(values, file),
+    body: file
+      ? toFormData(values, file)
+      : JSON.stringify({
+          titulo: values.titulo,
+          descripcion: values.descripcion,
+          textoAlternativo: values.textoAlternativo,
+          ordenVisualizacion: values.ordenVisualizacion,
+          activa: values.activo,
+        }),
   })
   return mapAdminGalleryPhoto(updated)
 }
 
 export async function deleteGaleriaPhoto(id: number): Promise<void> {
   await fetchWithAuth(`${ADMIN_PATHS[0]}/${id}`, { method: 'DELETE' })
+}
+
+export async function setGaleriaActiva(
+  id: number,
+  activa: boolean,
+): Promise<AdminGalleryPhoto> {
+  const updated = await fetchWithAuth<BackendGaleriaFoto>(
+    `${ADMIN_PATHS[0]}/${id}/estado`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ activa }),
+    },
+  )
+  return mapAdminGalleryPhoto(updated)
 }

@@ -10,6 +10,7 @@ import {
   createGaleriaPhoto,
   deleteGaleriaPhoto,
   getAdminGaleria,
+  setGaleriaActiva,
   updateGaleriaPhoto,
 } from '../services/galeriaApi'
 
@@ -83,6 +84,7 @@ const GalleryAdminPage = () => {
         await createGaleriaPhoto(values, file)
       } else if (editingPhoto) {
         await updateGaleriaPhoto(editingPhoto.id, values, file)
+        await setGaleriaActiva(editingPhoto.id, values.activo)
       }
 
       closeForm()
@@ -93,18 +95,16 @@ const GalleryAdminPage = () => {
   }
 
   const handleToggleEstado = async (photo: AdminGalleryPhoto) => {
-    await updateGaleriaPhoto(
-      photo.id,
-      {
-        titulo: photo.titulo ?? '',
-        descripcion: photo.descripcion ?? '',
-        textoAlternativo: photo.textoAlternativo,
-        ordenVisualizacion: photo.ordenVisualizacion,
-        activo: !photo.activo,
-      },
-      null,
-    )
-    await loadPhotos()
+    setError(null)
+
+    try {
+      const updated = await setGaleriaActiva(photo.id, !photo.activo)
+      setPhotos((current) =>
+        current.map((row) => (row.id === updated.id ? updated : row)),
+      )
+    } catch {
+      setError('No fue posible cambiar el estado de la fotografía.')
+    }
   }
 
   const handleDelete = async (photo: AdminGalleryPhoto) => {
@@ -213,6 +213,7 @@ const GalleryAdminPage = () => {
 
         {formMode !== 'hidden' ? (
           <GalleryAdminForm
+            key={`${formMode}-${editingPhoto?.id ?? 'nueva'}`}
             mode={formMode}
             initialValues={formInitialValues}
             currentImageUrl={editingPhoto?.imagenUrl}
@@ -222,13 +223,15 @@ const GalleryAdminPage = () => {
           />
         ) : null}
 
+        {error ? (
+          <p className="gallery-admin__empty" role="alert">
+            {error}
+          </p>
+        ) : null}
+
         {loading ? (
           <p className="gallery-admin__empty" role="status">
             Cargando fotografías…
-          </p>
-        ) : error ? (
-          <p className="gallery-admin__empty" role="alert">
-            {error}
           </p>
         ) : visiblePhotos.length === 0 ? (
           <p className="gallery-admin__empty" role="status">

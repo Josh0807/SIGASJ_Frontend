@@ -5,7 +5,7 @@ import { usePublicTransparencia } from './usePublicTransparencia'
 
 /**
  * Sección pública de transparencia y calidad del agua.
- * Sin `publications` en props usa la colección de ejemplo.
+ * Sin `publications` en props consulta el API público (solo activas).
  * Con `publications` (modo controlado) muestra exactamente esos datos.
  */
 const TransparencySection = ({

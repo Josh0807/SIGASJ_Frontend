@@ -42,7 +42,7 @@ const TransparenciaAdminForm = ({
     setFileError(null)
     setFormError(null)
     setSelectedFileLabel(null)
-  }, [initialValues, mode])
+  }, [mode])
 
   useEffect(() => {
     if (!file || !file.type.startsWith('image/')) {
@@ -151,38 +151,36 @@ const TransparenciaAdminForm = ({
         />
       </label>
 
-      {mode === 'create' ? (
-        <div className="gallery-admin__field-row">
-          <label className="gallery-admin__field">
-            <span>Orden</span>
-            <input
-              type="number"
-              min={0}
-              value={values.ordenVisualizacion}
-              onChange={(event) =>
-                setValues((current) => ({
-                  ...current,
-                  ordenVisualizacion: Number(event.target.value) || 0,
-                }))
-              }
-            />
-          </label>
+      <div className="gallery-admin__field-row">
+        <label className="gallery-admin__field">
+          <span>Orden</span>
+          <input
+            type="number"
+            min={0}
+            value={values.ordenVisualizacion}
+            onChange={(event) =>
+              setValues((current) => ({
+                ...current,
+                ordenVisualizacion: Number(event.target.value) || 0,
+              }))
+            }
+          />
+        </label>
 
-          <label className="gallery-admin__checkbox">
-            <input
-              type="checkbox"
-              checked={values.activo}
-              onChange={(event) =>
-                setValues((current) => ({
-                  ...current,
-                  activo: event.target.checked,
-                }))
-              }
-            />
-            <span>Visible en la sección pública</span>
-          </label>
-        </div>
-      ) : null}
+        <label className="gallery-admin__checkbox">
+          <input
+            type="checkbox"
+            checked={values.activo}
+            onChange={(event) =>
+              setValues((current) => ({
+                ...current,
+                activo: event.target.checked,
+              }))
+            }
+          />
+          <span>Visible en la sección pública</span>
+        </label>
+      </div>
 
       <label className="gallery-admin__field">
         <span>
