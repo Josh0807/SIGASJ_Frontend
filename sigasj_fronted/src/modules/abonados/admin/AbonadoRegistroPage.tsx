@@ -5,6 +5,7 @@ import type { AbonadoRegistroFormValues } from './types'
 import {
   getSolicitudesPendientes,
   registerAbonado,
+  type RegistroResumen,
   type SolicitudPendiente,
 } from '../services/abonadosApi'
 
@@ -24,9 +25,7 @@ const AbonadoRegistroPage = () => {
   const [loadingSolicitudes, setLoadingSolicitudes] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<{ idAbonado: number; mensaje: string } | null>(
-    null,
-  )
+  const [success, setSuccess] = useState<RegistroResumen | null>(null)
 
   const loadSolicitudes = useCallback(async () => {
     setLoadingSolicitudes(true)
@@ -53,13 +52,24 @@ const AbonadoRegistroPage = () => {
 
     try {
       const response = await registerAbonado(values)
-      setSuccess(response)
+      setSuccess({
+        idAbonado: response.idAbonado,
+        mensaje: response.mensaje,
+        cedula: values.cedula.trim(),
+        nis: values.servicio.nis.trim(),
+        medidor: values.servicio.medidor.trim(),
+      })
     } catch (error) {
       setServerError(parseServerError(error))
-      throw error
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleRegisterAnother = () => {
+    setSuccess(null)
+    setServerError(null)
+    void loadSolicitudes()
   }
 
   if (success) {
@@ -72,12 +82,17 @@ const AbonadoRegistroPage = () => {
         <section className="gallery-admin__panel">
           <h2>Registro completado</h2>
           <p>{success.mensaje}</p>
-          <p>
-            Abonado #{success.idAbonado} registrado correctamente.
-          </p>
+          <ul>
+            <li>ID abonado: {success.idAbonado}</li>
+            <li>Cédula: {success.cedula}</li>
+            <li>NIS: {success.nis}</li>
+            <li>Medidor: {success.medidor}</li>
+          </ul>
           <div className="gallery-admin__actions">
             <Link to="/admin/abonados">Volver al listado</Link>
-            <Link to="/admin/abonados/nuevo">Registrar otro abonado</Link>
+            <button type="button" onClick={handleRegisterAnother}>
+              Registrar otro abonado
+            </button>
           </div>
         </section>
       </main>
@@ -93,6 +108,10 @@ const AbonadoRegistroPage = () => {
         </div>
         <Link to="/admin/abonados">Volver al listado</Link>
       </header>
+
+      {loadingSolicitudes ? (
+        <p className="gallery-admin__status">Cargando solicitudes aprobadas…</p>
+      ) : null}
 
       <AbonadoRegistroForm
         solicitudes={solicitudes}

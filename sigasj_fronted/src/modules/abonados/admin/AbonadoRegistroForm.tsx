@@ -82,7 +82,7 @@ const AbonadoRegistroForm = ({
     try {
       await onSubmit(values)
     } catch {
-      setFormError('No fue posible registrar el abonado.')
+      // El contenedor muestra serverError del backend.
     }
   }
 

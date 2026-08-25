@@ -1,6 +1,14 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import type { AbonadoRegistroFormValues } from '../admin/types'
 
+export type RegistroResumen = {
+  idAbonado: number
+  mensaje: string
+  cedula: string
+  nis: string
+  medidor: string
+}
+
 export type SolicitudPendiente = {
   idSolicitud: number
   nombre: string
