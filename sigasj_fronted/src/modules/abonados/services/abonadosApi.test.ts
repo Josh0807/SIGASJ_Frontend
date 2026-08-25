@@ -91,4 +91,22 @@ describe('abonadosApi — Tarea #341', () => {
 
     expect(body.idSolicitud).toBeUndefined()
   })
+
+  it('consulta abonado por id con fetchWithAuth', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValue({
+      idAbonado: 12,
+      nombre: 'María',
+      apellidos: 'Rodríguez Mora',
+      cedula: '1-2345-6789',
+      telefono: '8888-1234',
+      correo: 'maria.rodriguez@correo.cr',
+      direccion: 'San Juan, Desamparados',
+    })
+
+    const { getAbonadoById } = await import('./abonadosApi')
+    const response = await getAbonadoById(12)
+
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/abonados/12', undefined)
+    expect(response.nombre).toBe('María')
+  })
 })

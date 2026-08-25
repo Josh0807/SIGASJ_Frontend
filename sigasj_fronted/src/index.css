@@ -2179,6 +2179,30 @@ a.auth-page__submit {
   color: #136734;
   background: #edf9f0;
 }
+.gallery-admin__summary {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.gallery-admin__summary-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid #d5e6f4;
+  border-radius: 12px;
+  background: #f7fbff;
+}
+.gallery-admin__summary-item dt {
+  margin: 0;
+  color: #516779;
+  font-size: .85rem;
+  font-weight: 700;
+}
+.gallery-admin__summary-item dd {
+  margin: 0;
+  color: #123f70;
+  font-weight: 600;
+}
 .gallery-admin__empty {
   padding: 28px 24px;
   border: 1px dashed #8ebce0;

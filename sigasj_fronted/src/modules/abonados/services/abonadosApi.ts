@@ -4,9 +4,21 @@ import type { AbonadoRegistroFormValues } from '../admin/types'
 export type RegistroResumen = {
   idAbonado: number
   mensaje: string
+  nombre: string
+  apellidos: string
   cedula: string
   nis: string
   medidor: string
+}
+
+export type AbonadoDetail = {
+  idAbonado: number
+  nombre: string
+  apellidos: string
+  cedula: string
+  telefono: string
+  correo: string
+  direccion: string
 }
 
 export type SolicitudPendiente = {
@@ -55,6 +67,9 @@ async function fetchFirst<T>(paths: string[], init?: RequestInit): Promise<T> {
 
 export const getSolicitudesPendientes = () =>
   fetchFirst<SolicitudesPendientesResponse>(SOLICITUDES_PATHS)
+
+export const getAbonadoById = (idAbonado: number) =>
+  fetchFirst<AbonadoDetail>([`/v1/abonados/${idAbonado}`, `/abonados/${idAbonado}`])
 
 export const registerAbonado = (values: AbonadoRegistroFormValues) => {
   const payload = {

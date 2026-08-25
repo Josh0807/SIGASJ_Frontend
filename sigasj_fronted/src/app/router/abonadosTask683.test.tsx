@@ -14,6 +14,7 @@ vi.mock('../../modules/abonados/services/abonadosApi', async () => {
     ...actual,
     getSolicitudesPendientes: vi.fn(),
     registerAbonado: vi.fn(),
+    getAbonadoById: vi.fn(),
   }
 })
 
@@ -54,44 +55,30 @@ const fillRegistroForm = async (container: HTMLElement) => {
   })
 }
 
-describe('Tarea #341 — integración formulario con backend', () => {
+describe('Tarea #683 — confirmación y resumen del registro', () => {
   beforeEach(() => {
     clearAccessToken()
     loginAsRole('Administradora')
     vi.mocked(abonadosApi.getSolicitudesPendientes).mockResolvedValue({
-      solicitudes: [
-        {
-          idSolicitud: 1,
-          nombre: 'María',
-          apellidos: 'Rodríguez Mora',
-          cedula: '1-2345-6789',
-          telefono: '8888-1234',
-          correo: 'maria.rodriguez@correo.cr',
-          direccion: 'San Juan, Desamparados',
-          utilizada: false,
-        },
-      ],
+      solicitudes: [],
       mensaje: null,
     })
     vi.mocked(abonadosApi.registerAbonado).mockResolvedValue({
       idAbonado: 12,
       mensaje: 'Abonado y servicio registrados correctamente.',
     })
+    vi.mocked(abonadosApi.getAbonadoById).mockResolvedValue({
+      idAbonado: 12,
+      nombre: 'María',
+      apellidos: 'Rodríguez Mora',
+      cedula: '1-2345-6789',
+      telefono: '8888-1234',
+      correo: 'maria.rodriguez@correo.cr',
+      direccion: 'San Juan, Desamparados',
+    })
   })
 
-  it('carga solicitudes al abrir el formulario', async () => {
-    const app = await mountAppRoutes('/admin/abonados/nuevo')
-
-    try {
-      await vi.waitFor(() => {
-        expect(abonadosApi.getSolicitudesPendientes).toHaveBeenCalled()
-      })
-    } finally {
-      await app.cleanup()
-    }
-  })
-
-  it('registra abonado y muestra resumen al enviar el formulario', async () => {
+  it('muestra resumen con nombre, cédula, NIS y medidor tras registrar', async () => {
     const app = await mountAppRoutes('/admin/abonados/nuevo')
 
     try {
@@ -103,21 +90,18 @@ describe('Tarea #341 — integración formulario con backend', () => {
       })
 
       await vi.waitFor(() => {
-        expect(abonadosApi.registerAbonado).toHaveBeenCalled()
         expect(app.container.innerHTML).toContain('Registro completado')
         expect(app.container.innerHTML).toContain('María Rodríguez Mora')
+        expect(app.container.innerHTML).toContain('1-2345-6789')
         expect(app.container.innerHTML).toContain('NIS-2026-001')
+        expect(app.container.innerHTML).toContain('MED-45821')
       })
     } finally {
       await app.cleanup()
     }
   })
 
-  it('muestra error del backend cuando el registro falla', async () => {
-    vi.mocked(abonadosApi.registerAbonado).mockRejectedValue(
-      new Error('HTTP 409: Ya existe un abonado registrado con esa cédula.'),
-    )
-
+  it('ofrece consultar abonado, registrar otro y volver al listado', async () => {
     const app = await mountAppRoutes('/admin/abonados/nuevo')
 
     try {
@@ -129,9 +113,43 @@ describe('Tarea #341 — integración formulario con backend', () => {
       })
 
       await vi.waitFor(() => {
-        expect(app.container.innerHTML).toContain(
-          'Ya existe un abonado registrado con esa cédula.',
-        )
+        expect(app.container.innerHTML).toContain('Consultar abonado')
+        expect(app.container.innerHTML).toContain('Registrar otro abonado')
+        expect(app.container.innerHTML).toContain('Volver al listado')
+      })
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('consulta el abonado creado desde la confirmación', async () => {
+    const app = await mountAppRoutes('/admin/abonados/nuevo')
+
+    try {
+      await fillRegistroForm(app.container)
+
+      const form = app.container.querySelector('form') as HTMLFormElement
+      await act(async () => {
+        form.requestSubmit()
+      })
+
+      await vi.waitFor(() => {
+        expect(app.container.innerHTML).toContain('Consultar abonado')
+      })
+
+      const consultLink = app.container.querySelector<HTMLAnchorElement>(
+        'a[href="/admin/abonados/12"]',
+      )
+      expect(consultLink).not.toBeNull()
+
+      await act(async () => {
+        consultLink?.click()
+      })
+
+      await vi.waitFor(() => {
+        expect(abonadosApi.getAbonadoById).toHaveBeenCalledWith(12)
+        expect(app.container.innerHTML).toContain('María Rodríguez Mora')
+        expect(app.container.innerHTML).toContain('NIS-2026-001')
       })
     } finally {
       await app.cleanup()

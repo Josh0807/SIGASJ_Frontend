@@ -14,6 +14,7 @@ import {
 import { PUBLIC_ROUTES } from './publicRoutes'
 import { ABONADO_ROLE } from '../../modules/auth/utils/internalRoles'
 import AbonadoRegistroPage from '../../modules/abonados/admin/AbonadoRegistroPage'
+import AbonadoConsultaPage from '../../modules/abonados/admin/AbonadoConsultaPage'
 import {
   ABONADO_PERSONAL_NAV_ITEMS,
   toAbonadoPersonalRoutePath,
@@ -87,6 +88,7 @@ const AppRoutes = () => (
               <Route path={segment} element={authorized} key={segment}>
                 <Route index element={element} />
                 <Route path="nuevo" element={<AbonadoRegistroPage />} />
+                <Route path=":id" element={<AbonadoConsultaPage />} />
                 <Route path="*" element={element} />
               </Route>
             )
