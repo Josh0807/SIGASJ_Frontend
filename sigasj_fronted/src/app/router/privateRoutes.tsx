@@ -9,6 +9,7 @@ import ComunicadosAdminPage from '../../modules/comunicados/admin/ComunicadosAdm
 import ContactoAdminPage from '../../modules/contacto/admin/ContactoAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
 import ProfilePage from '../../modules/auth/pages/ProfilePage'
+import AbonadosAdminPage from '../../modules/abonados/admin/AbonadosAdminPage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
 
 export type PrivateRouteDefinition = {
@@ -31,7 +32,7 @@ export type AdminNavItem = {
 const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   dashboard: <AdminDashboard />,
   usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
-  abonados: <PrivateModulePlaceholder title="Gestión de abonados" />,
+  abonados: <AbonadosAdminPage />,
   inventario: <PrivateModulePlaceholder title="Gestión de inventario" />,
   solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
   lecturas: <PrivateModulePlaceholder title="Gestión de lecturas" />,

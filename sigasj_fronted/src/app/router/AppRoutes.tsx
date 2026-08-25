@@ -13,6 +13,7 @@ import {
 } from './privateRoutes'
 import { PUBLIC_ROUTES } from './publicRoutes'
 import { ABONADO_ROLE } from '../../modules/auth/utils/internalRoles'
+import AbonadoRegistroPage from '../../modules/abonados/admin/AbonadoRegistroPage'
 import {
   ABONADO_PERSONAL_NAV_ITEMS,
   toAbonadoPersonalRoutePath,
@@ -85,6 +86,7 @@ const AppRoutes = () => (
             return (
               <Route path={segment} element={authorized} key={segment}>
                 <Route index element={element} />
+                <Route path="nuevo" element={<AbonadoRegistroPage />} />
                 <Route path="*" element={element} />
               </Route>
             )
