@@ -7,7 +7,7 @@ import { usePublicGallery } from './usePublicGallery'
 
 /**
  * Sección pública de la galería fotográfica.
- * Sin `photos` en props consulta el API público (solo activas).
+ * Sin `photos` en props usa la colección de ejemplo.
  * Con `photos` (modo controlado) muestra exactamente esos datos.
  */
 const GallerySection = ({

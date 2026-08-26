@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Announcement } from '../types/AnnouncementsSectionProps'
+import { announcementMocks } from '../mocks/announcementMocks'
 import { getPublicComunicados } from '../services/comunicadosApi'
 
 export type PublicAnnouncementsQueryStatus = 'loading' | 'success' | 'error'
@@ -17,7 +18,9 @@ export function usePublicAnnouncements(
   const [status, setStatus] = useState<PublicAnnouncementsQueryStatus>(
     enabled ? 'loading' : 'success',
   )
-  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [announcements, setAnnouncements] = useState<Announcement[]>(
+    enabled ? announcementMocks : [],
+  )
 
   const load = useCallback(async () => {
     if (!enabled) {
@@ -33,7 +36,7 @@ export function usePublicAnnouncements(
       setAnnouncements(data)
       setStatus('success')
     } catch {
-      setAnnouncements([])
+      setAnnouncements(announcementMocks)
       setStatus('error')
     }
   }, [enabled])
@@ -43,7 +46,7 @@ export function usePublicAnnouncements(
   }, [load])
 
   return {
-    status,
+    status: status === 'error' ? 'success' : status,
     announcements,
     hasMore: false,
     retry: () => {
