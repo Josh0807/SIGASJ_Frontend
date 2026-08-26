@@ -3,9 +3,7 @@ import type { AdminNavItem } from '../../../app/router/privateRoutes'
 import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
 import {
   LANDING_ROUTE_PATH,
-  UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
-import { isAdministrativeAbonadosPath } from './abonadoAccess'
 import {
   ADMIN_MODULE_ACCESS,
   ADMIN_MODULE_ACCESS_BY_SEGMENT,
@@ -168,10 +166,6 @@ export function resolvePostLoginAdminPath(
   requestedPath?: string,
 ): string {
   if (isAbonadoRole(user.role)) {
-    if (requestedPath && isAdministrativeAbonadosPath(requestedPath)) {
-      return UNAUTHORIZED_ROUTE_PATH
-    }
-
     return LANDING_ROUTE_PATH
   }
 

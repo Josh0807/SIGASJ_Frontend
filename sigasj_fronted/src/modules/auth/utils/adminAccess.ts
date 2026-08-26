@@ -4,10 +4,6 @@ import {
 } from '../../../app/router/routePaths'
 import type { AuthUser } from '../types/authUser'
 import {
-  ABONADO_PERSONAL_ROUTE_PATHS,
-  isListedAbonadoPersonalRoute,
-} from './abonadoAccess'
-import {
   canAccessAdminRoute,
   getAllowedRolesForAdminPath,
   getDefaultAdminHomePath,
@@ -83,23 +79,15 @@ export function evaluateRoleAccess(
 
 /**
  * Acceso directo por URL (no usa el menú).
- * - Sin sesión → login, también en rutas personales del Abonado.
- * - Sesión válida de Abonado en ruta administrativa → Acceso denegado (nunca login).
- * - Sesión de Abonado en ruta personal autorizada → allow.
  */
 export function evaluateDirectRouteAccess(
   isAuthenticated: boolean,
   user: AuthUser | null,
   path: string,
   allowedRoles?: readonly string[],
-  personalPaths: readonly string[] = ABONADO_PERSONAL_ROUTE_PATHS,
 ): AdminAccessDecision {
   if (!isAuthenticated || !user) {
     return loginRedirect(path)
-  }
-
-  if (isListedAbonadoPersonalRoute(path, personalPaths)) {
-    return isAbonadoRole(user.role) ? 'allow' : unauthorizedRedirect()
   }
 
   if (isAbonadoRole(user.role)) {
@@ -117,10 +105,6 @@ export function evaluateAdminRouteAccess(
 ): AdminAccessDecision {
   if (!isAuthenticated || !user) {
     return loginRedirect(path)
-  }
-
-  if (isListedAbonadoPersonalRoute(path)) {
-    return isAbonadoRole(user.role) ? 'allow' : unauthorizedRedirect()
   }
 
   if (isAbonadoRole(user.role)) {
