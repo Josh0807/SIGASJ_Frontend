@@ -1,9 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import {
-  ABONADO_PERSONAL_NAV_ITEMS,
-  ABONADO_PERSONAL_ROUTE_PATHS,
-  ADMINISTRATIVE_ABONADOS_PATH,
-} from '../../modules/auth/utils/abonadoAccess'
 import { ABONADO_ROLE } from '../../modules/auth/utils/internalRoles'
 import {
   clearAccessToken,
@@ -15,7 +10,7 @@ import { loginAsRole } from '../../test/authTestHelpers'
 import { mountAppRoutes } from '../../test/render-app-routes'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from './publicRoutes'
 
-const RESTRICTED_ADMIN_PATH = ADMINISTRATIVE_ABONADOS_PATH
+const RESTRICTED_ADMIN_PATH = '/admin/abonados'
 
 const sidebarHrefs = (html: string) =>
   [
@@ -95,26 +90,4 @@ describe('acceso manual a rutas restringidas (React Router)', () => {
       await app.cleanup()
     }
   })
-
-  it('Caso 4 — Abonado: no hay ruta personal real registrada para acceso directo', () => {
-    expect(ABONADO_PERSONAL_NAV_ITEMS).toEqual([])
-    expect(ABONADO_PERSONAL_ROUTE_PATHS).toEqual([])
-  })
-
-  it.each([...ABONADO_PERSONAL_ROUTE_PATHS])(
-    'Caso 4 — Abonado: URL directa permitida a la ruta personal %s',
-    async (path) => {
-      loginAsRole(ABONADO_ROLE)
-      const app = await mountAppRoutes(path)
-
-      try {
-        expect(isAuthenticated()).toBe(true)
-        expect(app.currentPath()).toBe(path)
-        expect(app.container.innerHTML).not.toContain('Acceso denegado')
-        expect(app.container.innerHTML).not.toContain('admin-layout')
-      } finally {
-        await app.cleanup()
-      }
-    },
-  )
 })

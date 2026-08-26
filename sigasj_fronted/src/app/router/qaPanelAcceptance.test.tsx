@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ADMIN_HOME_PATH,
 } from './privateRoutes'
@@ -35,11 +35,22 @@ describe('QA — Tarea 1: sesión válida, panel y dashboard', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
   })
 
   it('permite ingresar, muestra layout, nombre/rol, dashboard y conserva sesión al recargar', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          accessToken: 'token-admin-test',
+          user: { id: '1', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+        }),
+      }),
+    )
     const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
     try {

@@ -1,6 +1,6 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import {
   clearAccessToken,
@@ -81,6 +81,7 @@ const submitLogin = async (container: HTMLElement) => {
 
   await act(async () => {
     form?.requestSubmit()
+    await new Promise((resolve) => setTimeout(resolve, 50))
   })
 }
 
@@ -116,9 +117,20 @@ const logoutFromAccountMenu = async (container: HTMLElement) => {
 describe('protección de rutas administrativas después del logout', () => {
   beforeEach(() => {
     clearAccessToken()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          accessToken: 'local-administradora-session',
+          user: { id: '1', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+        }),
+      }),
+    )
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
   })

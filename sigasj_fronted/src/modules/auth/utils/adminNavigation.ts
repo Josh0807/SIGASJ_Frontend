@@ -70,12 +70,12 @@ export function userHasAllowedRole(
   user: AuthUser | null,
   allowedRoles: readonly string[],
 ): boolean {
-  const userRole = normalizeInternalRole(user?.role)
-  if (!userRole || allowedRoles.length === 0) {
+  if (!user?.role || allowedRoles.length === 0) {
     return false
   }
 
-  return allowedRoles.some((allowed) => normalizeInternalRole(allowed) === userRole)
+  const normalizedUserRole = user.role.trim().toLowerCase()
+  return allowedRoles.some((allowed) => allowed.trim().toLowerCase() === normalizedUserRole)
 }
 
 const normalizeAdminPath = (path: string): string =>

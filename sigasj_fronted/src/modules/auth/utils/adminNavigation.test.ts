@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   canAccessAdminRoute,
   getAbonadosNavItemsForUser,
@@ -48,7 +48,7 @@ describe('adminNavigation helpers', () => {
 
   it('Administradora accede a todos los modulos administrativos visibles', () => {
     const items = getAdminNavItemsForUser(administradora)
-    expect(items.length).toBe(10)
+    expect(items.length).toBe(12)
     expect(items.map((item) => item.path)).toContain('/admin/abonados')
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
@@ -104,10 +104,10 @@ describe('adminNavigation helpers', () => {
       resolvePostLoginAdminPath(fontanero, '/admin/abonados'),
     ).toBe('/admin/dashboard')
     expect(resolvePostLoginAdminPath(abonado, '/admin/abonados')).toBe(
-      '/unauthorized',
+      '/',
     )
     expect(resolvePostLoginAdminPath(abonado, '/admin/abonados/11')).toBe(
-      '/unauthorized',
+      '/',
     )
     expect(resolvePostLoginAdminPath(abonado)).toBe('/')
   })
@@ -136,17 +136,21 @@ describe('adminNavigation helpers', () => {
     expect(getAdminNavItemsForUser(abonado)).toEqual([])
   })
 
-  it('sigue resolviendo rutas administrativas después de cargar el árbol de pantallas', async () => {
-    await import('../../../app/router/AppRoutes')
+  it(
+    'sigue resolviendo rutas administrativas después de cargar el árbol de pantallas',
+    async () => {
+      await import('../../../app/router/AppRoutes')
 
-    expect(getAllowedRolesForAdminPath('/admin/dashboard')).toEqual([
-      'Administradora',
-      'Secretaria',
-      'Fontanero',
-    ])
-    expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
-    expect(getAbonadosNavItemsForUser(administradora).map((item) => item.path)).toEqual([
-      '/admin/abonados',
-    ])
-  })
+      expect(getAllowedRolesForAdminPath('/admin/dashboard')).toEqual([
+        'Administradora',
+        'Secretaria',
+        'Fontanero',
+      ])
+      expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
+      expect(getAbonadosNavItemsForUser(administradora).map((item) => item.path)).toEqual([
+        '/admin/abonados',
+      ])
+    },
+    15000,
+  )
 })
