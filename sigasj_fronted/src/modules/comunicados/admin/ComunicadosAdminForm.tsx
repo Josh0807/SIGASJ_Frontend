@@ -28,7 +28,7 @@ const ComunicadosAdminForm = ({
     setValues(initialValues)
     setFile(null)
     setFormError(null)
-  }, [mode])
+  }, [initialValues, mode])
 
   useEffect(() => {
     if (!file) {

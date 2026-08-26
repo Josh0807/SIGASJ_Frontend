@@ -24,6 +24,10 @@ const AnnouncementCard = ({
   const safeContent = typeof content === 'string' ? content.trim() : ''
   const bodyText = safeSummary || safeContent
 
+  if (!bodyText) {
+    return null
+  }
+
   const safeType = typeof type === 'string' ? type.trim() : ''
   const safeImageUrl = asPublicAssetUrl(imageUrl)
   const safeFileUrl = asPublicAssetUrl(fileUrl)
@@ -94,9 +98,7 @@ const AnnouncementCard = ({
           {safeTitle}
         </h3>
 
-        {bodyText ? (
-          <p className="announcements-section__summary">{bodyText}</p>
-        ) : null}
+        <p className="announcements-section__summary">{bodyText}</p>
 
         <footer className="announcements-section__card-actions">
           {safeImageUrl ? (

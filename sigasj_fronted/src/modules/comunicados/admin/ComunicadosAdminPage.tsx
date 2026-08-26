@@ -4,9 +4,7 @@ import ComunicadosAdminForm from './ComunicadosAdminForm'
 import { emptyComunicadoFormValues, type ComunicadoFormValues } from './types'
 import {
   createComunicado,
-  deleteComunicado,
   getAdminComunicados,
-  setComunicadoEstado,
   updateComunicado,
   type AdminComunicado,
 } from '../services/comunicadosApi'
@@ -14,18 +12,8 @@ import {
 const toDateInput = (value?: string | null) =>
   value ? value.slice(0, 10) : ''
 
-const toIsoDate = (value: string) => {
-  if (!value) {
-    return ''
-  }
-
-  const today = new Date().toISOString().slice(0, 10)
-  if (value === today) {
-    return new Date().toISOString()
-  }
-
-  return new Date(`${value}T12:00:00`).toISOString()
-}
+const toIsoDate = (value: string) =>
+  value ? new Date(`${value}T12:00:00`).toISOString() : ''
 
 const ComunicadosAdminPage = () => {
   const [items, setItems] = useState<AdminComunicado[]>([])
@@ -90,7 +78,6 @@ const ComunicadosAdminPage = () => {
         await createComunicado(payload, file)
       } else if (editingItem) {
         await updateComunicado(editingItem.id, payload, file)
-        await setComunicadoEstado(editingItem.id, payload.estado)
       }
 
       closeForm()
@@ -101,38 +88,22 @@ const ComunicadosAdminPage = () => {
   }
 
   const handleToggleEstado = async (item: AdminComunicado) => {
-    setError(null)
-
-    try {
-      const updated = await setComunicadoEstado(
-        item.id,
-        item.estado === 'Activo' ? 'Inactivo' : 'Activo',
-      )
-      setItems((current) =>
-        current.map((row) => (row.id === updated.id ? updated : row)),
-      )
-    } catch {
-      setError('No fue posible cambiar el estado del comunicado.')
-    }
-  }
-
-  const handleDelete = async (item: AdminComunicado) => {
-    const confirmed = window.confirm(
-      `¿Eliminar el comunicado «${item.titulo}»? Esta acción no se puede deshacer.`,
+    await updateComunicado(
+      item.id,
+      {
+        titulo: item.titulo,
+        descripcion: item.descripcion,
+        contenido: item.contenido ?? '',
+        tipo: item.tipo,
+        prioridad: item.prioridad,
+        estado: item.estado === 'Activo' ? 'Inactivo' : 'Activo',
+        esPublico: item.esPublico,
+        fechaPublicacion: item.fechaPublicacion,
+        fechaExpiracion: item.fechaExpiracion ?? '',
+      },
+      null,
     )
-
-    if (!confirmed) {
-      return
-    }
-
-    setError(null)
-
-    try {
-      await deleteComunicado(item.id)
-      setItems((current) => current.filter((row) => row.id !== item.id))
-    } catch {
-      setError('No fue posible eliminar el comunicado.')
-    }
+    await loadItems()
   }
 
   const formInitialValues: ComunicadoFormValues =
@@ -205,7 +176,6 @@ const ComunicadosAdminPage = () => {
 
         {formMode !== 'hidden' ? (
           <ComunicadosAdminForm
-            key={`${formMode}-${editingItem?.id ?? 'nuevo'}`}
             mode={formMode}
             initialValues={formInitialValues}
             currentImageUrl={editingItem?.imagenUrl}
@@ -215,15 +185,13 @@ const ComunicadosAdminPage = () => {
           />
         ) : null}
 
-        {error ? (
-          <p className="gallery-admin__empty" role="alert">
-            {error}
-          </p>
-        ) : null}
-
         {loading ? (
           <p className="gallery-admin__empty" role="status">
             Cargando comunicados…
+          </p>
+        ) : error ? (
+          <p className="gallery-admin__empty" role="alert">
+            {error}
           </p>
         ) : visibleItems.length === 0 ? (
           <p className="gallery-admin__empty" role="status">
@@ -254,13 +222,6 @@ const ComunicadosAdminPage = () => {
                   </button>
                   <button type="button" onClick={() => void handleToggleEstado(item)}>
                     {item.estado === 'Activo' ? 'Desactivar' : 'Activar'}
-                  </button>
-                  <button
-                    type="button"
-                    className="gallery-admin__danger"
-                    onClick={() => void handleDelete(item)}
-                  >
-                    Eliminar
                   </button>
                 </div>
               </article>

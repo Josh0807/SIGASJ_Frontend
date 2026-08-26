@@ -61,21 +61,11 @@ export const mapPublicAnnouncement = (item: AdminComunicado): Announcement => ({
 
 export async function getPublicComunicados(): Promise<Announcement[]> {
   const data = await fetchPublicApi<AdminComunicado[]>(PUBLIC_PATHS)
-  return (Array.isArray(data) ? data : [])
-    .filter(
-      (item) =>
-        item.estado !== 'Inactivo' && item.esPublico !== false && Boolean(item.titulo),
-    )
-    .sort((left, right) => {
-      const rightTime = Date.parse(right.fechaPublicacion) || 0
-      const leftTime = Date.parse(left.fechaPublicacion) || 0
-      return rightTime - leftTime
-    })
-    .map(mapPublicAnnouncement)
+  return (Array.isArray(data) ? data : []).map(mapPublicAnnouncement)
 }
 
 export async function getAdminComunicados(): Promise<AdminComunicado[]> {
-  const data = await fetchWithAuth<AdminComunicado[]>(ADMIN_PATHS[0])
+  const data = await fetchPublicApi<AdminComunicado[]>(ADMIN_PATHS)
   return Array.isArray(data) ? data : []
 }
 
@@ -85,7 +75,7 @@ export async function createComunicado(
 ): Promise<AdminComunicado> {
   return fetchWithAuth<AdminComunicado>(ADMIN_PATHS[0], {
     method: 'POST',
-    body: file ? toFormData(payload, file) : JSON.stringify(payload),
+    body: toFormData(payload, file),
   })
 }
 
@@ -96,20 +86,6 @@ export async function updateComunicado(
 ): Promise<AdminComunicado> {
   return fetchWithAuth<AdminComunicado>(`${ADMIN_PATHS[0]}/${id}`, {
     method: 'PATCH',
-    body: file ? toFormData(payload, file) : JSON.stringify(payload),
-  })
-}
-
-export async function deleteComunicado(id: string): Promise<void> {
-  await fetchWithAuth(`${ADMIN_PATHS[0]}/${id}`, { method: 'DELETE' })
-}
-
-export async function setComunicadoEstado(
-  id: string,
-  estado: 'Activo' | 'Inactivo',
-): Promise<AdminComunicado> {
-  return fetchWithAuth<AdminComunicado>(`${ADMIN_PATHS[0]}/${id}/estado`, {
-    method: 'PATCH',
-    body: JSON.stringify({ estado }),
+    body: toFormData(payload, file),
   })
 }
