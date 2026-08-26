@@ -219,6 +219,7 @@ const mountApp = async (path: string): Promise<MountedApp> => {
 
       await act(async () => {
         submit?.click()
+        await new Promise((resolve) => setTimeout(resolve, 50))
       })
     },
     openAccountMenu: async () => {
@@ -282,6 +283,7 @@ const mountInteractiveApp = async (
 
     await act(async () => {
       form?.requestSubmit()
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
   }
 
@@ -335,9 +337,20 @@ const mountInteractiveApp = async (
 describe('Cerrar sesión — pruebas funcionales', () => {
   beforeEach(() => {
     clearAccessToken()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          accessToken: 'local-administradora-session',
+          user: { id: 'demo-user-id', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+        }),
+      }),
+    )
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
     vi.restoreAllMocks()

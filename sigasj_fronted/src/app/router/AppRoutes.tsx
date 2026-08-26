@@ -60,7 +60,7 @@ const AppRoutes = () => (
           )
 
           return (
-            <Route path={segment} element={authorized} key={segment} />
+            <Route path={`${segment}/*`} element={authorized} key={segment} />
           )
         })}
         <Route path="*" element={<AdminFallbackRedirect />} />

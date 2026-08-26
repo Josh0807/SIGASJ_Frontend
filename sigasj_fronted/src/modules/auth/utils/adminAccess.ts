@@ -90,6 +90,10 @@ export function evaluateDirectRouteAccess(
     return loginRedirect(path)
   }
 
+  if (allowedRoles && userHasAllowedRole(user, allowedRoles)) {
+    return 'allow'
+  }
+
   if (isAbonadoRole(user.role)) {
     return unauthorizedRedirect()
   }

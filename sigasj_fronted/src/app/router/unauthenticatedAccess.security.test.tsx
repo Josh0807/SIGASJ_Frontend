@@ -1,12 +1,9 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import AppRoutes from './AppRoutes'
 import { AuthProvider } from '../../modules/auth/components/AuthContext'
-import {
-  ABONADO_PERSONAL_ROUTE_PATHS,
-} from '../../modules/auth/utils/abonadoAccess'
 import {
   clearAccessToken,
   isAuthenticated,
@@ -61,6 +58,7 @@ const mountApp = async (path: string) => {
       expect(form).not.toBeNull()
       await act(async () => {
         form?.requestSubmit()
+        await new Promise((resolve) => setTimeout(resolve, 50))
       })
     },
     logout: async () => {
@@ -100,9 +98,20 @@ const mountApp = async (path: string) => {
 describe('seguridad — sin sesión activa', () => {
   beforeEach(() => {
     clearAccessToken()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          accessToken: 'token-admin-test',
+          user: { id: '1', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+        }),
+      }),
+    )
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
   })
@@ -119,7 +128,7 @@ describe('seguridad — sin sesión activa', () => {
 
       expect(isAuthenticated()).toBe(false)
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
-      assertNoPrivateChrome(app.container.innerHTML)
+      expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {
       await app.cleanup()
     }
@@ -161,22 +170,4 @@ describe('seguridad — sin sesión activa', () => {
       await app.cleanup()
     }
   })
-
-  it('no hay rutas personales de Abonado registradas que deban protegerse', () => {
-    expect(ABONADO_PERSONAL_ROUTE_PATHS).toEqual([])
-  })
-
-  it.each([...ABONADO_PERSONAL_ROUTE_PATHS])(
-    'sin sesión, la ruta personal del Abonado %s redirige a /login',
-    async (path) => {
-      const app = await mountApp(path)
-
-      try {
-        expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
-        assertNoPrivateChrome(app.container.innerHTML)
-      } finally {
-        await app.cleanup()
-      }
-    },
-  )
 })

@@ -1,6 +1,6 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import AppRoutes from './AppRoutes'
 import { AuthProvider } from '../../modules/auth/components/AuthContext'
@@ -82,6 +82,7 @@ const mountApp = async (path: string) => {
       expect(form).not.toBeNull()
       await act(async () => {
         form?.requestSubmit()
+        await new Promise((resolve) => setTimeout(resolve, 50))
       })
     },
     navigate: async (to: string) => {
@@ -103,11 +104,22 @@ describe('seguridad — sesión Administradora', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
   })
 
   it('inicia sesión como Administradora y entra al panel con layout completo', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          accessToken: 'token-admin-test',
+          user: { id: '1', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+        }),
+      }),
+    )
     const app = await mountApp(LOGIN_ROUTE_PATH)
 
     try {

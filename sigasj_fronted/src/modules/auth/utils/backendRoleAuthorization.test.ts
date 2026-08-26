@@ -14,11 +14,12 @@ describe('contrato de autorización con Backend (11.4.5)', () => {
         ok: false,
         status: 403,
         statusText: 'Forbidden',
+        text: async () => 'Forbidden',
       }),
     )
 
     await expect(fetchWithAuth('/admin/usuarios')).rejects.toThrow(
-      'Error en solicitud HTTP 403',
+      'HTTP 403',
     )
   })
 

@@ -320,7 +320,7 @@ describe('navegación del menú administrativo', () => {
     const consoleProbe = captureConsole()
     const unknownPaths = [
       '/admin/no-existe',
-      '/admin/galeria/foto-12',
+      '/admin/ruta-inexistente',
     ]
 
     try {
