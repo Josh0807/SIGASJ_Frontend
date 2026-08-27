@@ -23,6 +23,7 @@ const ICONS: Record<AdminNavIconName, string> = {
   lecturas: 'M4.5 15.5h11 M6 15.5V8.5 M10 15.5V5.5 M14 15.5v-4',
   averias: 'M10 3.8 3.8 16.2h12.4z M10 8.5v3.2 M10 14.2h.01',
   reportes: 'M5.5 4.5h6l3 3v8H5.5z M11.5 4.5v3h3 M7.5 11h5 M7.5 13.5h3.5',
+  proyectos: 'M3.5 16.5V7.5L10 3.5l6.5 4v9H3.5z M7 16.5v-4.5h6v4.5 M10 7.2h.01',
   galeria: 'M4 5.5h12v9H4z M4 12.2l3.2-3.2 2.8 2.8 2-2 3.5 3.5 M8 8.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
   comunicados: 'M4.5 5.5h11v9H4.5z M7 8h6 M7 10.5h4.5',
   contacto: 'M10 10.8a3 3 0 1 0 0-4.6 3 3 0 0 0 0 4.6z M4.8 16.2c1.1-2.4 3-3.6 5.2-3.6s4.1 1.2 5.2 3.6',

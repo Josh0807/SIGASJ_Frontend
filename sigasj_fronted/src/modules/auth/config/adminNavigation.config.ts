@@ -138,6 +138,13 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     availableInNav: true,
   },
   {
+    segment: 'proyectos',
+    title: 'Gestión de Proyectos',
+    allowedRoles: [InternalAdminRoleName.Administradora],
+    requiredPermissions: ['projects.manage'],
+    availableInNav: true,
+  },
+  {
     segment: 'galeria',
     title: 'Galería de fotografías',
     allowedRoles: [

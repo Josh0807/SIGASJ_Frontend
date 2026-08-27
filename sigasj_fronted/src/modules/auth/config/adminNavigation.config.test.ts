@@ -33,12 +33,15 @@ describe('adminNavigation.config', () => {
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
   })
 
-  it('restringe usuarios y reportes a Administradora', () => {
+  it('restringe usuarios, reportes y proyectos a Administradora', () => {
     const usuarios = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'usuarios')
     const reportes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'reportes')
+    const proyectos = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'proyectos')
 
     expect(usuarios?.allowedRoles).toEqual(['Administradora'])
     expect(reportes?.allowedRoles).toEqual(['Administradora'])
+    expect(proyectos?.allowedRoles).toEqual(['Administradora'])
+    expect(proyectos?.requiredPermissions).toEqual(['projects.manage'])
   })
 
   it('autoriza a Administradora en Gestión de abonados (ruta y menú)', () => {

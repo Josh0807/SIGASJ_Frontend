@@ -53,4 +53,21 @@ describe('httpClient (fetchWithAuth)', () => {
       'HTTP 500: Internal Server Error',
     )
   })
+
+  it('serializa activo=false en la query y no lo omite', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ data: [] }),
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    await fetchWithAuth('/v1/admin/proyectos', {
+      params: { activo: false, page: 1 },
+    })
+
+    const [url] = mockFetch.mock.calls[0] as [string]
+    expect(url).toContain('activo=false')
+    expect(url).toContain('page=1')
+  })
 })

@@ -71,6 +71,7 @@ describe('route configuration', () => {
         '/admin/lecturas',
         '/admin/averias',
         '/admin/reportes',
+        '/admin/proyectos',
         '/admin/galeria',
         '/admin/comunicados',
         '/admin/contacto',
@@ -133,6 +134,9 @@ describe('route configuration', () => {
     expect(paths).toContain('/admin/comunicados')
     expect(navPaths).toContain('/admin/comunicados')
     expect(segments).toContain('comunicados')
+    expect(paths).toContain('/admin/proyectos')
+    expect(navPaths).toContain('/admin/proyectos')
+    expect(segments).toContain('proyectos')
     expect(paths).toContain('/admin/contacto')
     expect(paths).not.toContain('/admin/abonados/:id')
     expect(paths).not.toContain('/admin/abonados/me')
