@@ -44,7 +44,7 @@ describe('acceso manual a rutas restringidas (React Router)', () => {
       expect(app.currentPath()).toBe(RESTRICTED_ADMIN_PATH)
       expect(app.currentPath()).not.toBe(UNAUTHORIZED_ROUTE_PATH)
       expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
-      expect(app.container.innerHTML).toContain('Gestión de abonados')
+      expect(app.container.innerHTML).toContain('Gestión de asociados')
       expect(app.container.innerHTML).toContain('admin-layout')
       expect(app.container.innerHTML).not.toContain('Acceso denegado')
     } finally {
@@ -66,7 +66,7 @@ describe('acceso manual a rutas restringidas (React Router)', () => {
         'No tiene permisos para acceder a esta sección.',
       )
       expect(app.container.innerHTML).not.toContain('Iniciar sesión')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('admin-layout')
       expect(app.container.innerHTML).not.toContain('admin-sidebar')
       expect(sidebarHrefs(app.container.innerHTML)).toEqual([])
@@ -84,7 +84,7 @@ describe('acceso manual a rutas restringidas (React Router)', () => {
       expect(app.currentPath()).not.toBe(UNAUTHORIZED_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Iniciar sesión')
       expect(app.container.innerHTML).not.toContain('Acceso denegado')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {
       await app.cleanup()

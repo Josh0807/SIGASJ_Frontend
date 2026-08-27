@@ -80,7 +80,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   },
   {
     segment: 'abonados',
-    title: 'Gestión de abonados',
+    title: 'Gestión de asociados',
     // Abonado no está aquí: no ve el padrón ni entra por URL. No hay pantallas personales en este módulo.
     allowedRoles: [
       InternalAdminRoleName.Administradora,
@@ -111,7 +111,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   },
   {
     segment: 'lecturas',
-    title: 'Gestión de lecturas',
+    title: 'Recursos Humanos',
     allowedRoles: [
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
@@ -201,6 +201,6 @@ export const ADMIN_MODULE_ACCESS_BY_SEGMENT = Object.fromEntries(
   ADMIN_MODULE_ACCESS.map((module) => [module.segment, module]),
 ) as Record<AdminNavIconName, AdminModuleAccessDefinition>
 
-/** Roles del grupo de rutas de Gestión de Abonados (fuente única para el guard). */
+/** Roles del grupo de rutas de Gestión de asociados (fuente única para el guard). */
 export const ABONADOS_ALLOWED_ROLES =
   ADMIN_MODULE_ACCESS_BY_SEGMENT.abonados.allowedRoles

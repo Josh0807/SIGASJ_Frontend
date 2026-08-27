@@ -48,10 +48,10 @@ export const INTERNAL_ROLES_UNDER_TEST: InternalAdminRole[] = [
 export const SAMPLE_ALLOWED_CONTENT: Record<string, string> = {
   '/admin/dashboard': 'Dashboard administrativo',
   '/admin/usuarios': 'Gestión de usuarios',
-  '/admin/abonados': 'Gestión de abonados',
+  '/admin/abonados': 'Gestión de asociados',
   '/admin/inventario': 'Gestión de inventario',
   '/admin/solicitudes': 'Gestión de solicitudes',
-  '/admin/lecturas': 'Gestión de lecturas',
+  '/admin/lecturas': 'Recursos Humanos',
   '/admin/averias': 'Gestión de averías',
   '/admin/reportes': 'Gestión de reportes',
   '/admin/proyectos': 'Gestión de Proyectos',

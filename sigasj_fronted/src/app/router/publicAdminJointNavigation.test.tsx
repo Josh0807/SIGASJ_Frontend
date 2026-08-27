@@ -194,7 +194,7 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(app.container.innerHTML).toContain('admin-layout')
       expect(app.container.innerHTML).toContain('admin-sidebar')
       expect(app.container.innerHTML).toContain('admin-header')
-      expect(outletTitle(app.container)).toBe('Gestión de abonados')
+      expect(outletTitle(app.container)).toBe('Gestión de asociados')
 
       const toAverias = await clickHref(app.container, '/admin/averias')
       expect(toAverias.defaultPrevented).toBe(true)
@@ -228,7 +228,7 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       expect(app.snapshots.every((html) => !hasAdminChrome(html))).toBe(true)
       expect(app.container.innerHTML).toContain('auth-page')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.errors).toEqual([])
       expect(app.warnings).toEqual([])
     } finally {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ADMIN_MODULE_ACCESS } from '../config/adminNavigation.config'
 import {
   canAccessAdminRoute,
   getAbonadosNavItemsForUser,
@@ -48,11 +49,15 @@ describe('adminNavigation helpers', () => {
 
   it('Administradora accede a todos los modulos administrativos visibles', () => {
     const items = getAdminNavItemsForUser(administradora)
-    expect(items.length).toBe(12)
+    const visibleCount = ADMIN_MODULE_ACCESS.filter((module) => module.availableInNav)
+      .length
+    expect(items.length).toBe(visibleCount)
     expect(items.map((item) => item.path)).toContain('/admin/abonados')
+    expect(items.map((item) => item.path)).toContain('/admin/proyectos')
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(true)
+    expect(canAccessAdminRoute(administradora, '/admin/proyectos')).toBe(true)
   })
 
   it('Secretaria no ve usuarios ni reportes', () => {
@@ -85,7 +90,7 @@ describe('adminNavigation helpers', () => {
     expect(canAccessAdminRoute(abonado, '/admin/perfil')).toBe(false)
   })
 
-  it('un sufijo en la URL no abre Gestión de Abonados a Fontanero ni Abonado', () => {
+  it('un sufijo en la URL no abre Gestión de asociados a Fontanero ni Abonado', () => {
     expect(canAccessAdminRoute(fontanero, '/admin/abonados/11')).toBe(false)
     expect(canAccessAdminRoute(abonado, '/admin/abonados/11')).toBe(false)
   })
@@ -112,7 +117,7 @@ describe('adminNavigation helpers', () => {
     expect(resolvePostLoginAdminPath(abonado)).toBe('/')
   })
 
-  it('reconoce el rol Administradora del backend y abre Gestión de abonados', () => {
+  it('reconoce el rol Administradora del backend y abre Gestión de asociados', () => {
     const fromBackend = { role: 'ADMINISTRADORA', id: '10' }
 
     expect(canAccessAdminRoute(fromBackend, '/admin/abonados')).toBe(true)
@@ -121,7 +126,7 @@ describe('adminNavigation helpers', () => {
     ).toContain('/admin/abonados')
   })
 
-  it('muestra Gestión de Abonados en el menú solo a roles con permiso definido', () => {
+  it('muestra Gestión de asociados en el menú solo a roles con permiso definido', () => {
     expect(getAbonadosNavItemsForUser(administradora).map((item) => item.path)).toEqual([
       '/admin/abonados',
     ])

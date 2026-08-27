@@ -44,10 +44,10 @@ describe('adminNavigation.config', () => {
     expect(proyectos?.requiredPermissions).toEqual(['projects.manage'])
   })
 
-  it('autoriza a Administradora en Gestión de abonados (ruta y menú)', () => {
+  it('autoriza a Administradora en Gestión de asociados (ruta y menú)', () => {
     const abonados = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'abonados')
 
-    expect(abonados?.title).toBe('Gestión de abonados')
+    expect(abonados?.title).toBe('Gestión de asociados')
     expect(abonados?.allowedRoles).toContain(InternalAdminRoleName.Administradora)
     expect(abonados?.availableInNav).toBe(true)
     expect(abonados?.requiredPermissions).toContain('subscribers.read')

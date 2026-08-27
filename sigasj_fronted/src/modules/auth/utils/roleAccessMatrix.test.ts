@@ -60,7 +60,7 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     ])
   })
 
-  it('Gestión de Abonados aparece en el menú solo con permiso definido', () => {
+  it('Gestión de asociados aparece en el menú solo con permiso definido', () => {
     expect(EXPECTED_NAV_PATHS.Administradora).toContain('/admin/abonados')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/abonados')
     expect(EXPECTED_NAV_PATHS.Fontanero).not.toContain('/admin/abonados')

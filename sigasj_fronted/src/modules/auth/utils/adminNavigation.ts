@@ -144,7 +144,7 @@ export function getAdminNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
   }))
 }
 
-/** Opciones de menú de Gestión de Abonados según el rol autenticado. */
+/** Opciones de menú de Gestión de asociados según el rol autenticado. */
 export function getAbonadosNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
   return getAdminNavItemsForUser(user).filter(
     (item) => item.path === `${ADMIN_BASE_PATH}/abonados`,

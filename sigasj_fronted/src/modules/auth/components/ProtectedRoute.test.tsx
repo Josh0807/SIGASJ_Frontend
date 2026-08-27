@@ -15,7 +15,7 @@ describe('ProtectedRoute', () => {
     document.body.innerHTML = ''
   })
 
-  it('sin sesión no muestra Gestión de Abonados y redirige a /login', async () => {
+  it('sin sesión no muestra Gestión de asociados y redirige a /login', async () => {
     const container = document.createElement('div')
     document.body.appendChild(container)
     const root = createRoot(container)
@@ -28,7 +28,7 @@ describe('ProtectedRoute', () => {
               path="/admin/abonados"
               element={
                 <ProtectedRoute>
-                  <p>Gestión de abonados</p>
+                  <p>Gestión de asociados</p>
                 </ProtectedRoute>
               }
             />
@@ -39,7 +39,7 @@ describe('ProtectedRoute', () => {
     })
 
     expect(container.textContent).toContain('Iniciar sesión')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
   })
 
   it('con sesión válida deja continuar (la autorización por rol es un paso posterior)', async () => {
@@ -58,7 +58,7 @@ describe('ProtectedRoute', () => {
               path="/admin/abonados"
               element={
                 <ProtectedRoute>
-                  <p>Gestión de abonados</p>
+                  <p>Gestión de asociados</p>
                 </ProtectedRoute>
               }
             />
@@ -68,7 +68,7 @@ describe('ProtectedRoute', () => {
       )
     })
 
-    expect(container.textContent).toContain('Gestión de abonados')
+    expect(container.textContent).toContain('Gestión de asociados')
     expect(container.textContent).not.toContain('Iniciar sesión')
   })
 
@@ -108,7 +108,7 @@ describe('ProtectedRoute', () => {
     expect(container.textContent).not.toContain('Panel protegido')
   })
 
-  it('invalida Gestión de Abonados al cerrar sesión sin desmontar ProtectedRoute', async () => {
+  it('invalida Gestión de asociados al cerrar sesión sin desmontar ProtectedRoute', async () => {
     setAccessToken('token-demo')
     setAuthUser({ name: 'Ana', role: 'Administradora' })
 
@@ -124,7 +124,7 @@ describe('ProtectedRoute', () => {
               path="/admin/abonados"
               element={
                 <ProtectedRoute>
-                  <p>Gestión de abonados</p>
+                  <p>Gestión de asociados</p>
                 </ProtectedRoute>
               }
             />
@@ -134,17 +134,17 @@ describe('ProtectedRoute', () => {
       )
     })
 
-    expect(container.textContent).toContain('Gestión de abonados')
+    expect(container.textContent).toContain('Gestión de asociados')
 
     await act(async () => {
       clearAccessToken()
     })
 
     expect(container.textContent).toContain('Iniciar sesión')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
   })
 
-  it('al usar Atrás hacia Gestión de Abonados sin sesión no muestra contenido privado', async () => {
+  it('al usar Atrás hacia Gestión de asociados sin sesión no muestra contenido privado', async () => {
     clearAccessToken()
 
     const router = createMemoryRouter(
@@ -153,7 +153,7 @@ describe('ProtectedRoute', () => {
           path: '/admin/abonados',
           element: (
             <ProtectedRoute>
-              <p>Gestión de abonados</p>
+              <p>Gestión de asociados</p>
             </ProtectedRoute>
           ),
         },
@@ -181,6 +181,6 @@ describe('ProtectedRoute', () => {
 
     expect(router.state.location.pathname).toBe('/login')
     expect(container.textContent).toContain('Iniciar sesión')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
   })
 })

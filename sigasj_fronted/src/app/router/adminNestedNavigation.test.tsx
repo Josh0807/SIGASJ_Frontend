@@ -210,9 +210,9 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(app.container.querySelector('.admin-header')).toBe(header)
       expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(hasAdminChrome(app.container)).toBe(true)
-      expect(outletTitle(app.container)).toBe('Gestión de abonados')
+      expect(outletTitle(app.container)).toBe('Gestión de asociados')
       expect(header?.textContent).toContain('Panel administrativo')
-      expect(header?.textContent).not.toContain('Gestión de abonados')
+      expect(header?.textContent).not.toContain('Gestión de asociados')
       expect(sidebar?.querySelector('h1')).toBeNull()
 
       const secondClick = await app.clickSidebarLink('/admin/averias')
@@ -242,7 +242,7 @@ describe('navegación de rutas administrativas anidadas', () => {
     try {
       expect(app.currentPath()).toBe('/admin/abonados')
       expect(hasAdminChrome(app.container)).toBe(true)
-      expect(outletTitle(app.container)).toBe('Gestión de abonados')
+      expect(outletTitle(app.container)).toBe('Gestión de asociados')
       expect(app.container.querySelector('.admin-sidebar h1')).toBeNull()
     } finally {
       await app.cleanup()

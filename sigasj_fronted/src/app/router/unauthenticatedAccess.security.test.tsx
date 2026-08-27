@@ -14,7 +14,7 @@ import { LOGIN_ROUTE_PATH } from './publicRoutes'
 
 const UNAUTHENTICATED_PRIVATE_PATHS = [
   { label: 'ruta administrativa principal', path: ADMIN_HOME_PATH },
-  { label: 'Gestión de Abonados', path: '/admin/abonados' },
+  { label: 'Gestión de asociados', path: '/admin/abonados' },
   { label: 'ruta hija privada existente', path: '/admin/galeria' },
   { label: 'perfil interno privado', path: ADMIN_PROFILE_PATH },
 ] as const
@@ -23,7 +23,7 @@ const assertNoPrivateChrome = (html: string) => {
   expect(html).not.toContain('admin-layout')
   expect(html).not.toContain('admin-sidebar')
   expect(html).not.toContain('admin-header')
-  expect(html).not.toContain('Gestión de abonados')
+  expect(html).not.toContain('Gestión de asociados')
   expect(html).not.toContain('Dashboard administrativo')
   expect(html).not.toContain('Galería de fotografías')
   expect(html).toContain('Iniciar sesión')

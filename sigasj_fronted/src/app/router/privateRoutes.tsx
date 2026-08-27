@@ -32,10 +32,10 @@ export type AdminNavItem = {
 const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   dashboard: <AdminDashboard />,
   usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
-  abonados: <PrivateModulePlaceholder title="Gestión de abonados" />,
+  abonados: <PrivateModulePlaceholder title="Gestión de asociados" />,
   inventario: <PrivateModulePlaceholder title="Gestión de inventario" />,
   solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
-  lecturas: <PrivateModulePlaceholder title="Gestión de lecturas" />,
+  lecturas: <PrivateModulePlaceholder title="Recursos Humanos" />,
   averias: <PrivateModulePlaceholder title="Gestión de averías" />,
   reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,
   proyectos: <ProyectosAdminRoutes />,

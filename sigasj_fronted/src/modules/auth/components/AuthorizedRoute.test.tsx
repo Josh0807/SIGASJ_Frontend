@@ -34,8 +34,8 @@ const renderAbonadosGuard = async (path = '/admin/abonados') => {
                 </AuthorizedRoute>
               }
             >
-              <Route index element={<p>Gestión de abonados</p>} />
-              <Route path="*" element={<p>Gestión de abonados</p>} />
+              <Route index element={<p>Gestión de asociados</p>} />
+              <Route path="*" element={<p>Gestión de asociados</p>} />
             </Route>
             <Route path="/login" element={<p>Iniciar sesión</p>} />
             <Route path="/unauthorized" element={<p>Acceso denegado</p>} />
@@ -48,7 +48,7 @@ const renderAbonadosGuard = async (path = '/admin/abonados') => {
   return { container }
 }
 
-describe('AuthorizedRoute — Gestión de Abonados', () => {
+describe('AuthorizedRoute — Gestión de asociados', () => {
   afterEach(() => {
     clearAccessToken()
     document.body.innerHTML = ''
@@ -58,14 +58,14 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     const { container } = await renderAbonadosGuard()
 
     expect(container.textContent).toContain('Iniciar sesión')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
   })
 
   it('sin sesión también redirige al login desde un sufijo administrativo', async () => {
     const { container } = await renderAbonadosGuard('/admin/abonados/11')
 
     expect(container.textContent).toContain('Iniciar sesión')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
     expect(container.textContent).not.toContain('Acceso denegado')
   })
 
@@ -74,7 +74,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     setAuthUser({ id: '1', role: 'Administradora' })
     const { container } = await renderAbonadosGuard()
 
-    expect(container.textContent).toContain('Gestión de abonados')
+    expect(container.textContent).toContain('Gestión de asociados')
     expect(container.textContent).not.toContain('Iniciar sesión')
     expect(container.textContent).not.toContain('Acceso denegado')
   })
@@ -85,7 +85,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     const { container } = await renderAbonadosGuard()
 
     expect(container.textContent).toContain('Acceso denegado')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
     expect(container.textContent).not.toContain('Iniciar sesión')
   })
 
@@ -94,7 +94,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     setAuthUser({ id: '1', role: 'Administradora' })
     const { container } = await renderAbonadosGuard('/admin/abonados/11')
 
-    expect(container.textContent).toContain('Gestión de abonados')
+    expect(container.textContent).toContain('Gestión de asociados')
     expect(container.textContent).not.toContain('Acceso denegado')
     expect(container.textContent).not.toContain('Iniciar sesión')
   })
@@ -105,20 +105,20 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     const { container } = await renderAbonadosGuard('/admin/abonados/11')
 
     expect(container.textContent).toContain('Acceso denegado')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
     expect(container.textContent).not.toContain('Iniciar sesión')
   })
 
-  it('Fontanero autenticado no entra a Gestión de abonados', async () => {
+  it('Fontanero autenticado no entra a Gestión de asociados', async () => {
     setAccessToken('token-demo')
     setAuthUser({ id: '3', role: 'Fontanero' })
     const { container } = await renderAbonadosGuard()
 
     expect(container.textContent).toContain('Acceso denegado')
-    expect(container.textContent).not.toContain('Gestión de abonados')
+    expect(container.textContent).not.toContain('Gestión de asociados')
   })
 
-  it('mostrar Gestión de Abonados en el menú no autoriza al Abonado por URL', async () => {
+  it('mostrar Gestión de asociados en el menú no autoriza al Abonado por URL', async () => {
     setAccessToken('token-demo')
     setAuthUser({ id: '4', role: 'Abonado' })
 
@@ -139,7 +139,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
                     requiredPath="/admin/abonados"
                     allowedRoles={ABONADOS_ALLOWED_ROLES}
                   >
-                    <p>Contenido protegido de Gestión de Abonados</p>
+                    <p>Contenido protegido de Gestión de asociados</p>
                   </AuthorizedRoute>
                 }
               />
@@ -154,7 +154,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     expect(container.innerHTML).toContain('href="/admin/abonados"')
     expect(container.textContent).toContain('Acceso denegado')
     expect(container.textContent).not.toContain(
-      'Contenido protegido de Gestión de Abonados',
+      'Contenido protegido de Gestión de asociados',
     )
     expect(container.textContent).not.toContain('Iniciar sesión')
   })
@@ -182,7 +182,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
                     requiredPath="/admin/abonados"
                     allowedRoles={ABONADOS_ALLOWED_ROLES}
                   >
-                    <p>Contenido protegido de Gestión de Abonados</p>
+                    <p>Contenido protegido de Gestión de asociados</p>
                   </AuthorizedRoute>
                 }
               />
@@ -196,7 +196,7 @@ describe('AuthorizedRoute — Gestión de Abonados', () => {
     expect(container.innerHTML).not.toContain('href="/admin/abonados"')
     expect(container.textContent).toContain('Acceso denegado')
     expect(container.textContent).not.toContain(
-      'Contenido protegido de Gestión de Abonados',
+      'Contenido protegido de Gestión de asociados',
     )
   })
 })

@@ -38,7 +38,7 @@ export function isInternalAdminRole(
   return normalizeInternalRole(role) !== null
 }
 
-/** Rol de abonado: sin acceso al panel ni a Gestión de Abonados administrativa. */
+/** Rol de abonado: sin acceso al panel ni a Gestión de asociados administrativa. */
 export const ABONADO_ROLE = 'Abonado' as const
 
 export function isAbonadoRole(

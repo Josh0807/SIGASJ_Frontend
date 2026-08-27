@@ -131,7 +131,7 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
     }
   })
 
-  it('ocultar Gestión de Abonados del menú no sustituye el guard: Abonado denegado por URL', async () => {
+  it('ocultar Gestión de asociados del menú no sustituye el guard: Abonado denegado por URL', async () => {
     loginAs('Abonado')
     const app = await mountAppRoutes('/admin/abonados')
 
@@ -139,14 +139,14 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
       expect(sidebarLinks(app.container.innerHTML)).not.toContain('/admin/abonados')
       expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Acceso denegado')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('Iniciar sesión')
     } finally {
       await app.cleanup()
     }
   })
 
-  it('Abonado autenticado recibe acceso denegado en Gestión de abonados', async () => {
+  it('Abonado autenticado recibe acceso denegado en Gestión de asociados', async () => {
     loginAs('Abonado')
     const app = await mountAppRoutes('/admin/abonados')
 
@@ -155,7 +155,7 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
       expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Acceso denegado')
       expect(app.container.innerHTML).not.toContain('Iniciar sesión')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('admin-layout')
       expect(app.container.innerHTML).not.toContain('admin-sidebar')
     } finally {
@@ -172,7 +172,7 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
       expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Acceso denegado')
       expect(app.container.innerHTML).not.toContain('Iniciar sesión')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {
       await app.cleanup()
@@ -188,21 +188,21 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
       expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Acceso denegado')
       expect(app.container.innerHTML).not.toContain('Iniciar sesión')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(sidebarLinks(app.container.innerHTML)).not.toContain('/admin/abonados')
     } finally {
       await app.cleanup()
     }
   })
 
-  it('Fontanero tampoco entra a Gestión de abonados con un ID en la URL', async () => {
+  it('Fontanero tampoco entra a Gestión de asociados con un ID en la URL', async () => {
     loginAs('Fontanero')
     const app = await mountAppRoutes('/admin/abonados/11')
 
     try {
       expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Acceso denegado')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
     } finally {
       await app.cleanup()
     }
@@ -219,14 +219,14 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
     }
   })
 
-  it('sin sesión redirige al login desde Gestión de abonados', async () => {
+  it('sin sesión redirige al login desde Gestión de asociados', async () => {
     const app = await mountAppRoutes('/admin/abonados')
 
     try {
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Iniciar sesión')
       expect(app.container.innerHTML).not.toContain('Acceso denegado')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {
       await app.cleanup()

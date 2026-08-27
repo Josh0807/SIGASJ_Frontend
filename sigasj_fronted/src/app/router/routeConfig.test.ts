@@ -151,7 +151,7 @@ describe('route configuration', () => {
     ).toBe(true)
   })
 
-  it('Gestión de Abonados autoriza por rol en la ruta, no solo por visibilidad de menú', () => {
+  it('Gestión de asociados autoriza por rol en la ruta, no solo por visibilidad de menú', () => {
     const abonados = ADMIN_CHILD_ROUTES.find((route) => route.segment === 'abonados')
 
     expect(abonados).toBeDefined()
