@@ -2019,6 +2019,13 @@ button.announcements-section__more {
   opacity: .7;
   cursor: wait;
 }
+a.gallery-admin__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-decoration: none;
+}
 a.auth-page__submit {
   display: inline-flex;
   align-items: center;
@@ -2091,6 +2098,16 @@ a.auth-page__submit {
   grid-template-columns: minmax(0, 1.4fr) minmax(0, .6fr);
   gap: 16px;
   margin-bottom: 20px;
+}
+.gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .7fr) minmax(0, .7fr);
+}
+.gallery-admin__filters form[role="search"] {
+  min-width: 0;
+}
+.gallery-admin__filter-reset {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 .gallery-admin__field {
   display: flex;
@@ -2223,6 +2240,28 @@ a.auth-page__submit {
   font-weight: 700;
   cursor: pointer;
 }
+.gallery-admin__skeleton {
+  overflow: hidden;
+  border: 1px solid #d5e6f4;
+  border-radius: 16px;
+  background: white;
+}
+.gallery-admin__skeleton-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(72px, .7fr) minmax(64px, .6fr) minmax(72px, .7fr) minmax(96px, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.gallery-admin__skeleton-row:last-child {
+  border-bottom: 0;
+}
+.gallery-admin__skeleton-row .indicator-card__skeleton {
+  display: block;
+  height: 14px;
+  width: 100%;
+}
 .gallery-admin__list {
   display: flex;
   flex-direction: column;
@@ -2238,6 +2277,9 @@ a.auth-page__submit {
   border-radius: 16px;
   background: white;
   box-shadow: 0 8px 24px rgba(18, 63, 112, .06);
+}
+.gallery-admin__item--text {
+  grid-template-columns: minmax(0, 1fr);
 }
 .gallery-admin__thumb {
   width: 120px;
@@ -2295,7 +2337,11 @@ a.auth-page__submit {
   gap: 8px;
   justify-content: flex-end;
 }
-.gallery-admin__actions button {
+.gallery-admin__actions button,
+.gallery-admin__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 40px;
   padding: 8px 12px;
   border: 1px solid #c7dced;
@@ -2304,9 +2350,11 @@ a.auth-page__submit {
   color: #123f70;
   font: inherit;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
-.gallery-admin__actions button:disabled {
+.gallery-admin__actions button:disabled,
+.gallery-admin__actions a[aria-disabled="true"] {
   opacity: .45;
   cursor: not-allowed;
 }
@@ -2314,13 +2362,42 @@ a.auth-page__submit {
   border-color: #efb4b4 !important;
   color: #9b1c1c !important;
 }
+.gallery-admin__pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.gallery-admin__pagination p {
+  margin: 0;
+  color: #3f6281;
+  font-weight: 600;
+}
+.gallery-admin__pagination button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #c7dced;
+  border-radius: 10px;
+  background: white;
+  color: #123f70;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gallery-admin__pagination button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
 @media (max-width: 760px) {
   .gallery-admin__filters,
   .gallery-admin__field-row,
   .gallery-admin__item {
     grid-template-columns: 1fr;
   }
-  .gallery-admin__actions {
+  .gallery-admin__actions,
+  .gallery-admin__pagination {
     justify-content: flex-start;
   }
 }
@@ -3901,6 +3978,293 @@ html, body, #root {
   width: 100%;
   min-width: 600px;
   border-collapse: collapse;
+}
+.table-responsive th,
+.table-responsive td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid #e2e8f0;
+}
+.table-responsive th {
+  color: #123f70;
+  background: #f7fbff;
+  font-size: .82rem;
+  font-weight: 750;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.table-responsive td {
+  color: #304c67;
+  font-size: .95rem;
+}
+.table-responsive tbody tr:last-child td {
+  border-bottom: 0;
+}
+.table-responsive__name {
+  color: #123f70;
+  font-weight: 700;
+}
+.table-responsive .gallery-admin__actions {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+.gallery-admin__badges li.is-active {
+  background: #edf9f0;
+  color: #136734;
+}
+.gallery-admin__badges li.is-inactive {
+  background: #f4f1f1;
+  color: #6b4a4a;
+}
+
+/* Gestión de proyectos: filtros y tabla, sin cambiar AdminLayout */
+.admin-main__inner:has(.proyectos-admin) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.proyectos-admin {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.proyectos-admin .gallery-admin__shell {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.proyectos-admin .gallery-admin__filters form[role="search"] {
+  width: 100%;
+}
+
+.proyectos-admin .gallery-admin__field input:focus-visible,
+.proyectos-admin .gallery-admin__field textarea:focus-visible,
+.proyectos-admin .gallery-admin__field select:focus-visible,
+.proyectos-admin .gallery-admin__actions button:focus-visible,
+.proyectos-admin .gallery-admin__actions a:focus-visible,
+.proyectos-admin .gallery-admin__pagination button:focus-visible,
+.proyectos-admin .gallery-admin__button:focus-visible,
+.proyectos-admin .gallery-admin__link:focus-visible,
+.proyectos-admin .gallery-admin__empty button:focus-visible {
+  outline: 3px solid #7db7ed;
+  outline-offset: 2px;
+}
+
+.proyectos-admin .gallery-admin__field small.gallery-admin__form-error {
+  color: #9b1c1c;
+}
+
+.proyectos-admin__table {
+  min-width: 0;
+}
+
+.proyectos-admin__table table {
+  min-width: 720px;
+}
+
+.proyectos-admin__table .table-responsive__name {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.proyectos-admin__table td:last-child {
+  white-space: nowrap;
+}
+
+.proyectos-admin__table .gallery-admin__actions {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+
+.proyectos-admin__table .gallery-admin__actions button,
+.proyectos-admin__table .gallery-admin__actions a {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 1199px) {
+  .proyectos-admin .gallery-admin__filters,
+  .proyectos-admin .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .proyectos-admin .gallery-admin__filters form[role="search"] {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .proyectos-admin.gallery-admin {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .proyectos-admin .gallery-admin__filters,
+  .proyectos-admin .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proyectos-admin .gallery-admin__filters form[role="search"] {
+    grid-column: 1 / -1;
+  }
+
+  .proyectos-admin .gallery-admin__field span {
+    display: block;
+  }
+
+  .proyectos-admin .gallery-admin__field input,
+  .proyectos-admin .gallery-admin__field textarea,
+  .proyectos-admin .gallery-admin__field select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .proyectos-admin .gallery-admin__filter-reset .gallery-admin__button {
+    min-height: 44px;
+    max-width: 100%;
+  }
+
+  .proyectos-admin .gallery-admin__skeleton-row {
+    grid-template-columns: 1fr;
+  }
+
+  .proyectos-admin__table .gallery-admin__actions button,
+  .proyectos-admin__table .gallery-admin__actions a {
+    min-height: 44px;
+  }
+
+  .proyectos-admin .gallery-admin__pagination {
+    justify-content: flex-start;
+  }
+
+  .proyectos-admin .gallery-admin__pagination button {
+    min-height: 44px;
+  }
+}
+
+/* Formulario de proyectos: desktop, tablet y celular, sin cambiar AdminLayout */
+.proyectos-admin__form {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.proyectos-admin__form h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.proyectos-admin__form .gallery-admin__field span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.proyectos-admin__form .gallery-admin__field input,
+.proyectos-admin__form .gallery-admin__field textarea,
+.proyectos-admin__form .gallery-admin__field select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.proyectos-admin__form .gallery-admin__field textarea {
+  min-height: 9.5rem;
+  resize: vertical;
+}
+
+.proyectos-admin__form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.proyectos-admin__form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.proyectos-admin__form-actions .gallery-admin__button {
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.proyectos-admin__form .gallery-admin__field input:focus-visible,
+.proyectos-admin__form .gallery-admin__field textarea:focus-visible,
+.proyectos-admin__form .gallery-admin__field select:focus-visible,
+.proyectos-admin__form-actions .gallery-admin__button:focus-visible {
+  outline: 3px solid #7db7ed;
+  outline-offset: 2px;
+}
+
+.proyectos-admin .gallery-admin__header {
+  min-width: 0;
+}
+
+.proyectos-admin .gallery-admin__header h1 {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1199px) {
+  .proyectos-admin__form {
+    padding: 20px;
+  }
+
+  .proyectos-admin__form-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .proyectos-admin__form-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 760px) {
+  .proyectos-admin__form {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .proyectos-admin__form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proyectos-admin__form .gallery-admin__field input,
+  .proyectos-admin__form .gallery-admin__field textarea,
+  .proyectos-admin__form .gallery-admin__field select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .proyectos-admin__form .gallery-admin__field textarea {
+    min-height: 9.5rem;
+  }
+
+  .proyectos-admin__form-actions {
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .proyectos-admin__form-actions .gallery-admin__button {
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
 }
 
 .form-grid-responsive {

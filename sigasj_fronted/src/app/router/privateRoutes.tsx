@@ -8,6 +8,7 @@ import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
 import ComunicadosAdminPage from '../../modules/comunicados/admin/ComunicadosAdminPage'
 import ContactoAdminPage from '../../modules/contacto/admin/ContactoAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
+import ProyectosAdminRoutes from '../../modules/proyectos/admin/ProyectosAdminRoutes'
 import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
 
@@ -37,6 +38,7 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   lecturas: <PrivateModulePlaceholder title="Gestión de lecturas" />,
   averias: <PrivateModulePlaceholder title="Gestión de averías" />,
   reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,
+  proyectos: <ProyectosAdminRoutes />,
   galeria: <GalleryAdminPage />,
   comunicados: <ComunicadosAdminPage />,
   contacto: <ContactoAdminPage />,

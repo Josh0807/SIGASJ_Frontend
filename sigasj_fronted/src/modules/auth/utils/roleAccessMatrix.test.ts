@@ -40,12 +40,13 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
   })
 
   it('cubre los módulos administrativos configurados en el menú', () => {
-    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(12)
+    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(13)
   })
 
   it('Secretaria Ejecutiva no incluye usuarios ni reportes', () => {
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/usuarios')
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/reportes')
+    expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/proyectos')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/galeria')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/comunicados')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/contacto')

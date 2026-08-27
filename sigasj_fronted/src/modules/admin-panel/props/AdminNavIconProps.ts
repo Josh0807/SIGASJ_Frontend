@@ -7,6 +7,7 @@ export type AdminNavIconName =
   | 'lecturas'
   | 'averias'
   | 'reportes'
+  | 'proyectos'
   | 'galeria'
   | 'comunicados'
   | 'contacto'
