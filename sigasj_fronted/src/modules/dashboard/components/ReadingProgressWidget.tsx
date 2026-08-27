@@ -59,7 +59,7 @@ const ReadingProgressWidget: React.FC<ReadingProgressWidgetProps> = ({
 
       <div className="dashboard-widget__footer">
         <Link to="/admin/lecturas" className="dashboard-widget__link">
-          Gestionar lecturas &rarr;
+          Recursos Humanos &rarr;
         </Link>
       </div>
     </div>

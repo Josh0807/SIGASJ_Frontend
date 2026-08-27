@@ -88,7 +88,7 @@ describe('acceso directo a rutas administrativas', () => {
         expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
         expect(app.container.innerHTML).toContain('auth-page')
         expect(hasAdminChrome(app.container.innerHTML)).toBe(false)
-        expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+        expect(app.container.innerHTML).not.toContain('Gestión de asociados')
         expect(app.container.innerHTML).not.toContain('Módulo privado')
       } finally {
         await app.cleanup()
@@ -162,7 +162,7 @@ describe('acceso directo a rutas administrativas', () => {
       expect(app.container.innerHTML).toContain('admin-sidebar')
       expect(app.container.innerHTML).toContain('admin-header')
       expect(app.container.querySelector('.admin-main__content')?.textContent).toContain(
-        'Gestión de abonados',
+        'Gestión de asociados',
       )
       expect(app.container.querySelector('.admin-sidebar h1')).toBeNull()
       expect(app.container.innerHTML).not.toContain('No se encontró')
@@ -182,7 +182,7 @@ describe('acceso directo a rutas administrativas', () => {
     try {
       expect(firstLoad.currentPath()).toBe('/admin/abonados')
       expect(firstLoad.container.querySelector('.admin-main__content')?.textContent).toContain(
-        'Gestión de abonados',
+        'Gestión de asociados',
       )
     } finally {
       await firstLoad.cleanup()
@@ -209,7 +209,7 @@ describe('acceso directo a rutas administrativas', () => {
       expect(reload.container.innerHTML).toContain('admin-sidebar')
       expect(reload.container.innerHTML).toContain('admin-header')
       expect(reload.container.querySelector('.admin-main__content')?.textContent).toContain(
-        'Gestión de abonados',
+        'Gestión de asociados',
       )
       expect(reload.container.innerHTML).not.toContain('auth-page')
       expect(errors).toEqual([])
@@ -246,7 +246,7 @@ describe('acceso directo a rutas administrativas', () => {
         'Dashboard administrativo',
       )
       expect(app.container.querySelector('.admin-main__content')?.textContent).not.toContain(
-        'Gestión de abonados',
+        'Gestión de asociados',
       )
       expect(app.container.innerHTML).not.toContain('auth-page')
       expect(errors).toEqual([])

@@ -38,7 +38,7 @@ describe('Tarea #793 — rutas inexistentes y accesos no autorizados', () => {
     try {
       expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
       expect(app.container.innerHTML).toContain('Acceso denegado')
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
       expect(app.container.innerHTML).not.toContain('admin-layout')
       expect(app.container.innerHTML).not.toContain('admin-sidebar')
     } finally {

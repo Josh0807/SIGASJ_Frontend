@@ -55,7 +55,7 @@ describe('adminAccess', () => {
     })
   })
 
-  it('deniega al Abonado las rutas administrativas de Gestión de abonados', () => {
+  it('deniega al Abonado las rutas administrativas de Gestión de asociados', () => {
     expect(evaluateAdminAreaAccess(true, abonado)).toEqual({
       to: UNAUTHORIZED_ROUTE_PATH,
     })
@@ -130,7 +130,7 @@ describe('adminAccess', () => {
     ).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
   })
 
-  it('evaluateRoleAccess cubre los tres resultados del guard de Gestión de Abonados', () => {
+  it('evaluateRoleAccess cubre los tres resultados del guard de Gestión de asociados', () => {
     expect(
       evaluateRoleAccess(false, null, ABONADOS_ALLOWED_ROLES, '/admin/abonados'),
     ).toEqual({

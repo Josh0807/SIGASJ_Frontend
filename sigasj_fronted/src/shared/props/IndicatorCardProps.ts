@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 export type IndicatorBadgeType = 'success' | 'warning' | 'info' | 'alert' | 'default'
 
 export type IndicatorCardProps = {
-  /** Título del indicador (ej: "Abonados activos", "Lecturas pendientes") */
+  /** Título del indicador (ej: "Asociados activos", "Recursos Humanos") */
   title: string
   /** Valor numérico o de texto del indicador */
   value?: string | number | null

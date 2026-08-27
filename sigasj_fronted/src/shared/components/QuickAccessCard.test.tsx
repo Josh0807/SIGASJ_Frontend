@@ -8,8 +8,8 @@ describe('QuickAccessCard', () => {
     const markup = renderToStaticMarkup(
       <MemoryRouter>
         <QuickAccessCard
-          title="Padrón de abonados"
-          description="Consultar expediente de abonados"
+          title="Padrón de asociados"
+          description="Consultar expediente de asociados"
           path="/admin/abonados"
           icon={<svg data-testid="icon-abonados" />}
         />
@@ -17,8 +17,8 @@ describe('QuickAccessCard', () => {
     )
 
     expect(markup).toContain('href="/admin/abonados"')
-    expect(markup).toContain('Padrón de abonados')
-    expect(markup).toContain('Consultar expediente de abonados')
+    expect(markup).toContain('Padrón de asociados')
+    expect(markup).toContain('Consultar expediente de asociados')
     expect(markup).toContain('data-testid="icon-abonados"')
     expect(markup).toContain('quick-access-card')
   })

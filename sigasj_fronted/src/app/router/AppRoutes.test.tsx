@@ -260,7 +260,7 @@ describe('AppRoutes y AdminLayout', () => {
     expect(dashboard).toContain('admin-layout')
     expect(dashboard).toContain('Dashboard administrativo')
     expect(abonados).toContain('admin-layout')
-    expect(abonados).toContain('Gestión de abonados')
+    expect(abonados).toContain('Gestión de asociados')
     expect(averias).toContain('admin-layout')
     expect(averias).toContain('Gestión de averías')
     expect(renderPath('/')).not.toContain('admin-layout')
@@ -403,14 +403,14 @@ describe('AppRoutes y AdminLayout', () => {
     }
   })
 
-  it('Gestión de Abonados autoriza por rol al escribir la URL, no por visibilidad de menú', async () => {
+  it('Gestión de asociados autoriza por rol al escribir la URL, no por visibilidad de menú', async () => {
     loginAsRole('Abonado')
     const abonado = await mountApp('/admin/abonados')
 
     try {
       expect(abonado.location().pathname).toBe(UNAUTHORIZED_ROUTE_PATH)
       expect(abonado.container.innerHTML).toContain('Acceso denegado')
-      expect(abonado.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(abonado.container.innerHTML).not.toContain('Gestión de asociados')
       expect(abonado.container.innerHTML).not.toContain('Iniciar sesión')
       expect(abonado.container.innerHTML).not.toContain('href="/admin/abonados"')
     } finally {
@@ -422,7 +422,7 @@ describe('AppRoutes y AdminLayout', () => {
 
     try {
       expect(administradora.location().pathname).toBe('/admin/abonados')
-      expect(administradora.container.innerHTML).toContain('Gestión de abonados')
+      expect(administradora.container.innerHTML).toContain('Gestión de asociados')
       expect(administradora.container.innerHTML).toContain('href="/admin/abonados"')
       expect(administradora.container.innerHTML).not.toContain('Acceso denegado')
     } finally {

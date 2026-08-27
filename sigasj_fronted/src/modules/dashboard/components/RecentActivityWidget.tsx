@@ -15,7 +15,7 @@ const DEFAULT_ACTIVITIES: ActivityItem[] = [
   {
     id: 'act-2',
     user: 'Ana Solís',
-    action: 'Dio de alta al abonado',
+    action: 'Dio de alta al asociado',
     target: '#1042 (Carlos Mora)',
     timeAgo: 'Hace 45 min',
     icon: 'abonados',

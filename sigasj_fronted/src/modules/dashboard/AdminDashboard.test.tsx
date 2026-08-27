@@ -40,9 +40,9 @@ describe('AdminDashboard - Pruebas Integrales', () => {
   it('3. Muestra los indicadores generales con datos numéricos y sus enlaces a módulos correspondientes', () => {
     const markup = renderDashboard()
     expect(markup).toContain('Indicadores generales')
-    expect(markup).toContain('Abonados activos')
+    expect(markup).toContain('Asociados activos')
     expect(markup).toContain('1,248')
-    expect(markup).toContain('Lecturas pendientes')
+    expect(markup).toContain('Recursos Humanos')
     expect(markup).toContain('34')
     expect(markup).toContain('Averías reportadas')
     expect(markup).toContain('3')
@@ -139,7 +139,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     }
   })
 
-  it('Fontanero no ve el acceso a Gestión de Abonados en el dashboard', () => {
+  it('Fontanero no ve el acceso a Gestión de asociados en el dashboard', () => {
     setAuthSession({
       accessToken: 'token-fontanero',
       user: { id: '3', role: 'Fontanero' },
@@ -149,6 +149,6 @@ describe('AdminDashboard - Pruebas Integrales', () => {
 
     expect(markup).toContain('href="/admin/averias"')
     expect(markup).not.toContain('href="/admin/abonados"')
-    expect(markup).not.toContain('Abonados activos')
+    expect(markup).not.toContain('Asociados activos')
   })
 })

@@ -268,7 +268,7 @@ describe('protección de rutas administrativas después del logout', () => {
 
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       assertBlockedAdminAccess(app.container)
-      expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+      expect(app.container.innerHTML).not.toContain('Gestión de asociados')
     } finally {
       await app.cleanup()
     }
@@ -292,7 +292,7 @@ describe('protección de rutas administrativas después del logout', () => {
     }
   })
 
-  describe('Gestión de Abonados tras cerrar sesión', () => {
+  describe('Gestión de asociados tras cerrar sesión', () => {
     const ABONADOS_PATHS = ['/admin/abonados', '/admin/abonados/11'] as const
 
     const assertLoggedOutFromAbonados = (container: HTMLElement) => {
@@ -300,10 +300,10 @@ describe('protección de rutas administrativas después del logout', () => {
       expect(getAccessToken()).toBeNull()
       expect(getAuthUser()).toBeNull()
       assertBlockedAdminAccess(container)
-      expect(container.innerHTML).not.toContain('Gestión de abonados')
+      expect(container.innerHTML).not.toContain('Gestión de asociados')
     }
 
-    it('invalida la sesión al cerrar sesión desde Gestión de Abonados', async () => {
+    it('invalida la sesión al cerrar sesión desde Gestión de asociados', async () => {
       const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
       try {
@@ -314,7 +314,7 @@ describe('protección de rutas administrativas después del logout', () => {
         expect(getAuthUser()).not.toBeNull()
         expect(app.currentPath()).toBe('/admin/abonados')
         expect(app.container.innerHTML).toContain('admin-layout')
-        expect(app.container.innerHTML).toContain('Gestión de abonados')
+        expect(app.container.innerHTML).toContain('Gestión de asociados')
 
         await logoutFromAccountMenu(app.container)
 
@@ -325,7 +325,7 @@ describe('protección de rutas administrativas después del logout', () => {
       }
     })
 
-    it('bloquea el acceso directo a Gestión de Abonados después del logout', async () => {
+    it('bloquea el acceso directo a Gestión de asociados después del logout', async () => {
       const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
       try {
@@ -344,13 +344,13 @@ describe('protección de rutas administrativas después del logout', () => {
       }
     })
 
-    it('el botón Atrás no recupera Gestión de Abonados aunque la URL anterior reaparezca', async () => {
+    it('el botón Atrás no recupera Gestión de asociados aunque la URL anterior reaparezca', async () => {
       const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
       try {
         await submitLogin(app.container)
         await app.navigate('/admin/abonados')
-        expect(app.container.innerHTML).toContain('Gestión de abonados')
+        expect(app.container.innerHTML).toContain('Gestión de asociados')
 
         await logoutFromAccountMenu(app.container)
         expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
@@ -358,7 +358,7 @@ describe('protección de rutas administrativas después del logout', () => {
         await app.goBack()
 
         expect(isAuthenticated()).toBe(false)
-        expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+        expect(app.container.innerHTML).not.toContain('Gestión de asociados')
         expect(app.container.innerHTML).not.toContain('admin-layout')
         expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
       } finally {
@@ -387,7 +387,7 @@ describe('protección de rutas administrativas después del logout', () => {
       }
     })
 
-    it('recargar una URL de Gestión de Abonados tras logout sigue bloqueada', async () => {
+    it('recargar una URL de Gestión de asociados tras logout sigue bloqueada', async () => {
       const app = await mountInteractiveApp([LOGIN_ROUTE_PATH])
 
       try {

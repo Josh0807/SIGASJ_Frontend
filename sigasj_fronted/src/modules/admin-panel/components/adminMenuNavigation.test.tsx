@@ -184,7 +184,7 @@ describe('navegación del menú administrativo', () => {
       expect(activeNavLink(app.container)?.className).toContain(
         'admin-sidebar__link--active',
       )
-      expect(outletTitle(app.container)).toBe('Gestión de abonados')
+      expect(outletTitle(app.container)).toBe('Gestión de asociados')
 
       await clickElement(
         app.container.querySelector('.admin-sidebar__link[href="/admin/averias"]')!,

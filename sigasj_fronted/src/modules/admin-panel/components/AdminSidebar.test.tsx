@@ -75,7 +75,7 @@ describe('AdminSidebar', () => {
 
     expect(markup).toContain('admin-sidebar__nav')
     expect(markup).not.toContain('href="/admin/abonados"')
-    expect(markup).not.toContain('Gestión de abonados')
+    expect(markup).not.toContain('Gestión de asociados')
   })
 
   it('permite agregar un modulo nuevo desde la configuracion', () => {

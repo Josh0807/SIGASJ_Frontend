@@ -12,7 +12,7 @@ import type { DashboardIndicator } from './props'
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   {
     id: 'abonados',
-    label: 'Abonados activos',
+    label: 'Asociados activos',
     value: null,
     detail: 'Padrón actualizado',
     badgeText: 'Activos',
@@ -22,7 +22,7 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   },
   {
     id: 'lecturas',
-    label: 'Lecturas pendientes',
+    label: 'Recursos Humanos',
     value: null,
     detail: 'Ciclo del mes actual',
     badgeText: 'En curso',

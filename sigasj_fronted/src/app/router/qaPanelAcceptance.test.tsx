@@ -99,7 +99,7 @@ describe('QA — Tarea 2: rutas privadas sin sesión', () => {
       try {
         expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
         assertBlockedAdminAccess(app.container)
-        expect(app.container.innerHTML).not.toContain('Gestión de abonados')
+        expect(app.container.innerHTML).not.toContain('Gestión de asociados')
         expect(app.container.innerHTML).not.toContain('Gestión de usuarios')
       } finally {
         await app.cleanup()

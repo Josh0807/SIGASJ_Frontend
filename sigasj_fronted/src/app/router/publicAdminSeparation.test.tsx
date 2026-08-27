@@ -179,7 +179,7 @@ describe('separación entre interfaz pública y administrativa', () => {
       expect(app.container.innerHTML).toContain('admin-sidebar')
       expect(app.container.innerHTML).toContain('admin-header')
       expect(app.container.querySelector('.admin-main__content')?.textContent).toContain(
-        'Gestión de abonados',
+        'Gestión de asociados',
       )
 
       const second = await app.click('.admin-sidebar__link[href="/admin/averias"]')

@@ -7,13 +7,13 @@ describe('IndicatorCard', () => {
   it('renderiza título, valor y descripción correctamente', () => {
     const markup = renderToStaticMarkup(
       <IndicatorCard
-        title="Abonados activos"
+        title="Asociados activos"
         value="1,248"
         description="Padrón actualizado"
       />,
     )
 
-    expect(markup).toContain('Abonados activos')
+    expect(markup).toContain('Asociados activos')
     expect(markup).toContain('1,248')
     expect(markup).toContain('Padrón actualizado')
     expect(markup).not.toContain('indicator-card__value--unavailable')

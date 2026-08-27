@@ -138,7 +138,7 @@ describe('seguridad — sesión Administradora', () => {
     }
   })
 
-  it('ve las opciones administrativas de su rol e ingresa a Gestión de Abonados', async () => {
+  it('ve las opciones administrativas de su rol e ingresa a Gestión de asociados', async () => {
     loginAsRole('Administradora')
     const app = await mountApp(ADMIN_HOME_PATH)
 
@@ -152,7 +152,7 @@ describe('seguridad — sesión Administradora', () => {
       await app.clickSidebar('/admin/abonados')
 
       expect(app.currentPath()).toBe('/admin/abonados')
-      expect(app.container.innerHTML).toContain('Gestión de abonados')
+      expect(app.container.innerHTML).toContain('Gestión de asociados')
       assertAdminChrome(app.container.innerHTML)
     } finally {
       await app.cleanup()
@@ -194,7 +194,7 @@ describe('seguridad — sesión Administradora', () => {
         assertAdminChrome(app.container.innerHTML)
 
         if (path.startsWith('/admin/abonados')) {
-          expect(app.container.innerHTML).toContain('Gestión de abonados')
+          expect(app.container.innerHTML).toContain('Gestión de asociados')
         }
       } finally {
         await app.cleanup()
