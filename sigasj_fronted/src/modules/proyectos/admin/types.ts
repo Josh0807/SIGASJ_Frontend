@@ -83,9 +83,10 @@ export type ProyectoFormValues = {
   encargadoRealizacion: string
   duracion: string
   estado: EstadoProyecto | ''
+  imagenPrincipalUrl?: string | null
 }
 
-export type ProyectoFormField = keyof ProyectoFormValues
+export type ProyectoFormField = keyof ProyectoFormValues | 'imagenPrincipal'
 
 export const emptyProyectoFormValues = (): ProyectoFormValues => ({
   nombre: '',
@@ -93,12 +94,13 @@ export const emptyProyectoFormValues = (): ProyectoFormValues => ({
   encargadoRealizacion: '',
   duracion: '',
   estado: '',
+  imagenPrincipalUrl: null,
 })
 
 export const toProyectoFormValues = (
   proyecto: Pick<
     AdminProyecto,
-    'nombre' | 'descripcion' | 'encargadoRealizacion' | 'duracion' | 'estado'
+    'nombre' | 'descripcion' | 'encargadoRealizacion' | 'duracion' | 'estado' | 'imagenPrincipal'
   >,
 ): ProyectoFormValues => ({
   nombre: proyecto.nombre ?? '',
@@ -106,4 +108,5 @@ export const toProyectoFormValues = (
   encargadoRealizacion: proyecto.encargadoRealizacion ?? '',
   duracion: proyecto.duracion ?? '',
   estado: proyecto.estado,
+  imagenPrincipalUrl: proyecto.imagenPrincipal ?? null,
 })

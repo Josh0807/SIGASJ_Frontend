@@ -3,3 +3,5 @@ export const LANDING_ROUTE_PATH = '/'
 export const LOGIN_ROUTE_PATH = '/login'
 export const UNAUTHORIZED_ROUTE_PATH = '/unauthorized'
 export const RECEIPT_QUERY_ROUTE_PATH = '/consulta-recibo'
+export const PROYECTO_DETAIL_PUBLIC_ROUTE_PATH = '/proyectos/:id'
+

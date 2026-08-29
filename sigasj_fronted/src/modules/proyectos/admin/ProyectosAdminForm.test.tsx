@@ -34,19 +34,21 @@ describe('emptyProyectoFormValues / toProyectoFormValues', () => {
       encargadoRealizacion: '',
       duracion: '',
       estado: '',
+      imagenPrincipalUrl: null,
     })
   })
 
   it('carga los campos reales del proyecto para edición', () => {
     const proyecto: Pick<
       AdminProyecto,
-      'nombre' | 'descripcion' | 'encargadoRealizacion' | 'duracion' | 'estado'
+      'nombre' | 'descripcion' | 'encargadoRealizacion' | 'duracion' | 'estado' | 'imagenPrincipal'
     > = {
       nombre: 'Ampliación de Acueducto',
       descripcion: null,
       encargadoRealizacion: 'Ing. María',
       duracion: '8 meses',
       estado: 'EN_PROCESO',
+      imagenPrincipal: null,
     }
 
     expect(toProyectoFormValues(proyecto)).toEqual({
@@ -55,6 +57,7 @@ describe('emptyProyectoFormValues / toProyectoFormValues', () => {
       encargadoRealizacion: 'Ing. María',
       duracion: '8 meses',
       estado: 'EN_PROCESO',
+      imagenPrincipalUrl: null,
     })
   })
 
@@ -65,6 +68,7 @@ describe('emptyProyectoFormValues / toProyectoFormValues', () => {
       encargadoRealizacion: null,
       duracion: null,
       estado: 'PENDIENTE',
+      imagenPrincipal: null,
     })
 
     expect(values).toEqual({
@@ -73,6 +77,7 @@ describe('emptyProyectoFormValues / toProyectoFormValues', () => {
       encargadoRealizacion: '',
       duracion: '',
       estado: 'PENDIENTE',
+      imagenPrincipalUrl: null,
     })
     expect(Object.values(values).every((value) => value !== undefined)).toBe(true)
   })
@@ -150,11 +155,12 @@ describe('ProyectosAdminForm', () => {
     expect(markup).toContain('name="encargadoRealizacion"')
     expect(markup).toContain('for="proyectos-form-duracion"')
     expect(markup).toContain('name="duracion"')
+    expect(markup).toContain('for="proyectos-form-imagen-principal"')
+    expect(markup).toContain('name="imagenPrincipal"')
+    expect(markup).toContain('type="file"')
     expect(markup).not.toContain('type="number"')
     expect(markup).not.toContain('type="date"')
-    expect(markup).not.toContain('name="imagenPrincipal"')
     expect(markup).not.toContain('name="activo"')
-    expect(markup).not.toContain('type="file"')
     expect(markup).not.toContain('Visible en')
     expect(markup).not.toContain('Publicar')
   })
@@ -306,6 +312,8 @@ describe('ProyectosAdminForm — envío', () => {
         descripcion: '',
         estado: 'PENDIENTE',
       }),
+      null,
+      false,
     )
   })
 
@@ -338,13 +346,18 @@ describe('ProyectosAdminForm — envío', () => {
     })
 
     expect(onSubmit).toHaveBeenCalledTimes(1)
-    expect(onSubmit).toHaveBeenCalledWith({
-      nombre: 'Ampliación de Acueducto',
-      descripcion: 'Red principal',
-      encargadoRealizacion: 'Ing. María',
-      duracion: '8 meses',
-      estado: 'EN_PROCESO',
-    })
+    expect(onSubmit).toHaveBeenCalledWith(
+      {
+        nombre: 'Ampliación de Acueducto',
+        descripcion: 'Red principal',
+        encargadoRealizacion: 'Ing. María',
+        duracion: '8 meses',
+        estado: 'EN_PROCESO',
+        imagenPrincipalUrl: null,
+      },
+      null,
+      false,
+    )
     expect(container.innerHTML).not.toContain('fetchWithAuth')
   })
 
@@ -374,6 +387,8 @@ describe('ProyectosAdminForm — envío', () => {
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({ duracion: '6' }),
+      null,
+      false,
     )
     expect(onSubmit.mock.calls[0][0].duracion).not.toMatch(/meses|días|dias/i)
   })
@@ -647,6 +662,106 @@ describe('ProyectosAdminForm — envío', () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1)
     expect(onCancel).not.toHaveBeenCalled()
+  })
+
+  it('permite seleccionar una imagen válida, muestra su vista previa y la envía al submit', async () => {
+    const onSubmit = vi.fn(async () => undefined)
+    await renderForm({
+      onSubmit,
+      initialValues: validFormValues,
+    })
+
+    const fileInput = container.querySelector(
+      '#proyectos-form-imagen-principal',
+    ) as HTMLInputElement
+    const file = new File(['fake-image'], 'portada.png', { type: 'image/png' })
+
+    await act(async () => {
+      Object.defineProperty(fileInput, 'files', {
+        value: [file],
+        writable: true,
+      })
+      fileInput.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    expect(container.textContent).toContain('Nueva portada (sin guardar)')
+
+    await act(async () => {
+      container.querySelector('form')?.requestSubmit()
+    })
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ nombre: 'Obra Norte' }),
+      file,
+      false,
+    )
+  })
+
+  it('muestra error de validación cuando se selecciona un archivo no permitido o de tamaño excesivo', async () => {
+    const onSubmit = vi.fn(async () => undefined)
+    await renderForm({
+      onSubmit,
+      initialValues: validFormValues,
+    })
+
+    const fileInput = container.querySelector(
+      '#proyectos-form-imagen-principal',
+    ) as HTMLInputElement
+    const invalidFile = new File(['text content'], 'doc.pdf', {
+      type: 'application/pdf',
+    })
+
+    await act(async () => {
+      Object.defineProperty(fileInput, 'files', {
+        value: [invalidFile],
+        writable: true,
+      })
+      fileInput.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    expect(container.textContent).toContain(
+      'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.',
+    )
+
+    await act(async () => {
+      container.querySelector('form')?.requestSubmit()
+    })
+
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('permite quitar una imagen asignada mediante el botón Quitar portada', async () => {
+    const onSubmit = vi.fn(async () => undefined)
+    await renderForm({
+      onSubmit,
+      initialValues: {
+        ...validFormValues,
+        imagenPrincipalUrl: 'https://example.com/portada.jpg',
+      },
+    })
+
+    expect(container.textContent).toContain('Portada actual')
+
+    const removeBtn = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Quitar portada',
+    )
+
+    await act(async () => {
+      removeBtn?.click()
+    })
+
+    expect(container.textContent).toContain('No se ha asignado una imagen de portada')
+
+    await act(async () => {
+      container.querySelector('form')?.requestSubmit()
+    })
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ nombre: 'Obra Norte' }),
+      null,
+      true,
+    )
   })
 })
 

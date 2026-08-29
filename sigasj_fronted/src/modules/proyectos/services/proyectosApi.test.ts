@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import { ESTADOS_PROYECTO, PROYECTO_ESTADO_UPDATE_PENDING } from '../types/estadoProyecto'
-import { getAdminProyectos, toActivoQueryParam, toCreateProyectoPayload, toProyectosAdminParams, createAdminProyecto, toUpdateProyectoPayload, getAdminProyecto, updateAdminProyecto } from './proyectosApi'
+import { getAdminProyectos, toActivoQueryParam, toCreateProyectoPayload, toProyectosAdminParams, createAdminProyecto, toUpdateProyectoPayload, getAdminProyecto, updateAdminProyecto, uploadProyectoImagenPrincipal, removeProyectoImagenPrincipal, uploadProyectoImagenes, deleteProyectoImagen, reorderProyectoImagenes, updateProyectoVisibilidad, updateProyectoEstado } from './proyectosApi'
 
 vi.mock('../../../services/http/httpClient', () => ({
   fetchWithAuth: vi.fn(),
@@ -338,4 +338,132 @@ describe('updateAdminProyecto', () => {
     ) as Record<string, unknown>
     expect(body).not.toHaveProperty('estado')
   })
+
+  it('hace PATCH multipart FormData cuando se incluye imagenFile', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+    const file = new File(['dummy'], 'cover.png', { type: 'image/png' })
+
+    await updateAdminProyecto(
+      12,
+      {
+        nombre: 'Ampliación de Acueducto',
+        descripcion: 'Red principal',
+        encargadoRealizacion: 'Ing. María',
+        duracion: '8 meses',
+        estado: 'EN_PROCESO',
+      },
+      file,
+    )
+
+    expect(fetchWithAuth).toHaveBeenCalledTimes(1)
+    const call = vi.mocked(fetchWithAuth).mock.calls[0]
+    expect(call[0]).toBe('/v1/admin/proyectos/12')
+    expect(call[1]?.method).toBe('PATCH')
+    expect(call[1]?.body).toBeInstanceOf(FormData)
+    const form = call[1]?.body as FormData
+    expect(form.get('nombre')).toBe('Ampliación de Acueducto')
+    expect(form.get('imagenPrincipal')).toBe(file)
+  })
 })
+
+describe('uploadProyectoImagenPrincipal / removeProyectoImagenPrincipal', () => {
+  beforeEach(() => {
+    vi.mocked(fetchWithAuth).mockReset()
+  })
+
+  it('envía POST multipart a /v1/admin/proyectos/:id/imagen-principal', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+    const file = new File(['content'], 'cover.jpg', { type: 'image/jpeg' })
+
+    const res = await uploadProyectoImagenPrincipal(12, file)
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagen-principal', {
+      method: 'POST',
+      body: expect.any(FormData),
+    })
+  })
+
+  it('envía DELETE a /v1/admin/proyectos/:id/imagen-principal', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+
+    const res = await removeProyectoImagenPrincipal(12)
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagen-principal', {
+      method: 'DELETE',
+    })
+  })
+})
+
+describe('uploadProyectoImagenes / deleteProyectoImagen / reorderProyectoImagenes', () => {
+  beforeEach(() => {
+    vi.mocked(fetchWithAuth).mockReset()
+  })
+
+  it('envía POST multipart a /v1/admin/proyectos/:id/imagenes', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+    const file1 = new File(['1'], 'photo1.jpg', { type: 'image/jpeg' })
+    const file2 = new File(['2'], 'photo2.jpg', { type: 'image/jpeg' })
+
+    const res = await uploadProyectoImagenes(12, [file1, file2])
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagenes', {
+      method: 'POST',
+      body: expect.any(FormData),
+    })
+  })
+
+  it('envía DELETE a /v1/admin/proyectos/:proyectoId/imagenes/:imagenId', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+
+    const res = await deleteProyectoImagen(12, 5)
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagenes/5', {
+      method: 'DELETE',
+    })
+  })
+
+  it('envía PATCH JSON a /v1/admin/proyectos/:proyectoId/imagenes/orden', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+    const ordenes = [
+      { id: 5, orden: 1 },
+      { id: 6, orden: 2 },
+    ]
+
+    const res = await reorderProyectoImagenes(12, ordenes)
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagenes/orden', {
+      method: 'PATCH',
+      body: JSON.stringify({ ordenes }),
+    })
+  })
+})
+
+describe('updateProyectoVisibilidad / updateProyectoEstado', () => {
+  beforeEach(() => {
+    vi.mocked(fetchWithAuth).mockReset()
+  })
+
+  it('envía PATCH con activo a /v1/admin/proyectos/:id/visibilidad', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+
+    const res = await updateProyectoVisibilidad(12, true)
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/visibilidad', {
+      method: 'PATCH',
+      body: JSON.stringify({ activo: true }),
+    })
+  })
+
+  it('envía PATCH con estado a /v1/admin/proyectos/:id/estado', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+
+    const res = await updateProyectoEstado(12, 'COMPLETADO')
+    expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/estado', {
+      method: 'PATCH',
+      body: JSON.stringify({ estado: 'COMPLETADO' }),
+    })
+  })
+})
+
+

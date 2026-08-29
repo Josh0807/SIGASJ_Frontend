@@ -86,6 +86,17 @@ export async function updateGaleriaPhoto(
   return mapAdminGalleryPhoto(updated)
 }
 
+export async function updateGaleriaEstado(
+  id: number,
+  activa: boolean,
+): Promise<AdminGalleryPhoto> {
+  const updated = await fetchWithAuth<BackendGaleriaFoto>(`${ADMIN_PATHS[0]}/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ activa, activo: activa }),
+  })
+  return mapAdminGalleryPhoto(updated)
+}
+
 export async function deleteGaleriaPhoto(id: number): Promise<void> {
   await fetchWithAuth(`${ADMIN_PATHS[0]}/${id}`, { method: 'DELETE' })
 }

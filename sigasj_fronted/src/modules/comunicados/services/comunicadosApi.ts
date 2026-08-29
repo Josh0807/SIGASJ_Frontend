@@ -90,6 +90,26 @@ export async function updateComunicado(
   })
 }
 
+export async function getPublicComunicadoDetalle(id: string | number): Promise<Announcement> {
+  const paths = [
+    `/v1/comunicados/${id}`,
+    `/v1/public/comunicados/${id}`,
+    `/comunicados/${id}`,
+  ]
+  const data = await fetchPublicApi<AdminComunicado>(paths)
+  return mapPublicAnnouncement(data)
+}
+
+export async function updateComunicadoEstado(
+  id: string | number,
+  estado: 'Activo' | 'Inactivo' | string,
+): Promise<AdminComunicado> {
+  return fetchWithAuth<AdminComunicado>(`${ADMIN_PATHS[0]}/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ estado }),
+  })
+}
+
 export async function deleteComunicado(id: string): Promise<void> {
   await fetchWithAuth(`${ADMIN_PATHS[0]}/${id}`, { method: 'DELETE' })
 }

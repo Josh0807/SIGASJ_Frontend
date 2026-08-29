@@ -155,13 +155,17 @@ describe('ProyectosAdmin — registro', () => {
     })
 
     expect(proyectosApi.createAdminProyecto).toHaveBeenCalledTimes(1)
-    expect(proyectosApi.createAdminProyecto).toHaveBeenCalledWith({
-      nombre: 'Ampliación de Acueducto',
-      descripcion: 'Red principal',
-      encargadoRealizacion: 'Ing. María',
-      duracion: '8 meses',
-      estado: 'PENDIENTE',
-    })
+    expect(proyectosApi.createAdminProyecto).toHaveBeenCalledWith(
+      {
+        nombre: 'Ampliación de Acueducto',
+        descripcion: 'Red principal',
+        encargadoRealizacion: 'Ing. María',
+        duracion: '8 meses',
+        estado: 'PENDIENTE',
+        imagenPrincipalUrl: null,
+      },
+      null,
+    )
     expect(container.querySelector('.gallery-admin__form')).toBeNull()
     expect(container.textContent).toContain('Gestión de Proyectos')
     expect(proyectosApi.getAdminProyectos).toHaveBeenCalledTimes(1)

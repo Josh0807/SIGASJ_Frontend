@@ -1,4 +1,4 @@
-import { type FormEvent, useRef, useState } from 'react'
+import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from 'react'
 import {
   ESTADO_PROYECTO_OPTIONS,
   PROYECTO_ESTADO_UPDATE_PENDING,
@@ -15,12 +15,17 @@ import {
   PROYECTO_ENCARGADO_MAX_LENGTH,
   PROYECTO_NOMBRE_MAX_LENGTH,
   getProyectoFormValidationError,
+  validateProyectoImagenFile,
 } from './validateProyectoForm'
 
 type ProyectosAdminFormProps = {
   mode: 'create' | 'edit'
   initialValues: ProyectoFormValues
-  onSubmit: (values: ProyectoFormValues) => Promise<void>
+  onSubmit: (
+    values: ProyectoFormValues,
+    imagenFile?: File | null,
+    removeImagen?: boolean,
+  ) => Promise<void>
   onCancel: () => void
 }
 
@@ -29,6 +34,7 @@ const DESCRIPCION_INPUT_ID = 'proyectos-form-descripcion'
 const ENCARGADO_INPUT_ID = 'proyectos-form-encargado'
 const DURACION_INPUT_ID = 'proyectos-form-duracion'
 const ESTADO_INPUT_ID = 'proyectos-form-estado'
+const IMAGEN_INPUT_ID = 'proyectos-form-imagen-principal'
 const ESTADO_PENDING_HINT_ID = 'proyectos-form-estado-pending'
 const FORM_ERROR_ID = 'proyectos-form-error'
 
@@ -38,6 +44,8 @@ const FIELD_ERROR_IDS: Record<ProyectoFormField, string> = {
   encargadoRealizacion: 'proyectos-form-encargado-error',
   duracion: 'proyectos-form-duracion-error',
   estado: 'proyectos-form-estado-error',
+  imagenPrincipalUrl: 'proyectos-form-imagen-error',
+  imagenPrincipal: 'proyectos-form-imagen-error',
 }
 
 const ProyectosAdminForm = ({
@@ -47,6 +55,11 @@ const ProyectosAdminForm = ({
   onCancel,
 }: ProyectosAdminFormProps) => {
   const [values, setValues] = useState(initialValues)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [removeImagen, setRemoveImagen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<ProyectoFormField, string>>
@@ -60,17 +73,88 @@ const ProyectosAdminForm = ({
     setValuesSource(initialValues)
     setModeSource(mode)
     setValues(initialValues)
+    setSelectedFile(null)
+    setRemoveImagen(false)
     setFormError(null)
     setFieldErrors({})
   }
 
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl(null)
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile)
+    setPreviewUrl(objectUrl)
+
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [selectedFile])
+
   const estadoLocked = mode === 'edit' && PROYECTO_ESTADO_UPDATE_PENDING
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) {
+      return
+    }
+
+    const file = files[0]
+    const imageError = validateProyectoImagenFile(file)
+    if (imageError) {
+      setSelectedFile(null)
+      setFieldErrors((current) => ({
+        ...current,
+        imagenPrincipal: imageError,
+      }))
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      return
+    }
+
+    setFieldErrors((current) => {
+      const next = { ...current }
+      delete next.imagenPrincipal
+      return next
+    })
+    setSelectedFile(file)
+    setRemoveImagen(false)
+  }
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null)
+    setRemoveImagen(true)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+    setFieldErrors((current) => {
+      const next = { ...current }
+      delete next.imagenPrincipal
+      return next
+    })
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (isSubmittingRef.current) {
       return
+    }
+
+    if (fieldErrors.imagenPrincipal) {
+      return
+    }
+
+    const currentFileInput = fileInputRef.current?.files?.[0]
+    if (currentFileInput) {
+      const imageError = validateProyectoImagenFile(currentFileInput)
+      if (imageError) {
+        setFieldErrors((current) => ({ ...current, imagenPrincipal: imageError }))
+        return
+      }
     }
 
     setFormError(null)
@@ -86,13 +170,18 @@ const ProyectosAdminForm = ({
     setIsSubmitting(true)
 
     try {
-      await onSubmit({
-        nombre: values.nombre.trim(),
-        descripcion: values.descripcion.trim(),
-        encargadoRealizacion: values.encargadoRealizacion.trim(),
-        duracion: values.duracion.trim(),
-        estado: values.estado,
-      })
+      await onSubmit(
+        {
+          nombre: values.nombre.trim(),
+          descripcion: values.descripcion.trim(),
+          encargadoRealizacion: values.encargadoRealizacion.trim(),
+          duracion: values.duracion.trim(),
+          estado: values.estado,
+          imagenPrincipalUrl: values.imagenPrincipalUrl,
+        },
+        selectedFile,
+        removeImagen,
+      )
     } catch (error) {
       isSubmittingRef.current = false
       setIsSubmitting(false)
@@ -186,6 +275,81 @@ const ProyectosAdminForm = ({
         />
         {fieldAlert('nombre')}
       </label>
+
+      <div className="gallery-admin__field proyectos-admin__cover-field">
+        <label htmlFor={IMAGEN_INPUT_ID}>
+          <span>Fotografía de portada (Imagen principal)</span>
+        </label>
+        <div className="proyectos-admin__cover-container">
+          {previewUrl ? (
+            <div className="proyectos-admin__cover-preview-wrapper">
+              <img
+                src={previewUrl}
+                alt="Vista previa de portada seleccionada"
+                className="proyectos-admin__cover-preview"
+              />
+              <span className="proyectos-admin__cover-badge proyectos-admin__cover-badge--new">
+                Nueva portada (sin guardar)
+              </span>
+            </div>
+          ) : !removeImagen && values.imagenPrincipalUrl ? (
+            <div className="proyectos-admin__cover-preview-wrapper">
+              <img
+                src={values.imagenPrincipalUrl}
+                alt="Portada actual del proyecto"
+                className="proyectos-admin__cover-preview"
+              />
+              <span className="proyectos-admin__cover-badge">
+                Portada actual
+              </span>
+            </div>
+          ) : (
+            <div className="proyectos-admin__cover-empty">
+              <svg
+                className="proyectos-admin__cover-icon"
+                aria-hidden="true"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              <p>No se ha asignado una imagen de portada</p>
+              <small>JPG, PNG, WEBP o GIF (Máx. 5 MB)</small>
+            </div>
+          )}
+
+          <div className="proyectos-admin__cover-controls">
+            <input
+              ref={fileInputRef}
+              id={IMAGEN_INPUT_ID}
+              name="imagenPrincipal"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+              className="proyectos-admin__file-input"
+              aria-invalid={fieldErrors.imagenPrincipal ? true : undefined}
+              aria-describedby={describedBy('imagenPrincipal')}
+              onChange={handleFileChange}
+            />
+
+            {selectedFile || (!removeImagen && values.imagenPrincipalUrl) ? (
+              <button
+                type="button"
+                className="gallery-admin__button gallery-admin__button--danger proyectos-admin__remove-cover-btn"
+                onClick={handleRemoveImage}
+              >
+                Quitar portada
+              </button>
+            ) : null}
+          </div>
+        </div>
+        {fieldAlert('imagenPrincipal')}
+      </div>
 
       <label className="gallery-admin__field" htmlFor={DESCRIPCION_INPUT_ID}>
         <span>Descripción</span>

@@ -11,12 +11,14 @@ import {
 } from './types'
 import ProyectosAdminForm from './ProyectosAdminForm'
 import ProyectosAdminFormPageLayout from './ProyectosAdminFormPageLayout'
+import ProyectoImagenesGaleria from './ProyectoImagenesGaleria'
 import {
   parseProyectoSubmitError,
   PROYECTO_NOT_FOUND_ERROR,
 } from './proyectoSubmitError'
 import { PROYECTOS_ADMIN_PATH } from './proyectosAdminPaths'
 import { getAdminProyecto, updateAdminProyecto } from '../services/proyectosApi'
+
 
 const parseProyectoId = (value: string | undefined): number | null => {
   if (!value) {
@@ -93,13 +95,17 @@ const ProyectosAdminEditPage = () => {
     [detail],
   )
 
-  const handleSave = async (values: ProyectoFormValues) => {
+  const handleSave = async (
+    values: ProyectoFormValues,
+    imagenFile?: File | null,
+    removeImagen?: boolean,
+  ) => {
     if (proyectoId === null) {
       return
     }
 
     try {
-      await updateAdminProyecto(proyectoId, values)
+      await updateAdminProyecto(proyectoId, values, imagenFile, removeImagen)
       closeForm()
     } catch (error) {
       const parsed = parseProyectoSubmitError(error)
@@ -158,13 +164,20 @@ const ProyectosAdminEditPage = () => {
       ) : null}
 
       {detail && formInitialValues && !detailLoading && !detailMissing ? (
-        <ProyectosAdminForm
-          mode="edit"
-          initialValues={formInitialValues}
-          onSubmit={handleSave}
-          onCancel={closeForm}
-        />
+        <>
+          <ProyectosAdminForm
+            mode="edit"
+            initialValues={formInitialValues}
+            onSubmit={handleSave}
+            onCancel={closeForm}
+          />
+          <ProyectoImagenesGaleria
+            proyecto={detail}
+            onProyectoUpdated={(updated) => setDetail(updated)}
+          />
+        </>
       ) : null}
+
     </ProyectosAdminFormPageLayout>
   )
 }

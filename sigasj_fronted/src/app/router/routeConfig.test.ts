@@ -15,6 +15,7 @@ describe('route configuration', () => {
     expect(LANDING_ROUTE?.path).toBe('/')
     expect(PUBLIC_ROUTE_PATHS).toEqual([
       '/',
+      '/proyectos/:id',
       '/consulta-recibo',
       '/formulario-quejas',
       '/reportar-averia',
@@ -25,6 +26,7 @@ describe('route configuration', () => {
       '/login',
       '/unauthorized',
     ])
+
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/comunicados')
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/dashboard')
     expect(PUBLIC_ROUTE_PATHS).not.toContain(ADMIN_BASE_PATH)

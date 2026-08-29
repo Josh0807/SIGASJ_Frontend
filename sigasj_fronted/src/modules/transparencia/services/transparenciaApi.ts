@@ -91,6 +91,20 @@ export async function updateTransparenciaPublication(
   return mapAdminTransparencyPublication(updated)
 }
 
+export async function updateTransparenciaEstado(
+  id: number,
+  activa: boolean,
+): Promise<AdminTransparenciaPublication> {
+  const updated = await fetchWithAuth<BackendTransparenciaPublication>(
+    `${ADMIN_PATHS[0]}/${id}/estado`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ activa, activo: activa }),
+    },
+  )
+  return mapAdminTransparencyPublication(updated)
+}
+
 export async function deleteTransparenciaPublication(id: number): Promise<void> {
   await fetchWithAuth(`${ADMIN_PATHS[0]}/${id}`, { method: 'DELETE' })
 }
