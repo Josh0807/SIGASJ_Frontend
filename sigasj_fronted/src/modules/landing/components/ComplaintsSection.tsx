@@ -1,7 +1,4 @@
-const COMPLAINTS_EMAIL = 'jdasadasanjuan@gmail.com'
-const GMAIL_COMPOSE_URL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
-  COMPLAINTS_EMAIL,
-)}&su=${encodeURIComponent('Queja para ASADA San Juan')}`
+import { Link } from 'react-router-dom'
 
 const ComplaintsSection = () => (
   <section
@@ -25,22 +22,19 @@ const ComplaintsSection = () => (
         <p className="account-section__eyebrow">Atención al usuario</p>
         <h2 id="quejas-title">Sugerencias y Quejas</h2>
         <p>
-          Envíanos tus sugerencias y quejas por correo electrónico para que podamos conocerlas y brindarles la
-          atención correspondiente.
+          Envíanos tus sugerencias y quejas completando el formulario para brindarte la atención correspondiente.
         </p>
       </div>
 
       <div className="account-section__action">
-        <a
+        <Link
           className="account-section__button"
-          href={GMAIL_COMPOSE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          to="/formulario-quejas"
         >
-          {COMPLAINTS_EMAIL}
-        </a>
+          Enviar sugerencia o queja
+        </Link>
         <p className="account-section__button-note">
-          Haz clic en el correo electrónico para abrir Gmail y enviarnos tus sugerencias y quejas .
+          Haz clic para abrir el formulario en línea y enviarnos tus sugerencias y quejas.
         </p>
       </div>
     </div>

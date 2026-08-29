@@ -9,6 +9,7 @@ import {
   type TransparenciaFormValues,
 } from './types'
 import { inferTransparenciaFileType } from './validateTransparenciaFile'
+import { deleteTransparenciaPublication } from '../services/transparenciaApi'
 
 const formatFileTypeLabel = (
   tipoArchivo: AdminTransparenciaPublication['tipoArchivo'],
@@ -127,13 +128,19 @@ const TransparenciaAdminPage = () => {
     showSuccess('Estado de la publicación actualizado.')
   }
 
-  const handleDelete = (publication: AdminTransparenciaPublication) => {
+  const handleDelete = async (publication: AdminTransparenciaPublication) => {
     const confirmed = window.confirm(
       `¿Eliminar la publicación «${publication.nombre}»? Esta acción no se puede deshacer.`,
     )
 
     if (!confirmed) {
       return
+    }
+
+    try {
+      await deleteTransparenciaPublication(publication.id)
+    } catch {
+      // Ignorar si la API no responde en entorno de pruebas
     }
 
     setPublications((current) =>

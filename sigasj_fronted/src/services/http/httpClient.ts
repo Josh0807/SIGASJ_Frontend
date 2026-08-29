@@ -1,7 +1,7 @@
 import { getAccessToken } from '../../modules/auth/utils/authStorage'
 
 const getApiBaseUrl = (): string => {
-  return import.meta.env?.VITE_API_URL ?? '/api'
+  return import.meta.env?.VITE_API_URL ?? 'http://localhost:3000/api/v1'
 }
 
 

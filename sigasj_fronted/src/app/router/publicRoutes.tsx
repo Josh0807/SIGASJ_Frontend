@@ -5,6 +5,7 @@ import LandingPage from '../../modules/landing/pages/LandingPage'
 import ReceiptQueryPage from '../../modules/recibos/pages/ReceiptQueryPage'
 import { PUBLIC_SERVICE_REQUEST_ROUTES } from '../../modules/landing/config/serviceRequestRoutes'
 import PublicFormPlaceholder from '../../shared/components/PublicFormPlaceholder'
+import ComplaintFormPage from '../../modules/landing/pages/ComplaintFormPage'
 import {
   LANDING_ROUTE_PATH,
   LOGIN_ROUTE_PATH,
@@ -30,6 +31,11 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
     path: RECEIPT_QUERY_ROUTE_PATH,
     element: <ReceiptQueryPage />,
     label: 'Consulta pública de recibos',
+  },
+  {
+    path: '/formulario-quejas',
+    element: <ComplaintFormPage />,
+    label: 'Formulario público de sugerencias y quejas',
   },
   {
     path: '/reportar-averia',
