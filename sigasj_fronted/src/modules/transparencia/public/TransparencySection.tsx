@@ -1,4 +1,4 @@
-﻿import TransparencyCard from './TransparencyCard'
+import TransparencyCard from './TransparencyCard'
 import type { TransparencySectionProps } from './TransparencySectionProps'
 import { TRANSPARENCY_SECTION_ID } from '../../landing/config/landingAnchors'
 import { usePublicTransparencia } from './usePublicTransparencia'
@@ -14,7 +14,7 @@ const TransparencySection = ({
   description =
     'Consulta informes, documentos e imágenes oficiales sobre la gestión del servicio y la calidad del agua en la ASADA San Juan.',
   publications: publicationsProp,
-  emptyMessage = 'Próximamente publicaremos documentos e informes en esta sección.',
+  emptyMessage = 'No hay documentos de transparencia publicados por el momento.',
   errorMessage = 'No fue posible cargar la documentación. Intenta de nuevo más tarde.',
 }: TransparencySectionProps) => {
   const useDefaultItems = publicationsProp === undefined
@@ -64,9 +64,9 @@ const TransparencySection = ({
             ))}
           </div>
         ) : (
-          <p className="transparency-section__empty" role="status">
+          <div className="text-center py-8 text-gray-500 transparency-section__empty" role="status">
             {emptyMessage}
-          </p>
+          </div>
         )}
       </div>
     </section>

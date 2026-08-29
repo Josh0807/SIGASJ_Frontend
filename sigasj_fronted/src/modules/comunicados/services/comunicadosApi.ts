@@ -89,3 +89,7 @@ export async function updateComunicado(
     body: toFormData(payload, file),
   })
 }
+
+export async function deleteComunicado(id: string): Promise<void> {
+  await fetchWithAuth(`${ADMIN_PATHS[0]}/${id}`, { method: 'DELETE' })
+}
