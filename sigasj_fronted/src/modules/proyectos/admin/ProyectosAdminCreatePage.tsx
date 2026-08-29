@@ -19,9 +19,12 @@ const ProyectosAdminCreatePage = () => {
     navigate(PROYECTOS_ADMIN_PATH)
   }
 
-  const handleSave = async (values: ProyectoFormValues) => {
+  const handleSave = async (
+    values: ProyectoFormValues,
+    imagenFile?: File | null,
+  ) => {
     try {
-      await createAdminProyecto(values)
+      await createAdminProyecto(values, imagenFile)
       closeForm()
     } catch (error) {
       const parsed = parseProyectoSubmitError(error)

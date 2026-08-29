@@ -6,6 +6,7 @@ import {
   PROYECTO_NOMBRE_MAX_LENGTH,
   getProyectoFormValidationError,
   validateProyectoForm,
+  validateProyectoImagenFile,
 } from './validateProyectoForm'
 
 const validValues = (): ProyectoFormValues => ({
@@ -118,6 +119,44 @@ describe('emptyProyectoFormValues', () => {
       encargadoRealizacion: '',
       duracion: '',
       estado: '',
+      imagenPrincipalUrl: null,
     })
+  })
+})
+
+describe('validateProyectoImagenFile', () => {
+  it('acepta formatos válidos (JPG, PNG, WEBP, GIF) dentro del límite de 5 MB', () => {
+    const validJpg = new File(['dummy'], 'cover.jpg', { type: 'image/jpeg' })
+    const validPng = new File(['dummy'], 'cover.png', { type: 'image/png' })
+    const validWebp = new File(['dummy'], 'cover.webp', { type: 'image/webp' })
+    const validGif = new File(['dummy'], 'cover.gif', { type: 'image/gif' })
+
+    expect(validateProyectoImagenFile(validJpg)).toBeNull()
+    expect(validateProyectoImagenFile(validPng)).toBeNull()
+    expect(validateProyectoImagenFile(validWebp)).toBeNull()
+    expect(validateProyectoImagenFile(validGif)).toBeNull()
+  })
+
+  it('rechaza archivos que superan los 5 MB', () => {
+    const bigBuffer = new Uint8Array(5 * 1024 * 1024 + 1)
+    const bigFile = new File([bigBuffer], 'large-cover.jpg', { type: 'image/jpeg' })
+
+    expect(validateProyectoImagenFile(bigFile)).toBe(
+      'El archivo supera el tamaño máximo permitido (5 MB).',
+    )
+  })
+
+  it('rechaza formatos de archivo no permitidos (ej. PDF, TXT, SVG, EXE)', () => {
+    const pdfFile = new File(['pdf content'], 'document.pdf', {
+      type: 'application/pdf',
+    })
+    const txtFile = new File(['text'], 'notes.txt', { type: 'text/plain' })
+
+    expect(validateProyectoImagenFile(pdfFile)).toBe(
+      'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.',
+    )
+    expect(validateProyectoImagenFile(txtFile)).toBe(
+      'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.',
+    )
   })
 })

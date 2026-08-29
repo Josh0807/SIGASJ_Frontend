@@ -170,13 +170,19 @@ describe('ProyectosAdmin — edición', () => {
     })
 
     expect(proyectosApi.updateAdminProyecto).toHaveBeenCalledTimes(1)
-    expect(proyectosApi.updateAdminProyecto).toHaveBeenCalledWith(7, {
-      nombre: 'Ampliación de Acueducto',
-      descripcion: 'Red principal actualizada',
-      encargadoRealizacion: 'Ing. María',
-      duracion: '10 meses',
-      estado: 'EN_PROCESO',
-    })
+    expect(proyectosApi.updateAdminProyecto).toHaveBeenCalledWith(
+      7,
+      {
+        nombre: 'Ampliación de Acueducto',
+        descripcion: 'Red principal actualizada',
+        encargadoRealizacion: 'Ing. María',
+        duracion: '10 meses',
+        estado: 'EN_PROCESO',
+        imagenPrincipalUrl: null,
+      },
+      null,
+      false,
+    )
     expect(container.querySelector('.gallery-admin__form')).toBeNull()
     expect(proyectosApi.getAdminProyectos).toHaveBeenCalledTimes(1)
   })

@@ -1,4 +1,5 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
+import { fetchPublicApi } from '../../../services/http/publicApi'
 import {
   isEstadoProyecto,
   type EstadoProyecto,
@@ -12,8 +13,50 @@ import {
 } from '../admin/types'
 
 const ADMIN_PATHS = ['/v1/admin/proyectos', '/admin/proyectos']
+const PUBLIC_PROYECTOS_PATHS = ['/v1/public/proyectos', '/public/proyectos']
+
+export type PublicProyecto = {
+  id: number
+  nombre: string
+  imagenPrincipal?: string | null
+  duracion?: string | null
+  estado: EstadoProyecto
+}
+
+export type PublicProyectoImagen = {
+  id: number
+  imagenUrl: string
+  textoAlternativo?: string | null
+  ordenVisualizacion?: number
+}
+
+export type PublicProyectoDetalle = {
+  id: number
+  nombre: string
+  descripcion?: string | null
+  encargadoRealizacion?: string | null
+  duracion?: string | null
+  estado: EstadoProyecto
+  imagenPrincipal?: string | null
+  activo: boolean
+  imagenes?: PublicProyectoImagen[]
+}
+
+export async function getPublicProyectos(): Promise<PublicProyecto[]> {
+  const data = await fetchPublicApi<PublicProyecto[]>(PUBLIC_PROYECTOS_PATHS)
+  return Array.isArray(data) ? data : []
+}
+
+export async function getPublicProyectoDetalle(
+  id: number | string,
+): Promise<PublicProyectoDetalle> {
+  const paths = [`/v1/public/proyectos/${id}`, `/public/proyectos/${id}`]
+  return await fetchPublicApi<PublicProyectoDetalle>(paths)
+}
+
 
 export type CreateProyectoPayload = {
+
   nombre: string
   descripcion?: string
   encargadoRealizacion: string
@@ -89,22 +132,63 @@ export async function getAdminProyectos(
   throw lastError ?? new Error('No fue posible consultar los proyectos.')
 }
 
+export const toProyectoFormData = (
+  values: ProyectoFormValues,
+  imagenFile?: File | null,
+  removeImagen?: boolean,
+): FormData => {
+  const form = new FormData()
+  form.append('nombre', values.nombre.trim())
+  if (values.descripcion.trim()) {
+    form.append('descripcion', values.descripcion.trim())
+  }
+  form.append('encargadoRealizacion', values.encargadoRealizacion.trim())
+  form.append('duracion', values.duracion.trim())
+  if (values.estado) {
+    form.append('estado', values.estado)
+  }
+  if (imagenFile) {
+    form.append('imagenPrincipal', imagenFile)
+  } else if (removeImagen) {
+    form.append('removeImagenPrincipal', 'true')
+  }
+  return form
+}
+
 export async function createAdminProyecto(
   values: ProyectoFormValues,
+  imagenFile?: File | null,
 ): Promise<AdminProyecto> {
-  const payload = toCreateProyectoPayload(values)
   let lastError: Error | null = null
 
-  for (const path of ADMIN_PATHS) {
-    try {
-      return await fetchWithAuth<AdminProyecto>(path, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error))
-      if (!isNotFoundError(lastError)) {
-        throw lastError
+  if (imagenFile) {
+    const formData = toProyectoFormData(values, imagenFile)
+    for (const path of ADMIN_PATHS) {
+      try {
+        return await fetchWithAuth<AdminProyecto>(path, {
+          method: 'POST',
+          body: formData,
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
+      }
+    }
+  } else {
+    const payload = toCreateProyectoPayload(values)
+    for (const path of ADMIN_PATHS) {
+      try {
+        return await fetchWithAuth<AdminProyecto>(path, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
       }
     }
   }
@@ -159,15 +243,113 @@ export async function getAdminProyecto(
 export async function updateAdminProyecto(
   id: number,
   values: ProyectoFormValues,
+  imagenFile?: File | null,
+  removeImagen?: boolean,
 ): Promise<AdminProyectoDetalle> {
-  const payload = toUpdateProyectoPayload(values)
   let lastError: Error | null = null
 
+  if (imagenFile || removeImagen) {
+    const formData = toProyectoFormData(values, imagenFile, removeImagen)
+    for (const path of ADMIN_PATHS) {
+      try {
+        return await fetchWithAuth<AdminProyectoDetalle>(`${path}/${id}`, {
+          method: 'PATCH',
+          body: formData,
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
+      }
+    }
+  } else {
+    const payload = toUpdateProyectoPayload(values)
+    for (const path of ADMIN_PATHS) {
+      try {
+        return await fetchWithAuth<AdminProyectoDetalle>(`${path}/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible actualizar el proyecto.')
+}
+
+export async function uploadProyectoImagenPrincipal(
+  id: number,
+  file: File,
+): Promise<AdminProyectoDetalle> {
+  const form = new FormData()
+  form.append('imagenPrincipal', file)
+
+  let lastError: Error | null = null
   for (const path of ADMIN_PATHS) {
     try {
-      return await fetchWithAuth<AdminProyectoDetalle>(`${path}/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
+      return await fetchWithAuth<AdminProyectoDetalle>(
+        `${path}/${id}/imagen-principal`,
+        {
+          method: 'POST',
+          body: form,
+        },
+      )
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      if (!isNotFoundError(lastError)) {
+        throw lastError
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible subir la imagen principal.')
+}
+
+export async function removeProyectoImagenPrincipal(
+  id: number,
+): Promise<AdminProyectoDetalle> {
+  let lastError: Error | null = null
+  for (const path of ADMIN_PATHS) {
+    try {
+      return await fetchWithAuth<AdminProyectoDetalle>(
+        `${path}/${id}/imagen-principal`,
+        {
+          method: 'DELETE',
+        },
+      )
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      if (!isNotFoundError(lastError)) {
+        throw lastError
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible eliminar la imagen principal.')
+}
+
+export async function uploadProyectoImagenes(
+  id: number,
+  files: File[],
+): Promise<AdminProyectoDetalle> {
+  const form = new FormData()
+  files.forEach((file) => {
+    form.append('imagenes', file)
+    form.append('file', file)
+  })
+
+  let lastError: Error | null = null
+  for (const path of ADMIN_PATHS) {
+    try {
+      return await fetchWithAuth<AdminProyectoDetalle>(`${path}/${id}/imagenes`, {
+        method: 'POST',
+        body: form,
       })
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error))
@@ -177,5 +359,109 @@ export async function updateAdminProyecto(
     }
   }
 
-  throw lastError ?? new Error('No fue posible actualizar el proyecto.')
+  throw lastError ?? new Error('No fue posible subir las fotografías.')
 }
+
+export async function deleteProyectoImagen(
+  proyectoId: number,
+  imagenId: number,
+): Promise<AdminProyectoDetalle> {
+  let lastError: Error | null = null
+  for (const path of ADMIN_PATHS) {
+    try {
+      return await fetchWithAuth<AdminProyectoDetalle>(
+        `${path}/${proyectoId}/imagenes/${imagenId}`,
+        {
+          method: 'DELETE',
+        },
+      )
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      if (!isNotFoundError(lastError)) {
+        throw lastError
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible eliminar la fotografía.')
+}
+
+export async function reorderProyectoImagenes(
+  proyectoId: number,
+  ordenes: { id: number; orden: number }[],
+): Promise<AdminProyectoDetalle> {
+  let lastError: Error | null = null
+  for (const path of ADMIN_PATHS) {
+    try {
+      return await fetchWithAuth<AdminProyectoDetalle>(
+        `${path}/${proyectoId}/imagenes/orden`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ ordenes }),
+        },
+      )
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      if (!isNotFoundError(lastError)) {
+        throw lastError
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible actualizar el orden de las fotografías.')
+}
+
+export async function updateProyectoVisibilidad(
+  id: number,
+  activo: boolean,
+): Promise<AdminProyecto> {
+  let lastError: Error | null = null
+
+  // Intentar endpoint específico /visibilidad y fallback general
+  for (const basePath of ADMIN_PATHS) {
+    const paths = [`${basePath}/${id}/visibilidad`, `${basePath}/${id}`]
+    for (const path of paths) {
+      try {
+        return await fetchWithAuth<AdminProyecto>(path, {
+          method: 'PATCH',
+          body: JSON.stringify({ activo }),
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible actualizar la visibilidad del proyecto.')
+}
+
+export async function updateProyectoEstado(
+  id: number,
+  estado: EstadoProyecto,
+): Promise<AdminProyecto> {
+  let lastError: Error | null = null
+
+  for (const basePath of ADMIN_PATHS) {
+    const paths = [`${basePath}/${id}/estado`, `${basePath}/${id}`]
+    for (const path of paths) {
+      try {
+        return await fetchWithAuth<AdminProyecto>(path, {
+          method: 'PATCH',
+          body: JSON.stringify({ estado }),
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
+      }
+    }
+  }
+
+  throw lastError ?? new Error('No fue posible actualizar el estado del proyecto.')
+}
+
+

@@ -13,7 +13,11 @@ import ProyectosAdminTable from './ProyectosAdminTable'
 import ProyectosAdminPagination from './ProyectosAdminPagination'
 import ProyectosAdminQueryStates from './ProyectosAdminQueryStates'
 import { PROYECTOS_ADMIN_NEW_PATH } from './proyectosAdminPaths'
-import { toActivoQueryParam } from '../services/proyectosApi'
+import {
+  toActivoQueryParam,
+  updateProyectoEstado,
+  updateProyectoVisibilidad,
+} from '../services/proyectosApi'
 import { useAdminProyectos } from '../hooks/useAdminProyectos'
 
 const EMPTY_FILTER = ''
@@ -28,6 +32,7 @@ const ProyectosAdminPage = () => {
   const [estado, setEstado] = useState(EMPTY_FILTER)
   const [activo, setActivo] = useState(EMPTY_FILTER)
   const [page, setPage] = useState(DEFAULT_PROYECTOS_PAGE)
+  const [actionError, setActionError] = useState<string | null>(null)
   const appliedNombreRef = useRef(nombre)
 
   const applyNombreSearch = useCallback((value: string) => {
@@ -56,6 +61,35 @@ const ProyectosAdminPage = () => {
     page,
     limit: DEFAULT_PROYECTOS_LIMIT,
   })
+
+  const handleToggleVisibilidad = async (id: number, proximoActivo: boolean) => {
+    setActionError(null)
+    try {
+      await updateProyectoVisibilidad(id, proximoActivo)
+      await refetch()
+    } catch (err) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'No fue posible actualizar la visibilidad del proyecto.'
+      setActionError(msg)
+    }
+  }
+
+  const handleEstadoChange = async (id: number, nuevoEstado: EstadoProyecto) => {
+    setActionError(null)
+    try {
+      await updateProyectoEstado(id, nuevoEstado)
+      await refetch()
+    } catch (err) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'No fue posible actualizar el estado de ejecución.'
+      setActionError(msg)
+    }
+  }
+
 
   const totalPages = listado.totalPages
   const hasActiveFilters =
@@ -168,6 +202,15 @@ const ProyectosAdminPage = () => {
           ) : null}
         </section>
 
+        {actionError ? (
+          <div className="gallery-admin__error" role="alert" style={{ marginBottom: '16px' }}>
+            <p>{actionError}</p>
+            <button type="button" onClick={() => setActionError(null)}>
+              Cerrar
+            </button>
+          </div>
+        ) : null}
+
         <section aria-label="Listado de proyectos">
           <ProyectosAdminQueryStates
             loading={loading}
@@ -176,9 +219,14 @@ const ProyectosAdminPage = () => {
             hasActiveFilters={hasActiveFilters}
             onRetry={refetch}
           >
-            <ProyectosAdminTable proyectos={listado.data} />
+            <ProyectosAdminTable
+              proyectos={listado.data}
+              onToggleVisibilidad={handleToggleVisibilidad}
+              onEstadoChange={handleEstadoChange}
+            />
           </ProyectosAdminQueryStates>
         </section>
+
 
         {loading || error ? null : (
           <ProyectosAdminPagination

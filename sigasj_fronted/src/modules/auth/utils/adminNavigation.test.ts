@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import '../../../app/router/privateRoutes'
 import { ADMIN_MODULE_ACCESS } from '../config/adminNavigation.config'
 import {
   canAccessAdminRoute,
@@ -141,21 +142,15 @@ describe('adminNavigation helpers', () => {
     expect(getAdminNavItemsForUser(abonado)).toEqual([])
   })
 
-  it(
-    'sigue resolviendo rutas administrativas después de cargar el árbol de pantallas',
-    async () => {
-      await import('../../../app/router/AppRoutes')
-
-      expect(getAllowedRolesForAdminPath('/admin/dashboard')).toEqual([
-        'Administradora',
-        'Secretaria',
-        'Fontanero',
-      ])
-      expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
-      expect(getAbonadosNavItemsForUser(administradora).map((item) => item.path)).toEqual([
-        '/admin/abonados',
-      ])
-    },
-    15000,
-  )
+  it('sigue resolviendo rutas administrativas después de cargar el árbol de pantallas', () => {
+    expect(getAllowedRolesForAdminPath('/admin/dashboard')).toEqual([
+      'Administradora',
+      'Secretaria',
+      'Fontanero',
+    ])
+    expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
+    expect(getAbonadosNavItemsForUser(administradora).map((item) => item.path)).toEqual([
+      '/admin/abonados',
+    ])
+  })
 })

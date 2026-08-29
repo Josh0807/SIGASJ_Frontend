@@ -343,6 +343,7 @@ describe('Pruebas funcionales — ProyectoForm', () => {
       encargadoRealizacion: 'Ing. María',
       duracion: '8 meses',
       estado: 'PENDIENTE',
+      imagenPrincipalUrl: null,
     })
     expect(toCreateProyectoPayload(submittedCreate()!)).toEqual({
       nombre: 'Ampliación de Acueducto',
@@ -432,6 +433,7 @@ describe('Pruebas funcionales — ProyectoForm', () => {
       encargadoRealizacion: 'Ing. María',
       duracion: '8 meses',
       estado: 'EN_PROCESO',
+      imagenPrincipalUrl: null,
     })
     expect(toUpdateProyectoPayload(values)).toEqual({
       nombre: 'Ampliación Norte',
@@ -462,6 +464,7 @@ describe('Pruebas funcionales — ProyectoForm', () => {
       encargadoRealizacion: 'Ing. Carlos',
       duracion: '12 meses',
       estado: 'EN_PROCESO',
+      imagenPrincipalUrl: null,
     })
     expect(toUpdateProyectoPayload(values)).toEqual({
       nombre: 'Tanque elevado',

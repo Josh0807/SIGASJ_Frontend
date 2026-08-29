@@ -8,6 +8,36 @@ export const PROYECTO_NOMBRE_MAX_LENGTH = 200
 export const PROYECTO_ENCARGADO_MAX_LENGTH = 150
 export const PROYECTO_DURACION_MAX_LENGTH = 100
 
+export const PROYECTO_IMAGEN_MAX_SIZE_BYTES = 5 * 1024 * 1024 // 5 MB
+export const PROYECTO_IMAGEN_ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+]
+export const PROYECTO_IMAGEN_ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
+
+export function validateProyectoImagenFile(file: File): string | null {
+  const name = file.name.toLowerCase()
+  const extensionIndex = name.lastIndexOf('.')
+  const extension = extensionIndex >= 0 ? name.substring(extensionIndex) : ''
+
+  const isTypeAllowed =
+    PROYECTO_IMAGEN_ALLOWED_TYPES.includes(file.type.toLowerCase()) ||
+    (extension && PROYECTO_IMAGEN_ALLOWED_EXTENSIONS.includes(extension))
+
+  if (!isTypeAllowed) {
+    return 'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.'
+  }
+
+  if (file.size > PROYECTO_IMAGEN_MAX_SIZE_BYTES) {
+    return 'El archivo supera el tamaño máximo permitido (5 MB).'
+  }
+
+  return null
+}
+
 export type ProyectoFormValidationError = {
   field: ProyectoFormField
   message: string
