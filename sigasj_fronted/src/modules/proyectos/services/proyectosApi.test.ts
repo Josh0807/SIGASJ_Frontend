@@ -400,16 +400,20 @@ describe('uploadProyectoImagenes / deleteProyectoImagen / reorderProyectoImagene
   })
 
   it('envía POST multipart a /v1/admin/proyectos/:id/imagenes', async () => {
-    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detalle)
+    vi.mocked(fetchWithAuth).mockResolvedValue(detalle)
     const file1 = new File(['1'], 'photo1.jpg', { type: 'image/jpeg' })
     const file2 = new File(['2'], 'photo2.jpg', { type: 'image/jpeg' })
 
     const res = await uploadProyectoImagenes(12, [file1, file2])
     expect(res).toEqual(detalle)
+    expect(fetchWithAuth).toHaveBeenCalledTimes(2)
     expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagenes', {
       method: 'POST',
       body: expect.any(FormData),
     })
+    const firstForm = vi.mocked(fetchWithAuth).mock.calls[0][1]?.body as FormData
+    expect(firstForm.get('imagen')).toBe(file1)
+    expect(firstForm.has('imagenes')).toBe(false)
   })
 
   it('envía DELETE a /v1/admin/proyectos/:proyectoId/imagenes/:imagenId', async () => {
@@ -433,7 +437,7 @@ describe('uploadProyectoImagenes / deleteProyectoImagen / reorderProyectoImagene
     expect(res).toEqual(detalle)
     expect(fetchWithAuth).toHaveBeenCalledWith('/v1/admin/proyectos/12/imagenes/orden', {
       method: 'PATCH',
-      body: JSON.stringify({ ordenes }),
+      body: JSON.stringify({ items: ordenes }),
     })
   })
 })
