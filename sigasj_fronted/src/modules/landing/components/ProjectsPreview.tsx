@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ESTADO_PROYECTO_LABELS } from '../../proyectos/types/estadoProyecto'
 import { usePublicProyectos } from '../../proyectos/hooks/usePublicProyectos'
@@ -28,10 +28,10 @@ const ProjectsPreview = ({
   const [selectedProyecto, setSelectedProyecto] = useState<PublicProyecto | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [slidesPerView, setSlidesPerView] = useState(3)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const [touchEndX, setTouchEndX] = useState<number | null>(null)
-  const [touchStartY, setTouchStartY] = useState<number | null>(null)
-  const [touchEndY, setTouchEndY] = useState<number | null>(null)
+  const touchStartXRef = useRef<number | null>(null)
+  const touchEndXRef = useRef<number | null>(null)
+  const touchStartYRef = useRef<number | null>(null)
+  const touchEndYRef = useRef<number | null>(null)
 
   useEffect(() => {
     const updateSlidesPerView = () => {
@@ -59,20 +59,32 @@ const ProjectsPreview = ({
   }, [maxIndex])
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartX(e.targetTouches[0].clientX)
-    setTouchStartY(e.targetTouches[0].clientY)
+    const touch = e.targetTouches?.[0] || e.touches?.[0] || e.changedTouches?.[0]
+    if (touch) {
+      touchStartXRef.current = touch.clientX
+      touchStartYRef.current = touch.clientY
+      touchEndXRef.current = null
+      touchEndYRef.current = null
+    }
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEndX(e.targetTouches[0].clientX)
-    setTouchEndY(e.targetTouches[0].clientY)
+    const touch = e.targetTouches?.[0] || e.touches?.[0] || e.changedTouches?.[0]
+    if (touch) {
+      touchEndXRef.current = touch.clientX
+      touchEndYRef.current = touch.clientY
+    }
   }
 
   const handleTouchEnd = () => {
-    if (touchStartX === null || touchEndX === null) return
-    const diffX = touchStartX - touchEndX
-    const diffY =
-      touchStartY !== null && touchEndY !== null ? touchStartY - touchEndY : 0
+    const startX = touchStartXRef.current
+    const endX = touchEndXRef.current
+    const startY = touchStartYRef.current
+    const endY = touchEndYRef.current
+
+    if (startX === null || endX === null) return
+    const diffX = startX - endX
+    const diffY = startY !== null && endY !== null ? startY - endY : 0
 
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
       if (diffX > 0 && canNext) {
@@ -82,10 +94,10 @@ const ProjectsPreview = ({
       }
     }
 
-    setTouchStartX(null)
-    setTouchEndX(null)
-    setTouchStartY(null)
-    setTouchEndY(null)
+    touchStartXRef.current = null
+    touchEndXRef.current = null
+    touchStartYRef.current = null
+    touchEndYRef.current = null
   }
 
 
