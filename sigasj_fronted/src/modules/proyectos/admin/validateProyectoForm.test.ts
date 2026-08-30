@@ -151,11 +151,17 @@ describe('validateProyectoImagenFile', () => {
       type: 'application/pdf',
     })
     const txtFile = new File(['text'], 'notes.txt', { type: 'text/plain' })
+    const fakeJpg = new File(['%PDF-1.4'], 'portada.jpg', {
+      type: 'application/pdf',
+    })
 
     expect(validateProyectoImagenFile(pdfFile)).toBe(
       'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.',
     )
     expect(validateProyectoImagenFile(txtFile)).toBe(
+      'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.',
+    )
+    expect(validateProyectoImagenFile(fakeJpg)).toBe(
       'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.',
     )
   })

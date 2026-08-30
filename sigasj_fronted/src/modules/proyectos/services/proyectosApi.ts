@@ -136,6 +136,7 @@ export const toProyectoFormData = (
   values: ProyectoFormValues,
   imagenFile?: File | null,
   removeImagen?: boolean,
+  options?: { includeEstado?: boolean },
 ): FormData => {
   const form = new FormData()
   form.append('nombre', values.nombre.trim())
@@ -144,7 +145,7 @@ export const toProyectoFormData = (
   }
   form.append('encargadoRealizacion', values.encargadoRealizacion.trim())
   form.append('duracion', values.duracion.trim())
-  if (values.estado) {
+  if (options?.includeEstado && values.estado) {
     form.append('estado', values.estado)
   }
   if (imagenFile) {
@@ -162,7 +163,9 @@ export async function createAdminProyecto(
   let lastError: Error | null = null
 
   if (imagenFile) {
-    const formData = toProyectoFormData(values, imagenFile)
+    const formData = toProyectoFormData(values, imagenFile, undefined, {
+      includeEstado: true,
+    })
     for (const path of ADMIN_PATHS) {
       try {
         return await fetchWithAuth<AdminProyecto>(path, {
@@ -215,6 +218,17 @@ export const toUpdateProyectoPayload = (
     encargadoRealizacion: values.encargadoRealizacion.trim(),
     duracion: values.duracion.trim(),
   }
+}
+
+export function parseAdminProyectoId(
+  value: string | number | null | undefined,
+): number | null {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const id = typeof value === 'number' ? value : Number(value)
+  return Number.isInteger(id) && id > 0 ? id : null
 }
 
 export async function getAdminProyecto(
@@ -338,28 +352,43 @@ export async function uploadProyectoImagenes(
   id: number,
   files: File[],
 ): Promise<AdminProyectoDetalle> {
-  const form = new FormData()
-  files.forEach((file) => {
-    form.append('imagenes', file)
-    form.append('file', file)
-  })
-
+  let lastResult: AdminProyectoDetalle | undefined
   let lastError: Error | null = null
-  for (const path of ADMIN_PATHS) {
-    try {
-      return await fetchWithAuth<AdminProyectoDetalle>(`${path}/${id}/imagenes`, {
-        method: 'POST',
-        body: form,
-      })
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error))
-      if (!isNotFoundError(lastError)) {
-        throw lastError
+
+  for (const file of files) {
+    const form = new FormData()
+    form.append('imagen', file)
+    lastResult = undefined
+
+    for (const path of ADMIN_PATHS) {
+      try {
+        lastResult = await fetchWithAuth<AdminProyectoDetalle>(
+          `${path}/${id}/imagenes`,
+          {
+            method: 'POST',
+            body: form,
+          },
+        )
+        lastError = null
+        break
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        if (!isNotFoundError(lastError)) {
+          throw lastError
+        }
       }
+    }
+
+    if (!lastResult) {
+      throw lastError ?? new Error('No fue posible subir las fotografías.')
     }
   }
 
-  throw lastError ?? new Error('No fue posible subir las fotografías.')
+  if (!lastResult) {
+    throw lastError ?? new Error('No fue posible subir las fotografías.')
+  }
+
+  return lastResult
 }
 
 export async function deleteProyectoImagen(
@@ -397,7 +426,7 @@ export async function reorderProyectoImagenes(
         `${path}/${proyectoId}/imagenes/orden`,
         {
           method: 'PATCH',
-          body: JSON.stringify({ ordenes }),
+          body: JSON.stringify({ items: ordenes }),
         },
       )
     } catch (error) {

@@ -19,13 +19,9 @@ export const PROYECTO_IMAGEN_ALLOWED_TYPES = [
 export const PROYECTO_IMAGEN_ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
 
 export function validateProyectoImagenFile(file: File): string | null {
-  const name = file.name.toLowerCase()
-  const extensionIndex = name.lastIndexOf('.')
-  const extension = extensionIndex >= 0 ? name.substring(extensionIndex) : ''
-
-  const isTypeAllowed =
-    PROYECTO_IMAGEN_ALLOWED_TYPES.includes(file.type.toLowerCase()) ||
-    (extension && PROYECTO_IMAGEN_ALLOWED_EXTENSIONS.includes(extension))
+  const mime =
+    file.type.toLowerCase() === 'image/jpg' ? 'image/jpeg' : file.type.toLowerCase()
+  const isTypeAllowed = PROYECTO_IMAGEN_ALLOWED_TYPES.includes(mime)
 
   if (!isTypeAllowed) {
     return 'Formato de imagen no permitido. Solo se aceptan imágenes JPG, PNG, WEBP o GIF.'
