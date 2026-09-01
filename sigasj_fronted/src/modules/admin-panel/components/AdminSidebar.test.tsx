@@ -24,6 +24,15 @@ describe('AdminSidebar', () => {
     expect(markup).toContain('ASADA San Juan')
   })
 
+  it('muestra el estado del sistema sin duplicar el menú de cuenta', () => {
+    const markup = renderSidebar()
+
+    expect(markup).toContain('admin-sidebar__system-status')
+    expect(markup).toContain('Sistema en línea')
+    expect(markup).toContain('SIGASJ operativo')
+    expect(markup).not.toContain('admin-user-menu')
+  })
+
   it('renderiza el contenedor de opciones con multiples enlaces', () => {
     const markup = renderSidebar()
 

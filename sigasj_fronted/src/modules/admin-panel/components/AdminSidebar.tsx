@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import AdminNavIcon from './AdminNavIcon'
-import AdminUserMenu from './AdminUserMenu'
 import type { AdminSidebarItem, AdminSidebarProps } from '../props'
 
 export type { AdminSidebarItem, AdminSidebarProps }
@@ -68,7 +67,13 @@ const AdminSidebar = ({
       ))}
     </nav>
     <div className="admin-sidebar__footer">
-      <AdminUserMenu variant="sidebar" />
+      <div className="admin-sidebar__system-status" role="status" aria-label="Estado del sistema: en línea">
+        <span className="admin-sidebar__status-dot" aria-hidden="true" />
+        <span className="admin-sidebar__status-copy">
+          <strong>Sistema en línea</strong>
+          <small>SIGASJ operativo</small>
+        </span>
+      </div>
     </div>
   </aside>
 )

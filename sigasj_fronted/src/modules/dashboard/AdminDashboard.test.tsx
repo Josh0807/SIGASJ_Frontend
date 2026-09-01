@@ -42,8 +42,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('Indicadores generales')
     expect(markup).toContain('Asociados activos')
     expect(markup).toContain('1,248')
-    expect(markup).toContain('Recursos Humanos')
-    expect(markup).toContain('34')
+    expect(markup).not.toContain('Recursos Humanos')
     expect(markup).toContain('Averías reportadas')
     expect(markup).toContain('3')
     expect(markup).toContain('Solicitudes en trámite')
@@ -51,7 +50,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
 
     // Verificar correspondencia con los módulos
     expect(markup).toContain('href="/admin/abonados"')
-    expect(markup).toContain('href="/admin/lecturas"')
+    expect(markup).not.toContain('href="/admin/lecturas"')
     expect(markup).toContain('href="/admin/averias"')
     expect(markup).toContain('href="/admin/solicitudes"')
   })
