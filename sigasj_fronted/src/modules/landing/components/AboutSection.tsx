@@ -8,18 +8,18 @@ const AboutIcon = ({ children }: { children: ReactNode }) => (
 )
 
 const AboutSection = () => (
-  <section id="sobre-nosotros" className="about-section" aria-labelledby="sobre-nosotros-title">
+  <section
+    id="sobre-nosotros"
+    className="landing-section about-section"
+    aria-labelledby="sobre-nosotros-title"
+  >
     <div className="about-section__content">
-      <div className="about-section__overview">
-        <header className="about-section__heading">
-          <p className="about-section__eyebrow">Nuestra identidad</p>
-          <h2 id="sobre-nosotros-title">Sobre nosotros</h2>
-          <p className="about-section__intro">
-            ASADA San Juan de Santa Cruz es una organización comunal encargada de la gestión y
-            operación del acueducto de San Juan de Santa Cruz, Guanacaste.
-          </p>
-        </header>
+      <header className="about-section__heading">
+        <p className="about-section__eyebrow">Nuestra identidad</p>
+        <h2 id="sobre-nosotros-title">Sobre nosotros</h2>
+      </header>
 
+      <div className="about-section__body">
         <figure className="about-section__visual">
           <img
             className="about-section__image"
@@ -27,9 +27,8 @@ const AboutSection = () => (
             alt="Instalaciones de la ASADA San Juan"
           />
         </figure>
-      </div>
 
-      <div className="about-section__grid">
+        <div className="about-section__grid">
         <article className="about-section__card about-section__card--compact">
           <AboutIcon>
             <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
@@ -60,27 +59,25 @@ const AboutSection = () => (
           <p>Brindar un servicio de agua potable de calidad a la comunidad de San Juan de Santa Cruz, administrando el recurso hídrico de manera eficiente, transparente y sostenible, promoviendo su uso responsable y contribuyendo al bienestar de todos los usuarios.</p>
         </article>
 
-        <article className="about-section__card about-section__card--history">
-          <AboutIcon>
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
-              <path
-                d="M5 5.5h11.5A2.5 2.5 0 0 1 19 8v11.5H7.5A2.5 2.5 0 0 0 5 21.5V5.5Z"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinejoin="round"
-              />
-              <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19" stroke="currentColor" strokeWidth="1.7" />
-              <path d="M9 10h6.5M9 14h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-            </svg>
-          </AboutIcon>
-          <h3>Reseña histórica</h3>
+        </div>
+      </div>
+
+      <details className="about-section__history">
+        <summary>
+          <span>
+            <strong>Reseña histórica</strong>
+            <small>Conozca el origen y la evolución de nuestra ASADA</small>
+          </span>
+          <span className="about-section__history-action">Leer historia</span>
+        </summary>
+        <div className="about-section__history-content">
           <p>La Asociación Administradora del Sistema de Acueducto y Alcantarillado Sanitario (ASADA) de San Juan de Santa Cruz, Guanacaste, tiene sus orígenes en el año 2003, cuando el 24 de septiembre, un grupo de 53 vecinos fundadores se reunió en el salón comunal con el propósito de constituir una organización encargada de administrar, operar y proteger el sistema de abastecimiento de agua potable de la comunidad. 
 El acueducto que abastece a la comunidad había sido construido en 1977, respondiendo a las necesidades de la población de aquella época. Con el paso de los años, el crecimiento poblacional y el aumento en la demanda del servicio hicieron necesaria una administración comunal organizada que garantizara el acceso al agua potable y el mantenimiento de la infraestructura. 
 Desde su creación, la ASADA San Juan ha trabajado en el mejoramiento continuo del servicio, velando por la conservación de las fuentes de agua, el mantenimiento de la red de distribución y la promoción del uso responsable del recurso hídrico. Gracias al esfuerzo conjunto de sus juntas directivas, personal administrativo, fontaneros y usuarios, la asociación se ha consolidado como una organización comprometida con el bienestar y el desarrollo de la comunidad.
 En la actualidad, la ASADA continúa enfrentando el reto de modernizar y ampliar su infraestructura para responder al crecimiento de la población y garantizar un servicio de agua potable eficiente, seguro y sostenible para las generaciones presentes y futuras.
 </p>
-        </article>
-      </div>
+        </div>
+      </details>
     </div>
   </section>
 )

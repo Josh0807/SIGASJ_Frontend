@@ -1,7 +1,6 @@
 import AdminNavIcon from '../admin-panel/components/AdminNavIcon'
 import IndicatorCard from '../../shared/components/IndicatorCard'
 import ErrorBoundary from '../../shared/components/ErrorBoundary'
-import ReadingProgressWidget from './components/ReadingProgressWidget'
 import RecentAlertsWidget from './components/RecentAlertsWidget'
 import RecentActivityWidget from './components/RecentActivityWidget'
 import { useDashboardMetrics } from './hooks/useDashboardMetrics'
@@ -156,12 +155,9 @@ const AdminDashboard = () => {
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header">
             <h2>Operaciones en tiempo real</h2>
-            <p>Monitoreo operativo del acueducto, lecturas del ciclo y bitácora reciente.</p>
+            <p>Monitoreo de averías del acueducto y bitácora de actividad reciente.</p>
           </div>
           <div className="admin-dashboard__widgets-grid">
-            <ErrorBoundary>
-              <ReadingProgressWidget />
-            </ErrorBoundary>
             <ErrorBoundary>
               <RecentAlertsWidget />
             </ErrorBoundary>

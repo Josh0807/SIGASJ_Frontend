@@ -498,7 +498,9 @@ body {
 
 .about-section__heading {
   min-width: 0;
-  max-width: 40rem;
+  max-width: 46rem;
+  margin: 0;
+  text-align: left;
 }
 
 .about-section__eyebrow {
@@ -518,8 +520,8 @@ body {
 }
 
 .about-section__intro {
-  max-width: 52ch;
-  margin: 0;
+  max-width: 64ch;
+  margin: 0 auto;
   color: #516779;
   font-size: clamp(1rem, 1.8vw, 1.1rem);
   line-height: 1.7;
@@ -535,11 +537,12 @@ body {
 .about-section__image {
   display: block;
   width: 100%;
-  height: clamp(220px, 28vw, 300px);
+  height: auto;
+  aspect-ratio: 1;
   border: 1px solid rgba(142, 188, 224, .7);
   border-radius: 24px;
-  object-fit: cover;
-  object-position: center 58%;
+  object-fit: contain;
+  object-position: center;
   box-shadow: 0 18px 36px rgba(18, 63, 112, .12);
 }
 
@@ -576,10 +579,18 @@ body {
 
 .about-section__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: clamp(16px, 2.4vw, 22px);
-  margin-top: clamp(32px, 5vw, 48px);
-  align-items: start;
+  margin-top: 0;
+  align-items: stretch;
+}
+
+.about-section__body {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  gap: clamp(22px, 4vw, 42px);
+  align-items: stretch;
+  margin-top: clamp(24px, 3.5vw, 36px);
 }
 
 .about-section__card {
@@ -659,6 +670,100 @@ body {
   color: #516779;
   line-height: 1.65;
   overflow-wrap: anywhere;
+}
+
+.about-section__history {
+  margin-top: clamp(18px, 2.5vw, 24px);
+  overflow: hidden;
+  border: 1px solid #d5e6f4;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 10px 26px rgba(18, 63, 112, .07);
+}
+
+.about-section__history summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 88px;
+  padding: 20px 24px;
+  color: #123f70;
+  cursor: pointer;
+  list-style: none;
+}
+
+.about-section__history summary::-webkit-details-marker {
+  display: none;
+}
+
+.about-section__history summary:focus-visible {
+  outline: 3px solid #7db7ed;
+  outline-offset: -3px;
+}
+
+.about-section__history summary > span:first-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.about-section__history summary strong {
+  font-size: 1.16rem;
+}
+
+.about-section__history summary small {
+  color: #5d7386;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.about-section__history-action {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border: 1px solid #b9d7ed;
+  border-radius: 10px;
+  color: #1e5a9c;
+  background: #eef7fd;
+  font-size: .86rem;
+  font-weight: 750;
+}
+
+.about-section__history[open] .about-section__history-action {
+  color: #ffffff;
+  border-color: #1e5a9c;
+  background: #1e5a9c;
+}
+
+.about-section__history-content {
+  padding: 0 24px 24px;
+  border-top: 1px solid #e2edf6;
+}
+
+.about-section__history-content p {
+  margin: 20px 0 0;
+  color: #516779;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+@media (max-width: 520px) {
+  .about-section__history summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .about-section__history-action {
+    width: 100%;
+    text-align: center;
+  }
+
+  .about-section__history-content {
+    padding: 0 18px 20px;
+  }
 }
 
 .announcements-section {
@@ -2169,7 +2274,7 @@ button.announcements-section__more {
   min-width: 0;
 }
 
-.receipt-payment__consultation h2 {
+.landing-section .receipt-payment__consultation h2 {
   margin: 0 0 12px;
   color: white;
   font-size: clamp(1.8rem, 4vw, 2.5rem);
@@ -3328,6 +3433,10 @@ button.announcements-section__more {
 }
 
 @media (max-width: 760px) {
+  .about-section__body {
+    grid-template-columns: 1fr;
+  }
+
   .about-section__grid {
     grid-template-columns: 1fr;
   }
@@ -3393,7 +3502,7 @@ button.announcements-section__more {
   }
 
   .about-section__image {
-    height: 240px;
+    height: auto;
     border-radius: 18px;
   }
 
@@ -3614,25 +3723,6 @@ button.announcements-section__more {
 .projects-preview__content {
   width: min(100%, 720px);
   margin: 0 auto;
-}
-
-.projects-preview__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 9px;
-  color: #1e5a9c;
-  font-size: .82rem;
-  font-weight: 800;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-
-.projects-preview__eyebrow::before {
-  content: '';
-  width: 28px;
-  height: 2px;
-  background: #1e5a9c;
 }
 
 .projects-preview__content h2 {
@@ -4653,6 +4743,31 @@ body,
 
 .admin-account-menu__trigger:hover {
   background: #eef5fb;
+}
+
+.admin-account-menu__trigger--user {
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 52px;
+  padding: 5px 10px 5px 5px;
+  border-color: #d7e5f1;
+  border-radius: 14px;
+  background: #f8fbfe;
+}
+
+.admin-account-menu__trigger--user .admin-header__user {
+  max-width: 18rem;
+}
+
+.admin-account-menu__chevron {
+  flex: 0 0 auto;
+  color: #61788d;
+  transition: color .2s ease, transform .2s ease;
+}
+
+.admin-account-menu--open .admin-account-menu__chevron {
+  color: #123f70;
+  transform: rotate(180deg);
 }
 
 .admin-account-menu__trigger:focus-visible {
@@ -7764,6 +7879,19 @@ body,
   }
 }
 
+/* Tratamiento tipografico comun para los titulos de las secciones del landing. */
+.landing-section h2 {
+  margin: 0 0 12px;
+  color: #123f70;
+  font-family: inherit;
+  font-size: clamp(1.8rem, 4vw, 2.35rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
 /* ==========================================================================
    LANDING - PROYECTOS DESTACADOS (PROJECTS PREVIEW)
    ========================================================================== */
@@ -7947,9 +8075,9 @@ body,
 }
 
 
-.projects-preview__eyebrow {
+.projects-preview__header .projects-preview__eyebrow {
   margin: 0 0 9px;
-  color: #2470ad;
+  color: #1e5a9c;
   font-size: .82rem;
   font-weight: 800;
   letter-spacing: .16em;
