@@ -676,9 +676,16 @@ body {
   margin-top: clamp(18px, 2.5vw, 24px);
   overflow: hidden;
   border: 1px solid #d5e6f4;
+  border-top: 4px solid #2c7bb8;
   border-radius: 18px;
-  background: rgba(255, 255, 255, .88);
-  box-shadow: 0 10px 26px rgba(18, 63, 112, .07);
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(18, 63, 112, .08);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.about-section__history:hover {
+  box-shadow: 0 16px 34px rgba(18, 63, 112, .12);
+  transform: translateY(-3px);
 }
 
 .about-section__history summary {
@@ -728,6 +735,13 @@ body {
   background: #eef7fd;
   font-size: .86rem;
   font-weight: 750;
+  transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.about-section__history summary:hover .about-section__history-action {
+  border-color: #2c7bb8;
+  background: #e4f0fb;
+  transform: translateX(3px);
 }
 
 .about-section__history[open] .about-section__history-action {
@@ -3519,6 +3533,10 @@ button.announcements-section__more {
     transform: none;
   }
 
+  .about-section__history:hover {
+    transform: none;
+  }
+
   .requests-section {
     padding-right: 18px;
     padding-left: 18px;
@@ -5052,6 +5070,48 @@ body,
   width: 100%;
 }
 
+.admin-sidebar__system-status {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 11px 13px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.admin-sidebar__status-dot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  background: #4ade80;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.12);
+}
+
+.admin-sidebar__status-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.admin-sidebar__status-copy strong {
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.admin-sidebar__status-copy small {
+  margin-top: 2px;
+  color: #cfe4f7;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
 .admin-user-menu--sidebar {
   width: 100%;
   display: block;
@@ -5287,7 +5347,7 @@ body,
 /* Indicators Grid - Simétrico de 4 columnas en desktop */
 .admin-dashboard__indicators-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 

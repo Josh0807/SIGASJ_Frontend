@@ -20,16 +20,6 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     link: '/admin/abonados',
   },
   {
-    id: 'lecturas',
-    label: 'Recursos Humanos',
-    value: null,
-    detail: 'Ciclo del mes actual',
-    badgeText: 'En curso',
-    badgeType: 'warning',
-    icon: 'lecturas',
-    link: '/admin/lecturas',
-  },
-  {
     id: 'averias',
     label: 'Averías reportadas',
     value: null,
@@ -60,9 +50,6 @@ const AdminDashboard = () => {
   ).map((indicator) => {
     if (indicator.id === 'abonados') {
       return { ...indicator, value: metrics.abonadosActivos ?? null }
-    }
-    if (indicator.id === 'lecturas') {
-      return { ...indicator, value: metrics.lecturasPendientes ?? null }
     }
     if (indicator.id === 'averias') {
       return { ...indicator, value: metrics.averiasReportadas ?? null }

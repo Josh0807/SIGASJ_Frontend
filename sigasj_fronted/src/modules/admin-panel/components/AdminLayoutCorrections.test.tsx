@@ -51,7 +51,7 @@ describe('AdminLayout Responsive Corrections & Modal Utilities', () => {
     const markup = renderDashboardLayout()
 
     expect(markup).toContain('admin-header')
-    expect(markup).toContain('admin-user-menu')
+    expect(markup).toContain('admin-sidebar__system-status')
     expect(markup).toContain('admin-account-menu')
     expect(markup).toContain('admin-header__actions')
   })

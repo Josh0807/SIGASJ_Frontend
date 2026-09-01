@@ -68,7 +68,7 @@ const AboutSection = () => (
             <strong>Reseña histórica</strong>
             <small>Conozca el origen y la evolución de nuestra ASADA</small>
           </span>
-          <span className="about-section__history-action">Leer historia</span>
+          <span className="about-section__history-action">Leer más</span>
         </summary>
         <div className="about-section__history-content">
           <p>La Asociación Administradora del Sistema de Acueducto y Alcantarillado Sanitario (ASADA) de San Juan de Santa Cruz, Guanacaste, tiene sus orígenes en el año 2003, cuando el 24 de septiembre, un grupo de 53 vecinos fundadores se reunió en el salón comunal con el propósito de constituir una organización encargada de administrar, operar y proteger el sistema de abastecimiento de agua potable de la comunidad. 
