@@ -66,8 +66,6 @@ const AdminHeader = ({
       </div>
 
       <div className="admin-header__account">
-        <AdminHeaderUser />
-
         <div className="admin-header__actions">
           <Link
             className="admin-header__action admin-header__action--public"
@@ -87,7 +85,7 @@ const AdminHeader = ({
               Público
             </span>
           </Link>
-          <AdminAccountMenu />
+          <AdminAccountMenu triggerContent={<AdminHeaderUser />} />
         </div>
       </div>
     </header>

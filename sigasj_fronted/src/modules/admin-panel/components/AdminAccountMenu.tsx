@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
 } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -19,7 +20,7 @@ const LOGOUT_DIALOG_TITLE = 'Cerrar sesión'
 const LOGOUT_DIALOG_MESSAGE =
   'Confirme si desea cerrar sesión. Deberá iniciar sesión nuevamente para acceder al panel administrativo.'
 
-const AdminAccountMenu = () => {
+const AdminAccountMenu = ({ triggerContent }: { triggerContent?: ReactNode }) => {
   const menuId = useId()
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -166,7 +167,7 @@ const AdminAccountMenu = () => {
       <button
         ref={triggerRef}
         type="button"
-        className="admin-account-menu__trigger"
+        className={`admin-account-menu__trigger${triggerContent ? ' admin-account-menu__trigger--user' : ''}`}
         aria-haspopup="menu"
         aria-controls={menuId}
         aria-expanded={isOpen}
@@ -174,18 +175,40 @@ const AdminAccountMenu = () => {
         onClick={toggleMenu}
         onKeyDown={handleTriggerKeyDown}
       >
-        <span
-          className="admin-account-menu__trigger-label admin-account-menu__trigger-label--full"
-          aria-hidden="true"
-        >
-          Opciones de cuenta
-        </span>
-        <span
-          className="admin-account-menu__trigger-label admin-account-menu__trigger-label--short"
-          aria-hidden="true"
-        >
-          Cuenta
-        </span>
+        {triggerContent ? (
+          <>
+            {triggerContent}
+            <svg
+              className="admin-account-menu__chevron"
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </>
+        ) : (
+          <>
+            <span
+              className="admin-account-menu__trigger-label admin-account-menu__trigger-label--full"
+              aria-hidden="true"
+            >
+              Opciones de cuenta
+            </span>
+            <span
+              className="admin-account-menu__trigger-label admin-account-menu__trigger-label--short"
+              aria-hidden="true"
+            >
+              Cuenta
+            </span>
+          </>
+        )}
       </button>
 
       <div

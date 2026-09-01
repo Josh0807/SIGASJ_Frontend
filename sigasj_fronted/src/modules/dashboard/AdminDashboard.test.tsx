@@ -56,13 +56,12 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('href="/admin/solicitudes"')
   })
 
-  it('4. Renderiza los widgets operativos en tiempo real (Ciclo de lecturas, Averías recientes y Bitácora)', () => {
+  it('4. Renderiza los widgets operativos en tiempo real (Averías recientes y Bitácora)', () => {
     const markup = renderDashboard()
     expect(markup).toContain('Operaciones en tiempo real')
-    expect(markup).toContain('Ciclo de Lecturas')
+    expect(markup).not.toContain('Ciclo de Lecturas')
     expect(markup).toContain('Averías Recientes')
     expect(markup).toContain('Bitácora de Actividad')
-    expect(markup).toContain('href="/admin/lecturas"')
     expect(markup).toContain('href="/admin/averias"')
     expect(markup).toContain('href="/admin/reportes"')
   })
