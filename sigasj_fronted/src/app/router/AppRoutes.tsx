@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import AdminLayout from '../../shared/layouts/AdminLayout'
 import AuthorizedRoute, {
   AdminAreaGate,
@@ -6,6 +6,7 @@ import AuthorizedRoute, {
 import ProtectedRoute from '../../modules/auth/components/ProtectedRoute'
 import { useAuth } from '../../modules/auth/components/AuthContext'
 import { getDefaultAdminHomePath } from '../../modules/auth/utils/adminNavigation'
+import { ACTIVIDADES_FONTANERO_BASE_PATH } from '../../modules/actividades-fontanero/actividadesFontaneroPaths'
 import {
   ADMIN_CHILD_ROUTES,
   ADMIN_HOME_PATH,
@@ -27,6 +28,13 @@ const AdminFallbackRedirect = () => {
   return <Navigate to={fallbackPath} replace />
 }
 
+/** Compatibilidad con rutas de backlog `/fontanero/actividades/*`. */
+const FontaneroActividadesBacklogRedirect = () => {
+  const { pathname } = useLocation()
+  const suffix = pathname.replace(/^\/fontanero\/actividades/, '') || ''
+  return <Navigate to={`${ACTIVIDADES_FONTANERO_BASE_PATH}${suffix}`} replace />
+}
+
 const AppRoutes = () => (
   <Routes>
     <Route element={<PublicRouteLayout />}>
@@ -43,6 +51,10 @@ const AppRoutes = () => (
       }
     >
       <Route path="dashboard" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
+      <Route
+        path="fontanero/actividades/*"
+        element={<FontaneroActividadesBacklogRedirect />}
+      />
       <Route
         path={ADMIN_ROUTE_SEGMENT}
         element={

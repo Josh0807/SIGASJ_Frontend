@@ -4,13 +4,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { AuthProvider } from '../../auth/components/AuthContext'
 import { clearAccessToken } from '../../auth/utils/authStorage'
+import { getAdminNavItemsForUser } from '../../auth/utils/adminNavigation'
 import { loginWithAdminSession } from '../../../test/authTestHelpers'
 import AppRoutes from '../../../app/router/AppRoutes'
-import {
-  ADMIN_HOME_PATH,
-  ADMIN_NAV_ITEMS,
-  PRIVATE_ROUTES,
-} from '../../../app/router/privateRoutes'
+import { ADMIN_HOME_PATH, ADMIN_NAV_ITEMS } from '../../../app/router/privateRoutes'
 import AdminSidebar from './AdminSidebar'
 
 const LocationProbe = ({ onPath }: { onPath: (path: string) => void }) => {
@@ -136,18 +133,22 @@ describe('navegación del menú administrativo', () => {
   it('recorre todos los enlaces disponibles sin recargar ni errores de consola', async () => {
     const consoleProbe = captureConsole()
     const app = await mountApp(ADMIN_HOME_PATH)
+    const adminNavItems = getAdminNavItemsForUser({
+      id: '1',
+      role: 'Administradora',
+    })
 
     try {
       const sidebar = app.container.querySelector('.admin-sidebar')
       const header = app.container.querySelector('.admin-header')
       const content = app.container.querySelector('.admin-main__content')
 
-      expect(ADMIN_NAV_ITEMS.length).toBeGreaterThan(1)
+      expect(adminNavItems.length).toBeGreaterThan(1)
       expect(sidebar).not.toBeNull()
       expect(header).not.toBeNull()
       expect(content).not.toBeNull()
 
-      for (const { path, title } of ADMIN_NAV_ITEMS) {
+      for (const { path, title } of adminNavItems) {
         const link = app.container.querySelector<HTMLAnchorElement>(
           `.admin-sidebar__link[href="${path}"]`,
         )
@@ -349,18 +350,19 @@ describe('navegación del menú administrativo', () => {
 
   it('expone en el menú exactamente los módulos configurados como disponibles', async () => {
     const app = await mountApp(ADMIN_HOME_PATH)
+    const expectedHrefs = getAdminNavItemsForUser({
+      id: '1',
+      role: 'Administradora',
+    }).map(({ path }) => path)
 
     try {
       const hrefs = [
         ...app.container.querySelectorAll<HTMLAnchorElement>('.admin-sidebar__link'),
       ].map((link) => link.getAttribute('href'))
 
-      expect(hrefs).toEqual(ADMIN_NAV_ITEMS.map(({ path }) => path))
-      expect(hrefs).toEqual(
-        PRIVATE_ROUTES.filter(({ availableInNav }) => availableInNav).map(
-          ({ path }) => path,
-        ),
-      )
+      expect(hrefs).toEqual(expectedHrefs)
+      expect(hrefs).toContain('/admin/actividades-fontanero')
+      expect(hrefs).not.toContain('/admin/actividades')
       expect(hrefs).toContain('/admin/comunicados')
     } finally {
       await app.cleanup()

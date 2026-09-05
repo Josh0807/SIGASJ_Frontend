@@ -8788,3 +8788,210 @@ body,
     gap: 10px;
   }
 }
+
+/* ==========================================================================
+   Registro de Actividades del Fontanero — pantalla principal
+   ========================================================================== */
+.actividades-fontanero-home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 920px;
+}
+
+.actividades-fontanero-home__welcome {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(18, 63, 112, 0.06);
+}
+
+.actividades-fontanero-home__welcome-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.actividades-fontanero-home__eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividades-fontanero-home__welcome h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  color: #123f70;
+  line-height: 1.25;
+}
+
+.actividades-fontanero-home__welcome-text {
+  margin: 0;
+  color: #4a647c;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-home__back-link {
+  flex-shrink: 0;
+  align-self: flex-start;
+  color: #1e5a9c;
+  font-weight: 650;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 6px 2px;
+}
+
+.actividades-fontanero-home__back-link:hover,
+.actividades-fontanero-home__back-link:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.actividades-fontanero-home__back-link:focus-visible {
+  box-shadow: 0 0 0 2px #123f70;
+}
+
+.actividades-fontanero-home__alert {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #f5c2c7;
+  background: #fff5f5;
+  color: #9b1c1c;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-home__retry {
+  border: none;
+  background: transparent;
+  color: #9b1c1c;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+
+.actividades-fontanero-home__corrections-status {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #cfe8d8;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.actividades-fontanero-home__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.actividades-fontanero-home__card {
+  height: 100%;
+}
+
+.actividades-fontanero-home__card--primary {
+  border-color: #9ec5e8;
+  background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+}
+
+.actividades-fontanero-home__card--primary .quick-access-card__icon {
+  background: #dbeafe;
+  color: #1e5a9c;
+}
+
+.actividades-fontanero-home__card .quick-access-card__badge {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.actividades-fontanero-home__state {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  color: #4a647c;
+}
+
+.actividades-fontanero-stub {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(18, 63, 112, 0.06);
+}
+
+.actividades-fontanero-stub__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividades-fontanero-stub h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  color: #123f70;
+}
+
+.actividades-fontanero-stub__description,
+.actividades-fontanero-stub__empty {
+  margin: 0;
+  color: #4a647c;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-stub__back {
+  margin-top: 8px;
+  align-self: flex-start;
+  color: #1e5a9c;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.actividades-fontanero-stub__back:hover,
+.actividades-fontanero-stub__back:focus-visible {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .actividades-fontanero-home__welcome {
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .actividades-fontanero-home__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .actividades-fontanero-stub {
+    padding: 18px;
+  }
+}
