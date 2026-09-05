@@ -9,6 +9,8 @@ import ComunicadosAdminPage from '../../modules/comunicados/admin/ComunicadosAdm
 import ContactoAdminPage from '../../modules/contacto/admin/ContactoAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
 import ProyectosAdminRoutes from '../../modules/proyectos/admin/ProyectosAdminRoutes'
+import ActividadesFontaneroRoutes from '../../modules/actividades-fontanero/ActividadesFontaneroRoutes'
+import ActividadesAdminRoutes from '../../modules/actividades-fontanero/admin/ActividadesAdminRoutes'
 import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
 
@@ -37,6 +39,8 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
   lecturas: <PrivateModulePlaceholder title="Recursos Humanos" />,
   averias: <PrivateModulePlaceholder title="Gestión de averías" />,
+  actividades: <ActividadesFontaneroRoutes />,
+  'actividades-fontanero': <ActividadesAdminRoutes />,
   reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,
   proyectos: <ProyectosAdminRoutes />,
   galeria: <GalleryAdminPage />,

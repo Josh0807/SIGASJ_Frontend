@@ -28,6 +28,8 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
     'users.manage',
     'roles.manage',
     'audit.read',
+    'activities.read_all',
+    'activities.review',
   ],
   [InternalAdminRoleName.Secretaria]: [
     'subscribers.read',
@@ -43,6 +45,8 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
   [InternalAdminRoleName.Fontanero]: [
     'fault_reports.read',
     'fault_reports.update_status',
+    'activities.register',
+    'activities.read_own',
   ],
 }
 
@@ -128,6 +132,20 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
       InternalAdminRoleName.Fontanero,
     ],
     requiredPermissions: ['fault_reports.read'],
+    availableInNav: true,
+  },
+  {
+    segment: 'actividades',
+    title: 'Registro de Actividades',
+    allowedRoles: [InternalAdminRoleName.Fontanero],
+    requiredPermissions: ['activities.register'],
+    availableInNav: true,
+  },
+  {
+    segment: 'actividades-fontanero',
+    title: 'Actividades del Fontanero',
+    allowedRoles: [InternalAdminRoleName.Administradora],
+    requiredPermissions: ['activities.read_all'],
     availableInNav: true,
   },
   {

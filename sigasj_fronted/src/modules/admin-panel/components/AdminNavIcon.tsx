@@ -22,6 +22,10 @@ const ICONS: Record<AdminNavIconName, string> = {
   solicitudes: 'M6 5.5h8a1.5 1.5 0 0 1 1.5 1.5v9H4.5V7A1.5 1.5 0 0 1 6 5.5z M7.5 3.5h5v4h-5z M7 11h6 M7 13.5h4',
   lecturas: 'M4 5.5h12v10H4z M7 5.5V4h6v1.5 M7 9h.01 M10 9h3 M7 12h.01 M10 12h3',
   averias: 'M10 3.8 3.8 16.2h12.4z M10 8.5v3.2 M10 14.2h.01',
+  actividades:
+    'M6 4.5h8a1.5 1.5 0 0 1 1.5 1.5v10H4.5V6A1.5 1.5 0 0 1 6 4.5z M7.5 8.5h5 M7.5 11.5h5 M7.5 14.5h3',
+  'actividades-fontanero':
+    'M6 4.5h8a1.5 1.5 0 0 1 1.5 1.5v10H4.5V6A1.5 1.5 0 0 1 6 4.5z M7.5 8.5h5 M7.5 11.5h5 M7.5 14.5h3 M14.5 15.5l1.2 1.2 2.3-2.3',
   reportes: 'M5 3.5h7l3 3v10H5z M12 3.5v3h3 M7.5 13.5v-2 M10 13.5V9 M12.5 13.5v-3',
   proyectos: 'M4.5 5.5h11v10h-11z M7 5.5V4h6v1.5 M7 10l2 2 4-4',
   galeria: 'M4 5.5h12v9H4z M4 12.2l3.2-3.2 2.8 2.8 2-2 3.5 3.5 M8 8.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',

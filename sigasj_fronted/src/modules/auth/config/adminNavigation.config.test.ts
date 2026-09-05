@@ -33,15 +33,32 @@ describe('adminNavigation.config', () => {
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
   })
 
-  it('restringe usuarios, reportes y proyectos a Administradora', () => {
+  it('restringe usuarios, reportes, proyectos y actividades-fontanero a Administradora', () => {
     const usuarios = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'usuarios')
     const reportes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'reportes')
     const proyectos = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'proyectos')
+    const actividadesAdmin = ADMIN_MODULE_ACCESS.find(
+      (module) => module.segment === 'actividades-fontanero',
+    )
 
     expect(usuarios?.allowedRoles).toEqual(['Administradora'])
     expect(reportes?.allowedRoles).toEqual(['Administradora'])
     expect(proyectos?.allowedRoles).toEqual(['Administradora'])
     expect(proyectos?.requiredPermissions).toEqual(['projects.manage'])
+    expect(actividadesAdmin?.allowedRoles).toEqual(['Administradora'])
+    expect(actividadesAdmin?.requiredPermissions).toEqual(['activities.read_all'])
+  })
+
+  it('restringe el registro operativo de actividades al Fontanero', () => {
+    const actividades = ADMIN_MODULE_ACCESS.find(
+      (module) => module.segment === 'actividades',
+    )
+
+    expect(actividades?.allowedRoles).toEqual(['Fontanero'])
+    expect(actividades?.requiredPermissions).toEqual(['activities.register'])
+    expect(ROLE_PERMISSIONS.Fontanero).toContain('activities.register')
+    expect(ROLE_PERMISSIONS.Fontanero).toContain('activities.read_own')
+    expect(ROLE_PERMISSIONS.Administradora).toContain('activities.read_all')
   })
 
   it('autoriza a Administradora en Gestión de asociados (ruta y menú)', () => {

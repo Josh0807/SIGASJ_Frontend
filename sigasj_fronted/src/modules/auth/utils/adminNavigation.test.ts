@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import '../../../app/router/privateRoutes'
-import { ADMIN_MODULE_ACCESS } from '../config/adminNavigation.config'
 import {
   canAccessAdminRoute,
   getAbonadosNavItemsForUser,
@@ -48,17 +47,21 @@ describe('adminNavigation helpers', () => {
     expect(isAbonadoRole('Administradora')).toBe(false)
   })
 
-  it('Administradora accede a todos los modulos administrativos visibles', () => {
+  it('Administradora accede a los módulos visibles de su rol (no a operativos exclusivos del Fontanero)', () => {
     const items = getAdminNavItemsForUser(administradora)
-    const visibleCount = ADMIN_MODULE_ACCESS.filter((module) => module.availableInNav)
-      .length
-    expect(items.length).toBe(visibleCount)
-    expect(items.map((item) => item.path)).toContain('/admin/abonados')
-    expect(items.map((item) => item.path)).toContain('/admin/proyectos')
+    const paths = items.map((item) => item.path)
+    expect(paths).toContain('/admin/abonados')
+    expect(paths).toContain('/admin/proyectos')
+    expect(paths).toContain('/admin/actividades-fontanero')
+    expect(paths).not.toContain('/admin/actividades')
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/proyectos')).toBe(true)
+    expect(canAccessAdminRoute(administradora, '/admin/actividades-fontanero')).toBe(
+      true,
+    )
+    expect(canAccessAdminRoute(administradora, '/admin/actividades')).toBe(false)
   })
 
   it('Secretaria no ve usuarios ni reportes', () => {
@@ -69,13 +72,19 @@ describe('adminNavigation helpers', () => {
     expect(canAccessAdminRoute(secretaria, '/admin/abonados')).toBe(true)
   })
 
-  it('Fontanero solo ve dashboard y averias', () => {
+  it('Fontanero solo ve dashboard, averias y registro de actividades', () => {
     const items = getAdminNavItemsForUser(fontanero)
     expect(items.map((item) => item.path)).toEqual([
       '/admin/dashboard',
       '/admin/averias',
+      '/admin/actividades',
     ])
     expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/admin/actividades')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/admin/actividades/nueva')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/admin/actividades-fontanero')).toBe(
+      false,
+    )
     expect(canAccessAdminRoute(fontanero, '/admin/abonados')).toBe(false)
   })
 
