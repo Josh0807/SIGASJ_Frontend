@@ -1,3 +1,4 @@
+import { act } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { clearAccessToken, setAuthSession } from '../../../modules/auth/utils/authStorage'
 import { loginAsRole } from '../../../test/authTestHelpers'
@@ -27,6 +28,10 @@ describe('pantalla principal — Registro de Actividades del Fontanero', () => {
     vi.spyOn(actividadesApi, 'getCorreccionesPendientes').mockResolvedValue({
       data: [],
       total: 0,
+    })
+    vi.spyOn(actividadesApi, 'getTiposActividadFontanero').mockResolvedValue({
+      data: [{ id: 1, codigo: 'CONTROL_FUGAS', nombre: 'Control de fugas', orden: 1 }],
+      total: 1,
     })
   })
 
@@ -119,9 +124,15 @@ describe('pantalla principal — Registro de Actividades del Fontanero', () => {
     const app = await mountAppRoutes('/admin/actividades/nueva')
 
     try {
+      await act(async () => {
+        await Promise.resolve()
+      })
       expect(app.currentPath()).toBe('/admin/actividades/nueva')
       expect(app.container.innerHTML).toContain('Registrar actividad')
-      expect(app.container.innerHTML).toContain('tipo de actividad')
+      expect(app.container.innerHTML).toContain('Tipo de actividad')
+      expect(
+        app.container.querySelector('[data-testid="tipo-actividad-select"]'),
+      ).not.toBeNull()
     } finally {
       await app.cleanup()
     }

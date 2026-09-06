@@ -2,14 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { ACTIVIDADES_FONTANERO_PATHS } from './actividadesFontaneroPaths'
 import ActividadesFontaneroCorreccionesPage from './pages/ActividadesFontaneroCorreccionesPage'
 import ActividadesFontaneroHomePage from './pages/ActividadesFontaneroHomePage'
+import ActividadesFontaneroRegistrarPage from './pages/ActividadesFontaneroRegistrarPage'
 import ActividadesFontaneroStubPage from './pages/ActividadesFontaneroStubPage'
-
-const RegistrarActividadPage = () => (
-  <ActividadesFontaneroStubPage
-    title="Registrar actividad"
-    description="Seleccione el tipo de actividad que desea registrar. El catálogo de tipos estará disponible en una siguiente entrega."
-  />
-)
 
 const MisActividadesPage = () => (
   <ActividadesFontaneroStubPage
@@ -28,8 +22,8 @@ const HistorialActividadesPage = () => (
 const ActividadesFontaneroRoutes = () => (
   <Routes>
     <Route index element={<ActividadesFontaneroHomePage />} />
-    <Route path="registrar" element={<RegistrarActividadPage />} />
-    <Route path="nueva" element={<RegistrarActividadPage />} />
+    <Route path="registrar" element={<ActividadesFontaneroRegistrarPage />} />
+    <Route path="nueva" element={<ActividadesFontaneroRegistrarPage />} />
     <Route path="mis-actividades" element={<MisActividadesPage />} />
     <Route path="historial" element={<HistorialActividadesPage />} />
     <Route path="correcciones" element={<ActividadesFontaneroCorreccionesPage />} />

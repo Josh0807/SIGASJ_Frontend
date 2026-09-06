@@ -8790,7 +8790,7 @@ body,
 }
 
 /* ==========================================================================
-   Registro de Actividades del Fontanero — pantalla principal
+   Registro de Actividades del Fontanero â€” pantalla principal
    ========================================================================== */
 .actividades-fontanero-home {
   display: flex;
@@ -8981,6 +8981,182 @@ body,
   text-decoration: underline;
 }
 
+.actividades-fontanero-home__success {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #e8f7ef;
+  border: 1px solid #b8e0c8;
+  color: #1f5f3f;
+  font-weight: 600;
+}
+
+.actividades-fontanero-registrar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 720px;
+}
+
+.actividades-fontanero-registrar__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actividades-fontanero-registrar__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividades-fontanero-registrar h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  color: #123f70;
+}
+
+.actividades-fontanero-registrar__description {
+  margin: 0;
+  color: #4a647c;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-registrar__back {
+  margin-top: 4px;
+  align-self: flex-start;
+  color: #1e5a9c;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.actividades-fontanero-registrar__back:hover,
+.actividades-fontanero-registrar__back:focus-visible {
+  text-decoration: underline;
+}
+
+.actividades-fontanero-registrar__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(18, 63, 112, 0.06);
+}
+
+.actividades-fontanero-registrar__field,
+.actividades-fontanero-registrar__field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actividades-fontanero-registrar__field span {
+  font-weight: 650;
+  color: #123f70;
+}
+
+.actividades-fontanero-registrar__field input,
+.actividades-fontanero-registrar__field textarea,
+.actividades-fontanero-registrar__field select,
+.actividades-fontanero-registrar__select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #c5d8ea;
+  border-radius: 10px;
+  font: inherit;
+  color: #123f70;
+  background: #ffffff;
+}
+
+.actividades-fontanero-registrar__field input:focus-visible,
+.actividades-fontanero-registrar__field textarea:focus-visible,
+.actividades-fontanero-registrar__field select:focus-visible,
+.actividades-fontanero-registrar__select:focus-visible {
+  outline: 2px solid #3b82a8;
+  outline-offset: 2px;
+}
+
+.actividades-fontanero-registrar__hint {
+  margin: 0;
+  color: #4a647c;
+}
+
+.actividades-fontanero-registrar__alert {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff4f4;
+  border: 1px solid #f0c7c7;
+  color: #8b2f2f;
+}
+
+.actividades-fontanero-registrar__alert p {
+  margin: 0;
+}
+
+.actividades-fontanero-registrar__retry,
+.actividades-fontanero-registrar__cancel {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #1e5a9c;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.actividades-fontanero-registrar__retry:hover,
+.actividades-fontanero-registrar__retry:focus-visible,
+.actividades-fontanero-registrar__cancel:hover,
+.actividades-fontanero-registrar__cancel:focus-visible {
+  text-decoration: underline;
+}
+
+.actividades-fontanero-registrar__form-error {
+  margin: 0;
+  color: #8b2f2f;
+  font-weight: 600;
+}
+
+.actividades-fontanero-registrar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.actividades-fontanero-registrar__submit {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #1e5a9c;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.actividades-fontanero-registrar__submit:hover:not(:disabled),
+.actividades-fontanero-registrar__submit:focus-visible:not(:disabled) {
+  background: #174a80;
+}
+
+.actividades-fontanero-registrar__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 760px) {
   .actividades-fontanero-home__welcome {
     flex-direction: column;
@@ -8992,6 +9168,10 @@ body,
   }
 
   .actividades-fontanero-stub {
+    padding: 18px;
+  }
+
+  .actividades-fontanero-registrar__form {
     padding: 18px;
   }
 }
