@@ -4,6 +4,7 @@ import { clearAccessToken, setAuthSession } from '../../../modules/auth/utils/au
 import { mountAppRoutes } from '../../../test/render-app-routes'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { CATALOGO_TIPOS_ACTIVIDAD } from '../types/tipoActividadFontanero'
+import * as actividadesApi from '../services/actividadesFontaneroApi'
 
 const loginAsFontanero = () => {
   setAuthSession({
@@ -17,10 +18,24 @@ const loginAsFontanero = () => {
   })
 }
 
-describe('formulario de registro de actividad (#390)', () => {
+describe('formulario de registro de actividad (#390 / #932)', () => {
   beforeEach(() => {
     clearAccessToken()
     vi.restoreAllMocks()
+    vi.spyOn(actividadesApi, 'registrarActividad').mockResolvedValue({
+      id: 42,
+      tipoActividadId: 3,
+      tipoActividadNombre: 'Visita de Campo',
+      fechaActividad: '2026-09-07',
+      titulo: 'Visita programada',
+      descripcion: null,
+      ubicacion: null,
+      observaciones: null,
+      estado: 'REPORTADA',
+      observacionCorreccion: null,
+      createdAt: '2026-09-07T00:00:00.000Z',
+      updatedAt: '2026-09-07T00:00:00.000Z',
+    })
   })
 
   it('muestra los seis tipos de actividad en la pantalla de selección', async () => {
@@ -115,8 +130,7 @@ describe('formulario de registro de actividad (#390)', () => {
     input.dispatchEvent(new Event('change', { bubbles: true }))
   }
 
-  it('muestra éxito tras envío válido simulado', async () => {
-    vi.useFakeTimers()
+  it('muestra éxito tras registrar en el backend', async () => {
     loginAsFontanero()
     const app = await mountAppRoutes(
       ACTIVIDADES_FONTANERO_PATHS.registrarTipo('VISITA_CAMPO'),
@@ -133,13 +147,67 @@ describe('formulario de registro de actividad (#390)', () => {
         form.requestSubmit()
       })
 
+      expect(actividadesApi.registrarActividad).toHaveBeenCalledTimes(1)
+      expect(app.container.querySelector('[data-testid="actividad-registro-exito"]')).not.toBeNull()
+      expect(app.container.innerHTML).toContain('fue registrada correctamente')
+      expect(app.container.innerHTML).toContain('registro #42')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('muestra errores del backend y conserva los datos ingresados', async () => {
+    vi.mocked(actividadesApi.registrarActividad).mockRejectedValueOnce(
+      new Error('HTTP 400: La fecha de la actividad no puede ser futura'),
+    )
+    loginAsFontanero()
+    const app = await mountAppRoutes(
+      ACTIVIDADES_FONTANERO_PATHS.registrarTipo('CONTROL_FUGAS'),
+    )
+
+    try {
+      const fecha = app.container.querySelector('#fechaActividad') as HTMLInputElement
+      const titulo = app.container.querySelector('#titulo') as HTMLInputElement
+      const form = app.container.querySelector('form.actividad-registro-form') as HTMLFormElement
+
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(500)
+        setInputValue(fecha, '2099-01-01')
+        setInputValue(titulo, 'Control pendiente')
+        form.requestSubmit()
       })
 
-      expect(app.container.querySelector('[data-testid="actividad-registro-exito"]')).not.toBeNull()
+      expect(app.container.querySelector('[data-testid="actividad-registro-exito"]')).toBeNull()
+      expect(app.container.innerHTML).toContain('futura')
+      expect((app.container.querySelector('#titulo') as HTMLInputElement).value).toBe(
+        'Control pendiente',
+      )
     } finally {
-      vi.useRealTimers()
+      await app.cleanup()
+    }
+  })
+
+  it('informa sesión inválida ante HTTP 401', async () => {
+    vi.mocked(actividadesApi.registrarActividad).mockRejectedValueOnce(
+      new Error('HTTP 401: No autenticado'),
+    )
+    loginAsFontanero()
+    const app = await mountAppRoutes(
+      ACTIVIDADES_FONTANERO_PATHS.registrarTipo('TOMA_PRESION'),
+    )
+
+    try {
+      const fecha = app.container.querySelector('#fechaActividad') as HTMLInputElement
+      const titulo = app.container.querySelector('#titulo') as HTMLInputElement
+      const form = app.container.querySelector('form.actividad-registro-form') as HTMLFormElement
+
+      await act(async () => {
+        setInputValue(fecha, '2026-09-07')
+        setInputValue(titulo, 'Toma sector sur')
+        form.requestSubmit()
+      })
+
+      expect(app.container.innerHTML).toContain('sesión')
+    } finally {
       await app.cleanup()
     }
   })

@@ -6,17 +6,24 @@ import {
   type ActividadRegistroFormField,
   type ActividadRegistroFormValues,
 } from '../types/actividadRegistroForm'
+import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
 import {
   hasActividadRegistroFormErrors,
   validateActividadRegistroForm,
   type ActividadRegistroFormErrors,
 } from '../utils/validateActividadRegistroForm'
+import {
+  ACTIVIDAD_REGISTRO_SERVER_ERROR,
+  parseActividadRegistroSubmitError,
+  toActividadRegistroSubmitMessage,
+} from '../utils/actividadRegistroSubmitError'
+import { registrarActividad } from '../services/actividadesFontaneroApi'
 import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistry'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 
 type ActividadRegistroFormShellProps = {
   tipo: TipoActividadFontaneroCatalogo
-  onSubmit?: (values: ActividadRegistroFormValues) => Promise<void> | void
+  onSubmit?: (values: ActividadRegistroFormValues) => Promise<ActividadFontaneroRegistrada | void>
 }
 
 const ActividadRegistroFormShell = ({
@@ -30,6 +37,9 @@ const ActividadRegistroFormShell = ({
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [registrada, setRegistrada] = useState<ActividadFontaneroRegistrada | null>(
+    null,
+  )
 
   const FormularioEspecifico = FORMULARIOS_ACTIVIDAD[tipo.codigo]
 
@@ -66,16 +76,35 @@ const ActividadRegistroFormShell = ({
     setSubmitError(null)
 
     try {
-      if (onSubmit) {
-        await onSubmit(values)
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 400))
+      const result = onSubmit
+        ? await onSubmit(values)
+        : await registrarActividad(tipo, values)
+
+      if (result && typeof result === 'object' && 'id' in result) {
+        setRegistrada(result)
       }
       setIsSuccess(true)
-    } catch {
-      setSubmitError(
-        'No se pudo completar el registro. Intente nuevamente en unos momentos.',
-      )
+    } catch (error) {
+      const parsed = parseActividadRegistroSubmitError(error)
+
+      if (parsed.kind === 'validation') {
+        setErrors((current) => ({ ...current, ...parsed.fieldErrors }))
+        setSubmitError(toActividadRegistroSubmitMessage(error))
+        return
+      }
+
+      const status = parsed.kind
+      if (status === 'save') {
+        const httpStatus = error instanceof Error ? error.message : ''
+        setSubmitError(
+          /HTTP 5\d\d/.test(httpStatus)
+            ? ACTIVIDAD_REGISTRO_SERVER_ERROR
+            : toActividadRegistroSubmitMessage(error),
+        )
+        return
+      }
+
+      setSubmitError(toActividadRegistroSubmitMessage(error))
     } finally {
       setIsSubmitting(false)
     }
@@ -101,8 +130,14 @@ const ActividadRegistroFormShell = ({
           data-testid="actividad-registro-exito"
         >
           <p>
-            La actividad <strong>{tipo.nombre}</strong> quedó preparada para envío. La
-            integración con el servidor se habilitará en la siguiente entrega.
+            La actividad <strong>{tipo.nombre}</strong> fue registrada correctamente
+            {registrada?.id ? (
+              <>
+                {' '}
+                (registro #{registrada.id})
+              </>
+            ) : null}
+            .
           </p>
           <Link
             to={ACTIVIDADES_FONTANERO_PATHS.nueva}
