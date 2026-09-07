@@ -7,6 +7,7 @@
     "node": ">=22.12.0 <23"
   },
   "scripts": {
+    "preinstall": "node scripts/check-node-version.cjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
