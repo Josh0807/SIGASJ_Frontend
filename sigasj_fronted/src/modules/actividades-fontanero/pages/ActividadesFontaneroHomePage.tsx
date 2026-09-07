@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import QuickAccessCard from '../../../shared/components/QuickAccessCard'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -12,8 +13,26 @@ import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 
 const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
 
+type RegistrationNoticeState = {
+  actividadRegistrada?: boolean
+  tituloActividad?: string
+} | null
+
+const buildRegistrationSuccessMessage = (title?: string) =>
+  title
+    ? `Actividad registrada correctamente: ${title}`
+    : 'Actividad registrada correctamente.'
+
 const ActividadesFontaneroHomePage = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const { user, isAuthenticated } = useAuth()
+  const [successNotice] = useState(() => {
+    const state = location.state as RegistrationNoticeState
+    return state?.actividadRegistrada
+      ? buildRegistrationSuccessMessage(state.tituloActividad)
+      : null
+  })
   const displayName = resolveAuthUserDisplayName(user)
   const roleLabel = getAuthUserRoleLabel(user)
   const {
@@ -24,6 +43,15 @@ const ActividadesFontaneroHomePage = () => {
     isForbidden,
     refetch,
   } = useCorreccionesPendientesCount()
+
+  useEffect(() => {
+    const state = location.state as RegistrationNoticeState
+    if (!state?.actividadRegistrada) {
+      return
+    }
+
+    navigate(location.pathname, { replace: true, state: null })
+  }, [location.pathname, location.state, navigate])
 
   if (!isAuthenticated || !user) {
     return (
@@ -77,6 +105,16 @@ const ActividadesFontaneroHomePage = () => {
           Volver al dashboard
         </Link>
       </header>
+
+      {successNotice ? (
+        <div
+          className="actividades-fontanero-home__success"
+          role="status"
+          data-testid="actividad-registrada-exito"
+        >
+          {successNotice}
+        </div>
+      ) : null}
 
       {(isUnauthorized || isForbidden) && (
         <div className="actividades-fontanero-home__alert" role="alert">
