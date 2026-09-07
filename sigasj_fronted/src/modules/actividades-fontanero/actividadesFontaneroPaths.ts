@@ -6,6 +6,8 @@ export const ACTIVIDADES_FONTANERO_PATHS = {
   /** Alias de backlog: /fontanero/actividades/nueva */
   nueva: `${ACTIVIDADES_FONTANERO_BASE_PATH}/nueva`,
   registrar: `${ACTIVIDADES_FONTANERO_BASE_PATH}/registrar`,
+  registrarTipo: (tipoCodigo: string) =>
+    `${ACTIVIDADES_FONTANERO_BASE_PATH}/nueva/${tipoCodigo}`,
   /** Alias de backlog: /fontanero/actividades/historial */
   historial: `${ACTIVIDADES_FONTANERO_BASE_PATH}/historial`,
   misActividades: `${ACTIVIDADES_FONTANERO_BASE_PATH}/mis-actividades`,

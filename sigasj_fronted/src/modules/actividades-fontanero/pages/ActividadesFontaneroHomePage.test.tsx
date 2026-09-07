@@ -121,7 +121,9 @@ describe('pantalla principal — Registro de Actividades del Fontanero', () => {
     try {
       expect(app.currentPath()).toBe('/admin/actividades/nueva')
       expect(app.container.innerHTML).toContain('Registrar actividad')
-      expect(app.container.innerHTML).toContain('tipo de actividad')
+      expect(app.container.innerHTML).toContain('Seleccione el tipo de actividad')
+      expect(app.container.innerHTML).toContain('Control de Fugas')
+      expect(app.container.innerHTML).toContain('Toma de presión')
     } finally {
       await app.cleanup()
     }

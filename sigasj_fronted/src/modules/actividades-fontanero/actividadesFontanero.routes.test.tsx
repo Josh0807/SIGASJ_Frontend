@@ -9,7 +9,6 @@ const FONTANERO_PATHS = [
   '/admin/actividades/nueva',
   '/admin/actividades/historial',
   '/admin/actividades/correcciones',
-  '/admin/actividades/registrar',
   '/admin/actividades/mis-actividades',
 ] as const
 
@@ -57,6 +56,19 @@ describe('protección de rutas — Registro de Actividades del Fontanero', () =>
       }
     },
   )
+
+  it('Fontanero accede a /registrar mediante redirección a /nueva', async () => {
+    loginAsRole('Fontanero')
+    const app = await mountAppRoutes('/admin/actividades/registrar')
+
+    try {
+      expect(app.currentPath()).toBe('/admin/actividades/nueva')
+      expect(app.container.innerHTML).toContain('admin-layout')
+      expect(app.container.innerHTML).toContain('Registro de Actividades')
+    } finally {
+      await app.cleanup()
+    }
+  })
 
   it.each([...FONTANERO_PATHS])(
     'Fontanero puede acceder a %s',
