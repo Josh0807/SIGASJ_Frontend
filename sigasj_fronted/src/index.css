@@ -6242,6 +6242,80 @@ body,
   }
 }
 
+/* Reportes administrativos de actividades del Fontanero */
+.actividades-admin-reportes .gallery-admin__filters {
+  align-items: end;
+}
+
+.actividades-admin-reportes__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.actividades-admin-reportes__indicators {
+  margin-top: 8px;
+}
+
+.actividades-admin-reportes__listado {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actividades-admin-reportes__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.actividades-admin-reportes__table th,
+.actividades-admin-reportes__table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.actividades-admin-reportes__table th {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+@media (max-width: 1199px) {
+  .actividades-admin-reportes .gallery-admin__filters,
+  .actividades-admin-reportes .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .actividades-admin-reportes__actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .actividades-admin-reportes .gallery-admin__filters,
+  .actividades-admin-reportes .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .actividades-admin-reportes__actions {
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actividades-admin-reportes__actions .gallery-admin__button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
 /* Formulario de proyectos: desktop, tablet y celular, sin cambiar AdminLayout */
 .proyectos-admin__form {
   display: grid;

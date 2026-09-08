@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ActividadesFontaneroStubPage from '../pages/ActividadesFontaneroStubPage'
 import ActividadesAdminHomePage from './ActividadesAdminHomePage'
+import ActividadesAdminReportesPage from './ActividadesAdminReportesPage'
 import { ACTIVIDADES_ADMIN_PATHS } from './actividadesAdminPaths'
 
 const ActividadesAdminRoutes = () => (
@@ -17,17 +18,7 @@ const ActividadesAdminRoutes = () => (
         />
       }
     />
-    <Route
-      path="reportes"
-      element={
-        <ActividadesFontaneroStubPage
-          title="Reportes de actividades"
-          description="Consulte reportes e historial administrativo del registro de actividades."
-          backPath={ACTIVIDADES_ADMIN_PATHS.home}
-          backLabel="Volver a actividades del Fontanero"
-        />
-      }
-    />
+    <Route path="reportes" element={<ActividadesAdminReportesPage />} />
     <Route
       path="*"
       element={<Navigate to={ACTIVIDADES_ADMIN_PATHS.home} replace />}
