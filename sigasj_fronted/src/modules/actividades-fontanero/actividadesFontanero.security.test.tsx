@@ -15,6 +15,7 @@ import {
 } from '../../app/router/publicRoutes'
 import { ACTIVIDADES_FONTANERO_PATHS } from './actividadesFontaneroPaths'
 import { ACTIVIDADES_ADMIN_PATHS } from './admin/actividadesAdminPaths'
+import * as actividadesApi from './services/actividadesFontaneroApi'
 
 const FONTANERO_PRIVATE_PATHS = [
   ACTIVIDADES_FONTANERO_PATHS.home,
@@ -54,6 +55,10 @@ const sidebarHrefs = (html: string) =>
 describe('Seguridad — acceso privado al módulo de actividades (Fontanero)', () => {
   beforeEach(() => {
     clearAccessToken()
+    vi.spyOn(actividadesApi, 'getCorreccionesPendientes').mockResolvedValue({
+      data: [],
+      total: 0,
+    })
   })
 
   afterEach(() => {

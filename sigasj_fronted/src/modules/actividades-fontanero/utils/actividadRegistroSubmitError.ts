@@ -3,11 +3,20 @@ import type { ActividadRegistroFormField } from '../types/actividadRegistroForm'
 export const ACTIVIDAD_REGISTRO_SAVE_FALLBACK_ERROR =
   'No se pudo registrar la actividad. Intente nuevamente en unos momentos.'
 
+export const ACTIVIDAD_CORRECCION_SAVE_FALLBACK_ERROR =
+  'No se pudo reenviar la actividad corregida. Intente nuevamente en unos momentos.'
+
 export const ACTIVIDAD_REGISTRO_UNAUTHORIZED_ERROR =
-  'Su sesión no es válida o ha vencido. Vuelva a iniciar sesión para registrar la actividad.'
+  'Su sesión no es válida o ha vencido. Vuelva a iniciar sesión para continuar.'
 
 export const ACTIVIDAD_REGISTRO_FORBIDDEN_ERROR =
-  'No tiene permiso para registrar actividades en este módulo.'
+  'No tiene permiso para realizar esta operación en el módulo de actividades.'
+
+export const ACTIVIDAD_REGISTRO_CLIENT_VALIDATION_ERROR =
+  'Complete los campos obligatorios antes de registrar la actividad.'
+
+export const ACTIVIDAD_CORRECCION_CLIENT_VALIDATION_ERROR =
+  'Revise y complete los campos indicados antes de reenviar la actividad.'
 
 export const ACTIVIDAD_REGISTRO_SERVER_ERROR =
   'Ocurrió un error en el servidor. Intente nuevamente más tarde.'
@@ -34,6 +43,7 @@ const FIELD_MATCHERS: { field: ActividadRegistroFormField; pattern: RegExp }[] =
   { field: 'documentos', pattern: /documento|adjunt/i },
   { field: 'fechaActividad', pattern: /fecha/i },
   { field: 'titulo', pattern: /t[ií]tulo|resumen/i },
+  { field: 'descripcion', pattern: /descripci[oó]n/i },
   { field: 'ubicacion', pattern: /ubicaci[oó]n/i },
   { field: 'observaciones', pattern: /observaciones/i },
 ]
@@ -104,13 +114,28 @@ const matchField = (message: string): ActividadRegistroFormField | null => {
   return matched?.field ?? null
 }
 
+const sanitizeUserFacingMessage = (message: string): string => {
+  const trimmed = message
+    .replace(/^HTTP \d+:\s*/i, '')
+    .replace(/^"+|"+$/g, '')
+    .replace(/\b(dto|property|must be|should not)\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+
+  if (!trimmed || /^[\[\]{}]+$/.test(trimmed)) {
+    return 'Revise los datos del formulario.'
+  }
+
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
+}
+
 const toValidationError = (detail: string): ActividadRegistroSubmitError => {
   const fieldErrors: Partial<Record<ActividadRegistroFormField, string>> = {}
   const unmapped: string[] = []
 
   for (const raw of toMessageList(detail)) {
-    const trimmed = raw.replace(/^"+|"+$/g, '').trim()
-    if (!trimmed || /should not exist/i.test(trimmed)) {
+    const trimmed = sanitizeUserFacingMessage(raw)
+    if (!trimmed || /should not exist/i.test(raw)) {
       continue
     }
 
@@ -158,7 +183,9 @@ export const parseActividadRegistroSubmitError = (
 
 export const toActividadRegistroSubmitMessage = (
   error: unknown,
+  options?: { mode?: 'registrar' | 'corregir' },
 ): string => {
+  const isCorregirMode = options?.mode === 'corregir'
   const parsed = parseActividadRegistroSubmitError(error)
 
   if (parsed.kind === 'validation') {
@@ -172,8 +199,12 @@ export const toActividadRegistroSubmitMessage = (
     return ACTIVIDAD_REGISTRO_FORBIDDEN_ERROR
   }
   if (parsed.kind === 'not-found') {
-    return 'El tipo de actividad seleccionado ya no está disponible.'
+    return isCorregirMode
+      ? 'La actividad seleccionada ya no está disponible para corrección.'
+      : 'El tipo de actividad seleccionado ya no está disponible.'
   }
 
-  return ACTIVIDAD_REGISTRO_SAVE_FALLBACK_ERROR
+  return isCorregirMode
+    ? ACTIVIDAD_CORRECCION_SAVE_FALLBACK_ERROR
+    : ACTIVIDAD_REGISTRO_SAVE_FALLBACK_ERROR
 }

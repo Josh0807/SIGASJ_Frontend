@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import ActividadRegistroFieldError from './ActividadRegistroFieldError'
 import { DOCUMENTO_ACTIVIDAD_ACCEPT, formatDocumentoSize, validateDocumentoActividad } from '../utils/validateDocumentoActividad'
 
 type Props = { files: File[]; onChange: (files: File[]) => void; error?: string; disabled?: boolean; multiple?: boolean }
@@ -31,11 +32,11 @@ const DocumentoActividadUploader = ({ files, onChange, error, disabled = false, 
   }
 
   const displayedError = selectionError ?? error
-  return <div className="documento-uploader">
+  return <div className={`documento-uploader${displayedError ? ' documento-uploader--invalid' : ''}`}>
     <input ref={inputRef} id="documentos" name="documentos" type="file" multiple={multiple} accept={DOCUMENTO_ACTIVIDAD_ACCEPT} className="documento-uploader__input" onChange={handleSelection} aria-invalid={Boolean(displayedError)} aria-describedby={displayedError ? 'documentos-error' : 'documentos-help'} disabled={disabled} />
     <p id="documentos-help" className="actividad-formulario-especifico__hint">Formatos permitidos: PDF, JPG, JPEG y PNG. Máximo 10 MB por archivo.</p>
     {files.length > 0 ? <ul className="documento-uploader__files" aria-label="Documentos seleccionados">{files.map((file) => <li key={fileKey(file)} className="documento-uploader__file"><span className="documento-uploader__details"><strong>{file.name}</strong><span>{formatDocumentoSize(file.size)}</span></span><button type="button" className="documento-uploader__remove" onClick={() => removeFile(file)} disabled={disabled} aria-label={`Quitar ${file.name}`}>Quitar archivo</button></li>)}</ul> : null}
-    {displayedError ? <p id="documentos-error" className="actividad-registro-form__error" role="alert">{displayedError}</p> : null}
+    {displayedError ? <ActividadRegistroFieldError id="documentos-error" message={displayedError} /> : null}
   </div>
 }
 

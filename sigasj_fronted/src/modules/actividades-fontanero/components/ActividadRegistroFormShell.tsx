@@ -1,4 +1,4 @@
-import { type FormEvent, useCallback, useState } from 'react'
+import { type FormEvent, useCallback, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
 import {
@@ -13,11 +13,16 @@ import {
   type ActividadRegistroFormErrors,
 } from '../utils/validateActividadRegistroForm'
 import {
+  ACTIVIDAD_CORRECCION_CLIENT_VALIDATION_ERROR,
+  ACTIVIDAD_REGISTRO_CLIENT_VALIDATION_ERROR,
   ACTIVIDAD_REGISTRO_SERVER_ERROR,
   parseActividadRegistroSubmitError,
   toActividadRegistroSubmitMessage,
 } from '../utils/actividadRegistroSubmitError'
+import { focusFirstActividadRegistroError } from '../utils/focusFirstActividadRegistroError'
 import { registrarActividad } from '../services/actividadesFontaneroApi'
+import ActividadRegistroFieldError from './ActividadRegistroFieldError'
+import ActividadRegistroValidationSummary from './ActividadRegistroValidationSummary'
 import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistry'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -44,6 +49,7 @@ const ActividadRegistroFormShell = ({
   const isCorregirMode = mode === 'corregir'
   const navigate = useNavigate()
   const { logout } = useAuth()
+  const formRef = useRef<HTMLFormElement>(null)
   const [values, setValues] = useState<ActividadRegistroFormValues>(
     initialValues ?? ACTIVIDAD_REGISTRO_FORM_INITIAL,
   )
@@ -74,18 +80,39 @@ const ActividadRegistroFormShell = ({
     [],
   )
 
+  const applyValidationErrors = useCallback(
+    (nextErrors: ActividadRegistroFormErrors, message: string) => {
+      setErrors(nextErrors)
+      setSubmitError(message)
+      queueMicrotask(() => {
+        focusFirstActividadRegistroError(nextErrors, formRef.current ?? document)
+      })
+    },
+    [],
+  )
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (isSubmitting) {
       return
     }
 
-    const nextErrors = validateActividadRegistroForm(values, tipo.codigo)
-    setErrors(nextErrors)
+    const nextErrors = validateActividadRegistroForm(
+      values,
+      tipo.codigo,
+      isCorregirMode ? 'corregir' : 'registrar',
+    )
     if (hasActividadRegistroFormErrors(nextErrors)) {
+      applyValidationErrors(
+        nextErrors,
+        isCorregirMode
+          ? ACTIVIDAD_CORRECCION_CLIENT_VALIDATION_ERROR
+          : ACTIVIDAD_REGISTRO_CLIENT_VALIDATION_ERROR,
+      )
       return
     }
 
+    setErrors({})
     setIsSubmitting(true)
     setSubmitError(null)
 
@@ -107,8 +134,13 @@ const ActividadRegistroFormShell = ({
       const parsed = parseActividadRegistroSubmitError(error)
 
       if (parsed.kind === 'validation') {
-        setErrors((current) => ({ ...current, ...parsed.fieldErrors }))
-        setSubmitError(toActividadRegistroSubmitMessage(error))
+        const mergedErrors = { ...parsed.fieldErrors }
+        applyValidationErrors(
+          mergedErrors,
+          toActividadRegistroSubmitMessage(error, {
+            mode: isCorregirMode ? 'corregir' : 'registrar',
+          }),
+        )
         return
       }
 
@@ -124,12 +156,18 @@ const ActividadRegistroFormShell = ({
         setSubmitError(
           /HTTP 5\d\d/.test(httpStatus)
             ? ACTIVIDAD_REGISTRO_SERVER_ERROR
-            : toActividadRegistroSubmitMessage(error),
+            : toActividadRegistroSubmitMessage(error, {
+                mode: isCorregirMode ? 'corregir' : 'registrar',
+              }),
         )
         return
       }
 
-      setSubmitError(toActividadRegistroSubmitMessage(error))
+      setSubmitError(
+        toActividadRegistroSubmitMessage(error, {
+          mode: isCorregirMode ? 'corregir' : 'registrar',
+        }),
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -212,17 +250,32 @@ const ActividadRegistroFormShell = ({
         </div>
       ) : (
         <form
+          ref={formRef}
           className="actividad-registro-form"
           onSubmit={handleSubmit}
           noValidate
           aria-busy={isSubmitting}
         >
+          {Object.keys(errors).length > 0 || submitError ? (
+            <ActividadRegistroValidationSummary
+              errors={errors}
+              generalMessage={submitError}
+            />
+          ) : null}
+
           <fieldset className="actividad-registro-form__section" disabled={isSubmitting}>
             <legend className="actividad-registro-form__legend">Información general</legend>
 
-            <div className="actividad-registro-form__field">
+            <div
+              className={`actividad-registro-form__field${
+                errors.fechaActividad ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
               <label className="actividad-registro-form__label" htmlFor="fechaActividad">
-                Fecha de la actividad <span aria-hidden="true">*</span>
+                Fecha de la actividad{' '}
+                <span className="actividad-registro-form__required" aria-hidden="true">
+                  *
+                </span>
               </label>
               <input
                 id="fechaActividad"
@@ -242,19 +295,23 @@ const ActividadRegistroFormShell = ({
                 required
               />
               {errors.fechaActividad ? (
-                <p
+                <ActividadRegistroFieldError
                   id="fechaActividad-error"
-                  className="actividad-registro-form__error"
-                  role="alert"
-                >
-                  {errors.fechaActividad}
-                </p>
+                  message={errors.fechaActividad}
+                />
               ) : null}
             </div>
 
-            <div className="actividad-registro-form__field">
+            <div
+              className={`actividad-registro-form__field${
+                errors.titulo ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
               <label className="actividad-registro-form__label" htmlFor="titulo">
-                Título o resumen <span aria-hidden="true">*</span>
+                Título o resumen{' '}
+                <span className="actividad-registro-form__required" aria-hidden="true">
+                  *
+                </span>
               </label>
               <input
                 id="titulo"
@@ -271,13 +328,15 @@ const ActividadRegistroFormShell = ({
                 required
               />
               {errors.titulo ? (
-                <p id="titulo-error" className="actividad-registro-form__error" role="alert">
-                  {errors.titulo}
-                </p>
+                <ActividadRegistroFieldError id="titulo-error" message={errors.titulo} />
               ) : null}
             </div>
 
-            <div className="actividad-registro-form__field">
+            <div
+              className={`actividad-registro-form__field${
+                errors.descripcion ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
               <label className="actividad-registro-form__label" htmlFor="descripcion">
                 Descripción
               </label>
@@ -285,13 +344,27 @@ const ActividadRegistroFormShell = ({
                 id="descripcion"
                 name="descripcion"
                 rows={3}
-                className="actividad-registro-form__textarea"
+                className={`actividad-registro-form__textarea${
+                  errors.descripcion ? ' actividad-registro-form__input--error' : ''
+                }`}
                 value={values.descripcion}
                 onChange={(event) => updateField('descripcion', event.target.value)}
+                aria-invalid={Boolean(errors.descripcion)}
+                aria-describedby={errors.descripcion ? 'descripcion-error' : undefined}
               />
+              {errors.descripcion ? (
+                <ActividadRegistroFieldError
+                  id="descripcion-error"
+                  message={errors.descripcion}
+                />
+              ) : null}
             </div>
 
-            <div className="actividad-registro-form__field">
+            <div
+              className={`actividad-registro-form__field${
+                errors.ubicacion ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
               <label className="actividad-registro-form__label" htmlFor="ubicacion">
                 Ubicación
               </label>
@@ -309,13 +382,10 @@ const ActividadRegistroFormShell = ({
                 aria-describedby={errors.ubicacion ? 'ubicacion-error' : undefined}
               />
               {errors.ubicacion ? (
-                <p
+                <ActividadRegistroFieldError
                   id="ubicacion-error"
-                  className="actividad-registro-form__error"
-                  role="alert"
-                >
-                  {errors.ubicacion}
-                </p>
+                  message={errors.ubicacion}
+                />
               ) : null}
             </div>
 
@@ -354,12 +424,6 @@ const ActividadRegistroFormShell = ({
               setSubmitError(null)
             }}
           />
-
-          {submitError ? (
-            <p className="actividad-registro-form__submit-error" role="alert">
-              {submitError}
-            </p>
-          ) : null}
 
           <div className="actividad-registro-form__actions">
             <Link

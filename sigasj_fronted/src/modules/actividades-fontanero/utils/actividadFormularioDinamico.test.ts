@@ -31,7 +31,7 @@ describe('reglas del formulario dinámico de actividades', () => {
       { ...validBase, presionMedida: '0' },
       'TOMA_PRESION',
     )
-    expect(errors.presionMedida).toContain('positivo')
+    expect(errors.presionMedida).toContain('mayor que cero')
   })
 
   it('convierte las mediciones válidas al tipo numérico esperado por el backend', () => {

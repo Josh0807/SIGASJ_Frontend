@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { clearAccessToken } from '../../modules/auth/utils/authStorage'
 import { loginAsRole } from '../../test/authTestHelpers'
 import { mountAppRoutes } from '../../test/render-app-routes'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../app/router/publicRoutes'
+import * as actividadesApi from './services/actividadesFontaneroApi'
 
 const FONTANERO_PATHS = [
   '/admin/actividades',
@@ -28,6 +29,11 @@ const BACKLOG_FONTANERO_PATHS = [
 describe('protección de rutas — Registro de Actividades del Fontanero', () => {
   beforeEach(() => {
     clearAccessToken()
+    vi.restoreAllMocks()
+    vi.spyOn(actividadesApi, 'getCorreccionesPendientes').mockResolvedValue({
+      data: [],
+      total: 0,
+    })
   })
 
   it.each([...FONTANERO_PATHS])(

@@ -112,10 +112,8 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
       })
 
       expect(actividadesApi.registrarActividad).not.toHaveBeenCalled()
-      expect(app.container.innerHTML).toContain('La fecha de la actividad es obligatoria.')
-      expect(app.container.innerHTML).toContain(
-        'El título o resumen de la actividad es obligatorio.',
-      )
+      expect(app.container.innerHTML).toContain('Este campo es obligatorio.')
+      expect(app.container.innerHTML).toContain('data-testid="formulario-errores-resumen"')
     } finally {
       await app.cleanup()
     }

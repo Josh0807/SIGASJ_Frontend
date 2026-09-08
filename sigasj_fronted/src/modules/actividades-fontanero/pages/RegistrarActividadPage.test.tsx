@@ -115,10 +115,8 @@ describe('formulario de registro de actividad (#390 / #932)', () => {
         submit?.click()
       })
 
-      expect(app.container.innerHTML).toContain('La fecha de la actividad es obligatoria.')
-      expect(app.container.innerHTML).toContain(
-        'El título o resumen de la actividad es obligatorio.',
-      )
+      expect(app.container.innerHTML).toContain('Este campo es obligatorio.')
+      expect(app.container.innerHTML).toContain('data-testid="formulario-errores-resumen"')
     } finally {
       await app.cleanup()
     }

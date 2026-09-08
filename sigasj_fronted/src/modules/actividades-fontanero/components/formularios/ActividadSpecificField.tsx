@@ -1,5 +1,6 @@
 import type { ChangeEvent } from 'react'
 import type { ActividadRegistroFormField } from '../../types/actividadRegistroForm'
+import ActividadRegistroFieldError from '../ActividadRegistroFieldError'
 
 type Props = {
   field: ActividadRegistroFormField
@@ -39,7 +40,11 @@ const ActividadSpecificField = ({
   }
 
   return (
-    <div className="actividad-registro-form__field">
+    <div
+      className={`actividad-registro-form__field${
+        error ? ' actividad-registro-form__field--invalid' : ''
+      }`}
+    >
       <label className="actividad-registro-form__label" htmlFor={field}>
         {label} <span className="actividad-registro-form__required" aria-hidden="true">*</span>
         {unit ? <span className="actividad-registro-form__unit"> ({unit})</span> : null}
@@ -55,7 +60,7 @@ const ActividadSpecificField = ({
           step={type === 'number' ? 'any' : undefined}
         />
       )}
-      {error ? <p id={errorId} className="actividad-registro-form__error" role="alert">{error}</p> : null}
+      {error ? <ActividadRegistroFieldError id={errorId} message={error} /> : null}
     </div>
   )
 }
