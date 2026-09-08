@@ -4,6 +4,7 @@ import ComunicadosAdminForm from './ComunicadosAdminForm'
 import { emptyComunicadoFormValues, type ComunicadoFormValues } from './types'
 import {
   createComunicado,
+  deleteComunicado,
   getAdminComunicados,
   updateComunicado,
   type AdminComunicado,
@@ -19,6 +20,7 @@ const ComunicadosAdminPage = () => {
   const [items, setItems] = useState<AdminComunicado[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [searchTitle, setSearchTitle] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>(
     'all',
@@ -106,6 +108,24 @@ const ComunicadosAdminPage = () => {
     await loadItems()
   }
 
+  const handleDelete = async (item: AdminComunicado) => {
+    const confirmed = window.confirm(
+      `¿Eliminar el comunicado «${item.titulo}»? Esta acción no se puede deshacer.`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setActionError(null)
+    try {
+      await deleteComunicado(item.id)
+      await loadItems()
+    } catch {
+      setActionError('No fue posible eliminar el comunicado. Intente nuevamente.')
+    }
+  }
+
   const formInitialValues: ComunicadoFormValues =
     formMode === 'edit' && editingItem
       ? {
@@ -174,6 +194,12 @@ const ComunicadosAdminPage = () => {
           </label>
         </section>
 
+        {actionError ? (
+          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
+            {actionError}
+          </p>
+        ) : null}
+
         {formMode !== 'hidden' ? (
           <ComunicadosAdminForm
             mode={formMode}
@@ -222,6 +248,13 @@ const ComunicadosAdminPage = () => {
                   </button>
                   <button type="button" onClick={() => void handleToggleEstado(item)}>
                     {item.estado === 'Activo' ? 'Desactivar' : 'Activar'}
+                  </button>
+                  <button
+                    type="button"
+                    className="gallery-admin__danger"
+                    onClick={() => void handleDelete(item)}
+                  >
+                    Eliminar
                   </button>
                 </div>
               </article>

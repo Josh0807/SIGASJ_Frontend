@@ -62,7 +62,7 @@ describe('AdminSidebar', () => {
 
     expect(markup).toContain('admin-sidebar__link')
     expect(markup).not.toContain('target="_blank"')
-    expect(markup).not.toContain('http://')
+    expect(markup).not.toMatch(/<a[^>]+href="https?:\/\//)
   })
 
   it('puede recibir un conjunto distinto de opciones segun el usuario', () => {

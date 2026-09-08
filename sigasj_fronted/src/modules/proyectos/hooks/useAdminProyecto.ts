@@ -6,6 +6,7 @@ import {
 import type { AdminProyectoDetalle } from '../admin/types'
 import { getAdminProyecto, parseAdminProyectoId } from '../services/proyectosApi'
 import { subscribeAdminProyectosQueries } from './proyectosAdminQuery'
+import { clearAccessToken } from '../../auth/utils/authStorage'
 
 export type UseAdminProyectoResult = {
   proyecto: AdminProyectoDetalle | null
@@ -94,6 +95,9 @@ export function useAdminProyecto(
         }
 
         const parsed = parseProyectoSubmitError(caught)
+        if (parsed.kind === 'unauthorized') {
+          clearAccessToken()
+        }
         setProyecto(null)
         setStatusKind(parsed.kind)
 

@@ -8,6 +8,7 @@ import {
   getAccessToken,
 } from '../../modules/auth/utils/authStorage'
 import { loginWithAdminSession } from '../../test/authTestHelpers'
+import { canAccessAdminRoute } from '../../modules/auth/utils/adminNavigation'
 import AppRoutes from './AppRoutes'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
@@ -261,8 +262,17 @@ describe('acceso directo a rutas administrativas', () => {
   it('audita la consola al cargar cada ruta administrativa existente', async () => {
     loginWithAdminSession()
     const findings: Record<string, { errors: unknown[]; warnings: unknown[] }> = {}
+    const adminUser = {
+      id: '1',
+      role: 'Administradora',
+      name: 'Usuario',
+      lastName: 'Prueba',
+    }
+    const authorizedPaths = PRIVATE_ROUTE_PATHS.filter((path) =>
+      canAccessAdminRoute(adminUser, path),
+    )
 
-    for (const path of PRIVATE_ROUTE_PATHS) {
+    for (const path of authorizedPaths) {
       const errors: unknown[] = []
       const warnings: unknown[] = []
       const originalError = console.error
@@ -286,7 +296,7 @@ describe('acceso directo a rutas administrativas', () => {
       }
     }
 
-    for (const path of PRIVATE_ROUTE_PATHS) {
+    for (const path of authorizedPaths) {
       expect(findings[path].errors, path).toEqual([])
       expect(findings[path].warnings, path).toEqual([])
     }

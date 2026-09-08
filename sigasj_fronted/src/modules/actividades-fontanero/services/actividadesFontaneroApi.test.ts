@@ -4,7 +4,7 @@ import {
   registrarActividad,
   toRegistrarActividadPayloadFromTipo,
 } from './actividadesFontaneroApi'
-import { CATALOGO_TIPOS_ACTIVIDAD } from '../types/tipoActividadFontanero'
+import { TIPOS_ACTIVIDAD_BACKEND } from '../test/tiposActividadFixture'
 
 vi.mock('../../../services/http/httpClient', () => ({
   fetchWithAuth: vi.fn(),
@@ -16,7 +16,7 @@ describe('actividadesFontaneroApi — registrarActividad', () => {
   })
 
   it('construye payload sin identidad del fontanero', () => {
-    const tipo = CATALOGO_TIPOS_ACTIVIDAD[0]
+    const tipo = TIPOS_ACTIVIDAD_BACKEND[0]
     expect(
       toRegistrarActividadPayloadFromTipo(tipo, {
         fechaActividad: '2026-09-07',
@@ -33,7 +33,7 @@ describe('actividadesFontaneroApi — registrarActividad', () => {
   })
 
   it('envía POST autenticado al endpoint del fontanero', async () => {
-    const tipo = CATALOGO_TIPOS_ACTIVIDAD[2]
+    const tipo = TIPOS_ACTIVIDAD_BACKEND[2]
     const response = {
       id: 12,
       tipoActividadId: tipo.id,

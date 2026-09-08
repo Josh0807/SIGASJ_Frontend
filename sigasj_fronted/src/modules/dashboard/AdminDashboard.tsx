@@ -7,6 +7,7 @@ import { useDashboardMetrics } from './hooks/useDashboardMetrics'
 import { useAuth } from '../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
 import type { DashboardIndicator } from './props'
+import { IconRefresh } from '@tabler/icons-react'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   {
@@ -99,14 +100,14 @@ const AdminDashboard = () => {
               disabled={isLoading}
               aria-label="Actualizar datos del dashboard"
             >
-              <span
+              <IconRefresh
                 className={`admin-dashboard__refresh-icon ${
                   isLoading ? 'admin-dashboard__refresh-icon--loading' : ''
                 }`}
                 aria-hidden="true"
-              >
-                &#x21bb;
-              </span>
+                size={18}
+                stroke={2}
+              />
               {isLoading ? 'Cargando...' : 'Actualizar datos'}
             </button>
           </div>
@@ -130,6 +131,7 @@ const AdminDashboard = () => {
                 badgeText={indicator.badgeText}
                 badgeType={indicator.badgeType}
                 icon={<AdminNavIcon name={indicator.icon} />}
+                className={`indicator-card--${indicator.id}`}
                 link={indicator.link}
                 isLoading={isLoading}
                 onRetry={() => void refetch()}

@@ -202,6 +202,25 @@ describe('navegación del menú administrativo', () => {
     }
   })
 
+  it('vuelve al inicio de la página al abrir otro módulo', async () => {
+    const app = await mountApp('/admin/abonados')
+
+    try {
+      document.documentElement.scrollTop = 640
+      document.body.scrollTop = 640
+
+      await clickElement(
+        app.container.querySelector('.admin-sidebar__link[href="/admin/contacto"]')!,
+      )
+
+      expect(app.currentPath()).toBe('/admin/contacto')
+      expect(document.documentElement.scrollTop).toBe(0)
+      expect(document.body.scrollTop).toBe(0)
+    } finally {
+      await app.cleanup()
+    }
+  })
+
   it('mantiene activa la opción padre en una ruta hija del módulo', () => {
     const container = document.createElement('div')
     document.body.appendChild(container)
@@ -238,11 +257,15 @@ describe('navegación del menú administrativo', () => {
 
     try {
       const toggle = app.container.querySelector<HTMLButtonElement>('.admin-menu-toggle')
+      const sidebar = app.container.querySelector<HTMLElement>('.admin-sidebar')
       expect(toggle).not.toBeNull()
+      expect(sidebar).not.toBeNull()
       expect(toggle?.getAttribute('aria-expanded')).toBe('false')
 
+      sidebar!.scrollTop = 500
       await clickElement(toggle!)
       expect(toggle?.getAttribute('aria-expanded')).toBe('true')
+      expect(sidebar?.scrollTop).toBe(0)
       expect(app.container.querySelector('.admin-layout--nav-open')).not.toBeNull()
       expect(outletTitle(app.container)).toBe('Dashboard administrativo')
 

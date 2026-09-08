@@ -1,5 +1,5 @@
 import { type FormEvent, useCallback, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
 import {
   ACTIVIDAD_REGISTRO_FORM_INITIAL,
@@ -20,16 +20,21 @@ import {
 import { registrarActividad } from '../services/actividadesFontaneroApi'
 import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistry'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import { useAuth } from '../../auth/components/AuthContext'
 
 type ActividadRegistroFormShellProps = {
   tipo: TipoActividadFontaneroCatalogo
   onSubmit?: (values: ActividadRegistroFormValues) => Promise<ActividadFontaneroRegistrada | void>
+  onCatalogStale?: () => void
 }
 
 const ActividadRegistroFormShell = ({
   tipo,
   onSubmit,
+  onCatalogStale,
 }: ActividadRegistroFormShellProps) => {
+  const navigate = useNavigate()
+  const { logout } = useAuth()
   const [values, setValues] = useState<ActividadRegistroFormValues>(
     ACTIVIDAD_REGISTRO_FORM_INITIAL,
   )
@@ -66,7 +71,7 @@ const ActividadRegistroFormShell = ({
       return
     }
 
-    const nextErrors = validateActividadRegistroForm(values)
+    const nextErrors = validateActividadRegistroForm(values, tipo.codigo)
     setErrors(nextErrors)
     if (hasActividadRegistroFormErrors(nextErrors)) {
       return
@@ -84,6 +89,9 @@ const ActividadRegistroFormShell = ({
         setRegistrada(result)
       }
       setIsSuccess(true)
+      setValues(ACTIVIDAD_REGISTRO_FORM_INITIAL)
+      setErrors({})
+      window.dispatchEvent(new CustomEvent('actividades-fontanero:updated'))
     } catch (error) {
       const parsed = parseActividadRegistroSubmitError(error)
 
@@ -94,6 +102,12 @@ const ActividadRegistroFormShell = ({
       }
 
       const status = parsed.kind
+      if (status === 'not-found') onCatalogStale?.()
+      if (status === 'unauthorized') {
+        logout()
+        navigate('/login', { replace: true })
+        return
+      }
       if (status === 'save') {
         const httpStatus = error instanceof Error ? error.message : ''
         setSubmitError(
@@ -212,6 +226,20 @@ const ActividadRegistroFormShell = ({
             </div>
 
             <div className="actividad-registro-form__field">
+              <label className="actividad-registro-form__label" htmlFor="descripcion">
+                Descripción
+              </label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                rows={3}
+                className="actividad-registro-form__textarea"
+                value={values.descripcion}
+                onChange={(event) => updateField('descripcion', event.target.value)}
+              />
+            </div>
+
+            <div className="actividad-registro-form__field">
               <label className="actividad-registro-form__label" htmlFor="ubicacion">
                 Ubicación
               </label>
@@ -254,7 +282,21 @@ const ActividadRegistroFormShell = ({
             </div>
           </fieldset>
 
-          <FormularioEspecifico tipo={tipo} />
+          <FormularioEspecifico
+            values={values}
+            errors={errors}
+            disabled={isSubmitting}
+            onChange={updateField}
+            onFilesChange={(files) => {
+              setValues((current) => ({ ...current, documentos: files }))
+              setErrors((current) => {
+                const next = { ...current }
+                delete next.documentos
+                return next
+              })
+              setSubmitError(null)
+            }}
+          />
 
           {submitError ? (
             <p className="actividad-registro-form__submit-error" role="alert">

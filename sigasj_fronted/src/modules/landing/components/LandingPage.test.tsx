@@ -25,6 +25,8 @@ describe('LandingPage', () => {
 
     expect(markup).toContain('header__inner')
     expect(markup).toContain('navbar')
+    expect(markup).toContain('Sugerencias y Quejas')
+    expect(markup).toContain('href="#quejas"')
     expect(markup).toContain('hero')
     expect(markup).toContain('id="hero-title"')
     expect(markup).toContain('<footer')

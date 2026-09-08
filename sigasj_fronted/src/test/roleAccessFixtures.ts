@@ -30,7 +30,9 @@ export const EXPECTED_BLOCKED_PATHS: Record<
   InternalAdminRole,
   readonly string[]
 > = {
-  Administradora: [],
+  Administradora: ALL_ADMIN_MODULE_PATHS.filter(
+    (path) => !EXPECTED_NAV_PATHS.Administradora.includes(path),
+  ),
   Secretaria: ALL_ADMIN_MODULE_PATHS.filter(
     (path) => !EXPECTED_NAV_PATHS.Secretaria.includes(path),
   ),

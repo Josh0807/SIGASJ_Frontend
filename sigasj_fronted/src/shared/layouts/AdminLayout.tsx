@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import AdminMain from '../../modules/admin-panel/components/AdminMain'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
 import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigation'
@@ -23,6 +23,7 @@ const getMobileNavSnapshot = () =>
 
 const AdminLayout = () => {
   const { user } = useAuth()
+  const { pathname } = useLocation()
   const navItems = getAdminNavItemsForUser(user)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const isMobileNav = useSyncExternalStore(
@@ -34,6 +35,12 @@ const AdminLayout = () => {
   const closeRef = useRef<HTMLButtonElement>(null)
 
   const closeNav = () => setIsNavOpen(false)
+
+  useEffect(() => {
+    const scrollingElement = document.scrollingElement ?? document.documentElement
+    scrollingElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [pathname])
 
   useEffect(() => {
     if (!isNavOpen) {

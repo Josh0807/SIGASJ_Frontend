@@ -1,6 +1,6 @@
 import { fetchWithAuth, type FetchOptions } from '../../../services/http/httpClient'
 import type { ActividadRegistroFormValues } from '../types/actividadRegistroForm'
-import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
+import { isTipoActividadFontaneroCodigo, type TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
 import {
   type ActividadFontaneroRegistrada,
   type RegistrarActividadRequest,
@@ -13,12 +13,7 @@ export type ActividadFontaneroListado = {
   total: number
 }
 
-export type TipoActividadFontanero = {
-  id: number
-  codigo: string
-  nombre: string
-  orden: number
-}
+export type TipoActividadFontanero = TipoActividadFontaneroCatalogo
 
 export type TiposActividadFontaneroListado = {
   data: TipoActividadFontanero[]
@@ -36,10 +31,8 @@ const CORRECCIONES_PATHS = [
   '/v1/fontanero/actividades/correcciones',
 ] as const
 
-const REGISTRAR_PATHS = [
-  '/fontanero/actividades',
-  '/v1/fontanero/actividades',
-] as const
+// Una sola solicitud por registro. httpClient ya resuelve el prefijo /api/v1.
+const REGISTRAR_PATHS = ['/fontanero/actividades'] as const
 
 const TIPOS_PATHS = [
   '/fontanero/actividades/tipos',
@@ -78,7 +71,9 @@ const normalizeTipos = (
     return []
   }
 
-  return sortTiposActividad(data)
+  return sortTiposActividad(data.filter((tipo): tipo is TipoActividadFontanero =>
+    Number.isInteger(tipo.id) && tipo.id > 0 && isTipoActividadFontaneroCodigo(tipo.codigo),
+  ))
 }
 
 /**
@@ -148,13 +143,23 @@ export async function registrarActividad(
   values: ActividadRegistroFormValues,
 ): Promise<ActividadFontaneroRegistrada> {
   const body = toRegistrarActividadPayloadFromTipo(tipo, values)
+  const requestBody = tipo.codigo === 'INCAPACIDAD_VACACIONES'
+    ? (() => {
+        const formData = new FormData()
+        Object.entries(body).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) formData.append(key, String(value))
+        })
+        values.documentos.forEach((documento) => formData.append('documentos', documento))
+        return formData
+      })()
+    : JSON.stringify(body)
 
   try {
     return await fetchWithPathFallback<ActividadFontaneroRegistrada>(
       REGISTRAR_PATHS,
       {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: requestBody,
       },
     )
   } catch (error) {

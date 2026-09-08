@@ -40,7 +40,7 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
   })
 
   it('cubre los módulos administrativos configurados en el menú', () => {
-    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(13)
+    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(15)
   })
 
   it('Secretaria Ejecutiva no incluye usuarios ni reportes', () => {
@@ -57,6 +57,7 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(EXPECTED_NAV_PATHS.Fontanero).toEqual([
       '/admin/dashboard',
       '/admin/averias',
+      '/admin/actividades',
     ])
   })
 

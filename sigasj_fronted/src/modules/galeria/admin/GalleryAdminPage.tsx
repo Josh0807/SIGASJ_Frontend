@@ -17,6 +17,7 @@ const GalleryAdminPage = () => {
   const [photos, setPhotos] = useState<AdminGalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [searchTitle, setSearchTitle] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>(
     'all',
@@ -116,8 +117,13 @@ const GalleryAdminPage = () => {
       return
     }
 
-    await deleteGaleriaPhoto(photo.id)
-    await loadPhotos()
+    setActionError(null)
+    try {
+      await deleteGaleriaPhoto(photo.id)
+      await loadPhotos()
+    } catch {
+      setActionError('No fue posible eliminar la fotografía. Intente nuevamente.')
+    }
   }
 
   const movePhoto = async (index: number, direction: -1 | 1) => {
@@ -210,6 +216,12 @@ const GalleryAdminPage = () => {
             </select>
           </label>
         </section>
+
+        {actionError ? (
+          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
+            {actionError}
+          </p>
+        ) : null}
 
         {formMode !== 'hidden' ? (
           <GalleryAdminForm

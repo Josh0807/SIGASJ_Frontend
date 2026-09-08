@@ -1,23 +1,27 @@
 import type { ComponentType } from 'react'
-import type { TipoActividadFontaneroCatalogo } from '../../types/tipoActividadFontanero'
-import FormularioActividadPlaceholder from './FormularioActividadPlaceholder'
+import type { ActividadRegistroFormField, ActividadRegistroFormValues } from '../../types/actividadRegistroForm'
+import type { TipoActividadFontaneroCodigo } from '../../types/tipoActividadFontanero'
+import type { ActividadRegistroFormErrors } from '../../utils/validateActividadRegistroForm'
+import ControlClorosForm from './ControlClorosForm'
+import ControlFugasForm from './ControlFugasForm'
+import ControlOperativoForm from './ControlOperativoForm'
+import IncapacidadVacacionesForm from './IncapacidadVacacionesForm'
+import TomaPresionForm from './TomaPresionForm'
+import VisitaCampoForm from './VisitaCampoForm'
 
 export type FormularioActividadProps = {
-  tipo: TipoActividadFontaneroCatalogo
+  values: ActividadRegistroFormValues
+  errors: ActividadRegistroFormErrors
+  onChange: (field: ActividadRegistroFormField, value: string) => void
+  onFilesChange: (files: File[]) => void
+  disabled: boolean
 }
 
-const withPlaceholder = (): ComponentType<FormularioActividadProps> =>
-  FormularioActividadPlaceholder
-
-/** Un formulario por tipo de actividad (placeholders hasta backlogs específicos). */
-export const FORMULARIOS_ACTIVIDAD: Record<
-  TipoActividadFontaneroCatalogo['codigo'],
-  ComponentType<FormularioActividadProps>
-> = {
-  CONTROL_FUGAS: withPlaceholder(),
-  TOMA_PRESION: withPlaceholder(),
-  VISITA_CAMPO: withPlaceholder(),
-  CONTROL_CLOROS: withPlaceholder(),
-  CONTROL_OPERATIVO: withPlaceholder(),
-  INCAPACIDAD_VACACIONES: withPlaceholder(),
+export const FORMULARIOS_ACTIVIDAD: Record<TipoActividadFontaneroCodigo, ComponentType<FormularioActividadProps>> = {
+  CONTROL_FUGAS: ControlFugasForm,
+  TOMA_PRESION: TomaPresionForm,
+  VISITA_CAMPO: VisitaCampoForm,
+  CONTROL_CLOROS: ControlClorosForm,
+  CONTROL_OPERATIVO: ControlOperativoForm,
+  INCAPACIDAD_VACACIONES: IncapacidadVacacionesForm,
 }

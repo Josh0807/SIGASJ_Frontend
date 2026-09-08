@@ -1,28 +1,28 @@
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import TransparenciaAdminForm from './TransparenciaAdminForm'
-import { adminTransparenciaMocks } from './adminTransparenciaMocks'
 import {
   emptyTransparenciaFormValues,
   isTransparenciaImageType,
   type AdminTransparenciaPublication,
   type TransparenciaFormValues,
 } from './types'
-import { inferTransparenciaFileType } from './validateTransparenciaFile'
-import { deleteTransparenciaPublication } from '../services/transparenciaApi'
+import {
+  createTransparenciaPublication,
+  deleteTransparenciaPublication,
+  getAdminTransparencia,
+  updateTransparenciaEstado,
+  updateTransparenciaPublication,
+} from '../services/transparenciaApi'
 
 const formatFileTypeLabel = (
   tipoArchivo: AdminTransparenciaPublication['tipoArchivo'],
 ) => tipoArchivo.toUpperCase()
 
 const TransparenciaAdminPage = () => {
-  const nextIdRef = useRef(
-    Math.max(0, ...adminTransparenciaMocks.map((item) => item.id)) + 1,
-  )
-
-  const [publications, setPublications] = useState<AdminTransparenciaPublication[]>(
-    adminTransparenciaMocks,
-  )
+  const [publications, setPublications] = useState<AdminTransparenciaPublication[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchName, setSearchName] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>(
     'all',
@@ -33,7 +33,25 @@ const TransparenciaAdminPage = () => {
   const [submitting, setSubmitting] = useState(false)
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
 
+  const loadPublications = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      setPublications(await getAdminTransparencia())
+    } catch {
+      setError('No fue posible cargar las publicaciones de transparencia.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadPublications()
+  }, [loadPublications])
+
   const showSuccess = (message: string) => {
+    setError(null)
     setActionSuccess(message)
   }
 
@@ -73,6 +91,7 @@ const TransparenciaAdminPage = () => {
     file: File | null,
   ) => {
     setSubmitting(true)
+    setError(null)
 
     try {
       if (formMode === 'create') {
@@ -80,52 +99,31 @@ const TransparenciaAdminPage = () => {
           return
         }
 
-        const nextPublication: AdminTransparenciaPublication = {
-          id: nextIdRef.current,
-          nombre: values.nombre,
-          descripcionBreve: values.descripcionBreve,
-          archivoUrl: URL.createObjectURL(file),
-          tipoArchivo: inferTransparenciaFileType(file),
-          ordenVisualizacion: values.ordenVisualizacion,
-          activo: values.activo,
-        }
-        nextIdRef.current += 1
-        setPublications((current) => [...current, nextPublication])
+        await createTransparenciaPublication(values, file)
         showSuccess('Publicación registrada correctamente.')
       } else if (editingPublication) {
-        setPublications((current) =>
-          current.map((publication) =>
-            publication.id === editingPublication.id
-              ? {
-                  ...publication,
-                  nombre: values.nombre,
-                  descripcionBreve: values.descripcionBreve,
-                  archivoUrl: file
-                    ? URL.createObjectURL(file)
-                    : publication.archivoUrl,
-                  tipoArchivo: file
-                    ? inferTransparenciaFileType(file)
-                    : publication.tipoArchivo,
-                }
-              : publication,
-          ),
-        )
+        await updateTransparenciaPublication(editingPublication.id, values, file)
         showSuccess('Publicación actualizada correctamente.')
       }
 
       closeForm()
+      await loadPublications()
+    } catch {
+      setError('No fue posible guardar la publicación. Intente nuevamente.')
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleToggleEstado = (publication: AdminTransparenciaPublication) => {
-    setPublications((current) =>
-      current.map((item) =>
-        item.id === publication.id ? { ...item, activo: !item.activo } : item,
-      ),
-    )
-    showSuccess('Estado de la publicación actualizado.')
+  const handleToggleEstado = async (publication: AdminTransparenciaPublication) => {
+    setError(null)
+    try {
+      await updateTransparenciaEstado(publication.id, !publication.activo)
+      await loadPublications()
+      showSuccess('Estado de la publicación actualizado.')
+    } catch {
+      setError('No fue posible actualizar el estado de la publicación.')
+    }
   }
 
   const handleDelete = async (publication: AdminTransparenciaPublication) => {
@@ -137,19 +135,17 @@ const TransparenciaAdminPage = () => {
       return
     }
 
+    setError(null)
     try {
       await deleteTransparenciaPublication(publication.id)
+      await loadPublications()
+      showSuccess('Publicación eliminada correctamente.')
     } catch {
-      // Ignorar si la API no responde en entorno de pruebas
+      setError('No fue posible eliminar la publicación. Intente nuevamente.')
     }
-
-    setPublications((current) =>
-      current.filter((item) => item.id !== publication.id),
-    )
-    showSuccess('Publicación eliminada correctamente.')
   }
 
-  const movePublication = (index: number, direction: -1 | 1) => {
+  const movePublication = async (index: number, direction: -1 | 1) => {
     const targetIndex = index + direction
     if (targetIndex < 0 || targetIndex >= visiblePublications.length) {
       return
@@ -162,19 +158,30 @@ const TransparenciaAdminPage = () => {
       reordered.map((publication, orderIndex) => [publication.id, orderIndex]),
     )
 
-    setPublications((current) =>
-      current
-        .map((publication) =>
-          orderById.has(publication.id)
-            ? {
-                ...publication,
-                ordenVisualizacion: orderById.get(publication.id)!,
-              }
-            : publication,
-        )
-        .sort((left, right) => left.ordenVisualizacion - right.ordenVisualizacion),
-    )
-    showSuccess('Orden de publicaciones actualizado.')
+    setError(null)
+    try {
+      await Promise.all(
+        publications.map((publication) => {
+          const order = orderById.get(publication.id)
+          return order === undefined
+            ? Promise.resolve(publication)
+            : updateTransparenciaPublication(
+                publication.id,
+                {
+                  nombre: publication.nombre,
+                  descripcionBreve: publication.descripcionBreve,
+                  ordenVisualizacion: order,
+                  activo: publication.activo,
+                },
+                null,
+              )
+        }),
+      )
+      await loadPublications()
+      showSuccess('Orden de publicaciones actualizado.')
+    } catch {
+      setError('No fue posible actualizar el orden de las publicaciones.')
+    }
   }
 
   const formInitialValues =
@@ -248,6 +255,12 @@ const TransparenciaAdminPage = () => {
           </p>
         ) : null}
 
+        {error ? (
+          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
+            {error}
+          </p>
+        ) : null}
+
         {formMode !== 'hidden' ? (
           <TransparenciaAdminForm
             mode={formMode}
@@ -260,7 +273,11 @@ const TransparenciaAdminPage = () => {
           />
         ) : null}
 
-        {visiblePublications.length === 0 ? (
+        {loading ? (
+          <p className="gallery-admin__empty" role="status">
+            Cargando publicaciones…
+          </p>
+        ) : visiblePublications.length === 0 ? (
           <p className="gallery-admin__empty" role="status">
             No hay publicaciones registradas con los filtros actuales.
           </p>
@@ -297,28 +314,28 @@ const TransparenciaAdminPage = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleToggleEstado(publication)}
+                    onClick={() => void handleToggleEstado(publication)}
                   >
                     {publication.activo ? 'Desactivar' : 'Activar'}
                   </button>
                   <button
                     type="button"
                     disabled={index === 0}
-                    onClick={() => movePublication(index, -1)}
+                    onClick={() => void movePublication(index, -1)}
                   >
                     Subir
                   </button>
                   <button
                     type="button"
                     disabled={index === visiblePublications.length - 1}
-                    onClick={() => movePublication(index, 1)}
+                    onClick={() => void movePublication(index, 1)}
                   >
                     Bajar
                   </button>
                   <button
                     type="button"
                     className="gallery-admin__danger"
-                    onClick={() => handleDelete(publication)}
+                    onClick={() => void handleDelete(publication)}
                   >
                     Eliminar
                   </button>

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import AdminNavIcon from './AdminNavIcon'
@@ -12,8 +13,21 @@ const AdminSidebar = ({
   onNavigate,
   onClose,
   closeButtonRef,
-}: AdminSidebarProps) => (
+}: AdminSidebarProps) => {
+  const sidebarRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (isDrawer && isOpen) {
+      const sidebar = sidebarRef.current
+      if (sidebar) {
+        sidebar.scrollTop = 0
+      }
+    }
+  }, [isDrawer, isOpen])
+
+  return (
   <aside
+    ref={sidebarRef}
     id="admin-navigation"
     className="admin-sidebar"
     aria-label="Menú administrativo"
@@ -76,6 +90,7 @@ const AdminSidebar = ({
       </div>
     </div>
   </aside>
-)
+  )
+}
 
 export default AdminSidebar
