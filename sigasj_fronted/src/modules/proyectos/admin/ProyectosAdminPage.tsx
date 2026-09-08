@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import {
   ESTADO_PROYECTO_OPTIONS,
   type EstadoProyecto,
@@ -54,13 +55,17 @@ const ProyectosAdminPage = () => {
     return () => window.clearTimeout(timeout)
   }, [nombreInput, applyNombreSearch])
 
-  const { listado, loading, error, refetch } = useAdminProyectos({
+  const { listado, loading, error, forbidden, refetch } = useAdminProyectos({
     nombre: nombre || undefined,
     estado: estado ? (estado as EstadoProyecto) : undefined,
     activo: toActivoQueryParam(activo),
     page,
     limit: DEFAULT_PROYECTOS_LIMIT,
   })
+
+  if (forbidden) {
+    return <Navigate to={UNAUTHORIZED_ROUTE_PATH} replace />
+  }
 
   const handleToggleVisibilidad = async (id: number, proximoActivo: boolean) => {
     setActionError(null)

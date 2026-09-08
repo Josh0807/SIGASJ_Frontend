@@ -5,12 +5,12 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { AuthProvider } from '../../modules/auth/components/AuthContext'
 import { clearAccessToken } from '../../modules/auth/utils/authStorage'
+import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigation'
 import { loginAsRole, loginWithAdminSession } from '../../test/authTestHelpers'
 import AppRoutes from './AppRoutes'
 import {
   ADMIN_BASE_PATH,
   ADMIN_HOME_PATH,
-  ADMIN_NAV_ITEMS,
   PRIVATE_ROUTE_PATHS,
 } from './privateRoutes'
 import {
@@ -271,10 +271,18 @@ describe('AppRoutes y AdminLayout', () => {
     loginWithAdminSession()
 
     const markup = renderPath('/admin/dashboard')
+    const adminNavItems = getAdminNavItemsForUser({
+      id: '1',
+      role: 'Administradora',
+      name: 'Usuario',
+      lastName: 'Prueba',
+    })
 
-    for (const { path } of ADMIN_NAV_ITEMS) {
+    for (const { path } of adminNavItems) {
       expect(markup).toContain(`href="${path}"`)
     }
+
+    expect(markup).not.toContain('href="/admin/actividades"')
 
     expect(markup).toContain('admin-sidebar__link')
     expect(markup).toContain('href="/admin/comunicados"')

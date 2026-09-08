@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
-import { CATALOGO_TIPOS_ACTIVIDAD } from '../types/tipoActividadFontanero'
+import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 
-const SeleccionarTipoActividadPage = () => (
+const SeleccionarTipoActividadPage = () => {
+  const catalogo = useTiposActividadFontanero()
+  return (
   <section
     className="actividades-fontanero-registro actividades-fontanero-registro--selector"
     aria-labelledby="seleccion-tipo-actividad-title"
@@ -16,19 +18,24 @@ const SeleccionarTipoActividadPage = () => (
       </p>
     </header>
 
+    {catalogo.isLoading ? <p role="status">Cargando tipos de actividad…</p> : null}
+    {catalogo.isUnauthorized ? <p role="alert">Su sesión no es válida o ha vencido.</p> : null}
+    {catalogo.isForbidden ? <p role="alert">No tiene permiso para consultar los tipos de actividad.</p> : null}
+    {catalogo.isError ? <p role="alert">No se pudo cargar el catálogo. <button type="button" onClick={catalogo.refetch}>Reintentar</button></p> : null}
+    {catalogo.isEmpty ? <p role="status">No hay tipos de actividad disponibles.</p> : null}
     <div
       className="actividad-tipo-selector"
       role="list"
       aria-label="Tipos de actividad disponibles"
     >
-      {CATALOGO_TIPOS_ACTIVIDAD.map((tipo) => (
+      {catalogo.tipos.map((tipo) => (
         <article
           key={tipo.codigo}
           className="actividad-tipo-selector__card"
           role="listitem"
         >
           <h2 className="actividad-tipo-selector__title">{tipo.nombre}</h2>
-          <p className="actividad-tipo-selector__description">{tipo.descripcion}</p>
+          {tipo.descripcion ? <p className="actividad-tipo-selector__description">{tipo.descripcion}</p> : null}
           <Link
             to={ACTIVIDADES_FONTANERO_PATHS.registrarTipo(tipo.codigo)}
             className="actividad-tipo-selector__link"
@@ -44,6 +51,7 @@ const SeleccionarTipoActividadPage = () => (
       Volver al menú de actividades
     </Link>
   </section>
-)
+  )
+}
 
 export default SeleccionarTipoActividadPage

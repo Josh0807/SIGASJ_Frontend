@@ -7,3 +7,6 @@ export const GALLERY_HREF = `#${GALLERY_SECTION_ID}` as const
 
 export const TRANSPARENCY_SECTION_ID = 'transparencia'
 export const TRANSPARENCY_HREF = `#${TRANSPARENCY_SECTION_ID}` as const
+
+export const COMPLAINTS_SECTION_ID = 'quejas'
+export const COMPLAINTS_HREF = `#${COMPLAINTS_SECTION_ID}` as const

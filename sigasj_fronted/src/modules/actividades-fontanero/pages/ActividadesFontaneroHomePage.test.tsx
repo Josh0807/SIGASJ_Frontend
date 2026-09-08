@@ -5,6 +5,7 @@ import { loginAsRole } from '../../../test/authTestHelpers'
 import { mountAppRoutes } from '../../../test/render-app-routes'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/publicRoutes'
 import * as actividadesApi from '../services/actividadesFontaneroApi'
+import { respuestaTiposActividad } from '../test/tiposActividadFixture'
 
 const HOME_PATH = '/admin/actividades'
 const BACKLOG_HOME_PATH = '/fontanero/actividades'
@@ -29,10 +30,7 @@ describe('pantalla principal — Registro de Actividades del Fontanero', () => {
       data: [],
       total: 0,
     })
-    vi.spyOn(actividadesApi, 'getTiposActividadFontanero').mockResolvedValue({
-      data: [{ id: 1, codigo: 'CONTROL_FUGAS', nombre: 'Control de fugas', orden: 1 }],
-      total: 1,
-    })
+    vi.spyOn(actividadesApi, 'getTiposActividadFontanero').mockResolvedValue(respuestaTiposActividad)
   })
 
   it('Fontanero autenticado ve la pantalla de entrada con su nombre', async () => {

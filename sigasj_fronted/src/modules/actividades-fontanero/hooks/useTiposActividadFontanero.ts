@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   getTiposActividadFontanero,
   type TipoActividadFontanero,
@@ -23,12 +23,14 @@ export function useTiposActividadFontanero(): TiposActividadFontaneroState {
   const [isUnauthorized, setIsUnauthorized] = useState(false)
   const [isForbidden, setIsForbidden] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
+  const hasLoaded = useRef(false)
 
   useEffect(() => {
     let cancelled = false
 
     const load = async () => {
-      setIsLoading(true)
+      // Un refresco por ID obsoleto debe conservar montado el formulario y sus archivos.
+      setIsLoading(!hasLoaded.current)
       setIsError(false)
       setIsEmpty(false)
       setIsUnauthorized(false)
@@ -43,6 +45,7 @@ export function useTiposActividadFontanero(): TiposActividadFontaneroState {
           Array.isArray(result.data) ? result.data : [],
         )
         setTipos(data)
+        hasLoaded.current = true
         setIsEmpty(data.length === 0)
       } catch (error) {
         if (cancelled) {

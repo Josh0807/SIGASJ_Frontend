@@ -5,6 +5,7 @@ import { mountAppRoutes } from '../../test/render-app-routes'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../app/router/publicRoutes'
 import { ACTIVIDADES_FONTANERO_PATHS } from './actividadesFontaneroPaths'
 import * as actividadesApi from './services/actividadesFontaneroApi'
+import { respuestaTiposActividad } from './test/tiposActividadFixture'
 
 const loginAsFontanero = () => {
   setAuthSession({
@@ -33,8 +34,9 @@ const actividadRegistradaMock = {
   updatedAt: '2026-09-07T00:00:00.000Z',
 }
 
-const setInputValue = (input: HTMLInputElement, value: string) => {
-  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+const setInputValue = (input: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+  const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+  const setter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set
   setter?.call(input, value)
   input.dispatchEvent(new Event('input', { bubbles: true }))
   input.dispatchEvent(new Event('change', { bubbles: true }))
@@ -47,6 +49,7 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
   beforeEach(() => {
     clearAccessToken()
     vi.restoreAllMocks()
+    vi.spyOn(actividadesApi, 'getTiposActividadFontanero').mockResolvedValue(respuestaTiposActividad)
     vi.spyOn(actividadesApi, 'registrarActividad').mockResolvedValue(actividadRegistradaMock)
   })
 
@@ -74,12 +77,14 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
       const fecha = app.container.querySelector('#fechaActividad') as HTMLInputElement
       const titulo = app.container.querySelector('#titulo') as HTMLInputElement
       const ubicacion = app.container.querySelector('#ubicacion') as HTMLInputElement
+      const ubicacionFuga = app.container.querySelector('#ubicacionFuga') as HTMLInputElement
       const form = app.container.querySelector('form.actividad-registro-form') as HTMLFormElement
 
       await act(async () => {
         setInputValue(fecha, '2026-09-07')
         setInputValue(titulo, 'Control QA')
         setInputValue(ubicacion, 'Sector A')
+        setInputValue(ubicacionFuga, 'Frente a la escuela')
         form.requestSubmit()
       })
 
@@ -129,11 +134,13 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
     try {
       const fecha = app.container.querySelector('#fechaActividad') as HTMLInputElement
       const titulo = app.container.querySelector('#titulo') as HTMLInputElement
+      const resultadoVisita = app.container.querySelector('#resultadoVisita') as HTMLTextAreaElement
       const form = app.container.querySelector('form.actividad-registro-form') as HTMLFormElement
 
       await act(async () => {
         setInputValue(fecha, '2099-01-01')
         setInputValue(titulo, 'Visita QA')
+        setInputValue(resultadoVisita, 'Inspección completada')
         form.requestSubmit()
       })
 
@@ -169,6 +176,7 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
     try {
       const fecha = app.container.querySelector('#fechaActividad') as HTMLInputElement
       const titulo = app.container.querySelector('#titulo') as HTMLInputElement
+      const caudal = app.container.querySelector('#caudal') as HTMLInputElement
       const submit = app.container.querySelector(
         'button[type="submit"]',
       ) as HTMLButtonElement
@@ -177,6 +185,7 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
       await act(async () => {
         setInputValue(fecha, '2026-09-07')
         setInputValue(titulo, 'Operativo QA')
+        setInputValue(caudal, '12.5')
         form.requestSubmit()
       })
 

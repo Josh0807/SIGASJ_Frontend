@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { NavbarProps } from '../types/NavbarProps'
-import { GALLERY_HREF, TRANSPARENCY_HREF } from '../config/landingAnchors'
+import {
+  COMPLAINTS_HREF,
+  GALLERY_HREF,
+  TRANSPARENCY_HREF,
+} from '../config/landingAnchors'
 
 type NavigationItem = {
   label: string
@@ -11,6 +15,7 @@ type NavigationItem = {
 const dropdownItems: NavigationItem[] = [
   { label: 'Sobre nosotros', href: '#sobre-nosotros' },
   { label: 'Transparencia', href: TRANSPARENCY_HREF },
+  { label: 'Sugerencias y Quejas', href: COMPLAINTS_HREF },
   { label: 'Galería', href: GALLERY_HREF },
 ]
 
@@ -121,4 +126,3 @@ const Navbar = ({ className = '', onNavigate }: NavbarProps) => {
 }
 
 export default Navbar
-

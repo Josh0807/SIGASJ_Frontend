@@ -68,7 +68,10 @@ export async function fetchWithAuth<T>(
     if (errorBody) {
       try {
         const parsed = JSON.parse(errorBody)
-        detail = parsed.message || parsed.error || errorBody
+        const backendMessage = parsed.message || parsed.error
+        detail = Array.isArray(backendMessage)
+          ? JSON.stringify(backendMessage)
+          : backendMessage || errorBody
       } catch {
         detail = errorBody.slice(0, 150)
       }

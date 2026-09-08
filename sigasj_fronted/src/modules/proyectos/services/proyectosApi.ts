@@ -492,5 +492,3 @@ export async function updateProyectoEstado(
 
   throw lastError ?? new Error('No fue posible actualizar el estado del proyecto.')
 }
-
-

@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-  LOGIN_ROUTE_PATH,
-  UNAUTHORIZED_ROUTE_PATH,
-} from '../../../app/router/routePaths'
+import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import {
   toProyectoFormValues,
   type AdminProyectoDetalle,
@@ -18,6 +15,7 @@ import {
 } from './proyectoSubmitError'
 import { PROYECTOS_ADMIN_PATH } from './proyectosAdminPaths'
 import { getAdminProyecto, updateAdminProyecto } from '../services/proyectosApi'
+import { clearAccessToken } from '../../auth/utils/authStorage'
 
 
 const parseProyectoId = (value: string | undefined): number | null => {
@@ -68,7 +66,7 @@ const ProyectosAdminEditPage = () => {
         setDetailLoading(false)
 
         if (parsed.kind === 'unauthorized') {
-          navigate(LOGIN_ROUTE_PATH, { replace: true })
+          clearAccessToken()
           return
         }
         if (parsed.kind === 'forbidden') {
@@ -111,7 +109,7 @@ const ProyectosAdminEditPage = () => {
       const parsed = parseProyectoSubmitError(error)
 
       if (parsed.kind === 'unauthorized') {
-        navigate(LOGIN_ROUTE_PATH, { replace: true })
+        clearAccessToken()
       } else if (parsed.kind === 'forbidden') {
         navigate(UNAUTHORIZED_ROUTE_PATH, { replace: true })
       } else if (parsed.kind === 'not-found') {

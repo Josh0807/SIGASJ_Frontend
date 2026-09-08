@@ -7,11 +7,15 @@ import {
   type QueryProyectosAdmin,
 } from '../admin/types'
 import { getAdminProyectos } from '../services/proyectosApi'
+import { parseProyectoSubmitError } from '../admin/proyectoSubmitError'
+import { subscribeAdminProyectosQueries } from './proyectosAdminQuery'
+import { clearAccessToken } from '../../auth/utils/authStorage'
 
 export type UseAdminProyectosResult = {
   listado: ProyectosAdminListado
   loading: boolean
   error: string | null
+  forbidden: boolean
   refetch: () => void
 }
 
@@ -23,6 +27,7 @@ export function useAdminProyectos(
   )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [forbidden, setForbidden] = useState(false)
   const [reloadTrigger, setReloadTrigger] = useState(0)
 
   const nombre = query.nombre
@@ -35,12 +40,15 @@ export function useAdminProyectos(
     setReloadTrigger((current) => current + 1)
   }, [])
 
+  useEffect(() => subscribeAdminProyectosQueries(refetch), [refetch])
+
   useEffect(() => {
     let cancelled = false
 
     const load = async () => {
       setLoading(true)
       setError(null)
+      setForbidden(false)
 
       try {
         const result = await getAdminProyectos({
@@ -54,9 +62,18 @@ export function useAdminProyectos(
         if (!cancelled) {
           setListado(result)
         }
-      } catch {
+      } catch (caught) {
         if (!cancelled) {
-          setError('No fue posible cargar los proyectos.')
+          const parsed = parseProyectoSubmitError(caught)
+          if (parsed.kind === 'unauthorized') {
+            clearAccessToken()
+          }
+          setForbidden(parsed.kind === 'forbidden')
+          setError(
+            parsed.kind === 'unauthorized' || parsed.kind === 'forbidden'
+              ? null
+              : 'No fue posible cargar los proyectos.',
+          )
           setListado({
             ...EMPTY_PROYECTOS_LISTADO,
             page,
@@ -77,5 +94,5 @@ export function useAdminProyectos(
     }
   }, [nombre, estado, activo, page, limit, reloadTrigger])
 
-  return { listado, loading, error, refetch }
+  return { listado, loading, error, forbidden, refetch }
 }

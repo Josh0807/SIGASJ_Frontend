@@ -26,6 +26,12 @@ export type ActividadRegistroSubmitError =
 const HTTP_ERROR_PATTERN = /^HTTP (\d+):\s*([\s\S]*)$/
 
 const FIELD_MATCHERS: { field: ActividadRegistroFormField; pattern: RegExp }[] = [
+  { field: 'ubicacionFuga', pattern: /ubicaci[oó]n.*fuga|fuga/i },
+  { field: 'presionMedida', pattern: /presi[oó]n/i },
+  { field: 'resultadoVisita', pattern: /resultado.*visita|visita/i },
+  { field: 'cantidadCloro', pattern: /cloro/i },
+  { field: 'caudal', pattern: /caudal/i },
+  { field: 'documentos', pattern: /documento|adjunt/i },
   { field: 'fechaActividad', pattern: /fecha/i },
   { field: 'titulo', pattern: /t[ií]tulo|resumen/i },
   { field: 'ubicacion', pattern: /ubicaci[oó]n/i },
