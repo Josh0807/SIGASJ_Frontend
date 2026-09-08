@@ -1,29 +1,125 @@
-import { useCorreccionesPendientesCount } from '../hooks/useCorreccionesPendientesCount'
-import ActividadesFontaneroStubPage from './ActividadesFontaneroStubPage'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../auth/components/AuthContext'
+import CorreccionPendienteCard from '../components/CorreccionPendienteCard'
+import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import { useCorreccionesPendientes } from '../hooks/useCorreccionesPendientes'
 
 const ActividadesFontaneroCorreccionesPage = () => {
-  const { count, isLoading, isError, isUnauthorized } =
-    useCorreccionesPendientesCount()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
+  const {
+    actividades,
+    total,
+    isLoading,
+    isError,
+    isEmpty,
+    isUnauthorized,
+    isForbidden,
+    refetch,
+  } = useCorreccionesPendientes()
 
-  let emptyMessage: string | undefined
-
-  if (isUnauthorized) {
-    emptyMessage =
-      'Su sesión no es válida o ha vencido. Vuelva a iniciar sesión.'
-  } else if (isError) {
-    emptyMessage = 'No se pudieron cargar las correcciones pendientes.'
-  } else if (isLoading) {
-    emptyMessage = 'Cargando correcciones pendientes…'
-  } else if (!count) {
-    emptyMessage = 'No tiene actividades pendientes de corrección.'
-  }
+  useEffect(() => {
+    if (isUnauthorized) {
+      logout()
+      navigate('/login', { replace: true })
+    }
+  }, [isUnauthorized, logout, navigate])
 
   return (
-    <ActividadesFontaneroStubPage
-      title="Correcciones pendientes"
-      description="Aquí podrá atender las actividades que requieren ajuste antes de reenviarlas."
-      emptyMessage={emptyMessage}
-    />
+    <section
+      className="actividades-fontanero-correcciones"
+      aria-labelledby="correcciones-pendientes-title"
+    >
+      <header className="actividades-fontanero-correcciones__header">
+        <div>
+          <p className="actividades-fontanero-correcciones__eyebrow">
+            Registro de Actividades
+          </p>
+          <h1 id="correcciones-pendientes-title">Correcciones pendientes</h1>
+          <p className="actividades-fontanero-correcciones__intro">
+            Revise las actividades que requieren ajuste, lea el motivo indicado y
+            reenvíe la información corregida.
+          </p>
+        </div>
+        {!isLoading && !isError && total > 0 ? (
+          <p
+            className="actividades-fontanero-correcciones__count"
+            role="status"
+            data-testid="correcciones-total"
+          >
+            {total} {total === 1 ? 'actividad pendiente' : 'actividades pendientes'}
+          </p>
+        ) : null}
+      </header>
+
+      {isLoading ? (
+        <div
+          className="actividades-fontanero-correcciones__state"
+          role="status"
+          data-testid="correcciones-cargando"
+        >
+          <span className="actividades-fontanero-correcciones__spinner" aria-hidden="true" />
+          Cargando correcciones pendientes…
+        </div>
+      ) : null}
+
+      {isForbidden ? (
+        <div className="actividades-fontanero-correcciones__alert" role="alert">
+          No tiene permiso para consultar correcciones pendientes.
+        </div>
+      ) : null}
+
+      {isError && !isForbidden ? (
+        <div className="actividades-fontanero-correcciones__alert" role="alert">
+          <p>No se pudieron cargar las correcciones pendientes.</p>
+          <button
+            type="button"
+            className="actividades-fontanero-correcciones__retry"
+            onClick={refetch}
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : null}
+
+      {isEmpty ? (
+        <div
+          className="actividades-fontanero-correcciones__empty"
+          role="status"
+          data-testid="correcciones-lista-vacia"
+        >
+          <p className="actividades-fontanero-correcciones__empty-title">
+            Sin correcciones pendientes
+          </p>
+          <p className="actividades-fontanero-correcciones__empty-text">
+            Cuando una actividad requiera ajustes, aparecerá aquí con el motivo y la
+            opción para corregirla.
+          </p>
+        </div>
+      ) : null}
+
+      {!isLoading && !isError && actividades.length > 0 ? (
+        <div
+          className="actividades-fontanero-correcciones__list"
+          role="list"
+          aria-label="Actividades pendientes de corrección"
+        >
+          {actividades.map((actividad) => (
+            <div key={actividad.id} role="listitem">
+              <CorreccionPendienteCard actividad={actividad} />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <Link
+        to={ACTIVIDADES_FONTANERO_PATHS.home}
+        className="actividades-fontanero-correcciones__back"
+      >
+        Volver al menú de actividades
+      </Link>
+    </section>
   )
 }
 

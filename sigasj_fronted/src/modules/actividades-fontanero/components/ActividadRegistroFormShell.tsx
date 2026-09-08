@@ -22,21 +22,30 @@ import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistr
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useAuth } from '../../auth/components/AuthContext'
 
+type ActividadRegistroFormShellMode = 'registrar' | 'corregir'
+
 type ActividadRegistroFormShellProps = {
+  mode?: ActividadRegistroFormShellMode
   tipo: TipoActividadFontaneroCatalogo
+  initialValues?: ActividadRegistroFormValues
+  observacionCorreccion?: string | null
   onSubmit?: (values: ActividadRegistroFormValues) => Promise<ActividadFontaneroRegistrada | void>
   onCatalogStale?: () => void
 }
 
 const ActividadRegistroFormShell = ({
+  mode = 'registrar',
   tipo,
+  initialValues,
+  observacionCorreccion,
   onSubmit,
   onCatalogStale,
 }: ActividadRegistroFormShellProps) => {
+  const isCorregirMode = mode === 'corregir'
   const navigate = useNavigate()
   const { logout } = useAuth()
   const [values, setValues] = useState<ActividadRegistroFormValues>(
-    ACTIVIDAD_REGISTRO_FORM_INITIAL,
+    initialValues ?? ACTIVIDAD_REGISTRO_FORM_INITIAL,
   )
   const [errors, setErrors] = useState<ActividadRegistroFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -89,7 +98,9 @@ const ActividadRegistroFormShell = ({
         setRegistrada(result)
       }
       setIsSuccess(true)
-      setValues(ACTIVIDAD_REGISTRO_FORM_INITIAL)
+      if (!isCorregirMode) {
+        setValues(ACTIVIDAD_REGISTRO_FORM_INITIAL)
+      }
       setErrors({})
       window.dispatchEvent(new CustomEvent('actividades-fontanero:updated'))
     } catch (error) {
@@ -126,16 +137,38 @@ const ActividadRegistroFormShell = ({
 
   return (
     <section
-      className="actividades-fontanero-registro"
+      className={`actividades-fontanero-registro${
+        isCorregirMode ? ' actividades-fontanero-registro--corregir' : ''
+      }`}
       aria-labelledby="actividad-registro-title"
     >
       <header className="actividades-fontanero-registro__header">
         <p className="actividades-fontanero-registro__eyebrow">Registro de Actividades</p>
-        <h1 id="actividad-registro-title">Registrar: {tipo.nombre}</h1>
+        <h1 id="actividad-registro-title">
+          {isCorregirMode ? `Corregir: ${tipo.nombre}` : `Registrar: ${tipo.nombre}`}
+        </h1>
         <p className="actividades-fontanero-registro__intro">
-          Complete la información general y los campos del formulario correspondiente.
+          {isCorregirMode
+            ? 'Revise el motivo de corrección, ajuste los campos permitidos y reenvíe la actividad.'
+            : 'Complete la información general y los campos del formulario correspondiente.'}
         </p>
       </header>
+
+      {isCorregirMode && observacionCorreccion ? (
+        <div
+          className="actividades-fontanero-registro__correccion-banner"
+          role="note"
+          aria-label="Motivo de corrección"
+          data-testid="correccion-motivo-banner"
+        >
+          <p className="actividades-fontanero-registro__correccion-label">
+            Motivo de corrección
+          </p>
+          <p className="actividades-fontanero-registro__correccion-texto">
+            {observacionCorreccion}
+          </p>
+        </div>
+      ) : null}
 
       {isSuccess ? (
         <div
@@ -144,20 +177,37 @@ const ActividadRegistroFormShell = ({
           data-testid="actividad-registro-exito"
         >
           <p>
-            La actividad <strong>{tipo.nombre}</strong> fue registrada correctamente
-            {registrada?.id ? (
+            {isCorregirMode ? (
               <>
-                {' '}
-                (registro #{registrada.id})
+                La actividad <strong>{tipo.nombre}</strong> fue corregida y reenviada
+                {registrada?.id ? (
+                  <>
+                    {' '}
+                    (registro #{registrada.id})
+                  </>
+                ) : null}
+                .
               </>
-            ) : null}
-            .
+            ) : (
+              <>
+                La actividad <strong>{tipo.nombre}</strong> fue registrada correctamente
+                {registrada?.id ? (
+                  <>
+                    {' '}
+                    (registro #{registrada.id})
+                  </>
+                ) : null}
+                .
+              </>
+            )}
           </p>
           <Link
-            to={ACTIVIDADES_FONTANERO_PATHS.nueva}
+            to={isCorregirMode ? ACTIVIDADES_FONTANERO_PATHS.correcciones : ACTIVIDADES_FONTANERO_PATHS.nueva}
             className="actividades-fontanero-registro__link"
           >
-            Registrar otra actividad
+            {isCorregirMode
+              ? 'Volver a correcciones pendientes'
+              : 'Registrar otra actividad'}
           </Link>
         </div>
       ) : (
@@ -187,6 +237,8 @@ const ActividadRegistroFormShell = ({
                 aria-describedby={
                   errors.fechaActividad ? 'fechaActividad-error' : undefined
                 }
+                readOnly={isCorregirMode}
+                disabled={isCorregirMode}
                 required
               />
               {errors.fechaActividad ? (
@@ -278,6 +330,8 @@ const ActividadRegistroFormShell = ({
                 className="actividad-registro-form__textarea"
                 value={values.observaciones}
                 onChange={(event) => updateField('observaciones', event.target.value)}
+                readOnly={isCorregirMode}
+                disabled={isCorregirMode}
               />
             </div>
           </fieldset>
@@ -288,6 +342,9 @@ const ActividadRegistroFormShell = ({
             disabled={isSubmitting}
             onChange={updateField}
             onFilesChange={(files) => {
+              if (isCorregirMode) {
+                return
+              }
               setValues((current) => ({ ...current, documentos: files }))
               setErrors((current) => {
                 const next = { ...current }
@@ -306,7 +363,11 @@ const ActividadRegistroFormShell = ({
 
           <div className="actividad-registro-form__actions">
             <Link
-              to={ACTIVIDADES_FONTANERO_PATHS.nueva}
+              to={
+                isCorregirMode
+                  ? ACTIVIDADES_FONTANERO_PATHS.correcciones
+                  : ACTIVIDADES_FONTANERO_PATHS.nueva
+              }
               className="actividad-registro-form__button actividad-registro-form__button--secondary"
             >
               Cancelar
@@ -317,7 +378,13 @@ const ActividadRegistroFormShell = ({
               disabled={isSubmitting}
               aria-disabled={isSubmitting}
             >
-              {isSubmitting ? 'Registrando…' : 'Registrar actividad'}
+              {isSubmitting
+                ? isCorregirMode
+                  ? 'Reenviando…'
+                  : 'Registrando…'
+                : isCorregirMode
+                  ? 'Reenviar actividad corregida'
+                  : 'Registrar actividad'}
             </button>
           </div>
         </form>
@@ -325,10 +392,16 @@ const ActividadRegistroFormShell = ({
 
       {!isSuccess ? (
         <Link
-          to={ACTIVIDADES_FONTANERO_PATHS.nueva}
+          to={
+            isCorregirMode
+              ? ACTIVIDADES_FONTANERO_PATHS.correcciones
+              : ACTIVIDADES_FONTANERO_PATHS.nueva
+          }
           className="actividades-fontanero-registro__back"
         >
-          Cambiar tipo de actividad
+          {isCorregirMode
+            ? 'Volver a correcciones pendientes'
+            : 'Cambiar tipo de actividad'}
         </Link>
       ) : null}
     </section>

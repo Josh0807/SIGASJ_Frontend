@@ -6,10 +6,12 @@ import {
   type RegistrarActividadRequest,
   toRegistrarActividadPayloadFromTipo,
 } from '../types/actividadFontaneroApi'
+import { toCorregirActividadPayload } from '../utils/actividadCorreccionMapper'
+import { normalizeActividadFontanero } from '../utils/normalizeActividadFontanero'
 import { shouldRetryAlternatePath, sortTiposActividad } from '../utils/httpErrorStatus'
 
 export type ActividadFontaneroListado = {
-  data: unknown[]
+  data: ActividadFontaneroRegistrada[]
   total: number
 }
 
@@ -30,6 +32,12 @@ const CORRECCIONES_PATHS = [
   '/fontanero/actividades/correcciones',
   '/v1/fontanero/actividades/correcciones',
 ] as const
+
+const actividadDetallePath = (id: number) =>
+  `/fontanero/actividades/${id}` as const
+
+const corregirActividadPath = (id: number) =>
+  `/fontanero/actividades/${id}/corregir` as const
 
 // Una sola solicitud por registro. httpClient ya resuelve el prefijo /api/v1.
 const REGISTRAR_PATHS = ['/fontanero/actividades'] as const
@@ -85,14 +93,67 @@ export async function getCorreccionesPendientes(): Promise<ActividadFontaneroLis
     const result = await fetchWithPathFallback<ActividadFontaneroListado>(
       CORRECCIONES_PATHS,
     )
+    const data = Array.isArray(result?.data)
+      ? result.data
+          .map(normalizeActividadFontanero)
+          .filter((item): item is ActividadFontaneroRegistrada => item !== null)
+      : []
+
     return {
-      data: Array.isArray(result?.data) ? result.data : [],
-      total: typeof result?.total === 'number' ? result.total : 0,
+      data,
+      total: typeof result?.total === 'number' ? result.total : data.length,
     }
   } catch (error) {
     throw error instanceof Error
       ? error
       : new Error('No se pudieron consultar las correcciones pendientes')
+  }
+}
+
+/**
+ * Detalle de una actividad propia del Fontanero autenticado.
+ */
+export async function getActividadDetalle(
+  id: number,
+): Promise<ActividadFontaneroRegistrada> {
+  try {
+    const result = await fetchWithAuth<unknown>(actividadDetallePath(id))
+    const actividad = normalizeActividadFontanero(result)
+    if (!actividad) {
+      throw new Error('HTTP 404: Actividad no encontrada')
+    }
+    return actividad
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error('No se pudo consultar la actividad')
+  }
+}
+
+/**
+ * Corrige y reenvía una actividad propia en estado REQUIERE_CORRECCION.
+ */
+export async function corregirActividad(
+  actividadId: number,
+  tipo: TipoActividadFontaneroCatalogo,
+  values: ActividadRegistroFormValues,
+): Promise<ActividadFontaneroRegistrada> {
+  const body = toCorregirActividadPayload(values, tipo.codigo)
+
+  try {
+    const result = await fetchWithAuth<unknown>(corregirActividadPath(actividadId), {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    })
+    const actividad = normalizeActividadFontanero(result)
+    if (!actividad) {
+      throw new Error('No se pudo procesar la respuesta del servidor')
+    }
+    return actividad
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error('No se pudo reenviar la actividad corregida')
   }
 }
 

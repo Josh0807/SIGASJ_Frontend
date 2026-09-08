@@ -12,4 +12,6 @@ export const ACTIVIDADES_FONTANERO_PATHS = {
   historial: `${ACTIVIDADES_FONTANERO_BASE_PATH}/historial`,
   misActividades: `${ACTIVIDADES_FONTANERO_BASE_PATH}/mis-actividades`,
   correcciones: `${ACTIVIDADES_FONTANERO_BASE_PATH}/correcciones`,
+  corregirActividad: (actividadId: number | string) =>
+    `${ACTIVIDADES_FONTANERO_BASE_PATH}/correcciones/${actividadId}/corregir`,
 } as const
