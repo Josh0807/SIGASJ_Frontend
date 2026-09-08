@@ -6,6 +6,10 @@ import {
   type RegistrarActividadRequest,
   toRegistrarActividadPayloadFromTipo,
 } from '../types/actividadFontaneroApi'
+import type {
+  ReporteActividadesFilters,
+  ReporteActividadesResponse,
+} from '../types/actividadReportes'
 import { toCorregirActividadPayload } from '../utils/actividadCorreccionMapper'
 import { normalizeActividadFontanero } from '../utils/normalizeActividadFontanero'
 import { shouldRetryAlternatePath, sortTiposActividad } from '../utils/httpErrorStatus'
@@ -47,8 +51,51 @@ const TIPOS_PATHS = [
   '/v1/fontanero/actividades/tipos',
 ] as const
 
+const REPORTES_ADMIN_PATH = '/admin/actividades/reportes' as const
+
 export type { ActividadFontaneroRegistrada, RegistrarActividadRequest }
+export type {
+  ReporteActividadesFilters,
+  ReporteActividadesResponse,
+} from '../types/actividadReportes'
 export { toRegistrarActividadPayloadFromTipo }
+
+/** Construye query params omitiendo vacíos (undefined / null / ""). */
+export const toReportesAdminParams = (
+  filters: ReporteActividadesFilters = {},
+): Record<string, string | number> => {
+  const params: Record<string, string | number> = {}
+  if (filters.fechaInicio?.trim()) {
+    params.fechaInicio = filters.fechaInicio.trim()
+  }
+  if (filters.fechaFin?.trim()) {
+    params.fechaFin = filters.fechaFin.trim()
+  }
+  if (filters.fontaneroId?.trim()) {
+    params.fontaneroId = filters.fontaneroId.trim()
+  }
+  if (
+    filters.tipoActividadId !== undefined &&
+    filters.tipoActividadId !== null &&
+    Number.isInteger(filters.tipoActividadId) &&
+    filters.tipoActividadId > 0
+  ) {
+    params.tipoActividadId = filters.tipoActividadId
+  }
+  return params
+}
+
+const normalizeReporte = (raw: unknown): ReporteActividadesResponse => {
+  const body = (raw ?? {}) as Partial<ReporteActividadesResponse>
+  return {
+    total: typeof body.total === 'number' ? body.total : 0,
+    porEstado:
+      body.porEstado && typeof body.porEstado === 'object' ? body.porEstado : {},
+    porTipo: Array.isArray(body.porTipo) ? body.porTipo : [],
+    porFontanero: Array.isArray(body.porFontanero) ? body.porFontanero : [],
+    actividades: Array.isArray(body.actividades) ? body.actividades : [],
+  }
+}
 
 async function fetchWithPathFallback<T>(
   paths: readonly string[],
@@ -174,6 +221,25 @@ export async function getTiposActividadFontanero(): Promise<TiposActividadFontan
     throw error instanceof Error
       ? error
       : new Error('No se pudieron consultar los tipos de actividad')
+  }
+}
+
+/**
+ * Reporte administrativo consolidado (solo lectura).
+ * GET /api/v1/admin/actividades/reportes
+ */
+export async function getReportesAdmin(
+  filters: ReporteActividadesFilters = {},
+): Promise<ReporteActividadesResponse> {
+  try {
+    const result = await fetchWithAuth<unknown>(REPORTES_ADMIN_PATH, {
+      params: toReportesAdminParams(filters),
+    })
+    return normalizeReporte(result)
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error('No se pudo consultar el reporte de actividades')
   }
 }
 

@@ -59,6 +59,17 @@ describe('Seguridad — acceso privado al módulo de actividades (Fontanero)', (
       data: [],
       total: 0,
     })
+    vi.spyOn(actividadesApi, 'getTiposActividadFontanero').mockResolvedValue({
+      data: [],
+      total: 0,
+    })
+    vi.spyOn(actividadesApi, 'getReportesAdmin').mockResolvedValue({
+      total: 0,
+      porEstado: {},
+      porTipo: [],
+      porFontanero: [],
+      actividades: [],
+    })
   })
 
   afterEach(() => {

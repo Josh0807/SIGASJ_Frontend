@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import {
+  getReportesAdmin,
   registrarActividad,
   toRegistrarActividadPayloadFromTipo,
+  toReportesAdminParams,
 } from './actividadesFontaneroApi'
 import { TIPOS_ACTIVIDAD_BACKEND } from '../test/tiposActividadFixture'
 
@@ -71,5 +73,48 @@ describe('actividadesFontaneroApi — registrarActividad', () => {
     expect(JSON.stringify(fetchWithAuth.mock.calls[0][1]?.body ?? '')).not.toContain(
       'fontaneroId',
     )
+  })
+})
+
+describe('actividadesFontaneroApi — getReportesAdmin', () => {
+  beforeEach(() => {
+    vi.mocked(fetchWithAuth).mockReset()
+  })
+
+  it('omite params vacíos', () => {
+    expect(
+      toReportesAdminParams({
+        fechaInicio: '',
+        fechaFin: '  ',
+        fontaneroId: undefined,
+        tipoActividadId: 0,
+      }),
+    ).toEqual({})
+  })
+
+  it('consulta GET admin/actividades/reportes con filtros', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      total: 1,
+      porEstado: { REPORTADA: 1 },
+      porTipo: [],
+      porFontanero: [],
+      actividades: [],
+    })
+
+    await getReportesAdmin({
+      fechaInicio: '2026-09-01',
+      fechaFin: '2026-09-30',
+      fontaneroId: 'fontanero-1',
+      tipoActividadId: 3,
+    })
+
+    expect(fetchWithAuth).toHaveBeenCalledWith('/admin/actividades/reportes', {
+      params: {
+        fechaInicio: '2026-09-01',
+        fechaFin: '2026-09-30',
+        fontaneroId: 'fontanero-1',
+        tipoActividadId: 3,
+      },
+    })
   })
 })
