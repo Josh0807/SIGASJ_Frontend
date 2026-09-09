@@ -8,6 +8,10 @@ import {
 } from '../types/actividadFontaneroApi'
 import type { HistorialActividadesFilters } from '../types/actividadHistorial'
 import type {
+  ResumenActividadesFilters,
+  ResumenActividadesResponse,
+} from '../types/actividadResumen'
+import type {
   ReporteActividadesFilters,
   ReporteActividadesResponse,
 } from '../types/actividadReportes'
@@ -70,11 +74,21 @@ const TIPOS_PATHS = [
   '/v1/fontanero/actividades/tipos',
 ] as const
 
+const RESUMEN_FONTANERO_PATHS = [
+  '/fontanero/actividades/resumen',
+  '/v1/fontanero/actividades/resumen',
+] as const
+
+const RESUMEN_ADMIN_PATH = '/admin/actividades/resumen' as const
 const REPORTES_ADMIN_PATH = '/admin/actividades/reportes' as const
 const ACTIVIDADES_ADMIN_PATH = '/admin/actividades' as const
 
 export type { ActividadFontaneroRegistrada, RegistrarActividadRequest }
 export type { HistorialActividadesFilters } from '../types/actividadHistorial'
+export type {
+  ResumenActividadesFilters,
+  ResumenActividadesResponse,
+} from '../types/actividadResumen'
 export type {
   ReporteActividadesFilters,
   ReporteActividadesResponse,
@@ -99,6 +113,29 @@ export const toHistorialActividadesParams = (
     params.limit = filters.limit
   }
   return params
+}
+
+/** Query params para GET .../actividades/resumen */
+export const toResumenActividadesParams = (
+  filters: ResumenActividadesFilters = {},
+): Record<string, string> => {
+  const params: Record<string, string> = {}
+  if (filters.fechaInicio?.trim()) {
+    params.fechaInicio = filters.fechaInicio.trim()
+  }
+  if (filters.fechaFin?.trim()) {
+    params.fechaFin = filters.fechaFin.trim()
+  }
+  return params
+}
+
+const normalizeResumen = (raw: unknown): ResumenActividadesResponse => {
+  const body = (raw ?? {}) as Partial<ResumenActividadesResponse>
+  return {
+    total: typeof body.total === 'number' ? body.total : 0,
+    porEstado:
+      body.porEstado && typeof body.porEstado === 'object' ? body.porEstado : {},
+  }
 }
 
 /** Construye query params omitiendo vacíos (undefined / null / ""). */
@@ -302,6 +339,36 @@ export async function getTiposActividadFontanero(): Promise<TiposActividadFontan
  * Reporte administrativo consolidado (solo lectura).
  * GET /api/v1/admin/actividades/reportes
  */
+export async function getResumenActividadesFontanero(
+  filters: ResumenActividadesFilters = {},
+): Promise<ResumenActividadesResponse> {
+  try {
+    const result = await fetchWithPathFallback<unknown>(RESUMEN_FONTANERO_PATHS, {
+      params: toResumenActividadesParams(filters),
+    })
+    return normalizeResumen(result)
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error('No se pudo consultar el resumen de actividades')
+  }
+}
+
+export async function getResumenActividadesAdmin(
+  filters: ResumenActividadesFilters = {},
+): Promise<ResumenActividadesResponse> {
+  try {
+    const result = await fetchWithAuth<unknown>(RESUMEN_ADMIN_PATH, {
+      params: toResumenActividadesParams(filters),
+    })
+    return normalizeResumen(result)
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error('No se pudo consultar el resumen de actividades')
+  }
+}
+
 export async function getReportesAdmin(
   filters: ReporteActividadesFilters = {},
 ): Promise<ReporteActividadesResponse> {

@@ -7,6 +7,7 @@ import * as actividadesApi from './services/actividadesFontaneroApi'
 
 const FONTANERO_PATHS = [
   '/admin/actividades',
+  '/admin/actividades/dashboard',
   '/admin/actividades/nueva',
   '/admin/actividades/historial',
   '/admin/actividades/correcciones',
@@ -72,6 +73,14 @@ describe('protección de rutas — Registro de Actividades del Fontanero', () =>
       porTipo: [],
       porFontanero: [],
       actividades: [],
+    })
+    vi.spyOn(actividadesApi, 'getResumenActividadesFontanero').mockResolvedValue({
+      total: 0,
+      porEstado: {},
+    })
+    vi.spyOn(actividadesApi, 'getResumenActividadesAdmin').mockResolvedValue({
+      total: 0,
+      porEstado: {},
     })
   })
 

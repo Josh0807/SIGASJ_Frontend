@@ -5,6 +5,7 @@ const ESTADO_LABELS: Record<string, string> = {
   CORREGIDA: 'Corregida',
   APROBADA: 'Aprobada',
   RECHAZADA: 'Rechazada',
+  REVISADA: 'Revisada',
 }
 
 export const formatActividadEstado = (estado: string): string =>

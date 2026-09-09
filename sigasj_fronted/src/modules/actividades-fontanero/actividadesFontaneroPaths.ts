@@ -3,6 +3,7 @@ export const ACTIVIDADES_FONTANERO_BASE_PATH = '/admin/actividades'
 
 export const ACTIVIDADES_FONTANERO_PATHS = {
   home: ACTIVIDADES_FONTANERO_BASE_PATH,
+  dashboard: `${ACTIVIDADES_FONTANERO_BASE_PATH}/dashboard`,
   /** Alias de backlog: /fontanero/actividades/nueva */
   nueva: `${ACTIVIDADES_FONTANERO_BASE_PATH}/nueva`,
   registrar: `${ACTIVIDADES_FONTANERO_BASE_PATH}/registrar`,

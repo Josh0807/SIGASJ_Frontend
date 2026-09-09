@@ -5,6 +5,9 @@ import {
   getActividadAdminDetalle,
   getActividadesAdmin,
   getReportesAdmin,
+  getResumenActividadesAdmin,
+  getResumenActividadesFontanero,
+  toResumenActividadesParams,
   revisarActividadAdmin,
   solicitarCorreccionAdmin,
   registrarActividad,
@@ -176,6 +179,57 @@ describe('actividadesFontaneroApi — getReportesAdmin', () => {
         tipoActividadId: 3,
       },
     })
+  })
+})
+
+describe('actividadesFontaneroApi — resumen', () => {
+  beforeEach(() => {
+    vi.mocked(fetchWithAuth).mockReset()
+  })
+
+  it('omite params vacíos en resumen', () => {
+    expect(
+      toResumenActividadesParams({
+        fechaInicio: '',
+        fechaFin: '  ',
+      }),
+    ).toEqual({})
+  })
+
+  it('consulta GET admin/actividades/resumen', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      total: 2,
+      porEstado: { REPORTADA: 2 },
+    })
+
+    const result = await getResumenActividadesAdmin({
+      fechaInicio: '2026-09-01',
+      fechaFin: '2026-09-30',
+    })
+
+    expect(fetchWithAuth).toHaveBeenCalledWith('/admin/actividades/resumen', {
+      params: {
+        fechaInicio: '2026-09-01',
+        fechaFin: '2026-09-30',
+      },
+    })
+    expect(result.total).toBe(2)
+  })
+
+  it('consulta GET fontanero/actividades/resumen', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      total: 1,
+      porEstado: { REVISADA: 1 },
+    })
+
+    const result = await getResumenActividadesFontanero({
+      fechaInicio: '2026-09-01',
+    })
+
+    expect(fetchWithAuth).toHaveBeenCalledWith('/fontanero/actividades/resumen', {
+      params: { fechaInicio: '2026-09-01' },
+    })
+    expect(result.porEstado.REVISADA).toBe(1)
   })
 })
 

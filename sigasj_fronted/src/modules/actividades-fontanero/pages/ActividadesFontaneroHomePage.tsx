@@ -160,6 +160,16 @@ const ActividadesFontaneroHomePage = () => {
       >
         <div role="listitem">
           <QuickAccessCard
+            title="Dashboard de actividades"
+            description="Resumen por estado y accesos rápidos del módulo."
+            path={ACTIVIDADES_FONTANERO_PATHS.dashboard}
+            icon={<AdminNavIcon name="dashboard" />}
+            className="actividades-fontanero-home__card actividades-fontanero-home__card--primary"
+          />
+        </div>
+
+        <div role="listitem">
+          <QuickAccessCard
             title="Registrar actividad realizada"
             description="Seleccione el tipo de actividad y complete el registro."
             path={ACTIVIDADES_FONTANERO_PATHS.nueva}

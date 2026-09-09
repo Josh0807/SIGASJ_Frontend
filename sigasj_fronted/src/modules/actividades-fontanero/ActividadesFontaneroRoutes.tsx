@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { ACTIVIDADES_FONTANERO_PATHS } from './actividadesFontaneroPaths'
 import ActividadesFontaneroCorreccionesPage from './pages/ActividadesFontaneroCorreccionesPage'
 import ActividadesFontaneroHistorialPage from './pages/ActividadesFontaneroHistorialPage'
+import ActividadesFontaneroDashboardPage from './pages/ActividadesFontaneroDashboardPage'
 import ActividadesFontaneroHomePage from './pages/ActividadesFontaneroHomePage'
 import ActividadesFontaneroStubPage from './pages/ActividadesFontaneroStubPage'
 import CorregirActividadPage from './pages/CorregirActividadPage'
@@ -36,6 +37,7 @@ const HistorialActividadesPage = () => <ActividadesFontaneroHistorialPage />
 const ActividadesFontaneroRoutes = () => (
   <Routes>
     <Route index element={<ActividadesFontaneroHomePage />} />
+    <Route path="dashboard" element={<ActividadesFontaneroDashboardPage />} />
     <Route path="registrar" element={<RegistrarActividadAliasRedirect />} />
     <Route path="registrar/:tipoCodigo" element={<RegistrarActividadAliasRedirect />} />
     <Route path="nueva" element={<SeleccionarTipoActividadPage />} />

@@ -99,22 +99,23 @@ describe('pantalla principal — Registro de Actividades del Fontanero', () => {
     }
   })
 
-  it('muestra los cuatro accesos operativos y no opciones administrativas', async () => {
+  it('muestra los accesos operativos y no opciones administrativas', async () => {
     loginAsFontaneroConNombre()
     const app = await mountAppRoutes(HOME_PATH)
 
     try {
       const html = app.container.innerHTML
+      expect(html).toContain('Dashboard de actividades')
       expect(html).toContain('Registrar actividad realizada')
       expect(html).toContain('Ver mis actividades')
       expect(html).toContain('Historial')
       expect(html).toContain('Correcciones pendientes')
+      expect(html).toContain('href="/admin/actividades/dashboard"')
       expect(html).toContain('href="/admin/actividades/nueva"')
       expect(html).toContain('href="/admin/actividades/mis-actividades"')
       expect(html).toContain('href="/admin/actividades/historial"')
       expect(html).toContain('href="/admin/actividades/correcciones"')
       expect(html).not.toContain('href="/admin/actividades-fontanero"')
-      expect(html).not.toContain('Dashboard de actividades')
       expect(html).not.toContain('Reportes de actividades')
     } finally {
       await app.cleanup()
