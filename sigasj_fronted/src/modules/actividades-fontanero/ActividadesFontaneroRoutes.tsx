@@ -1,9 +1,11 @@
 import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { ACTIVIDADES_FONTANERO_PATHS } from './actividadesFontaneroPaths'
 import ActividadesFontaneroCorreccionesPage from './pages/ActividadesFontaneroCorreccionesPage'
+import ActividadesFontaneroHistorialPage from './pages/ActividadesFontaneroHistorialPage'
 import ActividadesFontaneroHomePage from './pages/ActividadesFontaneroHomePage'
 import ActividadesFontaneroStubPage from './pages/ActividadesFontaneroStubPage'
 import CorregirActividadPage from './pages/CorregirActividadPage'
+import HistorialActividadDetallePage from './pages/HistorialActividadDetallePage'
 import RegistrarActividadPage from './pages/RegistrarActividadPage'
 import SeleccionarTipoActividadPage from './pages/SeleccionarTipoActividadPage'
 
@@ -29,12 +31,7 @@ const MisActividadesPage = () => (
   />
 )
 
-const HistorialActividadesPage = () => (
-  <ActividadesFontaneroStubPage
-    title="Historial de actividades"
-    description="Consulte el historial de actividades registradas anteriormente."
-  />
-)
+const HistorialActividadesPage = () => <ActividadesFontaneroHistorialPage />
 
 const ActividadesFontaneroRoutes = () => (
   <Routes>
@@ -45,6 +42,7 @@ const ActividadesFontaneroRoutes = () => (
     <Route path="nueva/:tipoCodigo" element={<RegistrarActividadPage />} />
     <Route path="mis-actividades" element={<MisActividadesPage />} />
     <Route path="historial" element={<HistorialActividadesPage />} />
+    <Route path="historial/:actividadId" element={<HistorialActividadDetallePage />} />
     <Route path="correcciones" element={<ActividadesFontaneroCorreccionesPage />} />
     <Route path="correcciones/:actividadId/corregir" element={<CorregirActividadPage />} />
     <Route

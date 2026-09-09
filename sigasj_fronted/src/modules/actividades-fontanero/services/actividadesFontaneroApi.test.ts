@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import {
+  getHistorialActividades,
   getReportesAdmin,
   registrarActividad,
+  toHistorialActividadesParams,
   toRegistrarActividadPayloadFromTipo,
   toReportesAdminParams,
 } from './actividadesFontaneroApi'
@@ -114,6 +116,46 @@ describe('actividadesFontaneroApi — getReportesAdmin', () => {
         fechaFin: '2026-09-30',
         fontaneroId: 'fontanero-1',
         tipoActividadId: 3,
+      },
+    })
+  })
+})
+
+describe('actividadesFontaneroApi — getHistorialActividades', () => {
+  beforeEach(() => {
+    vi.mocked(fetchWithAuth).mockReset()
+  })
+
+  it('omite params vacíos en historial', () => {
+    expect(
+      toHistorialActividadesParams({
+        fechaInicio: '',
+        fechaFin: '  ',
+        page: 0,
+        limit: undefined,
+      }),
+    ).toEqual({})
+  })
+
+  it('consulta GET fontanero/actividades/historial con filtros', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      data: [],
+      total: 0,
+    })
+
+    await getHistorialActividades({
+      fechaInicio: '2026-09-01',
+      fechaFin: '2026-09-30',
+      page: 2,
+      limit: 10,
+    })
+
+    expect(fetchWithAuth).toHaveBeenCalledWith('/fontanero/actividades/historial', {
+      params: {
+        fechaInicio: '2026-09-01',
+        fechaFin: '2026-09-30',
+        page: 2,
+        limit: 10,
       },
     })
   })

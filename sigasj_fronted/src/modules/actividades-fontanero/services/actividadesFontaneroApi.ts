@@ -6,6 +6,7 @@ import {
   type RegistrarActividadRequest,
   toRegistrarActividadPayloadFromTipo,
 } from '../types/actividadFontaneroApi'
+import type { HistorialActividadesFilters } from '../types/actividadHistorial'
 import type {
   ReporteActividadesFilters,
   ReporteActividadesResponse,
@@ -37,6 +38,11 @@ const CORRECCIONES_PATHS = [
   '/v1/fontanero/actividades/correcciones',
 ] as const
 
+const HISTORIAL_PATHS = [
+  '/fontanero/actividades/historial',
+  '/v1/fontanero/actividades/historial',
+] as const
+
 const actividadDetallePath = (id: number) =>
   `/fontanero/actividades/${id}` as const
 
@@ -54,11 +60,32 @@ const TIPOS_PATHS = [
 const REPORTES_ADMIN_PATH = '/admin/actividades/reportes' as const
 
 export type { ActividadFontaneroRegistrada, RegistrarActividadRequest }
+export type { HistorialActividadesFilters } from '../types/actividadHistorial'
 export type {
   ReporteActividadesFilters,
   ReporteActividadesResponse,
 } from '../types/actividadReportes'
 export { toRegistrarActividadPayloadFromTipo }
+
+/** Query params para GET /fontanero/actividades/historial */
+export const toHistorialActividadesParams = (
+  filters: HistorialActividadesFilters = {},
+): Record<string, string | number> => {
+  const params: Record<string, string | number> = {}
+  if (filters.fechaInicio?.trim()) {
+    params.fechaInicio = filters.fechaInicio.trim()
+  }
+  if (filters.fechaFin?.trim()) {
+    params.fechaFin = filters.fechaFin.trim()
+  }
+  if (filters.page !== undefined && filters.page > 0) {
+    params.page = filters.page
+  }
+  if (filters.limit !== undefined && filters.limit > 0) {
+    params.limit = filters.limit
+  }
+  return params
+}
 
 /** Construye query params omitiendo vacíos (undefined / null / ""). */
 export const toReportesAdminParams = (
@@ -154,6 +181,35 @@ export async function getCorreccionesPendientes(): Promise<ActividadFontaneroLis
     throw error instanceof Error
       ? error
       : new Error('No se pudieron consultar las correcciones pendientes')
+  }
+}
+
+/**
+ * Historial de actividades del Fontanero (APROBADA, RECHAZADA, CORREGIDA).
+ * Acepta filtros de periodo y paginación cuando el Back-end los exponga.
+ */
+export async function getHistorialActividades(
+  filters: HistorialActividadesFilters = {},
+): Promise<ActividadFontaneroListado> {
+  try {
+    const result = await fetchWithPathFallback<ActividadFontaneroListado>(
+      HISTORIAL_PATHS,
+      { params: toHistorialActividadesParams(filters) },
+    )
+    const data = Array.isArray(result?.data)
+      ? result.data
+          .map(normalizeActividadFontanero)
+          .filter((item): item is ActividadFontaneroRegistrada => item !== null)
+      : []
+
+    return {
+      data,
+      total: typeof result?.total === 'number' ? result.total : data.length,
+    }
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error('No se pudo consultar el historial de actividades')
   }
 }
 

@@ -34,6 +34,10 @@ describe('protección de rutas — Registro de Actividades del Fontanero', () =>
       data: [],
       total: 0,
     })
+    vi.spyOn(actividadesApi, 'getHistorialActividades').mockResolvedValue({
+      data: [],
+      total: 0,
+    })
     vi.spyOn(actividadesApi, 'getTiposActividadFontanero').mockResolvedValue({
       data: [],
       total: 0,
