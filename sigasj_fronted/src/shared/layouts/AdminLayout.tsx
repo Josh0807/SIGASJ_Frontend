@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import AdminMain from '../../modules/admin-panel/components/AdminMain'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
@@ -36,10 +36,13 @@ const AdminLayout = () => {
 
   const closeNav = () => setIsNavOpen(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const scrollingElement = document.scrollingElement ?? document.documentElement
     scrollingElement.scrollTop = 0
+    document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
+    const mainContent = document.querySelector<HTMLElement>('.admin-main__content')
+    if (mainContent) mainContent.scrollTop = 0
   }, [pathname])
 
   useEffect(() => {

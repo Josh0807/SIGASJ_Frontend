@@ -18,6 +18,19 @@ import { shouldRetryAlternatePath, sortTiposActividad } from '../utils/httpError
 export type ActividadFontaneroListado = {
   data: ActividadFontaneroRegistrada[]
   total: number
+  page?: number
+  limit?: number
+  totalPages?: number
+}
+
+export type AdminActividadesFilters = {
+  fontaneroId?: string
+  tipoActividadId?: number
+  estado?: string
+  fechaInicio?: string
+  fechaFin?: string
+  page?: number
+  limit?: number
 }
 
 export type TipoActividadFontanero = TipoActividadFontaneroCatalogo
@@ -58,6 +71,7 @@ const TIPOS_PATHS = [
 ] as const
 
 const REPORTES_ADMIN_PATH = '/admin/actividades/reportes' as const
+const ACTIVIDADES_ADMIN_PATH = '/admin/actividades' as const
 
 export type { ActividadFontaneroRegistrada, RegistrarActividadRequest }
 export type { HistorialActividadesFilters } from '../types/actividadHistorial'
@@ -220,7 +234,11 @@ export async function getActividadDetalle(
   id: number,
 ): Promise<ActividadFontaneroRegistrada> {
   try {
-    const result = await fetchWithAuth<unknown>(actividadDetallePath(id))
+    const result = await fetchWithPathFallback<unknown>([
+      `/actividades-fontanero/${id}`,
+      `/actividades/${id}`,
+      actividadDetallePath(id),
+    ])
     const actividad = normalizeActividadFontanero(result)
     if (!actividad) {
       throw new Error('HTTP 404: Actividad no encontrada')
@@ -297,6 +315,79 @@ export async function getReportesAdmin(
       ? error
       : new Error('No se pudo consultar el reporte de actividades')
   }
+}
+
+export async function getActividadesAdmin(
+  filters: AdminActividadesFilters = {},
+): Promise<ActividadFontaneroListado> {
+  const params: Record<string, string | number> = {}
+  if (filters.fontaneroId?.trim()) params.fontaneroId = filters.fontaneroId.trim()
+  if (filters.tipoActividadId) params.tipoActividadId = filters.tipoActividadId
+  if (filters.estado?.trim()) params.estado = filters.estado.trim()
+  if (filters.fechaInicio?.trim()) params.fechaInicio = filters.fechaInicio.trim()
+  if (filters.fechaFin?.trim()) params.fechaFin = filters.fechaFin.trim()
+  if (filters.page && filters.page > 0) params.page = filters.page
+  if (filters.limit && filters.limit > 0) params.limit = filters.limit
+
+  const raw = await fetchWithAuth<unknown>(ACTIVIDADES_ADMIN_PATH, { params })
+  const body = (raw ?? {}) as Record<string, unknown>
+  const source = Array.isArray(raw)
+    ? raw
+    : Array.isArray(body.data)
+      ? body.data
+      : Array.isArray(body.actividades)
+        ? body.actividades
+        : []
+  const data = source
+    .map(normalizeActividadFontanero)
+    .filter((item): item is ActividadFontaneroRegistrada => item !== null)
+  const total = typeof body.total === 'number' ? body.total : data.length
+  const limit = typeof body.limit === 'number' ? body.limit : filters.limit
+
+  return {
+    data,
+    total,
+    page: typeof body.page === 'number' ? body.page : filters.page,
+    limit,
+    totalPages:
+      typeof body.totalPages === 'number'
+        ? body.totalPages
+        : limit
+          ? Math.max(1, Math.ceil(total / limit))
+          : 1,
+  }
+}
+
+export async function revisarActividadAdmin(
+  id: number,
+  observacion?: string,
+): Promise<ActividadFontaneroRegistrada> {
+  const raw = await fetchWithAuth<unknown>(
+    `/admin/actividades-fontanero/${id}/revisar`,
+    {
+      method: 'PATCH',
+      body: observacion?.trim()
+        ? JSON.stringify({ observacion: observacion.trim() })
+        : undefined,
+    },
+  )
+  const actividad = normalizeActividadFontanero(raw)
+  if (!actividad) throw new Error('La respuesta de revisión no es válida')
+  return actividad
+}
+
+export async function getActividadAdminDetalle(
+  id: number,
+): Promise<ActividadFontaneroRegistrada> {
+  const raw = await fetchWithPathFallback<unknown>([
+    `/actividades-fontanero/${id}`,
+    `/actividades/${id}`,
+    `/admin/actividades-fontanero/${id}`,
+    `/admin/actividades/${id}`,
+  ])
+  const actividad = normalizeActividadFontanero(raw)
+  if (!actividad) throw new Error('HTTP 404: Actividad no encontrada')
+  return actividad
 }
 
 /**

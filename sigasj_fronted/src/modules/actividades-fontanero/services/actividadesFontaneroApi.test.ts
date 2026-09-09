@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import {
   getHistorialActividades,
+  getActividadAdminDetalle,
+  getActividadesAdmin,
   getReportesAdmin,
+  revisarActividadAdmin,
   registrarActividad,
   toHistorialActividadesParams,
   toRegistrarActividadPayloadFromTipo,
@@ -76,6 +79,46 @@ describe('actividadesFontaneroApi — registrarActividad', () => {
       'fontaneroId',
     )
   })
+})
+
+describe('actividadesFontaneroApi — revisión administrativa', () => {
+  beforeEach(() => vi.mocked(fetchWithAuth).mockReset())
+
+  it('envía listado con filtros y conserva paginación del backend', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValue({ data: [], total: 25, page: 2, limit: 10, totalPages: 3 })
+    const result = await getActividadesAdmin({ estado: 'REPORTADA', page: 2, limit: 10 })
+    expect(fetchWithAuth).toHaveBeenCalledWith('/admin/actividades', {
+      params: { estado: 'REPORTADA', page: 2, limit: 10 },
+    })
+    expect(result.totalPages).toBe(3)
+  })
+
+  it('consulta el detalle por la ruta recomendada y normaliza documentos', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValue(actividadApiFixture())
+    const result = await getActividadAdminDetalle(12)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/actividades-fontanero/12', undefined)
+    expect(result.documentos).toHaveLength(1)
+  })
+
+  it('marca como revisada sin modificar datos desde el cliente', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValue(actividadApiFixture({ estado: 'REVISADA' }))
+    await revisarActividadAdmin(12)
+    expect(fetchWithAuth).toHaveBeenCalledWith('/admin/actividades-fontanero/12/revisar', {
+      method: 'PATCH',
+      body: undefined,
+    })
+  })
+})
+
+const actividadApiFixture = (overrides: Record<string, unknown> = {}) => ({
+  id: 12,
+  titulo: 'Control de Fugas',
+  tipoActividadId: 1,
+  tipoActividadNombre: 'Control de Fugas',
+  fechaActividad: '2026-08-23',
+  estado: 'REPORTADA',
+  documentos: [{ id: 5, nombreOriginal: 'evidencia.jpg' }],
+  ...overrides,
 })
 
 describe('actividadesFontaneroApi — getReportesAdmin', () => {
