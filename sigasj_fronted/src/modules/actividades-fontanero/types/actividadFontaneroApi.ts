@@ -19,12 +19,19 @@ export type ActividadFontaneroRegistrada = {
   id: number
   tipoActividadId: number
   tipoActividadNombre: string
+  tipoActividadCodigo?: string
   fechaActividad: string
   titulo: string
   descripcion: string | null
   ubicacion: string | null
   observaciones: string | null
   estado: string
+  estadoRevision?: 'PENDIENTE' | 'REVISADA' | string
+  fontaneroId?: string
+  fontaneroNombre?: string
+  fechaRevision?: string | null
+  revisadoPorId?: string | null
+  fechaRegistro?: string
   observacionCorreccion: string | null
   datosEspecificos?: Record<string, unknown> | null
   documentos?: DocumentoActividadRegistrado[]

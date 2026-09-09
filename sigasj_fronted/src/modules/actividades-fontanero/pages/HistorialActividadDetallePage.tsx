@@ -1,24 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { getActividadDetalle } from '../services/actividadesFontaneroApi'
 import { isHistorialEstado } from '../types/actividadHistorial'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
-import { listDatosEspecificosDetalle } from '../utils/formatDatosEspecificosDetalle'
-import { formatActividadEstado } from '../utils/formatActividadEstado'
-import { formatActividadFecha } from '../utils/formatActividadFecha'
+import DetalleActividad from '../components/DetalleActividad'
 import { getHttpErrorStatus } from '../utils/httpErrorStatus'
-
-const observacionCorreccionLabel = (estado: string): string => {
-  if (estado === 'RECHAZADA') {
-    return 'Motivo de rechazo'
-  }
-  if (estado === 'CORREGIDA') {
-    return 'Observación de corrección'
-  }
-  return 'Observación'
-}
 
 const HistorialActividadDetallePage = () => {
   const { actividadId } = useParams<{ actividadId: string }>()
@@ -34,13 +22,10 @@ const HistorialActividadDetallePage = () => {
 
   const parsedId = Number(actividadId)
 
-  const datosEspecificos = useMemo(
-    () => listDatosEspecificosDetalle(actividad?.datosEspecificos),
-    [actividad?.datosEspecificos],
-  )
-
   useEffect(() => {
     if (!Number.isInteger(parsedId) || parsedId <= 0) {
+      // El parámetro de ruta inválido se traduce inmediatamente al estado 404 local.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoadError('not-found')
       setIsLoading(false)
       return
@@ -137,78 +122,7 @@ const HistorialActividadDetallePage = () => {
         </div>
       ) : null}
 
-      {actividad ? (
-        <article className="actividades-fontanero-historial-detalle__panel">
-          <div className="actividades-fontanero-historial-detalle__title-row">
-            <div>
-              <p className="actividades-fontanero-historial-detalle__tipo">
-                {actividad.tipoActividadNombre}
-              </p>
-              <h2>{actividad.titulo}</h2>
-            </div>
-            <span
-              className="actividades-fontanero-historial-detalle__estado"
-              data-estado={actividad.estado}
-            >
-              {formatActividadEstado(actividad.estado)}
-            </span>
-          </div>
-
-          <dl className="actividades-fontanero-historial-detalle__meta">
-            <div>
-              <dt>Fecha de actividad</dt>
-              <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
-            </div>
-            <div>
-              <dt>Registro</dt>
-              <dd>#{actividad.id}</dd>
-            </div>
-            <div>
-              <dt>Ubicación</dt>
-              <dd>{actividad.ubicacion ?? '—'}</dd>
-            </div>
-            <div>
-              <dt>Actualización</dt>
-              <dd>{formatActividadFecha(actividad.updatedAt.slice(0, 10))}</dd>
-            </div>
-          </dl>
-
-          {actividad.descripcion ? (
-            <div className="actividades-fontanero-historial-detalle__block">
-              <h3>Descripción</h3>
-              <p>{actividad.descripcion}</p>
-            </div>
-          ) : null}
-
-          {actividad.observaciones ? (
-            <div className="actividades-fontanero-historial-detalle__block">
-              <h3>Observaciones</h3>
-              <p>{actividad.observaciones}</p>
-            </div>
-          ) : null}
-
-          {datosEspecificos.length > 0 ? (
-            <div className="actividades-fontanero-historial-detalle__block">
-              <h3>Datos específicos</h3>
-              <dl className="actividades-fontanero-historial-detalle__meta">
-                {datosEspecificos.map((item) => (
-                  <div key={item.label}>
-                    <dt>{item.label}</dt>
-                    <dd>{item.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          ) : null}
-
-          {actividad.observacionCorreccion ? (
-            <div className="actividades-fontanero-historial-detalle__block">
-              <h3>{observacionCorreccionLabel(actividad.estado)}</h3>
-              <p>{actividad.observacionCorreccion}</p>
-            </div>
-          ) : null}
-        </article>
-      ) : null}
+      {actividad ? <DetalleActividad actividad={actividad} /> : null}
 
       <Link
         to={ACTIVIDADES_FONTANERO_PATHS.historial}
