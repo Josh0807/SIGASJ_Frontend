@@ -6,32 +6,10 @@ import {
   type ReporteActividadesResponse,
 } from '../services/actividadesFontaneroApi'
 import { EMPTY_REPORTE_ACTIVIDADES } from '../types/actividadReportes'
-import { getHttpErrorStatus } from '../utils/httpErrorStatus'
-
-const HTTP_DETAIL_PATTERN = /^HTTP \d+:\s*([\s\S]*)$/
-
-const extractErrorMessage = (error: unknown, fallback: string): string => {
-  if (!(error instanceof Error) || !error.message.trim()) {
-    return fallback
-  }
-  const match = HTTP_DETAIL_PATTERN.exec(error.message)
-  const detail = match?.[1]?.trim()
-  if (!detail) {
-    return fallback
-  }
-  try {
-    const parsed = JSON.parse(detail) as unknown
-    if (Array.isArray(parsed)) {
-      return parsed.map(String).join('. ')
-    }
-    if (typeof parsed === 'string' && parsed.trim()) {
-      return parsed.trim()
-    }
-  } catch {
-    // detalle plano del backend
-  }
-  return detail.length > 200 ? fallback : detail
-}
+import {
+  extractHttpErrorMessage,
+  getHttpErrorStatus,
+} from '../utils/httpErrorStatus'
 
 export type UseAdminActividadesReportesResult = {
   reporte: ReporteActividadesResponse
@@ -99,7 +77,7 @@ export function useAdminActividadesReportes(
           setError(null)
         } else if (status === 400) {
           setError(
-            extractErrorMessage(
+            extractHttpErrorMessage(
               caught,
               'Los filtros del reporte no son válidos.',
             ),

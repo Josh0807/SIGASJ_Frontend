@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  extractHttpErrorMessage,
   getHttpErrorStatus,
   shouldRetryAlternatePath,
 } from './httpErrorStatus'
@@ -21,5 +22,14 @@ describe('httpErrorStatus — actividades fontanero', () => {
     expect(shouldRetryAlternatePath(new Error('HTTP 404: Not Found'))).toBe(true)
     expect(shouldRetryAlternatePath(new Error('HTTP 503: Service Unavailable'))).toBe(true)
     expect(shouldRetryAlternatePath(new Error('Network error'))).toBe(true)
+  })
+
+  it('extrae mensaje legible del cuerpo HTTP', () => {
+    expect(
+      extractHttpErrorMessage(
+        new Error('HTTP 400: fechaInicio no puede ser posterior a fechaFin'),
+        'fallback',
+      ),
+    ).toBe('fechaInicio no puede ser posterior a fechaFin')
   })
 })

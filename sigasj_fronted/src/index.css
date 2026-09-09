@@ -175,7 +175,7 @@ body {
   outline-offset: 3px;
 }
 
-/* Navbar Dropdown (Institución) */
+/* Navbar Dropdown (InstituciÃ³n) */
 .navbar__dropdown {
   position: relative;
   display: inline-flex;
@@ -5380,7 +5380,7 @@ body,
   margin: 0;
 }
 
-/* Indicators Grid - Simétrico de 4 columnas en desktop */
+/* Indicators Grid - SimÃ©trico de 4 columnas en desktop */
 .admin-dashboard__indicators-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6114,7 +6114,7 @@ body,
   color: #6b4a4a;
 }
 
-/* Gestión de proyectos: filtros y tabla, sin cambiar AdminLayout */
+/* GestiÃ³n de proyectos: filtros y tabla, sin cambiar AdminLayout */
 .admin-main__inner:has(.proyectos-admin) {
   min-width: 0;
   max-width: 100%;
@@ -7410,7 +7410,7 @@ body,
   background: #be123c;
 }
 
-/* Componentes de Consulta Pública de Recibos */
+/* Componentes de Consulta PÃºblica de Recibos */
 .receipt-search-form {
   display: flex;
   flex-direction: column;
@@ -7817,7 +7817,7 @@ body,
 }
 
 /* ==========================================================================
-   PROYECTO IMÁGENES Y GALERÍA (MÓDULO PROYECTOS)
+   PROYECTO IMÃGENES Y GALERÃA (MÃDULO PROYECTOS)
    ========================================================================== */
 
 .proyecto-imagenes-galeria {
@@ -8896,7 +8896,7 @@ body,
 }
 
 /* ==========================================================================
-   Registro de Actividades del Fontanero — pantalla principal
+   Registro de Actividades del Fontanero â pantalla principal
    ========================================================================== */
 .actividades-fontanero-home {
   display: flex;
@@ -9947,6 +9947,530 @@ body,
   }
 
   .actividad-correccion-card__action {
+    width: 100%;
+  }
+}
+
+/* Historial de actividades — Fontanero */
+.actividades-fontanero-historial {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+.actividades-fontanero-historial__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(18, 63, 112, 0.06);
+}
+
+.actividades-fontanero-historial__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividades-fontanero-historial__header h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  color: #123f70;
+}
+
+.actividades-fontanero-historial__intro {
+  margin: 8px 0 0;
+  color: #4a647c;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-historial__count {
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #edf8f1;
+  border: 1px solid #b8dfc4;
+  color: #1f4d33;
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.actividades-fontanero-historial__filters {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+}
+
+.actividades-fontanero-historial__filters-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.actividades-fontanero-historial__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #2f4f68;
+}
+
+.actividades-fontanero-historial__field input {
+  padding: 10px 12px;
+  border: 1px solid #c5d9ea;
+  border-radius: 10px;
+  font: inherit;
+  color: #123f70;
+}
+
+.actividades-fontanero-historial__form-error {
+  margin: 0;
+  color: #8b2f2f;
+  font-size: 0.9rem;
+}
+
+.actividades-fontanero-historial__filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.actividades-fontanero-historial__primary,
+.actividades-fontanero-historial__secondary {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.actividades-fontanero-historial__primary {
+  border: none;
+  background: #1e5a9c;
+  color: #ffffff;
+}
+
+.actividades-fontanero-historial__primary:hover,
+.actividades-fontanero-historial__primary:focus-visible {
+  background: #174a82;
+}
+
+.actividades-fontanero-historial__secondary {
+  border: 1px solid #c5d9ea;
+  background: #ffffff;
+  color: #1e5a9c;
+}
+
+.actividades-fontanero-historial__state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: #f7fbff;
+  border: 1px solid #d7e5f1;
+  color: #2f4f68;
+}
+
+.actividades-fontanero-historial__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #c5d9ea;
+  border-top-color: #1e5a9c;
+  border-radius: 50%;
+  animation: actividades-fontanero-spin 0.8s linear infinite;
+}
+
+.actividades-fontanero-historial__alert {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff4f4;
+  border: 1px solid #f0c7c7;
+  color: #8b2f2f;
+}
+
+.actividades-fontanero-historial__alert p {
+  margin: 0;
+}
+
+.actividades-fontanero-historial__retry {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #1e5a9c;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.actividades-fontanero-historial__empty {
+  padding: 28px 24px;
+  text-align: center;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px dashed #c5d9ea;
+  color: #4a647c;
+}
+
+.actividades-fontanero-historial__empty-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #123f70;
+}
+
+.actividades-fontanero-historial__empty-text {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-historial__list {
+  display: grid;
+  gap: 14px;
+}
+
+.actividades-fontanero-historial__pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 16px;
+}
+
+.actividades-fontanero-historial__page-btn {
+  padding: 8px 14px;
+  border: 1px solid #c5d9ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1e5a9c;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.actividades-fontanero-historial__page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actividades-fontanero-historial__page-info {
+  color: #4a647c;
+  font-size: 0.92rem;
+}
+
+.actividades-fontanero-historial__back {
+  align-self: flex-start;
+  color: #1e5a9c;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.actividades-fontanero-historial__back:hover,
+.actividades-fontanero-historial__back:focus-visible {
+  text-decoration: underline;
+}
+
+.actividad-historial-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(18, 63, 112, 0.05);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.actividad-historial-card:hover {
+  border-color: #b8d4ea;
+  box-shadow: 0 6px 20px rgba(18, 63, 112, 0.08);
+}
+
+.actividad-historial-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.actividad-historial-card__tipo {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividad-historial-card__titulo {
+  margin: 0;
+  font-size: 1.08rem;
+  color: #123f70;
+}
+
+.actividad-historial-card__estado {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  background: #edf8f1;
+  color: #1f4d33;
+  border: 1px solid #b8dfc4;
+}
+
+.actividad-historial-card__estado[data-estado='RECHAZADA'] {
+  background: #fff4f4;
+  color: #8b2f2f;
+  border-color: #f0c7c7;
+}
+
+.actividad-historial-card__estado[data-estado='CORREGIDA'] {
+  background: #fff4e5;
+  color: #7a4b00;
+  border-color: #f0d49a;
+}
+
+.actividad-historial-card__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px 18px;
+  margin: 0;
+}
+
+.actividad-historial-card__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.actividad-historial-card__meta-item dt {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #5b7288;
+}
+
+.actividad-historial-card__meta-item dd {
+  margin: 0;
+  color: #123f70;
+  font-weight: 600;
+}
+
+.actividad-historial-card__descripcion {
+  margin: 0;
+  color: #4a647c;
+  line-height: 1.45;
+}
+
+.actividad-historial-card__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.actividad-historial-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #1e5a9c;
+  color: #ffffff;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.actividad-historial-card__action:hover,
+.actividad-historial-card__action:focus-visible {
+  background: #174a82;
+}
+
+.actividades-fontanero-historial-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+.actividades-fontanero-historial-detalle__header {
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(18, 63, 112, 0.06);
+}
+
+.actividades-fontanero-historial-detalle__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividades-fontanero-historial-detalle__header h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  color: #123f70;
+}
+
+.actividades-fontanero-historial-detalle__state {
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: #f7fbff;
+  border: 1px solid #d7e5f1;
+  color: #2f4f68;
+}
+
+.actividades-fontanero-historial-detalle__alert {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff4f4;
+  border: 1px solid #f0c7c7;
+  color: #8b2f2f;
+}
+
+.actividades-fontanero-historial-detalle__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+}
+
+.actividades-fontanero-historial-detalle__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+
+.actividades-fontanero-historial-detalle__tipo {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3b82a8;
+}
+
+.actividades-fontanero-historial-detalle__title-row h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #123f70;
+}
+
+.actividades-fontanero-historial-detalle__estado {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  background: #edf8f1;
+  color: #1f4d33;
+  border: 1px solid #b8dfc4;
+}
+
+.actividades-fontanero-historial-detalle__estado[data-estado='RECHAZADA'] {
+  background: #fff4f4;
+  color: #8b2f2f;
+  border-color: #f0c7c7;
+}
+
+.actividades-fontanero-historial-detalle__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px 18px;
+  margin: 0;
+}
+
+.actividades-fontanero-historial-detalle__meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.actividades-fontanero-historial-detalle__meta dt {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #5b7288;
+}
+
+.actividades-fontanero-historial-detalle__meta dd {
+  margin: 0;
+  color: #123f70;
+  font-weight: 600;
+}
+
+.actividades-fontanero-historial-detalle__block h3 {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  color: #123f70;
+}
+
+.actividades-fontanero-historial-detalle__block p {
+  margin: 0;
+  color: #4a647c;
+  line-height: 1.45;
+}
+
+.actividades-fontanero-historial-detalle__back {
+  align-self: flex-start;
+  color: #1e5a9c;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.actividades-fontanero-historial-detalle__back:hover,
+.actividades-fontanero-historial-detalle__back:focus-visible {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .actividades-fontanero-historial__header,
+  .actividades-fontanero-historial-detalle__header,
+  .actividades-fontanero-historial-detalle__panel {
+    padding: 18px;
+  }
+
+  .actividad-historial-card {
+    padding: 16px;
+  }
+
+  .actividad-historial-card__action {
     width: 100%;
   }
 }

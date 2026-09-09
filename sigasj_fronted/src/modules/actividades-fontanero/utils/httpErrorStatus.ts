@@ -26,3 +26,32 @@ export const shouldRetryAlternatePath = (error: unknown): boolean => {
 
 export const sortTiposActividad = <T extends { orden: number }>(tipos: T[]): T[] =>
   [...tipos].sort((left, right) => left.orden - right.orden)
+
+export const extractHttpErrorMessage = (
+  error: unknown,
+  fallback: string,
+): string => {
+  if (!(error instanceof Error) || !error.message.trim()) {
+    return fallback
+  }
+
+  const match = HTTP_ERROR_PATTERN.exec(error.message)
+  const detail = match?.[2]?.trim()
+  if (!detail) {
+    return fallback
+  }
+
+  try {
+    const parsed = JSON.parse(detail) as unknown
+    if (Array.isArray(parsed)) {
+      return parsed.map(String).join('. ')
+    }
+    if (typeof parsed === 'string' && parsed.trim()) {
+      return parsed.trim()
+    }
+  } catch {
+    // detalle plano del backend
+  }
+
+  return detail.length > 200 ? fallback : detail
+}
