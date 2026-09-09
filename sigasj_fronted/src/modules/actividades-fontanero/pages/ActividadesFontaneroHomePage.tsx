@@ -8,8 +8,10 @@ import {
   resolveAuthUserDisplayName,
 } from '../../auth/utils/authUserDisplay'
 import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
+import ActivityFeedback from '../components/ActivityFeedback'
 import { useCorreccionesPendientesCount } from '../hooks/useCorreccionesPendientesCount'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 
 const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
 
@@ -20,8 +22,8 @@ type RegistrationNoticeState = {
 
 const buildRegistrationSuccessMessage = (title?: string) =>
   title
-    ? `Actividad registrada correctamente: ${title}`
-    : 'Actividad registrada correctamente.'
+    ? `${ACTIVITY_FEEDBACK_MESSAGES.successRegister.replace(/\.$/, '')}: ${title}.`
+    : ACTIVITY_FEEDBACK_MESSAGES.successRegister
 
 const ActividadesFontaneroHomePage = () => {
   const navigate = useNavigate()
@@ -107,35 +109,39 @@ const ActividadesFontaneroHomePage = () => {
       </header>
 
       {successNotice ? (
-        <div
-          className="actividades-fontanero-home__success"
-          role="status"
-          data-testid="actividad-registrada-exito"
-        >
-          {successNotice}
-        </div>
+        <ActivityFeedback
+          variant="success"
+          message={successNotice}
+          testId="actividad-registrada-exito"
+        />
       ) : null}
 
-      {(isUnauthorized || isForbidden) && (
-        <div className="actividades-fontanero-home__alert" role="alert">
-          {isUnauthorized
-            ? 'Su sesión no es válida o ha vencido. Vuelva a iniciar sesión para consultar correcciones.'
-            : 'No tiene permiso para consultar correcciones pendientes.'}
-        </div>
-      )}
+      {isUnauthorized || isForbidden ? (
+        <ActivityFeedback
+          variant={isUnauthorized ? 'warning' : 'error'}
+          message={
+            isUnauthorized
+              ? ACTIVITY_FEEDBACK_MESSAGES.unauthorized
+              : ACTIVITY_FEEDBACK_MESSAGES.forbidden
+          }
+        />
+      ) : null}
 
-      {isError && !isUnauthorized && !isForbidden && (
-        <div className="actividades-fontanero-home__alert" role="status">
-          No se pudo cargar el indicador de correcciones.{' '}
-          <button
-            type="button"
-            className="actividades-fontanero-home__retry"
-            onClick={refetch}
-          >
-            Reintentar
-          </button>
-        </div>
-      )}
+      {isError && !isUnauthorized && !isForbidden ? (
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.loadCorrections}
+          action={
+            <button
+              type="button"
+              className="activity-feedback__retry"
+              onClick={refetch}
+            >
+              Reintentar
+            </button>
+          }
+        />
+      ) : null}
 
       {!isLoading && !isError && !hasPendingCorrections && (
         <p

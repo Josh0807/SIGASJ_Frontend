@@ -6,10 +6,8 @@ import {
   type ReporteActividadesResponse,
 } from '../services/actividadesFontaneroApi'
 import { EMPTY_REPORTE_ACTIVIDADES } from '../types/actividadReportes'
-import {
-  extractHttpErrorMessage,
-  getHttpErrorStatus,
-} from '../utils/httpErrorStatus'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
+import { interpretActividadApiError } from '../utils/interpretActividadApiError'
 
 export type UseAdminActividadesReportesResult = {
   reporte: ReporteActividadesResponse
@@ -67,27 +65,28 @@ export function useAdminActividadesReportes(
         if (cancelled || requestId !== requestIdRef.current) {
           return
         }
-        const status = getHttpErrorStatus(caught)
-        if (status === 401) {
+        const interpreted = interpretActividadApiError(caught)
+        if (interpreted.kind === 'unauthorized') {
           clearAccessToken()
           setUnauthorized(true)
           setError(null)
-        } else if (status === 403) {
+        } else if (interpreted.kind === 'forbidden') {
           setForbidden(true)
           setError(null)
-        } else if (status === 400) {
+        } else if (interpreted.kind === 'validation') {
           setError(
-            extractHttpErrorMessage(
-              caught,
-              'Los filtros del reporte no son válidos.',
-            ),
+            interpreted.message === ACTIVITY_FEEDBACK_MESSAGES.validationReview
+              ? 'Los filtros del reporte no son válidos.'
+              : interpreted.message,
           )
-        } else if (status !== null && status >= 500) {
+        } else if (interpreted.kind === 'server') {
           setError('No fue posible cargar el reporte. Intente nuevamente.')
-        } else {
+        } else if (interpreted.kind === 'network') {
           setError(
             'No fue posible conectar con el servidor. Verifique su conexión.',
           )
+        } else {
+          setError(interpreted.message)
         }
         setReporte(EMPTY_REPORTE_ACTIVIDADES)
       } finally {

@@ -6,6 +6,7 @@ import {
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
+import ActivityFeedback from '../components/ActivityFeedback'
 import { useAdminActividadesReportes } from '../hooks/useAdminActividadesReportes'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 import { getReportesAdmin } from '../services/actividadesFontaneroApi'
@@ -272,19 +273,22 @@ const ActividadesAdminReportesPage = () => {
         </form>
 
         {filterError ? (
-          <div className="gallery-admin__banner gallery-admin__banner--error" role="alert">
-            <p>{filterError}</p>
-            <button
-              type="button"
-              className="gallery-admin__button"
-              onClick={() => {
-                setClientError(null)
-                refetch()
-              }}
-            >
-              Reintentar
-            </button>
-          </div>
+          <ActivityFeedback
+            variant="error"
+            message={filterError}
+            action={
+              <button
+                type="button"
+                className="activity-feedback__retry"
+                onClick={() => {
+                  setClientError(null)
+                  refetch()
+                }}
+              >
+                Reintentar
+              </button>
+            }
+          />
         ) : null}
 
         <section

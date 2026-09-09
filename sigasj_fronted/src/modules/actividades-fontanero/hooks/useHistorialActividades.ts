@@ -7,10 +7,9 @@ import {
   type HistorialActividadesFilters,
 } from '../types/actividadHistorial'
 import { deriveHistorialPagination } from '../utils/historialActividadesList'
-import {
-  extractHttpErrorMessage,
-  getHttpErrorStatus,
-} from '../utils/httpErrorStatus'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
+import { interpretActividadApiError } from '../utils/interpretActividadApiError'
+import { getHttpErrorStatus } from '../utils/httpErrorStatus'
 
 export type HistorialActividadesState = {
   actividades: ActividadFontaneroRegistrada[]
@@ -98,25 +97,31 @@ export function useHistorialActividades(
         if (cancelled) {
           return
         }
-        const status = getHttpErrorStatus(error)
+        const interpreted = interpretActividadApiError(error)
+        const status = interpreted.status ?? getHttpErrorStatus(error)
         setActividades([])
         setTotal(0)
         setPage(1)
         setTotalPages(1)
-        setIsUnauthorized(status === 401)
-        setIsForbidden(status === 403)
+        setIsUnauthorized(interpreted.kind === 'unauthorized')
+        setIsForbidden(interpreted.kind === 'forbidden')
 
-        if (status === 400) {
+        if (interpreted.kind === 'validation' || status === 400) {
           setErrorMessage(
-            extractHttpErrorMessage(
-              error,
-              'Los filtros del historial no son válidos.',
-            ),
+            interpreted.message === ACTIVITY_FEEDBACK_MESSAGES.validationReview
+              ? 'Los filtros del historial no son válidos.'
+              : interpreted.message,
           )
           setIsError(true)
         } else {
-          setErrorMessage(null)
-          setIsError(status !== 401 && status !== 403)
+          setErrorMessage(
+            interpreted.kind === 'unauthorized' || interpreted.kind === 'forbidden'
+              ? null
+              : interpreted.message,
+          )
+          setIsError(
+            interpreted.kind !== 'unauthorized' && interpreted.kind !== 'forbidden',
+          )
         }
       } finally {
         if (!cancelled) {
@@ -130,6 +135,8 @@ export function useHistorialActividades(
     return () => {
       cancelled = true
     }
+    // filtersKey serializa `filters`; evita re-fetch por identidad de objeto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- filtersKey
   }, [filtersKey, reloadKey])
 
   return {

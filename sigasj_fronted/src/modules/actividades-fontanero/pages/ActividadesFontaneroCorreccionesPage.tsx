@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
+import ActivityFeedback from '../components/ActivityFeedback'
 import CorreccionPendienteCard from '../components/CorreccionPendienteCard'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useCorreccionesPendientes } from '../hooks/useCorreccionesPendientes'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 
 const ActividadesFontaneroCorreccionesPage = () => {
   const navigate = useNavigate()
@@ -65,22 +67,26 @@ const ActividadesFontaneroCorreccionesPage = () => {
       ) : null}
 
       {isForbidden ? (
-        <div className="actividades-fontanero-correcciones__alert" role="alert">
-          No tiene permiso para consultar correcciones pendientes.
-        </div>
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.forbidden}
+        />
       ) : null}
 
       {isError && !isForbidden ? (
-        <div className="actividades-fontanero-correcciones__alert" role="alert">
-          <p>No se pudieron cargar las correcciones pendientes.</p>
-          <button
-            type="button"
-            className="actividades-fontanero-correcciones__retry"
-            onClick={refetch}
-          >
-            Reintentar
-          </button>
-        </div>
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}
+          action={
+            <button
+              type="button"
+              className="activity-feedback__retry"
+              onClick={refetch}
+            >
+              Reintentar
+            </button>
+          }
+        />
       ) : null}
 
       {isEmpty ? (

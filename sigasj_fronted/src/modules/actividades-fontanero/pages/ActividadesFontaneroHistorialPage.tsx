@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
+import ActivityFeedback from '../components/ActivityFeedback'
 import HistorialActividadCard from '../components/HistorialActividadCard'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useHistorialActividades } from '../hooks/useHistorialActividades'
@@ -9,6 +10,7 @@ import {
   hasHistorialPeriodFilter,
   type HistorialActividadesFilters,
 } from '../types/actividadHistorial'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 
 type DraftFilters = {
   fechaInicio: string
@@ -160,9 +162,7 @@ const ActividadesFontaneroHistorialPage = () => {
         </div>
 
         {clientError ? (
-          <p className="actividades-fontanero-historial__form-error" role="alert">
-            {clientError}
-          </p>
+          <ActivityFeedback variant="warning" message={clientError} />
         ) : null}
 
         <div className="actividades-fontanero-historial__filters-actions">
@@ -195,22 +195,26 @@ const ActividadesFontaneroHistorialPage = () => {
       ) : null}
 
       {isForbidden ? (
-        <div className="actividades-fontanero-historial__alert" role="alert">
-          No tiene permiso para consultar el historial de actividades.
-        </div>
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.forbidden}
+        />
       ) : null}
 
       {isError && !isForbidden ? (
-        <div className="actividades-fontanero-historial__alert" role="alert">
-          <p>{errorMessage ?? 'No se pudo cargar el historial de actividades.'}</p>
-          <button
-            type="button"
-            className="actividades-fontanero-historial__retry"
-            onClick={refetch}
-          >
-            Reintentar
-          </button>
-        </div>
+        <ActivityFeedback
+          variant="error"
+          message={errorMessage ?? ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}
+          action={
+            <button
+              type="button"
+              className="activity-feedback__retry"
+              onClick={refetch}
+            >
+              Reintentar
+            </button>
+          }
+        />
       ) : null}
 
       {isEmpty ? (

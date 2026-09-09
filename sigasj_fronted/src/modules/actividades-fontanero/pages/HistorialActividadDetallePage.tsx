@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import ActivityFeedback from '../components/ActivityFeedback'
+import DetalleActividad from '../components/DetalleActividad'
 import { getActividadDetalle } from '../services/actividadesFontaneroApi'
 import { isHistorialEstado } from '../types/actividadHistorial'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
-import DetalleActividad from '../components/DetalleActividad'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { getHttpErrorStatus } from '../utils/httpErrorStatus'
 
 const HistorialActividadDetallePage = () => {
@@ -21,13 +23,10 @@ const HistorialActividadDetallePage = () => {
   >(null)
 
   const parsedId = Number(actividadId)
+  const isInvalidId = !Number.isInteger(parsedId) || parsedId <= 0
 
   useEffect(() => {
-    if (!Number.isInteger(parsedId) || parsedId <= 0) {
-      // El parámetro de ruta inválido se traduce inmediatamente al estado 404 local.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoadError('not-found')
-      setIsLoading(false)
+    if (isInvalidId) {
       return
     }
 
@@ -78,7 +77,10 @@ const HistorialActividadDetallePage = () => {
     return () => {
       cancelled = true
     }
-  }, [logout, navigate, parsedId])
+  }, [isInvalidId, logout, navigate, parsedId])
+
+  const resolvedLoadError = isInvalidId ? 'not-found' : loadError
+  const resolvedLoading = isInvalidId ? false : isLoading
 
   return (
     <section
@@ -92,34 +94,38 @@ const HistorialActividadDetallePage = () => {
         <h1 id="historial-detalle-title">Detalle de actividad</h1>
       </header>
 
-      {isLoading ? (
+      {resolvedLoading ? (
         <p className="actividades-fontanero-historial-detalle__state" role="status">
           Cargando detalle…
         </p>
       ) : null}
 
-      {!isLoading && loadError === 'not-found' ? (
-        <div className="actividades-fontanero-historial-detalle__alert" role="alert">
-          No se encontró la actividad solicitada.
-        </div>
+      {!resolvedLoading && resolvedLoadError === 'not-found' ? (
+        <ActivityFeedback
+          variant="warning"
+          message={ACTIVITY_FEEDBACK_MESSAGES.notFound}
+        />
       ) : null}
 
-      {!isLoading && loadError === 'forbidden' ? (
-        <div className="actividades-fontanero-historial-detalle__alert" role="alert">
-          No tiene permiso para consultar esta actividad.
-        </div>
+      {!resolvedLoading && resolvedLoadError === 'forbidden' ? (
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.forbidden}
+        />
       ) : null}
 
-      {!isLoading && loadError === 'invalid-state' ? (
-        <div className="actividades-fontanero-historial-detalle__alert" role="alert">
-          Esta actividad aún no forma parte del historial consultable.
-        </div>
+      {!resolvedLoading && resolvedLoadError === 'invalid-state' ? (
+        <ActivityFeedback
+          variant="warning"
+          message="Esta actividad aún no forma parte del historial consultable."
+        />
       ) : null}
 
-      {!isLoading && loadError === 'error' ? (
-        <div className="actividades-fontanero-historial-detalle__alert" role="alert">
-          No se pudo cargar el detalle de la actividad.
-        </div>
+      {!resolvedLoading && resolvedLoadError === 'error' ? (
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}
+        />
       ) : null}
 
       {actividad ? <DetalleActividad actividad={actividad} /> : null}

@@ -151,7 +151,7 @@ describe('formulario de registro de actividad (#390 / #932)', () => {
 
       expect(actividadesApi.registrarActividad).toHaveBeenCalledTimes(1)
       expect(app.container.querySelector('[data-testid="actividad-registro-exito"]')).not.toBeNull()
-      expect(app.container.innerHTML).toContain('fue registrada correctamente')
+      expect(app.container.innerHTML).toContain('Actividad registrada correctamente')
       expect(app.container.innerHTML).toContain('registro #42')
     } finally {
       await app.cleanup()

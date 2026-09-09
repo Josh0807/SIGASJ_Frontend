@@ -6622,6 +6622,38 @@ body,
 
 .actividades-admin-revision__detail-actions {
   justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actividades-admin-revision__correction {
+  display: grid;
+  gap: 0.65rem;
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.actividades-admin-revision__correction textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  resize: vertical;
+  border: 1px solid #c5d2cd;
+  border-radius: 0.45rem;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .actividades-admin-revision__detail {
+    width: min(94vw, 42rem);
+    max-height: min(90vh, 48rem);
+  }
+
+  .actividades-admin-revision__correction {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 900px) {
@@ -10859,5 +10891,107 @@ body,
 
   .actividad-historial-card__action {
     width: 100%;
+  }
+}
+
+/* Feedback visual reutilizable — módulo actividades fontanero */
+.activity-feedback {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.activity-feedback__body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.activity-feedback__title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.activity-feedback__message {
+  margin: 0;
+}
+
+.activity-feedback__message p {
+  margin: 0 0 6px;
+}
+
+.activity-feedback__message p:last-child {
+  margin-bottom: 0;
+}
+
+.activity-feedback__action {
+  margin-top: 2px;
+}
+
+.activity-feedback__retry,
+.activity-feedback__dismiss {
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+}
+
+.activity-feedback__dismiss {
+  flex-shrink: 0;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.activity-feedback__dismiss:hover,
+.activity-feedback__dismiss:focus-visible,
+.activity-feedback__retry:hover,
+.activity-feedback__retry:focus-visible {
+  opacity: 1;
+}
+
+.activity-feedback--success {
+  border-color: #cfe8d8;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.activity-feedback--error {
+  border-color: #f5c2c7;
+  background: #fff5f5;
+  color: #9b1c1c;
+}
+
+.activity-feedback--warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.activity-feedback--info {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+@media (max-width: 560px) {
+  .activity-feedback {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .activity-feedback__dismiss {
+    align-self: flex-end;
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import ActividadRegistroFormShell from '../components/ActividadRegistroFormShell'
+import ActivityFeedback from '../components/ActivityFeedback'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 import {
@@ -9,6 +10,7 @@ import {
 } from '../services/actividadesFontaneroApi'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
 import { actividadToFormValues } from '../utils/actividadCorreccionMapper'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { getHttpErrorStatus } from '../utils/httpErrorStatus'
 import { useAuth } from '../../auth/components/AuthContext'
 
@@ -26,11 +28,10 @@ const CorregirActividadPage = () => {
   )
 
   const parsedId = Number(actividadId)
+  const isInvalidId = !Number.isInteger(parsedId) || parsedId <= 0
 
   useEffect(() => {
-    if (!Number.isInteger(parsedId) || parsedId <= 0) {
-      setLoadError('not-found')
-      setIsLoading(false)
+    if (isInvalidId) {
       return
     }
 
@@ -81,9 +82,9 @@ const CorregirActividadPage = () => {
     return () => {
       cancelled = true
     }
-  }, [parsedId, logout, navigate])
+  }, [isInvalidId, parsedId, logout, navigate])
 
-  if (!Number.isInteger(parsedId) || parsedId <= 0) {
+  if (isInvalidId) {
     return <Navigate to={ACTIVIDADES_FONTANERO_PATHS.correcciones} replace />
   }
 
@@ -102,9 +103,10 @@ const CorregirActividadPage = () => {
   if (loadError === 'forbidden') {
     return (
       <section className="actividades-fontanero-correcciones" aria-live="polite">
-        <div className="actividades-fontanero-correcciones__alert" role="alert">
-          Esta actividad no está disponible para corrección.
-        </div>
+        <ActivityFeedback
+          variant="error"
+          message="Esta actividad no está disponible para corrección."
+        />
         <Link
           to={ACTIVIDADES_FONTANERO_PATHS.correcciones}
           className="actividades-fontanero-correcciones__back"
@@ -118,9 +120,10 @@ const CorregirActividadPage = () => {
   if (loadError === 'error' || !actividad) {
     return (
       <section className="actividades-fontanero-correcciones" aria-live="polite">
-        <div className="actividades-fontanero-correcciones__alert" role="alert">
-          No se pudo cargar la actividad seleccionada.
-        </div>
+        <ActivityFeedback
+          variant="error"
+          message={ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}
+        />
         <Link
           to={ACTIVIDADES_FONTANERO_PATHS.correcciones}
           className="actividades-fontanero-correcciones__back"
@@ -136,12 +139,19 @@ const CorregirActividadPage = () => {
   if (!tipo) {
     return (
       <section className="actividades-fontanero-correcciones" aria-live="polite">
-        <div className="actividades-fontanero-correcciones__alert" role="alert">
-          No se encontró el tipo de actividad asociado.{' '}
-          <button type="button" onClick={catalogo.refetch}>
-            Reintentar catálogo
-          </button>
-        </div>
+        <ActivityFeedback
+          variant="warning"
+          message="No se encontró el tipo de actividad asociado."
+          action={
+            <button
+              type="button"
+              className="activity-feedback__retry"
+              onClick={catalogo.refetch}
+            >
+              Reintentar catálogo
+            </button>
+          }
+        />
       </section>
     )
   }

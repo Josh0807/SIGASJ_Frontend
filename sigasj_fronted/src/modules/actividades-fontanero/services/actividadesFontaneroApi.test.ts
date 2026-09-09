@@ -6,6 +6,7 @@ import {
   getActividadesAdmin,
   getReportesAdmin,
   revisarActividadAdmin,
+  solicitarCorreccionAdmin,
   registrarActividad,
   toHistorialActividadesParams,
   toRegistrarActividadPayloadFromTipo,
@@ -107,6 +108,20 @@ describe('actividadesFontaneroApi — revisión administrativa', () => {
       method: 'PATCH',
       body: undefined,
     })
+  })
+
+  it('solicita corrección con observación obligatoria', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValue(
+      actividadApiFixture({ estado: 'REQUIERE_CORRECCION' }),
+    )
+    await solicitarCorreccionAdmin(12, '  Complete evidencia  ')
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      '/admin/actividades/12/solicitar-correccion',
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ observacion: 'Complete evidencia' }),
+      },
+    )
   })
 })
 
