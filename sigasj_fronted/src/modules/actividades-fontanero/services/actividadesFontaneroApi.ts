@@ -376,6 +376,24 @@ export async function revisarActividadAdmin(
   return actividad
 }
 
+export async function solicitarCorreccionAdmin(
+  id: number,
+  observacion: string,
+): Promise<ActividadFontaneroRegistrada> {
+  const raw = await fetchWithAuth<unknown>(
+    `/admin/actividades/${id}/solicitar-correccion`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ observacion: observacion.trim() }),
+    },
+  )
+  const actividad = normalizeActividadFontanero(raw)
+  if (!actividad) {
+    throw new Error('La respuesta de solicitud de corrección no es válida')
+  }
+  return actividad
+}
+
 export async function getActividadAdminDetalle(
   id: number,
 ): Promise<ActividadFontaneroRegistrada> {

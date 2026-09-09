@@ -89,7 +89,7 @@ describe('QA #933 — registro y validación (Frontend Fontanero)', () => {
       })
 
       expect(actividadesApi.registrarActividad).toHaveBeenCalledTimes(1)
-      expect(app.container.innerHTML).toContain('fue registrada correctamente')
+      expect(app.container.innerHTML).toContain('Actividad registrada correctamente')
       expect(app.container.innerHTML).toContain('registro #99')
     } finally {
       await app.cleanup()

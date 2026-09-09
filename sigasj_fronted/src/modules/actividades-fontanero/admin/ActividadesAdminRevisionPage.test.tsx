@@ -91,6 +91,13 @@ describe('flujo frontend de revisión administrativa', () => {
         revisadoPorId: 'admin-1',
       }),
     )
+    vi.spyOn(actividadesApi, 'solicitarCorreccionAdmin').mockResolvedValue(
+      actividad({
+        estado: 'REQUIERE_CORRECCION',
+        observacionCorreccion: 'Complete la ubicación de la fuga.',
+        revisadoPorId: 'admin-1',
+      }),
+    )
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
@@ -172,7 +179,11 @@ describe('flujo frontend de revisión administrativa', () => {
     expect(container.textContent).toContain('Reparación de tubería de 2 pulgadas')
     expect(container.textContent).toContain('Acera principal')
     expect(container.textContent).toContain('evidencia-fuga.jpg')
-    expect(container.querySelector('a[href="http://localhost:3000/uploads/actividades-fontanero/12/evidencia.jpg"]')).not.toBeNull()
+    expect(
+      container.querySelector(
+        'a[href*="/uploads/actividades-fontanero/12/evidencia.jpg"]',
+      ),
+    ).not.toBeNull()
   })
 
   it('muestra 404 de detalle sin presentar datos incompletos como definitivos', async () => {
@@ -196,11 +207,22 @@ describe('flujo frontend de revisión administrativa', () => {
     expect(actividadesApi.revisarActividadAdmin).toHaveBeenCalledTimes(1)
     expect(actividadesApi.revisarActividadAdmin).toHaveBeenCalledWith(12)
     expect(container.textContent).toContain('La actividad fue marcada como revisada.')
+    expect(container.querySelectorAll('[data-testid="admin-revision-exito"]')).toHaveLength(1)
     expect(container.textContent).toContain('Actividad revisada')
     expect(container.textContent).toContain('admin-1')
     expect(container.textContent).toContain(original.titulo)
     expect(container.textContent).toContain(original.descripcion)
     expect(container.textContent).toContain('Acera principal')
+
+    const dismiss = container.querySelector(
+      '.activity-feedback__dismiss',
+    ) as HTMLButtonElement
+    expect(dismiss).not.toBeNull()
+    expect(dismiss.getAttribute('aria-label')).toBe('Cerrar mensaje')
+    await act(async () => {
+      dismiss.click()
+    })
+    expect(container.querySelector('[data-testid="admin-revision-exito"]')).toBeNull()
   })
 
   it('evita doble procesamiento mientras el PATCH está pendiente', async () => {
@@ -216,6 +238,42 @@ describe('flujo frontend de revisión administrativa', () => {
     await act(async () => resolveReview(actividad({ estado: 'REVISADA' })))
   })
 
+  it('solicita corrección con observación y actualiza el estado', async () => {
+    await renderPage()
+    await act(async () => button('Ver detalle').click())
+    await flush()
+    const textarea = container.querySelector('#admin-correction-note') as HTMLTextAreaElement
+    expect(textarea).not.toBeNull()
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set?.call(
+        textarea,
+        'Complete la ubicación de la fuga.',
+      )
+      textarea.dispatchEvent(new Event('input', { bubbles: true }))
+      textarea.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    await act(async () => button('Solicitar corrección').click())
+    expect(container.textContent).toContain('¿Confirma que desea solicitar la corrección')
+    await act(async () => button('Sí, solicitar corrección').click())
+    await flush()
+    expect(actividadesApi.solicitarCorreccionAdmin).toHaveBeenCalledWith(
+      12,
+      'Complete la ubicación de la fuga.',
+    )
+    expect(container.textContent).toContain(
+      'Se solicitó la corrección de la actividad correctamente.',
+    )
+    expect(container.textContent).toContain('Requiere corrección')
+    expect(container.querySelector('#admin-correction-note')).toBeNull()
+  })
+
+  it('exige observación antes de solicitar corrección', async () => {
+    await renderPage()
+    await act(async () => button('Ver detalle').click())
+    await flush()
+    expect(button('Solicitar corrección').disabled).toBe(true)
+  })
+
   it('muestra carga y lista vacía', async () => {
     let resolveList!: (value: actividadesApi.ActividadFontaneroListado) => void
     vi.mocked(actividadesApi.getActividadesAdmin).mockImplementation(() => new Promise((resolve) => { resolveList = resolve }))
@@ -228,7 +286,7 @@ describe('flujo frontend de revisión administrativa', () => {
   it('muestra el error de consulta sin confundirlo con una lista vacía', async () => {
     vi.mocked(actividadesApi.getActividadesAdmin).mockRejectedValue(new Error('HTTP 500: Error interno'))
     await renderPage()
-    expect(container.textContent).toContain('Error interno')
+    expect(container.textContent).toContain('No fue posible completar la operación. Intente nuevamente.')
     expect(container.textContent).not.toContain('No se encontraron actividades')
     expect(container.textContent).not.toContain('actividades encontradas')
     expect(button('Reintentar')).not.toBeNull()

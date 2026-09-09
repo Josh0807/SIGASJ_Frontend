@@ -15,16 +15,17 @@ import {
 import {
   ACTIVIDAD_CORRECCION_CLIENT_VALIDATION_ERROR,
   ACTIVIDAD_REGISTRO_CLIENT_VALIDATION_ERROR,
-  ACTIVIDAD_REGISTRO_SERVER_ERROR,
   parseActividadRegistroSubmitError,
   toActividadRegistroSubmitMessage,
 } from '../utils/actividadRegistroSubmitError'
 import { focusFirstActividadRegistroError } from '../utils/focusFirstActividadRegistroError'
 import { registrarActividad } from '../services/actividadesFontaneroApi'
+import ActivityFeedback from './ActivityFeedback'
 import ActividadRegistroFieldError from './ActividadRegistroFieldError'
 import ActividadRegistroValidationSummary from './ActividadRegistroValidationSummary'
 import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistry'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { useAuth } from '../../auth/components/AuthContext'
 
 type ActividadRegistroFormShellMode = 'registrar' | 'corregir'
@@ -134,35 +135,23 @@ const ActividadRegistroFormShell = ({
       const parsed = parseActividadRegistroSubmitError(error)
 
       if (parsed.kind === 'validation') {
-        const mergedErrors = { ...parsed.fieldErrors }
         applyValidationErrors(
-          mergedErrors,
-          toActividadRegistroSubmitMessage(error, {
-            mode: isCorregirMode ? 'corregir' : 'registrar',
-          }),
+          { ...parsed.fieldErrors },
+          parsed.formMessage ?? ACTIVITY_FEEDBACK_MESSAGES.validationReview,
         )
         return
       }
 
-      const status = parsed.kind
-      if (status === 'not-found') onCatalogStale?.()
-      if (status === 'unauthorized') {
+      if (parsed.kind === 'not-found') {
+        onCatalogStale?.()
+      }
+      if (parsed.kind === 'unauthorized') {
         logout()
         navigate('/login', { replace: true })
         return
       }
-      if (status === 'save') {
-        const httpStatus = error instanceof Error ? error.message : ''
-        setSubmitError(
-          /HTTP 5\d\d/.test(httpStatus)
-            ? ACTIVIDAD_REGISTRO_SERVER_ERROR
-            : toActividadRegistroSubmitMessage(error, {
-                mode: isCorregirMode ? 'corregir' : 'registrar',
-              }),
-        )
-        return
-      }
 
+      // Conserva valores del formulario ante 403 / 5xx / red / save.
       setSubmitError(
         toActividadRegistroSubmitMessage(error, {
           mode: isCorregirMode ? 'corregir' : 'registrar',
@@ -209,45 +198,38 @@ const ActividadRegistroFormShell = ({
       ) : null}
 
       {isSuccess ? (
-        <div
-          className="actividades-fontanero-registro__success"
-          role="status"
-          data-testid="actividad-registro-exito"
-        >
-          <p>
-            {isCorregirMode ? (
-              <>
-                La actividad <strong>{tipo.nombre}</strong> fue corregida y reenviada
-                {registrada?.id ? (
-                  <>
-                    {' '}
-                    (registro #{registrada.id})
-                  </>
-                ) : null}
-                .
-              </>
-            ) : (
-              <>
-                La actividad <strong>{tipo.nombre}</strong> fue registrada correctamente
-                {registrada?.id ? (
-                  <>
-                    {' '}
-                    (registro #{registrada.id})
-                  </>
-                ) : null}
-                .
-              </>
-            )}
-          </p>
-          <Link
-            to={isCorregirMode ? ACTIVIDADES_FONTANERO_PATHS.correcciones : ACTIVIDADES_FONTANERO_PATHS.nueva}
-            className="actividades-fontanero-registro__link"
-          >
-            {isCorregirMode
-              ? 'Volver a correcciones pendientes'
-              : 'Registrar otra actividad'}
-          </Link>
-        </div>
+        <ActivityFeedback
+          variant="success"
+          testId="actividad-registro-exito"
+          message={
+            <>
+              <p>
+                {isCorregirMode
+                  ? `${ACTIVITY_FEEDBACK_MESSAGES.successCorrect}${
+                      registrada?.id ? ` (registro #${registrada.id})` : ''
+                    }`
+                  : `${ACTIVITY_FEEDBACK_MESSAGES.successRegister.replace(
+                      /\.$/,
+                      '',
+                    )}${tipo.nombre ? `: ${tipo.nombre}` : ''}${
+                      registrada?.id ? ` (registro #${registrada.id})` : ''
+                    }.`}
+              </p>
+              <Link
+                to={
+                  isCorregirMode
+                    ? ACTIVIDADES_FONTANERO_PATHS.correcciones
+                    : ACTIVIDADES_FONTANERO_PATHS.nueva
+                }
+                className="actividades-fontanero-registro__link"
+              >
+                {isCorregirMode
+                  ? 'Volver a correcciones pendientes'
+                  : 'Registrar otra actividad'}
+              </Link>
+            </>
+          }
+        />
       ) : (
         <form
           ref={formRef}

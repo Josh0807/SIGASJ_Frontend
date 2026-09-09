@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import ActividadRegistroFormShell from '../components/ActividadRegistroFormShell'
+import ActivityFeedback from '../components/ActivityFeedback'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { useAuth } from '../../auth/components/AuthContext'
 
 const RegistrarActividadPage = () => {
@@ -20,9 +22,39 @@ const RegistrarActividadPage = () => {
   }, [catalogo.isUnauthorized, logout, navigate])
 
   if (catalogo.isLoading) return <p role="status">Cargando tipo de actividad…</p>
-  if (catalogo.isUnauthorized) return <p role="alert">Su sesión no es válida o ha vencido.</p>
-  if (catalogo.isForbidden) return <p role="alert">No tiene permiso para registrar actividades.</p>
-  if (catalogo.isError) return <p role="alert">No se pudo cargar el catálogo. <button type="button" onClick={catalogo.refetch}>Reintentar</button></p>
+  if (catalogo.isUnauthorized) {
+    return (
+      <ActivityFeedback
+        variant="warning"
+        message={ACTIVITY_FEEDBACK_MESSAGES.unauthorized}
+      />
+    )
+  }
+  if (catalogo.isForbidden) {
+    return (
+      <ActivityFeedback
+        variant="error"
+        message={ACTIVITY_FEEDBACK_MESSAGES.forbidden}
+      />
+    )
+  }
+  if (catalogo.isError) {
+    return (
+      <ActivityFeedback
+        variant="error"
+        message={ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}
+        action={
+          <button
+            type="button"
+            className="activity-feedback__retry"
+            onClick={catalogo.refetch}
+          >
+            Reintentar
+          </button>
+        }
+      />
+    )
+  }
 
   if (!tipo) {
     return <Navigate to={ACTIVIDADES_FONTANERO_PATHS.nueva} replace />

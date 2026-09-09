@@ -42,6 +42,30 @@ describe('protección de rutas — Registro de Actividades del Fontanero', () =>
       data: [],
       total: 0,
     })
+    vi.spyOn(actividadesApi, 'getActividadesAdmin').mockResolvedValue({
+      data: [],
+      total: 0,
+      totalPages: 1,
+    })
+    vi.spyOn(actividadesApi, 'getActividadAdminDetalle').mockResolvedValue({
+      id: 1,
+      titulo: 'Actividad de prueba',
+      descripcion: null,
+      ubicacion: null,
+      observaciones: null,
+      fontaneroId: 'fontanero-1',
+      tipoActividadId: 1,
+      tipoActividadNombre: 'Control de Fugas',
+      fechaActividad: '2026-09-01',
+      estado: 'REPORTADA',
+      observacionCorreccion: null,
+      fechaRevision: null,
+      revisadoPorId: null,
+      datosEspecificos: null,
+      documentos: [],
+      createdAt: '2026-09-01T00:00:00.000Z',
+      updatedAt: '2026-09-01T00:00:00.000Z',
+    })
     vi.spyOn(actividadesApi, 'getReportesAdmin').mockResolvedValue({
       total: 0,
       porEstado: {},

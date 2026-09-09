@@ -1,16 +1,20 @@
 import type { ActividadRegistroFormField } from '../types/actividadRegistroForm'
+import { ACTIVITY_FEEDBACK_MESSAGES } from './activityFeedbackMessages'
+import { getHttpErrorStatus } from './httpErrorStatus'
+import { interpretActividadApiError } from './interpretActividadApiError'
 
+/** @deprecated Prefer ACTIVITY_FEEDBACK_MESSAGES — se mantienen por tests legacy */
 export const ACTIVIDAD_REGISTRO_SAVE_FALLBACK_ERROR =
-  'No se pudo registrar la actividad. Intente nuevamente en unos momentos.'
+  ACTIVITY_FEEDBACK_MESSAGES.server
 
 export const ACTIVIDAD_CORRECCION_SAVE_FALLBACK_ERROR =
-  'No se pudo reenviar la actividad corregida. Intente nuevamente en unos momentos.'
+  ACTIVITY_FEEDBACK_MESSAGES.server
 
 export const ACTIVIDAD_REGISTRO_UNAUTHORIZED_ERROR =
-  'Su sesión no es válida o ha vencido. Vuelva a iniciar sesión para continuar.'
+  ACTIVITY_FEEDBACK_MESSAGES.unauthorized
 
 export const ACTIVIDAD_REGISTRO_FORBIDDEN_ERROR =
-  'No tiene permiso para realizar esta operación en el módulo de actividades.'
+  ACTIVITY_FEEDBACK_MESSAGES.forbidden
 
 export const ACTIVIDAD_REGISTRO_CLIENT_VALIDATION_ERROR =
   'Complete los campos obligatorios antes de registrar la actividad.'
@@ -18,8 +22,7 @@ export const ACTIVIDAD_REGISTRO_CLIENT_VALIDATION_ERROR =
 export const ACTIVIDAD_CORRECCION_CLIENT_VALIDATION_ERROR =
   'Revise y complete los campos indicados antes de reenviar la actividad.'
 
-export const ACTIVIDAD_REGISTRO_SERVER_ERROR =
-  'Ocurrió un error en el servidor. Intente nuevamente más tarde.'
+export const ACTIVIDAD_REGISTRO_SERVER_ERROR = ACTIVITY_FEEDBACK_MESSAGES.server
 
 export type ActividadRegistroSubmitError =
   | {
@@ -30,6 +33,8 @@ export type ActividadRegistroSubmitError =
   | { kind: 'unauthorized' }
   | { kind: 'forbidden' }
   | { kind: 'not-found' }
+  | { kind: 'network' }
+  | { kind: 'server' }
   | { kind: 'save' }
 
 const HTTP_ERROR_PATTERN = /^HTTP (\d+):\s*([\s\S]*)$/
@@ -40,7 +45,7 @@ const FIELD_MATCHERS: { field: ActividadRegistroFormField; pattern: RegExp }[] =
   { field: 'resultadoVisita', pattern: /resultado.*visita|visita/i },
   { field: 'cantidadCloro', pattern: /cloro/i },
   { field: 'caudal', pattern: /caudal/i },
-  { field: 'documentos', pattern: /documento|adjunt/i },
+  { field: 'documentos', pattern: /documento|adjunt|archivo|pdf|jpg|png|10\s*mb/i },
   { field: 'fechaActividad', pattern: /fecha/i },
   { field: 'titulo', pattern: /t[ií]tulo|resumen/i },
   { field: 'descripcion', pattern: /descripci[oó]n/i },
@@ -48,14 +53,8 @@ const FIELD_MATCHERS: { field: ActividadRegistroFormField; pattern: RegExp }[] =
   { field: 'observaciones', pattern: /observaciones/i },
 ]
 
-export const getHttpErrorStatus = (error: unknown): number | null => {
-  if (!(error instanceof Error) || !error.message.trim()) {
-    return null
-  }
-
-  const match = HTTP_ERROR_PATTERN.exec(error.message)
-  return match ? Number(match[1]) : null
-}
+const TECHNICAL_PATTERN =
+  /\b(QueryFailedError|EntityNotFoundError|TypeORM|SQL|stack|constraint|INSERT|UPDATE|DELETE|SELECT|driverError|ECONNREFUSED)/i
 
 const getHttpErrorDetail = (error: unknown): string => {
   if (!(error instanceof Error)) {
@@ -67,12 +66,7 @@ const getHttpErrorDetail = (error: unknown): string => {
     return ''
   }
 
-  const detail = match[2].trim()
-  if (detail.startsWith('[') && detail.endsWith(']')) {
-    return detail
-  }
-
-  return detail
+  return match[2].trim()
 }
 
 const toMessageList = (detail: string): string[] => {
@@ -122,8 +116,13 @@ const sanitizeUserFacingMessage = (message: string): string => {
     .replace(/\s{2,}/g, ' ')
     .trim()
 
-  if (!trimmed || /^[\[\]{}]+$/.test(trimmed)) {
-    return 'Revise los datos del formulario.'
+  if (
+    !trimmed ||
+    /^[[\]{}]+$/.test(trimmed) ||
+    TECHNICAL_PATTERN.test(trimmed) ||
+    trimmed.length > 220
+  ) {
+    return ACTIVITY_FEEDBACK_MESSAGES.validationReview
   }
 
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
@@ -135,7 +134,17 @@ const toValidationError = (detail: string): ActividadRegistroSubmitError => {
 
   for (const raw of toMessageList(detail)) {
     const trimmed = sanitizeUserFacingMessage(raw)
-    if (!trimmed || /should not exist/i.test(raw)) {
+    if (
+      !trimmed ||
+      /should not exist/i.test(raw) ||
+      trimmed === ACTIVITY_FEEDBACK_MESSAGES.validationReview
+    ) {
+      if (TECHNICAL_PATTERN.test(raw) || raw.length > 220) {
+        continue
+      }
+      if (trimmed === ACTIVITY_FEEDBACK_MESSAGES.validationReview) {
+        unmapped.push(trimmed)
+      }
       continue
     }
 
@@ -148,10 +157,10 @@ const toValidationError = (detail: string): ActividadRegistroSubmitError => {
     fieldErrors[field] = trimmed
   }
 
-  const formMessage =
-    Object.keys(fieldErrors).length === 0
-      ? unmapped[0] ?? 'Revise los datos del formulario.'
-      : unmapped[0] ?? null
+  const hasFields = Object.keys(fieldErrors).length > 0
+  const formMessage = hasFields
+    ? ACTIVITY_FEEDBACK_MESSAGES.validationReview
+    : unmapped[0] ?? ACTIVITY_FEEDBACK_MESSAGES.validationReview
 
   return {
     kind: 'validation',
@@ -163,19 +172,30 @@ const toValidationError = (detail: string): ActividadRegistroSubmitError => {
 export const parseActividadRegistroSubmitError = (
   error: unknown,
 ): ActividadRegistroSubmitError => {
-  const status = getHttpErrorStatus(error)
+  const interpreted = interpretActividadApiError(error)
 
-  if (status === 401) {
+  if (interpreted.kind === 'unauthorized') {
     return { kind: 'unauthorized' }
   }
-  if (status === 403) {
+  if (interpreted.kind === 'forbidden') {
     return { kind: 'forbidden' }
   }
-  if (status === 404) {
+  if (interpreted.kind === 'not-found') {
     return { kind: 'not-found' }
   }
-  if (status === 400 || status === 422) {
+  if (interpreted.kind === 'network') {
+    return { kind: 'network' }
+  }
+  if (interpreted.kind === 'validation') {
     return toValidationError(getHttpErrorDetail(error))
+  }
+  if (interpreted.kind === 'server') {
+    return { kind: 'server' }
+  }
+
+  const status = getHttpErrorStatus(error)
+  if (status !== null && status >= 500) {
+    return { kind: 'server' }
   }
 
   return { kind: 'save' }
@@ -190,13 +210,23 @@ export const toActividadRegistroSubmitMessage = (
 
   if (parsed.kind === 'validation') {
     const firstFieldError = Object.values(parsed.fieldErrors)[0]
-    return parsed.formMessage ?? firstFieldError ?? 'Revise los datos del formulario.'
+    return (
+      parsed.formMessage ??
+      firstFieldError ??
+      ACTIVITY_FEEDBACK_MESSAGES.validationReview
+    )
   }
   if (parsed.kind === 'unauthorized') {
-    return ACTIVIDAD_REGISTRO_UNAUTHORIZED_ERROR
+    return ACTIVITY_FEEDBACK_MESSAGES.unauthorized
   }
   if (parsed.kind === 'forbidden') {
-    return ACTIVIDAD_REGISTRO_FORBIDDEN_ERROR
+    return ACTIVITY_FEEDBACK_MESSAGES.forbidden
+  }
+  if (parsed.kind === 'network') {
+    return ACTIVITY_FEEDBACK_MESSAGES.network
+  }
+  if (parsed.kind === 'server') {
+    return ACTIVITY_FEEDBACK_MESSAGES.server
   }
   if (parsed.kind === 'not-found') {
     return isCorregirMode
@@ -204,7 +234,5 @@ export const toActividadRegistroSubmitMessage = (
       : 'El tipo de actividad seleccionado ya no está disponible.'
   }
 
-  return isCorregirMode
-    ? ACTIVIDAD_CORRECCION_SAVE_FALLBACK_ERROR
-    : ACTIVIDAD_REGISTRO_SAVE_FALLBACK_ERROR
+  return interpretActividadApiError(error).message
 }

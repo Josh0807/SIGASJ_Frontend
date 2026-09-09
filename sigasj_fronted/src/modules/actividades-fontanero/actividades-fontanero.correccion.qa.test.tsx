@@ -101,7 +101,9 @@ describe('QA #937 — corrección y reenvío (Frontend Fontanero)', () => {
       })
 
       expect(actividadesApi.corregirActividad).toHaveBeenCalledTimes(1)
-      expect(corregir.container.innerHTML).toContain('fue corregida y reenviada')
+      expect(corregir.container.innerHTML).toContain(
+        'La información fue actualizada correctamente',
+      )
     } finally {
       await corregir.cleanup()
     }
