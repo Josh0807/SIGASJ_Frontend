@@ -3,6 +3,8 @@ import { AlertIcon, EmptyInboxIcon } from './announcementIcons'
 import type { AnnouncementsSectionProps } from '../types/AnnouncementsSectionProps'
 import { ANNOUNCEMENTS_SECTION_ID } from '../../landing/config/landingAnchors'
 import { usePublicAnnouncements } from '../hooks/usePublicAnnouncements'
+import { useState } from 'react'
+import GalleryLightbox from '../../galeria/public/GalleryLightbox'
 
 const AnnouncementsSkeleton = () => (
   <div className="announcements-carousel announcements-carousel--loading" aria-hidden="true">
@@ -39,6 +41,7 @@ const AnnouncementsSection = ({
   errorMessage =
     'No fue posible cargar los comunicados. Por favor, intente nuevamente más tarde.',
 }: AnnouncementsSectionProps) => {
+  const [imageIndex, setImageIndex] = useState<number | null>(null)
   const useDefaultItems = announcementsProp === undefined
   const { status, announcements: fetched, retry } =
     usePublicAnnouncements(useDefaultItems)
@@ -48,6 +51,7 @@ const AnnouncementsSection = ({
   const showLoading = useDefaultItems && status === 'loading'
   const showError = useDefaultItems && status === 'error'
   const titleId = `${id}-title`
+  const announcementImages = announcements.filter((item) => Boolean(item.imageUrl)).map((item) => ({ id: item.id, imageUrl: item.imageUrl as string, altText: `Ilustración del comunicado: ${item.title}`, title: item.title, description: item.summary || item.content }))
 
   return (
     <section
@@ -88,6 +92,7 @@ const AnnouncementsSection = ({
           <AnnouncementsCarousel
             announcements={announcements}
             labelledBy={titleId}
+            onImageOpen={(announcement) => setImageIndex(announcementImages.findIndex((item) => item.id === announcement.id))}
           />
         ) : (
           <div className="announcements-section__empty" role="status">
@@ -98,6 +103,7 @@ const AnnouncementsSection = ({
           </div>
         )}
       </div>
+      {imageIndex !== null && imageIndex >= 0 ? <GalleryLightbox photos={announcementImages} activeIndex={imageIndex} onClose={() => setImageIndex(null)} onNavigate={setImageIndex} /> : null}
     </section>
   )
 }

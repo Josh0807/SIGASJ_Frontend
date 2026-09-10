@@ -39,11 +39,13 @@ export function usePublicAnnouncements(
   }, [enabled])
 
   useEffect(() => {
+    // La consulta inicia la sincronización del estado con la API pública.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load()
   }, [load])
 
   return {
-    status: status === 'error' ? 'success' : status,
+    status,
     announcements,
     hasMore: false,
     retry: () => {

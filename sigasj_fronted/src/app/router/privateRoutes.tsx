@@ -13,6 +13,7 @@ import ActividadesFontaneroRoutes from '../../modules/actividades-fontanero/Acti
 import ActividadesAdminRoutes from '../../modules/actividades-fontanero/admin/ActividadesAdminRoutes'
 import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
+import InventarioRoutes from '../../modules/inventario/InventarioRoutes'
 
 export type PrivateRouteDefinition = {
   segment: string
@@ -35,7 +36,7 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   dashboard: <AdminDashboard />,
   usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
   abonados: <PrivateModulePlaceholder title="Gestión de asociados" />,
-  inventario: <PrivateModulePlaceholder title="Gestión de inventario" />,
+  inventario: <InventarioRoutes />,
   solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
   lecturas: <PrivateModulePlaceholder title="Recursos Humanos" />,
   averias: <PrivateModulePlaceholder title="Gestión de averías" />,

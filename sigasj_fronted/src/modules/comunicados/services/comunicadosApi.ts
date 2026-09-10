@@ -1,6 +1,7 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import { appendFormValue, fetchPublicApi } from '../../../services/http/publicApi'
 import type { Announcement } from '../types/AnnouncementsSectionProps'
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 
 export type AdminComunicado = {
   id: string
@@ -14,6 +15,7 @@ export type AdminComunicado = {
   fechaPublicacion: string
   fechaExpiracion: string | null
   imagenUrl: string | null
+  url?: string | null
 }
 
 export type ComunicadoPayload = {
@@ -56,7 +58,7 @@ export const mapPublicAnnouncement = (item: AdminComunicado): Announcement => ({
   publishedAt: item.fechaPublicacion,
   type: item.tipo,
   urgent: item.prioridad === 'Alta',
-  imageUrl: item.imagenUrl ?? undefined,
+  imageUrl: resolveBackendAssetUrl(item.imagenUrl || item.url),
 })
 
 export async function getPublicComunicados(): Promise<Announcement[]> {
@@ -66,7 +68,10 @@ export async function getPublicComunicados(): Promise<Announcement[]> {
 
 export async function getAdminComunicados(): Promise<AdminComunicado[]> {
   const data = await fetchPublicApi<AdminComunicado[]>(ADMIN_PATHS)
-  return Array.isArray(data) ? data : []
+  return (Array.isArray(data) ? data : []).map((item) => ({
+    ...item,
+    imagenUrl: resolveBackendAssetUrl(item.imagenUrl || item.url) ?? null,
+  }))
 }
 
 export async function createComunicado(
