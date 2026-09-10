@@ -51,7 +51,6 @@ const toFormData = (values: TransparenciaFormValues, file: File | null) => {
   appendFormValue(form, 'descripcionBreve', values.descripcionBreve)
   appendFormValue(form, 'ordenVisualizacion', values.ordenVisualizacion)
   appendFormValue(form, 'activa', values.activo)
-  appendFormValue(form, 'activo', values.activo)
   if (file) {
     form.append('archivo', file)
   }
@@ -99,7 +98,7 @@ export async function updateTransparenciaEstado(
     `${ADMIN_PATHS[0]}/${id}/estado`,
     {
       method: 'PATCH',
-      body: JSON.stringify({ activa, activo: activa }),
+      body: JSON.stringify({ activa }),
     },
   )
   return mapAdminTransparencyPublication(updated)
