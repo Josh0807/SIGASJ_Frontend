@@ -2,6 +2,7 @@ import { fetchWithAuth } from '../../../services/http/httpClient'
 import { appendFormValue, fetchPublicApi } from '../../../services/http/publicApi'
 import type { AdminGalleryPhoto, GalleryFormValues } from '../admin/types'
 import type { GalleryPhoto } from '../public/GallerySectionProps'
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 
 export type BackendGaleriaFoto = {
   id: number
@@ -24,7 +25,7 @@ export const mapAdminGalleryPhoto = (
   id: item.id,
   titulo: item.titulo ?? null,
   descripcion: item.descripcion ?? null,
-  imagenUrl: item.imagenUrl || item.url || '',
+  imagenUrl: resolveBackendAssetUrl(item.imagenUrl || item.url) || '',
   textoAlternativo: item.textoAlternativo || item.titulo || 'Fotografía institucional',
   ordenVisualizacion: item.ordenVisualizacion ?? 0,
   activo: item.activa ?? item.activo ?? true,
@@ -34,7 +35,7 @@ export const mapPublicGalleryPhoto = (item: BackendGaleriaFoto): GalleryPhoto =>
   id: String(item.id),
   title: item.titulo ?? undefined,
   description: item.descripcion ?? undefined,
-  imageUrl: item.imagenUrl || item.url || '',
+  imageUrl: resolveBackendAssetUrl(item.imagenUrl || item.url) || '',
   altText: item.textoAlternativo || item.titulo || 'Fotografía de la ASADA San Juan',
 })
 

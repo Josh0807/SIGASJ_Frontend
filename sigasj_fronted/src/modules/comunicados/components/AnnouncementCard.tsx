@@ -14,6 +14,7 @@ const AnnouncementCard = ({
   onMoreClick,
   imageUrl,
   fileUrl,
+  onImageClick,
 }: AnnouncementCardProps) => {
   const safeTitle = typeof title === 'string' ? title.trim() : ''
   if (!safeTitle) {
@@ -23,10 +24,6 @@ const AnnouncementCard = ({
   const safeSummary = typeof summary === 'string' ? summary.trim() : ''
   const safeContent = typeof content === 'string' ? content.trim() : ''
   const bodyText = safeSummary || safeContent
-
-  if (!bodyText) {
-    return null
-  }
 
   const safeType = typeof type === 'string' ? type.trim() : ''
   const safeImageUrl = asPublicAssetUrl(imageUrl)
@@ -61,12 +58,11 @@ const AnnouncementCard = ({
 
       {safeImageUrl ? (
         <div className="announcements-section__media">
-          <a
+          <button
+            type="button"
             className="announcements-section__media-link"
-            href={safeImageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             aria-label={`Ver imagen ampliada: ${safeTitle}`}
+            onClick={onImageClick}
           >
             <img
               className="announcements-section__image"
@@ -75,7 +71,7 @@ const AnnouncementCard = ({
               loading="lazy"
               decoding="async"
             />
-          </a>
+          </button>
         </div>
       ) : null}
 
@@ -98,18 +94,19 @@ const AnnouncementCard = ({
           {safeTitle}
         </h3>
 
-        <p className="announcements-section__summary">{bodyText}</p>
+        {bodyText ? (
+          <p className="announcements-section__summary">{bodyText}</p>
+        ) : null}
 
         <footer className="announcements-section__card-actions">
           {safeImageUrl ? (
-            <a
+            <button
+              type="button"
               className="announcements-section__more"
-              href={safeImageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={onImageClick}
             >
               Ver imagen
-            </a>
+            </button>
           ) : null}
 
           {!safeImageUrl && (safeMoreHref || typeof onMoreClick === 'function') ? (

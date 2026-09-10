@@ -13,6 +13,7 @@ import type { Announcement } from '../types/AnnouncementsSectionProps'
 type AnnouncementsCarouselProps = {
   announcements: Announcement[]
   labelledBy: string
+  onImageOpen: (announcement: Announcement) => void
 }
 
 const AUTOPLAY_MS = 7000
@@ -28,6 +29,7 @@ const getSlidesPerView = (width: number) => {
 const AnnouncementsCarousel = ({
   announcements,
   labelledBy,
+  onImageOpen,
 }: AnnouncementsCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [slidesPerView, setSlidesPerView] = useState(2)
@@ -81,6 +83,8 @@ const AnnouncementsCarousel = ({
   const canNavigate = announcements.length > slidesPerView
 
   useEffect(() => {
+    // Ajusta la posición cuando cambia la cantidad visible de tarjetas.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentIndex((index) => Math.min(index, maxIndex))
   }, [maxIndex])
 
@@ -215,6 +219,7 @@ const AnnouncementsCarousel = ({
                 moreLabel={announcement.moreLabel}
                 imageUrl={announcement.imageUrl}
                 fileUrl={announcement.fileUrl}
+                onImageClick={() => onImageOpen(announcement)}
               />
             </div>
           ))}

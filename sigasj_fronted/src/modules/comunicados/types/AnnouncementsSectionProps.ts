@@ -21,6 +21,7 @@ export type AnnouncementCardProps = Announcement & {
    * Pendiente de cablear desde AnnouncementsSection cuando exista el mecanismo.
    */
   onMoreClick?: () => void
+  onImageClick?: () => void
 }
 
 export type AnnouncementsSectionProps = {
@@ -44,4 +45,3 @@ export type AnnouncementsSectionProps = {
   hasMoreAnnouncements?: boolean
   moreAnnouncementsLabel?: string
 }
-

@@ -30,6 +30,7 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
     'audit.read',
     'activities.read_all',
     'activities.review',
+    'inventory.read',
   ],
   [InternalAdminRoleName.Secretaria]: [
     'subscribers.read',
@@ -41,12 +42,14 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
     'fault_reports.update_status',
     'institutional_content.manage',
     'projects.manage',
+    'inventory.read',
   ],
   [InternalAdminRoleName.Fontanero]: [
     'fault_reports.read',
     'fault_reports.update_status',
     'activities.register',
     'activities.read_own',
+    'inventory.read',
   ],
 }
 
@@ -99,8 +102,9 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     allowedRoles: [
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
+      InternalAdminRoleName.Fontanero,
     ],
-    requiredPermissions: ['subscribers.read'],
+    requiredPermissions: ['inventory.read'],
     availableInNav: true,
   },
   {
