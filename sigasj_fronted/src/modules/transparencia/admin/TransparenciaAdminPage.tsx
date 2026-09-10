@@ -14,6 +14,7 @@ import {
   updateTransparenciaEstado,
   updateTransparenciaPublication,
 } from '../services/transparenciaApi'
+import { toTransparenciaSubmitMessage } from './transparenciaSubmitError'
 
 const formatFileTypeLabel = (
   tipoArchivo: AdminTransparenciaPublication['tipoArchivo'],
@@ -108,8 +109,8 @@ const TransparenciaAdminPage = () => {
 
       closeForm()
       await loadPublications()
-    } catch {
-      setError('No fue posible guardar la publicación. Intente nuevamente.')
+    } catch (caught) {
+      setError(toTransparenciaSubmitMessage(caught))
     } finally {
       setSubmitting(false)
     }
