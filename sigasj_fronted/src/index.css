@@ -11136,3 +11136,222 @@ body,
     align-self: flex-end;
   }
 }
+
+/* Formulario público de reporte de averías */
+.public-averia-page__container {
+  width: min(100%, 720px);
+}
+
+.public-averia-page__eyebrow {
+  margin: 0 0 8px;
+  color: #1e5a9c;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.public-averia-page__card {
+  padding: clamp(20px, 4vw, 32px);
+}
+
+.public-averia-page__back {
+  margin: 0;
+  text-align: center;
+}
+
+.public-averia-page__back a {
+  color: #1e5a9c;
+  font-weight: 650;
+}
+
+.public-averia-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.public-averia-form__fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.public-averia-form__success {
+  background: #f3f8f4;
+  border: 1px solid #b7d7c0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  color: #1b4332;
+}
+
+.public-averia-form__success:focus {
+  outline: 3px solid #1e5a9c;
+  outline-offset: 2px;
+}
+
+.public-averia-form__success-title {
+  margin: 0 0 10px;
+  color: #123f70;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.public-averia-form__success-label {
+  margin: 0;
+  color: #5d7386;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.public-averia-form__code {
+  margin: 4px 0 10px;
+  color: #123f70;
+  font-size: clamp(1.25rem, 4vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+.public-averia-form__success p:last-child {
+  margin: 0;
+}
+
+.public-averia-form__form-error {
+  margin: 0;
+}
+
+.public-averia-form__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.public-averia-form__submit-spinner {
+  width: 18px;
+  height: 18px;
+  border-width: 2.5px;
+  flex-shrink: 0;
+}
+
+.public-averia-form__section h2 {
+  margin: 0 0 16px;
+  color: #123f70;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.public-averia-form__grid,
+.public-averia-form__stack {
+  display: grid;
+  gap: 16px;
+}
+
+.public-averia-form__grid--pair {
+  grid-template-columns: 1fr;
+}
+
+.public-averia-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.public-averia-form__label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  color: #123f70;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.public-averia-form__required {
+  color: #c62828;
+}
+
+.public-averia-form__optional {
+  color: #5d7386;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.public-averia-form input,
+.public-averia-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid #c8dceb;
+  border-radius: 10px;
+  background: #fff;
+  color: #123f70;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+.public-averia-form textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.public-averia-form input:focus,
+.public-averia-form textarea:focus {
+  border-color: #1e5a9c;
+  box-shadow: 0 0 0 3px rgba(30, 90, 156, 0.16);
+}
+
+.public-averia-form input:-webkit-autofill,
+.public-averia-form textarea:-webkit-autofill {
+  -webkit-text-fill-color: #123f70;
+  box-shadow: 0 0 0 1000px #fff inset;
+  transition: background-color 9999s ease-out;
+}
+
+.public-averia-form__error {
+  color: #a12e2e;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.public-averia-form__actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.public-averia-form__submit {
+  min-height: 48px;
+  min-width: 180px;
+  padding: 12px 28px;
+}
+
+.public-averia-form__submit:focus-visible,
+.public-averia-page__back a:focus-visible {
+  outline: 3px solid #1e5a9c;
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  .public-averia-form__grid--pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .public-averia-form__grid--pair {
+    grid-template-columns: 1fr;
+  }
+
+  .public-averia-form__submit {
+    width: 100%;
+  }
+}

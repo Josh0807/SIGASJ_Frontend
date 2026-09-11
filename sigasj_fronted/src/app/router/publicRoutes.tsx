@@ -6,6 +6,7 @@ import ReceiptQueryPage from '../../modules/recibos/pages/ReceiptQueryPage'
 import { PUBLIC_SERVICE_REQUEST_ROUTES } from '../../modules/landing/config/serviceRequestRoutes'
 import PublicFormPlaceholder from '../../shared/components/PublicFormPlaceholder'
 import ComplaintFormPage from '../../modules/landing/pages/ComplaintFormPage'
+import ReportarAveriaPage from '../../modules/averias/pages/ReportarAveriaPage'
 import ProyectoPublicDetailPage from '../../modules/proyectos/public/ProyectoPublicDetailPage'
 
 import {
@@ -13,6 +14,7 @@ import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
   RECEIPT_QUERY_ROUTE_PATH,
+  REPORTAR_AVERIA_ROUTE_PATH,
   PROYECTO_DETAIL_PUBLIC_ROUTE_PATH,
 } from './routePaths'
 
@@ -27,6 +29,7 @@ export {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
   RECEIPT_QUERY_ROUTE_PATH,
+  REPORTAR_AVERIA_ROUTE_PATH,
   PROYECTO_DETAIL_PUBLIC_ROUTE_PATH,
 }
 
@@ -53,10 +56,8 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
     label: 'Formulario público de sugerencias y quejas',
   },
   {
-    path: '/reportar-averia',
-    element: (
-      <PublicFormPlaceholder label="Formulario público de reporte de averías" />
-    ),
+    path: REPORTAR_AVERIA_ROUTE_PATH,
+    element: <ReportarAveriaPage />,
     label: 'Formulario público de reporte de averías',
   },
   ...PUBLIC_SERVICE_REQUEST_ROUTES.map(({ path, label }) => ({

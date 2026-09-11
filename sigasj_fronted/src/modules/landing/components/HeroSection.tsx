@@ -1,9 +1,11 @@
 import heroImage from '../../../assets/Hero1.png'
+import { Link } from 'react-router-dom'
 import type { HeroSectionProps } from '../types/HeroSectionProps'
 import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
+import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
 
-/** Destino público actual del reporte de averías (sección en la Landing Page). */
-const REPORT_FAULTS_HREF = '#reporte-averias'
+/** Destino público del reporte de averías. */
+const REPORT_FAULTS_HREF = REPORTAR_AVERIA_ROUTE_PATH
 
 const HeroSection = ({
   id = 'inicio',
@@ -30,9 +32,9 @@ const HeroSection = ({
         <p className="hero__description">{description}</p>
 
         <nav className="hero__actions" aria-label="Acciones principales">
-          <a className="hero__button hero__button--secondary" href={reportHref}>
+          <Link className="hero__button hero__button--secondary" to={reportHref}>
             {reportLabel}
-          </a>
+          </Link>
           <a className="hero__button hero__button--secondary" href={announcementsHref}>
             {announcementsLabel}
           </a>
