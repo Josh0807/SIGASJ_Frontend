@@ -11038,6 +11038,7 @@ body,
 .materials-admin__header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
 .materials-admin__filters { display: grid; grid-template-columns: minmax(220px,2fr) minmax(160px,1fr) auto; align-items: end; gap: 16px; }
 .materials-admin__filters--category { grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(150px, 1fr)) auto; }
+.materials-admin__filters--inventory { grid-template-columns: minmax(210px, 2fr) repeat(3, minmax(135px, 1fr)) auto; }
 .materials-admin__category-state, .materials-admin__category-error { grid-column: 1 / -1; margin: 0; color: #526d82; }
 .materials-admin__category-error { padding: 10px 12px; border: 1px solid #efcaca; border-radius: 9px; background: #fff5f5; color: #912f2f; }
 .materials-admin__category-error button { border: 0; background: transparent; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
@@ -11082,13 +11083,35 @@ body,
 .materials-admin__field-error { color: #a12e2e; font-weight: 600; }
 .category-admin__form label { grid-column: 1 / -1; }
 .materials-admin input[aria-invalid='true'], .materials-admin textarea[aria-invalid='true'] { border-color: #c94a4a; }
+.materials-admin__form-full { grid-column: 1 / -1; }
+.providers-admin { max-width: 1240px; }
+.providers-admin td a { color: #1e6592; overflow-wrap: anywhere; }
+.materials-admin__empty .materials-admin__primary { margin-top: 14px; }
+.inventory-entry__notice { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid #bdd8e9; border-radius: 10px; background: #f2f9fd; color: #315b79; }
+.inventory-entry__notice strong { color: #123f70; }
+.inventory-entry__form small { color: #637b8e; font-weight: 500; }
+.inventory-entry__form .materials-admin__field-error { color: #a12e2e; font-weight: 600; }
+.inventory-entry__success { display: grid; gap: 6px; }
+.inventory-entry__success a { width: fit-content; color: inherit; font-weight: 700; }
+.inventory-entry__documents { display: grid; gap: 10px; margin: 0; padding: 16px; border: 1px solid #c8dae8; border-radius: 12px; }
+.inventory-entry__documents legend { padding: 0 6px; color: #123f70; font-weight: 700; }
+.inventory-entry__documents p { margin: 0; color: #526d82; font-size: .9rem; }
+.inventory-entry__file-button { width: fit-content; min-height: 40px; padding: 9px 14px; border: 1px solid #1e6592; border-radius: 9px; color: #1e6592; cursor: pointer; }
+.inventory-entry__file-list, .inventory-entry__uploaded ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.inventory-entry__file-list li, .inventory-entry__uploaded li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 9px; background: #f5f9fc; }
+.inventory-entry__file-list span { display: grid; gap: 2px; min-width: 0; }
+.inventory-entry__file-list strong { overflow-wrap: anywhere; }
+.inventory-entry__file-list button, .inventory-entry__uploaded button { border: 0; background: transparent; color: #1e6592; font: inherit; font-weight: 700; cursor: pointer; }
+.inventory-entry__uploaded { padding: 18px 20px; border: 1px solid #bce2c9; border-radius: 14px; background: #fff; }
+.inventory-entry__uploaded h2 { margin: 0 0 12px; color: #123f70; font-size: 1rem; }
 
 @media (max-width: 760px) {
   .materials-admin__header { flex-direction: column; padding: 18px; }
   .materials-admin__header-actions { width: 100%; justify-content: space-between; }
   .materials-admin__filters, .materials-admin__form { grid-template-columns: 1fr; padding: 18px; }
   .materials-admin__filters--category { grid-template-columns: 1fr; }
-  .materials-admin__form label:nth-child(3), .materials-admin__form-actions { grid-column: auto; }
+  .materials-admin__filters--inventory { grid-template-columns: 1fr; }
+  .materials-admin__form label:nth-child(3), .materials-admin__form-actions, .materials-admin__form-full { grid-column: auto; }
   .materials-admin__filters .materials-admin__secondary { width: 100%; }
   .materials-admin__table-wrap { overflow: visible; border: 0; background: transparent; }
   .materials-admin table, .materials-admin tbody, .materials-admin tr, .materials-admin td { display: block; }
