@@ -1,7 +1,8 @@
+import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
 import { Link } from 'react-router-dom'
 import type { AccountSectionProps } from '../types/AccountSectionProps'
 
-const AccountSection = ({ formHref = '/reportar-averia' }: AccountSectionProps) => (
+const AccountSection = ({ formHref = REPORTAR_AVERIA_ROUTE_PATH }: AccountSectionProps) => (
   <section
     className="landing-section account-section"
     id="reporte-averias"
