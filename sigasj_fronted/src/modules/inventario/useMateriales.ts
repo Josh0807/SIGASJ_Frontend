@@ -10,6 +10,7 @@ export function useMateriales(query: MaterialesQuery) {
   const nombre = query.nombre
   const activo = query.activo
   const idCategoria = query.idCategoria
+  const idProveedor = query.idProveedor
   const [result, setResult] = useState(() => emptyResult(page, limit))
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,12 +23,12 @@ export function useMateriales(query: MaterialesQuery) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true)
     setError(null)
-    getMateriales({ nombre, activo, idCategoria, page, limit })
+    getMateriales({ nombre, activo, idCategoria, idProveedor, page, limit })
       .then((data) => { if (!cancelled) setResult(data) })
       .catch(() => { if (!cancelled) { setResult(emptyResult(page, limit)); setError('No fue posible cargar los materiales. Intente nuevamente.') } })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [nombre, activo, idCategoria, page, limit, reload])
+  }, [nombre, activo, idCategoria, idProveedor, page, limit, reload])
 
   return { result, loading, error, refetch }
 }

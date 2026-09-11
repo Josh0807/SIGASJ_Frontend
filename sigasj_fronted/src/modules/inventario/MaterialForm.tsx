@@ -5,18 +5,20 @@ import { validateMaterial, type MaterialFormErrors } from './materialFormUtils'
 import type { MaterialFormValues } from './types'
 import { useCategorias } from './categorias/useCategorias'
 import { materialCategoryOptions } from './materialCategoryOptions'
+import { useProveedores } from './proveedores/useProveedores'
 
 type Props = {
   mode: 'create' | 'edit'
   initialValues?: MaterialFormValues
   stockActual?: number
   currentCategoria?: { id: number; nombre: string; activo: boolean } | null
+  currentProveedor?: { id: number; nombre: string; activo: boolean } | null
   onSubmit: (values: MaterialFormValues) => Promise<void>
 }
 
-const EMPTY_VALUES: MaterialFormValues = { nombre: '', descripcion: '', unidadMedida: '', ubicacion: '', stockMinimo: '0', activo: true, categoriaId: '' }
+const EMPTY_VALUES: MaterialFormValues = { nombre: '', descripcion: '', unidadMedida: '', ubicacion: '', stockMinimo: '0', activo: true, categoriaId: '', proveedorId: '' }
 
-export default function MaterialForm({ mode, initialValues = EMPTY_VALUES, stockActual, currentCategoria, onSubmit }: Props) {
+export default function MaterialForm({ mode, initialValues = EMPTY_VALUES, stockActual, currentCategoria, currentProveedor, onSubmit }: Props) {
   const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState<MaterialFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -25,6 +27,8 @@ export default function MaterialForm({ mode, initialValues = EMPTY_VALUES, stock
   const submitting = useRef(false)
   const { result: categorias, loading: loadingCategorias, error: categoriasError, refetch: refetchCategorias } = useCategorias({ activo: true, page: 1, limit: 100 })
   const categoryOptions = materialCategoryOptions(categorias.data, currentCategoria)
+  const { result: proveedores, loading: loadingProveedores, error: proveedoresError, refetch: refetchProveedores } = useProveedores({ activo: true, page: 1, limit: 100 })
+  const providerOptions = currentProveedor && !proveedores.data.some((item) => item.id === currentProveedor.id) ? [currentProveedor, ...proveedores.data] : proveedores.data
   const update = (field: keyof MaterialFormValues, value: string | boolean) => { setValues((current) => ({ ...current, [field]: value })); setErrors((current) => ({ ...current, [field]: undefined })); setSuccess(false) }
 
   async function handleSubmit(event: FormEvent) {
@@ -50,8 +54,11 @@ export default function MaterialForm({ mode, initialValues = EMPTY_VALUES, stock
       {field('ubicacion', 'Ubicación', <input value={values.ubicacion} maxLength={150} aria-invalid={Boolean(errors.ubicacion)} onChange={(e) => update('ubicacion', e.target.value)} />)}
       {field('stockMinimo', 'Stock mínimo *', <input value={values.stockMinimo} type="number" min="0" step="1" aria-invalid={Boolean(errors.stockMinimo)} onChange={(e) => update('stockMinimo', e.target.value)} />)}
       {field('categoriaId', 'Categoría', <select value={values.categoriaId} disabled={loadingCategorias} onChange={(e) => update('categoriaId', e.target.value)}><option value="">Sin categoría</option>{categoryOptions.map((item) => <option key={item.id} value={item.id}>{item.nombre}{item.activo ? '' : ' (inactiva · actual)'}</option>)}</select>)}
+      {field('proveedorId', 'Proveedor principal', <select value={values.proveedorId} disabled={loadingProveedores} aria-invalid={Boolean(errors.proveedorId)} onChange={(e) => update('proveedorId', e.target.value)}><option value="">Sin proveedor</option>{providerOptions.map((item) => <option key={item.id} value={item.id} disabled={!item.activo && item.id !== currentProveedor?.id}>{item.nombre}{item.activo ? '' : ' (inactivo · actual)'}</option>)}</select>)}
       {loadingCategorias && <p className="materials-admin__category-state" role="status">Cargando categorías disponibles…</p>}
       {categoriasError && <div className="materials-admin__category-error" role="alert">No fue posible cargar las categorías. <button type="button" onClick={refetchCategorias}>Reintentar</button></div>}
+      {loadingProveedores && <p className="materials-admin__category-state" role="status">Cargando proveedores disponibles…</p>}
+      {proveedoresError && <div className="materials-admin__category-error" role="alert">No fue posible cargar los proveedores. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}
       {mode === 'edit' && field('activo', 'Estado', <select value={String(values.activo)} onChange={(e) => update('activo', e.target.value === 'true')}><option value="true">Activo</option><option value="false">Inactivo</option></select>)}
       {mode === 'edit' && <label><span>Existencia actual</span><input value={stockActual ?? 0} disabled readOnly /><small>Solo cambia mediante entradas y salidas de inventario.</small></label>}
       <div className="materials-admin__form-actions"><Link className="materials-admin__secondary" to={MATERIALES_PATH}>Volver al catálogo</Link><button type="submit" className="materials-admin__primary" disabled={saving}>{saving ? 'Guardando…' : mode === 'create' ? 'Registrar material' : 'Guardar cambios'}</button></div>

@@ -10,7 +10,7 @@ export const getMaterial = (id: number) =>
   fetchWithAuth<Material>(`${MATERIALES_PATH}/${id}`)
 
 export const updateMaterial = (id: number, payload: UpdateMaterialPayload) =>
-  fetchWithAuth<Material>(`${MATERIALES_PATH}/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+  fetchWithAuth<Material>(`${MATERIALES_PATH}/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
 
 export const createMaterial = (payload: CreateMaterialPayload) =>
   fetchWithAuth<Material>(MATERIALES_PATH, { method: 'POST', body: JSON.stringify(payload) })

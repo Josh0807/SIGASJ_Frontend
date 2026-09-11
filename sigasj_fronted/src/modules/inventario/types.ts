@@ -9,6 +9,8 @@ export type Material = {
   activo: boolean
   idCategoria: number | null
   categoria: { id: number; nombre: string; descripcion: string | null; activo: boolean } | null
+  idProveedor: number | null
+  proveedor: { id: number; nombre: string; telefono: string | null; correo: string | null; activo: boolean } | null
   createdAt: string
   updatedAt: string
 }
@@ -27,9 +29,10 @@ export type MaterialesQuery = {
   nombre?: string
   activo?: boolean
   idCategoria?: number
+  idProveedor?: number
 }
 
-export type UpdateMaterialPayload = Pick<Material, 'nombre' | 'unidadMedida' | 'descripcion' | 'ubicacion' | 'stockMinimo' | 'activo'> & { idCategoria: number | null }
+export type UpdateMaterialPayload = Pick<Material, 'nombre' | 'unidadMedida' | 'descripcion' | 'ubicacion' | 'stockMinimo' | 'activo'> & { idCategoria: number | null; idProveedor: number | null }
 
 export type CreateMaterialPayload = Omit<UpdateMaterialPayload, 'activo'>
 export type MaterialFormValues = {
@@ -40,4 +43,5 @@ export type MaterialFormValues = {
   stockMinimo: string
   activo: boolean
   categoriaId: string
+  proveedorId: string
 }
