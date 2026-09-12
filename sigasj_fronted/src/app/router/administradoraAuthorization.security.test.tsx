@@ -167,8 +167,11 @@ describe('seguridad — sesión Administradora', () => {
       for (const path of EXPECTED_NAV_PATHS.Administradora) {
         await app.clickSidebar(path)
 
-        expect(app.currentPath()).toBe(path)
-        expect(app.currentPath()).not.toBe(UNAUTHORIZED_ROUTE_PATH)
+        const currentPath = app.currentPath()
+        expect(
+          currentPath === path || currentPath.startsWith(`${path}/`),
+        ).toBe(true)
+        expect(currentPath).not.toBe(UNAUTHORIZED_ROUTE_PATH)
         assertAdminChrome(app.container.innerHTML)
 
         const title = SAMPLE_ALLOWED_CONTENT[path]
@@ -188,9 +191,12 @@ describe('seguridad — sesión Administradora', () => {
       const app = await mountApp(path)
 
       try {
-        expect(app.currentPath()).toBe(path)
-        expect(app.currentPath()).not.toBe(UNAUTHORIZED_ROUTE_PATH)
-        expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
+        const currentPath = app.currentPath()
+        expect(
+          currentPath === path || currentPath.startsWith(`${path}/`),
+        ).toBe(true)
+        expect(currentPath).not.toBe(UNAUTHORIZED_ROUTE_PATH)
+        expect(currentPath).not.toBe(LOGIN_ROUTE_PATH)
         assertAdminChrome(app.container.innerHTML)
 
         if (path.startsWith('/admin/abonados')) {

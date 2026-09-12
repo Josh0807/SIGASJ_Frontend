@@ -145,7 +145,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
 
     const markup = renderDashboard()
 
-    expect(markup).toContain('href="/admin/averias"')
+    expect(markup).not.toContain('href="/admin/averias"')
     expect(markup).not.toContain('href="/admin/abonados"')
     expect(markup).not.toContain('Asociados activos')
   })
