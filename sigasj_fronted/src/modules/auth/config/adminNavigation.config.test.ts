@@ -30,6 +30,10 @@ describe('adminNavigation.config', () => {
     expect(ROLE_PERMISSIONS.Administradora).toContain('audit.read')
     expect(ROLE_PERMISSIONS.Secretaria).not.toContain('roles.manage')
     expect(ROLE_PERMISSIONS.Fontanero).toContain('fault_reports.read')
+    expect(
+      ADMIN_MODULE_ACCESS.find((module) => module.segment === 'averias')
+        ?.allowedRoles,
+    ).toEqual(['Administradora', 'Secretaria'])
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
   })
 

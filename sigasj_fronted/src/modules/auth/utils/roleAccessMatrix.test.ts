@@ -57,7 +57,6 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(EXPECTED_NAV_PATHS.Fontanero).toEqual([
       '/admin/dashboard',
       '/admin/inventario',
-      '/admin/averias',
       '/admin/actividades',
     ])
   })

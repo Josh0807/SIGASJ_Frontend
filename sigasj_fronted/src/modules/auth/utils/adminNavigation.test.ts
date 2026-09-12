@@ -72,14 +72,14 @@ describe('adminNavigation helpers', () => {
     expect(canAccessAdminRoute(secretaria, '/admin/abonados')).toBe(true)
   })
 
-  it('Fontanero solo ve dashboard, averias y registro de actividades', () => {
+  it('Fontanero solo ve dashboard e inventario operativo, no el listado admin de averías', () => {
     const items = getAdminNavItemsForUser(fontanero)
     expect(items.map((item) => item.path)).toEqual([
       '/admin/dashboard',
-      '/admin/averias',
+      '/admin/inventario',
       '/admin/actividades',
     ])
-    expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(false)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades/nueva')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades-fontanero')).toBe(

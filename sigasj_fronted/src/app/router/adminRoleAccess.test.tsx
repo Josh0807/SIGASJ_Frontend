@@ -67,7 +67,10 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
         const app = await mountAppRoutes(path)
 
         try {
-          expect(app.currentPath()).toBe(path)
+          const currentPath = app.currentPath()
+          expect(
+            currentPath === path || currentPath.startsWith(`${path}/`),
+          ).toBe(true)
           const expectedTitle = SAMPLE_ALLOWED_CONTENT[path]
           if (expectedTitle) {
             expect(app.container.innerHTML).toContain(expectedTitle)

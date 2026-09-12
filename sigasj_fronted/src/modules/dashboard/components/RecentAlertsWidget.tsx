@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
+import { useAuth } from '../../auth/components/AuthContext'
+import { canAccessAdminRoute } from '../../auth/utils/adminNavigation'
 import type { AlertItem, RecentAlertsWidgetProps } from '../props'
 
 const DEFAULT_ALERTS: AlertItem[] = [
@@ -30,6 +32,9 @@ const DEFAULT_ALERTS: AlertItem[] = [
 const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({
   alerts = DEFAULT_ALERTS,
 }) => {
+  const { user } = useAuth()
+  const canOpenAdminAverias = canAccessAdminRoute(user, '/admin/averias')
+
   return (
     <div className="dashboard-widget recent-alerts-widget">
       <div className="dashboard-widget__header">
@@ -68,11 +73,13 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({
         )}
       </div>
 
-      <div className="dashboard-widget__footer">
-        <Link to="/admin/averias" className="dashboard-widget__link">
-          Ver todas las averías &rarr;
-        </Link>
-      </div>
+      {canOpenAdminAverias ? (
+        <div className="dashboard-widget__footer">
+          <Link to="/admin/averias" className="dashboard-widget__link">
+            Ver todas las averías &rarr;
+          </Link>
+        </div>
+      ) : null}
     </div>
   )
 }
