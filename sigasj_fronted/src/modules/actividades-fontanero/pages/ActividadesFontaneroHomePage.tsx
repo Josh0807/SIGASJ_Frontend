@@ -12,6 +12,7 @@ import ActivityFeedback from '../components/ActivityFeedback'
 import { useCorreccionesPendientesCount } from '../hooks/useCorreccionesPendientesCount'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
+import { SOLICITUD_MATERIALES_NEW_PATH, SOLICITUDES_MATERIALES_PATH } from '../../inventario/inventarioPaths'
 
 const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
 
@@ -158,6 +159,26 @@ const ActividadesFontaneroHomePage = () => {
         role="list"
         aria-label="Funciones del módulo de actividades"
       >
+        <div role="listitem">
+          <QuickAccessCard
+            title="Solicitar materiales"
+            description="Prepare una solicitud para bodega sin modificar las existencias."
+            path={SOLICITUD_MATERIALES_NEW_PATH}
+            icon={<AdminNavIcon name="inventario" />}
+            className="actividades-fontanero-home__card actividades-fontanero-home__card--primary"
+          />
+        </div>
+
+        <div role="listitem">
+          <QuickAccessCard
+            title="Mis solicitudes de materiales"
+            description="Consulte el estado y detalle de sus solicitudes a bodega."
+            path={SOLICITUDES_MATERIALES_PATH}
+            icon={<AdminNavIcon name="solicitudes" />}
+            className="actividades-fontanero-home__card"
+          />
+        </div>
+
         <div role="listitem">
           <QuickAccessCard
             title="Dashboard de actividades"

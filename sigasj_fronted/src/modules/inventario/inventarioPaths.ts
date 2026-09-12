@@ -8,3 +8,7 @@ export const PROVEEDORES_PATH = '/admin/inventario/proveedores'
 export const PROVEEDOR_NEW_PATH = `${PROVEEDORES_PATH}/nuevo`
 export const proveedorEditPath = (id: number) => `${PROVEEDORES_PATH}/${id}/editar`
 export const ENTRADAS_PATH = '/admin/inventario/entradas'
+export const SALIDAS_PATH = '/admin/inventario/salidas'
+export const SOLICITUD_MATERIALES_NEW_PATH = '/admin/inventario/solicitudes-materiales/nueva'
+export const SOLICITUDES_MATERIALES_PATH = '/admin/inventario/solicitudes-materiales'
+export const solicitudMaterialesDetailPath = (id: number | string) => `${SOLICITUDES_MATERIALES_PATH}/${id}`
