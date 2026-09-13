@@ -21,3 +21,31 @@ export const getMisSolicitudesMateriales = (query: SolicitudesMaterialesQuery = 
 
 export const getMiSolicitudMateriales = (id: number) =>
   fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_MATERIALES_PATH}/${id}`)
+
+const SOLICITUDES_ADMIN_PATH = '/admin/solicitudes-materiales'
+
+export const getSolicitudesMaterialesAdmin = (
+  query: SolicitudesMaterialesQuery = { estado: 'PENDIENTE' },
+) =>
+  fetchWithAuth<SolicitudesMaterialesListResponse>(SOLICITUDES_ADMIN_PATH, {
+    params: {
+      estado: query.estado ?? 'PENDIENTE',
+      page: query.page ?? 1,
+      limit: query.limit ?? 10,
+      ...(query.idAveria ? { idAveria: query.idAveria } : {}),
+    },
+  })
+
+export const getSolicitudMaterialesAdmin = (id: number) =>
+  fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_ADMIN_PATH}/${id}`)
+
+export const aprobarSolicitudMaterialesAdmin = (id: number) =>
+  fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_ADMIN_PATH}/${id}/aprobar`, {
+    method: 'PATCH',
+  })
+
+export const rechazarSolicitudMaterialesAdmin = (id: number, motivoRechazo?: string) =>
+  fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_ADMIN_PATH}/${id}/rechazar`, {
+    method: 'PATCH',
+    body: JSON.stringify(motivoRechazo?.trim() ? { motivoRechazo: motivoRechazo.trim() } : {}),
+  })

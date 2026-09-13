@@ -32,24 +32,28 @@ export type SolicitudMateriales = {
   detalles: SolicitudMaterialDetalle[]
   cantidadMateriales?: number
   totalMateriales?: number
+  idUsuarioAprobador?: number | null
+  fechaRevision?: string | null
+  motivoRechazo?: string | null
   averia?: {
     id?: number
     codigo?: string
     numero?: string
     referencia?: string
+    codigoSeguimiento?: string
+  } | null
+  fontanero?: {
+    id?: number
+    nombre?: string | null
+  } | null
+  usuarioAprobador?: {
+    id?: number
+    nombre?: string | null
   } | null
 }
 
 export type SolicitudMaterialesListItem = Omit<SolicitudMateriales, 'detalles'> & {
   detalles?: SolicitudMaterialDetalle[]
-  cantidadMateriales?: number
-  totalMateriales?: number
-  averia?: {
-    id?: number
-    codigo?: string
-    numero?: string
-    referencia?: string
-  } | null
 }
 
 export type SolicitudesMaterialesListResponse =

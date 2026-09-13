@@ -12,3 +12,5 @@ export const SALIDAS_PATH = '/admin/inventario/salidas'
 export const SOLICITUD_MATERIALES_NEW_PATH = '/admin/inventario/solicitudes-materiales/nueva'
 export const SOLICITUDES_MATERIALES_PATH = '/admin/inventario/solicitudes-materiales'
 export const solicitudMaterialesDetailPath = (id: number | string) => `${SOLICITUDES_MATERIALES_PATH}/${id}`
+export const SOLICITUDES_REVISION_PATH = '/admin/inventario/solicitudes'
+export const solicitudRevisionDetailPath = (id: number | string) => `${SOLICITUDES_REVISION_PATH}/${id}`

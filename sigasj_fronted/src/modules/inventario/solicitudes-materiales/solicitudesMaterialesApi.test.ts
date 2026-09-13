@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { setAuthSession } from '../../auth/utils/authStorage'
-import { createSolicitudMateriales, getMiSolicitudMateriales, getMisSolicitudesMateriales } from './solicitudesMaterialesApi'
+import { createSolicitudMateriales, getMiSolicitudMateriales, getMisSolicitudesMateriales, getSolicitudMaterialesAdmin, getSolicitudesMaterialesAdmin, aprobarSolicitudMaterialesAdmin, rechazarSolicitudMaterialesAdmin } from './solicitudesMaterialesApi'
 
 describe('solicitudesMaterialesApi', () => {
   beforeEach(() => {
@@ -42,5 +42,41 @@ describe('solicitudesMaterialesApi', () => {
     expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/v1/fontanero/solicitudes-materiales?estado=PENDIENTE&page=1&limit=10')
     expect(fetchMock.mock.calls[1][0]).toBe('http://localhost:3000/api/v1/fontanero/solicitudes-materiales/12')
     expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({ Authorization: 'Bearer jwt-fontanero' })
+  })
+
+  it('consulta el listado administrativo de solicitudes pendientes', async () => {
+    setAuthSession({
+      accessToken: 'jwt-admin',
+      user: { id: '1', name: 'Ana', role: 'Administradora' },
+    })
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ data: [], total: 0, page: 1, limit: 10, totalPages: 0 }), { status: 200 }),
+    )
+
+    await getSolicitudesMaterialesAdmin()
+
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales?estado=PENDIENTE&page=1&limit=10')
+    expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({ Authorization: 'Bearer jwt-admin' })
+  })
+
+  it('consulta el detalle y envía aprobar o rechazar sin alterar el cliente de stock', async () => {
+    setAuthSession({
+      accessToken: 'jwt-admin',
+      user: { id: '1', name: 'Ana', role: 'Administradora' },
+    })
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 15, detalles: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 15, estado: 'APROBADA' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 16, estado: 'RECHAZADA' }), { status: 200 }))
+
+    await getSolicitudMaterialesAdmin(15)
+    await aprobarSolicitudMaterialesAdmin(15)
+    await rechazarSolicitudMaterialesAdmin(16, 'No justificado')
+
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales/15')
+    expect(fetchMock.mock.calls[1][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales/15/aprobar')
+    expect(fetchMock.mock.calls[1][1]?.method).toBe('PATCH')
+    expect(fetchMock.mock.calls[2][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales/16/rechazar')
+    expect(JSON.parse(String(fetchMock.mock.calls[2][1]?.body))).toEqual({ motivoRechazo: 'No justificado' })
   })
 })
