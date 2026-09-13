@@ -3697,6 +3697,9 @@ button.announcements-section__more {
 .material-review__approve { border: 1px solid #8cc9a3; background: #effaf3; color: #1d6338; }
 .material-review__reject { border: 1px solid #efcaca; background: #fff5f5; color: #912f2f; }
 .material-review__approve:disabled, .material-review__reject:disabled { opacity: .55; cursor: not-allowed; }
+.material-review__motivo { display: grid; gap: 8px; padding: 18px 20px; border: 1px solid #d7e5f1; border-radius: 14px; background: #fff; color: #193f61; }
+.material-review__motivo span { font-size: .82rem; font-weight: 750; text-transform: uppercase; letter-spacing: .03em; color: #637b8e; }
+.material-review__motivo textarea { min-height: 88px; padding: 10px 12px; border: 1px solid #bfd2e1; border-radius: 9px; font: inherit; resize: vertical; }
 
 @media (max-width: 700px) {
   .material-tracking__header, .material-detail__header { flex-direction: column; padding: 18px; }

@@ -113,3 +113,11 @@ export const getHttpErrorStatus = (error: unknown) => {
   const match = (error instanceof Error ? error.message : '').match(/HTTP\s+(\d{3})/i)
   return match ? Number(match[1]) : null
 }
+
+export const solicitudRevisionErrorMessage = (error: unknown) => {
+  const status = getHttpErrorStatus(error)
+  if (status === 403) return 'No tiene permiso para revisar o decidir sobre solicitudes de materiales.'
+  if (status === 404) return 'La solicitud indicada no existe en el sistema.'
+  if (status === 400) return 'Esta solicitud ya no está pendiente. Es posible que otra persona la haya procesado.'
+  return 'No fue posible completar la operación. Compruebe su conexión e inténtelo de nuevo.'
+}

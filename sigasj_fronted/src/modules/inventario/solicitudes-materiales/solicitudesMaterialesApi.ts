@@ -35,3 +35,17 @@ export const getSolicitudesMaterialesAdmin = (
       ...(query.idAveria ? { idAveria: query.idAveria } : {}),
     },
   })
+
+export const getSolicitudMaterialesAdmin = (id: number) =>
+  fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_ADMIN_PATH}/${id}`)
+
+export const aprobarSolicitudMaterialesAdmin = (id: number) =>
+  fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_ADMIN_PATH}/${id}/aprobar`, {
+    method: 'PATCH',
+  })
+
+export const rechazarSolicitudMaterialesAdmin = (id: number, motivoRechazo?: string) =>
+  fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_ADMIN_PATH}/${id}/rechazar`, {
+    method: 'PATCH',
+    body: JSON.stringify(motivoRechazo?.trim() ? { motivoRechazo: motivoRechazo.trim() } : {}),
+  })

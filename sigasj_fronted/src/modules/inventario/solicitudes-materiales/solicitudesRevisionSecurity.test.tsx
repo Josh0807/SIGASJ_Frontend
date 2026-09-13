@@ -41,4 +41,11 @@ describe('seguridad de la revisión de solicitudes de materiales', () => {
     expect(view.container.textContent).toContain('Revisión de solicitudes de materiales')
     await view.cleanup()
   })
+
+  it('deniega el detalle administrativo a Fontanero', async () => {
+    loginAsRole('Fontanero')
+    const view = await mountAppRoutes('/admin/inventario/solicitudes/15')
+    expect(view.currentPath()).toBe('/unauthorized')
+    await view.cleanup()
+  })
 })

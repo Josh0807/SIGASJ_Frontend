@@ -32,6 +32,9 @@ export type SolicitudMateriales = {
   detalles: SolicitudMaterialDetalle[]
   cantidadMateriales?: number
   totalMateriales?: number
+  idUsuarioAprobador?: number | null
+  fechaRevision?: string | null
+  motivoRechazo?: string | null
   averia?: {
     id?: number
     codigo?: string
@@ -40,6 +43,10 @@ export type SolicitudMateriales = {
     codigoSeguimiento?: string
   } | null
   fontanero?: {
+    id?: number
+    nombre?: string | null
+  } | null
+  usuarioAprobador?: {
     id?: number
     nombre?: string | null
   } | null
