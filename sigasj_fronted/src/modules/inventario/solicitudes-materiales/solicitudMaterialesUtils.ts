@@ -85,8 +85,17 @@ export const getSolicitudMaterialesCount = (request: SolicitudMaterialesListItem
   request.cantidadMateriales ?? request.totalMateriales ?? request.detalles?.length ?? 0
 
 export const getSolicitudAveriaReference = (request: SolicitudMaterialesListItem) =>
-  request.averia?.codigo ?? request.averia?.numero ?? request.averia?.referencia ??
+  request.averia?.codigo ??
+  request.averia?.codigoSeguimiento ??
+  request.averia?.numero ??
+  request.averia?.referencia ??
   (request.idAveria ? `Avería #${request.idAveria}` : '—')
+
+export const getSolicitudFontaneroNombre = (request: SolicitudMaterialesListItem) => {
+  const nombre = request.fontanero?.nombre?.trim()
+  if (nombre) return nombre
+  return request.idFontanero ? `Fontanero #${request.idFontanero}` : 'Sin identificar'
+}
 
 export const formatSolicitudDate = (value: string) => {
   const date = new Date(value)

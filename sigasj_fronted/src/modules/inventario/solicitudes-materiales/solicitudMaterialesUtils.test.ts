@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   hasSolicitudMaterialesErrors,
   getSolicitudAveriaReference,
+  getSolicitudFontaneroNombre,
   getSolicitudMaterialesCount,
   normalizeSolicitudesMaterialesList,
   toSolicitudMaterialesPayload,
@@ -89,5 +90,19 @@ describe('solicitud de materiales', () => {
     }
     expect(getSolicitudAveriaReference(request)).toBe('—')
     expect(getSolicitudMaterialesCount(request)).toBe(0)
+    expect(getSolicitudFontaneroNombre(request)).toBe('Fontanero #7')
+  })
+
+  it('usa el nombre del fontanero cuando el backend lo envía', () => {
+    expect(getSolicitudFontaneroNombre({
+      id: 15,
+      codigo: 'SOL-0015',
+      fechaSolicitud: '2026-08-22',
+      estado: 'PENDIENTE',
+      idFontanero: 7,
+      idAveria: 42,
+      observacion: null,
+      fontanero: { id: 7, nombre: 'Juan Pérez' },
+    })).toBe('Juan Pérez')
   })
 })
