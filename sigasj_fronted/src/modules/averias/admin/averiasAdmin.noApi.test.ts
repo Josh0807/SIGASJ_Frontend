@@ -30,10 +30,13 @@ describe('Averías admin — integración de consulta', () => {
 
     for (const file of files) {
       const source = readFileSync(file, 'utf8')
+      const isAdminApi = file.replace(/\\/g, '/').endsWith('services/averiasAdminApi.ts')
       expect(source, file).not.toMatch(/items\.filter\s*\(/)
       expect(source, file).not.toMatch(/items\.slice\s*\(/)
       expect(source, file).not.toMatch(/method:\s*['"]POST['"]/)
-      expect(source, file).not.toMatch(/method:\s*['"]PATCH['"]/)
+      if (!isAdminApi) {
+        expect(source, file).not.toMatch(/method:\s*['"]PATCH['"]/)
+      }
       expect(source, file).not.toMatch(/method:\s*['"]PUT['"]/)
       expect(source, file).not.toMatch(/method:\s*['"]DELETE['"]/)
       expect(source, file).not.toMatch(/useQuery\s*\(/)

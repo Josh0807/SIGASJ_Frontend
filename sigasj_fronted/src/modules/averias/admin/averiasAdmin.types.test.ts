@@ -26,6 +26,9 @@ describe('labels de detalle de avería', () => {
 
   it('no usa el nombre de una relación nula', () => {
     expect(getFontaneroLabel({ id: 8 })).toBe('Fontanero #8')
+    expect(getFontaneroLabel({ id: 5, nombre: 'Carlos Pérez' })).toBe(
+      'Carlos Pérez',
+    )
     expect(getAbonadoRelacionadoLabel(14, { id: 14, nombre: 'Juan Pérez' })).toBe(
       'Juan Pérez',
     )

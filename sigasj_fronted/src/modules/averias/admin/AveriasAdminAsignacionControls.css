@@ -1,0 +1,23 @@
+.averias-admin-asignacion {
+  display: grid;
+  gap: 12px;
+}
+
+.averias-admin-asignacion__controls {
+  display: grid;
+  gap: 12px;
+  max-width: 28rem;
+}
+
+.averias-admin-asignacion__feedback {
+  margin-bottom: 4px;
+}
+
+.averias-admin-asignacion__hint {
+  margin: 0;
+  color: #6b7c8d;
+}
+
+.averias-admin-asignacion__hint[aria-busy='true'] {
+  font-style: italic;
+}

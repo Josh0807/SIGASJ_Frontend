@@ -6,6 +6,11 @@ import {
   ADMIN_AVERIAS_ENDPOINT,
   getAdminAveria,
   getAdminAverias,
+  getAdminAveriasFontanerosAsignables,
+  patchAdminAveriaAsignacion,
+  patchAdminAveriaClasificacion,
+  patchAdminAveriaEstado,
+  patchAdminAveriaPrioridad,
   toAveriasAdminParams,
 } from './averiasAdminApi'
 
@@ -78,5 +83,63 @@ describe('averiasAdminApi', () => {
     expect(fetchWithAuth).toHaveBeenCalledWith(`${ADMIN_AVERIAS_ENDPOINT}/25`, {
       signal: undefined,
     })
+  })
+
+  it('GET fontaneros y PATCH asignacion usan contrato Backend 2.4', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({ data: [{ id: 7 }] })
+
+    await getAdminAveriasFontanerosAsignables()
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/fontaneros`,
+      { signal: undefined },
+    )
+
+    const detail = findAveriaDetailFixture(1)
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detail)
+
+    await patchAdminAveriaAsignacion(10, 7)
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/10/asignacion`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ fontaneroId: 7 }),
+        signal: undefined,
+      },
+    )
+  })
+
+  it('PATCH estado, prioridad y clasificación usan rutas y body del Backend 2.3', async () => {
+    const detail = findAveriaDetailFixture(1)
+    vi.mocked(fetchWithAuth).mockResolvedValue(detail)
+
+    await patchAdminAveriaEstado(10, 'EN_REVISION')
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/10/estado`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ estado: 'EN_REVISION' }),
+        signal: undefined,
+      },
+    )
+
+    await patchAdminAveriaPrioridad(10, 'URGENTE')
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/10/prioridad`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ prioridad: 'URGENTE' }),
+        signal: undefined,
+      },
+    )
+
+    await patchAdminAveriaClasificacion(10, 'FUGA')
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/10/clasificacion`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ clasificacion: 'FUGA' }),
+        signal: undefined,
+      },
+    )
   })
 })

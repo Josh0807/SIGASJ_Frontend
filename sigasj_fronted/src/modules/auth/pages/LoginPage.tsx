@@ -15,21 +15,15 @@ type AuthLoginResponse = {
   user: { id: string; email: string; role: string; name?: string }
 }
 
-const DEMO_LOGIN: Record<InternalAdminRole, { email: string; password: string }> =
-  {
-    Administradora: {
-      email: 'admin@asadasanjuan.cr',
-      password: 'Password123!',
-    },
-    Secretaria: {
-      email: 'secretaria@asadasanjuan.cr',
-      password: 'Password123!',
-    },
-    Fontanero: {
-      email: 'fontanero@asadasanjuan.cr',
-      password: 'Password123!',
-    },
-  }
+/** Correos alineados con las cuentas de desarrollo del backend (login por rol, sin contraseña en local). */
+const DEV_LOGIN_EMAIL: Record<InternalAdminRole, string> = {
+  Administradora: 'admin@asadasanjuan.cr',
+  Secretaria: 'secretaria@asadasanjuan.cr',
+  Fontanero: 'fontanero@asadasanjuan.cr',
+}
+
+/** El backend en desarrollo ignora la contraseña; el DTO aún exige un string mínimo. */
+const DEV_LOGIN_PASSWORD_PLACEHOLDER = 'dev-login'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -61,10 +55,12 @@ const LoginPage = () => {
     setLoading(true)
 
     try {
-      const credentials = DEMO_LOGIN[selectedRole]
       const payload = await fetchWithAuth<AuthLoginResponse>('/v1/auth/login', {
         method: 'POST',
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({
+          email: DEV_LOGIN_EMAIL[selectedRole],
+          password: DEV_LOGIN_PASSWORD_PLACEHOLDER,
+        }),
       })
 
       if (!payload.accessToken) {
@@ -76,9 +72,13 @@ const LoginPage = () => {
         normalizeInternalRole(payload.user.role) ?? selectedRole,
         payload.user.id,
       )
-    } catch {
+    } catch (err) {
+      const detail =
+        err instanceof Error ? err.message.replace(/^HTTP \d+: /, '') : null
       setError(
-        'No fue posible iniciar sesión con el backend. Verifique que el servidor esté en ejecución.',
+        detail
+          ? `No fue posible iniciar sesión: ${detail}`
+          : 'No fue posible iniciar sesión. Verifique que el backend esté en http://localhost:3000.',
       )
     } finally {
       setLoading(false)

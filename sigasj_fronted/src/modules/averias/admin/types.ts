@@ -1,10 +1,31 @@
 import type { EstadoAveria } from './estadoAveria'
+import {
+  PRIORIDAD_AVERIA_LABELS,
+  type PrioridadAveria,
+} from './prioridadAveria'
+import { TIPO_AVERIA_LABELS, type TipoAveria } from './tipoAveria'
 
-/** Coincide con `AveriaAdminFontanero` del Backend 2.2.1. `nombre` es opcional: Usuario aún no lo expone. */
+/** Coincide con `AveriaAdminFontanero` del Backend 2.2 / 2.4. `nombre` es opcional. */
 export type AveriaAdminFontanero = {
   id: number
   nombre?: string | null
 }
+
+/** GET /api/v1/admin/averias/fontaneros (PBI 2.4). */
+export type AveriaFontaneroAsignable = AveriaAdminFontanero
+
+export type AveriaFontanerosResponse = {
+  data: AveriaFontaneroAsignable[]
+}
+
+/** @deprecated Alias de compatibilidad interna */
+export type AveriasAdminFontanerosListado = AveriaFontanerosResponse
+
+export const AVERIAS_ADMIN_FONTANEROS_LOAD_ERROR =
+  'No fue posible cargar los fontaneros disponibles. Intente nuevamente.'
+
+export const AVERIAS_ADMIN_FONTANEROS_EMPTY =
+  'No hay fontaneros disponibles.'
 
 /**
  * Ítem del listado administrativo. Alineado con `AveriaAdminListItem` del Backend.
@@ -116,16 +137,17 @@ export const EMPTY_FILTER = ''
 export const PRIORIDAD_FILTER_UNASSIGNED = 'SIN_ASIGNAR'
 
 export const PRIORIDAD_FILTER_OPTIONS = [
-  { value: 'ALTA', label: 'Alta' },
-  { value: 'MEDIA', label: 'Media' },
-  { value: 'BAJA', label: 'Baja' },
+  { value: 'URGENTE', label: PRIORIDAD_AVERIA_LABELS.URGENTE },
+  { value: 'ALTA', label: PRIORIDAD_AVERIA_LABELS.ALTA },
+  { value: 'MEDIA', label: PRIORIDAD_AVERIA_LABELS.MEDIA },
+  { value: 'BAJA', label: PRIORIDAD_AVERIA_LABELS.BAJA },
 ] as const
 
 export const PRIORIDAD_LABELS: Record<string, string> = {
-  ALTA: 'Alta',
-  MEDIA: 'Media',
-  BAJA: 'Baja',
+  ...PRIORIDAD_AVERIA_LABELS,
 }
+
+export type { PrioridadAveria, TipoAveria }
 
 export const getPrioridadLabel = (prioridad: string | null): string => {
   if (prioridad == null || prioridad.trim() === '') {
@@ -140,7 +162,8 @@ export const getTipoAveriaLabel = (tipoAveria: string | null): string => {
     return AVERIA_UNASSIGNED_LABEL
   }
 
-  return tipoAveria
+  const key = tipoAveria.trim().toUpperCase()
+  return TIPO_AVERIA_LABELS[key as TipoAveria] ?? tipoAveria
 }
 
 export const getTipoAveriaDetailLabel = (tipoAveria: string | null): string => {
@@ -148,7 +171,8 @@ export const getTipoAveriaDetailLabel = (tipoAveria: string | null): string => {
     return AVERIA_UNCLASSIFIED_LABEL
   }
 
-  return tipoAveria
+  const key = tipoAveria.trim().toUpperCase()
+  return TIPO_AVERIA_LABELS[key as TipoAveria] ?? tipoAveria
 }
 
 export const getOptionalPersonalLabel = (
@@ -198,4 +222,28 @@ export const getFontaneroLabel = (
   }
 
   return `Fontanero #${fontanero.id}`
+}
+
+export const getFontaneroAsignableLabel = (
+  fontanero: AveriaFontaneroAsignable,
+): string => getFontaneroLabel(fontanero)
+
+export const buildAveriaAsignacionConfirmMessage = (
+  fontanero: AveriaAdminFontanero,
+): string => {
+  const label = getFontaneroLabel(fontanero)
+  if (label.startsWith('Fontanero #')) {
+    return `¿Desea asignar esta avería al ${label}?`
+  }
+  return `¿Desea asignar esta avería a ${label}?`
+}
+
+export const buildAveriaAsignacionSuccessMessage = (
+  fontanero: AveriaAdminFontanero,
+): string => {
+  const label = getFontaneroLabel(fontanero)
+  if (label.startsWith('Fontanero #')) {
+    return `Avería asignada correctamente al ${label}.`
+  }
+  return `Avería asignada correctamente a ${label}.`
 }

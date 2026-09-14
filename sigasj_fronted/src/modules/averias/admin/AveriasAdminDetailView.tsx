@@ -1,22 +1,28 @@
-import AveriaStatusBadge from './AveriaStatusBadge'
+import AveriasAdminAsignacionControls from './AveriasAdminAsignacionControls'
+import AveriasAdminGestionControls from './AveriasAdminGestionControls'
 import AveriasDetailField from './AveriasDetailField'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import {
   AVERIA_UNAVAILABLE_LABEL,
   getAbonadoRelacionadoLabel,
-  getFontaneroLabel,
   getObservacionesLabel,
   getOptionalPersonalLabel,
-  getPrioridadLabel,
-  getTipoAveriaDetailLabel,
   type AveriaDetail,
 } from './types'
 
 type AveriasAdminDetailViewProps = {
   averia: AveriaDetail
+  canEditGestion?: boolean
+  canAssignFontanero?: boolean
+  onAveriaUpdated?: (averia: AveriaDetail) => void
 }
 
-const AveriasAdminDetailView = ({ averia }: AveriasAdminDetailViewProps) => (
+const AveriasAdminDetailView = ({
+  averia,
+  canEditGestion = false,
+  canAssignFontanero = false,
+  onAveriaUpdated,
+}: AveriasAdminDetailViewProps) => (
   <div className="averias-admin__detail">
     <section className="averias-admin__section" aria-labelledby="averia-reporte-heading">
       <h2 id="averia-reporte-heading">Información del reporte</h2>
@@ -57,25 +63,22 @@ const AveriasAdminDetailView = ({ averia }: AveriasAdminDetailViewProps) => (
 
       <section className="averias-admin__section" aria-labelledby="averia-gestion-heading">
         <h2 id="averia-gestion-heading">Gestión de la avería</h2>
+        {canEditGestion ? (
+          <AveriasAdminGestionControls
+            key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}`}
+            averia={averia}
+            canEdit
+            onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
+          />
+        ) : null}
         <dl className="averias-admin__fields">
-          <AveriasDetailField label="Estado">
-            <AveriaStatusBadge estado={averia.estado} />
-          </AveriasDetailField>
-          <AveriasDetailField label="Fontanero asignado">
-            {getFontaneroLabel(averia.fontanero)}
-          </AveriasDetailField>
-          <AveriasDetailField label="Tipo de avería">
-            {getTipoAveriaDetailLabel(averia.tipoAveria)}
-          </AveriasDetailField>
-          <AveriasDetailField label="Prioridad">
-            {getPrioridadLabel(averia.prioridad)}
-          </AveriasDetailField>
-          <AveriasDetailField label="Fecha de asignación">
-            {formatAveriaAdminDateTimeOrUnavailable(
-              averia.fechaAsignacion,
-              AVERIA_UNAVAILABLE_LABEL,
-            )}
-          </AveriasDetailField>
+          {!canEditGestion ? (
+            <AveriasAdminGestionControls
+              averia={averia}
+              canEdit={false}
+              onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
+            />
+          ) : null}
           <AveriasDetailField label="Inicio de atención">
             {formatAveriaAdminDateTimeOrUnavailable(
               averia.fechaInicioAtencion,
@@ -91,6 +94,19 @@ const AveriasAdminDetailView = ({ averia }: AveriasAdminDetailViewProps) => (
         </dl>
       </section>
     </div>
+
+    <section
+      className="averias-admin__section"
+      aria-labelledby="averia-asignacion-heading"
+    >
+      <h2 id="averia-asignacion-heading">Asignación de avería</h2>
+      <AveriasAdminAsignacionControls
+        key={`${averia.id}:${averia.estado}:${averia.fontanero?.id ?? 'none'}:${averia.fechaAsignacion ?? ''}`}
+        averia={averia}
+        canAssign={canAssignFontanero}
+        onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
+      />
+    </section>
 
     <section className="averias-admin__section" aria-labelledby="averia-ubicacion-heading">
       <h2 id="averia-ubicacion-heading">Ubicación de la avería</h2>
