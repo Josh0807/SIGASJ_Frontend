@@ -1,11 +1,16 @@
+import { useState } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
+import { useAuthUser } from '../../auth/hooks/useAuthUser'
 import { useAdminAveria } from '../hooks/useAdminAveria'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import AveriasAdminDetailView from './AveriasAdminDetailView'
+import { canEditAveriaAsignacion } from './canEditAveriaAsignacion'
+import { canEditAveriaGestion } from './canEditAveriaGestion'
+import { parseAveriaAdminId } from './parseAveriaAdminId'
 import { averiasAdminListPathFromState } from './averiasAdminListSearch'
 import {
   AVERIAS_ADMIN_DETAIL_ERROR,
@@ -29,7 +34,10 @@ const AveriasAdminDetailPage = ({
 }: AveriasAdminDetailPageProps) => {
   const { id } = useParams()
   const location = useLocation()
+  const user = useAuthUser()
   const listPath = averiasAdminListPathFromState(location.state)
+  const parsedAveriaId = parseAveriaAdminId(id)
+  const [mutatedAveria, setMutatedAveria] = useState<AveriaDetail | null>(null)
   const remoteEnabled =
     averiaProp === undefined &&
     loadingProp === undefined &&
@@ -48,7 +56,18 @@ const AveriasAdminDetailPage = ({
   const loading = loadingProp ?? remote.loading
   const error = errorProp === undefined ? remote.error : errorProp
   const notFound = notFoundProp ?? remote.notFound
-  const averia = averiaProp !== undefined ? averiaProp : remote.averia
+  const fetchedAveria =
+    averiaProp !== undefined ? averiaProp : remote.averia
+  const averia =
+    mutatedAveria != null &&
+    parsedAveriaId != null &&
+    mutatedAveria.id === parsedAveriaId
+      ? mutatedAveria
+      : fetchedAveria
+  const canEditGestion =
+    remoteEnabled && canEditAveriaGestion(user)
+  const canAssignFontanero =
+    remoteEnabled && canEditAveriaAsignacion(user)
 
   if (loading) {
     return (
@@ -120,7 +139,12 @@ const AveriasAdminDetailPage = ({
             </Link>
           </div>
         </header>
-        <AveriasAdminDetailView averia={averia} />
+        <AveriasAdminDetailView
+          averia={averia}
+          canEditGestion={canEditGestion}
+          canAssignFontanero={canAssignFontanero}
+          onAveriaUpdated={setMutatedAveria}
+        />
       </div>
     </main>
   )

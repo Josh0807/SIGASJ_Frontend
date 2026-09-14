@@ -1,0 +1,9 @@
+.averias-admin__gestion-controls {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.averias-admin__gestion-feedback {
+  margin-bottom: 12px;
+}

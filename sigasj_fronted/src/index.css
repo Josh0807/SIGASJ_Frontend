@@ -11598,6 +11598,11 @@ body,
   color: #1e5a9c;
 }
 
+.averias-admin__badge--estado.is-en-revision {
+  background: #f3eef9;
+  color: #5a3d8a;
+}
+
 .averias-admin__badge--estado.is-asignada {
   background: #eef6f0;
   color: #1f6b3a;
@@ -11618,6 +11623,11 @@ body,
   color: #3d4d5c;
 }
 
+.averias-admin__badge--estado.is-cancelada {
+  background: #fdecec;
+  color: #8a1f1f;
+}
+
 .averias-admin__badge--estado.is-desconocido {
   background: #f4f1f1;
   color: #6b4a4a;
@@ -11636,6 +11646,11 @@ body,
 .averias-admin__badge--prioridad.is-baja {
   background: #f3f5f7;
   color: #445566;
+}
+
+.averias-admin__badge--prioridad.is-urgente {
+  background: #fdecec;
+  color: #7a1010;
 }
 
 .averias-admin__cards {

@@ -141,10 +141,22 @@ describe('AveriasAdminPage', () => {
     expect([...estado.options].map((option) => option.value)).toEqual([
       '',
       'RECIBIDA',
+      'EN_REVISION',
+      'ASIGNADA',
+      'EN_ATENCION',
+      'PENDIENTE',
+      'RESUELTA',
+      'CANCELADA',
     ])
     expect([...estado.options].map((option) => option.textContent)).toEqual([
       'Todos',
       'Recibida',
+      'En revisión',
+      'Asignada',
+      'En atención',
+      'Pendiente',
+      'Resuelta',
+      'Cancelada',
     ])
 
     await act(async () => {
