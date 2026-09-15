@@ -3674,10 +3674,13 @@ button.announcements-section__more {
 .material-tracking tbody tr:last-child td, .material-detail tbody tr:last-child td { border-bottom: 0; }
 .material-tracking__badge { display: inline-flex; padding: 6px 10px; border: 1px solid #d2dce5; border-radius: 99px; background: #f4f6f8; color: #4a5c6d; font-size: .82rem; font-weight: 750; white-space: nowrap; }
 .material-tracking__badge[data-status='PENDIENTE'] { border-color: #edd58e; background: #fff9df; color: #7a5100; }
+.material-tracking__badge[data-status='EN_GESTION'] { border-color: #b7d4ee; background: #eef6fd; color: #1e4f7a; }
+.material-tracking__badge[data-status='RESUELTA'] { border-color: #bce2c9; background: #effaf3; color: #1d6338; }
 .material-tracking__badge[data-status='APROBADA'], .material-tracking__badge[data-status='APROBADO'] { border-color: #bce2c9; background: #effaf3; color: #1d6338; }
 .material-tracking__badge[data-status='RECHAZADA'], .material-tracking__badge[data-status='RECHAZADO'] { border-color: #efcaca; background: #fff5f5; color: #912f2f; }
 .material-tracking__detail-link, .material-detail__back { display: inline-flex; align-items: center; gap: 6px; color: #1e6592; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .material-tracking__detail-link:hover, .material-tracking__detail-link:focus-visible, .material-detail__back:hover, .material-detail__back:focus-visible { text-decoration: underline; }
+button.material-tracking__detail-link { border: 0; background: transparent; font: inherit; cursor: pointer; }
 .material-tracking__pagination { display: flex; align-items: center; justify-content: center; gap: 16px; }
 .material-tracking__pagination button { min-height: 40px; padding: 8px 14px; border: 1px solid #b9cfdf; border-radius: 9px; background: #fff; color: #1e6592; font: inherit; font-weight: 700; cursor: pointer; }
 .material-tracking__pagination button:disabled { opacity: .45; cursor: not-allowed; }

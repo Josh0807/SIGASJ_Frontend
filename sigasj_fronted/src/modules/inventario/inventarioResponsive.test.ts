@@ -10,4 +10,9 @@ describe('responsive del catálogo de materiales', () => {
     expect(css).toContain('.materials-admin__filters, .materials-admin__form { grid-template-columns: 1fr;')
     expect(css).toContain('.materials-admin__row-actions, .materials-admin__state-action { width: 100%; }')
   })
+
+  it('adapta el listado de alertas de reposición en pantallas pequeñas', () => {
+    expect(css).toContain('.material-tracking table, .material-tracking tbody, .material-tracking tr, .material-tracking td')
+    expect(css).toContain('.material-tracking__filters { align-items: stretch; flex-direction: column; }')
+  })
 })
