@@ -9,6 +9,7 @@ import {
   formatReposicionOrigen,
   getHttpErrorStatus,
   getReposicionCodigo,
+  getReposicionProveedorNombre,
   getReposicionResponsable,
   normalizeReposicionesList,
   reposicionErrorMessage,
@@ -163,6 +164,7 @@ export default function ReposicionesPage() {
                 <th>Código</th>
                 <th>Fecha</th>
                 <th>Origen</th>
+                <th>Proveedor</th>
                 <th>Materiales</th>
                 <th>Estado</th>
                 <th>Responsable</th>
@@ -175,6 +177,7 @@ export default function ReposicionesPage() {
                   <td data-label="Código"><strong>{getReposicionCodigo(reposicion)}</strong></td>
                   <td data-label="Fecha">{formatReposicionFecha(reposicion.fechaGeneracion)}</td>
                   <td data-label="Origen">{formatReposicionOrigen(String(reposicion.origen))}</td>
+                  <td data-label="Proveedor">{getReposicionProveedorNombre(reposicion)}</td>
                   <td data-label="Materiales">{resumenMaterialesReposicion(reposicion.detalles ?? [])}</td>
                   <td data-label="Estado">
                     <span className="material-tracking__badge" data-status={String(reposicion.estado).toUpperCase()}>

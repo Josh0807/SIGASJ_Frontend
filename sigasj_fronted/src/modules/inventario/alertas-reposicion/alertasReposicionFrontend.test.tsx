@@ -123,4 +123,23 @@ describe('pantalla de alertas de reposición', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
     await view.cleanup()
   })
+
+  it('genera reposición desde alerta cuando se confirma', async () => {
+    loginAsRole('Administradora')
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response({ data: [alerta], total: 1, page: 1, limit: 10, totalPages: 1 }))
+      .mockResolvedValueOnce(response({ id: 12, codigo: 'REP-0012' }, true, 201))
+    vi.stubGlobal('fetch', fetchMock)
+    const view = await mount()
+    const generar = Array.from(view.container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Generar reposición'),
+    )
+    expect(generar).toBeTruthy()
+    await act(async () => generar?.click())
+    expect(fetchMock.mock.calls[1][0]).toContain('/admin/inventario/alertas-reposicion/3/reposicion')
+    expect(view.container.textContent).toContain('Se generó la reposición desde la alerta.')
+    confirmSpy.mockRestore()
+    await view.cleanup()
+  })
 })

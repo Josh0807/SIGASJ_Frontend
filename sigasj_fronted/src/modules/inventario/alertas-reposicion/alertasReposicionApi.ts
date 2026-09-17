@@ -25,3 +25,12 @@ export const patchAlertaReposicionEstado = (
     method: 'PATCH',
     body: JSON.stringify({ estado }),
   })
+
+export const generarReposicionDesdeAlertaAdmin = (
+  id: number,
+  body: { cantidad?: number; observacion?: string } = {},
+) =>
+  fetchWithAuth<Record<string, unknown>>(`${ALERTAS_ADMIN_PATH}/${id}/reposicion`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })

@@ -1,5 +1,7 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import type {
+  EstadoReposicion,
+  RegistrarCompraReposicionPayload,
   ReposicionMaterial,
   ReposicionesListResponse,
   ReposicionesQuery,
@@ -19,3 +21,18 @@ export const getReposicionesAdmin = (query: ReposicionesQuery = {}) =>
 
 export const getReposicionAdmin = (id: number) =>
   fetchWithAuth<ReposicionMaterial>(`${REPOSICIONES_ADMIN_PATH}/${id}`)
+
+export const registrarCompraReposicionAdmin = (
+  id: number,
+  payload: RegistrarCompraReposicionPayload,
+) =>
+  fetchWithAuth<ReposicionMaterial>(`${REPOSICIONES_ADMIN_PATH}/${id}/compra`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+
+export const patchReposicionEstadoAdmin = (id: number, estado: EstadoReposicion) =>
+  fetchWithAuth<ReposicionMaterial>(`${REPOSICIONES_ADMIN_PATH}/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ estado }),
+  })

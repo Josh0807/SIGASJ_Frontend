@@ -52,6 +52,7 @@ export type ReposicionMaterial = {
   idUsuarioResponsable: number
   idProveedor: number | null
   fechaCompra: string | null
+  fechaRecepcion: string | null
   observacion: string | null
   updatedAt?: string
   proveedor: ReposicionProveedor | null
@@ -66,6 +67,18 @@ export type ReposicionesQuery = {
   origen?: OrigenReposicion | ''
   page?: number
   limit?: number
+}
+
+export type RegistrarCompraReposicionPayload = {
+  idProveedor: number
+  fechaCompra: string
+  referenciaCompra?: string
+  observacion?: string
+  detalles: {
+    idMaterial: number
+    cantidad: number
+    observacion?: string
+  }[]
 }
 
 export type ReposicionesListResponse = {

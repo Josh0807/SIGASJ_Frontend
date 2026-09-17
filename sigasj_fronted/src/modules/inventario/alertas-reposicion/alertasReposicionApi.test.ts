@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { setAuthSession } from '../../auth/utils/authStorage'
-import { getAlertasReposicionAdmin, patchAlertaReposicionEstado } from './alertasReposicionApi'
+import {
+  generarReposicionDesdeAlertaAdmin,
+  getAlertasReposicionAdmin,
+  patchAlertaReposicionEstado,
+} from './alertasReposicionApi'
 
 describe('alertasReposicionApi', () => {
   beforeEach(() => {
@@ -61,5 +65,18 @@ describe('alertasReposicionApi', () => {
       headers: { Authorization: 'Bearer jwt-admin' },
     })
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ estado: 'EN_GESTION' })
+  })
+
+  it('genera reposición desde alerta con POST autenticado', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ id: 12, codigo: 'REP-0012' }), { status: 201 }),
+    )
+
+    await generarReposicionDesdeAlertaAdmin(3, { cantidad: 20 })
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      'http://localhost:3000/api/v1/admin/inventario/alertas-reposicion/3/reposicion',
+    )
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST' })
   })
 })

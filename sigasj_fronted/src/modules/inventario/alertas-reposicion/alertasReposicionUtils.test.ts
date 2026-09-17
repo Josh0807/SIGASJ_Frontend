@@ -5,6 +5,7 @@ import {
   getAlertaResponsable,
   getAlertaUnidadMedida,
   normalizeAlertasReposicionList,
+  puedeGenerarReposicionDesdeAlerta,
   siguienteEstadoAlerta,
 } from './alertasReposicionUtils'
 import type { AlertaReposicion } from './types'
@@ -37,5 +38,7 @@ describe('alertasReposicionUtils', () => {
     expect(siguienteEstadoAlerta('PENDIENTE')).toBe('EN_GESTION')
     expect(siguienteEstadoAlerta('EN_GESTION')).toBe('RESUELTA')
     expect(siguienteEstadoAlerta('RESUELTA')).toBeNull()
+    expect(puedeGenerarReposicionDesdeAlerta('PENDIENTE')).toBe(true)
+    expect(puedeGenerarReposicionDesdeAlerta('RESUELTA')).toBe(false)
   })
 })

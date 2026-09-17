@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  etiquetaAccionReposicion,
   formatReposicionEstado,
   formatReposicionOrigen,
   getReposicionCodigo,
+  getReposicionProveedorNombre,
   normalizeReposicionesList,
+  puedeConfirmarRecepcion,
   puedeRegistrarCompra,
   resumenMaterialesReposicion,
+  siguienteEstadoReposicion,
 } from './reposicionesUtils'
 import type { ReposicionMaterial } from './types'
 
@@ -51,5 +55,9 @@ describe('reposicionesUtils', () => {
     expect(resumenMaterialesReposicion(reposicion.detalles)).toBe('Tubo PVC (10)')
     expect(puedeRegistrarCompra('PENDIENTE')).toBe(true)
     expect(puedeRegistrarCompra('COMPRA_REGISTRADA')).toBe(false)
+    expect(puedeConfirmarRecepcion('PENDIENTE_RECEPCION')).toBe(true)
+    expect(siguienteEstadoReposicion('PENDIENTE')).toBe('EN_GESTION')
+    expect(etiquetaAccionReposicion('RECIBIDA')).toBe('Completar reposición')
+    expect(getReposicionProveedorNombre({ ...reposicion, proveedor: null })).toBe('Sin definir')
   })
 })

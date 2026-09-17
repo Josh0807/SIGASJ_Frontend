@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { MATERIALES_PATH } from '../inventarioPaths'
-import { getAlertasReposicionAdmin, patchAlertaReposicionEstado } from './alertasReposicionApi'
+import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
+import {
+  generarReposicionDesdeAlertaAdmin,
+  getAlertasReposicionAdmin,
+  patchAlertaReposicionEstado,
+} from './alertasReposicionApi'
 import {
   alertaReposicionErrorMessage,
   etiquetaAccionAlerta,
@@ -13,6 +17,7 @@ import {
   getAlertaUnidadMedida,
   getHttpErrorStatus,
   normalizeAlertasReposicionList,
+  puedeGenerarReposicionDesdeAlerta,
   siguienteEstadoAlerta,
 } from './alertasReposicionUtils'
 import type { AlertaReposicion, EstadoAlertaReposicion } from './types'
@@ -36,6 +41,8 @@ export default function AlertasReposicionPage() {
   const [notice, setNotice] = useState('')
   const [actionError, setActionError] = useState('')
   const [managingId, setManagingId] = useState<number | null>(null)
+  const [generatingId, setGeneratingId] = useState<number | null>(null)
+  const [reposicionGeneradaId, setReposicionGeneradaId] = useState<number | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -81,6 +88,7 @@ export default function AlertasReposicionPage() {
     setPage(1)
     setNotice('')
     setActionError('')
+    setReposicionGeneradaId(null)
   }
 
   const gestionar = async (alerta: AlertaReposicion) => {
@@ -116,6 +124,33 @@ export default function AlertasReposicionPage() {
     }
   }
 
+  const generarReposicion = async (alerta: AlertaReposicion) => {
+    if (generatingId !== null || managingId !== null) return
+    const confirmado = window.confirm(
+      `¿Generar una reposición para ${getAlertaMaterialNombre(alerta)}? No se modificarán las existencias.`,
+    )
+    if (!confirmado) return
+
+    setGeneratingId(alerta.id)
+    setActionError('')
+    setNotice('')
+    setReposicionGeneradaId(null)
+    try {
+      const reposicion = await generarReposicionDesdeAlertaAdmin(alerta.id)
+      const id = Number(reposicion.id)
+      setReposicionGeneradaId(Number.isInteger(id) && id > 0 ? id : null)
+      setNotice('Se generó la reposición desde la alerta.')
+    } catch (requestError) {
+      if (getHttpErrorStatus(requestError) === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
+      setActionError(alertaReposicionErrorMessage(requestError, 'generar'))
+    } finally {
+      setGeneratingId(null)
+    }
+  }
+
   return (
     <section className="material-tracking" aria-labelledby="alertas-reposicion-title">
       <header className="material-tracking__header">
@@ -143,7 +178,14 @@ export default function AlertasReposicionPage() {
         ) : null}
       </div>
 
-      {notice ? <div className="material-tracking__state" role="status">{notice}</div> : null}
+      {notice ? (
+        <div className="material-tracking__state" role="status">
+          {notice}
+          {reposicionGeneradaId ? (
+            <> <Link to={reposicionDetailPath(reposicionGeneradaId)}>Ver reposición</Link></>
+          ) : null}
+        </div>
+      ) : null}
       {actionError ? (
         <div className="material-tracking__state material-tracking__state--error" role="alert">
           {actionError}
@@ -186,7 +228,7 @@ export default function AlertasReposicionPage() {
                 <th>Fecha</th>
                 <th>Estado</th>
                 <th>Responsable</th>
-                <th><span className="visually-hidden">Acción</span></th>
+                <th><span className="visually-hidden">Acciones</span></th>
               </tr>
             </thead>
             <tbody>
@@ -205,19 +247,28 @@ export default function AlertasReposicionPage() {
                       </span>
                     </td>
                     <td data-label="Responsable">{getAlertaResponsable(alerta)}</td>
-                    <td data-label="Acción">
+                    <td data-label="Acciones">
                       {accion ? (
                         <button
                           type="button"
                           className="material-tracking__detail-link"
-                          disabled={managingId !== null}
+                          disabled={managingId !== null || generatingId !== null}
                           onClick={() => void gestionar(alerta)}
                         >
                           <IconAlertTriangle size={18} aria-hidden="true" /> {managingId === alerta.id ? 'Actualizando…' : accion}
                         </button>
-                      ) : (
-                        <span>—</span>
-                      )}
+                      ) : null}
+                      {puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? (
+                        <button
+                          type="button"
+                          className="material-tracking__detail-link"
+                          disabled={managingId !== null || generatingId !== null}
+                          onClick={() => void generarReposicion(alerta)}
+                        >
+                          {generatingId === alerta.id ? 'Generando…' : 'Generar reposición'}
+                        </button>
+                      ) : null}
+                      {!accion && !puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? <span>—</span> : null}
                     </td>
                   </tr>
                 )
