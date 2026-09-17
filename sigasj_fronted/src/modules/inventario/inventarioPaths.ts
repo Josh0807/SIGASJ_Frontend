@@ -15,3 +15,5 @@ export const solicitudMaterialesDetailPath = (id: number | string) => `${SOLICIT
 export const SOLICITUDES_REVISION_PATH = '/admin/inventario/solicitudes'
 export const solicitudRevisionDetailPath = (id: number | string) => `${SOLICITUDES_REVISION_PATH}/${id}`
 export const ALERTAS_REPOSICION_PATH = '/admin/inventario/alertas-reposicion'
+export const REPOSICIONES_PATH = '/admin/inventario/reposiciones'
+export const reposicionDetailPath = (id: number | string) => `${REPOSICIONES_PATH}/${id}`
