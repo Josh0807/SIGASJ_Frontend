@@ -17,3 +17,7 @@ export const solicitudRevisionDetailPath = (id: number | string) => `${SOLICITUD
 export const ALERTAS_REPOSICION_PATH = '/admin/inventario/alertas-reposicion'
 export const REPOSICIONES_PATH = '/admin/inventario/reposiciones'
 export const reposicionDetailPath = (id: number | string) => `${REPOSICIONES_PATH}/${id}`
+export const RECEPCIONES_PATH = '/admin/inventario/recepciones'
+export const recepcionDetailPath = (id: number | string) => `${RECEPCIONES_PATH}/${id}`
+export const MOVIMIENTOS_PATH = '/admin/inventario/movimientos'
+export const movimientoDetailPath = (id: number | string) => `${MOVIMIENTOS_PATH}/${id}`

@@ -3655,7 +3655,8 @@ button.announcements-section__more {
 .material-tracking__header .material-request__primary { flex: none; text-decoration: none; }
 .material-tracking__filters { display: flex; align-items: center; gap: 12px; padding: 16px 20px; }
 .material-tracking__filters label { font-weight: 700; }
-.material-tracking__filters select { min-width: 210px; padding: 9px 12px; border: 1px solid #bfd2e1; border-radius: 9px; background: #fff; color: #193f61; font: inherit; }
+.material-tracking__filters select, .material-tracking__filters input[type="date"] { min-width: 210px; padding: 9px 12px; border: 1px solid #bfd2e1; border-radius: 9px; background: #fff; color: #193f61; font: inherit; }
+.material-tracking__filter-action { min-height: 40px; padding: 8px 14px; border: 1px solid #b9cfdf; border-radius: 9px; background: #fff; color: #1e6592; font: inherit; font-weight: 700; cursor: pointer; }
 .material-tracking__filters span { margin-left: auto; color: #637b8e; font-size: .9rem; }
 .material-tracking__state, .material-tracking__empty { padding: 26px; }
 .material-tracking__state { display: flex; align-items: center; gap: 10px; }
@@ -3678,6 +3679,8 @@ button.announcements-section__more {
 .material-tracking__badge[data-status='RESUELTA'] { border-color: #bce2c9; background: #effaf3; color: #1d6338; }
 .material-tracking__badge[data-status='APROBADA'], .material-tracking__badge[data-status='APROBADO'] { border-color: #bce2c9; background: #effaf3; color: #1d6338; }
 .material-tracking__badge[data-status='RECHAZADA'], .material-tracking__badge[data-status='RECHAZADO'] { border-color: #efcaca; background: #fff5f5; color: #912f2f; }
+.material-tracking__badge[data-status='ENTRADA'] { border-color: #bce2c9; background: #effaf3; color: #1d6338; }
+.material-tracking__badge[data-status='SALIDA'] { border-color: #efcaca; background: #fff5f5; color: #912f2f; }
 .material-tracking__detail-link, .material-detail__back { display: inline-flex; align-items: center; gap: 6px; color: #1e6592; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .material-tracking__detail-link:hover, .material-tracking__detail-link:focus-visible, .material-detail__back:hover, .material-detail__back:focus-visible { text-decoration: underline; }
 button.material-tracking__detail-link { border: 0; background: transparent; font: inherit; cursor: pointer; }

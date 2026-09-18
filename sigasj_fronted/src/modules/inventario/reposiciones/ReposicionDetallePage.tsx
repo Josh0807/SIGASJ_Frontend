@@ -4,6 +4,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { REPOSICIONES_PATH } from '../inventarioPaths'
 import { getProveedores } from '../proveedores/proveedoresApi'
+import { registrarRecepcionAdmin } from '../recepciones/recepcionesApi'
+import { recepcionErrorMessage, recepcionItemsValidos } from '../recepciones/recepcionesUtils'
+import type { RecepcionItemPayload } from '../recepciones/types'
 import {
   getReposicionAdmin,
   patchReposicionEstadoAdmin,
@@ -50,6 +53,8 @@ export default function ReposicionDetallePage() {
   const [referenciaCompra, setReferenciaCompra] = useState('')
   const [observacionCompra, setObservacionCompra] = useState('')
   const [compraItems, setCompraItems] = useState<CompraItemDraft[]>([])
+  const [recepcionItems, setRecepcionItems] = useState<RecepcionItemPayload[]>([])
+  const [observacionRecepcion, setObservacionRecepcion] = useState('')
   const [proveedores, setProveedores] = useState<{ id: number; nombre: string; activo: boolean }[]>([])
   const [busy, setBusy] = useState(false)
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
@@ -74,6 +79,12 @@ export default function ReposicionDetallePage() {
             idMaterial: detalle.idMaterial,
             cantidad: detalle.cantidad,
             observacion: '',
+          })),
+        )
+        setRecepcionItems(
+          (response.detalles ?? []).map((detalle) => ({
+            idMaterial: detalle.idMaterial,
+            cantidad: detalle.cantidad,
           })),
         )
       })
@@ -140,6 +151,8 @@ export default function ReposicionDetallePage() {
     return compraItems.every((item) => Number.isInteger(item.cantidad) && item.cantidad > 0)
   }, [compraItems, fechaCompra, proveedorId])
 
+  const recepcionValida = useMemo(() => recepcionItemsValidos(recepcionItems), [recepcionItems])
+
   const confirmarCompra = async () => {
     if (!reposicion || busy || !compraValida) return
     setBusy(true)
@@ -175,22 +188,35 @@ export default function ReposicionDetallePage() {
     }
   }
 
+  const updateCantidadRecepcion = (idMaterial: number, cantidad: number) => {
+    setRecepcionItems((items) => items.map((item) => (
+      item.idMaterial === idMaterial ? { ...item, cantidad } : item
+    )))
+  }
+
   const confirmarRecepcion = async () => {
-    if (!reposicion || busy) return
+    if (!reposicion || busy || !recepcionValida) return
     setBusy(true)
     setConfirmAction(null)
     setError('')
     setSuccess('')
     try {
-      const updated = await patchReposicionEstadoAdmin(reposicion.id, 'RECIBIDA')
+      const updated = await registrarRecepcionAdmin({
+        idReposicion: reposicion.id,
+        detalles: recepcionItems,
+        ...(observacionRecepcion.trim() ? { observacion: observacionRecepcion.trim() } : {}),
+      })
       setReposicion(updated)
-      setSuccess('La recepción quedó registrada. Revise las existencias al registrar la entrada en bodega si aún no se reflejó el stock.')
+      setSuccess(
+        updated.mensaje
+          ?? 'Recepción registrada. Se generaron entradas de inventario y se actualizaron las existencias.',
+      )
     } catch (requestError) {
       if (getHttpErrorStatus(requestError) === 401) {
         navigate('/login', { replace: true })
         return
       }
-      setError(reposicionErrorMessage(requestError, 'recepcion'))
+      setError(recepcionErrorMessage(requestError))
     } finally {
       setBusy(false)
     }
@@ -434,12 +460,56 @@ export default function ReposicionDetallePage() {
           {mostrarRecepcion ? (
             <section className="material-detail__materials" aria-labelledby="reposicion-recepcion-title">
               <h2 id="reposicion-recepcion-title">Confirmar recepción</h2>
-              <p>Confirme que los materiales comprados llegaron a bodega. Esta acción actualiza el estado de la reposición.</p>
+              <p>Indique las cantidades recibidas. El backend registrará entradas de inventario y actualizará las existencias.</p>
+              <div className="material-tracking__table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Material</th>
+                      <th>Comprado</th>
+                      <th>Recibido</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recepcionItems.map((item) => {
+                      const detalle = reposicion.detalles?.find((entry) => entry.idMaterial === item.idMaterial)
+                      return (
+                        <tr key={item.idMaterial}>
+                          <td data-label="Material">
+                            <strong>{detalle?.material?.nombre ?? `Material #${item.idMaterial}`}</strong>
+                          </td>
+                          <td data-label="Comprado">
+                            {detalle?.cantidad ?? '—'} {detalle?.material?.unidadMedida ?? ''}
+                          </td>
+                          <td data-label="Recibido">
+                            <input
+                              type="number"
+                              min={1}
+                              value={item.cantidad}
+                              disabled={busy}
+                              onChange={(event) => updateCantidadRecepcion(item.idMaterial, Number(event.target.value))}
+                            />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <label className="material-review__motivo">
+                <span>Observación de la recepción</span>
+                <textarea
+                  value={observacionRecepcion}
+                  maxLength={2000}
+                  disabled={busy}
+                  onChange={(event) => setObservacionRecepcion(event.target.value)}
+                />
+              </label>
               <div className="material-review__actions">
                 <button
                   type="button"
                   className="material-review__approve"
-                  disabled={busy}
+                  disabled={busy || !recepcionValida}
                   onClick={() => setConfirmAction('recepcion')}
                 >
                   {busy ? 'Procesando…' : 'Confirmar recepción'}
@@ -466,7 +536,7 @@ export default function ReposicionDetallePage() {
       <ConfirmDialog
         isOpen={confirmAction === 'recepcion'}
         title="Confirmar recepción"
-        message="¿Confirma que los materiales de esta reposición fueron recibidos en bodega?"
+        message="¿Confirma la recepción con las cantidades indicadas? Se generarán entradas de inventario automáticamente."
         confirmLabel="Confirmar recepción"
         onCancel={() => setConfirmAction(null)}
         onConfirm={onConfirmDialog}
