@@ -1,6 +1,7 @@
 import type { InternalAdminRole } from '../modules/auth/utils/internalRoles'
 import { ADMIN_MODULE_ACCESS } from '../modules/auth/config/adminNavigation.config'
 import { ADMIN_BASE_PATH } from '../app/router/privateRoutes'
+import { FONTANERO_AVERIAS_PATH } from '../modules/averias/fontanero/averiasFontaneroPaths'
 
 /** En SIGASJ el rol técnico es `Secretaria` (equivalente a “Secretaria Ejecutiva” en la tarea). */
 export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
@@ -23,7 +24,7 @@ const pathsForRoles = (...roles: InternalAdminRole[]) =>
 export const EXPECTED_NAV_PATHS: Record<InternalAdminRole, readonly string[]> = {
   Administradora: pathsForRoles('Administradora'),
   Secretaria: pathsForRoles('Secretaria'),
-  Fontanero: pathsForRoles('Fontanero'),
+  Fontanero: [...pathsForRoles('Fontanero'), FONTANERO_AVERIAS_PATH],
 }
 
 export const EXPECTED_BLOCKED_PATHS: Record<
@@ -63,4 +64,5 @@ export const SAMPLE_ALLOWED_CONTENT: Record<string, string> = {
   '/admin/comunicados': 'Gestión de Comunicados',
   '/admin/contacto': 'Información de Contacto y Ubicación',
   '/admin/transparencia': 'Transparencia y calidad del agua',
+  [FONTANERO_AVERIAS_PATH]: 'Mis averías',
 }

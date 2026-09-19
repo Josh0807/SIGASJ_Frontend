@@ -5,6 +5,11 @@ import {
   LANDING_ROUTE_PATH,
 } from '../../../app/router/routePaths'
 import {
+  FONTANERO_AVERIAS_PATH,
+  FONTANERO_AVERIAS_TITLE,
+  isFontaneroAveriasPath,
+} from '../../averias/fontanero/averiasFontaneroPaths'
+import {
   ADMIN_MODULE_ACCESS,
   ADMIN_MODULE_ACCESS_BY_SEGMENT,
   ROLE_PERMISSIONS,
@@ -116,6 +121,10 @@ export function canAccessAdminRoute(
     return false
   }
 
+  if (isFontaneroAveriasPath(path)) {
+    return userHasAllowedRole(user, [InternalAdminRoleName.Fontanero])
+  }
+
   const module = resolveAdminModuleFromPath(path)
   if (!module) {
     return false
@@ -127,6 +136,10 @@ export function canAccessAdminRoute(
 export function getAllowedRolesForAdminPath(
   path: string,
 ): readonly InternalAdminRole[] | undefined {
+  if (isFontaneroAveriasPath(path)) {
+    return [InternalAdminRoleName.Fontanero]
+  }
+
   return resolveAdminModuleFromPath(path)?.allowedRoles
 }
 
@@ -135,13 +148,23 @@ export function getAdminNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
     return []
   }
 
-  return ADMIN_MODULE_ACCESS.filter(
+  const items = ADMIN_MODULE_ACCESS.filter(
     (module) => module.availableInNav && canAccessAdminModule(user, module.segment),
   ).map(({ segment, title }) => ({
     path: `${ADMIN_BASE_PATH}/${segment}`,
     title,
     icon: segment,
   }))
+
+  if (userHasAllowedRole(user, [InternalAdminRoleName.Fontanero])) {
+    items.push({
+      path: FONTANERO_AVERIAS_PATH,
+      title: FONTANERO_AVERIAS_TITLE,
+      icon: 'averias',
+    })
+  }
+
+  return items
 }
 
 /** Opciones de menú de Gestión de asociados según el rol autenticado. */

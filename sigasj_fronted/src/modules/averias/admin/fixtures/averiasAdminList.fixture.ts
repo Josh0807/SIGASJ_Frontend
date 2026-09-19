@@ -45,11 +45,24 @@ export const AVERIAS_ADMIN_UI_FIXTURE_ITEMS: AveriaListItem[] = [
     tipoAveria: null,
     fontanero: { id: 8 },
   },
+  {
+    id: 4,
+    codigoSeguimiento: 'AV-2026-0004',
+    fechaReporte: '2026-09-04T09:00:00.000Z',
+    nombreReportante: 'Carlos Mora',
+    sectorComunidad: 'San Rafael',
+    ubicacion: 'Costado oeste de la plaza, 75 m norte',
+    descripcion: 'Fuga en tubo madre detectada durante ronda matutina.',
+    estado: 'PENDIENTE',
+    prioridad: 'ALTA',
+    tipoAveria: 'TUBERIA',
+    fontanero: { id: 5, nombre: 'Luis Campos' },
+  },
 ]
 
 export const AVERIAS_ADMIN_UI_FIXTURE: AveriasAdminListado = {
   data: AVERIAS_ADMIN_UI_FIXTURE_ITEMS,
-  total: 3,
+  total: 4,
   page: 1,
   limit: 20,
   totalPages: 1,

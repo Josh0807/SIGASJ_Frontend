@@ -58,6 +58,7 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/admin/dashboard',
       '/admin/inventario',
       '/admin/actividades',
+      '/fontanero/averias',
     ])
   })
 

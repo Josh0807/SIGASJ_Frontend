@@ -3,6 +3,10 @@ import AveriasAdminGestionControls from './AveriasAdminGestionControls'
 import AveriasDetailField from './AveriasDetailField'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import {
+  MENSAJE_ATENCION_NO_INICIADA,
+  mostrarAvisoPendienteAdmin,
+} from '../utils/averiaPendienteAtencion'
+import {
   AVERIA_UNAVAILABLE_LABEL,
   getAbonadoRelacionadoLabel,
   getObservacionesLabel,
@@ -80,10 +84,17 @@ const AveriasAdminDetailView = ({
             />
           ) : null}
           <AveriasDetailField label="Inicio de atención">
-            {formatAveriaAdminDateTimeOrUnavailable(
-              averia.fechaInicioAtencion,
-              AVERIA_UNAVAILABLE_LABEL,
-            )}
+            {averia.fechaInicioAtencion
+              ? formatAveriaAdminDateTimeOrUnavailable(
+                  averia.fechaInicioAtencion,
+                  AVERIA_UNAVAILABLE_LABEL,
+                )
+              : mostrarAvisoPendienteAdmin(
+                    String(averia.estado),
+                    averia.fontanero != null,
+                  )
+                ? MENSAJE_ATENCION_NO_INICIADA
+                : AVERIA_UNAVAILABLE_LABEL}
           </AveriasDetailField>
           <AveriasDetailField label="Fecha de resolución">
             {formatAveriaAdminDateTimeOrUnavailable(
@@ -125,9 +136,28 @@ const AveriasAdminDetailView = ({
 
     <section className="averias-admin__section" aria-labelledby="averia-obs-heading">
       <h2 id="averia-obs-heading">Observaciones</h2>
-      <p className="averias-admin__prewrap">
-        {getObservacionesLabel(averia.observacionesAtencion)}
-      </p>
+      {averia.observaciones && averia.observaciones.length > 0 ? (
+        <ol className="averias-fontanero__observaciones-list">
+          {averia.observaciones.map((item) => (
+            <li key={item.id}>
+              <p className="averias-admin__prewrap">{item.observacion}</p>
+              <p className="averias-admin__muted">
+                {item.autor.nombre}
+                {item.fechaCreacion
+                  ? ` · ${formatAveriaAdminDateTimeOrUnavailable(
+                      item.fechaCreacion,
+                      AVERIA_UNAVAILABLE_LABEL,
+                    )}`
+                  : ''}
+              </p>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="averias-admin__prewrap">
+          {getObservacionesLabel(averia.observacionesAtencion)}
+        </p>
+      )}
     </section>
   </div>
 )

@@ -10,6 +10,8 @@ import AveriasAdminRoutes from './AveriasAdminRoutes'
 import { AVERIAS_ADMIN_DETAIL_FIXTURE } from './fixtures/averiasAdminDetail.fixture'
 import { findAveriaDetailFixture } from './fixtures/averiasAdminDetail.fixture'
 import { AVERIAS_ADMIN_UI_FIXTURE } from './fixtures/averiasAdminList.fixture'
+import { InternalAdminRoleName } from '../../auth/utils/internalRoles'
+import { clearAccessToken, setAuthSession } from '../../auth/utils/authStorage'
 import * as averiasAdminApi from '../services/averiasAdminApi'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
 import {
@@ -35,6 +37,7 @@ describe('AveriasAdminDetailPage', () => {
   let root: Root
 
   beforeEach(() => {
+    clearAccessToken()
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
@@ -55,6 +58,7 @@ describe('AveriasAdminDetailPage', () => {
       root.unmount()
     })
     container.remove()
+    clearAccessToken()
     vi.restoreAllMocks()
   })
 
@@ -97,6 +101,22 @@ describe('AveriasAdminDetailPage', () => {
     })
   }
 
+  it('muestra el formulario de gestión cuando entra la Administradora', async () => {
+    setAuthSession({
+      accessToken: 'token-admin',
+      user: {
+        id: '18',
+        role: InternalAdminRoleName.Administradora,
+        email: 'admin@asadasanjuan.cr',
+        name: 'Administradora',
+      },
+    })
+    await renderAt('/admin/averias/1')
+    expect(container.querySelector('#averia-gestion-estado')).toBeNull()
+    expect(container.querySelector('#averia-gestion-prioridad')).not.toBeNull()
+    expect(container.querySelector('#averia-gestion-clasificacion')).not.toBeNull()
+  })
+
   it('muestra información general, reportante, ubicación y gestión de una avería asignada', async () => {
     await renderAt('/admin/averias/2')
     const assigned = AVERIAS_ADMIN_DETAIL_FIXTURE[1]
@@ -115,16 +135,16 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.textContent).toContain(assigned.ubicacion)
     expect(container.textContent).toContain(assigned.descripcion)
     expect(container.textContent).toContain('Luis Campos')
-    expect(container.textContent).toContain('TUBERIA')
+    expect(container.textContent).toContain('Tubería dañada')
     expect(container.textContent).toContain('Alta')
     expect(container.textContent).toContain(
       formatAveriaAdminDateTime(assigned.fechaAsignacion),
     )
     expect(container.textContent).toContain(AVERIA_UNAVAILABLE_LABEL)
     expect(container.querySelector('.averias-admin__clamp')).toBeNull()
-    expect(container.querySelector('input')).toBeNull()
-    expect(container.querySelector('select')).toBeNull()
-    expect(container.querySelector('textarea')).toBeNull()
+    expect(container.querySelector('#averia-gestion-estado')).toBeNull()
+    expect(container.querySelector('#averia-gestion-prioridad')).not.toBeNull()
+    expect(container.querySelector('#averia-gestion-clasificacion')).not.toBeNull()
   })
 
   it('muestra fallbacks de una avería recién recibida', async () => {
@@ -147,7 +167,7 @@ describe('AveriasAdminDetailPage', () => {
     const inProgress = AVERIAS_ADMIN_DETAIL_FIXTURE[3]
     expect(container.textContent).toContain('En atención')
     expect(container.textContent).toContain('Luis Campos')
-    expect(container.textContent).toContain('TUBERIA')
+    expect(container.textContent).toContain('Tubería dañada')
     expect(container.textContent).toContain(
       formatAveriaAdminDateTime(inProgress.fechaAsignacion),
     )
@@ -165,15 +185,33 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.textContent).toContain(
       formatAveriaAdminDateTime(resolved.fechaResolucion),
     )
-    expect(container.textContent).toContain(resolved.observacionesAtencion)
+    expect(container.textContent).toContain(
+      resolved.observaciones![0].observacion,
+    )
+    expect(container.textContent).toContain(
+      resolved.observaciones![1].observacion,
+    )
+    expect(container.textContent).toContain('Luis Campos')
+    expect(container.textContent).toContain(
+      formatAveriaAdminDateTime(resolved.observaciones![0].fechaCreacion),
+    )
     expect(container.textContent).not.toContain(AVERIA_NO_OBSERVATIONS_LABEL)
   })
 
   it('muestra Pendiente de atención y Fontanero solo con id', async () => {
     await renderAt('/admin/averias/3')
+    const pendiente = AVERIAS_ADMIN_DETAIL_FIXTURE.find((item) => item.id === 3)!
     expect(container.textContent).toContain('Pendiente de atención')
     expect(container.textContent).toContain('Fontanero #8')
     expect(container.textContent).toContain(AVERIA_UNCLASSIFIED_LABEL)
+    expect(container.textContent).toContain(
+      'La avería ya tiene un Fontanero responsable, pero la atención todavía no ha comenzado.',
+    )
+    expect(container.textContent).toContain('La atención todavía no ha comenzado.')
+    expect(container.textContent).toContain(
+      formatAveriaAdminDateTime(pendiente.fechaAsignacion),
+    )
+    expect(container.textContent).not.toContain('Fuera de horario')
   })
 
   it('muestra textos largos completos sin truncar', async () => {
@@ -266,14 +304,14 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.textContent).toContain('María Rodríguez')
   })
 
-  it('expone el enlace Volver con foco visible y sin inputs de edición', async () => {
+  it('expone el enlace Volver con foco visible', async () => {
     await renderAt('/admin/averias/2')
     const back = [...container.querySelectorAll('a')].find(
       (anchor) => anchor.textContent === 'Volver a averías',
     )
     expect(back?.getAttribute('href')).toBe('/admin/averias')
     expect(back?.tabIndex).toBeGreaterThanOrEqual(0)
-    expect(back?.className).toContain('gallery-admin__link')
+    expect(back?.className).toContain('gallery-admin__button')
     expect(styles).toContain('.averias-admin .gallery-admin__link:focus-visible')
     expect(container.querySelectorAll('h1')).toHaveLength(1)
     expect(container.querySelectorAll('h2').length).toBeGreaterThanOrEqual(4)

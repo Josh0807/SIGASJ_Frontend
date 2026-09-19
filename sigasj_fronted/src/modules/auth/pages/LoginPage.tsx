@@ -12,7 +12,7 @@ import {
 
 type AuthLoginResponse = {
   accessToken: string
-  user: { id: string; email: string; role: string; name?: string }
+  user: { id: string | number; email: string; role: string; name?: string }
 }
 
 /** Correos alineados con las cuentas de desarrollo del backend (login por rol, sin contraseña en local). */
@@ -38,11 +38,18 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const completeLogin = (accessToken: string, role: string, id: string) => {
+  const completeLogin = (
+    accessToken: string,
+    role: string,
+    id: string,
+    userEmail?: string,
+    name?: string,
+  ) => {
     const user = {
       id,
       role,
-      name: 'Usuario',
+      email: userEmail,
+      name: name?.trim() || 'Usuario',
       lastName: role,
     }
     login({ accessToken, user })
@@ -55,7 +62,7 @@ const LoginPage = () => {
     setLoading(true)
 
     try {
-      const payload = await fetchWithAuth<AuthLoginResponse>('/v1/auth/login', {
+      const payload = await fetchWithAuth<AuthLoginResponse>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({
           email: DEV_LOGIN_EMAIL[selectedRole],
@@ -70,15 +77,20 @@ const LoginPage = () => {
       completeLogin(
         payload.accessToken,
         normalizeInternalRole(payload.user.role) ?? selectedRole,
-        payload.user.id,
+        String(payload.user.id),
+        payload.user.email,
+        payload.user.name,
       )
     } catch (err) {
-      const detail =
-        err instanceof Error ? err.message.replace(/^HTTP \d+: /, '') : null
+      const raw = err instanceof Error ? err.message : ''
+      const isNetworkFailure =
+        /failed to fetch|networkerror|load failed/i.test(raw)
       setError(
-        detail
-          ? `No fue posible iniciar sesión: ${detail}`
-          : 'No fue posible iniciar sesión. Verifique que el backend esté en http://localhost:3000.',
+        isNetworkFailure
+          ? 'No fue posible conectar con el servidor. Confirme que el backend esté en http://localhost:3000.'
+          : raw
+            ? `No fue posible iniciar sesión: ${raw.replace(/^HTTP \d+: /, '')}`
+            : 'No fue posible iniciar sesión. Verifique que el backend esté en http://localhost:3000.',
       )
     } finally {
       setLoading(false)

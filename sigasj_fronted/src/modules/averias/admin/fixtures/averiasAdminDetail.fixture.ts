@@ -116,6 +116,21 @@ export const AVERIAS_ADMIN_DETAIL_FIXTURE: AveriaDetail[] = [
     fechaResolucion: '2026-08-20T15:45:00.000Z',
     observacionesAtencion:
       'Se reemplazó el tramo afectado y se dejó el sector con presión normal.',
+    observaciones: [
+      {
+        id: 21,
+        observacion: 'Se identificó la fuga en el tramo afectado.',
+        fechaCreacion: '2026-08-20T09:20:00.000Z',
+        autor: { id: 5, nombre: 'Luis Campos' },
+      },
+      {
+        id: 22,
+        observacion:
+          'Se reemplazó el tramo afectado y se dejó el sector con presión normal.',
+        fechaCreacion: '2026-08-20T15:40:00.000Z',
+        autor: { id: 5, nombre: 'Luis Campos' },
+      },
+    ],
   },
   {
     id: 6,

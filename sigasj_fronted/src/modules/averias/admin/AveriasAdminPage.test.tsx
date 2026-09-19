@@ -73,6 +73,11 @@ describe('AveriasAdminPage', () => {
     )
     expect(container.querySelector('table')).toBeTruthy()
     expect(container.textContent).toContain('AV-2026-0001')
+    expect(container.textContent).toContain('AV-2026-0004')
+    expect(container.textContent).toContain('Pendiente de atención')
+    expect(container.textContent).toContain('Luis Campos')
+    expect(container.textContent).toContain('Atención no iniciada')
+    expect(container.textContent).not.toContain('Fuera de horario')
   })
 
   it('muestra loading sin empty ni error', async () => {
@@ -154,7 +159,7 @@ describe('AveriasAdminPage', () => {
       'En revisión',
       'Asignada',
       'En atención',
-      'Pendiente',
+      'Pendiente de atención',
       'Resuelta',
       'Cancelada',
     ])

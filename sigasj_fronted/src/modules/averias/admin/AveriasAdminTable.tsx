@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { averiasAdminDetailPath } from './averiasAdminPaths'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
+import { esPendienteDeAtencion } from '../utils/averiaPendienteAtencion'
 import {
   getFontaneroLabel,
   getPrioridadLabel,
@@ -69,7 +70,15 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
                   </span>
                 </td>
                 <td>
-                  <AveriaStatusBadge estado={item.estado} />
+                  <div className="averias-admin__estado-cell">
+                    <AveriaStatusBadge estado={item.estado} />
+                    {esPendienteDeAtencion(String(item.estado)) &&
+                    item.fontanero != null ? (
+                      <p className="averias-admin__estado-note">
+                        Atención no iniciada
+                      </p>
+                    ) : null}
+                  </div>
                 </td>
                 <td>
                   <span
@@ -106,6 +115,9 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
               <span className="averias-admin__codigo">{item.codigoSeguimiento}</span>
               <AveriaStatusBadge estado={item.estado} />
             </header>
+            {esPendienteDeAtencion(String(item.estado)) && item.fontanero != null ? (
+              <p className="averias-admin__estado-note">Atención no iniciada</p>
+            ) : null}
             <dl className="averias-admin__card-meta">
               <div>
                 <dt>Fecha</dt>
