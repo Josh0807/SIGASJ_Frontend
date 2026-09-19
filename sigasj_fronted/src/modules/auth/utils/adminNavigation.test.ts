@@ -78,8 +78,11 @@ describe('adminNavigation helpers', () => {
       '/admin/dashboard',
       '/admin/inventario',
       '/admin/actividades',
+      '/fontanero/averias',
     ])
     expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(false)
+    expect(canAccessAdminRoute(fontanero, '/fontanero/averias')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/fontanero/averias/25')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades/nueva')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades-fontanero')).toBe(

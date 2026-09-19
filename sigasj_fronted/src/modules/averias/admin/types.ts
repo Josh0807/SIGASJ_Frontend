@@ -107,6 +107,12 @@ export type AveriaDetail = {
   fechaInicioAtencion: string | null
   fechaResolucion: string | null
   observacionesAtencion: string | null
+  observaciones?: Array<{
+    id: number
+    observacion: string
+    fechaCreacion: string
+    autor: { id: number; nombre: string }
+  }>
 }
 
 export const AVERIA_UNASSIGNED_LABEL = 'Sin asignar'

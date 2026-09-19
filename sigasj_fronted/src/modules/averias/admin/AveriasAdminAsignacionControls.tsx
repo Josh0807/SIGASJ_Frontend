@@ -3,6 +3,10 @@ import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
 import { useAveriaAdminAsignacion } from '../hooks/useAveriaAdminAsignacion'
 import {
+  MENSAJE_PENDIENTE_ATENCION_ADMIN,
+  mostrarAvisoPendienteAdmin,
+} from '../utils/averiaPendienteAtencion'
+import {
   AVERIA_RECIBIDA_ANTES_ASIGNAR_MSG,
   getAveriaAsignacionView,
 } from './averiaAsignacionView'
@@ -78,6 +82,10 @@ const AveriasAdminAsignacionControls = ({
   }
 
   if (view === 'asignada' || view === 'solo_lectura') {
+    const pendienteConResponsable = mostrarAvisoPendienteAdmin(
+      String(averia.estado),
+      averia.fontanero != null,
+    )
     return (
       <dl className="averias-admin__fields">
         <AveriasDetailField label="Fontanero asignado">
@@ -89,6 +97,13 @@ const AveriasAdminAsignacionControls = ({
             AVERIA_UNAVAILABLE_LABEL,
           )}
         </AveriasDetailField>
+        {pendienteConResponsable ? (
+          <AveriasDetailField label="Atención">
+            <p className="averias-admin__horario-hint" role="status">
+              {MENSAJE_PENDIENTE_ATENCION_ADMIN}
+            </p>
+          </AveriasDetailField>
+        ) : null}
       </dl>
     )
   }

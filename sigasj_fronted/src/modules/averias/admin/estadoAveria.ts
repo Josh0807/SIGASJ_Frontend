@@ -28,7 +28,7 @@ export const ESTADO_AVERIA_LABELS: Record<EstadoAveria, string> = {
   EN_REVISION: 'En revisión',
   ASIGNADA: 'Asignada',
   EN_ATENCION: 'En atención',
-  PENDIENTE: 'Pendiente',
+  PENDIENTE: 'Pendiente de atención',
   RESUELTA: 'Resuelta',
   CANCELADA: 'Cancelada',
 }
@@ -61,7 +61,7 @@ export const ESTADO_AVERIA_PRESENTATION: Record<
   RECIBIDA: { label: 'Recibida', modifier: 'is-recibida' },
   EN_REVISION: { label: 'En revisión', modifier: 'is-en-revision' },
   ASIGNADA: { label: 'Asignada', modifier: 'is-asignada' },
-  PENDIENTE: { label: 'Pendiente', modifier: 'is-pendiente' },
+  PENDIENTE: { label: 'Pendiente de atención', modifier: 'is-pendiente' },
   PENDIENTE_ATENCION: {
     label: 'Pendiente de atención',
     modifier: 'is-pendiente',

@@ -7,6 +7,10 @@ import ProtectedRoute from '../../modules/auth/components/ProtectedRoute'
 import { useAuth } from '../../modules/auth/components/AuthContext'
 import { getDefaultAdminHomePath } from '../../modules/auth/utils/adminNavigation'
 import { ACTIVIDADES_FONTANERO_BASE_PATH } from '../../modules/actividades-fontanero/actividadesFontaneroPaths'
+import AveriasFontaneroDetailPage from '../../modules/averias/fontanero/AveriasFontaneroDetailPage'
+import AveriasFontaneroListPage from '../../modules/averias/fontanero/AveriasFontaneroListPage'
+import { FONTANERO_AVERIAS_PATH } from '../../modules/averias/fontanero/averiasFontaneroPaths'
+import { InternalAdminRoleName } from '../../modules/auth/utils/internalRoles'
 import {
   ADMIN_CHILD_ROUTES,
   ADMIN_HOME_PATH,
@@ -55,6 +59,22 @@ const AppRoutes = () => (
         path="fontanero/actividades/*"
         element={<FontaneroActividadesBacklogRedirect />}
       />
+      <Route
+        path="fontanero/averias"
+        element={
+          <AdminAreaGate>
+            <AuthorizedRoute
+              requiredPath={FONTANERO_AVERIAS_PATH}
+              allowedRoles={[InternalAdminRoleName.Fontanero]}
+            >
+              <AdminLayout />
+            </AuthorizedRoute>
+          </AdminAreaGate>
+        }
+      >
+        <Route index element={<AveriasFontaneroListPage />} />
+        <Route path=":id" element={<AveriasFontaneroDetailPage />} />
+      </Route>
       <Route
         path={ADMIN_ROUTE_SEGMENT}
         element={

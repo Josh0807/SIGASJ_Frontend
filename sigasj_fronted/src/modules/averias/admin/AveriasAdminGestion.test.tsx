@@ -10,6 +10,9 @@ import AveriasAdminDetailView from './AveriasAdminDetailView'
 import { findAveriaDetailFixture } from './fixtures/averiasAdminDetail.fixture'
 import { ESTADO_AVERIA_LABELS } from './estadoAveria'
 import * as averiasAdminApi from '../services/averiasAdminApi'
+import {
+  AVERIA_ESTADO_FONTANERO_HINT,
+} from './AveriasAdminGestionControls'
 import type { AveriaDetail } from './types'
 
 const adminDir = dirname(fileURLToPath(import.meta.url))
@@ -69,84 +72,23 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
     })
   }
 
-  it('muestra estado, prioridad y clasificación en modo lectura', async () => {
+  it('muestra el estado en lectura porque lo actualiza el Fontanero', async () => {
     const averia = findAveriaDetailFixture(2)
     expect(averia).toBeDefined()
-    await renderView(averia!, false)
+    await renderView(averia!, true)
     expect(container.textContent).toContain('Asignada')
-    expect(container.textContent).toContain('Alta')
+    expect(container.textContent).toContain(AVERIA_ESTADO_FONTANERO_HINT)
     expect(container.querySelector('#averia-gestion-estado')).toBeNull()
   })
 
-  it('renderiza selects editables para administradora autorizada', async () => {
+  it('no permite a la Administradora cambiar el estado', async () => {
     loginAs(InternalAdminRoleName.Administradora)
     const averia = findAveriaDetailFixture(1)
     expect(averia).toBeDefined()
     await renderView(averia!, true)
-
-    const estado = container.querySelector(
-      '#averia-gestion-estado',
-    ) as HTMLSelectElement
-    const prioridad = container.querySelector(
-      '#averia-gestion-prioridad',
-    ) as HTMLSelectElement
-    const clasificacion = container.querySelector(
-      '#averia-gestion-clasificacion',
-    ) as HTMLSelectElement
-
-    expect(estado).not.toBeNull()
-    expect(prioridad).not.toBeNull()
-    expect(clasificacion).not.toBeNull()
-    expect(estado.value).toBe('RECIBIDA')
-    expect([...estado.options].map((o) => o.value)).toEqual([
-      'RECIBIDA',
-      'EN_REVISION',
-    ])
-  })
-
-  it('no ofrece ASIGNADA ni EN_ATENCION en estado sin fontanero asignado', async () => {
-    loginAs(InternalAdminRoleName.Administradora)
-    const base = findAveriaDetailFixture(1)!
-    await renderView(
-      { ...base, estado: 'EN_REVISION', fontanero: null },
-      true,
-    )
-
-    const estado = container.querySelector(
-      '#averia-gestion-estado',
-    ) as HTMLSelectElement
-    const values = [...estado.options].map((o) => o.value)
-    expect(values).toContain('EN_REVISION')
-    expect(values).toContain('PENDIENTE')
-    expect(values).not.toContain('ASIGNADA')
-    expect(values).not.toContain('EN_ATENCION')
-  })
-
-  it('ejecuta PATCH de estado válido y actualiza la UI', async () => {
-    const base = findAveriaDetailFixture(1)!
-    const updated: AveriaDetail = { ...base, estado: 'EN_REVISION' }
-    vi.spyOn(averiasAdminApi, 'patchAdminAveriaEstado').mockResolvedValueOnce(
-      updated,
-    )
-
-    await renderView(base, true)
-    const estado = container.querySelector(
-      '#averia-gestion-estado',
-    ) as HTMLSelectElement
-
-    await act(async () => {
-      estado.value = 'EN_REVISION'
-      estado.dispatchEvent(new Event('change', { bubbles: true }))
-      await Promise.resolve()
-      await Promise.resolve()
-    })
-
-    expect(averiasAdminApi.patchAdminAveriaEstado).toHaveBeenCalledWith(
-      base.id,
-      'EN_REVISION',
-    )
-    expect(onUpdated).toHaveBeenCalledWith(updated)
-    expect(container.textContent).toContain('Estado actualizado correctamente.')
+    expect(container.querySelector('#averia-gestion-estado')).toBeNull()
+    expect(container.querySelector('#averia-gestion-prioridad')).not.toBeNull()
+    expect(container.querySelector('#averia-gestion-clasificacion')).not.toBeNull()
   })
 
   it('permite cambiar prioridad y clasificación', async () => {
@@ -201,59 +143,33 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
     const pending = new Promise<AveriaDetail>((resolve) => {
       resolvePatch = resolve
     })
-    vi.spyOn(averiasAdminApi, 'patchAdminAveriaEstado').mockReturnValueOnce(
+    vi.spyOn(averiasAdminApi, 'patchAdminAveriaPrioridad').mockReturnValueOnce(
       pending,
     )
 
     await renderView(base, true)
-    const estado = container.querySelector(
-      '#averia-gestion-estado',
-    ) as HTMLSelectElement
     const prioridad = container.querySelector(
       '#averia-gestion-prioridad',
     ) as HTMLSelectElement
+    const clasificacion = container.querySelector(
+      '#averia-gestion-clasificacion',
+    ) as HTMLSelectElement
 
     await act(async () => {
-      estado.value = 'EN_REVISION'
-      estado.dispatchEvent(new Event('change', { bubbles: true }))
+      prioridad.value = 'ALTA'
+      prioridad.dispatchEvent(new Event('change', { bubbles: true }))
     })
 
-    expect(estado.disabled).toBe(true)
     expect(prioridad.disabled).toBe(true)
+    expect(clasificacion.disabled).toBe(true)
 
     await act(async () => {
-      resolvePatch({ ...base, estado: 'EN_REVISION' })
+      resolvePatch({ ...base, prioridad: 'ALTA' })
       await pending
       await Promise.resolve()
     })
 
-    expect(estado.disabled).toBe(false)
-  })
-
-  it('muestra error de transición y revierte el select de estado', async () => {
-    const base = findAveriaDetailFixture(1)!
-    vi.spyOn(averiasAdminApi, 'patchAdminAveriaEstado').mockRejectedValueOnce(
-      new Error(
-        'HTTP 400: No se puede cambiar una avería de RECIBIDA a EN_REVISION.',
-      ),
-    )
-
-    await renderView(base, true)
-    const estado = container.querySelector(
-      '#averia-gestion-estado',
-    ) as HTMLSelectElement
-
-    await act(async () => {
-      estado.value = 'EN_REVISION'
-      estado.dispatchEvent(new Event('change', { bubbles: true }))
-      await Promise.resolve()
-      await Promise.resolve()
-    })
-
-    expect(container.textContent).toContain(
-      'No se puede cambiar una avería de RECIBIDA a EN_REVISION.',
-    )
-    expect(estado.value).toBe('RECIBIDA')
+    expect(prioridad.disabled).toBe(false)
   })
 
   it('sin permisos de edición no muestra controles administrativos', async () => {
@@ -265,6 +181,10 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
 
   it('expone etiquetas de estado alineadas al Backend', () => {
     expect(ESTADO_AVERIA_LABELS.EN_REVISION).toBe('En revisión')
+    expect(ESTADO_AVERIA_LABELS.ASIGNADA).toBe('Asignada')
+    expect(ESTADO_AVERIA_LABELS.PENDIENTE).toBe('Pendiente de atención')
+    expect(ESTADO_AVERIA_LABELS.EN_ATENCION).toBe('En atención')
     expect(ESTADO_AVERIA_LABELS.CANCELADA).toBe('Cancelada')
+    expect(Object.values(ESTADO_AVERIA_LABELS)).not.toContain('Fuera de horario')
   })
 })

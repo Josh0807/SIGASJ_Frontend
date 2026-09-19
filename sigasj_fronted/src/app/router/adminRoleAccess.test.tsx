@@ -19,7 +19,7 @@ const loginAs = (role: string, id = '1') => {
 const sidebarLinks = (html: string) => {
   const classFirst = [
     ...html.matchAll(
-      /<a[^>]*class="[^"]*admin-sidebar__link[^"]*"[^>]*href="(\/admin\/[^"]+)"/g,
+      /<a[^>]*class="[^"]*admin-sidebar__link[^"]*"[^>]*href="((?:\/admin|\/fontanero)\/[^"]+)"/g,
     ),
   ].map((match) => match[1])
 
@@ -29,7 +29,7 @@ const sidebarLinks = (html: string) => {
 
   return [
     ...html.matchAll(
-      /<a[^>]*href="(\/admin\/[^"]+)"[^>]*class="[^"]*admin-sidebar__link[^"]*"/g,
+      /<a[^>]*href="((?:\/admin|\/fontanero)\/[^"]+)"[^>]*class="[^"]*admin-sidebar__link[^"]*"/g,
     ),
   ].map((match) => match[1])
 }

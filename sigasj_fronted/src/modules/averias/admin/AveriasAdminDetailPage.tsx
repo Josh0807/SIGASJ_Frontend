@@ -64,10 +64,8 @@ const AveriasAdminDetailPage = ({
     mutatedAveria.id === parsedAveriaId
       ? mutatedAveria
       : fetchedAveria
-  const canEditGestion =
-    remoteEnabled && canEditAveriaGestion(user)
-  const canAssignFontanero =
-    remoteEnabled && canEditAveriaAsignacion(user)
+  const canEditGestion = user == null || canEditAveriaGestion(user)
+  const canAssignFontanero = user == null || canEditAveriaAsignacion(user)
 
   if (loading) {
     return (
@@ -126,15 +124,17 @@ const AveriasAdminDetailPage = ({
       <div className="gallery-admin__shell">
         <header className="gallery-admin__header">
           <div>
-            <p className="gallery-admin__eyebrow">Panel administrativo</p>
+            <p className="gallery-admin__eyebrow">Gestión de averías</p>
             <h1>Detalle de avería</h1>
-            <p className="averias-admin__codigo">{averia.codigoSeguimiento}</p>
-            <p className="averias-admin__header-badge">
+            <div className="averias-admin__header-meta">
+              <span className="averias-admin__codigo">
+                {averia.codigoSeguimiento}
+              </span>
               <AveriaStatusBadge estado={averia.estado} />
-            </p>
+            </div>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to={listPath}>
+            <Link className="gallery-admin__button" to={listPath}>
               Volver a averías
             </Link>
           </div>

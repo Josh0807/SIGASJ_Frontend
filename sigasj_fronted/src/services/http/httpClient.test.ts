@@ -54,6 +54,20 @@ describe('httpClient (fetchWithAuth)', () => {
     )
   })
 
+  it('en desarrollo usa el proxy same-origin /api/v1', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true }),
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    await fetchWithAuth('/auth/login', { method: 'POST', body: '{}' })
+
+    const [url] = mockFetch.mock.calls[0] as [string]
+    expect(url).toBe('/api/v1/auth/login')
+  })
+
   it('serializa activo=false en la query y no lo omite', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,

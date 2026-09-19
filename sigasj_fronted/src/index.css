@@ -4858,6 +4858,7 @@ body,
   font-weight: 750;
   line-height: 1.35;
   overflow-wrap: anywhere;
+  word-spacing: 0.08em;
 }
 
 .admin-header__account {
@@ -11544,6 +11545,7 @@ body,
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  word-spacing: 0.06em;
 }
 
 .averias-admin .gallery-admin__shell {
@@ -11570,6 +11572,12 @@ body,
 }
 
 .averias-admin__codigo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #edf4fb;
   color: #123f70;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -11599,6 +11607,48 @@ body,
   white-space: nowrap;
 }
 
+.averias-admin__estado-cell {
+  display: grid;
+  gap: 4px;
+}
+
+.averias-admin__estado-note {
+  margin: 0;
+  color: #8a5a12;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.averias-admin__horario-hint {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff6e8;
+  color: #6a4510;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.averias-admin__estado-leyenda {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.averias-admin__estado-leyenda li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.averias-admin__estado-leyenda span {
+  color: #304c67;
+  font-size: 0.9rem;
+}
+
 .averias-admin__badge--estado.is-recibida {
   background: #edf4fb;
   color: #1e5a9c;
@@ -11615,13 +11665,15 @@ body,
 }
 
 .averias-admin__badge--estado.is-pendiente {
-  background: #fff6e8;
-  color: #8a5a12;
+  background: #fff3d6;
+  color: #7a4b00;
+  box-shadow: inset 0 0 0 1px #e6c27a;
 }
 
 .averias-admin__badge--estado.is-en-atencion {
-  background: #eef3fb;
-  color: #1e4f8c;
+  background: #e4eefc;
+  color: #163f7a;
+  box-shadow: inset 0 0 0 1px #9bb6e0;
 }
 
 .averias-admin__badge--estado.is-resuelta {
@@ -11713,54 +11765,69 @@ body,
   outline-offset: 2px;
 }
 
-.averias-admin__header-badge {
-  margin: 10px 0 0;
+.averias-admin__header-badge,
+.averias-admin__header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 0;
 }
 
 .averias-admin__detail {
   display: grid;
-  gap: 16px;
+  gap: 18px;
   min-width: 0;
 }
 
 .averias-admin__detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .averias-admin__section {
   min-width: 0;
-  padding: 20px 22px;
+  padding: 22px 24px;
   border: 1px solid #d7e5f1;
   border-radius: 16px;
   background: #ffffff;
+  box-shadow: 0 8px 24px rgba(18, 63, 112, 0.05);
 }
 
 .averias-admin__section h2 {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e6eef6;
   color: #123f70;
-  font-size: 1.05rem;
+  font-size: 1.08rem;
+  word-spacing: 0.06em;
 }
 
 .averias-admin__fields {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px 20px;
   margin: 0;
+}
+
+.averias-admin__field.is-multiline {
+  grid-column: 1 / -1;
 }
 
 .averias-admin__field dt {
   color: #3781a9;
-  font-size: 0.75rem;
-  font-weight: 750;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  word-spacing: 0.08em;
 }
 
 .averias-admin__field dd {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   color: #304c67;
   overflow-wrap: anywhere;
+  line-height: 1.5;
 }
 
 .averias-admin__prewrap {
@@ -11812,8 +11879,145 @@ body,
     min-height: 44px;
   }
 
+  .averias-admin__badge--estado {
+    white-space: normal;
+    text-align: center;
+    max-width: 11rem;
+  }
+
   .averias-admin .gallery-admin__header-actions {
     order: -1;
     width: 100%;
+  }
+}
+
+.averias-fontanero__list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.averias-fontanero__detail {
+  display: grid;
+  gap: 16px;
+}
+
+.averias-fontanero__ubicacion {
+  border-color: #9ec4e0;
+}
+
+.averias-fontanero__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.averias-fontanero__acciones p,
+.averias-fontanero__acciones .activity-feedback {
+  flex: 1 1 100%;
+  margin: 0;
+  color: #304c67;
+}
+
+.averias-fontanero__acciones .gallery-admin__button {
+  min-height: 44px;
+}
+
+.averias-fontanero__observaciones-list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.averias-fontanero__observaciones-list li + li {
+  margin-top: 12px;
+}
+
+.averias-fontanero__observacion-fecha {
+  margin: 0;
+  color: #123f70;
+  font-weight: 700;
+}
+
+.averias-fontanero__observacion-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.averias-fontanero__resolver-panel {
+  width: min(100%, 36rem);
+}
+
+.averias-fontanero__resolver-form {
+  display: grid;
+  gap: 10px;
+}
+
+.averias-fontanero__resolver-label {
+  color: #123f70;
+  font-weight: 700;
+  font-size: .92rem;
+}
+
+.averias-fontanero__resolver-form textarea,
+.averias-fontanero__observacion-form textarea {
+  width: 100%;
+  min-height: 7.5rem;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid #c5d7e8;
+  border-radius: 10px;
+  font: inherit;
+  color: #123f70;
+}
+
+.averias-fontanero__resolver-form textarea:focus-visible,
+.averias-fontanero__observacion-form textarea:focus-visible {
+  outline: 2px solid #1d6fb8;
+  outline-offset: 2px;
+}
+
+.averias-fontanero__resolver-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: .9rem;
+}
+
+.averias-fontanero .gallery-admin__empty .gallery-admin__button + .gallery-admin__button {
+  margin-top: 8px;
+}
+
+@media (max-width: 760px) {
+  .averias-fontanero__detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .averias-fontanero__ubicacion {
+    order: 1;
+  }
+
+  .averias-fontanero__gestion {
+    order: 2;
+  }
+
+  .averias-fontanero__reporte {
+    order: 3;
+  }
+
+  .averias-fontanero__observaciones {
+    order: 4;
+  }
+
+  .averias-fontanero .gallery-admin__button,
+  .averias-fontanero .gallery-admin__link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }

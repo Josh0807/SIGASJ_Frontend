@@ -94,12 +94,16 @@ describe('accesibilidad del listado administrativo de averías', () => {
     expect(styles).toContain('.averias-admin__cards')
     expect(styles).toMatch(/@media \(max-width: 760px\)[\s\S]*\.averias-admin__cards/)
     expect(styles).toMatch(/@media \(max-width: 1199px\)[\s\S]*\.averias-admin__detail-grid/)
+    expect(styles).toContain('.averias-admin__horario-hint')
+    expect(styles).toContain('.averias-admin__estado-leyenda')
+    expect(styles).toMatch(/@media \(max-width: 760px\)[\s\S]*\.averias-admin__badge--estado/)
   })
 
   it('muestra el texto de cada estado previsto', async () => {
     const cases = [
       ['RECIBIDA', 'Recibida'],
       ['ASIGNADA', 'Asignada'],
+      ['PENDIENTE', 'Pendiente de atención'],
       ['PENDIENTE_ATENCION', 'Pendiente de atención'],
       ['EN_ATENCION', 'En atención'],
       ['RESUELTA', 'Resuelta'],

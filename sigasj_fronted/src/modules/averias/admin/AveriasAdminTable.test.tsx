@@ -107,4 +107,12 @@ describe('AveriasAdminTable', () => {
     await renderTable([AVERIAS_ADMIN_UI_FIXTURE_ITEMS[0]])
     expect(container.textContent).toContain('Recibida')
   })
+
+  it('distingue Pendiente de atención con Fontanero y sin inicio', async () => {
+    await renderTable([AVERIAS_ADMIN_UI_FIXTURE_ITEMS[3]])
+    expect(container.textContent).toContain('Pendiente de atención')
+    expect(container.textContent).toContain('Luis Campos')
+    expect(container.textContent).toContain('Atención no iniciada')
+    expect(container.textContent).not.toContain('Fuera de horario')
+  })
 })

@@ -29,6 +29,16 @@ export function subscribeAuthUser(listener: AuthUserListener): () => void {
 const isPresent = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0
 
+const asUserId = (value: unknown): string | undefined => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return String(value)
+  }
+  if (isPresent(value)) {
+    return value.trim()
+  }
+  return undefined
+}
+
 const sanitizeAuthUser = (value: unknown): AuthUser | null => {
   if (!value || typeof value !== 'object') {
     return null
@@ -36,9 +46,9 @@ const sanitizeAuthUser = (value: unknown): AuthUser | null => {
 
   const candidate = value as Record<string, unknown>
   const user: AuthUser = {}
-
-  if (isPresent(candidate.id)) {
-    user.id = candidate.id.trim()
+  const id = asUserId(candidate.id)
+  if (id) {
+    user.id = id
   }
 
   if (isPresent(candidate.name)) {

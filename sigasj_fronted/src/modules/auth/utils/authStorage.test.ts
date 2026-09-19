@@ -48,6 +48,25 @@ describe('authStorage', () => {
     expect(isAuthenticated()).toBe(false)
   })
 
+  it('persiste el id numérico que emite el backend en el login', () => {
+    setAuthSession({
+      accessToken: 'token-demo',
+      user: {
+        id: 18 as unknown as string,
+        email: 'admin@asadasanjuan.cr',
+        role: 'ADMINISTRADORA',
+        name: 'Administradora',
+      },
+    })
+
+    expect(getAuthUser()).toEqual({
+      id: '18',
+      email: 'admin@asadasanjuan.cr',
+      role: 'Administradora',
+      name: 'Administradora',
+    })
+  })
+
   it('guarda sesión completa con setAuthSession', () => {
     setAuthSession({
       accessToken: 'token-demo',

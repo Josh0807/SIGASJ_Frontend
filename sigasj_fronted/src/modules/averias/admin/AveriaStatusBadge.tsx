@@ -10,6 +10,7 @@ const AveriaStatusBadge = ({ estado }: AveriaStatusBadgeProps) => {
   return (
     <span
       className={`averias-admin__badge averias-admin__badge--estado ${presentation.modifier}`}
+      aria-label={`Estado: ${presentation.label}`}
     >
       {presentation.label}
     </span>
