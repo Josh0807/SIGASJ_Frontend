@@ -182,7 +182,7 @@ const AveriasFontaneroResolverDialog = ({
       }}
     >
       <div
-        className="confirm-dialog__panel averias-fontanero__resolver-panel"
+        className="confirm-dialog__panel averias-fontanero__resolver-panel max-h-[min(90dvh,40rem)] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -231,7 +231,7 @@ const AveriasFontaneroResolverDialog = ({
               {AVERIAS_FONTANERO_RESOLVER_LOADING}
             </p>
           ) : null}
-          <div className="confirm-dialog__actions">
+          <div className="confirm-dialog__actions w-full">
             <button
               ref={cancelRef}
               type="button"

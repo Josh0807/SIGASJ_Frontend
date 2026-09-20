@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../components/AuthContext'
 import { fetchWithAuth } from '../../../services/http/httpClient'
@@ -37,6 +37,7 @@ const LoginPage = () => {
   )
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const submittingRef = useRef(false)
 
   const completeLogin = (
     accessToken: string,
@@ -58,7 +59,12 @@ const LoginPage = () => {
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (submittingRef.current) {
+      return
+    }
+
     setError(null)
+    submittingRef.current = true
     setLoading(true)
 
     try {
@@ -93,13 +99,14 @@ const LoginPage = () => {
             : 'No fue posible iniciar sesión. Verifique que el backend esté en http://localhost:3000.',
       )
     } finally {
+      submittingRef.current = false
       setLoading(false)
     }
   }
 
   return (
-    <main className="auth-page">
-      <div className="auth-page__card">
+    <main className="auth-page w-full min-w-0">
+      <div className="auth-page__card w-full max-w-md">
         <h1>Iniciar sesión</h1>
         <p className="auth-page__hint">
           Acceso administrativo de SIGASJ. Selecciona un rol interno; el

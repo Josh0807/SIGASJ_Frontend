@@ -119,7 +119,7 @@ const TransparenciaAdminForm = ({
   }
 
   return (
-    <form className="gallery-admin__form" onSubmit={handleSubmit}>
+    <form className="gallery-admin__form w-full max-w-3xl" onSubmit={handleSubmit}>
       <h2>{mode === 'create' ? 'Nueva publicación' : 'Editar publicación'}</h2>
 
       <label className="gallery-admin__field">

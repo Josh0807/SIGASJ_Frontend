@@ -11,5 +11,5 @@ export default function CategoriaCreatePage() {
   const { user } = useAuth()
   if (normalizeInternalRole(user?.role) !== InternalAdminRoleName.Administradora) return <Navigate to={UNAUTHORIZED_ROUTE_PATH} replace />
   const submit = async (values: CategoriaFormValues) => { try { await createCategoria({ nombre: values.nombre.trim(), descripcion: values.descripcion.trim() || null }) } catch (caught) { const parsed = categoriaError(caught); const error = new Error(parsed.message, { cause: caught }) as Error & { fieldError?: string }; error.fieldError = parsed.nombre; throw error } }
-  return <main className="materials-admin materials-admin--form"><header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Categorías</p><h1>Nueva categoría</h1><p>Registre una clasificación para los materiales de bodega.</p></div></header><CategoriaForm mode="create" onSubmit={submit} /></main>
+  return <main className="materials-admin materials-admin--form sigasj-stack"><header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Categorías</p><h1>Nueva categoría</h1><p>Registre una clasificación para los materiales de bodega.</p></div></header><CategoriaForm mode="create" onSubmit={submit} /></main>
 }

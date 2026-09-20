@@ -63,7 +63,7 @@ const ContactoAdminPage = () => {
 
   return (
     <main className="gallery-admin">
-      <div className="gallery-admin__shell">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Panel administrativo</p>
@@ -84,7 +84,7 @@ const ContactoAdminPage = () => {
             Cargando información…
           </p>
         ) : (
-          <form className="gallery-admin__form" onSubmit={handleSubmit}>
+          <form className="gallery-admin__form w-full max-w-3xl" onSubmit={handleSubmit}>
             <h2>Contacto</h2>
 
             <label className="gallery-admin__field">

@@ -20,6 +20,8 @@ import {
   AVERIAS_FONTANERO_DETAIL_LOADING_MESSAGE,
   AVERIAS_FONTANERO_DETAIL_NOT_FOUND,
   AVERIAS_FONTANERO_ATENCION_NO_INICIADA,
+  AVERIAS_FONTANERO_CALIFICAR_GUARDAR,
+  AVERIAS_FONTANERO_CALIFICAR_SUCCESS,
   AVERIAS_FONTANERO_LIST_EMPTY,
   AVERIAS_FONTANERO_INICIAR_FORBIDDEN,
   AVERIAS_FONTANERO_INICIAR_LABEL,
@@ -62,6 +64,8 @@ describe('AveriasFontaneroDetailPage', () => {
     vi.spyOn(averiasFontaneroApi, 'resolverFontaneroAveria')
     vi.spyOn(averiasFontaneroApi, 'createFontaneroObservacion')
     vi.spyOn(averiasFontaneroApi, 'iniciarFontaneroAtencion')
+    vi.spyOn(averiasFontaneroApi, 'patchFontaneroAveriaPrioridad')
+    vi.spyOn(averiasFontaneroApi, 'patchFontaneroAveriaClasificacion')
     vi.spyOn(averiasFontaneroApi, 'getFontaneroAverias').mockResolvedValue({
       data: [],
     })
@@ -131,12 +135,62 @@ describe('AveriasFontaneroDetailPage', () => {
     expect(container.textContent).not.toContain('1-2345-6789')
     expect(container.textContent).not.toContain('juan.perez@example.com')
     expect(container.textContent).not.toContain('Abonado')
-    expect(container.querySelector('select')).toBeNull()
+    expect(container.querySelector('#averia-fontanero-prioridad')).not.toBeNull()
+    expect(container.querySelector('#averia-fontanero-clasificacion')).not.toBeNull()
+    expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
     expect(container.querySelector('textarea[name="observacion"]')).toBeTruthy()
     expect(container.querySelector('textarea[name="observacionFinal"]')).toBeNull()
     expect(
       container.querySelector(`a[href="${FONTANERO_AVERIAS_PATH}"]`)?.textContent,
     ).toContain(AVERIAS_FONTANERO_BACK_LABEL)
+  })
+
+  it('el Fontanero califica prioridad y tipo contra el Backend', async () => {
+    const assigned = findFontaneroAveriaFixture(25)!
+    vi.mocked(averiasFontaneroApi.patchFontaneroAveriaPrioridad).mockResolvedValueOnce(
+      { ...assigned, prioridad: 'MEDIA' },
+    )
+    vi.mocked(averiasFontaneroApi.patchFontaneroAveriaClasificacion).mockResolvedValueOnce(
+      { ...assigned, prioridad: 'MEDIA', tipoAveria: 'TUBO_MADRE' },
+    )
+
+    await renderAt(`${FONTANERO_AVERIAS_PATH}/25`)
+    const prioridad = container.querySelector(
+      '#averia-fontanero-prioridad',
+    ) as HTMLSelectElement
+    const tipo = container.querySelector(
+      '#averia-fontanero-clasificacion',
+    ) as HTMLSelectElement
+    await act(async () => {
+      prioridad.value = 'MEDIA'
+      prioridad.dispatchEvent(new Event('change', { bubbles: true }))
+      tipo.value = 'TUBO_MADRE'
+      tipo.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    const guardar = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent?.includes(AVERIAS_FONTANERO_CALIFICAR_GUARDAR),
+    )
+    await act(async () => {
+      guardar?.click()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+
+    expect(averiasFontaneroApi.patchFontaneroAveriaPrioridad).toHaveBeenCalledWith(
+      25,
+      'MEDIA',
+    )
+    expect(averiasFontaneroApi.patchFontaneroAveriaClasificacion).toHaveBeenCalledWith(
+      25,
+      'TUBO_MADRE',
+    )
+    expect(container.textContent).toContain(AVERIAS_FONTANERO_CALIFICAR_SUCCESS)
+  })
+
+  it('no muestra calificación en una avería resuelta', async () => {
+    await renderAt(`${FONTANERO_AVERIAS_PATH}/28`)
+    expect(container.querySelector('#averia-fontanero-prioridad')).toBeNull()
+    expect(container.querySelector('#averia-fontanero-clasificacion')).toBeNull()
   })
 
   it('maneja tipo, prioridad, fechas y observaciones pendientes sin undefined', async () => {

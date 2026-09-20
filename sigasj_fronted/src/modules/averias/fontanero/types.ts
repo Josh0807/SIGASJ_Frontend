@@ -160,6 +160,27 @@ export const AVERIAS_FONTANERO_RESOLVER_FORBIDDEN =
 export const AVERIAS_FONTANERO_RESOLVER_SUCCESS =
   'La avería fue marcada como resuelta.'
 
+export const AVERIAS_FONTANERO_CALIFICAR_TITULO = 'Calificar avería'
+
+export const AVERIAS_FONTANERO_CALIFICAR_HINT =
+  'Califique prioridad (Baja, Media o Alta) y tipo (Tubo madre o Tubo medidor).'
+
+export const AVERIAS_FONTANERO_CALIFICAR_GUARDAR = 'Guardar calificación'
+
+export const AVERIAS_FONTANERO_CALIFICAR_LOADING = 'Guardando calificación...'
+
+export const AVERIAS_FONTANERO_CALIFICAR_SUCCESS =
+  'La calificación se guardó correctamente.'
+
+export const AVERIAS_FONTANERO_CALIFICAR_ERROR =
+  'No fue posible guardar la calificación. Intente nuevamente.'
+
+export const AVERIAS_FONTANERO_CALIFICAR_FORBIDDEN =
+  'No tiene autorización para calificar esta avería.'
+
+export const AVERIAS_FONTANERO_CALIFICAR_INVALIDA =
+  'Seleccione una prioridad y un tipo válidos.'
+
 export const OBSERVACION_AVERIA_MAX_LENGTH = 2000
 
 export const OBSERVACION_FINAL_MAX_LENGTH = OBSERVACION_AVERIA_MAX_LENGTH

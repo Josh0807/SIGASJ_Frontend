@@ -15,8 +15,8 @@ const Header = () => {
   }, [])
 
   return (
-    <header className="header">
-      <div className="header__inner">
+    <header className="header w-full">
+      <div className="header__inner min-w-0">
         <a className="brand" href="#inicio" aria-label="SIGASJ, ir al inicio">
           <span className="brand__logo">
             <img src={asadaLogo} alt="Logo de la ASADA San Juan de Santa Cruz" />

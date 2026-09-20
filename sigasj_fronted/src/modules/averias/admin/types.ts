@@ -3,7 +3,7 @@ import {
   PRIORIDAD_AVERIA_LABELS,
   type PrioridadAveria,
 } from './prioridadAveria'
-import { TIPO_AVERIA_LABELS, type TipoAveria } from './tipoAveria'
+import { getTipoAveriaStoredLabel, TIPO_AVERIA_LABELS, type TipoAveria } from './tipoAveria'
 
 /** Coincide con `AveriaAdminFontanero` del Backend 2.2 / 2.4. `nombre` es opcional. */
 export type AveriaAdminFontanero = {
@@ -177,8 +177,7 @@ export const getTipoAveriaDetailLabel = (tipoAveria: string | null): string => {
     return AVERIA_UNCLASSIFIED_LABEL
   }
 
-  const key = tipoAveria.trim().toUpperCase()
-  return TIPO_AVERIA_LABELS[key as TipoAveria] ?? tipoAveria
+  return getTipoAveriaStoredLabel(tipoAveria)
 }
 
 export const getOptionalPersonalLabel = (

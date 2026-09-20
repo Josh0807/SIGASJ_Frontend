@@ -29,7 +29,7 @@
 
 .averias-admin__hint {
   margin: 0;
-  max-width: 28rem;
+  max-width: 40rem;
   color: #6b7c8d;
   font-size: 0.92rem;
   line-height: 1.45;
@@ -42,9 +42,44 @@
   margin-bottom: 16px;
 }
 
+.averias-admin__gestion-controls > .averias-admin__estado-label,
+.averias-admin__gestion-controls > .averias-admin__hint,
+.averias-admin__gestion-controls > .gallery-admin__button {
+  grid-column: 1 / -1;
+}
+
 .averias-admin__gestion-readonly {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px 16px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 1199px) {
+  .averias-admin__gestion-controls,
+  .averias-admin__gestion-readonly {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .averias-admin__estado-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .averias-admin__hint {
+    max-width: none;
+  }
+
+  .averias-admin__gestion-controls,
+  .averias-admin__gestion-readonly {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .averias-admin__gestion-controls .gallery-admin__field,
+  .averias-admin__gestion-controls .gallery-admin__field select,
+  .averias-admin__gestion-controls .gallery-admin__button {
+    width: 100%;
+  }
 }

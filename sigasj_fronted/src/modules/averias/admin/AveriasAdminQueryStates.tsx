@@ -56,9 +56,9 @@ const AveriasAdminQueryStates = ({
 
   if (!hasResults) {
     return (
-      <p className="gallery-admin__empty" role="status">
-        {AVERIAS_ADMIN_EMPTY_MESSAGE}
-      </p>
+      <div className="gallery-admin__empty" role="status">
+        <p>{AVERIAS_ADMIN_EMPTY_MESSAGE}</p>
+      </div>
     )
   }
 

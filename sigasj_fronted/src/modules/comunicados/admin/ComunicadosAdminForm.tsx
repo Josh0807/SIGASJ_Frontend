@@ -23,11 +23,13 @@ const ComunicadosAdminForm = ({
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
+  const [tituloError, setTituloError] = useState<string | null>(null)
 
   useEffect(() => {
     setValues(initialValues)
     setFile(null)
     setFormError(null)
+    setTituloError(null)
   }, [initialValues, mode])
 
   useEffect(() => {
@@ -49,9 +51,10 @@ const ComunicadosAdminForm = ({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setFormError(null)
+    setTituloError(null)
 
     if (!values.titulo.trim()) {
-      setFormError('El título es obligatorio.')
+      setTituloError('El título es obligatorio.')
       return
     }
 
@@ -72,7 +75,7 @@ const ComunicadosAdminForm = ({
   }
 
   return (
-    <form className="gallery-admin__form" onSubmit={handleSubmit}>
+    <form className="gallery-admin__form w-full max-w-3xl" onSubmit={handleSubmit}>
       <h2>{mode === 'create' ? 'Nuevo comunicado' : 'Editar comunicado'}</h2>
 
       <label className="gallery-admin__field">
@@ -81,11 +84,19 @@ const ComunicadosAdminForm = ({
           type="text"
           maxLength={200}
           required
+          aria-invalid={Boolean(tituloError)}
+          aria-describedby={tituloError ? 'comunicado-titulo-error' : undefined}
           value={values.titulo}
-          onChange={(event) =>
+          onChange={(event) => {
+            setTituloError(null)
             setValues((current) => ({ ...current, titulo: event.target.value }))
-          }
+          }}
         />
+        {tituloError ? (
+          <small id="comunicado-titulo-error" className="gallery-admin__form-error" role="alert">
+            {tituloError}
+          </small>
+        ) : null}
       </label>
 
       <label className="gallery-admin__field">
@@ -255,7 +266,7 @@ const ComunicadosAdminForm = ({
           className="gallery-admin__button gallery-admin__button--primary"
           disabled={submitting}
         >
-          {submitting ? 'Guardando…' : 'Guardar'}
+          {submitting ? 'Guardando…' : mode === 'create' ? 'Guardar comunicado' : 'Guardar cambios'}
         </button>
       </div>
     </form>

@@ -35,18 +35,33 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('¡Bienvenido al sistema administrativo de ASADA San Juan!')
     expect(markup).toContain('Sistema Operativo')
     expect(markup).toContain('¡ASADA San Juan!')
+    expect(markup).toContain('alt="Gotín"')
   })
 
   it('3. Muestra los indicadores generales con datos numéricos y sus enlaces a módulos correspondientes', () => {
+    vi.spyOn(useDashboardMetricsModule, 'useDashboardMetrics').mockReturnValue({
+      metrics: {
+        abonadosActivos: 12,
+        lecturasPendientes: null,
+        averiasReportadas: 2,
+        solicitudesEnTramite: 1,
+      },
+      isLoading: false,
+      isError: false,
+      refetch: async () => {},
+    })
+
     const markup = renderDashboard()
     expect(markup).toContain('Indicadores generales')
     expect(markup).toContain('Asociados activos')
-    expect(markup).toContain('1,248')
+    expect(markup).toContain('12')
+    expect(markup).not.toContain('1,248')
     expect(markup).not.toContain('Recursos Humanos')
     expect(markup).toContain('Averías reportadas')
-    expect(markup).toContain('3')
+    expect(markup).toContain('2')
     expect(markup).toContain('Solicitudes en trámite')
-    expect(markup).toContain('8')
+    expect(markup).toContain('1')
+    expect(markup).toContain('N/D')
 
     // Verificar correspondencia con los módulos
     expect(markup).toContain('href="/admin/abonados"')

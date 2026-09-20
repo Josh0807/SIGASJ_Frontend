@@ -6,8 +6,11 @@ import RecentActivityWidget from './components/RecentActivityWidget'
 import { useDashboardMetrics } from './hooks/useDashboardMetrics'
 import { useAuth } from '../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
+import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
 import type { DashboardIndicator } from './props'
 import { IconRefresh } from '@tabler/icons-react'
+import welcomeImage from '../../assets/Hero1.png'
+import gotinImage from '../../assets/Gotín sin fondo.png'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   {
@@ -40,15 +43,28 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     icon: 'solicitudes',
     link: '/admin/solicitudes',
   },
+  {
+    id: 'lecturas',
+    label: 'Pendientes de lectura',
+    value: null,
+    detail: 'Ciclo en curso',
+    badgeText: 'Pendientes',
+    badgeType: 'warning',
+    icon: 'lecturas',
+  },
 ]
 
 const AdminDashboard = () => {
   const { user } = useAuth()
   const { metrics, isLoading, isError, refetch } = useDashboardMetrics()
+  const displayName = resolveAuthUserHeaderName(user)
 
-  const indicators: DashboardIndicator[] = DASHBOARD_INDICATORS.filter(
-    (indicator) => !indicator.link || canAccessAdminRoute(user, indicator.link),
-  ).map((indicator) => {
+  const indicators: DashboardIndicator[] = DASHBOARD_INDICATORS.filter((indicator) => {
+    if (indicator.id === 'lecturas') {
+      return canAccessAdminRoute(user, '/admin/lecturas')
+    }
+    return !indicator.link || canAccessAdminRoute(user, indicator.link)
+  }).map((indicator) => {
     if (indicator.id === 'abonados') {
       return { ...indicator, value: metrics.abonadosActivos ?? null }
     }
@@ -58,16 +74,25 @@ const AdminDashboard = () => {
     if (indicator.id === 'solicitudes') {
       return { ...indicator, value: metrics.solicitudesEnTramite ?? null }
     }
+    if (indicator.id === 'lecturas') {
+      return { ...indicator, value: metrics.lecturasPendientes ?? null }
+    }
     return indicator
   })
 
   return (
-    <section className="admin-dashboard" aria-labelledby="admin-dashboard-title">
-      <div className="admin-dashboard__shell">
-        {/* Banner de Bienvenida */}
+    <section className="admin-dashboard w-full min-w-0" aria-labelledby="admin-dashboard-title">
+      <div className="admin-dashboard__shell sigasj-stack">
         <header className="admin-dashboard__welcome">
+          <img
+            className="admin-dashboard__welcome-art"
+            src={welcomeImage}
+            alt=""
+          />
           <div className="admin-dashboard__welcome-content">
             <span className="admin-dashboard__eyebrow">Panel de Control General</span>
+            <p className="admin-dashboard__welcome-kicker">Bienvenido de nuevo,</p>
+            <p className="admin-dashboard__welcome-name">{displayName}</p>
             <h1 id="admin-dashboard-title">Dashboard administrativo</h1>
             <p className="admin-dashboard__welcome-text">
               ¡Bienvenido al sistema administrativo de ASADA San Juan! Aquí encontrarás
@@ -76,7 +101,13 @@ const AdminDashboard = () => {
             </p>
           </div>
           <div className="admin-dashboard__system-status" role="status" aria-live="polite">
-            <span className="admin-dashboard__status-dot admin-dashboard__status-dot--online" />
+            <span className="admin-dashboard__status-ring">
+              <img
+                className="admin-dashboard__status-mascot"
+                src={gotinImage}
+                alt="Gotín"
+              />
+            </span>
             <div className="admin-dashboard__status-info">
               <strong>Sistema Operativo</strong>
               <small>¡ASADA San Juan!</small>
@@ -84,7 +115,6 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        {/* Sección de Indicadores Generales */}
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header admin-dashboard__section-header--with-action">
             <div>
@@ -140,7 +170,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Sección de Operaciones y Estado en Tiempo Real (Widgets) */}
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header">
             <h2>Operaciones en tiempo real</h2>

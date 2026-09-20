@@ -45,8 +45,9 @@ const AveriasAdminFilters = ({
   onClear,
   hasActiveFilters,
 }: AveriasAdminFiltersProps) => (
-  <section className="gallery-admin__filters" aria-label="Búsqueda y filtros">
+  <section className="gallery-admin__filters w-full" aria-label="Búsqueda y filtros">
     <form
+      className="sigasj-filter-search"
       role="search"
       onSubmit={(event) => {
         event.preventDefault()

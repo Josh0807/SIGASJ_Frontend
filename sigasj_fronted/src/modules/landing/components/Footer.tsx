@@ -7,7 +7,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="footer">
+    <footer className="footer w-full min-w-0">
       <div className="footer__content">
         <div className="footer__brand">
           <img src={asadaLogo} alt="Logo de la ASADA San Juan de Santa Cruz" />

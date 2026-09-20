@@ -108,7 +108,7 @@ export default function ReportesInventarioPage() {
 
   return (
     <main className="gallery-admin inventario-reportes">
-      <div className="gallery-admin__shell">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <span className="gallery-admin__eyebrow">Inventario · Administración</span>

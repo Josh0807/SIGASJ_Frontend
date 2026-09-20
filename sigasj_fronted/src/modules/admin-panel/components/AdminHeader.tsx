@@ -54,8 +54,8 @@ const AdminHeader = ({
   menuToggleRef,
 }: AdminHeaderProps) => {
   return (
-    <header className="admin-header" aria-label="Encabezado del panel administrativo">
-      <div className="admin-header__start">
+    <header className="admin-header min-w-0" aria-label="Encabezado del panel administrativo">
+      <div className="admin-header__start min-w-0">
         <AdminHeaderMenuToggle
           menuOpen={menuOpen}
           onToggleMenu={onToggleMenu}
@@ -65,7 +65,7 @@ const AdminHeader = ({
         <p className="admin-header__title">Panel administrativo</p>
       </div>
 
-      <div className="admin-header__account">
+      <div className="admin-header__account min-w-0">
         <div className="admin-header__actions">
           <Link
             className="admin-header__action admin-header__action--public"

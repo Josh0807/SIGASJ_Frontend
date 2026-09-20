@@ -10,7 +10,7 @@ const ProyectosAdminFormPageLayout = ({
   children,
 }: ProyectosAdminFormPageLayoutProps) => (
   <main className="gallery-admin proyectos-admin">
-    <div className="gallery-admin__shell">
+    <div className="gallery-admin__shell sigasj-stack">
       <header className="gallery-admin__header">
         <div>
           <p className="gallery-admin__eyebrow">Panel administrativo</p>

@@ -21,19 +21,21 @@ const AveriasAdminPagination = ({
   const canGoNext = page < totalPages
 
   return (
-    <nav className="gallery-admin__pagination" aria-label="Paginación de averías">
+    <nav className="gallery-admin__pagination w-full" aria-label="Paginación de averías">
       <button
         type="button"
+        className="min-w-24"
         disabled={!canGoPrevious || loading}
         onClick={() => onPageChange(page - 1)}
       >
         Anterior
       </button>
-      <p>
+      <p className="text-sm tabular-nums">
         Página {page} de {totalPages}
       </p>
       <button
         type="button"
+        className="min-w-24"
         disabled={!canGoNext || loading}
         onClick={() => onPageChange(page + 1)}
       >

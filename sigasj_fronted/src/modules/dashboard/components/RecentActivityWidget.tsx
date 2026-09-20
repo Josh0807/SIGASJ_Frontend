@@ -1,38 +1,73 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
+import { useAuth } from '../../auth/components/AuthContext'
+import { canAccessAdminRoute } from '../../auth/utils/adminNavigation'
+import { ACTIVIDADES_FONTANERO_BASE_PATH } from '../../actividades-fontanero/actividadesFontaneroPaths'
 import type { ActivityItem, RecentActivityWidgetProps } from '../props'
-
-const DEFAULT_ACTIVITIES: ActivityItem[] = [
-  {
-    id: 'act-1',
-    user: 'Juan Pérez',
-    action: 'Registró 45 lecturas en',
-    target: 'Sector Norte',
-    timeAgo: 'Hace 10 min',
-    icon: 'lecturas',
-  },
-  {
-    id: 'act-2',
-    user: 'Ana Solís',
-    action: 'Dio de alta al asociado',
-    target: '#1042 (Carlos Mora)',
-    timeAgo: 'Hace 45 min',
-    icon: 'abonados',
-  },
-  {
-    id: 'act-3',
-    user: 'Carlos Ramos',
-    action: 'Atendió reporte de fuga en',
-    target: 'Calle Principal',
-    timeAgo: 'Hace 1 hora',
-    icon: 'averias',
-  },
-]
+import { getRecentDashboardActivities } from '../services/dashboardService'
 
 const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
-  activities = DEFAULT_ACTIVITIES,
+  activities: activitiesProp,
 }) => {
+  const { user } = useAuth()
+  const canOpenAdminReportes = canAccessAdminRoute(user, '/admin/reportes')
+  const canOpenAdminActividades = canAccessAdminRoute(user, '/admin/actividades-fontanero')
+  const canOpenFontaneroActividades = canAccessAdminRoute(user, '/admin/actividades')
+  const [activities, setActivities] = useState<ActivityItem[]>(activitiesProp ?? [])
+  const [isLoading, setIsLoading] = useState(activitiesProp === undefined)
+
+  useEffect(() => {
+    if (activitiesProp !== undefined) {
+      setActivities(activitiesProp)
+      setIsLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setIsLoading(true)
+
+    const scope =
+      canOpenAdminActividades || canOpenAdminReportes
+        ? 'admin'
+        : canOpenFontaneroActividades
+          ? 'fontanero'
+          : null
+
+    if (scope === null) {
+      setActivities([])
+      setIsLoading(false)
+      return
+    }
+
+    void getRecentDashboardActivities(scope)
+      .then((items) => {
+        if (!cancelled) {
+          setActivities(items)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setActivities([])
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [activitiesProp, canOpenAdminActividades, canOpenAdminReportes, canOpenFontaneroActividades])
+
+  const footerPath = canOpenAdminReportes
+    ? '/admin/reportes'
+    : canOpenFontaneroActividades
+      ? ACTIVIDADES_FONTANERO_BASE_PATH
+      : null
+
   return (
     <div className="dashboard-widget recent-activity-widget">
       <div className="dashboard-widget__header">
@@ -48,7 +83,9 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
       </div>
 
       <div className="recent-activity-widget__body">
-        {activities.length === 0 ? (
+        {isLoading ? (
+          <p className="recent-activity-widget__empty">Cargando actividad…</p>
+        ) : activities.length === 0 ? (
           <p className="recent-activity-widget__empty">Sin actividad reciente registrada.</p>
         ) : (
           <ul className="recent-activity-widget__timeline">
@@ -68,11 +105,13 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
         )}
       </div>
 
-      <div className="dashboard-widget__footer">
-        <Link to="/admin/reportes" className="dashboard-widget__link">
-          Ver historial completo &rarr;
-        </Link>
-      </div>
+      {footerPath ? (
+        <div className="dashboard-widget__footer">
+          <Link to={footerPath} className="dashboard-widget__link">
+            Ver historial completo &rarr;
+          </Link>
+        </div>
+      ) : null}
     </div>
   )
 }

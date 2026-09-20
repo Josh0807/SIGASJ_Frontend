@@ -11,9 +11,11 @@ import {
   mostrarAvisoHorarioFontanero,
   parseInicioAtencionError,
 } from '../utils/averiaPendienteAtencion'
+import AveriasFontaneroClasificacionForm from './AveriasFontaneroClasificacionForm'
 import AveriasFontaneroObservacionForm from './AveriasFontaneroObservacionForm'
 import AveriasFontaneroResolverDialog from './AveriasFontaneroResolverDialog'
 import {
+  puedeCalificarAveria,
   puedeIntentarIniciarAtencionAveria,
   puedeMarcarAveriaResuelta,
   puedeRegistrarObservacionAveria,
@@ -44,6 +46,7 @@ type AveriasFontaneroDetailViewProps = {
   successMessage?: string | null
   onResolved: (averia: AveriaFontaneroDetail, message: string) => void
   onAtencionIniciada: (averia: AveriaFontaneroDetail, message: string) => void
+  onClasificada: (averia: AveriaFontaneroDetail, message: string) => void
   onObservacionCreated: (observacion: AveriaObservacionItem) => void
   onUnauthorized: () => void
 }
@@ -53,6 +56,7 @@ const AveriasFontaneroDetailView = ({
   successMessage,
   onResolved,
   onAtencionIniciada,
+  onClasificada,
   onObservacionCreated,
   onUnauthorized,
 }: AveriasFontaneroDetailViewProps) => {
@@ -62,6 +66,7 @@ const AveriasFontaneroDetailView = ({
   const puedeResolver = puedeMarcarAveriaResuelta(estado)
   const puedeIniciar = puedeIntentarIniciarAtencionAveria(estado)
   const puedeRegistrar = puedeRegistrarObservacionAveria(estado)
+  const puedeCalificar = puedeCalificarAveria(estado)
   const avisoHorario = mostrarAvisoHorarioFontanero(estado)
   const [resolverOpen, setResolverOpen] = useState(false)
   const [iniciarError, setIniciarError] = useState<string | null>(null)
@@ -140,6 +145,13 @@ const AveriasFontaneroDetailView = ({
             )}
           </AveriasDetailField>
         </dl>
+        {puedeCalificar ? (
+          <AveriasFontaneroClasificacionForm
+            averia={averia}
+            onUpdated={onClasificada}
+            onUnauthorized={onUnauthorized}
+          />
+        ) : null}
         <div className="averias-fontanero__acciones">
           <p className="averias-admin__muted">Acciones disponibles</p>
           {iniciarError ? (

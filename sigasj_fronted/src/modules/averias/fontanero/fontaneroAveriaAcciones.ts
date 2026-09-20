@@ -31,6 +31,11 @@ export function puedeRegistrarObservacionAveria(estadoActual: string): boolean {
   return estadoActual !== 'RESUELTA'
 }
 
+/** El Fontanero califica prioridad y tipo mientras la avería no esté cerrada. */
+export function puedeCalificarAveria(estadoActual: string): boolean {
+  return estadoActual !== 'RESUELTA' && estadoActual !== 'CANCELADA'
+}
+
 export function getFontaneroAccionesOperativas(
   estadoActual: string,
 ): EstadoAveria[] {
