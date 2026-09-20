@@ -29,5 +29,5 @@ export default function MaterialEditPage() {
     catch (caught) { throw new Error(materialApiError(caught), { cause: caught }) }
   }
 
-  return <main className="materials-admin materials-admin--form"><header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Materiales</p><h1>Editar material</h1><p>Actualice la información del material. La existencia no puede modificarse aquí.</p></div></header><MaterialForm mode="edit" initialValues={initialValues} stockActual={material.stockActual} currentCategoria={material.categoria} currentProveedor={material.proveedor} onSubmit={submit} /></main>
+  return <main className="materials-admin materials-admin--form sigasj-stack"><header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Materiales</p><h1>Editar material</h1><p>Actualice la información del material. La existencia no puede modificarse aquí.</p></div></header><MaterialForm mode="edit" initialValues={initialValues} stockActual={material.stockActual} currentCategoria={material.categoria} currentProveedor={material.proveedor} onSubmit={submit} /></main>
 }

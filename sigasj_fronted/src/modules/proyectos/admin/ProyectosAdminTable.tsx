@@ -41,7 +41,7 @@ const ProyectosAdminTable = ({
   }
 
   return (
-    <div className="table-responsive proyectos-admin__table">
+    <div className="table-responsive proyectos-admin__table overflow-x-auto">
       <table>
         <caption className="visually-hidden">Listado de proyectos</caption>
         <thead>

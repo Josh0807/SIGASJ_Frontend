@@ -22,6 +22,17 @@ export const ESTADO_PROYECTO_OPTIONS = ESTADOS_PROYECTO.map((value) => ({
   label: ESTADO_PROYECTO_LABELS[value],
 }))
 
+export const PROYECTO_ESTADO_CONFIRM_TITLE = 'Cambiar estado'
+
+export const PROYECTO_ESTADO_CONFIRM_ACCEPT = 'Aceptar'
+
+export const buildProyectoEstadoConfirmMessage = (
+  nombre: string,
+  actual: EstadoProyecto,
+  siguiente: EstadoProyecto,
+) =>
+  `¿Desea cambiar el estado de «${nombre}» de ${ESTADO_PROYECTO_LABELS[actual]} a ${ESTADO_PROYECTO_LABELS[siguiente]}? Confirme para aplicar el cambio o cancele para dejarlo igual.`
+
 export const isEstadoProyecto = (value: string): value is EstadoProyecto =>
   ESTADOS_PROYECTO.includes(value as EstadoProyecto)
 

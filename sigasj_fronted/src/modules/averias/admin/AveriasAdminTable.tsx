@@ -30,7 +30,7 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
 
   return (
     <>
-      <div className="table-responsive averias-admin__table">
+      <div className="table-responsive averias-admin__table overflow-x-auto">
         <table>
           <caption className="visually-hidden">Listado de averías</caption>
           <thead>

@@ -10,14 +10,14 @@ const AdminMain = ({
   onToggleMenu,
   menuToggleRef,
 }: AdminMainProps) => (
-  <div className="admin-main">
+  <div className="admin-main min-w-0 flex-1">
     <AdminHeader
       menuOpen={menuOpen}
       onToggleMenu={onToggleMenu}
       menuToggleRef={menuToggleRef}
     />
-    <div className="admin-main__content" aria-label="Contenido administrativo">
-      <div className="admin-main__inner">
+    <div className="admin-main__content min-w-0" aria-label="Contenido administrativo">
+      <div className="admin-main__inner w-full min-w-0">
         <ErrorBoundary>{children}</ErrorBoundary>
       </div>
     </div>

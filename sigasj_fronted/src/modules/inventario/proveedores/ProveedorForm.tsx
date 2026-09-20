@@ -21,7 +21,7 @@ export default function ProveedorForm({ mode, initialValues = EMPTY_PROVEEDOR_VA
     try { await onSubmit(toProveedorPayload(values)) } catch (caught) { setSubmitError(caught instanceof Error ? caught.message : 'No fue posible guardar el proveedor.') } finally { submitting.current = false; setSaving(false) }
   }
   const field = (name: keyof ProveedorFormValues, label: string, input: ReactNode, full = false) => <label className={full ? 'materials-admin__form-full' : undefined}><span>{label}</span>{input}{errors[name] && <small className="materials-admin__field-error" role="alert">{errors[name]}</small>}</label>
-  return <>{submitError && <div className="materials-admin__error" role="alert">{submitError}</div>}<form className="materials-admin__form provider-admin__form" noValidate onSubmit={submit}>
+  return <>{submitError && <div className="materials-admin__error" role="alert">{submitError}</div>}<form className="materials-admin__form provider-admin__form w-full max-w-3xl" noValidate onSubmit={submit}>
     {field('nombre', 'Nombre *', <input autoFocus value={values.nombre} maxLength={150} aria-invalid={Boolean(errors.nombre)} onChange={(e) => update('nombre', e.target.value)} />)}
     {field('razonSocial', 'Razón social', <input value={values.razonSocial} maxLength={200} onChange={(e) => update('razonSocial', e.target.value)} />)}
     {field('identificacion', 'Identificación', <input value={values.identificacion} maxLength={50} aria-invalid={Boolean(errors.identificacion)} onChange={(e) => update('identificacion', e.target.value)} />)}

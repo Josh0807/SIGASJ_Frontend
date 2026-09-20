@@ -8,6 +8,7 @@ export type ReadingProgressWidgetProps = {
 
 export type AlertItem = {
   id: string
+  code?: string
   title: string
   location: string
   urgency: 'alta' | 'media' | 'baja'
@@ -39,5 +40,5 @@ export type DashboardIndicator = {
   badgeText: string
   badgeType: 'success' | 'warning' | 'info' | 'alert'
   icon: AdminNavIconName
-  link: string
+  link?: string
 }

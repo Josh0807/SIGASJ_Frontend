@@ -7,6 +7,8 @@ import {
   getFontaneroAveria,
   getFontaneroAverias,
   iniciarFontaneroAtencion,
+  patchFontaneroAveriaClasificacion,
+  patchFontaneroAveriaPrioridad,
   resolverFontaneroAveria,
 } from './averiasFontaneroApi'
 
@@ -112,6 +114,41 @@ describe('averiasFontaneroApi', () => {
   it('no inicia atención con ID inválido', async () => {
     await expect(iniciarFontaneroAtencion(Number.NaN)).rejects.toThrow(/HTTP 400/)
     expect(fetchWithAuth).not.toHaveBeenCalled()
+  })
+
+  it('envía prioridad Baja/Media/Alta y tipo Tubo madre/Tubo medidor', async () => {
+    const detail = findFontaneroAveriaFixture(25)!
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      ...detail,
+      prioridad: 'MEDIA',
+    })
+    await expect(patchFontaneroAveriaPrioridad(25, 'MEDIA')).resolves.toMatchObject({
+      prioridad: 'MEDIA',
+    })
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${FONTANERO_AVERIAS_ENDPOINT}/25/prioridad`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ prioridad: 'MEDIA' }),
+        signal: undefined,
+      },
+    )
+
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      ...detail,
+      tipoAveria: 'TUBO_MADRE',
+    })
+    await expect(
+      patchFontaneroAveriaClasificacion(25, 'TUBO_MADRE'),
+    ).resolves.toMatchObject({ tipoAveria: 'TUBO_MADRE' })
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${FONTANERO_AVERIAS_ENDPOINT}/25/clasificacion`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ clasificacion: 'TUBO_MADRE' }),
+        signal: undefined,
+      },
+    )
   })
 
   it('registra una observación enviando solo el texto', async () => {

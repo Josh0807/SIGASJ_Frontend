@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
+import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
 import {
   generarReposicionDesdeAlertaAdmin,
@@ -43,6 +44,11 @@ export default function AlertasReposicionPage() {
   const [managingId, setManagingId] = useState<number | null>(null)
   const [generatingId, setGeneratingId] = useState<number | null>(null)
   const [reposicionGeneradaId, setReposicionGeneradaId] = useState<number | null>(null)
+  const [pendingAction, setPendingAction] = useState<
+    | { type: 'estado'; alerta: AlertaReposicion; siguiente: EstadoAlertaReposicion }
+    | { type: 'reposicion'; alerta: AlertaReposicion }
+    | null
+  >(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -91,17 +97,16 @@ export default function AlertasReposicionPage() {
     setReposicionGeneradaId(null)
   }
 
-  const gestionar = async (alerta: AlertaReposicion) => {
+  const requestEstadoChange = (alerta: AlertaReposicion) => {
     const siguiente = siguienteEstadoAlerta(String(alerta.estado))
-    if (!siguiente || managingId !== null) return
+    if (!siguiente || managingId !== null || generatingId !== null) return
+    setPendingAction({ type: 'estado', alerta, siguiente })
+  }
 
-    const confirmado = window.confirm(
-      siguiente === 'EN_GESTION'
-        ? `¿Poner en gestión la alerta de ${getAlertaMaterialNombre(alerta)}?`
-        : `¿Marcar como resuelta la alerta de ${getAlertaMaterialNombre(alerta)}?`,
-    )
-    if (!confirmado) return
-
+  const applyEstadoChange = async (
+    alerta: AlertaReposicion,
+    siguiente: EstadoAlertaReposicion,
+  ) => {
     setManagingId(alerta.id)
     setActionError('')
     setNotice('')
@@ -124,13 +129,12 @@ export default function AlertasReposicionPage() {
     }
   }
 
-  const generarReposicion = async (alerta: AlertaReposicion) => {
+  const requestGenerarReposicion = (alerta: AlertaReposicion) => {
     if (generatingId !== null || managingId !== null) return
-    const confirmado = window.confirm(
-      `¿Generar una reposición para ${getAlertaMaterialNombre(alerta)}? No se modificarán las existencias.`,
-    )
-    if (!confirmado) return
+    setPendingAction({ type: 'reposicion', alerta })
+  }
 
+  const applyGenerarReposicion = async (alerta: AlertaReposicion) => {
     setGeneratingId(alerta.id)
     setActionError('')
     setNotice('')
@@ -149,6 +153,17 @@ export default function AlertasReposicionPage() {
     } finally {
       setGeneratingId(null)
     }
+  }
+
+  const confirmPendingAction = () => {
+    const pending = pendingAction
+    setPendingAction(null)
+    if (!pending) return
+    if (pending.type === 'estado') {
+      void applyEstadoChange(pending.alerta, pending.siguiente)
+      return
+    }
+    void applyGenerarReposicion(pending.alerta)
   }
 
   return (
@@ -253,7 +268,7 @@ export default function AlertasReposicionPage() {
                           type="button"
                           className="material-tracking__detail-link"
                           disabled={managingId !== null || generatingId !== null}
-                          onClick={() => void gestionar(alerta)}
+                          onClick={() => requestEstadoChange(alerta)}
                         >
                           <IconAlertTriangle size={18} aria-hidden="true" /> {managingId === alerta.id ? 'Actualizando…' : accion}
                         </button>
@@ -263,7 +278,7 @@ export default function AlertasReposicionPage() {
                           type="button"
                           className="material-tracking__detail-link"
                           disabled={managingId !== null || generatingId !== null}
-                          onClick={() => void generarReposicion(alerta)}
+                          onClick={() => requestGenerarReposicion(alerta)}
                         >
                           {generatingId === alerta.id ? 'Generando…' : 'Generar reposición'}
                         </button>
@@ -285,6 +300,24 @@ export default function AlertasReposicionPage() {
           <button type="button" disabled={page >= totalPages} onClick={() => { setLoading(true); setPage((value) => value + 1) }}>Siguiente</button>
         </nav>
       ) : null}
+
+      <ConfirmDialog
+        isOpen={pendingAction !== null}
+        title={pendingAction?.type === 'reposicion' ? 'Generar reposición' : 'Cambiar estado'}
+        message={
+          pendingAction?.type === 'estado'
+            ? pendingAction.siguiente === 'EN_GESTION'
+              ? `¿Poner en gestión la alerta de ${getAlertaMaterialNombre(pendingAction.alerta)}? Confirme para aplicar el cambio o cancele para dejarlo igual.`
+              : `¿Marcar como resuelta la alerta de ${getAlertaMaterialNombre(pendingAction.alerta)}? Confirme para aplicar el cambio o cancele para dejarlo igual.`
+            : pendingAction?.type === 'reposicion'
+              ? `¿Generar una reposición para ${getAlertaMaterialNombre(pendingAction.alerta)}? No se modificarán las existencias.`
+              : ''
+        }
+        confirmLabel="Aceptar"
+        cancelLabel="Cancelar"
+        onCancel={() => setPendingAction(null)}
+        onConfirm={confirmPendingAction}
+      />
     </section>
   )
 }

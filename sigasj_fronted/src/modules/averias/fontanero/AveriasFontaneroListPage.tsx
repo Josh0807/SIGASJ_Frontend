@@ -54,8 +54,8 @@ const AveriasFontaneroListPage = ({
   const forbidden = forbiddenProp ?? remote.forbidden
 
   return (
-    <main className="gallery-admin averias-admin averias-fontanero">
-      <div className="gallery-admin__shell">
+    <main className="gallery-admin averias-admin averias-fontanero w-full min-w-0">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Atención de campo</p>

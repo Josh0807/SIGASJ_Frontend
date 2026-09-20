@@ -73,7 +73,7 @@ const AveriasFontaneroDetailPage = ({
   if (loading) {
     return (
       <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div role="status" aria-live="polite" aria-busy="true">
             <p>{AVERIAS_FONTANERO_DETAIL_LOADING_MESSAGE}</p>
             <div className="gallery-admin__skeleton" aria-hidden="true">
@@ -95,7 +95,7 @@ const AveriasFontaneroDetailPage = ({
   if (forbidden) {
     return (
       <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div className="gallery-admin__empty" role="alert">
             <h1>{AVERIAS_FONTANERO_DETAIL_FORBIDDEN}</h1>
             <BackLink />
@@ -108,7 +108,7 @@ const AveriasFontaneroDetailPage = ({
   if (error) {
     return (
       <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div className="gallery-admin__empty" role="alert">
             <p>{AVERIAS_FONTANERO_DETAIL_ERROR}</p>
             <button
@@ -128,7 +128,7 @@ const AveriasFontaneroDetailPage = ({
   if (notFound || averia == null) {
     return (
       <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div className="gallery-admin__empty" role="status">
             <h1>{AVERIAS_FONTANERO_DETAIL_NOT_FOUND}</h1>
             <BackLink />
@@ -139,8 +139,8 @@ const AveriasFontaneroDetailPage = ({
   }
 
   return (
-    <main className="gallery-admin averias-admin averias-fontanero">
-      <div className="gallery-admin__shell">
+    <main className="gallery-admin averias-admin averias-fontanero w-full min-w-0">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Atención de campo</p>
@@ -164,6 +164,10 @@ const AveriasFontaneroDetailPage = ({
             setSuccessMessage(message)
           }}
           onAtencionIniciada={(updated, message) => {
+            setResolvedAveria(updated)
+            setSuccessMessage(message)
+          }}
+          onClasificada={(updated, message) => {
             setResolvedAveria(updated)
             setSuccessMessage(message)
           }}

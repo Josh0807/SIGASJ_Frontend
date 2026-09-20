@@ -18,7 +18,7 @@ const HeroSection = ({
   announcementsHref = ANNOUNCEMENTS_HREF,
 }: HeroSectionProps) => (
   <section
-    className="hero"
+    className="hero w-full min-w-0"
     id={id}
     aria-labelledby="hero-title"
     style={{
@@ -31,7 +31,7 @@ const HeroSection = ({
         <h1 id="hero-title">{title}</h1>
         <p className="hero__description">{description}</p>
 
-        <nav className="hero__actions" aria-label="Acciones principales">
+        <nav className="hero__actions flex flex-wrap" aria-label="Acciones principales">
           <Link className="hero__button hero__button--secondary" to={reportHref}>
             {reportLabel}
           </Link>

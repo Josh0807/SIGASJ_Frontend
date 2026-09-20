@@ -237,8 +237,8 @@ const AveriasAdminPage = ({
   }
 
   return (
-    <main className="gallery-admin averias-admin">
-      <div className="gallery-admin__shell">
+    <main className="gallery-admin averias-admin w-full min-w-0">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Panel administrativo</p>

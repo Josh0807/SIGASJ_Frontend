@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import FormSuccessResult from '../../shared/components/FormSuccessResult'
 import { MATERIALES_PATH } from './inventarioPaths'
 import { validateMaterial, type MaterialFormErrors } from './materialFormUtils'
 import type { MaterialFormValues } from './types'
@@ -46,8 +47,23 @@ export default function MaterialForm({ mode, initialValues = EMPTY_VALUES, stock
   const field = (name: keyof MaterialFormValues, label: string, input: ReactNode) => <label><span>{label}</span>{input}{errors[name] && <small className="materials-admin__field-error" role="alert">{errors[name]}</small>}</label>
   return <>
     {submitError && <div className="materials-admin__error" role="alert">{submitError}</div>}
-    {success && <div className="materials-admin__success" role="status">{mode === 'create' ? 'Material registrado correctamente.' : 'Cambios guardados correctamente.'}</div>}
-    <form className="materials-admin__form" noValidate onSubmit={handleSubmit}>
+    {success && (
+      <FormSuccessResult
+        className="materials-admin__success"
+        title={mode === 'create' ? 'Material registrado correctamente.' : 'Cambios guardados correctamente.'}
+        description={
+          mode === 'create'
+            ? 'El material ya está disponible en el catálogo de bodega.'
+            : 'La ficha del material se actualizó con la información enviada.'
+        }
+        actions={
+          <Link className="materials-admin__secondary" to={MATERIALES_PATH}>
+            Volver al catálogo
+          </Link>
+        }
+      />
+    )}
+    <form className="materials-admin__form w-full max-w-3xl" noValidate onSubmit={handleSubmit}>
       {field('nombre', 'Nombre *', <input value={values.nombre} maxLength={150} aria-invalid={Boolean(errors.nombre)} onChange={(e) => update('nombre', e.target.value)} />)}
       {field('unidadMedida', 'Unidad de medida *', <input value={values.unidadMedida} maxLength={50} aria-invalid={Boolean(errors.unidadMedida)} onChange={(e) => update('unidadMedida', e.target.value)} />)}
       {field('descripcion', 'Descripción', <textarea value={values.descripcion} maxLength={1000} aria-invalid={Boolean(errors.descripcion)} onChange={(e) => update('descripcion', e.target.value)} />)}

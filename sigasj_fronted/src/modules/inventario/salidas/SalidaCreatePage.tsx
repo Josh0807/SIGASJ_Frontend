@@ -78,10 +78,10 @@ export default function SalidaCreatePage() {
     } finally { submitting.current = false; setSaving(false) }
   }
 
-  return <main className="materials-admin materials-admin--form inventory-exit">
+  return <main className="materials-admin materials-admin--form inventory-exit sigasj-stack">
     <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar salida de materiales</h1><p>Indique el material retirado de bodega. El servidor validará y actualizará las existencias al confirmar.</p></div></header>
     {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento SALIDA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}</div>}
-    <form className="materials-admin__form inventory-entry__form" noValidate onSubmit={submit}>
+    <form className="materials-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
       <label className="materials-admin__form-full"><span>Material a retirar *</span><select value={values.materialId} disabled={loading || Boolean(error)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}><option value="">Seleccione un material</option>{availableMaterials.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}</select>{errors.materialId && <small className="materials-admin__field-error" role="alert">{errors.materialId}</small>}</label>
       {loading && <p className="materials-admin__category-state" role="status">Cargando materiales disponibles…</p>}
       {error && <div className="materials-admin__category-error" role="alert">{error} <button type="button" onClick={refetch}>Reintentar</button></div>}

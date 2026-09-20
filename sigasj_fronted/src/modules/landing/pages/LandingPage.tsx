@@ -15,7 +15,7 @@ const LandingPage = () => {
   return (
     <>
       <Header />
-      <main>
+      <main className="w-full min-w-0 overflow-x-hidden">
         <HeroSection />
 
         {LANDING_SECTIONS.map(({ id, Component }) => (

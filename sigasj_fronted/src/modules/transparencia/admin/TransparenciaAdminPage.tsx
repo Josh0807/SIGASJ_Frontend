@@ -197,7 +197,7 @@ const TransparenciaAdminPage = () => {
 
   return (
     <main className="gallery-admin">
-      <div className="gallery-admin__shell">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Panel administrativo</p>
@@ -221,7 +221,7 @@ const TransparenciaAdminPage = () => {
           </div>
         </header>
 
-        <section className="gallery-admin__filters" aria-label="Filtros">
+        <section className="gallery-admin__filters w-full" aria-label="Filtros">
           <label className="gallery-admin__field">
             <span>Buscar por nombre</span>
             <input

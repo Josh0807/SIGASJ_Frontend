@@ -4,6 +4,7 @@ import {
   AVERIA_UNCLASSIFIED_LABEL,
 } from '../admin/types'
 import {
+  puedeCalificarAveria,
   getFontaneroAccionesOperativas,
   puedeIntentarIniciarAtencionAveria,
   puedeRegistrarObservacionAveria,
@@ -20,6 +21,8 @@ describe('presentación del detalle Fontanero', () => {
   it('trata los textos de ausencia del Backend como pendientes, no como enums', () => {
     expect(getFontaneroTipoLabel('Sin clasificar')).toBe(AVERIA_UNCLASSIFIED_LABEL)
     expect(getFontaneroTipoLabel(null)).toBe(AVERIA_UNCLASSIFIED_LABEL)
+    expect(getFontaneroTipoLabel('TUBO_MADRE')).toBe('Tubo madre')
+    expect(getFontaneroTipoLabel('TUBO_MEDIDOR')).toBe('Tubo medidor')
     expect(getFontaneroTipoLabel('TUBERIA_DANADA')).toBe('Tubería dañada')
     expect(getFontaneroPrioridadLabel('Sin asignar')).toBe(AVERIA_UNASSIGNED_LABEL)
     expect(getFontaneroPrioridadLabel('ALTA')).toBe('Alta')
@@ -52,6 +55,14 @@ describe('presentación del detalle Fontanero', () => {
     expect(puedeRegistrarObservacionAveria('EN_ATENCION')).toBe(true)
     expect(puedeRegistrarObservacionAveria('PENDIENTE')).toBe(true)
     expect(puedeRegistrarObservacionAveria('RESUELTA')).toBe(false)
+  })
+
+  it('permite calificar prioridad y tipo mientras no esté cerrada', () => {
+    expect(puedeCalificarAveria('ASIGNADA')).toBe(true)
+    expect(puedeCalificarAveria('PENDIENTE')).toBe(true)
+    expect(puedeCalificarAveria('EN_ATENCION')).toBe(true)
+    expect(puedeCalificarAveria('RESUELTA')).toBe(false)
+    expect(puedeCalificarAveria('CANCELADA')).toBe(false)
   })
 
   it('ordena las observaciones de atención cronológicamente', () => {

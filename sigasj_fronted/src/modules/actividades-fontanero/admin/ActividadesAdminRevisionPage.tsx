@@ -274,7 +274,7 @@ const ActividadesAdminRevisionPage = () => {
 
   return (
     <main className="gallery-admin actividades-admin-revision">
-      <div className="gallery-admin__shell">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <span className="gallery-admin__eyebrow">Actividades del Fontanero · Administradora</span>

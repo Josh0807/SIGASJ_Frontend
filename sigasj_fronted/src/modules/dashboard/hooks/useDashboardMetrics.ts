@@ -15,25 +15,30 @@ export type UseDashboardMetricsResult = {
   refetch: () => Promise<void>
 }
 
-// Métricas por defecto cuando no hay API conectada
-const DEFAULT_METRICS: DashboardSummaryData = {
-  abonadosActivos: '1,248',
-  lecturasPendientes: '34',
-  averiasReportadas: '3',
-  solicitudesEnTramite: '8',
+const EMPTY_METRICS: DashboardSummaryData = {
+  abonadosActivos: null,
+  lecturasPendientes: null,
+  averiasReportadas: null,
+  solicitudesEnTramite: null,
 }
 
+const hasSummaryValues = (summary: DashboardSummaryData): boolean =>
+  summary.abonadosActivos !== undefined ||
+  summary.lecturasPendientes !== undefined ||
+  summary.averiasReportadas !== undefined ||
+  summary.solicitudesEnTramite !== undefined
+
 /**
- * Custom hook tolerante a fallos para consumir las métricas de los módulos.
- * Garantiza que si un módulo o endpoint individual falla, no se bloquee ni rompa el dashboard completo.
+ * Consume métricas reales por módulo. Si un endpoint falla, ese indicador
+ * queda en N/D y no bloquea el resto del dashboard.
  */
 export function useDashboardMetrics(
   initialMetrics?: DashboardSummaryData,
 ): UseDashboardMetricsResult {
   const [metrics, setMetrics] = useState<DashboardSummaryData>(
-    initialMetrics ?? DEFAULT_METRICS,
+    initialMetrics ?? EMPTY_METRICS,
   )
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(!initialMetrics)
   const [isError, setIsError] = useState<boolean>(false)
 
   const fetchMetrics = useCallback(async () => {
@@ -41,24 +46,16 @@ export function useDashboardMetrics(
     setIsError(false)
 
     try {
-      // 1. Intentar obtener el resumen general del dashboard
       const summary = await getDashboardSummary()
 
-      if (
-        summary.abonadosActivos !== undefined ||
-        summary.lecturasPendientes !== undefined ||
-        summary.averiasReportadas !== undefined ||
-        summary.solicitudesEnTramite !== undefined
-      ) {
-        setMetrics((prev) => ({
-          ...prev,
+      if (hasSummaryValues(summary)) {
+        setMetrics({
+          ...EMPTY_METRICS,
           ...summary,
-        }))
-        setIsLoading(false)
+        })
         return
       }
 
-      // 2. Si el resumen global no devuelve datos, consultar métricas por módulo de manera independiente (Promise.allSettled)
       const results = await Promise.allSettled([
         getAbonadosSummaryMetric(),
         getLecturasSummaryMetric(),
@@ -66,20 +63,26 @@ export function useDashboardMetrics(
         getSolicitudesSummaryMetric(),
       ])
 
-      const fetchedMetrics: DashboardSummaryData = {}
+      const fetchedMetrics: DashboardSummaryData = { ...EMPTY_METRICS }
+      let failed = 0
 
       results.forEach((result) => {
-        if (result.status === 'fulfilled' && result.value.value !== null) {
-          fetchedMetrics[result.value.key] = result.value.value
+        if (result.status !== 'fulfilled') {
+          failed += 1
+          return
+        }
+        fetchedMetrics[result.value.key] = result.value.value
+        if (result.value.value === null && result.value.key !== 'lecturasPendientes') {
+          failed += 1
         }
       })
 
-      // Actualizar solo las métricas que hayan respondido exitosamente
-      setMetrics((prev) => ({
-        ...prev,
-        ...fetchedMetrics,
-      }))
+      setMetrics(fetchedMetrics)
+      if (failed === 3) {
+        setIsError(true)
+      }
     } catch {
+      setMetrics(EMPTY_METRICS)
       setIsError(true)
     } finally {
       setIsLoading(false)
@@ -87,7 +90,7 @@ export function useDashboardMetrics(
   }, [])
 
   useEffect(() => {
-    fetchMetrics()
+    void fetchMetrics()
   }, [fetchMetrics])
 
   return {

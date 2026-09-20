@@ -24,19 +24,21 @@ const ProyectosAdminPagination = ({
   const canGoNext = currentPage < totalPages
 
   return (
-    <nav className="gallery-admin__pagination" aria-label="Paginación">
+    <nav className="gallery-admin__pagination w-full" aria-label="Paginación">
       <button
         type="button"
+        className="min-w-24"
         disabled={!canGoPrevious || loading}
         onClick={() => onPageChange(clampProyectosPage(currentPage - 1, totalPages))}
       >
         Anterior
       </button>
-      <p>
+      <p className="text-sm tabular-nums">
         Página {currentPage} de {totalPages}
       </p>
       <button
         type="button"
+        className="min-w-24"
         disabled={!canGoNext || loading}
         onClick={() => onPageChange(clampProyectosPage(currentPage + 1, totalPages))}
       >

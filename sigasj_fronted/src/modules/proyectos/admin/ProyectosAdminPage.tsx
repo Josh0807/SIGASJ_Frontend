@@ -115,7 +115,7 @@ const ProyectosAdminPage = () => {
 
   return (
     <main className="gallery-admin proyectos-admin">
-      <div className="gallery-admin__shell">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Panel administrativo</p>
@@ -138,8 +138,9 @@ const ProyectosAdminPage = () => {
           </div>
         </header>
 
-        <section className="gallery-admin__filters" aria-label="Búsqueda y filtros">
+        <section className="gallery-admin__filters w-full" aria-label="Búsqueda y filtros">
           <form
+            className="sigasj-filter-search"
             role="search"
             onSubmit={(event) => {
               event.preventDefault()

@@ -55,6 +55,50 @@ export async function createFontaneroObservacion(
   )
 }
 
+export async function patchFontaneroAveriaPrioridad(
+  id: number,
+  prioridad: 'BAJA' | 'MEDIA' | 'ALTA',
+  signal?: AbortSignal,
+): Promise<AveriaFontaneroDetail> {
+  const parsedId = parseAveriaAdminId(id)
+  if (parsedId == null) {
+    throw new Error(
+      'HTTP 400: El identificador de la avería debe ser un número entero positivo',
+    )
+  }
+
+  return fetchWithAuth<AveriaFontaneroDetail>(
+    `${FONTANERO_AVERIAS_ENDPOINT}/${parsedId}/prioridad`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ prioridad }),
+      signal,
+    },
+  )
+}
+
+export async function patchFontaneroAveriaClasificacion(
+  id: number,
+  clasificacion: 'TUBO_MADRE' | 'TUBO_MEDIDOR',
+  signal?: AbortSignal,
+): Promise<AveriaFontaneroDetail> {
+  const parsedId = parseAveriaAdminId(id)
+  if (parsedId == null) {
+    throw new Error(
+      'HTTP 400: El identificador de la avería debe ser un número entero positivo',
+    )
+  }
+
+  return fetchWithAuth<AveriaFontaneroDetail>(
+    `${FONTANERO_AVERIAS_ENDPOINT}/${parsedId}/clasificacion`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ clasificacion }),
+      signal,
+    },
+  )
+}
+
 export async function iniciarFontaneroAtencion(
   id: number,
   signal?: AbortSignal,

@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
+import FormSuccessResult from '../../../shared/components/FormSuccessResult'
+import { formatAveriaAdminDateTime } from '../admin/formatAveriaAdminDate'
 import { createPublicAveria } from '../services/averiasApi'
 import type { PublicAveriaConfirmation } from '../types/publicAveriaApi'
 import {
@@ -113,7 +115,7 @@ export default function ReportarAveriaForm() {
 
   return (
     <form
-      className="public-averia-form"
+      className="public-averia-form w-full max-w-3xl"
       noValidate
       onSubmit={handleSubmit}
       aria-busy={isSubmitting ? true : undefined}
@@ -121,17 +123,28 @@ export default function ReportarAveriaForm() {
       data-submitting={isSubmitting ? 'true' : 'false'}
     >
       {submittedReport ? (
-        <div
+        <FormSuccessResult
           ref={confirmationRef}
           className="public-averia-form__success"
-          role="status"
-          tabIndex={-1}
-        >
-          <p className="public-averia-form__success-title">{submittedReport.message}</p>
-          <p className="public-averia-form__success-label">Código de seguimiento</p>
-          <p className="public-averia-form__code">{submittedReport.codigoSeguimiento}</p>
-          <p>Conserve este código para identificar su reporte.</p>
-        </div>
+          titleClassName="public-averia-form__success-title"
+          highlightLabelClassName="public-averia-form__success-label"
+          highlightValueClassName="public-averia-form__code"
+          title={submittedReport.message}
+          description="Su avería fue registrada en SIGASJ."
+          highlightLabel="Código de seguimiento"
+          highlightValue={submittedReport.codigoSeguimiento}
+          meta={[
+            {
+              label: 'Fecha del reporte',
+              value: formatAveriaAdminDateTime(submittedReport.fechaReporte),
+            },
+            {
+              label: 'Estado',
+              value: submittedReport.estado?.trim() || 'No disponible',
+            },
+          ]}
+          hint="Conserve este código para identificar su reporte."
+        />
       ) : null}
 
       {formError ? (
@@ -213,7 +226,11 @@ export default function ReportarAveriaForm() {
                 required
                 aria-required="true"
                 aria-invalid={Boolean(errors.telefonoReportante)}
-                aria-describedby={errorId('telefonoReportante')}
+                aria-describedby={
+                  errors.telefonoReportante
+                    ? errorId('telefonoReportante')
+                    : `${fieldId(idPrefix, 'telefonoReportante')}-help`
+                }
                 value={values.telefonoReportante}
                 onChange={(event) => update('telefonoReportante', event.target.value)}
               />
@@ -221,7 +238,11 @@ export default function ReportarAveriaForm() {
                 <small id={errorId('telefonoReportante')} className="public-averia-form__error" role="alert">
                   {errors.telefonoReportante}
                 </small>
-              ) : null}
+              ) : (
+                <small id={`${fieldId(idPrefix, 'telefonoReportante')}-help`} className="public-averia-form__help">
+                  Ingrese un número donde podamos contactarle.
+                </small>
+              )}
             </div>
 
             <div className="public-averia-form__field">

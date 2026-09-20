@@ -80,7 +80,9 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className={`admin-layout${isNavOpen ? ' admin-layout--nav-open' : ''}`}>
+    <div
+      className={`admin-layout admin-layout--panel min-h-screen min-w-0${isNavOpen ? ' admin-layout--nav-open' : ''}`}
+    >
       {isNavOpen ? (
         <button
           type="button"

@@ -16,14 +16,12 @@ import {
 
 type AveriasAdminDetailViewProps = {
   averia: AveriaDetail
-  canEditGestion?: boolean
   canAssignFontanero?: boolean
   onAveriaUpdated?: (averia: AveriaDetail) => void
 }
 
 const AveriasAdminDetailView = ({
   averia,
-  canEditGestion = false,
   canAssignFontanero = false,
   onAveriaUpdated,
 }: AveriasAdminDetailViewProps) => (
@@ -67,22 +65,11 @@ const AveriasAdminDetailView = ({
 
       <section className="averias-admin__section" aria-labelledby="averia-gestion-heading">
         <h2 id="averia-gestion-heading">Gestión de la avería</h2>
-        {canEditGestion ? (
-          <AveriasAdminGestionControls
-            key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}`}
-            averia={averia}
-            canEdit
-            onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
-          />
-        ) : null}
+        <AveriasAdminGestionControls
+          key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}`}
+          averia={averia}
+        />
         <dl className="averias-admin__fields">
-          {!canEditGestion ? (
-            <AveriasAdminGestionControls
-              averia={averia}
-              canEdit={false}
-              onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
-            />
-          ) : null}
           <AveriasDetailField label="Inicio de atención">
             {averia.fechaInicioAtencion
               ? formatAveriaAdminDateTimeOrUnavailable(

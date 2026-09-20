@@ -117,7 +117,7 @@ const ConfirmDialog = ({
       onClick={onCancel}
     >
       <div
-        className="confirm-dialog__panel"
+        className="confirm-dialog__panel max-h-[min(90dvh,40rem)] overflow-y-auto"
         role={dialogRole}
         aria-modal="true"
         aria-labelledby={titleId}
@@ -131,7 +131,7 @@ const ConfirmDialog = ({
         <p id={messageId} className="confirm-dialog__message">
           {message}
         </p>
-        <div className="confirm-dialog__actions">
+        <div className="confirm-dialog__actions w-full">
           <button
             ref={cancelRef}
             type="button"

@@ -29,13 +29,13 @@ const AdminSidebar = ({
   <aside
     ref={sidebarRef}
     id="admin-navigation"
-    className="admin-sidebar"
+    className="admin-sidebar min-h-0 flex flex-col"
     aria-label="Menú administrativo"
     role={isDrawer && isOpen ? 'dialog' : undefined}
     aria-modal={isDrawer && isOpen ? true : undefined}
     inert={isDrawer && !isOpen ? true : undefined}
   >
-    <div className="admin-sidebar__brand">
+    <div className="admin-sidebar__brand min-w-0">
       <span className="admin-sidebar__logo">
         <img src={asadaLogo} alt="" />
       </span>
@@ -54,7 +54,7 @@ const AdminSidebar = ({
         <span aria-hidden="true" />
       </button>
     </div>
-    <nav className="admin-sidebar__nav" aria-label="Navegación administrativa">
+    <nav className="admin-sidebar__nav min-h-0" aria-label="Navegación administrativa">
       {items.map(({ path, title, icon }) => (
         <NavLink
           key={path}
@@ -71,7 +71,7 @@ const AdminSidebar = ({
               <span className="admin-sidebar__icon" aria-hidden="true" data-icon={icon}>
                 <AdminNavIcon name={icon} />
               </span>
-              <span className="admin-sidebar__label">{title}</span>
+              <span className="admin-sidebar__label min-w-0">{title}</span>
               {isActive ? (
                 <span className="admin-sidebar__active-mark" aria-hidden="true" />
               ) : null}

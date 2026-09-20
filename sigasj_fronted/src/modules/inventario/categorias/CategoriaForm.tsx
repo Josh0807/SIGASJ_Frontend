@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 import { CATEGORIAS_PATH } from '../inventarioPaths'
 import { validateCategoria, type CategoriaErrors } from './categoriaUtils'
 import type { CategoriaFormValues } from './types'
@@ -21,5 +22,42 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
     catch (caught) { const parsed = caught as Error & { fieldError?: string }; setMessage({ error: true, text: parsed.message }); if (parsed.fieldError) setErrors({ nombre: parsed.fieldError }) }
     finally { submitting.current = false; setSaving(false) }
   }
-  return <>{message && <div className={message.error ? 'materials-admin__error' : 'materials-admin__success'} role={message.error ? 'alert' : 'status'}>{message.text}</div>}<form className="materials-admin__form category-admin__form" noValidate onSubmit={submit}><label><span>Nombre *</span><input value={values.nombre} maxLength={100} aria-invalid={Boolean(errors.nombre)} onChange={(event) => change('nombre', event.target.value)} />{errors.nombre && <small className="materials-admin__field-error">{errors.nombre}</small>}</label><label><span>Descripción</span><textarea value={values.descripcion} maxLength={500} aria-invalid={Boolean(errors.descripcion)} onChange={(event) => change('descripcion', event.target.value)} />{errors.descripcion && <small className="materials-admin__field-error">{errors.descripcion}</small>}</label><div className="materials-admin__form-actions"><Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>Volver al listado</Link><button type="submit" className="materials-admin__primary" disabled={saving}>{saving ? 'Guardando…' : mode === 'create' ? 'Registrar categoría' : 'Guardar cambios'}</button></div></form></>
+  return (
+    <>
+      {message ? (
+        message.error ? (
+          <div className="materials-admin__error" role="alert">{message.text}</div>
+        ) : (
+          <FormSuccessResult
+            className="materials-admin__success"
+            title={message.text}
+            description="Puede volver al listado o seguir editando esta ficha."
+            actions={
+              <Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>
+                Volver al listado
+              </Link>
+            }
+          />
+        )
+      ) : null}
+      <form className="materials-admin__form category-admin__form w-full max-w-3xl" noValidate onSubmit={submit}>
+        <label>
+          <span>Nombre *</span>
+          <input value={values.nombre} maxLength={100} aria-invalid={Boolean(errors.nombre)} onChange={(event) => change('nombre', event.target.value)} />
+          {errors.nombre && <small className="materials-admin__field-error">{errors.nombre}</small>}
+        </label>
+        <label>
+          <span>Descripción</span>
+          <textarea value={values.descripcion} maxLength={500} aria-invalid={Boolean(errors.descripcion)} onChange={(event) => change('descripcion', event.target.value)} />
+          {errors.descripcion && <small className="materials-admin__field-error">{errors.descripcion}</small>}
+        </label>
+        <div className="materials-admin__form-actions">
+          <Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>Volver al listado</Link>
+          <button type="submit" className="materials-admin__primary" disabled={saving}>
+            {saving ? 'Guardando…' : mode === 'create' ? 'Registrar categoría' : 'Guardar cambios'}
+          </button>
+        </div>
+      </form>
+    </>
+  )
 }

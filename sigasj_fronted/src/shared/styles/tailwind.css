@@ -1,0 +1,92 @@
+/*
+  Tailwind v4 without Preflight so existing SIGASJ CSS keeps control of
+  buttons, inputs, tables, headings and images.
+*/
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  --color-sigasj-ice: #eaf6ff;
+  --color-sigasj-mist: #bfe3fa;
+  --color-sigasj-sky: #7fc4f2;
+  --color-sigasj-blue: #3e8fd6;
+  --color-sigasj-navy: #1e5a9c;
+  --color-sigasj-ink: #123f70;
+  --color-sigasj-muted: #5b7390;
+  --color-sigasj-canvas: #f5faff;
+  --color-sigasj-surface: #ffffff;
+  --radius-sigasj: 0.625rem;
+}
+
+@layer components {
+  .sigasj-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .sigasj-filter-search {
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) {
+    .sigasj-filter-search {
+      grid-column: span 2 / span 2;
+    }
+  }
+}
+
+.header__inner,
+.hero__content,
+.footer__content,
+.admin-header__start,
+.admin-header__account,
+.admin-sidebar__brand,
+.admin-sidebar__label,
+.admin-dashboard__shell {
+  min-width: 0;
+}
+
+.admin-sidebar__label {
+  overflow-wrap: anywhere;
+}
+
+.confirm-dialog__panel {
+  max-height: min(90dvh, 40rem);
+  overflow-y: auto;
+}
+
+.materials-admin__table-wrap,
+.table-responsive,
+.proyectos-admin__table {
+  max-width: 100%;
+}
+
+.gallery-admin__form,
+.materials-admin__form,
+.public-averia-form {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .confirm-dialog__actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .confirm-dialog__actions .confirm-dialog__button {
+    width: 100%;
+  }
+
+  .hero__actions,
+  .gallery-admin__header-actions,
+  .materials-admin__header-actions,
+  .gallery-admin__form-actions,
+  .materials-admin__form-actions {
+    width: 100%;
+  }
+}

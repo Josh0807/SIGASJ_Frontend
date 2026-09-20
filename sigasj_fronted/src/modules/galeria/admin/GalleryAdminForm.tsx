@@ -27,12 +27,14 @@ const GalleryAdminForm = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
+  const [altError, setAltError] = useState<string | null>(null)
 
   useEffect(() => {
     setValues(initialValues)
     setFile(null)
     setFileError(null)
     setFormError(null)
+    setAltError(null)
   }, [initialValues, mode])
 
   useEffect(() => {
@@ -72,9 +74,10 @@ const GalleryAdminForm = ({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setFormError(null)
+    setAltError(null)
 
     if (!values.textoAlternativo.trim()) {
-      setFormError('El texto alternativo es obligatorio.')
+      setAltError('El texto alternativo es obligatorio.')
       return
     }
 
@@ -99,7 +102,7 @@ const GalleryAdminForm = ({
   }
 
   return (
-    <form className="gallery-admin__form" onSubmit={handleSubmit}>
+    <form className="gallery-admin__form w-full max-w-3xl" onSubmit={handleSubmit}>
       <h2>{mode === 'create' ? 'Nueva fotografía' : 'Editar fotografía'}</h2>
 
       <label className="gallery-admin__field">
@@ -135,14 +138,22 @@ const GalleryAdminForm = ({
           type="text"
           maxLength={255}
           required
+          aria-invalid={Boolean(altError)}
+          aria-describedby={altError ? 'gallery-alt-error' : undefined}
           value={values.textoAlternativo}
-          onChange={(event) =>
+          onChange={(event) => {
+            setAltError(null)
             setValues((current) => ({
               ...current,
               textoAlternativo: event.target.value,
             }))
-          }
+          }}
         />
+        {altError ? (
+          <small id="gallery-alt-error" className="gallery-admin__form-error" role="alert">
+            {altError}
+          </small>
+        ) : null}
       </label>
 
       <div className="gallery-admin__field-row">
@@ -215,7 +226,7 @@ const GalleryAdminForm = ({
           className="gallery-admin__button gallery-admin__button--primary"
           disabled={submitting}
         >
-          {submitting ? 'Guardando…' : 'Guardar'}
+          {submitting ? 'Guardando…' : mode === 'create' ? 'Guardar fotografía' : 'Guardar cambios'}
         </button>
       </div>
     </form>

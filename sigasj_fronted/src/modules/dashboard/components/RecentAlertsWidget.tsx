@@ -1,39 +1,80 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import { useAuth } from '../../auth/components/AuthContext'
-import { canAccessAdminRoute } from '../../auth/utils/adminNavigation'
+import {
+  canAccessAdminRoute,
+  InternalAdminRoleName,
+  userHasAllowedRole,
+} from '../../auth/utils/adminNavigation'
+import { FONTANERO_AVERIAS_PATH } from '../../averias/fontanero/averiasFontaneroPaths'
 import type { AlertItem, RecentAlertsWidgetProps } from '../props'
+import { getRecentDashboardAlerts } from '../services/dashboardService'
 
-const DEFAULT_ALERTS: AlertItem[] = [
-  {
-    id: 'av-101',
-    title: 'Fuga de tubería principal',
-    location: 'Sector Central - Av. 2',
-    urgency: 'alta',
-    timeAgo: 'Hace 25 min',
-  },
-  {
-    id: 'av-102',
-    title: 'Baja presión en hidrante',
-    location: 'Barrio El Carmen',
-    urgency: 'media',
-    timeAgo: 'Hace 2 horas',
-  },
-  {
-    id: 'av-103',
-    title: 'Medidor dañado',
-    location: 'Sector Norte - Calle 5',
-    urgency: 'baja',
-    timeAgo: 'Hace 4 horas',
-  },
-]
+const URGENCY_LABELS: Record<AlertItem['urgency'], string> = {
+  alta: 'Alta',
+  media: 'Media',
+  baja: 'Baja',
+}
 
-const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({
-  alerts = DEFAULT_ALERTS,
-}) => {
+const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsProp }) => {
   const { user } = useAuth()
   const canOpenAdminAverias = canAccessAdminRoute(user, '/admin/averias')
+  const canOpenFontaneroAverias = userHasAllowedRole(user, [
+    InternalAdminRoleName.Fontanero,
+  ])
+  const [alerts, setAlerts] = useState<AlertItem[]>(alertsProp ?? [])
+  const [isLoading, setIsLoading] = useState(alertsProp === undefined)
+
+  useEffect(() => {
+    if (alertsProp !== undefined) {
+      setAlerts(alertsProp)
+      setIsLoading(false)
+      return
+    }
+
+    const scope = canOpenAdminAverias
+      ? 'admin'
+      : canOpenFontaneroAverias
+        ? 'fontanero'
+        : null
+
+    if (scope === null) {
+      setAlerts([])
+      setIsLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setIsLoading(true)
+
+    void getRecentDashboardAlerts(scope)
+      .then((items) => {
+        if (!cancelled) {
+          setAlerts(items)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAlerts([])
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [alertsProp, canOpenAdminAverias, canOpenFontaneroAverias])
+
+  const footerPath = canOpenAdminAverias
+    ? '/admin/averias'
+    : canOpenFontaneroAverias
+      ? FONTANERO_AVERIAS_PATH
+      : null
 
   return (
     <div className="dashboard-widget recent-alerts-widget">
@@ -47,11 +88,15 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({
             <span className="dashboard-widget__subtitle">Reportes prioritarios</span>
           </div>
         </div>
-        <span className="recent-alerts-widget__count">{alerts.length} activas</span>
+        <span className="recent-alerts-widget__count">
+          {isLoading ? '…' : `${alerts.length} activas`}
+        </span>
       </div>
 
       <div className="recent-alerts-widget__body">
-        {alerts.length === 0 ? (
+        {isLoading ? (
+          <p className="recent-alerts-widget__empty">Cargando averías…</p>
+        ) : alerts.length === 0 ? (
           <p className="recent-alerts-widget__empty">No hay averías prioritarias pendientes.</p>
         ) : (
           <ul className="recent-alerts-widget__list">
@@ -59,9 +104,12 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({
               <li key={alert.id} className="recent-alerts-widget__item">
                 <div className="recent-alerts-widget__item-main">
                   <span className={`recent-alerts-widget__urgency recent-alerts-widget__urgency--${alert.urgency}`}>
-                    {alert.urgency.toUpperCase()}
+                    {URGENCY_LABELS[alert.urgency]}
                   </span>
                   <div className="recent-alerts-widget__info">
+                    {alert.code ? (
+                      <span className="recent-alerts-widget__item-code">{alert.code}</span>
+                    ) : null}
                     <strong className="recent-alerts-widget__item-title">{alert.title}</strong>
                     <span className="recent-alerts-widget__item-location">{alert.location}</span>
                   </div>
@@ -73,9 +121,9 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({
         )}
       </div>
 
-      {canOpenAdminAverias ? (
+      {footerPath ? (
         <div className="dashboard-widget__footer">
-          <Link to="/admin/averias" className="dashboard-widget__link">
+          <Link to={footerPath} className="dashboard-widget__link">
             Ver todas las averías &rarr;
           </Link>
         </div>

@@ -15,5 +15,15 @@ export const PRIORIDAD_AVERIA_OPTIONS = PRIORIDADES_AVERIA.map((value) => ({
   label: PRIORIDAD_AVERIA_LABELS[value],
 }))
 
+/** El Fontanero califica solo Baja / Media / Alta (diagrama). */
+export const PRIORIDADES_AVERIA_FONTANERO = ['BAJA', 'MEDIA', 'ALTA'] as const
+
+export const PRIORIDAD_AVERIA_FONTANERO_OPTIONS = PRIORIDADES_AVERIA_FONTANERO.map(
+  (value) => ({
+    value,
+    label: PRIORIDAD_AVERIA_LABELS[value],
+  }),
+)
+
 export const isPrioridadAveria = (value: string): value is PrioridadAveria =>
   PRIORIDADES_AVERIA.includes(value as PrioridadAveria)

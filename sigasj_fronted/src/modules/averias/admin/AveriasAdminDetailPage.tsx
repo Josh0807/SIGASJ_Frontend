@@ -9,7 +9,6 @@ import { useAdminAveria } from '../hooks/useAdminAveria'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import AveriasAdminDetailView from './AveriasAdminDetailView'
 import { canEditAveriaAsignacion } from './canEditAveriaAsignacion'
-import { canEditAveriaGestion } from './canEditAveriaGestion'
 import { parseAveriaAdminId } from './parseAveriaAdminId'
 import { averiasAdminListPathFromState } from './averiasAdminListSearch'
 import {
@@ -64,13 +63,12 @@ const AveriasAdminDetailPage = ({
     mutatedAveria.id === parsedAveriaId
       ? mutatedAveria
       : fetchedAveria
-  const canEditGestion = user == null || canEditAveriaGestion(user)
   const canAssignFontanero = user == null || canEditAveriaAsignacion(user)
 
   if (loading) {
     return (
       <main className="gallery-admin averias-admin">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div role="status" aria-live="polite" aria-busy="true">
             <p>{AVERIAS_ADMIN_DETAIL_LOADING_MESSAGE}</p>
             <div className="gallery-admin__skeleton" aria-hidden="true">
@@ -92,7 +90,7 @@ const AveriasAdminDetailPage = ({
   if (error) {
     return (
       <main className="gallery-admin averias-admin">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div className="gallery-admin__empty" role="alert">
             <p>{AVERIAS_ADMIN_DETAIL_ERROR}</p>
             <Link className="gallery-admin__button" to={listPath}>
@@ -107,7 +105,7 @@ const AveriasAdminDetailPage = ({
   if (notFound || averia == null) {
     return (
       <main className="gallery-admin averias-admin">
-        <div className="gallery-admin__shell">
+        <div className="gallery-admin__shell sigasj-stack">
           <div className="gallery-admin__empty" role="status">
             <h1>{AVERIAS_ADMIN_DETAIL_NOT_FOUND}</h1>
             <Link className="gallery-admin__button" to={listPath}>
@@ -120,8 +118,8 @@ const AveriasAdminDetailPage = ({
   }
 
   return (
-    <main className="gallery-admin averias-admin">
-      <div className="gallery-admin__shell">
+    <main className="gallery-admin averias-admin w-full min-w-0">
+      <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
             <p className="gallery-admin__eyebrow">Gestión de averías</p>
@@ -141,7 +139,6 @@ const AveriasAdminDetailPage = ({
         </header>
         <AveriasAdminDetailView
           averia={averia}
-          canEditGestion={canEditGestion}
           canAssignFontanero={canAssignFontanero}
           onAveriaUpdated={setMutatedAveria}
         />

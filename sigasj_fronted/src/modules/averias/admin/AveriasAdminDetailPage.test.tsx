@@ -101,7 +101,7 @@ describe('AveriasAdminDetailPage', () => {
     })
   }
 
-  it('muestra el formulario de gestión cuando entra la Administradora', async () => {
+  it('no muestra formulario de prioridad ni tipo cuando entra la Administradora', async () => {
     setAuthSession({
       accessToken: 'token-admin',
       user: {
@@ -113,8 +113,11 @@ describe('AveriasAdminDetailPage', () => {
     })
     await renderAt('/admin/averias/1')
     expect(container.querySelector('#averia-gestion-estado')).toBeNull()
-    expect(container.querySelector('#averia-gestion-prioridad')).not.toBeNull()
-    expect(container.querySelector('#averia-gestion-clasificacion')).not.toBeNull()
+    expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
+    expect(container.querySelector('#averia-gestion-clasificacion')).toBeNull()
+    expect(container.textContent).toContain(
+      'El Fontanero califica la prioridad (Baja, Media o Alta) y el tipo (Tubo madre o Tubo medidor).',
+    )
   })
 
   it('muestra información general, reportante, ubicación y gestión de una avería asignada', async () => {
@@ -135,7 +138,7 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.textContent).toContain(assigned.ubicacion)
     expect(container.textContent).toContain(assigned.descripcion)
     expect(container.textContent).toContain('Luis Campos')
-    expect(container.textContent).toContain('Tubería dañada')
+    expect(container.textContent).toContain('Tubo madre')
     expect(container.textContent).toContain('Alta')
     expect(container.textContent).toContain(
       formatAveriaAdminDateTime(assigned.fechaAsignacion),
@@ -143,8 +146,8 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.textContent).toContain(AVERIA_UNAVAILABLE_LABEL)
     expect(container.querySelector('.averias-admin__clamp')).toBeNull()
     expect(container.querySelector('#averia-gestion-estado')).toBeNull()
-    expect(container.querySelector('#averia-gestion-prioridad')).not.toBeNull()
-    expect(container.querySelector('#averia-gestion-clasificacion')).not.toBeNull()
+    expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
+    expect(container.querySelector('#averia-gestion-clasificacion')).toBeNull()
   })
 
   it('muestra fallbacks de una avería recién recibida', async () => {
@@ -167,7 +170,7 @@ describe('AveriasAdminDetailPage', () => {
     const inProgress = AVERIAS_ADMIN_DETAIL_FIXTURE[3]
     expect(container.textContent).toContain('En atención')
     expect(container.textContent).toContain('Luis Campos')
-    expect(container.textContent).toContain('Tubería dañada')
+    expect(container.textContent).toContain('Tubo madre')
     expect(container.textContent).toContain(
       formatAveriaAdminDateTime(inProgress.fechaAsignacion),
     )

@@ -40,13 +40,14 @@ describe('useDashboardMetrics', () => {
     vi.restoreAllMocks()
   })
 
-  it('retorna métricas por defecto de manera inicial', async () => {
+  it('inicia sin cifras inventadas mientras consulta el Backend', async () => {
     const { result, cleanup } = renderMetricsHook()
 
-    expect(result.current.metrics.abonadosActivos).toBe('1,248')
-    expect(result.current.metrics.lecturasPendientes).toBe('34')
-    expect(result.current.metrics.averiasReportadas).toBe('3')
-    expect(result.current.metrics.solicitudesEnTramite).toBe('8')
+    expect(result.current.metrics.abonadosActivos).toBeNull()
+    expect(result.current.metrics.lecturasPendientes).toBeNull()
+    expect(result.current.metrics.averiasReportadas).toBeNull()
+    expect(result.current.metrics.solicitudesEnTramite).toBeNull()
+    expect(result.current.isLoading).toBe(true)
 
     await cleanup()
   })
@@ -101,10 +102,11 @@ describe('useDashboardMetrics', () => {
       await result.current.refetch()
     })
 
-    // Abonados y lecturas se actualizaron correctamente
+    // Abonados y lecturas se actualizaron; averías queda N/D sin bloquear
     expect(result.current.metrics.abonadosActivos).toBe(1500)
     expect(result.current.metrics.lecturasPendientes).toBe(10)
-    // El dashboard no se rompió ni bloqueó por el fallo en averías
+    expect(result.current.metrics.averiasReportadas).toBeNull()
+    expect(result.current.metrics.solicitudesEnTramite).toBe(4)
     expect(result.current.isLoading).toBe(false)
 
     await cleanup()

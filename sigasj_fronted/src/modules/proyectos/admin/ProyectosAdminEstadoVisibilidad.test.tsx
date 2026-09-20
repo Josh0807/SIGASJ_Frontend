@@ -5,6 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ProyectosAdminRoutes from './ProyectosAdminRoutes'
 import type { AdminProyecto, ProyectosAdminListado } from './types'
 import * as proyectosApi from '../services/proyectosApi'
+import {
+  PROYECTO_ESTADO_CONFIRM_ACCEPT,
+  PROYECTO_ESTADO_CONFIRM_TITLE,
+  buildProyectoEstadoConfirmMessage,
+} from '../types/estadoProyecto'
 
 const proyectoActivo = (overrides: Partial<AdminProyecto> = {}): AdminProyecto => ({
   id: 1,
@@ -94,7 +99,7 @@ describe('ProyectosAdmin — Estado y Visibilidad', () => {
     expect(selects.length).toBe(2)
   })
 
-  it('permite cambiar el estado de ejecución mediante el selector de estado', async () => {
+  it('solicita confirmación antes de cambiar el estado de ejecución', async () => {
     await renderAdminPage()
 
     const select = container.querySelectorAll(
@@ -106,8 +111,47 @@ describe('ProyectosAdmin — Estado y Visibilidad', () => {
       select.dispatchEvent(new Event('change', { bubbles: true }))
     })
 
+    expect(container.textContent).toContain(PROYECTO_ESTADO_CONFIRM_TITLE)
+    expect(container.textContent).toContain(
+      buildProyectoEstadoConfirmMessage('Acueducto Norte', 'EN_PROCESO', 'COMPLETADO'),
+    )
+    expect(proyectosApi.updateProyectoEstado).not.toHaveBeenCalled()
+
+    const confirmBtn = Array.from(container.querySelectorAll('button')).find(
+      (btn) => btn.textContent === PROYECTO_ESTADO_CONFIRM_ACCEPT,
+    )
+
+    await act(async () => {
+      confirmBtn?.click()
+    })
+
     expect(proyectosApi.updateProyectoEstado).toHaveBeenCalledWith(1, 'COMPLETADO')
     expect(proyectosApi.getAdminProyectos).toHaveBeenCalledTimes(2) // Refetch inmediato
+  })
+
+  it('cancela el cambio de estado sin llamar al Backend', async () => {
+    await renderAdminPage()
+
+    const select = container.querySelectorAll(
+      '.proyectos-admin__estado-select',
+    )[0] as HTMLSelectElement
+
+    await act(async () => {
+      select.value = 'COMPLETADO'
+      select.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    const cancelBtn = Array.from(container.querySelectorAll('button')).find(
+      (btn) => btn.textContent === 'Cancelar',
+    )
+
+    await act(async () => {
+      cancelBtn?.click()
+    })
+
+    expect(proyectosApi.updateProyectoEstado).not.toHaveBeenCalled()
+    expect(container.querySelector('[role="alertdialog"]')).toBeNull()
+    expect(select.value).toBe('EN_PROCESO')
   })
 
   it('solicita confirmación modal antes de inactivar un proyecto', async () => {
@@ -207,6 +251,14 @@ describe('ProyectosAdmin — Estado y Visibilidad', () => {
     await act(async () => {
       select.value = 'PENDIENTE'
       select.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    const confirmBtn = Array.from(container.querySelectorAll('button')).find(
+      (btn) => btn.textContent === PROYECTO_ESTADO_CONFIRM_ACCEPT,
+    )
+
+    await act(async () => {
+      confirmBtn?.click()
     })
 
     expect(proyectosApi.updateProyectoEstado).toHaveBeenCalledWith(1, 'PENDIENTE')

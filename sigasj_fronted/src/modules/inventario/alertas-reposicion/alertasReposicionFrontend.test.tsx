@@ -91,7 +91,6 @@ describe('pantalla de alertas de reposición', () => {
 
   it('confirma y actualiza el estado de la alerta, luego recarga el listado', async () => {
     loginAsRole('Administradora')
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({ data: [alerta], total: 1, page: 1, limit: 10, totalPages: 1 }))
       .mockResolvedValueOnce(response({ id: 3, estado: 'EN_GESTION', usuarioGestiona: { id: 1, nombre: 'Ana' } }))
@@ -103,16 +102,19 @@ describe('pantalla de alertas de reposición', () => {
     )
     expect(gestionar).toBeTruthy()
     await act(async () => gestionar?.click())
-    expect(confirmSpy).toHaveBeenCalled()
+    expect(view.container.textContent).toContain('Cambiar estado')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const accept = Array.from(view.container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Aceptar',
+    )
+    await act(async () => accept?.click())
     expect(fetchMock.mock.calls[1][0]).toContain('/admin/inventario/alertas-reposicion/3/estado')
     expect(view.container.textContent).toContain('La alerta quedó en gestión.')
-    confirmSpy.mockRestore()
     await view.cleanup()
   })
 
   it('no llama al backend si se cancela la confirmación', async () => {
     loginAsRole('Administradora')
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
     const fetchMock = vi.fn().mockResolvedValueOnce(response({ data: [alerta], total: 1, page: 1, limit: 10, totalPages: 1 }))
     vi.stubGlobal('fetch', fetchMock)
     const view = await mount()
@@ -120,13 +122,17 @@ describe('pantalla de alertas de reposición', () => {
       button.textContent?.includes('Poner en gestión'),
     )
     await act(async () => gestionar?.click())
+    const cancel = Array.from(view.container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Cancelar',
+    )
+    await act(async () => cancel?.click())
     expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(view.container.querySelector('[role="alertdialog"]')).toBeNull()
     await view.cleanup()
   })
 
   it('genera reposición desde alerta cuando se confirma', async () => {
     loginAsRole('Administradora')
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(response({ data: [alerta], total: 1, page: 1, limit: 10, totalPages: 1 }))
       .mockResolvedValueOnce(response({ id: 12, codigo: 'REP-0012' }, true, 201))
@@ -137,9 +143,12 @@ describe('pantalla de alertas de reposición', () => {
     )
     expect(generar).toBeTruthy()
     await act(async () => generar?.click())
+    const accept = Array.from(view.container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Aceptar',
+    )
+    await act(async () => accept?.click())
     expect(fetchMock.mock.calls[1][0]).toContain('/admin/inventario/alertas-reposicion/3/reposicion')
     expect(view.container.textContent).toContain('Se generó la reposición desde la alerta.')
-    confirmSpy.mockRestore()
     await view.cleanup()
   })
 })
