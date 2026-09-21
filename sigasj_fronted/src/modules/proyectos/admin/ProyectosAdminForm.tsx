@@ -250,7 +250,7 @@ const ProyectosAdminForm = ({
 
   return (
     <form
-      className="gallery-admin__form proyectos-admin__form w-full max-w-3xl"
+      className="gallery-admin__form proyectos-admin__form sigasj-project-form w-full max-w-3xl"
       onSubmit={handleSubmit}
       noValidate
       aria-busy={isSubmitting ? true : undefined}

@@ -9,9 +9,9 @@ type ProyectosAdminFormPageLayoutProps = {
 const ProyectosAdminFormPageLayout = ({
   children,
 }: ProyectosAdminFormPageLayoutProps) => (
-  <main className="gallery-admin proyectos-admin">
-    <div className="gallery-admin__shell sigasj-stack">
-      <header className="gallery-admin__header">
+  <main className="gallery-admin proyectos-admin sigasj-project-form-layout">
+    <div className="gallery-admin__shell sigasj-stack sigasj-project-form-shell">
+      <header className="gallery-admin__header sigasj-project-form-header">
         <div>
           <p className="gallery-admin__eyebrow">Panel administrativo</p>
           <h1>Gestión de Proyectos</h1>

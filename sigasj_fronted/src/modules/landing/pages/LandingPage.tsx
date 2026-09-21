@@ -1,14 +1,28 @@
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import Header from '../components/Header'
 import HeroSection from '../components/HeroSection'
 import Footer from '../components/Footer'
 import { LANDING_SECTIONS } from '../config/landingSections'
 
 const LandingPage = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0)
-    if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname)
+  useLayoutEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration
+    window.history.scrollRestoration = 'manual'
+    const sectionId = decodeURIComponent(window.location.hash.slice(1))
+    const section = sectionId ? document.getElementById(sectionId) : null
+    const top = section ? Math.max(0, section.offsetTop - 86) : 0
+
+    const placeAtDestination = () => {
+      document.documentElement.scrollTop = top
+      document.body.scrollTop = top
+    }
+
+    placeAtDestination()
+    const frameId = window.requestAnimationFrame(placeAtDestination)
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      window.history.scrollRestoration = previousScrollRestoration
     }
   }, [])
 
@@ -28,4 +42,3 @@ const LandingPage = () => {
 }
 
 export default LandingPage
-

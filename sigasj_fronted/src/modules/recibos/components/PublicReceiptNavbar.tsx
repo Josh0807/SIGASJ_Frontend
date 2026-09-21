@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 
-export const PublicReceiptNavbar = () => {
+type PublicReceiptNavbarProps = { returnTo?: string }
+
+export const PublicReceiptNavbar = ({ returnTo = '/' }: PublicReceiptNavbarProps) => {
   return (
     <header className="header public-receipt-navbar" aria-label="Navegación pública de recibos">
       <div className="header__inner">
@@ -19,8 +21,8 @@ export const PublicReceiptNavbar = () => {
         <nav className="navbar" aria-label="Navegación de retorno">
           <ul className="navbar__list">
             <li>
-              <Link className="navbar__link navbar__link--home" to="/">
-                Inicio
+              <Link className="navbar__link navbar__link--home" to={returnTo}>
+                Volver
               </Link>
             </li>
           </ul>

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { IconArrowLeft, IconDropletDollar } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import PublicReceiptNavbar from '../components/PublicReceiptNavbar'
 import ReceiptSearchForm from '../components/ReceiptSearchForm'
@@ -37,21 +38,22 @@ export const ReceiptQueryPage = () => {
 
 
   const handleGoHome = () => {
-    navigate('/')
+    navigate('/#pagos')
   }
 
   return (
-    <div className="receipt-query-page" aria-label="Consulta pública de recibos">
-      <PublicReceiptNavbar />
+    <div className="receipt-query-page sigasj-receipt-query-page min-h-screen bg-white" aria-label="Consulta pública de recibos">
+      <PublicReceiptNavbar returnTo="/#pagos" />
 
-      <main className="receipt-query-page__main">
-        <div className="receipt-query-page__container">
-          <header className="receipt-query-page__heading">
+      <main className="receipt-query-page__main sigasj-receipt-query-main bg-white px-5 py-12 max-[640px]:px-4 max-[640px]:py-8">
+        <div className="receipt-query-page__container sigasj-receipt-query-container mx-auto w-full max-w-[920px]">
+          <header className="receipt-query-page__heading sigasj-receipt-query-heading text-center">
+            <span className="sigasj-receipt-query-icon mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-sky-100 text-[#0872d3]"><IconDropletDollar size={36} aria-hidden="true" /></span>
             <h1>Consulta de recibo</h1>
             <p>Revisa la información de tu recibo de agua ingresando tu número de paja.</p>
           </header>
 
-          <section className="receipt-query-page__search-card">
+          <section className="receipt-query-page__search-card sigasj-receipt-search-card mt-8 rounded-[22px] border border-sky-100 bg-white p-7 shadow-[0_16px_42px_rgba(39,112,166,0.12)]">
             <ReceiptSearchForm
               initialValue={numeroPaja ?? ''}
               onSearch={handleSearch}
@@ -59,7 +61,7 @@ export const ReceiptQueryPage = () => {
             />
           </section>
 
-          <section className="receipt-query-page__results" aria-live="polite">
+          <section className="receipt-query-page__results sigasj-receipt-results mt-6" aria-live="polite">
             {loading ? (
               <div className="receipt-query-page__loading" role="status">
                 <span className="receipt-query-page__spinner" aria-hidden="true" />
@@ -91,7 +93,7 @@ export const ReceiptQueryPage = () => {
             ) : null}
           </section>
 
-          <footer className="receipt-query-page__actions">
+          <footer className="receipt-query-page__actions sigasj-receipt-query-actions mt-6 flex justify-center gap-3 max-[560px]:flex-col">
             <button
               type="button"
               className="receipt-query-page__button receipt-query-page__button--secondary"
@@ -104,7 +106,7 @@ export const ReceiptQueryPage = () => {
               className="receipt-query-page__button receipt-query-page__button--primary"
               onClick={handleGoHome}
             >
-              Volver al inicio
+              <IconArrowLeft size={18} aria-hidden="true" /> Volver
             </button>
           </footer>
         </div>
