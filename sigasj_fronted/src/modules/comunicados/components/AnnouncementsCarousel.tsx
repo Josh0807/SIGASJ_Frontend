@@ -151,7 +151,7 @@ const AnnouncementsCarousel = ({
 
   return (
     <div
-      className="announcements-carousel"
+      className="mt-7 outline-none"
       style={
         {
           '--announcements-total': announcements.length,
@@ -174,15 +174,15 @@ const AnnouncementsCarousel = ({
       tabIndex={canNavigate ? 0 : -1}
     >
       {canNavigate ? (
-        <div className="announcements-carousel__toolbar">
-          <p className="announcements-carousel__status" aria-live="polite">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="m-0 text-sm font-extrabold tracking-[0.08em] text-[#2869ad]" aria-live="polite">
             {statusLabel}
           </p>
 
-          <div className="announcements-carousel__controls">
+          <div className="flex gap-3">
             <button
               type="button"
-              className="announcements-carousel__control"
+              className="announcement-motion-button grid size-11 cursor-pointer place-items-center rounded-lg border border-white bg-white text-[#0872d3] shadow-[0_8px_18px_rgba(40,111,164,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               onClick={goPrevious}
               aria-label="Comunicado anterior"
             >
@@ -190,7 +190,7 @@ const AnnouncementsCarousel = ({
             </button>
             <button
               type="button"
-              className="announcements-carousel__control"
+              className="announcement-motion-button grid size-11 cursor-pointer place-items-center rounded-lg border border-white bg-white text-[#0872d3] shadow-[0_8px_18px_rgba(40,111,164,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               onClick={goNext}
               aria-label="Comunicado siguiente"
             >
@@ -200,12 +200,19 @@ const AnnouncementsCarousel = ({
         </div>
       ) : null}
 
-      <div className="announcements-carousel__viewport">
-        <div className="announcements-carousel__track">
+      <div className="overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-out"
+          style={{
+            width: `${(announcements.length / slidesPerView) * 100}%`,
+            transform: `translateX(-${(currentIndex * 100) / announcements.length}%)`,
+          }}
+        >
           {announcements.map((announcement) => (
             <div
               key={announcement.id}
-              className="announcements-carousel__slide"
+              className="min-w-0 px-2"
+              style={{ width: `${100 / announcements.length}%` }}
             >
               <AnnouncementCard
                 id={announcement.id}
@@ -228,7 +235,7 @@ const AnnouncementsCarousel = ({
 
       {canNavigate && totalPages > 1 ? (
         <div
-          className="announcements-carousel__dots"
+          className="mt-6 flex items-center justify-center gap-2"
           role="tablist"
           aria-label="Páginas del carrusel de comunicados"
         >
@@ -236,11 +243,7 @@ const AnnouncementsCarousel = ({
             <button
               key={`announcement-page-${pageIndex}`}
               type="button"
-              className={
-                pageIndex === currentIndex
-                  ? 'announcements-carousel__dot announcements-carousel__dot--active'
-                  : 'announcements-carousel__dot'
-              }
+              className={`h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all ${pageIndex === currentIndex ? 'w-7 bg-[#0872d3]' : 'w-5 bg-sky-200 hover:bg-sky-300'}`}
               role="tab"
               aria-selected={pageIndex === currentIndex}
               aria-label={`Ir al grupo ${pageIndex + 1} de ${totalPages}`}

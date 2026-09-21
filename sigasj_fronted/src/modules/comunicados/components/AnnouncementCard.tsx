@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { IconArrowRight } from '@tabler/icons-react'
 import type { AnnouncementCardProps } from '../types/AnnouncementsSectionProps'
 
 const AnnouncementCard = ({
@@ -38,13 +39,7 @@ const AnnouncementCard = ({
   const titleId = `announcement-title-${id}`
   const showMeta = Boolean(safeType || formattedDate || urgent)
 
-  const cardClassName = [
-    'announcements-section__card',
-    urgent ? 'announcements-section__card--urgent' : '',
-    safeImageUrl ? 'announcements-section__card--with-media' : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const cardClassName = `flex h-full min-h-[320px] flex-col overflow-hidden rounded-[18px] border-[3px] bg-white shadow-none transition hover:-translate-y-0.5 hover:shadow-none ${urgent ? 'border-amber-300' : 'border-white'}`
 
   const imageAlt = `Ilustración del comunicado: ${safeTitle}`
 
@@ -54,18 +49,16 @@ const AnnouncementCard = ({
       data-announcement-id={id}
       aria-labelledby={titleId}
     >
-      <div className="announcements-section__card-accent" aria-hidden="true" />
-
       {safeImageUrl ? (
-        <div className="announcements-section__media">
+        <div className="m-0.5 aspect-[2.35/1] overflow-hidden rounded-[14px] bg-[#eef8ff]">
           <button
             type="button"
-            className="announcements-section__media-link"
+            className="block h-full w-full cursor-zoom-in border-0 bg-transparent p-0 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-sky-400"
             aria-label={`Ver imagen ampliada: ${safeTitle}`}
             onClick={onImageClick}
           >
             <img
-              className="announcements-section__image"
+              className="h-full w-full object-contain transition duration-500 hover:scale-[1.01]"
               src={safeImageUrl}
               alt={imageAlt}
               loading="lazy"
@@ -75,37 +68,37 @@ const AnnouncementCard = ({
         </div>
       ) : null}
 
-      <div className="announcements-section__card-body">
+      <div className="flex flex-1 flex-col px-5 pb-4 pt-3 max-[640px]:px-4">
         {showMeta ? (
-          <p className="announcements-section__meta">
+          <p className="m-0 mb-1.5 flex flex-wrap items-center gap-x-2 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-[#1874c8]">
             {safeType ? <span>{safeType}</span> : null}
             {formattedDate ? (
               <time dateTime={safePublishedAt}>{formattedDate}</time>
             ) : null}
             {urgent ? (
-              <span className="announcements-section__meta-urgent">
+              <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-800">
                 Prioridad alta
               </span>
             ) : null}
           </p>
         ) : null}
 
-        <h3 className="announcements-section__title" id={titleId}>
+        <h3 className="m-0 text-[1.05rem] font-extrabold leading-tight text-[#092e67]" id={titleId}>
           {safeTitle}
         </h3>
 
-        {bodyText ? (
-          <p className="announcements-section__summary">{bodyText}</p>
+        {bodyText && !safeImageUrl ? (
+          <p className="mb-0 mt-3 line-clamp-3 text-sm leading-6 text-[#496b78]">{bodyText}</p>
         ) : null}
 
-        <footer className="announcements-section__card-actions">
+        <footer className="mt-auto flex flex-wrap gap-3 pt-3">
           {safeImageUrl ? (
             <button
               type="button"
-              className="announcements-section__more"
+              className="announcement-motion-button inline-flex min-h-9 cursor-pointer items-center gap-4 rounded-[10px] border border-[#0872d3] bg-white px-5 text-xs font-bold text-[#0869bd] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               onClick={onImageClick}
             >
-              Ver imagen
+              Ver imagen <IconArrowRight size={18} aria-hidden="true" />
             </button>
           ) : null}
 
@@ -119,7 +112,7 @@ const AnnouncementCard = ({
 
           {safeFileUrl ? (
             <a
-              className="announcements-section__file"
+              className="announcement-motion-button inline-flex min-h-10 items-center rounded-xl border border-sky-200 px-5 text-sm font-bold text-[#0869bd] no-underline"
               href={safeFileUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -142,18 +135,20 @@ type CardActionProps = {
 const isInternalSpaPath = (href: string) =>
   href.startsWith('/') && !href.startsWith('//')
 
+const cardActionClassName = 'announcement-motion-button inline-flex min-h-10 items-center rounded-xl border border-[#0872d3] bg-white px-5 text-sm font-bold text-[#0869bd] no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400'
+
 const CardAction = ({ label, href, onClick }: CardActionProps) => {
   if (href) {
     if (isInternalSpaPath(href)) {
       return (
-        <Link className="announcements-section__more" to={href}>
+        <Link className={cardActionClassName} to={href}>
           {label}
         </Link>
       )
     }
 
     return (
-      <a className="announcements-section__more" href={href}>
+      <a className={cardActionClassName} href={href}>
         {label}
       </a>
     )
@@ -163,7 +158,7 @@ const CardAction = ({ label, href, onClick }: CardActionProps) => {
     return (
       <button
         type="button"
-        className="announcements-section__more"
+        className={cardActionClassName}
         onClick={onClick}
       >
         {label}

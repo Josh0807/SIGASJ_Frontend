@@ -28,30 +28,34 @@ const TransparencySection = ({
 
   return (
     <section
-      className="landing-section transparency-section"
+      className="relative isolate min-h-0 overflow-hidden bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
       id={id}
       aria-labelledby={`${id}-title`}
     >
-      <div className="transparency-section__content">
-        <header className="transparency-section__heading">
-          <p className="transparency-section__eyebrow">Documentación</p>
-          <h2 id={`${id}-title`}>{title}</h2>
-          <p>{description}</p>
+      <div className="pointer-events-none absolute -left-48 top-16 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sky-200/35" aria-hidden="true" />
+      <div className="pointer-events-none absolute -right-44 top-24 -z-10 h-52 w-[520px] -rotate-[18deg] rounded-[50%] border-[44px] border-sky-300/20" aria-hidden="true" />
+      <div className="pointer-events-none absolute -bottom-28 left-1/4 -z-10 h-48 w-[760px] rotate-3 rounded-[50%] border-[46px] border-sky-300/15" aria-hidden="true" />
+
+      <div className="mx-auto w-full max-w-[1180px]">
+        <header className="max-w-[780px]">
+          <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-[#1476cf] before:h-0.5 before:w-9 before:bg-[#1476cf]">Documentación</p>
+          <h2 id={`${id}-title`} className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-[#092e67]">{title}</h2>
+          <p className="mb-0 mt-4 max-w-[760px] text-base leading-7 text-[#526d8c]">{description}</p>
         </header>
 
         {showLoading ? (
-          <p className="transparency-section__empty" role="status">
+          <p data-ui="transparency-section__empty" className="mt-8 rounded-2xl bg-white/75 p-8 text-center text-[#496b78] shadow-sm" role="status">
             Cargando documentación…
           </p>
         ) : showError ? (
-          <div className="transparency-section__empty" role="alert">
+          <div data-ui="transparency-section__empty" className="mt-8 rounded-2xl bg-white/80 p-8 text-center text-[#496b78] shadow-sm" role="alert">
             <p>{errorMessage}</p>
-            <button type="button" onClick={retry}>
+            <button className="mt-3 min-h-10 cursor-pointer rounded-xl border border-[#0872d3] bg-white px-5 font-bold text-[#0872d3]" type="button" onClick={retry}>
               Reintentar
             </button>
           </div>
         ) : hasPublications ? (
-          <div className="transparency-section__grid">
+          <div data-ui="transparency-section__grid" className="mt-9 grid grid-cols-1 gap-5">
             {publications.map((publication) => (
               <TransparencyCard
                 key={publication.id}
@@ -64,7 +68,7 @@ const TransparencySection = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500 transparency-section__empty" role="status">
+          <div data-ui="transparency-section__empty" className="mt-8 rounded-2xl bg-white/75 py-8 text-center text-gray-500 shadow-sm" role="status">
             {emptyMessage}
           </div>
         )}

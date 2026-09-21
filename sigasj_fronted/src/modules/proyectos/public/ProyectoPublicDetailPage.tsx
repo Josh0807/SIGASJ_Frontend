@@ -1,6 +1,7 @@
 
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { IconArrowLeft, IconCalendarTime, IconChevronLeft, IconChevronRight, IconCircleCheck, IconPhoto, IconUserCog } from '@tabler/icons-react'
 import { Link, useParams } from 'react-router-dom'
 import Header from '../../landing/components/Header'
 import Footer from '../../landing/components/Footer'
@@ -127,8 +128,8 @@ const ProyectoPublicDetailPage = () => {
       <main className="proyecto-detail-public">
         <div className="proyecto-detail-public__container">
           <div className="proyecto-detail-public__top-bar">
-            <Link to="/#proyectos" className="proyecto-detail-public__back-link">
-              ← Volver a Proyectos
+            <Link to="/#proyectos" className="proyecto-detail-public__back-link sigasj-project-back-link">
+              <IconArrowLeft size={18} aria-hidden="true" /> Volver
             </Link>
           </div>
 
@@ -140,8 +141,8 @@ const ProyectoPublicDetailPage = () => {
             <div className="proyecto-detail-public__status" role="status">
               <h2>Proyecto no disponible</h2>
               <p>El proyecto solicitado no existe o no se encuentra publicado actualmente.</p>
-              <Link to="/" className="proyecto-detail-public__home-btn">
-                Ir al inicio
+              <Link to="/#proyectos" className="proyecto-detail-public__home-btn">
+                Volver
               </Link>
             </div>
           ) : status === 'error' ? (
@@ -155,7 +156,8 @@ const ProyectoPublicDetailPage = () => {
             <article className="proyecto-detail-public__article">
               <header className="proyecto-detail-public__header">
                 <div className="proyecto-detail-public__badge-wrapper">
-                  <span className="proyecto-detail-public__badge">
+                  <span className={`proyecto-detail-public__badge sigasj-project-status-badge ${proyecto.estado === 'COMPLETADO' ? 'sigasj-project-status-badge--complete' : ''}`}>
+                    {proyecto.estado === 'COMPLETADO' ? <IconCircleCheck size={18} aria-hidden="true" /> : null}
                     {ESTADO_PROYECTO_LABELS[proyecto.estado] ?? proyecto.estado}
                   </span>
                 </div>
@@ -171,26 +173,35 @@ const ProyectoPublicDetailPage = () => {
                 </div>
               ) : null}
 
-              <section className="proyecto-detail-public__meta-grid">
-                <div className="proyecto-detail-public__meta-card">
+              <section className="proyecto-detail-public__meta-grid sigasj-project-meta-grid">
+                <div className="proyecto-detail-public__meta-card sigasj-project-meta-card">
+                  <span className="sigasj-project-meta-icon sigasj-project-meta-icon--status"><IconCircleCheck size={22} aria-hidden="true" /></span>
+                  <div>
                   <span className="proyecto-detail-public__meta-label">Estado de Ejecución</span>
                   <strong className="proyecto-detail-public__meta-value">
                     {ESTADO_PROYECTO_LABELS[proyecto.estado] ?? proyecto.estado}
                   </strong>
+                  </div>
                 </div>
 
-                <div className="proyecto-detail-public__meta-card">
+                <div className="proyecto-detail-public__meta-card sigasj-project-meta-card">
+                  <span className="sigasj-project-meta-icon"><IconCalendarTime size={22} aria-hidden="true" /></span>
+                  <div>
                   <span className="proyecto-detail-public__meta-label">Duración Estimada</span>
                   <strong className="proyecto-detail-public__meta-value">
                     {proyecto.duracion || 'No especificada'}
                   </strong>
+                  </div>
                 </div>
 
-                <div className="proyecto-detail-public__meta-card">
+                <div className="proyecto-detail-public__meta-card sigasj-project-meta-card">
+                  <span className="sigasj-project-meta-icon"><IconUserCog size={22} aria-hidden="true" /></span>
+                  <div>
                   <span className="proyecto-detail-public__meta-label">Encargado de Realización</span>
                   <strong className="proyecto-detail-public__meta-value">
                     {proyecto.encargadoRealizacion || 'ASADA San Juan de Santa Cruz'}
                   </strong>
+                  </div>
                 </div>
               </section>
 
@@ -229,8 +240,8 @@ const ProyectoPublicDetailPage = () => {
                 </section>
               ) : (
                 <section className="proyecto-detail-public__section proyecto-detail-public__gallery-section">
-                  <div className="proyecto-detail-public__gallery-header">
-                    <h2>Galería de Fotografías</h2>
+                  <div className="proyecto-detail-public__gallery-header sigasj-project-gallery-header">
+                    <h2><span className="sigasj-project-gallery-icon"><IconPhoto size={22} aria-hidden="true" /></span> Galería de Fotografías</h2>
                     {imagenes.length > gallerySlidesPerView ? (
                       <div className="proyecto-detail-public__gallery-controls">
                         <button
@@ -240,7 +251,7 @@ const ProyectoPublicDetailPage = () => {
                           disabled={!canPrevGallery}
                           aria-label="Fotografía anterior"
                         >
-                          ‹
+                          <IconChevronLeft size={21} aria-hidden="true" />
                         </button>
                         <span className="proyecto-detail-public__page-indicator" aria-live="polite">
                           {effectiveGalleryIndex + 1} / {maxGalleryIndex + 1}
@@ -252,7 +263,7 @@ const ProyectoPublicDetailPage = () => {
                           disabled={!canNextGallery}
                           aria-label="Siguiente fotografía"
                         >
-                          ›
+                          <IconChevronRight size={21} aria-hidden="true" />
                         </button>
                       </div>
                     ) : null}

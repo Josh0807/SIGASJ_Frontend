@@ -59,7 +59,7 @@ describe('Consulta Pública de Recibos SIGASJ', () => {
   })
 
   describe('Navbar Público de Recibos (PublicReceiptNavbar)', () => {
-    it('renderiza el logo oficial de la ASADA, el texto SIGASJ San Juan y el botón Inicio', () => {
+    it('renderiza el logo oficial de la ASADA, el texto SIGASJ San Juan y el botón Volver', () => {
       const markup = renderToStaticMarkup(
         <MemoryRouter>
           <PublicReceiptNavbar />
@@ -69,7 +69,7 @@ describe('Consulta Pública de Recibos SIGASJ', () => {
       expect(markup).toContain('Logo oficial de la ASADA')
       expect(markup).toContain('SIGASJ')
       expect(markup).toContain('San Juan')
-      expect(markup).toContain('Inicio')
+      expect(markup).toContain('Volver')
       expect(markup).toContain('href="/"')
     })
   })
@@ -145,7 +145,8 @@ describe('Consulta Pública de Recibos SIGASJ', () => {
 
       expect(markup).toContain('Consulta de recibo')
       expect(markup).toContain('Consultar otra paja')
-      expect(markup).toContain('Volver al inicio')
+      expect(markup).toContain('Volver')
+      expect(markup).toContain('/#pagos')
     })
   })
 
@@ -164,4 +165,3 @@ describe('Consulta Pública de Recibos SIGASJ', () => {
     })
   })
 })
-

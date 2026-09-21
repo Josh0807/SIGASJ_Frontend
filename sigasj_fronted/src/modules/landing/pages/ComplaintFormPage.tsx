@@ -1,4 +1,5 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { IconCalendar, IconMail, IconMessageCircle } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import { submitPublicQueja } from '../../contacto/services/quejasApi'
@@ -14,6 +15,11 @@ const formatDateForDisplay = (date: Date) => {
 }
 
 const ComplaintFormPage = () => {
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [])
+
   const currentDate = new Date()
   const dateDisplay = formatDateForDisplay(currentDate)
 
@@ -78,12 +84,13 @@ const ComplaintFormPage = () => {
   }
 
   return (
-    <div className="complaint-form-page receipt-query-page" aria-label="Formulario público de sugerencias y quejas">
-      <PublicReceiptNavbar />
+    <div className="complaint-form-page receipt-query-page sigasj-complaint-page min-h-screen bg-white" aria-label="Formulario público de sugerencias y quejas">
+      <PublicReceiptNavbar returnTo="/#quejas" />
 
-      <main className="receipt-query-page__main">
-        <div className="receipt-query-page__container">
-          <header className="receipt-query-page__heading">
+      <main className="receipt-query-page__main sigasj-complaint-main bg-white px-5 py-12 max-[640px]:px-4 max-[640px]:py-8">
+        <div className="receipt-query-page__container sigasj-complaint-container mx-auto w-full max-w-[850px]">
+          <header className="receipt-query-page__heading sigasj-complaint-heading text-center">
+            <span className="sigasj-complaint-heading-icon mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-sky-100 text-[#0872d3]"><IconMessageCircle size={35} aria-hidden="true" /></span>
             <p className="complaint-form-page__eyebrow">Atención al usuario</p>
             <h1>Formulario de Sugerencias y Quejas</h1>
             <p>
@@ -92,7 +99,7 @@ const ComplaintFormPage = () => {
             </p>
           </header>
 
-          <section className="receipt-query-page__search-card w-full">
+          <section className="receipt-query-page__search-card sigasj-complaint-card mt-8 w-full rounded-[24px] border border-sky-100 bg-white p-8 shadow-[0_18px_50px_rgba(39,112,166,0.13)] max-[640px]:p-5">
             {submitted ? (
               <FormSuccessResult
                 title="Sugerencia o queja enviada exitosamente"
@@ -106,9 +113,9 @@ const ComplaintFormPage = () => {
                   <>
                     <Link
                       className="receipt-query-page__button receipt-query-page__button--primary"
-                      to="/"
+                      to="/#quejas"
                     >
-                      Volver al inicio
+                      Volver
                     </Link>
                     <button
                       type="button"
@@ -128,8 +135,9 @@ const ComplaintFormPage = () => {
                   </div>
                 ) : null}
 
-                <div className="complaint-form-page__field">
+                <div className="complaint-form-page__field sigasj-complaint-date-field">
                   <label htmlFor={fechaId}>Fecha de la queja (generada automáticamente)</label>
+                  <span className="sigasj-complaint-field-icon" aria-hidden="true"><IconCalendar size={19} /></span>
                   <input
                     id={fechaId}
                     type="text"
@@ -195,12 +203,6 @@ const ComplaintFormPage = () => {
                 </div>
 
                 <div className="complaint-form-page__actions">
-                  <Link
-                    to="/"
-                    className="receipt-query-page__button receipt-query-page__button--secondary"
-                  >
-                    Cancelar y volver
-                  </Link>
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -208,9 +210,16 @@ const ComplaintFormPage = () => {
                   >
                     {isSubmitting ? 'Enviando...' : 'Enviar sugerencia o queja'}
                   </button>
+                  <Link
+                    to="/#quejas"
+                    className="receipt-query-page__button receipt-query-page__button--secondary"
+                  >
+                    Cancelar y volver
+                  </Link>
                 </div>
 
-                <p className="complaint-form-page__help">
+                <p className="complaint-form-page__help sigasj-complaint-note">
+                  <IconMail size={18} aria-hidden="true" />
                   Nota: La información ingresada se enviará directamente a <strong>{TARGET_EMAIL}</strong>.
                 </p>
               </form>

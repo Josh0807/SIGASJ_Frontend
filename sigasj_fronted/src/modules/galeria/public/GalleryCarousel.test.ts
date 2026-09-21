@@ -8,10 +8,11 @@ describe('carrusel responsive de galería', () => {
   it('dispone controles accesibles y desplazamiento suave', () => {
     expect(component).toContain('Ver fotografías anteriores')
     expect(component).toContain('Ver fotografías siguientes')
-    expect(component).toContain("behavior: 'smooth'")
+    expect(component).toContain('transition-transform duration-500 ease-out')
+    expect(component).toContain('AUTOPLAY_MS')
     expect(component).toContain('gallery-section__status')
     expect(component).toContain('gallery-section__dots')
-    expect(component).toContain('tabIndex={0}')
+    expect(component).toContain('tabIndex={canMove ? 0 : -1}')
   })
 
   it('mantiene las fotografías en una fila desplazable', () => {

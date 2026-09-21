@@ -2642,14 +2642,19 @@ button.announcements-section__more {
 }
 
 .contact-section__intro h2 {
-  margin-bottom: 12px;
+  margin: 0;
+  color: #092e67;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .contact-section__intro>p:last-child {
-  margin: 0;
-  color: #4c6479;
-  font-size: 1.04rem;
-  line-height: 1.7;
+  margin: 1rem 0 0;
+  color: #526d8c;
+  font-size: 1rem;
+  line-height: 1.75rem;
 }
 
 .contact-section__grid {
