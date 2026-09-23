@@ -3716,7 +3716,8 @@ button.material-tracking__detail-link { border: 0; background: transparent; font
   .material-tracking__header, .material-detail__header { flex-direction: column; padding: 18px; }
   .material-tracking__header .material-request__primary { width: 100%; }
   .material-tracking__filters { align-items: stretch; flex-direction: column; }
-  .material-tracking__filters select { width: 100%; min-width: 0; }
+  .material-tracking__filters select,
+  .material-tracking__filters input[type="date"] { width: 100%; min-width: 0; }
   .material-tracking__filters span { margin-left: 0; }
   .material-tracking__table-wrap { overflow: visible; border: 0; background: transparent; }
   .material-tracking table, .material-tracking tbody, .material-tracking tr, .material-tracking td, .material-detail table, .material-detail tbody, .material-detail tr, .material-detail td { display: block; }
@@ -4596,10 +4597,39 @@ a.auth-page__submit {
     padding: 18px;
   }
 
+  .gallery-admin__shell > .gallery-admin__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gallery-admin__header-actions {
+    width: 100%;
+  }
+
   .gallery-admin__filters,
+  .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)),
   .gallery-admin__field-row,
   .gallery-admin__item {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gallery-admin__filters .gallery-admin__field input,
+  .gallery-admin__filters .gallery-admin__field select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .gallery-admin__filters .actividades-admin-reportes__actions,
+  .gallery-admin__filters .actividades-admin-revision__filter-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .gallery-admin__filters .gallery-admin__button {
+    width: 100%;
+    min-height: 48px;
   }
 
   .gallery-admin__actions,
@@ -6879,14 +6909,25 @@ body,
 }
 
 @media (max-width: 900px) {
-  .actividades-admin-revision__filters {
+  .actividades-admin-revision__filters,
+  .actividades-admin-revision__filters:has(.gallery-admin__field:nth-child(3)) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .actividades-admin-revision__filters {
-    grid-template-columns: 1fr;
+  .actividades-admin-revision__filters,
+  .actividades-admin-revision__filters:has(.gallery-admin__field:nth-child(3)) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .actividades-admin-revision__filters .gallery-admin__field:nth-child(-n+3),
+  .actividades-admin-revision__filter-actions {
+    grid-column: 1 / -1;
+  }
+
+  .actividades-admin-revision__filter-actions .gallery-admin__button {
+    width: 100%;
   }
 
   .actividades-admin-revision__filter-actions,

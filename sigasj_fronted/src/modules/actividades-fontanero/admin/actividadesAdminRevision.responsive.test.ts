@@ -14,6 +14,9 @@ describe('responsive — revisión administrativa', () => {
     expect(css).toContain(
       '@media (min-width: 641px) and (max-width: 900px)',
     )
+    expect(css).toContain(
+      '.actividades-admin-revision__filters:has(.gallery-admin__field:nth-child(3))',
+    )
     expect(css).toContain('.actividades-admin-revision__filters')
     expect(css).toContain('.actividades-admin-revision__correction')
     expect(css).toContain('.actividades-admin-revision__table td::before')
