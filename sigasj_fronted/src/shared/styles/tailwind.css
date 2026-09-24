@@ -245,6 +245,63 @@
   }
 }
 
+@media (max-width: 760px) {
+  .sigasj-action-section {
+    padding-inline: 16px;
+  }
+
+  .sigasj-action-section--first,
+  .sigasj-action-section--second {
+    min-height: 0;
+  }
+
+  .sigasj-action-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    width: 100%;
+    min-height: 0;
+    padding: 22px 18px 20px;
+  }
+
+  .sigasj-action-icon {
+    flex: none;
+    width: 64px;
+    height: 64px;
+  }
+
+  .sigasj-action-copy {
+    width: 100%;
+  }
+
+  .sigasj-action-copy > p:first-child {
+    letter-spacing: 0.12em;
+  }
+
+  .sigasj-action-copy h2 {
+    font-size: clamp(1.7rem, 8vw, 2.15rem);
+    line-height: 1.08;
+  }
+
+  .sigasj-action-button,
+  .sigasj-action-side {
+    flex: none;
+    width: 100%;
+  }
+
+  .sigasj-action-button {
+    min-height: 52px;
+    height: auto;
+    padding: 14px 16px;
+    gap: 10px;
+    white-space: normal;
+  }
+
+  .sigasj-action-side {
+    text-align: left;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sigasj-action-card,
   .sigasj-action-button,
@@ -522,6 +579,8 @@
 @media (max-width: 950px) { .sigasj-contact-grid { grid-template-columns: 1fr; } }
 @media (max-width: 620px) {
   .sigasj-contact-section { padding: 44px 16px; }
+  .sigasj-contact-section .contact-section__eyebrow { gap: 10px; letter-spacing: 0.12em; }
+  .sigasj-contact-section .contact-section__intro h2 { font-size: clamp(1.8rem, 8vw, 2.4rem); line-height: 1.08; }
   .sigasj-contact-details { grid-template-columns: 1fr; padding: 16px; }
   .sigasj-contact-item { grid-template-columns: 52px minmax(0,1fr); min-height: 0; padding: 16px; }
   .sigasj-contact-item .contact-section__icon, .sigasj-contact-map .contact-section__icon { width: 52px; height: 52px; }
@@ -640,6 +699,7 @@
 .sigasj-complaint-card .complaint-form-page__field input[aria-invalid='true'], .sigasj-complaint-card .complaint-form-page__field textarea[aria-invalid='true'] { border-color: #dc3545; box-shadow: 0 0 0 3px rgba(220,53,69,.09); }
 .sigasj-complaint-card .complaint-form-page__field input:disabled { color: #55718e; background: #edf5fa; opacity: 1; }
 .sigasj-complaint-field-icon { position: absolute; top: 56px; right: 34px; display: grid; place-items: center; color: #3695d8; pointer-events: none; }
+.sigasj-complaint-date-field input { padding-right: 46px; }
 .sigasj-complaint-card .complaint-form-page__help { color: #6b829b; font-size: .74rem; line-height: 1.5; }
 .sigasj-complaint-card .complaint-form-page__field-error { color: #c52636; font-size: .74rem; font-weight: 650; }
 .sigasj-complaint-card .complaint-form-page__error { padding: 13px 15px; border: 1px solid #f2bec4; border-radius: 12px; color: #a51f2d; background: #fff3f4; font-size: .84rem; }
