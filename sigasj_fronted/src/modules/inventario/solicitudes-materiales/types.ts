@@ -8,7 +8,7 @@ export type SolicitudMaterialItemPayload = {
 
 export type CreateSolicitudMaterialesPayload = {
   idAveria?: number
-  motivo?: string
+  observacion?: string
   materiales: SolicitudMaterialItemPayload[]
 }
 

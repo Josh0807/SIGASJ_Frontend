@@ -16,6 +16,7 @@ import {
 } from './solicitudMaterialesUtils'
 import type { SolicitudMaterialFormErrors, SolicitudMateriales } from './types'
 import { SOLICITUDES_MATERIALES_PATH } from '../inventarioPaths'
+import { readSafeAveriaReturnPath } from '../../averias/inventario/averiaInventarioPaths'
 
 const EMPTY_ERRORS: SolicitudMaterialFormErrors = { rows: {} }
 
@@ -26,6 +27,7 @@ export default function SolicitudMaterialesPage() {
   const parsedAveria = averiaValue ? Number(averiaValue) : undefined
   const idAveria = parsedAveria && Number.isInteger(parsedAveria) && parsedAveria > 0 ? parsedAveria : undefined
   const referenciaAveria = searchParams.get('referencia')?.trim()
+  const returnToAveria = readSafeAveriaReturnPath(searchParams.get('from'))
   const [materials, setMaterials] = useState<Material[]>([])
   const [rows, setRows] = useState([createEmptyMaterialRow()])
   const [motivo, setMotivo] = useState('')
@@ -120,6 +122,7 @@ export default function SolicitudMaterialesPage() {
         <p>La solicitud quedó en estado <strong>{created.estado}</strong>. El inventario no fue modificado.</p>
         {created.idAveria ? <p>Avería relacionada: <strong>#{created.idAveria}</strong></p> : null}
         <div className="material-request__success-actions">
+          {returnToAveria ? <Link className="material-request__primary" to={returnToAveria}>Volver a la avería</Link> : null}
           <Link className="material-request__primary" to={SOLICITUDES_MATERIALES_PATH}>Ver mis solicitudes</Link>
           <button className="material-request__add" type="button" onClick={() => setCreated(null)}>Crear otra solicitud</button>
         </div>
@@ -145,6 +148,7 @@ export default function SolicitudMaterialesPage() {
       <span>Avería relacionada</span>
       <strong>{referenciaAveria || `Avería #${idAveria}`}</strong>
       <small>Identificador #{idAveria}</small>
+      {returnToAveria ? <Link className="material-request__add" to={returnToAveria}>Volver a la avería</Link> : null}
     </aside> : null}
 
     <form className="material-request__form" onSubmit={submit} noValidate>
