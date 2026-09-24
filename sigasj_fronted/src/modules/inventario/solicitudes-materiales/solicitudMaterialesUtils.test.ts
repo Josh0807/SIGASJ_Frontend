@@ -28,7 +28,7 @@ describe('solicitud de materiales', () => {
 
     expect(payload).toEqual({
       idAveria: 14,
-      motivo: 'Fuga principal',
+      observacion: 'Fuga principal',
       materiales: [{ idMaterial: 8, cantidad: 3, observacion: 'Para la reparación' }],
     })
     expect(payload).not.toHaveProperty('fontaneroId')

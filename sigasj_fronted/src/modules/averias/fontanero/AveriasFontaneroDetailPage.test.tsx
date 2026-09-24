@@ -9,6 +9,9 @@ import {
   AVERIA_UNCLASSIFIED_LABEL,
 } from '../admin/types'
 import * as averiasFontaneroApi from '../services/averiasFontaneroApi'
+import * as materialesApi from '../../inventario/materialesApi'
+import * as solicitudesMaterialesApi from '../../inventario/solicitudes-materiales/solicitudesMaterialesApi'
+import * as salidasApi from '../../inventario/salidas/salidasApi'
 import AveriasFontaneroDetailPage from './AveriasFontaneroDetailPage'
 import AveriasFontaneroListPage from './AveriasFontaneroListPage'
 import { FONTANERO_AVERIAS_PATH } from './averiasFontaneroPaths'
@@ -69,6 +72,18 @@ describe('AveriasFontaneroDetailPage', () => {
     vi.spyOn(averiasFontaneroApi, 'getFontaneroAverias').mockResolvedValue({
       data: [],
     })
+    vi.spyOn(materialesApi, 'getMateriales').mockResolvedValue({
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 0,
+    })
+    vi.spyOn(
+      solicitudesMaterialesApi,
+      'getMisSolicitudesMateriales',
+    ).mockResolvedValue([])
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(async () => {
@@ -131,6 +146,8 @@ describe('AveriasFontaneroDetailPage', () => {
     )
     expect(container.textContent).toContain(AVERIAS_FONTANERO_INICIAR_LABEL)
     expect(container.textContent).toContain(AVERIAS_FONTANERO_ATENCION_NO_INICIADA)
+    expect(container.textContent).toContain('Materiales de la avería')
+    expect(container.textContent).toContain('Solicitar materiales')
     expect(container.textContent).not.toContain(AVERIAS_FONTANERO_NO_ACTIONS)
     expect(container.textContent).not.toContain('1-2345-6789')
     expect(container.textContent).not.toContain('juan.perez@example.com')
@@ -361,6 +378,8 @@ describe('AveriasFontaneroDetailPage', () => {
     expect(container.textContent).not.toContain(AVERIAS_FONTANERO_OBSERVACION_GUARDAR)
     expect(container.textContent).toContain('Tramo reemplazado y presión normal.')
     expect(container.textContent).toContain('Fontanero A')
+    expect(container.querySelector('textarea[name="observacion"]')).toBeNull()
+    expect(container.querySelector('.averias-fontanero__observacion-form')).toBeNull()
     expect(container.querySelector('button[type="submit"]')).toBeNull()
   })
 

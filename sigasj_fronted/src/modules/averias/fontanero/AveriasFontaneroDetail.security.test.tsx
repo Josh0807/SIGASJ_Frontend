@@ -11,6 +11,9 @@ import {
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/publicRoutes'
 import * as averiasFontaneroApi from '../services/averiasFontaneroApi'
+import * as materialesApi from '../../inventario/materialesApi'
+import * as solicitudesMaterialesApi from '../../inventario/solicitudes-materiales/solicitudesMaterialesApi'
+import * as salidasApi from '../../inventario/salidas/salidasApi'
 import {
   FONTANERO_AVERIAS_PATH,
   FONTANERO_AVERIAS_TITLE as LIST_TITLE,
@@ -40,6 +43,18 @@ describe('GET /fontanero/averias — protección de ruta', () => {
         return found
       },
     )
+    vi.spyOn(materialesApi, 'getMateriales').mockResolvedValue({
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 0,
+    })
+    vi.spyOn(
+      solicitudesMaterialesApi,
+      'getMisSolicitudesMateriales',
+    ).mockResolvedValue([])
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(() => {

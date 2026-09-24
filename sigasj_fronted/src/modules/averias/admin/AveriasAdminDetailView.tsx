@@ -1,6 +1,7 @@
 import AveriasAdminAsignacionControls from './AveriasAdminAsignacionControls'
 import AveriasAdminGestionControls from './AveriasAdminGestionControls'
 import AveriasDetailField from './AveriasDetailField'
+import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import {
   MENSAJE_ATENCION_NO_INICIADA,
@@ -17,13 +18,19 @@ import {
 type AveriasAdminDetailViewProps = {
   averia: AveriaDetail
   canAssignFontanero?: boolean
+  canRevisarSolicitudes?: boolean
+  canRegistrarSalida?: boolean
   onAveriaUpdated?: (averia: AveriaDetail) => void
+  onUnauthorized?: () => void
 }
 
 const AveriasAdminDetailView = ({
   averia,
   canAssignFontanero = false,
+  canRevisarSolicitudes = false,
+  canRegistrarSalida = false,
   onAveriaUpdated,
+  onUnauthorized,
 }: AveriasAdminDetailViewProps) => (
   <div className="averias-admin__detail">
     <section className="averias-admin__section" aria-labelledby="averia-reporte-heading">
@@ -146,6 +153,15 @@ const AveriasAdminDetailView = ({
         </p>
       )}
     </section>
+
+    <AveriaMaterialesSection
+      averiaId={averia.id}
+      codigoSeguimiento={averia.codigoSeguimiento}
+      variant="admin"
+      canRevisarSolicitudes={canRevisarSolicitudes}
+      canRegistrarSalida={canRegistrarSalida}
+      onUnauthorized={onUnauthorized}
+    />
   </div>
 )
 

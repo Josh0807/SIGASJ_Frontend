@@ -3,11 +3,13 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
+import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AveriasAdminDetailView from './AveriasAdminDetailView'
 import { findAveriaDetailFixture } from './fixtures/averiasAdminDetail.fixture'
 import { AVERIAS_ADMIN_FONTANEROS_EMPTY } from './types'
 import * as averiasAdminApi from '../services/averiasAdminApi'
+import * as salidasApi from '../../inventario/salidas/salidasApi'
 import type { AveriaDetail } from './types'
 
 const adminDir = dirname(fileURLToPath(import.meta.url))
@@ -24,6 +26,7 @@ describe('AveriasAdminAsignacion (PBI 2.4)', () => {
     document.body.appendChild(container)
     root = createRoot(container)
     onUpdated = vi.fn()
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(async () => {
@@ -40,11 +43,13 @@ describe('AveriasAdminAsignacion (PBI 2.4)', () => {
   ) => {
     await act(async () => {
       root.render(
-        <AveriasAdminDetailView
-          averia={averia}
-          canAssignFontanero={canAssignFontanero}
-          onAveriaUpdated={onUpdated}
-        />,
+        <MemoryRouter>
+          <AveriasAdminDetailView
+            averia={averia}
+            canAssignFontanero={canAssignFontanero}
+            onAveriaUpdated={onUpdated}
+          />
+        </MemoryRouter>,
       )
     })
     await act(async () => {

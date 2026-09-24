@@ -13,6 +13,8 @@ import { AVERIAS_ADMIN_UI_FIXTURE } from './fixtures/averiasAdminList.fixture'
 import { InternalAdminRoleName } from '../../auth/utils/internalRoles'
 import { clearAccessToken, setAuthSession } from '../../auth/utils/authStorage'
 import * as averiasAdminApi from '../services/averiasAdminApi'
+import * as solicitudesMaterialesApi from '../../inventario/solicitudes-materiales/solicitudesMaterialesApi'
+import * as salidasApi from '../../inventario/salidas/salidasApi'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
 import {
   AVERIA_NO_ABONADO_LABEL,
@@ -51,6 +53,11 @@ describe('AveriasAdminDetailPage', () => {
       }
       return found
     })
+    vi.spyOn(
+      solicitudesMaterialesApi,
+      'getSolicitudesMaterialesAdmin',
+    ).mockResolvedValue({ data: [], total: 0, page: 1, limit: 100, totalPages: 0 })
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(async () => {
@@ -148,6 +155,7 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.querySelector('#averia-gestion-estado')).toBeNull()
     expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
     expect(container.querySelector('#averia-gestion-clasificacion')).toBeNull()
+    expect(container.textContent).toContain('Materiales y movimientos')
   })
 
   it('muestra fallbacks de una avería recién recibida', async () => {

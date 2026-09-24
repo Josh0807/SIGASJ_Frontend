@@ -57,7 +57,7 @@ export const toSolicitudMaterialesPayload = (
   idAveria?: number,
 ): CreateSolicitudMaterialesPayload => ({
   ...(idAveria ? { idAveria } : {}),
-  ...(motivo.trim() ? { motivo: motivo.trim() } : {}),
+  ...(motivo.trim() ? { observacion: motivo.trim() } : {}),
   materiales: rows.map((row) => ({
     idMaterial: Number(row.materialId),
     cantidad: Number(row.cantidad),

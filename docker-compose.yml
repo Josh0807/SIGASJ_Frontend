@@ -1,0 +1,72 @@
+name: backend
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sigasj-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+      MSSQL_PID: Developer
+    ports:
+      - "1435:1433"
+    volumes:
+      - sigasj_mssql_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$${MSSQL_SA_PASSWORD}" -C -Q "SELECT 1" || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sigasj-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_TYPE: mssql
+      DB_HOST: sqlserver
+      DB_PORT: 1433
+    ports:
+      - "3000:3000"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+      - ./backend/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./sigasj_fronted
+      dockerfile: Dockerfile
+    container_name: sigasj-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://backend:3000
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./sigasj_fronted:/app
+      - frontend_node_modules:/app/node_modules
+
+volumes:
+  sigasj_mssql_data:
+    name: backend_sigasj_mssql_data
+  backend_node_modules:
+  frontend_node_modules:

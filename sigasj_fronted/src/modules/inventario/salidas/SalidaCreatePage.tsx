@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
 import { MATERIALES_PATH } from '../inventarioPaths'
+import { readSafeAveriaReturnPath } from '../../averias/inventario/averiaInventarioPaths'
 import { useMateriales } from '../useMateriales'
 import { consultarDisponibilidad, registrarSalida } from './salidasApi'
 import { parseRelatedId, salidaError, toSalidaPayload, validateSalida, type SalidaFormErrors } from './salidaUtils'
@@ -16,6 +17,7 @@ export default function SalidaCreatePage() {
   const [searchParams] = useSearchParams()
   const idAveria = parseRelatedId(searchParams.get('idAveria') ?? searchParams.get('averiaId'))
   const idSolicitud = parseRelatedId(searchParams.get('idSolicitud') ?? searchParams.get('solicitudId'))
+  const returnToAveria = readSafeAveriaReturnPath(searchParams.get('from'))
   const [values, setValues] = useState(EMPTY_VALUES)
   const [errors, setErrors] = useState<SalidaFormErrors>({})
   const [availability, setAvailability] = useState<Availability>(null)
@@ -80,7 +82,7 @@ export default function SalidaCreatePage() {
 
   return <main className="materials-admin materials-admin--form inventory-exit sigasj-stack">
     <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar salida de materiales</h1><p>Indique el material retirado de bodega. El servidor validará y actualizará las existencias al confirmar.</p></div></header>
-    {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento SALIDA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}</div>}
+    {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento SALIDA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}{feedback.kind === 'success' && returnToAveria && <Link to={returnToAveria}>Volver a la avería</Link>}</div>}
     <form className="materials-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
       <label className="materials-admin__form-full"><span>Material a retirar *</span><select value={values.materialId} disabled={loading || Boolean(error)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}><option value="">Seleccione un material</option>{availableMaterials.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}</select>{errors.materialId && <small className="materials-admin__field-error" role="alert">{errors.materialId}</small>}</label>
       {loading && <p className="materials-admin__category-state" role="status">Cargando materiales disponibles…</p>}
@@ -92,7 +94,7 @@ export default function SalidaCreatePage() {
       {availability?.kind === 'checking' && <div className="inventory-exit__availability is-checking materials-admin__form-full" role="status">Verificando disponibilidad…</div>}
       {availability?.kind === 'invalid' && <div className="inventory-exit__availability is-error materials-admin__form-full" role="alert">{availability.message}</div>}
       {availability?.kind === 'valid' && <div className={`inventory-exit__availability ${availability.data.esAgotamientoTotal || availability.data.esBajoMinimo ? 'is-warning' : 'is-valid'} materials-admin__form-full`} role="status"><strong>{availability.data.esAgotamientoTotal ? 'Atención: esta salida dejará en 0 las existencias.' : availability.data.esBajoMinimo ? 'El material quedará en o por debajo del stock mínimo.' : 'Cantidad disponible.'}</strong><span>{availability.data.mensaje}</span></div>}
-      {(idAveria || idSolicitud) && <section className="inventory-exit__relations materials-admin__form-full" aria-label="Registros relacionados"><strong>Origen de la salida</strong>{idAveria && <span>Avería relacionada: #{idAveria}</span>}{idSolicitud && <span>Solicitud aprobada relacionada: #{idSolicitud}</span>}</section>}
+      {(idAveria || idSolicitud) && <section className="inventory-exit__relations materials-admin__form-full" aria-label="Registros relacionados"><strong>Origen de la salida</strong>{idAveria && <span>Avería relacionada: #{idAveria}</span>}{idSolicitud && <span>Solicitud aprobada relacionada: #{idSolicitud}</span>}{returnToAveria && <Link to={returnToAveria}>Volver a la avería</Link>}</section>}
       <label className="materials-admin__form-full"><span>Motivo u observación</span><textarea value={values.observacion} maxLength={1000} aria-invalid={Boolean(errors.observacion)} placeholder="Ej. Reparación de fuga en calle central" onChange={(event) => update('observacion', event.target.value)} />{errors.observacion && <small className="materials-admin__field-error" role="alert">{errors.observacion}</small>}<small>{values.observacion.length}/1000 caracteres</small></label>
       <div className="inventory-exit__responsible materials-admin__form-full" role="note"><strong>Responsable</strong><span>{resolveAuthUserDisplayName(user)} · obtenido de la sesión activa</span></div>
       <div className="inventory-entry__notice materials-admin__form-full" role="note"><strong>Control de existencias</strong><span>No se edita el stock final en este formulario. El backend volverá a validar la disponibilidad y registrará el movimiento de forma transaccional.</span></div>

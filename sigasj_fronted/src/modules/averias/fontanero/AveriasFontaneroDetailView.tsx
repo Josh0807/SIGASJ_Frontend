@@ -14,6 +14,7 @@ import {
 import AveriasFontaneroClasificacionForm from './AveriasFontaneroClasificacionForm'
 import AveriasFontaneroObservacionForm from './AveriasFontaneroObservacionForm'
 import AveriasFontaneroResolverDialog from './AveriasFontaneroResolverDialog'
+import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
 import {
   puedeCalificarAveria,
   puedeIntentarIniciarAtencionAveria,
@@ -287,6 +288,14 @@ const AveriasFontaneroDetailView = ({
           />
         ) : null}
       </section>
+
+      <AveriaMaterialesSection
+        averiaId={averia.id}
+        codigoSeguimiento={averia.codigoSeguimiento}
+        variant="fontanero"
+        canRegistrarSalida
+        onUnauthorized={onUnauthorized}
+      />
 
       <AveriasFontaneroResolverDialog
         averiaId={averia.id}
