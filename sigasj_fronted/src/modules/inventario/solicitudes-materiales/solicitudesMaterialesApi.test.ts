@@ -20,7 +20,7 @@ describe('solicitudesMaterialesApi', () => {
     )
 
     await createSolicitudMateriales({
-      motivo: 'Reparación',
+      observacion: 'Reparación',
       materiales: [{ idMaterial: 1, cantidad: 5 }],
     })
 
