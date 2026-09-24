@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
+import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InternalAdminRoleName } from '../../auth/utils/internalRoles'
 import { setAuthSession, clearAccessToken } from '../../auth/utils/authStorage'
@@ -10,6 +11,7 @@ import AveriasAdminDetailView from './AveriasAdminDetailView'
 import { findAveriaDetailFixture } from './fixtures/averiasAdminDetail.fixture'
 import { ESTADO_AVERIA_LABELS } from './estadoAveria'
 import * as averiasAdminApi from '../services/averiasAdminApi'
+import * as salidasApi from '../../inventario/salidas/salidasApi'
 import {
   AVERIA_CLASIFICACION_FONTANERO_HINT,
   AVERIA_ESTADO_FONTANERO_HINT,
@@ -33,6 +35,7 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
     clearAccessToken()
     vi.spyOn(averiasAdminApi, 'patchAdminAveriaPrioridad')
     vi.spyOn(averiasAdminApi, 'patchAdminAveriaClasificacion')
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(async () => {
@@ -47,10 +50,12 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
   const renderView = async (averia: AveriaDetail) => {
     await act(async () => {
       root.render(
-        <AveriasAdminDetailView
-          averia={averia}
-          onAveriaUpdated={onUpdated}
-        />,
+        <MemoryRouter>
+          <AveriasAdminDetailView
+            averia={averia}
+            onAveriaUpdated={onUpdated}
+          />
+        </MemoryRouter>,
       )
     })
     await act(async () => {

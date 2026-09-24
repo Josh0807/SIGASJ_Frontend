@@ -20,6 +20,8 @@ const flush = async () => {
 import { AVERIAS_ADMIN_UI_FIXTURE } from './fixtures/averiasAdminList.fixture'
 import { findAveriaDetailFixture } from './fixtures/averiasAdminDetail.fixture'
 import * as averiasAdminApi from '../services/averiasAdminApi'
+import * as solicitudesMaterialesApi from '../../inventario/solicitudes-materiales/solicitudesMaterialesApi'
+import * as salidasApi from '../../inventario/salidas/salidasApi'
 
 describe('GET /admin/averias — protección de ruta', () => {
   beforeEach(() => {
@@ -34,6 +36,11 @@ describe('GET /admin/averias — protección de ruta', () => {
       }
       return found
     })
+    vi.spyOn(
+      solicitudesMaterialesApi,
+      'getSolicitudesMaterialesAdmin',
+    ).mockResolvedValue({ data: [], total: 0, page: 1, limit: 100, totalPages: 0 })
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -128,6 +135,11 @@ describe('GET /admin/averias/:id — protección de ruta', () => {
       }
       return found
     })
+    vi.spyOn(
+      solicitudesMaterialesApi,
+      'getSolicitudesMaterialesAdmin',
+    ).mockResolvedValue({ data: [], total: 0, page: 1, limit: 100, totalPages: 0 })
+    vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
   })
 
   afterEach(() => {
