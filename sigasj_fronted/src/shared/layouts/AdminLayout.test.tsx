@@ -106,8 +106,8 @@ describe('AdminLayout', () => {
     const first = renderAdminRoute('/admin/a')
     const second = renderAdminRoute('/admin/b')
 
-    expect(first.match(/class="admin-header"/g)?.length).toBe(1)
-    expect(second.match(/class="admin-header"/g)?.length).toBe(1)
+    expect(first.match(/class="admin-header[\s"]/g)?.length).toBe(1)
+    expect(second.match(/class="admin-header[\s"]/g)?.length).toBe(1)
   })
 
   it('no emite errores de consola al renderizar el layout', () => {
