@@ -3,6 +3,7 @@ import type { AdminHeaderProps } from '../props'
 import { useAuthUser } from '../../auth/hooks/useAuthUser'
 import AdminAccountMenu from './AdminAccountMenu'
 import AdminHeaderMenuToggle from './AdminHeaderMenuToggle'
+import NotificacionesCampana from '../../notificaciones/NotificacionesCampana'
 import {
   getAuthUserHeaderAvatarUrl,
   getAuthUserInitials,
@@ -67,6 +68,7 @@ const AdminHeader = ({
 
       <div className="admin-header__account min-w-0">
         <div className="admin-header__actions">
+          <NotificacionesCampana />
           <Link
             className="admin-header__action admin-header__action--public"
             to="/"

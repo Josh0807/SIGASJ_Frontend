@@ -4946,6 +4946,99 @@ body,
   max-width: 100%;
 }
 
+.notificaciones-campana {
+  position: relative;
+  display: inline-flex;
+}
+
+.notificaciones-campana__trigger {
+  position: relative;
+  width: 40px;
+  min-width: 40px;
+  padding: 8px;
+  color: #1e5a9c;
+}
+
+.notificaciones-campana__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #1e5a9c;
+  color: #ffffff;
+  font-size: .65rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.notificaciones-campana__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: 20rem;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid #c7d9ea;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(30, 90, 156, 0.12);
+}
+
+.notificaciones-campana__state {
+  margin: 0;
+  padding: 12px;
+  color: #61788d;
+  font-size: .84rem;
+}
+
+.notificaciones-campana__state--error {
+  color: #9c2b2b;
+}
+
+.notificaciones-campana__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notificaciones-campana__item {
+  border-radius: 8px;
+}
+
+.notificaciones-campana__item--unread {
+  background: #eef5fb;
+}
+
+.notificaciones-campana__link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.notificaciones-campana__link:hover {
+  background: #eef5fb;
+}
+
+.notificaciones-campana__title {
+  color: #163a63;
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.notificaciones-campana__message {
+  color: #61788d;
+  font-size: .78rem;
+}
+
 .admin-header__action-label--short {
   display: none;
 }
@@ -11949,6 +12042,104 @@ body,
   font-weight: 700;
 }
 
+.averias-inventario__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.averias-inventario__header h2 {
+  margin: 0;
+}
+
+.averias-inventario__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.averias-inventario__block {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.averias-inventario__block h3 {
+  margin: 0;
+  color: #123f70;
+  font-size: 0.98rem;
+}
+
+.averias-inventario__search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.averias-inventario__search label {
+  display: grid;
+  gap: 4px;
+  color: #3781a9;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.averias-inventario__search input {
+  min-width: 12rem;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #c5d7e8;
+  border-radius: 10px;
+  font: inherit;
+  color: #123f70;
+}
+
+.averias-inventario__table-wrap {
+  overflow-x: auto;
+}
+
+.averias-inventario__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.averias-inventario__table th,
+.averias-inventario__table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e6eef6;
+  color: #123f70;
+  vertical-align: top;
+}
+
+.averias-inventario__table th {
+  color: #3781a9;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.averias-inventario__stock--zero {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.averias-inventario__list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 12px;
+}
+
+.averias-inventario__pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .averias-fontanero__observacion-form {
   display: grid;
   gap: 10px;
@@ -12018,6 +12209,10 @@ body,
 
   .averias-fontanero__observaciones {
     order: 4;
+  }
+
+  .averias-fontanero__materiales {
+    order: 5;
   }
 
   .averias-fontanero .gallery-admin__button,
