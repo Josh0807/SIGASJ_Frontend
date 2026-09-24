@@ -11,6 +11,7 @@ import AveriasAdminDetailView from './AveriasAdminDetailView'
 import { canEditAveriaAsignacion } from './canEditAveriaAsignacion'
 import { parseAveriaAdminId } from './parseAveriaAdminId'
 import { averiasAdminListPathFromState } from './averiasAdminListSearch'
+import { InternalAdminRoleName, normalizeInternalRole } from '../../auth/utils/internalRoles'
 import {
   AVERIAS_ADMIN_DETAIL_ERROR,
   AVERIAS_ADMIN_DETAIL_LOADING_MESSAGE,
@@ -37,6 +38,7 @@ const AveriasAdminDetailPage = ({
   const listPath = averiasAdminListPathFromState(location.state)
   const parsedAveriaId = parseAveriaAdminId(id)
   const [mutatedAveria, setMutatedAveria] = useState<AveriaDetail | null>(null)
+  const [forceLogin, setForceLogin] = useState(false)
   const remoteEnabled =
     averiaProp === undefined &&
     loadingProp === undefined &&
@@ -44,7 +46,7 @@ const AveriasAdminDetailPage = ({
     notFoundProp === undefined
   const remote = useAdminAveria(id, { enabled: remoteEnabled })
 
-  if (remote.unauthorized) {
+  if (remote.unauthorized || forceLogin) {
     return <Navigate to={LOGIN_ROUTE_PATH} replace />
   }
 
@@ -64,6 +66,11 @@ const AveriasAdminDetailPage = ({
       ? mutatedAveria
       : fetchedAveria
   const canAssignFontanero = user == null || canEditAveriaAsignacion(user)
+  const role = normalizeInternalRole(user?.role)
+  const canRevisarSolicitudes =
+    user == null || role === InternalAdminRoleName.Administradora
+  const canRegistrarSalida =
+    user == null || role === InternalAdminRoleName.Administradora
 
   if (loading) {
     return (
@@ -140,7 +147,10 @@ const AveriasAdminDetailPage = ({
         <AveriasAdminDetailView
           averia={averia}
           canAssignFontanero={canAssignFontanero}
+          canRevisarSolicitudes={canRevisarSolicitudes}
+          canRegistrarSalida={canRegistrarSalida}
           onAveriaUpdated={setMutatedAveria}
+          onUnauthorized={() => setForceLogin(true)}
         />
       </div>
     </main>
