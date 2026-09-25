@@ -1,4 +1,5 @@
 import AveriasAdminAsignacionControls from './AveriasAdminAsignacionControls'
+import AveriasAdminEventosHistorial from './AveriasAdminEventosHistorial'
 import AveriasAdminGestionControls from './AveriasAdminGestionControls'
 import AveriasDetailField from './AveriasDetailField'
 import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
@@ -22,6 +23,7 @@ type AveriasAdminDetailViewProps = {
   canRegistrarSalida?: boolean
   onAveriaUpdated?: (averia: AveriaDetail) => void
   onUnauthorized?: () => void
+  onForbidden?: () => void
 }
 
 const AveriasAdminDetailView = ({
@@ -31,6 +33,7 @@ const AveriasAdminDetailView = ({
   canRegistrarSalida = false,
   onAveriaUpdated,
   onUnauthorized,
+  onForbidden,
 }: AveriasAdminDetailViewProps) => (
   <div className="averias-admin__detail">
     <section className="averias-admin__section" aria-labelledby="averia-reporte-heading">
@@ -161,6 +164,12 @@ const AveriasAdminDetailView = ({
       canRevisarSolicitudes={canRevisarSolicitudes}
       canRegistrarSalida={canRegistrarSalida}
       onUnauthorized={onUnauthorized}
+    />
+
+    <AveriasAdminEventosHistorial
+      averiaId={averia.id}
+      onUnauthorized={onUnauthorized}
+      onForbidden={onForbidden}
     />
   </div>
 )

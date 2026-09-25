@@ -10,6 +10,7 @@ import AveriaStatusBadge from './AveriaStatusBadge'
 import AveriasAdminDetailView from './AveriasAdminDetailView'
 import { canEditAveriaAsignacion } from './canEditAveriaAsignacion'
 import { parseAveriaAdminId } from './parseAveriaAdminId'
+import { AVERIAS_ADMIN_HISTORIAL_PATH } from './averiasAdminPaths'
 import { averiasAdminListPathFromState } from './averiasAdminListSearch'
 import { InternalAdminRoleName, normalizeInternalRole } from '../../auth/utils/internalRoles'
 import {
@@ -36,9 +37,13 @@ const AveriasAdminDetailPage = ({
   const location = useLocation()
   const user = useAuthUser()
   const listPath = averiasAdminListPathFromState(location.state)
+  const fromHistorial = listPath.startsWith(AVERIAS_ADMIN_HISTORIAL_PATH)
+  const backLabel = fromHistorial ? 'Volver al historial' : 'Volver a averías'
+  const backEmptyLabel = fromHistorial ? 'Volver al historial' : 'Volver al listado'
   const parsedAveriaId = parseAveriaAdminId(id)
   const [mutatedAveria, setMutatedAveria] = useState<AveriaDetail | null>(null)
   const [forceLogin, setForceLogin] = useState(false)
+  const [forceForbidden, setForceForbidden] = useState(false)
   const remoteEnabled =
     averiaProp === undefined &&
     loadingProp === undefined &&
@@ -50,7 +55,7 @@ const AveriasAdminDetailPage = ({
     return <Navigate to={LOGIN_ROUTE_PATH} replace />
   }
 
-  if (remote.forbidden) {
+  if (remote.forbidden || forceForbidden) {
     return <Navigate to={UNAUTHORIZED_ROUTE_PATH} replace />
   }
 
@@ -101,7 +106,7 @@ const AveriasAdminDetailPage = ({
           <div className="gallery-admin__empty" role="alert">
             <p>{AVERIAS_ADMIN_DETAIL_ERROR}</p>
             <Link className="gallery-admin__button" to={listPath}>
-              Volver al listado
+              {backEmptyLabel}
             </Link>
           </div>
         </div>
@@ -116,7 +121,7 @@ const AveriasAdminDetailPage = ({
           <div className="gallery-admin__empty" role="status">
             <h1>{AVERIAS_ADMIN_DETAIL_NOT_FOUND}</h1>
             <Link className="gallery-admin__button" to={listPath}>
-              Volver al listado
+              {backEmptyLabel}
             </Link>
           </div>
         </div>
@@ -140,7 +145,7 @@ const AveriasAdminDetailPage = ({
           </div>
           <div className="gallery-admin__header-actions">
             <Link className="gallery-admin__button" to={listPath}>
-              Volver a averías
+              {backLabel}
             </Link>
           </div>
         </header>
@@ -151,6 +156,7 @@ const AveriasAdminDetailPage = ({
           canRegistrarSalida={canRegistrarSalida}
           onAveriaUpdated={setMutatedAveria}
           onUnauthorized={() => setForceLogin(true)}
+          onForbidden={() => setForceForbidden(true)}
         />
       </div>
     </main>

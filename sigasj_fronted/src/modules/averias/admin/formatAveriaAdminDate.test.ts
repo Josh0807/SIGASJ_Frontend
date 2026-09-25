@@ -5,8 +5,8 @@ import {
 } from './formatAveriaAdminDate'
 
 describe('formatAveriaAdminDateTime', () => {
-  it('formatea fecha y hora a partir de un Date local', () => {
-    const value = new Date(2026, 8, 12, 15, 5)
+  it('formatea fecha y hora en America/Costa_Rica', () => {
+    const value = new Date('2026-09-12T21:05:00.000Z')
     expect(formatAveriaAdminDateTime(value)).toBe('12/09/2026 15:05')
   })
 
@@ -28,7 +28,7 @@ describe('formatAveriaAdminDateTime', () => {
     ).toBe('No disponible')
     expect(
       formatAveriaAdminDateTimeOrUnavailable(
-        new Date(2026, 8, 12, 15, 5),
+        new Date('2026-09-12T21:05:00.000Z'),
         'No disponible',
       ),
     ).toBe('12/09/2026 15:05')

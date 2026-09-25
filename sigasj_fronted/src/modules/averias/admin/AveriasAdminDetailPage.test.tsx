@@ -53,6 +53,11 @@ describe('AveriasAdminDetailPage', () => {
       }
       return found
     })
+    vi.spyOn(averiasAdminApi, 'getAdminAveriaEventosHistorial').mockResolvedValue({
+      id: 1,
+      codigoSeguimiento: 'AV-2026-0001',
+      data: [],
+    })
     vi.spyOn(
       solicitudesMaterialesApi,
       'getSolicitudesMaterialesAdmin',

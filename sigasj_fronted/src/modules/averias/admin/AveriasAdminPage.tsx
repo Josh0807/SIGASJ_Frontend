@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
 import { useAdminAverias } from '../hooks/useAdminAverias'
 import AveriasAdminFilters from './AveriasAdminFilters'
+import {
+  AVERIAS_ADMIN_HISTORIAL_PATH,
+  AVERIAS_ADMIN_REPORTE_PATH,
+} from './averiasAdminPaths'
 import AveriasAdminPagination from './AveriasAdminPagination'
 import AveriasAdminQueryStates from './AveriasAdminQueryStates'
 import AveriasAdminTable from './AveriasAdminTable'
@@ -244,6 +248,14 @@ const AveriasAdminPage = ({
             <p className="gallery-admin__eyebrow">Panel administrativo</p>
             <h1>Gestión de averías</h1>
             <p>Consulte y dé seguimiento a las averías reportadas.</p>
+          </div>
+          <div className="gallery-admin__header-actions">
+            <Link className="gallery-admin__button" to={AVERIAS_ADMIN_REPORTE_PATH}>
+              Resumen
+            </Link>
+            <Link className="gallery-admin__button" to={AVERIAS_ADMIN_HISTORIAL_PATH}>
+              Historial
+            </Link>
           </div>
         </header>
 

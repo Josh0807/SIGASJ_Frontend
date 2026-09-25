@@ -36,6 +36,11 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
     vi.spyOn(averiasAdminApi, 'patchAdminAveriaPrioridad')
     vi.spyOn(averiasAdminApi, 'patchAdminAveriaClasificacion')
     vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
+    vi.spyOn(averiasAdminApi, 'getAdminAveriaEventosHistorial').mockResolvedValue({
+      id: 1,
+      codigoSeguimiento: 'AV-2026-0001',
+      data: [],
+    })
   })
 
   afterEach(async () => {

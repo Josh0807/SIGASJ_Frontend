@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { AVERIAS_ADMIN_HISTORIAL_PATH } from './averiasAdminPaths'
 import {
   averiasAdminListPathFromState,
   buildAveriasAdminListSearch,
@@ -52,5 +53,20 @@ describe('averiasAdminListSearch', () => {
         listSearch: '?page=2&search=Juan',
       }),
     ).toBe('/admin/averias?page=2&search=Juan')
+  })
+
+  it('vuelve al historial cuando el detalle se abrió desde esa pantalla', () => {
+    expect(
+      averiasAdminListPathFromState({
+        listBase: AVERIAS_ADMIN_HISTORIAL_PATH,
+        listSearch: '?estado=RESUELTA&page=2',
+      }),
+    ).toBe('/admin/averias/historial?estado=RESUELTA&page=2')
+    expect(
+      averiasAdminListPathFromState({
+        listBase: 'https://externo.example/admin/averias/historial',
+        listSearch: '?page=2',
+      }),
+    ).toBe('/admin/averias?page=2')
   })
 })

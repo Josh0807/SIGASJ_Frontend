@@ -36,6 +36,11 @@ describe('GET /admin/averias — protección de ruta', () => {
       }
       return found
     })
+    vi.spyOn(averiasAdminApi, 'getAdminAveriaEventosHistorial').mockResolvedValue({
+      id: 1,
+      codigoSeguimiento: 'AV-2026-0001',
+      data: [],
+    })
     vi.spyOn(
       solicitudesMaterialesApi,
       'getSolicitudesMaterialesAdmin',
@@ -135,6 +140,11 @@ describe('GET /admin/averias/:id — protección de ruta', () => {
       }
       return found
     })
+    vi.spyOn(averiasAdminApi, 'getAdminAveriaEventosHistorial').mockResolvedValue({
+      id: 1,
+      codigoSeguimiento: 'AV-2026-0001',
+      data: [],
+    })
     vi.spyOn(
       solicitudesMaterialesApi,
       'getSolicitudesMaterialesAdmin',
@@ -198,11 +208,15 @@ describe('GET /admin/averias/:id — protección de ruta', () => {
     await view.cleanup()
   })
 
-  it('deniega el detalle a Abonado', async () => {
-    loginAsRole('Abonado')
-    const view = await mountAppRoutes(averiasAdminDetailPath(1))
-    expect(view.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
-    expect(view.container.textContent).not.toContain('AV-2026-0001')
-    await view.cleanup()
+  it('deniega el detalle, y con él la línea de tiempo, a Fontanero y Abonado', async () => {
+    for (const role of ['Fontanero', 'Abonado'] as const) {
+      clearAccessToken()
+      loginAsRole(role)
+      const view = await mountAppRoutes(averiasAdminDetailPath(1))
+      expect(view.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(view.container.textContent).not.toContain('AV-2026-0001')
+      expect(view.container.textContent).not.toContain('Historial de la avería')
+      await view.cleanup()
+    }
   })
 })

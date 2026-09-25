@@ -1,11 +1,13 @@
 const EMPTY_DATE = '—'
 
-const pad = (unit: number) => String(unit).padStart(2, '0')
+/** Misma zona que el reloj del Backend (`America/Costa_Rica`). */
+const ZONA_HORARIA_SIGASJ = 'America/Costa_Rica'
+
+const pad = (unit: string) => unit.padStart(2, '0')
 
 /**
- * Fecha + hora para el listado. El proyecto no tiene i18n ni un helper
- * compartido de date-time; el formato sigue el de proyectos (dd/mm/yyyy)
- * y agrega hh:mm en hora local.
+ * Fecha + hora del sistema, en Costa Rica. No usa la zona del navegador:
+ * un instante UTC no debe verse como 22:22 si en la ASADA son las 16:22.
  */
 export const formatAveriaAdminDateTime = (
   value: string | Date | null | undefined,
@@ -19,7 +21,21 @@ export const formatAveriaAdminDateTime = (
     return EMPTY_DATE
   }
 
-  return `${pad(parsed.getDate())}/${pad(parsed.getMonth() + 1)}/${parsed.getFullYear()} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: ZONA_HORARIA_SIGASJ,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    })
+      .formatToParts(parsed)
+      .map((part) => [part.type, part.value]),
+  )
+
+  return `${pad(parts.day ?? '')}/${pad(parts.month ?? '')}/${parts.year} ${pad(parts.hour ?? '')}:${pad(parts.minute ?? '')}`
 }
 
 export const formatAveriaAdminDateTimeOrUnavailable = (

@@ -1,4 +1,7 @@
-import { AVERIAS_ADMIN_PATH } from './averiasAdminPaths'
+import {
+  AVERIAS_ADMIN_HISTORIAL_PATH,
+  AVERIAS_ADMIN_PATH,
+} from './averiasAdminPaths'
 import { DEFAULT_AVERIAS_PAGE, EMPTY_FILTER } from './types'
 
 const ISO_DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
@@ -15,7 +18,13 @@ export type AveriasAdminListSearch = {
 
 export type AveriasAdminLocationState = {
   listSearch?: string
+  listBase?: string
 }
+
+const AVERIAS_ADMIN_LIST_BASES = new Set<string>([
+  AVERIAS_ADMIN_PATH,
+  AVERIAS_ADMIN_HISTORIAL_PATH,
+])
 
 const toIsoDate = (value: string | null): string => {
   const trimmed = value?.trim() ?? EMPTY_FILTER
@@ -81,19 +90,31 @@ export function buildAveriasAdminListSearch(
   return serialized ? `?${serialized}` : ''
 }
 
-export function averiasAdminListPathFromState(state: unknown): string {
-  if (!state || typeof state !== 'object' || !('listSearch' in state)) {
+function readAveriasAdminListBase(state: unknown): string {
+  if (!state || typeof state !== 'object' || !('listBase' in state)) {
     return AVERIAS_ADMIN_PATH
+  }
+
+  const listBase = (state as AveriasAdminLocationState).listBase
+  if (typeof listBase === 'string' && AVERIAS_ADMIN_LIST_BASES.has(listBase)) {
+    return listBase
+  }
+
+  return AVERIAS_ADMIN_PATH
+}
+
+export function averiasAdminListPathFromState(state: unknown): string {
+  const base = readAveriasAdminListBase(state)
+  if (!state || typeof state !== 'object' || !('listSearch' in state)) {
+    return base
   }
 
   const listSearch = (state as AveriasAdminLocationState).listSearch
   if (typeof listSearch !== 'string' || !listSearch.trim()) {
-    return AVERIAS_ADMIN_PATH
+    return base
   }
 
-  return `${AVERIAS_ADMIN_PATH}${
-    listSearch.startsWith('?') ? listSearch : `?${listSearch}`
-  }`
+  return `${base}${listSearch.startsWith('?') ? listSearch : `?${listSearch}`}`
 }
 
 export function toBackendPrioridad(prioridad: string): string | undefined {

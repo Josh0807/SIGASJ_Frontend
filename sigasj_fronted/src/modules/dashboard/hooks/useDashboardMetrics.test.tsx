@@ -5,13 +5,15 @@ import { clearAccessToken, setAccessToken } from '../../auth/utils/authStorage'
 import * as dashboardService from '../services/dashboardService'
 import { useDashboardMetrics, type UseDashboardMetricsResult } from './useDashboardMetrics'
 
-function renderMetricsHook() {
+function renderMetricsHook(
+  requestedKeys?: readonly (keyof dashboardService.DashboardSummaryData)[],
+) {
   const result: { current: UseDashboardMetricsResult } = {
     current: undefined as unknown as UseDashboardMetricsResult,
   }
 
   const TestComponent = () => {
-    result.current = useDashboardMetrics()
+    result.current = useDashboardMetrics(undefined, requestedKeys)
     return null
   }
 
@@ -107,6 +109,26 @@ describe('useDashboardMetrics', () => {
     expect(result.current.metrics.lecturasPendientes).toBe(10)
     expect(result.current.metrics.averiasReportadas).toBeNull()
     expect(result.current.metrics.solicitudesEnTramite).toBe(4)
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.isError).toBe(false)
+
+    await cleanup()
+  })
+
+  it('no consulta indicadores administrativos si el rol no tiene ninguno visible', async () => {
+    const abonados = vi.spyOn(dashboardService, 'getAbonadosSummaryMetric')
+    const averias = vi.spyOn(dashboardService, 'getAveriasSummaryMetric')
+    const solicitudes = vi.spyOn(dashboardService, 'getSolicitudesSummaryMetric')
+    const { result, cleanup } = renderMetricsHook([])
+
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    expect(abonados).not.toHaveBeenCalled()
+    expect(averias).not.toHaveBeenCalled()
+    expect(solicitudes).not.toHaveBeenCalled()
+    expect(result.current.isError).toBe(false)
     expect(result.current.isLoading).toBe(false)
 
     await cleanup()
