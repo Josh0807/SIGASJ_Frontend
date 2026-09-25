@@ -27,6 +27,43 @@ export const AVERIAS_ADMIN_FONTANEROS_LOAD_ERROR =
 export const AVERIAS_ADMIN_FONTANEROS_EMPTY =
   'No hay fontaneros disponibles.'
 
+export type AveriaEventoHistorialUsuario = {
+  id: number
+  nombre: string
+}
+
+export type AveriaEventoHistorialReferencia = {
+  tipo: string
+  id: number
+}
+
+/** GET /api/v1/admin/averias/:id/historial */
+export type AveriaEventoHistorial = {
+  id: number
+  tipoEvento: string
+  descripcion: string
+  fechaHora: string
+  usuario: AveriaEventoHistorialUsuario | null
+  estadoAnterior: string | null
+  estadoNuevo: string | null
+  referencia: AveriaEventoHistorialReferencia | null
+}
+
+export type AveriaEventosHistorial = {
+  id: number
+  codigoSeguimiento: string
+  data: AveriaEventoHistorial[]
+}
+
+export const AVERIAS_EVENTOS_LOADING_MESSAGE =
+  'Cargando el historial de la avería.'
+
+export const AVERIAS_EVENTOS_EMPTY_MESSAGE =
+  'No hay eventos registrados en el historial de esta avería.'
+
+export const AVERIAS_EVENTOS_LOAD_ERROR =
+  'No se pudo consultar el historial de la avería.'
+
 /**
  * Ítem del listado administrativo. Alineado con `AveriaAdminListItem` del Backend.
  * `prioridad`, `tipoAveria` y `fontanero` pueden ser null.
@@ -117,6 +154,7 @@ export type AveriaDetail = {
 
 export const AVERIA_UNASSIGNED_LABEL = 'Sin asignar'
 export const AVERIA_UNCLASSIFIED_LABEL = 'Sin clasificar'
+export const AVERIA_NO_PRIORITY_LABEL = 'Sin prioridad'
 export const AVERIA_UNAVAILABLE_LABEL = 'No disponible'
 export const AVERIA_NO_OBSERVATIONS_LABEL = 'Sin observaciones'
 export const AVERIA_NOT_PROVIDED_LABEL = 'No proporcionado'
@@ -136,6 +174,88 @@ export const AVERIAS_ADMIN_EMPTY_MESSAGE =
   'No se encontraron averías con los criterios seleccionados.'
 
 export const AVERIAS_ADMIN_LOADING_MESSAGE = 'Cargando averías...'
+
+export type AveriaHistorialItem = {
+  id: number
+  codigoSeguimiento: string
+  fechaReporte: string
+  nombreReportante: string
+  sectorComunidad: string
+  estado: EstadoAveria | string
+  tipoAveria: string | null
+  prioridad: string | null
+  fontanero: AveriaAdminFontanero | null
+  fechaAsignacion: string | null
+  fechaInicioAtencion: string | null
+  fechaResolucion: string | null
+}
+
+export type AveriasHistorialQuery = {
+  page?: number
+  limit?: number
+  estado?: string
+  prioridad?: string
+  tipo?: string
+  fontaneroId?: number
+  sector?: string
+  fechaDesde?: string
+  fechaHasta?: string
+  codigoSeguimiento?: string
+}
+
+export type AveriasHistorialListado = {
+  data: AveriaHistorialItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export const EMPTY_AVERIAS_HISTORIAL: AveriasHistorialListado = {
+  data: [],
+  total: 0,
+  page: DEFAULT_AVERIAS_PAGE,
+  limit: DEFAULT_AVERIAS_LIMIT,
+  totalPages: 0,
+}
+
+export const AVERIAS_HISTORIAL_LOAD_ERROR =
+  'No fue posible cargar el historial de averías. Intente nuevamente.'
+
+export const AVERIAS_HISTORIAL_EMPTY_MESSAGE =
+  'No se encontraron averías en el historial con los criterios seleccionados.'
+
+export const AVERIAS_HISTORIAL_LOADING_MESSAGE = 'Cargando historial de averías...'
+
+export const AVERIAS_HISTORIAL_RANGE_ERROR =
+  'La fecha inicial no puede ser posterior a la fecha final.'
+
+export type AveriasReporteResumen = {
+  fechaDesde: string | null
+  fechaHasta: string | null
+  total: number
+  porEstado: {
+    RECIBIDA: number
+    EN_REVISION: number
+    ASIGNADA: number
+    EN_ATENCION: number
+    PENDIENTE: number
+    RESUELTA: number
+    CANCELADA: number
+  }
+  otros: number
+}
+
+export const AVERIAS_REPORTE_LOAD_ERROR =
+  'No fue posible cargar el resumen de averías. Intente nuevamente.'
+
+export const AVERIAS_REPORTE_EMPTY_MESSAGE =
+  'No hay averías registradas en el periodo seleccionado.'
+
+export const AVERIAS_REPORTE_LOADING_MESSAGE = 'Cargando resumen de averías...'
+
+export const AVERIAS_REPORTE_RANGE_ERROR =
+  'La fecha inicial no puede ser posterior a la fecha final.'
 
 export const EMPTY_FILTER = ''
 
@@ -161,6 +281,14 @@ export const getPrioridadLabel = (prioridad: string | null): string => {
   }
 
   return PRIORIDAD_LABELS[prioridad] ?? prioridad
+}
+
+export const getHistorialPrioridadLabel = (prioridad: string | null): string => {
+  if (prioridad == null || prioridad.trim() === '') {
+    return AVERIA_NO_PRIORITY_LABEL
+  }
+
+  return getPrioridadLabel(prioridad)
 }
 
 export const getTipoAveriaLabel = (tipoAveria: string | null): string => {

@@ -1,0 +1,86 @@
+import type { AveriaHistorialItem, AveriasHistorialListado } from '../types'
+
+/**
+ * Fixture exclusivo de tests. El historial productivo consulta
+ * GET /api/v1/admin/averias/historial.
+ */
+export const AVERIAS_HISTORIAL_ITEMS: AveriaHistorialItem[] = [
+  {
+    id: 1,
+    codigoSeguimiento: 'AV-2026-0001',
+    fechaReporte: '2026-09-12T15:00:00.000Z',
+    nombreReportante: 'María Rodríguez',
+    sectorComunidad: 'San Juan',
+    estado: 'RECIBIDA',
+    tipoAveria: null,
+    prioridad: null,
+    fontanero: null,
+    fechaAsignacion: null,
+    fechaInicioAtencion: null,
+    fechaResolucion: null,
+  },
+  {
+    id: 2,
+    codigoSeguimiento: 'AV-2026-0002',
+    fechaReporte: '2026-09-10T12:00:00.000Z',
+    nombreReportante: 'Juan Pérez',
+    sectorComunidad: 'San Juan',
+    estado: 'ASIGNADA',
+    tipoAveria: 'TUBO_MADRE',
+    prioridad: 'ALTA',
+    fontanero: { id: 5, nombre: 'Luis Campos' },
+    fechaAsignacion: '2026-09-10T13:00:00.000Z',
+    fechaInicioAtencion: null,
+    fechaResolucion: null,
+  },
+  {
+    id: 3,
+    codigoSeguimiento: 'AV-2026-0003',
+    fechaReporte: '2026-08-15T10:00:00.000Z',
+    nombreReportante: 'Ana Soto',
+    sectorComunidad: 'Palmares',
+    estado: 'PENDIENTE',
+    tipoAveria: 'TUBO_MEDIDOR',
+    prioridad: 'MEDIA',
+    fontanero: { id: 5, nombre: 'Luis Campos' },
+    fechaAsignacion: '2026-08-15T11:00:00.000Z',
+    fechaInicioAtencion: null,
+    fechaResolucion: null,
+  },
+  {
+    id: 4,
+    codigoSeguimiento: 'AV-2026-0004',
+    fechaReporte: '2026-08-20T09:00:00.000Z',
+    nombreReportante: 'Carlos Mora',
+    sectorComunidad: 'San Juan Norte',
+    estado: 'EN_ATENCION',
+    tipoAveria: 'TUBO_MADRE',
+    prioridad: 'BAJA',
+    fontanero: { id: 5, nombre: 'Luis Campos' },
+    fechaAsignacion: '2026-08-20T09:30:00.000Z',
+    fechaInicioAtencion: '2026-08-20T10:00:00.000Z',
+    fechaResolucion: null,
+  },
+  {
+    id: 5,
+    codigoSeguimiento: 'AV-2026-0005',
+    fechaReporte: '2026-08-01T08:00:00.000Z',
+    nombreReportante: 'Lucía Brenes',
+    sectorComunidad: 'Palmares',
+    estado: 'RESUELTA',
+    tipoAveria: 'TUBO_MEDIDOR',
+    prioridad: 'ALTA',
+    fontanero: { id: 5, nombre: 'Luis Campos' },
+    fechaAsignacion: '2026-08-01T09:00:00.000Z',
+    fechaInicioAtencion: '2026-08-01T10:00:00.000Z',
+    fechaResolucion: '2026-08-01T16:00:00.000Z',
+  },
+]
+
+export const AVERIAS_HISTORIAL_FIXTURE: AveriasHistorialListado = {
+  data: AVERIAS_HISTORIAL_ITEMS,
+  total: 5,
+  page: 1,
+  limit: 20,
+  totalPages: 1,
+}

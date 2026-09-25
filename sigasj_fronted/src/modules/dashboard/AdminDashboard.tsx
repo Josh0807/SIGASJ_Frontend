@@ -4,6 +4,7 @@ import ErrorBoundary from '../../shared/components/ErrorBoundary'
 import RecentAlertsWidget from './components/RecentAlertsWidget'
 import RecentActivityWidget from './components/RecentActivityWidget'
 import { useDashboardMetrics } from './hooks/useDashboardMetrics'
+import type { DashboardSummaryData } from './services/dashboardService'
 import { useAuth } from '../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
 import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
@@ -54,17 +55,50 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   },
 ]
 
+const indicatorMetricKey = (
+  indicatorId: DashboardIndicator['id'],
+): keyof DashboardSummaryData | null => {
+  if (indicatorId === 'abonados') {
+    return 'abonadosActivos'
+  }
+  if (indicatorId === 'averias') {
+    return 'averiasReportadas'
+  }
+  if (indicatorId === 'solicitudes') {
+    return 'solicitudesEnTramite'
+  }
+  if (indicatorId === 'lecturas') {
+    return 'lecturasPendientes'
+  }
+  return null
+}
+
+const canShowIndicator = (
+  user: Parameters<typeof canAccessAdminRoute>[0],
+  indicator: DashboardIndicator,
+) => {
+  if (indicator.id === 'lecturas') {
+    return canAccessAdminRoute(user, '/admin/lecturas')
+  }
+  return !indicator.link || canAccessAdminRoute(user, indicator.link)
+}
+
 const AdminDashboard = () => {
   const { user } = useAuth()
-  const { metrics, isLoading, isError, refetch } = useDashboardMetrics()
+  const visibleDefinitions = DASHBOARD_INDICATORS.filter((indicator) =>
+    canShowIndicator(user, indicator),
+  )
+  const metricKeys = visibleDefinitions.flatMap((indicator) => {
+    const key = indicatorMetricKey(indicator.id)
+    return key ? [key] : []
+  })
+  const { metrics, isLoading, isError, refetch } = useDashboardMetrics(
+    undefined,
+    metricKeys,
+  )
   const displayName = resolveAuthUserHeaderName(user)
 
-  const indicators: DashboardIndicator[] = DASHBOARD_INDICATORS.filter((indicator) => {
-    if (indicator.id === 'lecturas') {
-      return canAccessAdminRoute(user, '/admin/lecturas')
-    }
-    return !indicator.link || canAccessAdminRoute(user, indicator.link)
-  }).map((indicator) => {
+  const indicators: DashboardIndicator[] = visibleDefinitions.map((indicator) => {
     if (indicator.id === 'abonados') {
       return { ...indicator, value: metrics.abonadosActivos ?? null }
     }
@@ -115,6 +149,7 @@ const AdminDashboard = () => {
           </div>
         </header>
 
+        {indicators.length > 0 ? (
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header admin-dashboard__section-header--with-action">
             <div>
@@ -169,6 +204,7 @@ const AdminDashboard = () => {
             ))}
           </div>
         </div>
+        ) : null}
 
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header">

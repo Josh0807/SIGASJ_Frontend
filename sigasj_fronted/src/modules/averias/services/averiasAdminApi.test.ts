@@ -4,8 +4,12 @@ import { AVERIAS_ADMIN_UI_FIXTURE } from '../admin/fixtures/averiasAdminList.fix
 import { findAveriaDetailFixture } from '../admin/fixtures/averiasAdminDetail.fixture'
 import {
   ADMIN_AVERIAS_ENDPOINT,
+  ADMIN_AVERIAS_HISTORIAL_ENDPOINT,
   getAdminAveria,
+  getAdminAveriaEventosHistorial,
   getAdminAverias,
+  getAdminAveriasHistorial,
+  toAveriasHistorialParams,
   getAdminAveriasFontanerosAsignables,
   patchAdminAveriaAsignacion,
   patchAdminAveriaClasificacion,
@@ -75,6 +79,73 @@ describe('averiasAdminApi', () => {
     })
   })
 
+  it('arma el historial sin estados antiguos ni tipo inválido', () => {
+    expect(
+      toAveriasHistorialParams({
+        page: 1,
+        limit: 20,
+        estado: 'RESUELTA',
+        prioridad: 'ALTA',
+        tipo: 'TUBO_MADRE',
+        fontaneroId: 5,
+        sector: 'Palmares',
+        fechaDesde: '2026-08-01',
+        fechaHasta: '2026-08-31',
+        codigoSeguimiento: 'AV-2026-0005',
+      }),
+    ).toEqual({
+      page: 1,
+      limit: 20,
+      estado: 'RESUELTA',
+      prioridad: 'ALTA',
+      tipo: 'TUBO_MADRE',
+      fontaneroId: 5,
+      sector: 'Palmares',
+      fechaDesde: '2026-08-01',
+      fechaHasta: '2026-08-31',
+      codigoSeguimiento: 'AV-2026-0005',
+    })
+
+    expect(
+      toAveriasHistorialParams({
+        estado: 'REPORTADA',
+        tipo: 'TUBERIA',
+        fontaneroId: 0,
+        codigoSeguimiento: '   ',
+      }),
+    ).toMatchObject({
+      estado: undefined,
+      tipo: undefined,
+      fontaneroId: undefined,
+      codigoSeguimiento: undefined,
+    })
+  })
+
+  it('consulta GET /admin/averias/historial', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce({
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 20,
+      totalPages: 0,
+    })
+
+    await getAdminAveriasHistorial({
+      page: 2,
+      estado: 'EN_ATENCION',
+      prioridad: 'SIN_ASIGNAR',
+    })
+
+    expect(fetchWithAuth).toHaveBeenCalledWith(ADMIN_AVERIAS_HISTORIAL_ENDPOINT, {
+      params: expect.objectContaining({
+        page: 2,
+        estado: 'EN_ATENCION',
+        prioridad: 'SIN_ASIGNAR',
+      }),
+      signal: undefined,
+    })
+  })
+
   it('consulta el detalle por id numérico', async () => {
     const detail = findAveriaDetailFixture(2)
     vi.mocked(fetchWithAuth).mockResolvedValueOnce(detail)
@@ -83,6 +154,21 @@ describe('averiasAdminApi', () => {
     expect(fetchWithAuth).toHaveBeenCalledWith(`${ADMIN_AVERIAS_ENDPOINT}/25`, {
       signal: undefined,
     })
+  })
+
+  it('consulta el historial cronológico de una avería', async () => {
+    const timeline = {
+      id: 25,
+      codigoSeguimiento: 'AV-2026-0042',
+      data: [],
+    }
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(timeline)
+
+    await expect(getAdminAveriaEventosHistorial(25)).resolves.toEqual(timeline)
+    expect(fetchWithAuth).toHaveBeenCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/25/historial`,
+      { signal: undefined },
+    )
   })
 
   it('GET fontaneros y PATCH asignacion usan contrato Backend 2.4', async () => {

@@ -27,6 +27,11 @@ describe('AveriasAdminAsignacion (PBI 2.4)', () => {
     root = createRoot(container)
     onUpdated = vi.fn()
     vi.spyOn(salidasApi, 'getSalidasPorAveria').mockResolvedValue([])
+    vi.spyOn(averiasAdminApi, 'getAdminAveriaEventosHistorial').mockResolvedValue({
+      id: 1,
+      codigoSeguimiento: 'AV-2026-0001',
+      data: [],
+    })
   })
 
   afterEach(async () => {

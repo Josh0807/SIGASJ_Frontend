@@ -11978,6 +11978,94 @@ body,
   overflow-wrap: anywhere;
 }
 
+.averias-reporte__rango {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #123f70;
+  font-weight: 700;
+}
+
+.averias-evento__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.averias-evento__item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 12px;
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.averias-evento__item:not(:last-child) .averias-evento__marca::after {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 22px;
+  bottom: 0;
+  width: 2px;
+  background: #c5d7ea;
+}
+
+.averias-evento__marca {
+  position: relative;
+  min-height: 100%;
+}
+
+.averias-evento__punto {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  margin-left: 7px;
+  border: 2px solid #123f70;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.averias-evento__cuerpo {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.averias-evento__fecha {
+  margin: 0;
+  color: #123f70;
+  font-weight: 700;
+}
+
+.averias-evento__tipo {
+  margin: 0;
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 2px 8px;
+  border: 1px solid #123f70;
+  border-radius: 999px;
+  color: #123f70;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.averias-evento__descripcion,
+.averias-evento__detalle {
+  margin: 0;
+  color: #304c67;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.averias-evento .gallery-admin__empty button:focus-visible {
+  outline: 3px solid #7db7ed;
+  outline-offset: 2px;
+}
+
 @media (max-width: 1199px) {
   .averias-admin .gallery-admin__filters,
   .averias-admin .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
@@ -11990,6 +12078,11 @@ body,
 
   .averias-admin__detail-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .averias-evento__item {
+    grid-template-columns: 24px minmax(0, 1fr);
+    column-gap: 10px;
   }
 }
 
@@ -12008,6 +12101,14 @@ body,
 
   .averias-admin__table {
     display: none;
+  }
+
+  .averias-admin__section.averias-evento {
+    padding: 16px;
+  }
+
+  .averias-evento__fecha {
+    font-size: 0.95rem;
   }
 
   .averias-admin__cards {

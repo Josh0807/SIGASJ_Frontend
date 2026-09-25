@@ -9,6 +9,8 @@ type AveriasAdminQueryStatesProps = {
   loading: boolean
   error: string | null
   hasResults: boolean
+  loadingMessage?: string
+  emptyMessage?: string
   onRetry?: () => void
   children: ReactNode
 }
@@ -19,13 +21,15 @@ const AveriasAdminQueryStates = ({
   loading,
   error,
   hasResults,
+  loadingMessage = AVERIAS_ADMIN_LOADING_MESSAGE,
+  emptyMessage = AVERIAS_ADMIN_EMPTY_MESSAGE,
   onRetry,
   children,
 }: AveriasAdminQueryStatesProps) => {
   if (loading && !hasResults) {
     return (
       <div role="status" aria-live="polite" aria-busy="true">
-        <span className="visually-hidden">{AVERIAS_ADMIN_LOADING_MESSAGE}</span>
+        <span className="visually-hidden">{loadingMessage}</span>
         <div className="gallery-admin__skeleton" aria-hidden="true">
           {Array.from({ length: SKELETON_ROWS }, (_, index) => (
             <div className="gallery-admin__skeleton-row" key={index}>
@@ -57,7 +61,7 @@ const AveriasAdminQueryStates = ({
   if (!hasResults) {
     return (
       <div className="gallery-admin__empty" role="status">
-        <p>{AVERIAS_ADMIN_EMPTY_MESSAGE}</p>
+        <p>{emptyMessage}</p>
       </div>
     )
   }

@@ -163,5 +163,8 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).not.toContain('href="/admin/averias"')
     expect(markup).not.toContain('href="/admin/abonados"')
     expect(markup).not.toContain('Asociados activos')
+    expect(markup).not.toContain(
+      'No se pudieron actualizar algunos indicadores del servidor.',
+    )
   })
 })
