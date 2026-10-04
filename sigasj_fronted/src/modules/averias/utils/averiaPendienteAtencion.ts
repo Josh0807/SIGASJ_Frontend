@@ -26,8 +26,9 @@ export function puedeIntentarIniciarAtencion(estado: string): boolean {
   return esAsignada(estado) || esPendienteDeAtencion(estado)
 }
 
-export function mostrarAvisoHorarioFontanero(estado: string): boolean {
-  return esPendienteDeAtencion(estado)
+/** El Fontanero puede iniciar la atención a cualquier hora. */
+export function mostrarAvisoHorarioFontanero(_estado: string): boolean {
+  return false
 }
 
 export function mostrarAvisoPendienteAdmin(

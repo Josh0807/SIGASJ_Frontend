@@ -84,21 +84,27 @@ const AveriasAdminEventosHistorial = ({
                   <span className="averias-evento__punto" />
                 </p>
                 <div className="averias-evento__cuerpo">
-                  <p className="averias-evento__fecha">
-                    <time dateTime={evento.fechaHora}>
-                      {formatFechaHoraEvento(evento.fechaHora)}
-                    </time>
-                  </p>
-                  <p className="averias-evento__tipo">
-                    {etiquetaTipoEvento(evento.tipoEvento)}
-                  </p>
+                  <div className="averias-evento__cabeza">
+                    <p className="averias-evento__fecha">
+                      <time dateTime={evento.fechaHora}>
+                        {formatFechaHoraEvento(evento.fechaHora)}
+                      </time>
+                    </p>
+                    <p className="averias-evento__tipo">
+                      {etiquetaTipoEvento(evento.tipoEvento)}
+                    </p>
+                  </div>
                   <p className="averias-evento__descripcion">{evento.descripcion}</p>
-                  {estado ? <p className="averias-evento__detalle">{estado}</p> : null}
-                  {responsable ? (
-                    <p className="averias-evento__detalle">{responsable}</p>
-                  ) : null}
-                  {referencia ? (
-                    <p className="averias-evento__detalle">{referencia}</p>
+                  {estado || responsable || referencia ? (
+                    <div className="averias-evento__meta">
+                      {estado ? <p className="averias-evento__detalle">{estado}</p> : null}
+                      {responsable ? (
+                        <p className="averias-evento__detalle">{responsable}</p>
+                      ) : null}
+                      {referencia ? (
+                        <p className="averias-evento__detalle">{referencia}</p>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
               </li>

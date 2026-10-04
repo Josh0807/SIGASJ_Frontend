@@ -103,58 +103,60 @@ const AveriasAdminDetailView = ({
       </section>
     </div>
 
-    <section
-      className="averias-admin__section"
-      aria-labelledby="averia-asignacion-heading"
-    >
-      <h2 id="averia-asignacion-heading">Asignación de avería</h2>
-      <AveriasAdminAsignacionControls
-        key={`${averia.id}:${averia.estado}:${averia.fontanero?.id ?? 'none'}:${averia.fechaAsignacion ?? ''}`}
-        averia={averia}
-        canAssign={canAssignFontanero}
-        onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
-      />
-    </section>
+    <div className="averias-admin__detail-grid">
+      <section
+        className="averias-admin__section"
+        aria-labelledby="averia-asignacion-heading"
+      >
+        <h2 id="averia-asignacion-heading">Asignación de avería</h2>
+        <AveriasAdminAsignacionControls
+          key={`${averia.id}:${averia.estado}:${averia.fontanero?.id ?? 'none'}:${averia.fechaAsignacion ?? ''}`}
+          averia={averia}
+          canAssign={canAssignFontanero}
+          onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
+        />
+      </section>
+
+      <section className="averias-admin__section" aria-labelledby="averia-obs-heading">
+        <h2 id="averia-obs-heading">Observaciones</h2>
+        {averia.observaciones && averia.observaciones.length > 0 ? (
+          <ol className="averias-fontanero__observaciones-list">
+            {averia.observaciones.map((item) => (
+              <li key={item.id}>
+                <p className="averias-admin__prewrap">{item.observacion}</p>
+                <p className="averias-admin__muted">
+                  {item.autor.nombre}
+                  {item.fechaCreacion
+                    ? ` · ${formatAveriaAdminDateTimeOrUnavailable(
+                        item.fechaCreacion,
+                        AVERIA_UNAVAILABLE_LABEL,
+                      )}`
+                    : ''}
+                </p>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="averias-admin__empty-note">
+            {getObservacionesLabel(averia.observacionesAtencion)}
+          </p>
+        )}
+      </section>
+    </div>
 
     <section className="averias-admin__section" aria-labelledby="averia-ubicacion-heading">
       <h2 id="averia-ubicacion-heading">Ubicación de la avería</h2>
-      <dl className="averias-admin__fields">
+      <dl className="averias-admin__fields averias-admin__fields--ubicacion">
         <AveriasDetailField label="Sector / comunidad">
           {averia.sectorComunidad}
+        </AveriasDetailField>
+        <AveriasDetailField label="Descripción">
+          {averia.descripcion}
         </AveriasDetailField>
         <AveriasDetailField label="Ubicación" multiline>
           {averia.ubicacion}
         </AveriasDetailField>
-        <AveriasDetailField label="Descripción" multiline>
-          {averia.descripcion}
-        </AveriasDetailField>
       </dl>
-    </section>
-
-    <section className="averias-admin__section" aria-labelledby="averia-obs-heading">
-      <h2 id="averia-obs-heading">Observaciones</h2>
-      {averia.observaciones && averia.observaciones.length > 0 ? (
-        <ol className="averias-fontanero__observaciones-list">
-          {averia.observaciones.map((item) => (
-            <li key={item.id}>
-              <p className="averias-admin__prewrap">{item.observacion}</p>
-              <p className="averias-admin__muted">
-                {item.autor.nombre}
-                {item.fechaCreacion
-                  ? ` · ${formatAveriaAdminDateTimeOrUnavailable(
-                      item.fechaCreacion,
-                      AVERIA_UNAVAILABLE_LABEL,
-                    )}`
-                  : ''}
-              </p>
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <p className="averias-admin__prewrap">
-          {getObservacionesLabel(averia.observacionesAtencion)}
-        </p>
-      )}
     </section>
 
     <AveriaMaterialesSection

@@ -93,19 +93,27 @@ const AveriasFontaneroListPage = ({
           ) : (
             <ul className="averias-admin__cards averias-fontanero__list">
               {items.map((item) => (
-                <li className="averias-admin__card" key={item.id}>
-                  <header className="averias-admin__card-head">
-                    <span className="averias-admin__codigo">
-                      {item.codigoSeguimiento}
-                    </span>
-                    <AveriaStatusBadge estado={item.estado} />
+                <li className="averias-admin__card averias-fontanero__item" key={item.id}>
+                  <header className="averias-fontanero__item-head">
+                    <div className="averias-fontanero__item-identidad">
+                      <span className="averias-admin__codigo">
+                        {item.codigoSeguimiento}
+                      </span>
+                      <AveriaStatusBadge estado={item.estado} />
+                      {esPendienteDeAtencion(String(item.estado)) ? (
+                        <p className="averias-admin__estado-note averias-fontanero__nota">
+                          {AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
+                        </p>
+                      ) : null}
+                    </div>
+                    <Link
+                      className="gallery-admin__button averias-fontanero__detail-link"
+                      to={averiasFontaneroDetailPath(item.id)}
+                    >
+                      Ver detalle
+                    </Link>
                   </header>
-                  {esPendienteDeAtencion(String(item.estado)) ? (
-                    <p className="averias-admin__estado-note">
-                      {AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
-                    </p>
-                  ) : null}
-                  <dl className="averias-admin__card-meta">
+                  <dl className="averias-admin__card-meta averias-fontanero__meta">
                     <div>
                       <dt>Asignación</dt>
                       <dd>{formatAveriaAdminDateTime(item.fechaAsignacion)}</dd>
@@ -115,10 +123,6 @@ const AveriasFontaneroListPage = ({
                       <dd>{item.sectorComunidad}</dd>
                     </div>
                     <div>
-                      <dt>Ubicación</dt>
-                      <dd>{item.ubicacion}</dd>
-                    </div>
-                    <div>
                       <dt>Prioridad</dt>
                       <dd>{getFontaneroPrioridadLabel(item.prioridad)}</dd>
                     </div>
@@ -126,13 +130,11 @@ const AveriasFontaneroListPage = ({
                       <dt>Tipo</dt>
                       <dd>{getFontaneroTipoLabel(item.tipoAveria)}</dd>
                     </div>
+                    <div className="averias-fontanero__meta-wide">
+                      <dt>Ubicación</dt>
+                      <dd>{item.ubicacion}</dd>
+                    </div>
                   </dl>
-                  <Link
-                    className="gallery-admin__button"
-                    to={averiasFontaneroDetailPath(item.id)}
-                  >
-                    Ver detalle
-                  </Link>
                 </li>
               ))}
             </ul>

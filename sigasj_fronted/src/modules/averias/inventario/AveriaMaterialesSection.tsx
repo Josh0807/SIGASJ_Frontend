@@ -237,6 +237,7 @@ const AveriaMaterialesSection = ({
 
       {isFontanero ? <AveriaCatalogoMateriales /> : null}
 
+      <div className="averias-inventario__columns">
       <div className="averias-inventario__block">
         <h3>Solicitudes</h3>
         {!includeSolicitudes ? (
@@ -382,6 +383,7 @@ const AveriaMaterialesSection = ({
             </table>
           </div>
         ) : null}
+      </div>
       </div>
     </section>
   )

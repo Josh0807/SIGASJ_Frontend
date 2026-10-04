@@ -10,6 +10,7 @@ import {
 import {
   getAdminAveriaFontaneros,
   patchAdminAveriaAsignacion,
+  patchAdminAveriaEstado,
 } from '../services/averiasAdminApi'
 
 export type AveriaAsignacionFeedback = {
@@ -82,11 +83,14 @@ export function useAveriaAdminAsignacion(
   }, [])
 
   const assignFontanero = useCallback(
-    async (averiaId: number, fontaneroId: number) => {
+    async (averiaId: number, fontaneroId: number, estadoActual?: string) => {
       setAssigning(true)
       setFeedback(null)
 
       try {
+        if (estadoActual === 'RECIBIDA') {
+          await patchAdminAveriaEstado(averiaId, 'EN_REVISION')
+        }
         const updated = await patchAdminAveriaAsignacion(averiaId, fontaneroId)
         onUpdated(updated)
         const fontaneroForMessage = updated.fontanero ?? { id: fontaneroId }

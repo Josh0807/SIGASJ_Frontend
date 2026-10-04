@@ -11807,6 +11807,110 @@ body,
   min-width: 980px;
 }
 
+.averias-admin__table--listado.table-responsive {
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.averias-admin__table--listado table {
+  min-width: 0;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.averias-admin__table--listado tbody td {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.averias-admin__fila {
+  padding: 16px 18px;
+  border: 1px solid #e3eef6;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.averias-admin__fila:hover {
+  border-color: #b9d3ea;
+  background: #f7fbff;
+}
+
+.averias-admin__fila-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15.5rem;
+  gap: 12px 24px;
+  align-items: start;
+}
+
+.averias-admin__fila-identidad {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.averias-admin__fila-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+
+.averias-admin__fila-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #5d7388;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.averias-admin__fila .averias-admin__fecha,
+.averias-admin__fila .averias-admin__sector,
+.averias-admin__fila .averias-admin__persona {
+  display: inline;
+  margin: 0;
+}
+
+.averias-admin__fila-lado {
+  display: grid;
+  justify-items: stretch;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f7fbfe;
+}
+
+.averias-admin__fila-marcas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.averias-admin__fila-lado .averias-admin__estado-note {
+  display: block;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #8a5a12;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.averias-admin__fila-lado .gallery-admin__button {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  justify-content: center;
+}
+
 .averias-admin__codigo {
   display: inline-flex;
   align-items: center;
@@ -11817,6 +11921,103 @@ body,
   color: #123f70;
   font-weight: 700;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.averias-admin__fecha,
+.averias-admin__sub {
+  display: block;
+  margin-top: 6px;
+  color: #5d7388;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.averias-admin__persona {
+  display: block;
+  color: #123f70;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.averias-admin__sector {
+  display: block;
+  margin-top: 4px;
+  color: #5d7388;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.averias-admin__lugar {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
+.averias-admin__direccion,
+.averias-admin__detalle {
+  margin: 0;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.averias-admin__fila .averias-admin__direccion {
+  margin-top: 6px;
+}
+
+.averias-admin__direccion {
+  color: #24384c;
+  line-height: 1.45;
+}
+
+.averias-admin__detalle {
+  color: #5d7388;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.averias-admin__ficha {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  margin: 0;
+}
+
+.averias-admin__ficha > div {
+  display: grid;
+  grid-template-columns: 4.6rem minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.averias-admin__ficha dt {
+  margin: 0;
+  color: #7a90a4;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.averias-admin__ficha dd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0;
+  min-width: 0;
+  color: #24384c;
+}
+
+.averias-admin__badge--tipo {
+  background: #eef6f0;
+  color: #1f6b3a;
+}
+
+.averias-admin__badge--vacio {
+  background: #f3f5f7;
+  color: #6b7c8d;
+  font-weight: 650;
 }
 
 .averias-admin__clamp {
@@ -11825,6 +12026,25 @@ body,
   -webkit-line-clamp: 2;
   overflow: hidden;
   max-width: 18rem;
+}
+
+.averias-admin__table--listado .averias-admin__clamp {
+  width: 100%;
+  max-width: none;
+  color: #24384c;
+  line-height: 1.45;
+}
+
+.averias-admin__table--listado .averias-admin__estado-note {
+  display: inline;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #8a5a12;
+  font-size: 0.75rem;
+  font-weight: 650;
 }
 
 .averias-admin__muted {
@@ -11978,6 +12198,16 @@ body,
   margin: 0;
 }
 
+.averias-admin__card-meta--listado {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+}
+
+.averias-admin__card-meta--listado > div:nth-child(4),
+.averias-admin__card-meta--listado > div:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
 .averias-admin__card-meta dt {
   color: #3781a9;
   font-size: 0.75rem;
@@ -12047,6 +12277,19 @@ body,
   margin: 0;
 }
 
+.averias-admin__fields--ubicacion {
+  grid-template-columns: minmax(9rem, 0.4fr) minmax(0, 1fr);
+}
+
+.averias-admin__empty-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f4f8fb;
+  color: #5d7388;
+  line-height: 1.45;
+}
+
 .averias-admin__field.is-multiline {
   grid-column: 1 / -1;
 }
@@ -12093,17 +12336,21 @@ body,
   grid-template-columns: 28px minmax(0, 1fr);
   column-gap: 12px;
   position: relative;
-  padding-bottom: 18px;
+  padding-bottom: 12px;
+}
+
+.averias-evento__item:last-child {
+  padding-bottom: 0;
 }
 
 .averias-evento__item:not(:last-child) .averias-evento__marca::after {
   content: '';
   position: absolute;
   left: 13px;
-  top: 22px;
-  bottom: 0;
+  top: 20px;
+  bottom: -12px;
   width: 2px;
-  background: #c5d7ea;
+  background: #d5e4f2;
 }
 
 .averias-evento__marca {
@@ -12113,19 +12360,32 @@ body,
 
 .averias-evento__punto {
   display: block;
-  width: 14px;
-  height: 14px;
-  margin-top: 4px;
-  margin-left: 7px;
-  border: 2px solid #123f70;
+  width: 12px;
+  height: 12px;
+  margin-top: 16px;
+  margin-left: 8px;
+  border: 2px solid #1e5a9c;
   border-radius: 50%;
   background: #ffffff;
+  box-shadow: 0 0 0 3px #f4f8fb;
 }
 
 .averias-evento__cuerpo {
   min-width: 0;
   display: grid;
-  gap: 4px;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid #e3eef6;
+  border-radius: 12px;
+  background: #f8fbfe;
+}
+
+.averias-evento__cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
 }
 
 .averias-evento__fecha {
@@ -12140,20 +12400,36 @@ body,
   width: fit-content;
   max-width: 100%;
   padding: 2px 8px;
-  border: 1px solid #123f70;
+  border: 1px solid #c5d7ea;
   border-radius: 999px;
+  background: #ffffff;
   color: #123f70;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
-.averias-evento__descripcion,
-.averias-evento__detalle {
+.averias-evento__descripcion {
   margin: 0;
-  color: #304c67;
+  color: #24384c;
   overflow-wrap: anywhere;
   line-height: 1.45;
+}
+
+.averias-evento__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  padding-top: 8px;
+  border-top: 1px solid #e3eef6;
+}
+
+.averias-evento__detalle {
+  margin: 0;
+  color: #5d7388;
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
 }
 
 .averias-evento .gallery-admin__empty button:focus-visible {
@@ -12178,6 +12454,20 @@ body,
   .averias-evento__item {
     grid-template-columns: 24px minmax(0, 1fr);
     column-gap: 10px;
+  }
+
+  .averias-evento__cabeza,
+  .averias-evento__meta {
+    gap: 6px 12px;
+  }
+
+  .averias-admin__fila-cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .averias-admin__fila-lado {
+    width: 100%;
   }
 }
 
@@ -12206,8 +12496,32 @@ body,
     font-size: 0.95rem;
   }
 
+  .averias-evento__cabeza,
+  .averias-evento__meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .averias-admin__cards {
     display: grid;
+  }
+
+  .averias-admin__fields--ubicacion,
+  .averias-inventario__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .averias-fontanero__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .averias-fontanero__item-head {
+    align-items: stretch;
+  }
+
+  .averias-fontanero__detail-link {
+    justify-self: stretch;
+    width: 100%;
   }
 
   .averias-admin .gallery-admin__pagination button,
@@ -12236,6 +12550,56 @@ body,
   list-style: none;
 }
 
+.averias-fontanero__item {
+  gap: 14px;
+}
+
+.averias-fontanero__item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.averias-fontanero__item-identidad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.averias-fontanero__nota {
+  margin: 0;
+}
+
+.averias-fontanero__meta {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f7fbfe;
+}
+
+.averias-fontanero__meta-wide {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid #e3eef6;
+}
+
+.averias-fontanero__meta dd {
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.averias-fontanero__detail-link {
+  justify-self: end;
+  width: fit-content;
+  min-width: 9.5rem;
+}
+
 .averias-fontanero__detail {
   display: grid;
   gap: 16px;
@@ -12245,12 +12609,54 @@ body,
   border-color: #9ec4e0;
 }
 
+.averias-fontanero__resumen,
+.averias-fontanero__reporte .averias-admin__fields {
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+}
+
+.averias-fontanero__estado-hint,
+.averias-fontanero__gestion .averias-admin__horario-hint {
+  margin-top: 14px;
+}
+
+.averias-fontanero__gestion-paneles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 16px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.averias-fontanero__calificar,
+.averias-fontanero__acciones {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #e3eef6;
+  border-radius: 12px;
+  background: #f7fbfe;
+}
+
+.averias-fontanero .averias-fontanero__calificar {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.averias-fontanero .averias-fontanero__calificar > .gallery-admin__button {
+  grid-column: 1 / -1;
+  width: fit-content;
+  justify-self: start;
+}
+
+.averias-fontanero .averias-fontanero__calificar > .activity-feedback {
+  grid-column: 1 / -1;
+}
+
 .averias-fontanero__acciones {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: flex-start;
-  margin-top: 16px;
+  align-content: start;
 }
 
 .averias-fontanero__acciones p,
@@ -12262,6 +12668,7 @@ body,
 
 .averias-fontanero__acciones .gallery-admin__button {
   min-height: 44px;
+  width: fit-content;
 }
 
 .averias-fontanero__observaciones-list {
@@ -12282,25 +12689,55 @@ body,
 .averias-inventario__header {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 12px 16px;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e6eef6;
 }
 
 .averias-inventario__header h2 {
   margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .averias-inventario__toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+}
+
+.averias-inventario__toolbar .gallery-admin__button,
+.averias-inventario__toolbar .gallery-admin__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.averias-inventario__columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
 }
 
 .averias-inventario__block {
   display: grid;
   gap: 10px;
   margin-top: 16px;
+  align-content: start;
+}
+
+.averias-inventario__columns .averias-inventario__block {
+  margin-top: 0;
+  padding: 14px 16px;
+  border: 1px solid #e3eef6;
+  border-radius: 12px;
+  background: #f7fbfe;
 }
 
 .averias-inventario__block h3 {
@@ -12318,6 +12755,7 @@ body,
 
 .averias-inventario__search label {
   display: grid;
+  flex: 1 1 16rem;
   gap: 4px;
   color: #3781a9;
   font-size: 0.8rem;
@@ -12325,7 +12763,8 @@ body,
 }
 
 .averias-inventario__search input {
-  min-width: 12rem;
+  width: 100%;
+  min-width: 0;
   min-height: 44px;
   padding: 8px 12px;
   border: 1px solid #c5d7e8;
@@ -12383,6 +12822,12 @@ body,
   margin-top: 16px;
 }
 
+.averias-fontanero__observacion-form .gallery-admin__button {
+  justify-self: end;
+  width: fit-content;
+  min-width: 12rem;
+}
+
 .averias-fontanero__resolver-panel {
   width: min(100%, 36rem);
 }
@@ -12401,7 +12846,7 @@ body,
 .averias-fontanero__resolver-form textarea,
 .averias-fontanero__observacion-form textarea {
   width: 100%;
-  min-height: 7.5rem;
+  min-height: 5.5rem;
   resize: vertical;
   padding: 10px 12px;
   border: 1px solid #c5d7e8;
@@ -12458,5 +12903,12 @@ body,
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .averias-fontanero .averias-fontanero__calificar > .gallery-admin__button,
+  .averias-fontanero__observacion-form .gallery-admin__button,
+  .averias-fontanero__acciones .gallery-admin__button {
+    width: 100%;
+    justify-self: stretch;
   }
 }

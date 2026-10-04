@@ -111,7 +111,7 @@ const AveriasFontaneroClasificacionForm = ({
 
   return (
     <form
-      className="averias-admin__gestion-controls"
+      className="averias-admin__gestion-controls averias-fontanero__calificar"
       onSubmit={handleSubmit}
     >
       <p className="averias-admin__estado-label">{AVERIAS_FONTANERO_CALIFICAR_TITULO}</p>

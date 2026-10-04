@@ -285,7 +285,10 @@ describe('AveriasFontaneroDetailPage', () => {
     await renderAt(`${FONTANERO_AVERIAS_PATH}/29`)
     expect(container.textContent).toContain('Pendiente de atención')
     expect(container.textContent).toContain(
-      'La avería se encuentra asignada, pero todavía no puede iniciarse la atención debido al horario laboral.',
+      'Usted actualiza el estado al atender o resolver esta avería.',
+    )
+    expect(container.textContent).not.toContain(
+      'todavía no puede iniciarse la atención debido al horario laboral',
     )
     expect(container.textContent).toContain(AVERIAS_FONTANERO_ATENCION_NO_INICIADA)
     expect(container.textContent).toContain(AVERIAS_FONTANERO_INICIAR_LABEL)
