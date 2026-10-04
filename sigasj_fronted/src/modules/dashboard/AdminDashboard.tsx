@@ -158,7 +158,7 @@ const AdminDashboard = () => {
             </div>
             <button
               type="button"
-              className="admin-dashboard__refresh-btn"
+              className="admin-dashboard__refresh-btn max-[760px]:w-full max-[760px]:justify-center"
               onClick={() => {
                 void refetch()
               }}

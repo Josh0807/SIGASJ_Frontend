@@ -52,10 +52,10 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
           {errors.descripcion && <small className="materials-admin__field-error">{errors.descripcion}</small>}
         </label>
         <div className="materials-admin__form-actions">
-          <Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>Volver al listado</Link>
           <button type="submit" className="materials-admin__primary" disabled={saving}>
             {saving ? 'Guardando…' : mode === 'create' ? 'Registrar categoría' : 'Guardar cambios'}
           </button>
+          <Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>Volver al listado</Link>
         </div>
       </form>
     </>

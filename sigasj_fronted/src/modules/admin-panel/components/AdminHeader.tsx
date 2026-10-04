@@ -63,7 +63,7 @@ const AdminHeader = ({
           menuToggleRef={menuToggleRef}
         />
 
-        <p className="admin-header__title">Panel administrativo</p>
+        <p className="admin-header__title max-[520px]:hidden">Panel administrativo</p>
       </div>
 
       <div className="admin-header__account min-w-0">

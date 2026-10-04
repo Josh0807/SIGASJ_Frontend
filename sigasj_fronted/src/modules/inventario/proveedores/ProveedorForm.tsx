@@ -1,4 +1,5 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { IconArrowLeft, IconBuilding, IconBuildingStore, IconDeviceFloppy, IconId, IconMail, IconMapPin, IconPhone, IconUser } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { PROVEEDORES_PATH } from '../inventarioPaths'
 import { toProveedorPayload, validateProveedor, type ProveedorFormErrors } from './proveedorUtils'
@@ -20,15 +21,16 @@ export default function ProveedorForm({ mode, initialValues = EMPTY_PROVEEDOR_VA
     submitting.current = true; setSaving(true); setSubmitError(null)
     try { await onSubmit(toProveedorPayload(values)) } catch (caught) { setSubmitError(caught instanceof Error ? caught.message : 'No fue posible guardar el proveedor.') } finally { submitting.current = false; setSaving(false) }
   }
-  const field = (name: keyof ProveedorFormValues, label: string, input: ReactNode, full = false) => <label className={full ? 'materials-admin__form-full' : undefined}><span>{label}</span>{input}{errors[name] && <small className="materials-admin__field-error" role="alert">{errors[name]}</small>}</label>
+  const field = (name: keyof ProveedorFormValues, label: string, icon: ReactNode, input: ReactNode, full = false) => <label className={full ? 'materials-admin__form-full' : undefined}><span>{label}</span><span className="provider-admin__control">{icon}{input}</span>{errors[name] && <small className="materials-admin__field-error" role="alert">{errors[name]}</small>}</label>
   return <>{submitError && <div className="materials-admin__error" role="alert">{submitError}</div>}<form className="materials-admin__form provider-admin__form w-full max-w-3xl" noValidate onSubmit={submit}>
-    {field('nombre', 'Nombre *', <input autoFocus value={values.nombre} maxLength={150} aria-invalid={Boolean(errors.nombre)} onChange={(e) => update('nombre', e.target.value)} />)}
-    {field('razonSocial', 'Razón social', <input value={values.razonSocial} maxLength={200} onChange={(e) => update('razonSocial', e.target.value)} />)}
-    {field('identificacion', 'Identificación', <input value={values.identificacion} maxLength={50} aria-invalid={Boolean(errors.identificacion)} onChange={(e) => update('identificacion', e.target.value)} />)}
-    {field('telefono', 'Teléfono', <input type="tel" value={values.telefono} maxLength={30} aria-invalid={Boolean(errors.telefono)} onChange={(e) => update('telefono', e.target.value)} />)}
-    {field('correo', 'Correo electrónico', <input type="email" value={values.correo} maxLength={150} aria-invalid={Boolean(errors.correo)} onChange={(e) => update('correo', e.target.value)} />)}
-    {field('personaContacto', 'Persona de contacto', <input value={values.personaContacto} maxLength={150} onChange={(e) => update('personaContacto', e.target.value)} />)}
-    {field('direccion', 'Dirección', <textarea value={values.direccion} maxLength={500} onChange={(e) => update('direccion', e.target.value)} />, true)}
-    <div className="materials-admin__form-actions"><Link className="materials-admin__secondary" to={PROVEEDORES_PATH}>Cancelar</Link><button type="submit" className="materials-admin__primary" disabled={saving}>{saving ? 'Guardando…' : mode === 'create' ? 'Registrar proveedor' : 'Guardar cambios'}</button></div>
+    <div className="provider-admin__form-heading"><span><IconBuildingStore size={25} aria-hidden="true" /></span><div><h2>Información del proveedor</h2><p>Los campos marcados con * son obligatorios.</p></div></div>
+    {field('nombre', 'Nombre *', <IconBuildingStore size={20} aria-hidden="true" />, <input autoFocus autoComplete="organization" value={values.nombre} maxLength={150} placeholder="Ej. Ferretería Central" aria-invalid={Boolean(errors.nombre)} onChange={(e) => update('nombre', e.target.value)} />)}
+    {field('razonSocial', 'Razón social', <IconBuilding size={20} aria-hidden="true" />, <input autoComplete="organization" value={values.razonSocial} maxLength={200} placeholder="Nombre legal de la empresa" onChange={(e) => update('razonSocial', e.target.value)} />)}
+    {field('identificacion', 'Identificación', <IconId size={20} aria-hidden="true" />, <input value={values.identificacion} maxLength={50} placeholder="Cédula física o jurídica" aria-invalid={Boolean(errors.identificacion)} onChange={(e) => update('identificacion', e.target.value)} />)}
+    {field('telefono', 'Teléfono', <IconPhone size={20} aria-hidden="true" />, <input type="tel" autoComplete="tel" value={values.telefono} maxLength={30} placeholder="Ej. 2222-2222" aria-invalid={Boolean(errors.telefono)} onChange={(e) => update('telefono', e.target.value)} />)}
+    {field('correo', 'Correo electrónico', <IconMail size={20} aria-hidden="true" />, <input type="email" autoComplete="email" value={values.correo} maxLength={150} placeholder="correo@empresa.com" aria-invalid={Boolean(errors.correo)} onChange={(e) => update('correo', e.target.value)} />)}
+    {field('personaContacto', 'Persona de contacto', <IconUser size={20} aria-hidden="true" />, <input autoComplete="name" value={values.personaContacto} maxLength={150} placeholder="Nombre del contacto principal" onChange={(e) => update('personaContacto', e.target.value)} />)}
+    {field('direccion', 'Dirección', <IconMapPin size={20} aria-hidden="true" />, <textarea autoComplete="street-address" value={values.direccion} maxLength={500} placeholder="Dirección física del proveedor" onChange={(e) => update('direccion', e.target.value)} />, true)}
+    <div className="materials-admin__form-actions"><button type="submit" className="materials-admin__primary" disabled={saving}><IconDeviceFloppy size={19} aria-hidden="true" />{saving ? 'Guardando…' : mode === 'create' ? 'Registrar proveedor' : 'Guardar cambios'}</button><Link className="materials-admin__secondary" to={PROVEEDORES_PATH}><IconArrowLeft size={19} aria-hidden="true" />Cancelar</Link></div>
   </form></>
 }

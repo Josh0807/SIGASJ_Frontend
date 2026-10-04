@@ -16,6 +16,9 @@ type ProyectosAdminTableProps = {
 
 const visibilidadLabel = (activo: boolean) => (activo ? 'Activo' : 'Inactivo')
 
+const mobileCellClass =
+  'max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:whitespace-normal max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]'
+
 const ProyectosAdminTable = ({
   proyectos,
   onToggleVisibilidad,
@@ -41,10 +44,10 @@ const ProyectosAdminTable = ({
   }
 
   return (
-    <div className="table-responsive proyectos-admin__table overflow-x-auto">
-      <table>
+    <div className="table-responsive proyectos-admin__table overflow-x-auto max-[760px]:overflow-visible max-[760px]:border-0 max-[760px]:bg-transparent">
+      <table className="max-[760px]:block max-[760px]:min-w-0">
         <caption className="visually-hidden">Listado de proyectos</caption>
-        <thead>
+        <thead className="max-[760px]:hidden">
           <tr>
             <th scope="col">Proyecto</th>
             <th scope="col">Estado</th>
@@ -54,14 +57,16 @@ const ProyectosAdminTable = ({
 
           </tr>
         </thead>
-        <tbody>
+        <tbody className="max-[760px]:block">
           {proyectos.map((proyecto) => {
             const duracion = proyecto.duracion?.trim()
 
             return (
-              <tr key={proyecto.id}>
-                <td className="table-responsive__name">{proyecto.nombre}</td>
-                <td>
+              <tr className="max-[760px]:mb-3.5 max-[760px]:block max-[760px]:rounded-[14px] max-[760px]:border max-[760px]:border-[#d7e5f1] max-[760px]:bg-white max-[760px]:px-3.5 max-[760px]:py-2 max-[760px]:shadow-[0_4px_14px_rgba(18,63,112,0.05)]" key={proyecto.id}>
+                <td className={`table-responsive__name ${mobileCellClass}`} data-label="Proyecto">
+                  {proyecto.nombre}
+                </td>
+                <td className={`${mobileCellClass} max-[760px]:[&_.proyectos-admin__estado-select]:min-w-0 max-[760px]:[&_.proyectos-admin__estado-select]:w-full`} data-label="Estado">
                   <div className="proyectos-admin__estado-cell">
                     <select
                       className="proyectos-admin__estado-select"
@@ -82,15 +87,15 @@ const ProyectosAdminTable = ({
                     </select>
                   </div>
                 </td>
-                <td>{duracion ? duracion : '—'}</td>
-                <td>
+                <td className={mobileCellClass} data-label="Duración">{duracion ? duracion : '—'}</td>
+                <td className={mobileCellClass} data-label="Visibilidad">
                   <ul className="gallery-admin__badges">
                     <li className={proyecto.activo ? 'is-active' : 'is-inactive'}>
                       {visibilidadLabel(proyecto.activo)}
                     </li>
                   </ul>
                 </td>
-                <td>
+                <td className={`${mobileCellClass} max-[760px]:border-b-0 max-[760px]:[&_.gallery-admin__actions]:w-full max-[760px]:[&_.gallery-admin__actions]:min-w-0 max-[760px]:[&_.gallery-admin__actions]:flex-wrap`} data-label="Acciones">
                   <ProyectosAdminRowActions
                     proyecto={proyecto}
                     editTo={proyectosAdminEditPath(proyecto.id)}
