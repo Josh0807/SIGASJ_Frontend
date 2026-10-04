@@ -1,21 +1,21 @@
 import type { AveriaDetail } from './types'
 
 export const AVERIA_RECIBIDA_ANTES_ASIGNAR_MSG =
-  'La avería debe estar en revisión antes de poder asignarse.'
+  'Al asignar el fontanero, el reporte pasa a revisión y queda en su listado.'
 
-export const ESTADOS_FORMULARIO_ASIGNACION = ['EN_REVISION', 'PENDIENTE'] as const
+export const ESTADOS_FORMULARIO_ASIGNACION = [
+  'RECIBIDA',
+  'EN_REVISION',
+  'PENDIENTE',
+] as const
 
 export type AveriaAsignacionView =
   | 'formulario'
   | 'asignada'
-  | 'recibida_info'
   | 'solo_lectura'
 
 export function estadoPermiteFormularioAsignacion(estado: string): boolean {
-  return (
-    estado === 'EN_REVISION' ||
-    estado === 'PENDIENTE'
-  )
+  return (ESTADOS_FORMULARIO_ASIGNACION as readonly string[]).includes(estado)
 }
 
 export function puedeAsignarFontaneroAveria(averia: AveriaDetail): boolean {
@@ -45,10 +45,6 @@ export function getAveriaAsignacionView(
 
   if (!canAssign) {
     return 'solo_lectura'
-  }
-
-  if (estado === 'RECIBIDA') {
-    return 'recibida_info'
   }
 
   if (estadoPermiteFormularioAsignacion(estado)) {

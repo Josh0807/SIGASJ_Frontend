@@ -288,15 +288,16 @@ describe('AveriasAdminAsignacion (PBI 2.4)', () => {
     )
   })
 
-  it('RECIBIDA muestra mensaje informativo y no consulta fontaneros', async () => {
+  it('RECIBIDA permite asignar fontanero para que el reporte aparezca en su listado', async () => {
     const recibida = findAveriaDetailFixture(1)!
-    const listSpy = vi.spyOn(averiasAdminApi, 'getAdminAveriaFontaneros')
+    vi.spyOn(averiasAdminApi, 'getAdminAveriaFontaneros').mockResolvedValue({
+      data: [{ id: 20, nombre: 'Fontanero demo', activo: true }],
+    })
     await renderView(recibida, true)
     expect(container.textContent).toContain(
-      'La avería debe estar en revisión antes de poder asignarse.',
+      'Al asignar el fontanero, el reporte pasa a revisión y queda en su listado.',
     )
-    expect(container.querySelector('#averia-asignacion-fontanero')).toBeNull()
-    expect(listSpy).not.toHaveBeenCalled()
+    expect(container.querySelector('#averia-asignacion-fontanero')).not.toBeNull()
   })
 
   it('RESUELTA y CANCELADA no muestran formulario de asignación', async () => {

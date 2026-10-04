@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 import { formatAveriaAdminDateTime } from '../admin/formatAveriaAdminDate'
 import { createPublicAveria } from '../services/averiasApi'
+import { consultarPersonaPorCedula } from '../services/consultaCedulaApi'
 import type { PublicAveriaConfirmation } from '../types/publicAveriaApi'
 import {
   EMPTY_PUBLIC_AVERIA_FORM,
@@ -25,6 +26,8 @@ export default function ReportarAveriaForm() {
   const [formError, setFormError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedReport, setSubmittedReport] = useState<PublicAveriaConfirmation | null>(null)
+  const [cedulaMensaje, setCedulaMensaje] = useState<string | null>(null)
+  const consultaCedulaRef = useRef(0)
 
   useEffect(() => {
     mountedRef.current = true
@@ -36,6 +39,59 @@ export default function ReportarAveriaForm() {
   const update = (name: keyof PublicAveriaFormValues, value: string) => {
     setValues((current) => ({ ...current, [name]: value }))
     setErrors((current) => ({ ...current, [name]: undefined }))
+    if (name === 'identificacionReportante') {
+      setCedulaMensaje(null)
+    }
+  }
+
+  const consultarIdentificacion = async (raw: string) => {
+    const digitos = raw.replace(/\D/g, '')
+    if (digitos.length < 9 || digitos.length > 12) {
+      setCedulaMensaje(
+        digitos.length === 0
+          ? null
+          : 'Use entre 9 y 12 dígitos para consultar el nombre.',
+      )
+      return
+    }
+
+    const consultaId = consultaCedulaRef.current + 1
+    consultaCedulaRef.current = consultaId
+    setCedulaMensaje('Consultando el nombre registrado para esta cédula…')
+
+    try {
+      const resultado = await consultarPersonaPorCedula(raw)
+      if (!mountedRef.current || consultaId !== consultaCedulaRef.current) {
+        return
+      }
+      const nombre = resultado.nombre?.trim() ?? ''
+      if (resultado.encontrada && nombre) {
+        setValues((current) => ({
+          ...current,
+          nombreReportante: nombre.slice(0, 150),
+        }))
+        setErrors((current) => ({ ...current, nombreReportante: undefined }))
+        setCedulaMensaje(
+          resultado.tipoIdentificacion
+            ? `Nombre encontrado (${resultado.tipoIdentificacion}). El teléfono y el correo se completan aquí.`
+            : 'Nombre encontrado. El teléfono y el correo se completan aquí.',
+        )
+        return
+      }
+      setCedulaMensaje(
+        'No hay un nombre público para esa cédula. Puede escribir los datos manualmente.',
+      )
+    } catch (error) {
+      if (!mountedRef.current || consultaId !== consultaCedulaRef.current) {
+        return
+      }
+      if (error instanceof Error && error.name === 'AbortError') {
+        return
+      }
+      setCedulaMensaje(
+        'No fue posible consultar la cédula. Puede escribir los datos manualmente.',
+      )
+    }
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -198,9 +254,18 @@ export default function ReportarAveriaForm() {
                 inputMode="text"
                 maxLength={50}
                 aria-invalid={Boolean(errors.identificacionReportante)}
-                aria-describedby={errorId('identificacionReportante')}
+                aria-describedby={
+                  errors.identificacionReportante
+                    ? errorId('identificacionReportante')
+                    : cedulaMensaje
+                      ? `${fieldId(idPrefix, 'identificacionReportante')}-help`
+                      : undefined
+                }
                 value={values.identificacionReportante}
                 onChange={(event) => update('identificacionReportante', event.target.value)}
+                onBlur={(event) => {
+                  void consultarIdentificacion(event.target.value)
+                }}
               />
               {errors.identificacionReportante ? (
                 <small
@@ -209,6 +274,14 @@ export default function ReportarAveriaForm() {
                   role="alert"
                 >
                   {errors.identificacionReportante}
+                </small>
+              ) : cedulaMensaje ? (
+                <small
+                  id={`${fieldId(idPrefix, 'identificacionReportante')}-help`}
+                  className="public-averia-form__help"
+                  role="status"
+                >
+                  {cedulaMensaje}
                 </small>
               ) : null}
             </div>

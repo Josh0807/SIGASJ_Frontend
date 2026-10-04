@@ -78,7 +78,11 @@ const AveriasAdminAsignacionControls = ({
     if (selectedFontaneroId == null) {
       return
     }
-    void assignFontanero(averia.id, selectedFontaneroId).catch(() => undefined)
+    void assignFontanero(
+      averia.id,
+      selectedFontaneroId,
+      String(averia.estado),
+    ).catch(() => undefined)
   }
 
   if (view === 'asignada' || view === 'solo_lectura') {
@@ -108,14 +112,6 @@ const AveriasAdminAsignacionControls = ({
     )
   }
 
-  if (view === 'recibida_info') {
-    return (
-      <p className="averias-admin-asignacion__hint" role="status">
-        {AVERIA_RECIBIDA_ANTES_ASIGNAR_MSG}
-      </p>
-    )
-  }
-
   return (
     <div className="averias-admin-asignacion">
       {feedback ? (
@@ -125,6 +121,12 @@ const AveriasAdminAsignacionControls = ({
           className="averias-admin-asignacion__feedback"
           testId="averia-asignacion-feedback"
         />
+      ) : null}
+
+      {String(averia.estado) === 'RECIBIDA' ? (
+        <p className="averias-admin-asignacion__hint" role="status">
+          {AVERIA_RECIBIDA_ANTES_ASIGNAR_MSG}
+        </p>
       ) : null}
 
       <dl className="averias-admin__fields">

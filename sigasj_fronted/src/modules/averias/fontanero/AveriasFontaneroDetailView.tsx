@@ -86,15 +86,15 @@ const AveriasFontaneroDetailView = ({
         aria-labelledby="averia-fontanero-ubicacion-heading"
       >
         <h2 id="averia-fontanero-ubicacion-heading">Ubicación de la avería</h2>
-        <dl className="averias-admin__fields">
+        <dl className="averias-admin__fields averias-admin__fields--ubicacion">
           <AveriasDetailField label="Sector / comunidad">
             {averia.sectorComunidad}
           </AveriasDetailField>
+          <AveriasDetailField label="Descripción del problema">
+            {averia.descripcion}
+          </AveriasDetailField>
           <AveriasDetailField label="Dirección" multiline>
             {averia.ubicacion}
-          </AveriasDetailField>
-          <AveriasDetailField label="Descripción del problema" multiline>
-            {averia.descripcion}
           </AveriasDetailField>
         </dl>
       </section>
@@ -104,7 +104,7 @@ const AveriasFontaneroDetailView = ({
         aria-labelledby="averia-fontanero-gestion-heading"
       >
         <h2 id="averia-fontanero-gestion-heading">Gestión de la avería</h2>
-        <dl className="averias-admin__fields">
+        <dl className="averias-admin__fields averias-fontanero__resumen">
           <AveriasDetailField label="Tipo">
             {getFontaneroTipoLabel(averia.tipoAveria)}
           </AveriasDetailField>
@@ -121,15 +121,6 @@ const AveriasFontaneroDetailView = ({
           </AveriasDetailField>
           <AveriasDetailField label="Estado">
             <AveriaStatusBadge estado={averia.estado} />
-            {avisoHorario ? (
-              <p className="averias-admin__horario-hint" role="status">
-                {MENSAJE_PENDIENTE_HORARIO_FONTANERO}
-              </p>
-            ) : (
-              <p className="averias-admin__hint">
-                Usted actualiza el estado al atender o resolver esta avería.
-              </p>
-            )}
           </AveriasDetailField>
           <AveriasDetailField label="Inicio de atención">
             {averia.fechaInicioAtencion
@@ -146,6 +137,16 @@ const AveriasFontaneroDetailView = ({
             )}
           </AveriasDetailField>
         </dl>
+        {avisoHorario ? (
+          <p className="averias-admin__horario-hint" role="status">
+            {MENSAJE_PENDIENTE_HORARIO_FONTANERO}
+          </p>
+        ) : (
+          <p className="averias-admin__hint averias-fontanero__estado-hint">
+            Usted actualiza el estado al atender o resolver esta avería.
+          </p>
+        )}
+        <div className="averias-fontanero__gestion-paneles">
         {puedeCalificar ? (
           <AveriasFontaneroClasificacionForm
             averia={averia}
@@ -216,6 +217,7 @@ const AveriasFontaneroDetailView = ({
             <p>{AVERIAS_FONTANERO_NO_ACTIONS}</p>
           ) : null}
         </div>
+        </div>
       </section>
 
       <section
@@ -276,7 +278,7 @@ const AveriasFontaneroDetailView = ({
             })}
           </ol>
         ) : (
-          <p className="averias-admin__muted">
+          <p className="averias-admin__empty-note">
             {AVERIAS_FONTANERO_OBSERVACIONES_LISTA_VACIA}
           </p>
         )}

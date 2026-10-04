@@ -23,8 +23,8 @@ describe('averiaPendienteAtencion', () => {
     expect(puedeIntentarIniciarAtencion('EN_ATENCION')).toBe(false)
   })
 
-  it('muestra el aviso de horario solo cuando está pendiente', () => {
-    expect(mostrarAvisoHorarioFontanero('PENDIENTE')).toBe(true)
+  it('no bloquea el inicio con un aviso de horario', () => {
+    expect(mostrarAvisoHorarioFontanero('PENDIENTE')).toBe(false)
     expect(mostrarAvisoHorarioFontanero('ASIGNADA')).toBe(false)
     expect(mostrarAvisoPendienteAdmin('PENDIENTE', true)).toBe(true)
     expect(mostrarAvisoPendienteAdmin('PENDIENTE', false)).toBe(false)

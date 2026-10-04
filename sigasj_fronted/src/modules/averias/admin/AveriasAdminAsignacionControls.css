@@ -15,7 +15,11 @@
 
 .averias-admin-asignacion__hint {
   margin: 0;
-  color: #6b7c8d;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f4f8fb;
+  color: #5d7388;
+  line-height: 1.45;
 }
 
 .averias-admin-asignacion__hint[aria-busy='true'] {

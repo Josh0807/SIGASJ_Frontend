@@ -71,7 +71,7 @@ describe('accesibilidad del listado administrativo de averías', () => {
     expect(container.querySelector('table caption')?.textContent).toBe(
       'Listado de averías',
     )
-    expect(container.querySelectorAll('th[scope="col"]').length).toBe(11)
+    expect(container.querySelectorAll('th[scope="col"]').length).toBe(5)
 
     const detail = [...container.querySelectorAll('a')].find(
       (anchor) => anchor.textContent === 'Ver detalle',
