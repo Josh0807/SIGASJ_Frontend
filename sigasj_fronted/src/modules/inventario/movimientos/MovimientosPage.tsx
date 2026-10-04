@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowsExchange, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MATERIALES_PATH, movimientoDetailPath } from '../inventarioPaths'
 import { useMateriales } from '../useMateriales'
@@ -94,19 +94,23 @@ export default function MovimientosPage() {
   const filtered = Boolean(tipo || materialId || fechaDesde || fechaHasta)
 
   return (
-    <section className="material-tracking" aria-labelledby="movimientos-title">
-      <header className="material-tracking__header">
-        <div>
-          <p className="material-request__eyebrow">Inventario · Administración</p>
-          <h1 id="movimientos-title">Historial de movimientos</h1>
-          <p>Consulte las entradas y salidas registradas sobre los materiales de bodega.</p>
+    <section className="material-tracking !mx-auto !w-full !max-w-[1480px] !gap-6" aria-labelledby="movimientos-title">
+      <header className="material-tracking__header !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8 !shadow-[0_12px_32px_rgba(30,90,156,0.08)]">
+        <div className="flex items-start gap-4">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-cyan-50 text-cyan-700"><IconArrowsExchange size={25} aria-hidden="true" /></span>
+          <div>
+          <p className="material-request__eyebrow !mb-2 !text-xs !font-black !tracking-[0.12em] !text-cyan-700">Inventario · Administración</p>
+          <h1 className="!text-3xl !font-black !tracking-tight !text-slate-900" id="movimientos-title">Historial de movimientos</h1>
+          <p className="!mt-2 !text-base !text-slate-500">Consulte las entradas y salidas registradas sobre los materiales de bodega.</p>
+          </div>
         </div>
-        <Link className="material-tracking__detail-link" to={MATERIALES_PATH}>Volver al catálogo</Link>
+        <Link className="material-tracking__detail-link !gap-2" to={MATERIALES_PATH}><IconArrowLeft size={18} aria-hidden="true" />Volver al catálogo</Link>
       </header>
 
-      <div className="material-tracking__filters">
-        <label htmlFor="movimiento-tipo-filtro">Tipo</label>
+      <div className="material-tracking__filters !grid !grid-cols-1 !gap-4 !p-6 sm:!grid-cols-2 xl:!grid-cols-4">
+        <label className="!grid !gap-2" htmlFor="movimiento-tipo-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Tipo</span>
         <select
+          className="!m-0 !w-full !min-w-0"
           id="movimiento-tipo-filtro"
           value={tipo}
           onChange={(event) => {
@@ -117,10 +121,11 @@ export default function MovimientosPage() {
           {TIPOS_FILTRO.map((option) => (
             <option key={option.label} value={option.value}>{option.label}</option>
           ))}
-        </select>
+        </select></label>
 
-        <label htmlFor="movimiento-material-filtro">Material</label>
+        <label className="!grid !gap-2" htmlFor="movimiento-material-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Material</span>
         <select
+          className="!m-0 !w-full !min-w-0"
           id="movimiento-material-filtro"
           value={materialId}
           disabled={materialesLoading}
@@ -133,10 +138,11 @@ export default function MovimientosPage() {
           {materialesResult.data.map((material) => (
             <option key={material.id} value={material.id}>{material.nombre}</option>
           ))}
-        </select>
+        </select></label>
 
-        <label htmlFor="movimiento-desde-filtro">Desde</label>
+        <label className="!grid !gap-2" htmlFor="movimiento-desde-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Desde</span>
         <input
+          className="!m-0 !w-full !min-w-0"
           id="movimiento-desde-filtro"
           type="date"
           value={fechaDesde}
@@ -144,10 +150,11 @@ export default function MovimientosPage() {
             setFechaDesde(event.target.value)
             setPage(1)
           }}
-        />
+        /></label>
 
-        <label htmlFor="movimiento-hasta-filtro">Hasta</label>
+        <label className="!grid !gap-2" htmlFor="movimiento-hasta-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Hasta</span>
         <input
+          className="!m-0 !w-full !min-w-0"
           id="movimiento-hasta-filtro"
           type="date"
           value={fechaHasta}
@@ -155,11 +162,11 @@ export default function MovimientosPage() {
             setFechaHasta(event.target.value)
             setPage(1)
           }}
-        />
+        /></label>
 
         {filtered ? (
-          <button type="button" className="material-tracking__filter-action" onClick={clearFilters}>
-            Limpiar filtros
+          <button type="button" className="material-tracking__filter-action sm:!col-span-2 xl:!col-span-4 xl:!ml-auto" onClick={clearFilters}>
+            <IconTrash size={17} aria-hidden="true" /> Limpiar filtros
           </button>
         ) : null}
       </div>
@@ -225,8 +232,8 @@ export default function MovimientosPage() {
                   <td data-label="Responsable">{getMovimientoResponsable(movimiento)}</td>
                   <td data-label="Referencia">{getMovimientoReferencia(movimiento)}</td>
                   <td data-label="Acciones">
-                    <Link className="material-tracking__detail-link" to={movimientoDetailPath(movimiento.id)}>
-                      Ver detalle
+                    <Link className="material-tracking__detail-link !gap-2" to={movimientoDetailPath(movimiento.id)}>
+                      <IconEye size={17} aria-hidden="true" /> Ver detalle
                     </Link>
                   </td>
                 </tr>

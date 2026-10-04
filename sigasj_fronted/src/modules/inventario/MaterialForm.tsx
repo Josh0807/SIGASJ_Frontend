@@ -77,7 +77,7 @@ export default function MaterialForm({ mode, initialValues = EMPTY_VALUES, stock
       {proveedoresError && <div className="materials-admin__category-error" role="alert">No fue posible cargar los proveedores. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}
       {mode === 'edit' && field('activo', 'Estado', <select value={String(values.activo)} onChange={(e) => update('activo', e.target.value === 'true')}><option value="true">Activo</option><option value="false">Inactivo</option></select>)}
       {mode === 'edit' && <label><span>Existencia actual</span><input value={stockActual ?? 0} disabled readOnly /><small>Solo cambia mediante entradas y salidas de inventario.</small></label>}
-      <div className="materials-admin__form-actions"><Link className="materials-admin__secondary" to={MATERIALES_PATH}>Volver al catálogo</Link><button type="submit" className="materials-admin__primary" disabled={saving}>{saving ? 'Guardando…' : mode === 'create' ? 'Registrar material' : 'Guardar cambios'}</button></div>
+      <div className="materials-admin__form-actions"><button type="submit" className="materials-admin__primary" disabled={saving}>{saving ? 'Guardando…' : mode === 'create' ? 'Registrar material' : 'Guardar cambios'}</button><Link className="materials-admin__secondary" to={MATERIALES_PATH}>Volver al catálogo</Link></div>
     </form>
   </>
 }
