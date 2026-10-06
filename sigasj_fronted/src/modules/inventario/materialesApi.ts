@@ -6,6 +6,29 @@ const MATERIALES_PATH = '/inventario/materiales'
 export const getMateriales = (query: MaterialesQuery = {}) =>
   fetchWithAuth<MaterialesResponse>(MATERIALES_PATH, { params: query })
 
+const PRINT_PAGE_SIZE = 100
+const PRINT_PAGE_CAP = 50
+
+export async function getMaterialesParaImpresion(
+  query: Omit<MaterialesQuery, 'page' | 'limit'> = {},
+): Promise<{ data: Material[]; total: number }> {
+  const data: Material[] = []
+  let page = 1
+  let total = 0
+
+  while (page <= PRINT_PAGE_CAP) {
+    const result = await getMateriales({ ...query, page, limit: PRINT_PAGE_SIZE })
+    total = result.total
+    data.push(...result.data)
+    if (result.totalPages <= page || result.data.length === 0) {
+      break
+    }
+    page += 1
+  }
+
+  return { data, total }
+}
+
 export const getMaterial = (id: number) =>
   fetchWithAuth<Material>(`${MATERIALES_PATH}/${id}`)
 

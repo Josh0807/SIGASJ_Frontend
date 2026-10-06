@@ -22,3 +22,4 @@ export const recepcionDetailPath = (id: number | string) => `${RECEPCIONES_PATH}
 export const MOVIMIENTOS_PATH = '/admin/inventario/movimientos'
 export const movimientoDetailPath = (id: number | string) => `${MOVIMIENTOS_PATH}/${id}`
 export const REPORTES_INVENTARIO_PATH = '/admin/inventario/reportes'
+export const IMPRIMIR_INVENTARIO_PATH = '/admin/inventario/imprimir'

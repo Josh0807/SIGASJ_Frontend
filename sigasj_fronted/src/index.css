@@ -11796,6 +11796,121 @@ body,
 .inventario-reportes .actividades-admin-reportes__actions .gallery-admin__button {
   flex: 1 1 160px;
 }
+
+.inventario-print .actividades-admin-reportes__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.inventario-print .inventario-print__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.inventario-print__sheet {
+  padding: 22px 24px;
+  border: 1px solid #d7e5f1;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(18, 63, 112, .06);
+}
+.inventario-print__letterhead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #d7e5f1;
+}
+.inventario-print__letterhead img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #fff;
+}
+.inventario-print__letterhead p {
+  margin: 0;
+  color: #4a647c;
+  font-size: .82rem;
+}
+.inventario-print__letterhead h2 {
+  margin: 2px 0;
+  color: #123f70;
+  font-size: 1.25rem;
+}
+.inventario-print__meta {
+  margin: 0 0 16px;
+  color: #4a647c;
+  font-size: .88rem;
+}
+.inventario-print__table-wrap table {
+  width: 100%;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+
+  .admin-sidebar,
+  .admin-header,
+  .admin-nav-backdrop,
+  .admin-menu-toggle,
+  .inventory-module-menu,
+  .inventario-print__controls,
+  .notificaciones-campana {
+    display: none !important;
+  }
+
+  .admin-layout,
+  .admin-layout--panel,
+  .admin-main,
+  .admin-main__content,
+  .admin-main__inner,
+  .inventory-module-shell,
+  .gallery-admin__shell,
+  .inventario-print {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .inventario-print__sheet {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .inventario-print__table-wrap {
+    overflow: visible !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .inventario-print table {
+    font-size: 11px;
+  }
+
+  .inventario-print th,
+  .inventario-print td {
+    padding: 6px 8px !important;
+  }
+
+  .inventario-print tr {
+    break-inside: avoid;
+  }
+}
 .inventario-reportes .gallery-admin__filter-reset {
   grid-column: auto;
 }

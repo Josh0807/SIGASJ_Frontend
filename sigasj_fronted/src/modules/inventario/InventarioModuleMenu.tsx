@@ -10,6 +10,7 @@ import {
   IconClipboardCheck,
   IconFileAnalytics,
   IconLayoutGrid,
+  IconPrinter,
   IconPackageExport,
   IconPackageImport,
   IconPackageOff,
@@ -28,6 +29,7 @@ import {
   MOVIMIENTOS_PATH,
   PROVEEDORES_PATH,
   RECEPCIONES_PATH,
+  IMPRIMIR_INVENTARIO_PATH,
   REPORTES_INVENTARIO_PATH,
   REPOSICIONES_PATH,
   SALIDAS_PATH,
@@ -48,6 +50,7 @@ const adminItems = [
   { label: 'Recepciones', description: 'Material por recibir', to: RECEPCIONES_PATH, icon: IconPackageOff },
   { label: 'Historial', description: 'Movimientos de inventario', to: MOVIMIENTOS_PATH, icon: IconArrowsExchange },
   { label: 'Reportes', description: 'Indicadores y análisis', to: REPORTES_INVENTARIO_PATH, icon: IconFileAnalytics },
+  { label: 'Imprimir inventario', description: 'Listado para archivo', to: IMPRIMIR_INVENTARIO_PATH, icon: IconPrinter },
 ]
 
 const plumberItems = [

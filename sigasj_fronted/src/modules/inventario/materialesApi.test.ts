@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createMaterial, getMaterial, getMateriales, updateMaterial, updateMaterialEstado } from './materialesApi'
+import { createMaterial, getMaterial, getMateriales, getMaterialesParaImpresion, updateMaterial, updateMaterialEstado } from './materialesApi'
 
 const response = (body: unknown) => ({ ok: true, status: 200, json: async () => body }) as Response
 
@@ -32,6 +32,22 @@ describe('contrato API de materiales', () => {
     vi.stubGlobal('fetch', fetchMock)
     await getMateriales({ idProveedor: 10, page: 1, limit: 10 })
     expect(String(fetchMock.mock.calls[0][0])).toContain('idProveedor=10')
+  })
+
+  it('recorre páginas para armar el listado de impresión', async () => {
+    const pageOne = Array.from({ length: 100 }, (_, index) => ({ id: index + 1, nombre: `M${index + 1}` }))
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response({ data: pageOne, total: 101, page: 1, limit: 100, totalPages: 2 }))
+      .mockResolvedValueOnce(response({ data: [{ id: 101, nombre: 'M101' }], total: 101, page: 2, limit: 100, totalPages: 2 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await getMaterialesParaImpresion({ activo: true })
+
+    expect(result.total).toBe(101)
+    expect(result.data).toHaveLength(101)
+    expect(String(fetchMock.mock.calls[0][0])).toContain('limit=100')
+    expect(String(fetchMock.mock.calls[0][0])).toContain('activo=true')
+    expect(String(fetchMock.mock.calls[1][0])).toContain('page=2')
   })
 
   it('registra sin enviar stockActual', async () => {
