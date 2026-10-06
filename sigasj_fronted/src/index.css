@@ -11407,6 +11407,10 @@ body,
 .inventory-module-shell :is(.materials-admin__filters, .material-tracking__filters, .gallery-admin__filters) .provider-admin__control {
   width: 100%;
 }
+.inventory-module-shell :is(.materials-admin__filters, .material-tracking__filters, .gallery-admin__filters) .provider-admin__control > :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+}
 .inventory-module-shell .material-tracking__filters {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
@@ -11462,6 +11466,7 @@ body,
 .materials-admin__pagination { display: flex; align-items: center; justify-content: center; gap: 16px; }
 .materials-admin__pagination button:disabled { opacity: .45; cursor: not-allowed; }
 .materials-admin--form { max-width: 820px; }
+.materials-admin--form > .materials-admin__form { max-width: 100%; }
 .materials-admin__form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .materials-admin__form label:nth-child(3) { grid-column: 1 / -1; }
 .materials-admin__form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; }
@@ -11511,7 +11516,7 @@ body,
 .provider-admin__control input,
 .provider-admin__control select,
 .provider-admin__control textarea { min-height: 54px; padding-left: 50px !important; border-color: #d5e4ef; border-radius: 13px; background: #fbfdff; transition: border-color .18s ease, box-shadow .18s ease, background .18s ease; }
-.provider-admin__control select { padding-right: 16px; appearance: none; background-image: linear-gradient(45deg, transparent 50%, #7a93aa 50%), linear-gradient(135deg, #7a93aa 50%, transparent 50%); background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px); background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+.provider-admin__control select { padding-right: 42px !important; appearance: none; background-image: linear-gradient(45deg, transparent 50%, #7a93aa 50%), linear-gradient(135deg, #7a93aa 50%, transparent 50%); background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px); background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
 .provider-admin__control textarea { min-height: 112px; padding-top: 16px; }
 .provider-admin__control textarea + svg,
 .provider-admin__control:has(textarea) > svg { top: 18px; transform: none; }
@@ -11779,13 +11784,23 @@ body,
 
 .inventario-reportes .gallery-admin__filters,
 .inventario-reportes .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 176px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   align-items: end;
+  gap: 20px;
 }
-.inventario-reportes .gallery-admin__field input,
-.inventario-reportes .gallery-admin__field select {
+.inventario-reportes .gallery-admin__filters > label,
+.inventario-reportes .gallery-admin__filters .provider-admin__control,
+.inventario-reportes .gallery-admin__filters .provider-admin__control > :is(input, select) {
+  width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+.inventario-reportes .gallery-admin__filters input[type="date"] {
+  padding-right: 20px !important;
+}
+.inventario-reportes .gallery-admin__filters input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-right: 2px;
+  cursor: pointer;
 }
 .inventario-reportes .actividades-admin-reportes__actions {
   grid-column: 1 / -1;
@@ -11796,6 +11811,76 @@ body,
 .inventario-reportes .actividades-admin-reportes__actions .gallery-admin__button {
   flex: 1 1 160px;
 }
+.inventario-reportes__category-summary {
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid #d7e5f1;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(18, 63, 112, .09);
+}
+.inventario-reportes__category-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #dce9f3;
+  background: linear-gradient(135deg, #f8fcff 0%, #edf7ff 100%);
+}
+.inventario-reportes__category-icon {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #176fd1, #23a6e8);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(23, 111, 209, .24);
+}
+.inventario-reportes__category-heading h2 {
+  margin: 0;
+  color: #123f70;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+.inventario-reportes__category-heading p {
+  margin: 4px 0 0;
+  color: #60778d;
+  font-size: .9rem;
+}
+.inventario-reportes__category-table { overflow-x: auto; }
+.inventario-reportes__category-summary table { width: 100%; border-collapse: collapse; }
+.inventario-reportes__category-summary th {
+  padding: 14px 24px;
+  border-bottom: 1px solid #dce9f3;
+  background: #f7fbfe;
+  color: #45627c;
+  font-size: .78rem;
+  letter-spacing: .045em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.inventario-reportes__category-summary td {
+  padding: 17px 24px;
+  border-bottom: 1px solid #e8f0f6;
+  color: #344d64;
+}
+.inventario-reportes__category-summary tbody tr:last-child td { border-bottom: 0; }
+.inventario-reportes__category-summary tbody tr { transition: background-color .18s ease; }
+.inventario-reportes__category-summary tbody tr:hover { background: #f5faff; }
+.inventario-reportes__category-summary td strong { color: #123f70; }
+.inventario-reportes__metric-badge {
+  display: inline-grid;
+  min-width: 38px;
+  min-height: 32px;
+  padding: 5px 11px;
+  place-items: center;
+  border-radius: 999px;
+  font-weight: 800;
+}
+.inventario-reportes__metric-badge.is-total { background: #e4f3ff; color: #08689f; }
+.inventario-reportes__metric-badge.is-ok { background: #dcf8e7; color: #13743c; }
+.inventario-reportes__metric-badge.is-warning { background: #fff0d1; color: #9a5800; }
 
 .inventario-print .actividades-admin-reportes__actions {
   grid-column: 1 / -1;
@@ -11894,7 +11979,9 @@ body,
 
   .inventario-print__table-wrap {
     overflow: visible !important;
+    margin: 0 !important;
     border: 0 !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
   }
 
