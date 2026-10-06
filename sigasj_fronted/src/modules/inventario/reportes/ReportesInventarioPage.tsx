@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { IconArrowsExchange, IconCalendar, IconCategory, IconPackage } from '@tabler/icons-react'
+import { IconArrowsExchange, IconCalendar, IconCategory, IconEraser, IconPackage, IconSearch } from '@tabler/icons-react'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
 import { InventoryFormField } from '../InventoryFormField'
 import {
@@ -157,6 +157,7 @@ export default function ReportesInventarioPage() {
               }
             >
               <option value="">Todos los materiales</option>
+              {(materialesResult?.data ?? []).map((material) => (
                 <option key={material.id} value={material.id}>{material.nombre}</option>
               ))}
             </select>
@@ -194,21 +195,24 @@ export default function ReportesInventarioPage() {
             </select>
           </InventoryFormField>
 
-          <div className="actividades-admin-reportes__actions">
+          <div className="actividades-admin-reportes__actions [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:gap-2.5">
             <button
               type="submit"
-              className="gallery-admin__button gallery-admin__button--primary"
+              className="group relative isolate overflow-hidden gallery-admin__button gallery-admin__button--primary !min-h-14 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-7 !text-white !shadow-[0_10px_24px_rgba(29,78,216,0.25)] transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.015] hover:!shadow-[0_16px_30px_rgba(29,78,216,0.34)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 motion-reduce:transform-none motion-reduce:transition-none"
               disabled={loading}
             >
-              {loading ? 'Consultando…' : 'Consultar'}
+              <span className="absolute inset-0 -translate-x-[140%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[140%] motion-reduce:hidden" aria-hidden="true" />
+              <IconSearch className="relative transition-transform duration-300 group-hover:scale-110" size={20} aria-hidden="true" />
+              <span className="relative">{loading ? 'Consultando…' : 'Consultar'}</span>
             </button>
             <button
               type="button"
-              className="gallery-admin__button gallery-admin__filter-reset"
+              className="group gallery-admin__button gallery-admin__filter-reset !min-h-14 !rounded-2xl !border !border-blue-200 !bg-white/90 !px-7 !text-blue-700 !shadow-[0_8px_20px_rgba(15,71,139,0.10)] backdrop-blur-sm transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.015] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(15,71,139,0.18)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 motion-reduce:transform-none motion-reduce:transition-none"
               onClick={handleLimpiar}
               disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
             >
-              Limpiar filtros
+              <IconEraser className="transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110 motion-reduce:transform-none" size={20} aria-hidden="true" />
+              <span>Limpiar filtros</span>
             </button>
           </div>
         </form>
@@ -273,8 +277,17 @@ export default function ReportesInventarioPage() {
         ) : null}
 
         {!loading && reporte.porCategoria.length > 0 ? (
-          <section className="material-tracking__table-wrap" aria-labelledby="reporte-categorias-title">
-            <h2 id="reporte-categorias-title">Resumen por categoría</h2>
+          <section className="material-tracking__table-wrap inventario-reportes__category-summary" aria-labelledby="reporte-categorias-title">
+            <header className="inventario-reportes__category-heading">
+              <span className="inventario-reportes__category-icon" aria-hidden="true">
+                <IconCategory size={26} />
+              </span>
+              <div>
+                <h2 id="reporte-categorias-title">Resumen por categoría</h2>
+                <p>Distribución de materiales y alertas de existencias por clasificación.</p>
+              </div>
+            </header>
+            <div className="inventario-reportes__category-table">
             <table>
               <caption className="visually-hidden">Materiales por categoría</caption>
               <thead>
@@ -287,48 +300,55 @@ export default function ReportesInventarioPage() {
               <tbody>
                 {reporte.porCategoria.map((item) => (
                   <tr key={`${item.idCategoria ?? 'sin'}-${item.nombre}`}>
-                    <td data-label="Categoría">{item.nombre}</td>
-                    <td data-label="Materiales">{item.totalMateriales}</td>
-                    <td data-label="Stock bajo">{item.materialesStockBajo}</td>
+                    <td data-label="Categoría"><strong>{item.nombre}</strong></td>
+                    <td data-label="Materiales"><span className="inventario-reportes__metric-badge is-total">{item.totalMateriales}</span></td>
+                    <td data-label="Stock bajo"><span className={`inventario-reportes__metric-badge ${item.materialesStockBajo > 0 ? 'is-warning' : 'is-ok'}`}>{item.materialesStockBajo}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </section>
         ) : null}
 
         {!loading && reporte.movimientos.length > 0 ? (
-          <section className="material-tracking" aria-labelledby="reporte-movimientos-title">
-            <header className="material-tracking__header">
-              <div>
-                <h2 id="reporte-movimientos-title">Movimientos del periodo</h2>
-                <p>Detalle de entradas y salidas según los filtros aplicados.</p>
+          <section className="material-tracking !mx-0 !max-w-none space-y-5" aria-labelledby="reporte-movimientos-title">
+            <header className="material-tracking__header !items-center !rounded-3xl !border-blue-100 !bg-gradient-to-br !from-white !via-blue-50/70 !to-cyan-50/70 !p-7 !shadow-[0_14px_36px_rgba(18,63,112,0.10)]">
+              <div className="flex items-center gap-4">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-600/20" aria-hidden="true">
+                  <IconArrowsExchange size={28} />
+                </span>
+                <div>
+                  <h2 className="!m-0 text-2xl font-extrabold tracking-tight text-slate-800" id="reporte-movimientos-title">Movimientos del periodo</h2>
+                  <p className="!mt-1.5 !mb-0 text-sm text-slate-600">Detalle de entradas y salidas según los filtros aplicados.</p>
+                </div>
               </div>
             </header>
-            <div className="material-tracking__table-wrap">
-              <table>
+            <div className="material-tracking__table-wrap !overflow-hidden !rounded-3xl !border-blue-100 !bg-white !shadow-[0_14px_36px_rgba(18,63,112,0.10)]">
+              <table className="w-full border-separate border-spacing-0">
                 <caption className="visually-hidden">Movimientos del reporte</caption>
                 <thead>
                   <tr>
-                    <th>Fecha</th>
-                    <th>Material</th>
-                    <th>Tipo</th>
-                    <th>Cantidad</th>
-                    <th>Responsable</th>
+                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Fecha</th>
+                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Material</th>
+                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Tipo</th>
+                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Cantidad</th>
+                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Responsable</th>
                   </tr>
                 </thead>
                 <tbody>
                   {reporte.movimientos.map((movimiento) => (
-                    <tr key={movimiento.id}>
-                      <td data-label="Fecha">{formatMovimientoFecha(movimiento.fechaMovimiento)}</td>
-                      <td data-label="Material">{getMovimientoMaterialNombre(movimiento)}</td>
+                  <tr className="group transition-colors duration-200 hover:!bg-blue-50/60" key={movimiento.id}>
+                      <td className="!px-5 !py-4 text-slate-500" data-label="Fecha">{formatMovimientoFecha(movimiento.fechaMovimiento)}</td>
+                      <td className="!px-5 !py-4 !font-semibold !text-slate-800" data-label="Material">{getMovimientoMaterialNombre(movimiento)}</td>
                       <td data-label="Tipo">
-                        <span className="material-tracking__badge" data-status={movimiento.tipo}>
+                        <span className={`material-tracking__badge !inline-flex !items-center !gap-2 !px-3.5 !py-2 !shadow-sm ${movimiento.tipo === 'ENTRADA' ? '!border-emerald-200 !bg-emerald-50 !text-emerald-700' : '!border-rose-200 !bg-rose-50 !text-rose-700'}`} data-status={movimiento.tipo}>
+                          <span className={`size-2 rounded-full ${movimiento.tipo === 'ENTRADA' ? 'bg-emerald-500' : 'bg-rose-500'}`} aria-hidden="true" />
                           {formatMovimientoTipo(movimiento.tipo)}
                         </span>
                       </td>
-                      <td data-label="Cantidad">{formatMovimientoCantidad(movimiento)}</td>
-                      <td data-label="Responsable">{getMovimientoResponsable(movimiento)}</td>
+                      <td className="!px-5 !py-4 !font-bold !text-blue-700" data-label="Cantidad">{formatMovimientoCantidad(movimiento)}</td>
+                      <td className="!px-5 !py-4 !text-slate-700" data-label="Responsable">{getMovimientoResponsable(movimiento)}</td>
                     </tr>
                   ))}
                 </tbody>
