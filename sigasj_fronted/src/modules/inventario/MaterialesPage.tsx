@@ -11,6 +11,7 @@ import { useMateriales } from './useMateriales'
 import { useCategorias } from './categorias/useCategorias'
 import { useProveedores } from './proveedores/useProveedores'
 import { IconCategory, IconCircleCheckFilled, IconCircleXFilled, IconFilter, IconPencil, IconSearch, IconTruck } from '@tabler/icons-react'
+import { InventoryFormField } from './InventoryFormField'
 
 const PAGE_SIZE = 10
 
@@ -59,8 +60,34 @@ export default function MaterialesPage() {
   const clearFilters = () => { setSearchInput(''); latestSearch.current = ''; setNombre(''); setActivo(''); setCategoriaId(''); setProveedorId(''); setPage(1) }
 
   return <main className="materials-admin sigasj-stack !gap-6">
-    <header className="materials-admin__header !flex !min-h-[220px] !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8 lg:!pr-[310px]"><div><p className="materials-admin__eyebrow !mb-4 !text-sm !font-extrabold !tracking-[0.12em] !text-blue-600">Inventario · Bodega</p><div className="flex flex-wrap items-center gap-4"><h1 className="!m-0 !text-4xl !font-black !tracking-tight !text-[#062e63]">Catálogo de materiales</h1><span className="materials-admin__count !rounded-full !border-0 !bg-blue-50 !px-4 !py-2 !text-sm !font-extrabold !text-blue-700">{result.total} materiales</span></div><p className="!mt-4 !max-w-xl !text-lg !leading-8 !text-slate-500">Consulte existencias, ubicación y niveles mínimos de los materiales registrados.</p></div></header>
-    <section className="materials-admin__filters materials-admin__filters--inventory !gap-5 !rounded-[22px] !border-sky-100 !bg-white !p-7" aria-label="Búsqueda y filtros"><label><span className="!flex !items-center !gap-2"><span className="grid size-8 place-items-center rounded-lg bg-sky-50 text-blue-600"><IconSearch size={18} aria-hidden="true" /></span>Buscar por nombre</span><input className="!min-h-[56px] !rounded-xl !border-slate-200 !px-5 !text-base" type="search" value={searchInput} maxLength={150} placeholder="Ej. Tubo PVC" onChange={(event) => setSearchInput(event.target.value)} /></label><label><span className="!flex !items-center !gap-2"><span className="grid size-8 place-items-center rounded-lg bg-sky-50 text-blue-600"><IconFilter size={18} aria-hidden="true" /></span>Estado</span><select className="!min-h-[56px] !rounded-xl !border-slate-200 !px-5 !text-base" value={activo} onChange={(event) => { setActivo(event.target.value); setPage(1) }}><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></label><label><span className="!flex !items-center !gap-2"><span className="grid size-8 place-items-center rounded-lg bg-sky-50 text-blue-600"><IconCategory size={18} aria-hidden="true" /></span>Categoría</span><select className="!min-h-[56px] !rounded-xl !border-slate-200 !px-5 !text-base" value={categoriaId} disabled={categoriasLoading} onChange={(event) => { setCategoriaId(event.target.value); setPage(1) }}><option value="">Todas las categorías</option>{categorias.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}{item.activo ? '' : ' (inactiva)'}</option>)}</select></label><label><span className="!flex !items-center !gap-2"><span className="grid size-8 place-items-center rounded-lg bg-sky-50 text-blue-600"><IconTruck size={18} aria-hidden="true" /></span>Proveedor</span><select className="!min-h-[56px] !rounded-xl !border-slate-200 !px-5 !text-base" value={proveedorId} disabled={proveedoresLoading} onChange={(event) => { setProveedorId(event.target.value); setPage(1) }}><option value="">Todos los proveedores</option>{proveedores.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}{item.activo ? '' : ' (inactivo)'}</option>)}</select></label>{filtered && <button type="button" className="materials-admin__secondary" onClick={clearFilters}>Limpiar filtros</button>}{categoriasError && <div className="materials-admin__category-error" role="alert">No fue posible cargar el filtro de categorías. <button type="button" onClick={refetchCategorias}>Reintentar</button></div>}{proveedoresError && <div className="materials-admin__category-error" role="alert">No fue posible cargar el filtro de proveedores. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}</section>
+    <header className="materials-admin__header !flex !min-h-[220px] !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8"><div><p className="materials-admin__eyebrow !mb-4 !text-sm !font-extrabold !tracking-[0.12em] !text-blue-600">Inventario · Bodega</p><div className="inventory-catalog__heading"><h1 className="!m-0 !text-4xl !font-black !tracking-tight !text-[#062e63]">Catálogo de materiales</h1><span className="materials-admin__count !rounded-full !border-0 !bg-blue-50 !px-4 !py-2 !text-sm !font-extrabold !text-blue-700">{result.total} materiales</span></div><p className="!mt-4 !max-w-xl !text-lg !leading-8 !text-slate-500">Consulte existencias, ubicación y niveles mínimos de los materiales registrados.</p></div></header>
+    <section className="materials-admin__filters materials-admin__filters--inventory" aria-label="Búsqueda y filtros">
+      <InventoryFormField label="Buscar por nombre" icon={<IconSearch size={20} aria-hidden="true" />}>
+        <input type="search" value={searchInput} maxLength={150} placeholder="Ej. Tubo PVC" onChange={(event) => setSearchInput(event.target.value)} />
+      </InventoryFormField>
+      <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
+        <select value={activo} onChange={(event) => { setActivo(event.target.value); setPage(1) }}>
+          <option value="">Todos los estados</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
+        </select>
+      </InventoryFormField>
+      <InventoryFormField label="Categoría" icon={<IconCategory size={20} aria-hidden="true" />}>
+        <select value={categoriaId} disabled={categoriasLoading} onChange={(event) => { setCategoriaId(event.target.value); setPage(1) }}>
+          <option value="">Todas las categorías</option>
+          {categorias.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}{item.activo ? '' : ' (inactiva)'}</option>)}
+        </select>
+      </InventoryFormField>
+      <InventoryFormField label="Proveedor" icon={<IconTruck size={20} aria-hidden="true" />}>
+        <select value={proveedorId} disabled={proveedoresLoading} onChange={(event) => { setProveedorId(event.target.value); setPage(1) }}>
+          <option value="">Todos los proveedores</option>
+          {proveedores.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}{item.activo ? '' : ' (inactivo)'}</option>)}
+        </select>
+      </InventoryFormField>
+      {filtered && <button type="button" className="materials-admin__secondary" onClick={clearFilters}>Limpiar filtros</button>}
+      {categoriasError && <div className="materials-admin__category-error" role="alert">No fue posible cargar el filtro de categorías. <button type="button" onClick={refetchCategorias}>Reintentar</button></div>}
+      {proveedoresError && <div className="materials-admin__category-error" role="alert">No fue posible cargar el filtro de proveedores. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}
+    </section>
     {actionMessage && <div className={actionMessage.kind === 'success' ? 'materials-admin__success' : 'materials-admin__error'} role={actionMessage.kind === 'error' ? 'alert' : 'status'}>{actionMessage.text}</div>}
     {loading && <div className="materials-admin__state" role="status"><span className="materials-admin__spinner" />Cargando materiales…</div>}
     {!loading && error && <div className="materials-admin__error" role="alert"><p>{error}</p><button type="button" onClick={refetch}>Reintentar</button></div>}

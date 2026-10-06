@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { IconRefresh } from '@tabler/icons-react'
+import { IconBox, IconFilter, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
 import { getReposicionesAdmin } from './reposicionesApi'
 import {
@@ -107,7 +108,7 @@ export default function ReposicionesPage() {
       </header>
 
       <div className="material-tracking__filters">
-        <label htmlFor="reposicion-estado-filtro">Estado</label>
+        <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
         <select
           id="reposicion-estado-filtro"
           value={estado}
@@ -117,7 +118,8 @@ export default function ReposicionesPage() {
             <option key={option.label} value={option.value}>{option.label}</option>
           ))}
         </select>
-        <label htmlFor="reposicion-origen-filtro">Origen</label>
+        </InventoryFormField>
+        <InventoryFormField label="Origen" icon={<IconBox size={20} aria-hidden="true" />}>
         <select
           id="reposicion-origen-filtro"
           value={origen}
@@ -127,6 +129,7 @@ export default function ReposicionesPage() {
             <option key={option.label} value={option.value}>{option.label}</option>
           ))}
         </select>
+        </InventoryFormField>
         {!loading && !error ? (
           <span role="status">{total} {total === 1 ? 'reposición' : 'reposiciones'}</span>
         ) : null}

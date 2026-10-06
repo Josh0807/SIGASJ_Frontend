@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
 import { InternalAdminRoleName, normalizeInternalRole } from '../../auth/utils/internalRoles'
 import { MATERIALES_PATH, PROVEEDOR_NEW_PATH, proveedorEditPath } from '../inventarioPaths'
+import { InventoryFormField } from '../InventoryFormField'
 import ProveedorStateAction from './ProveedorStateAction'
 import { updateProveedorEstado } from './proveedoresApi'
 import { proveedorError } from './proveedorUtils'
@@ -51,7 +52,19 @@ export default function ProveedoresPage() {
   const clearFilters = () => { setSearchInput(''); latestSearch.current = ''; setNombre(''); setActivo(''); setPage(1) }
   return <main className="materials-admin providers-admin sigasj-stack">
     <header className="materials-admin__header providers-admin__header"><div><p className="materials-admin__eyebrow"><IconBuildingWarehouse size={18} aria-hidden="true" />Inventario · Administración</p><h1>Proveedores de materiales</h1><p>Registre y mantenga actualizados los datos de contacto de sus proveedores.</p></div><div className="materials-admin__header-actions"><span className="materials-admin__count"><IconBuildingWarehouse size={17} aria-hidden="true" />{result.total} proveedores</span><Link className="materials-admin__secondary" to={MATERIALES_PATH}><IconPackage size={19} aria-hidden="true" />Materiales</Link>{canManage && <Link className="materials-admin__primary" to={PROVEEDOR_NEW_PATH}><IconPlus size={20} aria-hidden="true" />Nuevo proveedor</Link>}</div></header>
-    <section className="materials-admin__filters providers-admin__filters" aria-label="Búsqueda y filtros"><label><span>Buscar por nombre</span><span className="providers-admin__control"><IconSearch size={21} aria-hidden="true" /><input type="search" value={searchInput} maxLength={150} placeholder="Ej. Ferretería Central" onChange={(event) => setSearchInput(event.target.value)} /></span></label><label><span>Estado</span><span className="providers-admin__control"><IconLayersSubtract size={21} aria-hidden="true" /><select value={activo} onChange={(event) => { setActivo(event.target.value); setPage(1) }}><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></span></label><button type="button" className="materials-admin__secondary providers-admin__clear" onClick={clearFilters} disabled={!filtered}><IconRefresh size={20} aria-hidden="true" />Limpiar filtros</button></section>
+    <section className="materials-admin__filters providers-admin__filters" aria-label="Búsqueda y filtros">
+      <InventoryFormField label="Buscar por nombre" icon={<IconSearch size={21} aria-hidden="true" />}>
+        <input type="search" value={searchInput} maxLength={150} placeholder="Ej. Ferretería Central" onChange={(event) => setSearchInput(event.target.value)} />
+      </InventoryFormField>
+      <InventoryFormField label="Estado" icon={<IconLayersSubtract size={21} aria-hidden="true" />}>
+        <select value={activo} onChange={(event) => { setActivo(event.target.value); setPage(1) }}>
+          <option value="">Todos los estados</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
+        </select>
+      </InventoryFormField>
+      <button type="button" className="materials-admin__secondary providers-admin__clear" onClick={clearFilters} disabled={!filtered}><IconRefresh size={20} aria-hidden="true" />Limpiar filtros</button>
+    </section>
     {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success' : 'materials-admin__error'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.text}</div>}
     {loading && <div className="materials-admin__state" role="status"><span className="materials-admin__spinner" />Cargando proveedores…</div>}
     {!loading && error && <div className="materials-admin__error" role="alert"><p>{error}</p><button type="button" onClick={refetch}>Reintentar</button></div>}

@@ -69,7 +69,7 @@ export default function InventarioModuleMenu() {
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      setHeaderTarget(document.querySelector<HTMLElement>('.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header'))
+      setHeaderTarget(document.querySelector<HTMLElement>('.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header'))
     })
     return () => window.cancelAnimationFrame(frame)
   }, [location.pathname])
@@ -85,23 +85,31 @@ export default function InventarioModuleMenu() {
   if (!headerTarget) return null
 
   return createPortal(
-    <div ref={containerRef} className="inventory-module-menu absolute right-6 top-6 z-30 flex justify-end">
+    <div ref={containerRef} className="inventory-module-menu">
       <button
         type="button"
-        className="flex min-h-[52px] min-w-[230px] items-center justify-between gap-3 rounded-[14px] border border-blue-200 bg-white px-4 text-sm font-extrabold text-[#064b93] shadow-[0_8px_22px_rgba(30,90,156,0.1)] transition hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+        className="flex min-h-[52px] items-center justify-between gap-3"
         aria-expanded={open}
         aria-controls="inventory-module-menu"
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-[10px] bg-blue-600 text-white"><IconLayoutGrid size={19} aria-hidden="true" /></span>Operaciones</span>
-        <IconChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={18} aria-hidden="true" />
+        <span className="inventory-module-menu__trigger-label">
+          <span className="inventory-module-menu__trigger-icon">
+            <IconLayoutGrid size={18} aria-hidden="true" />
+          </span>
+          Operaciones
+        </span>
+        <IconChevronDown
+          className={`inventory-module-menu__chevron${open ? ' inventory-module-menu__chevron--open' : ''}`}
+          size={18}
+          aria-hidden="true"
+        />
       </button>
 
       {open ? (
         <nav
           id="inventory-module-menu"
           aria-label="Módulos de inventario"
-          className="absolute right-0 top-14 w-[min(720px,calc(100vw-32px))] rounded-[24px] border border-sky-100 bg-white p-3 shadow-[0_24px_70px_rgba(15,63,110,0.2)]"
         >
           <div className="border-b border-slate-100 px-3 pb-3 pt-1">
             <strong className="block text-sm text-slate-900">Gestión de inventario</strong>

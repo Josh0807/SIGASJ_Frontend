@@ -15,11 +15,18 @@ const isDisplayString = (value: unknown): value is string => {
 
 export const AUTH_USER_DISPLAY_NAME_FALLBACK = 'Usuario'
 
+const normalizeDisplayPart = (value: string): string => value.trim().toLowerCase()
+
 const buildNameFromParts = (user: AuthUser): string | undefined => {
-  const fullName = [user.name, user.lastName]
+  const parts = [user.name, user.lastName]
     .filter(isDisplayString)
     .map((part) => part.trim())
-    .join(' ')
+  const uniqueParts = parts.filter(
+    (part, index) =>
+      parts.findIndex((candidate) => normalizeDisplayPart(candidate) === normalizeDisplayPart(part)) ===
+      index,
+  )
+  const fullName = uniqueParts.join(' ')
 
   return fullName || undefined
 }
@@ -87,6 +94,34 @@ export const getAuthUserRoleLabel = (
   const formattedRole = formatAuthUserRole(user.role)
 
   return formattedRole || undefined
+}
+
+/** Oculta el rol en el chip si ya está contenido en el nombre visible. */
+export const getAuthUserHeaderRoleLabel = (
+  user: AuthUser | null | undefined,
+  displayName: string,
+): string | undefined => {
+  const roleLabel = getAuthUserRoleLabel(user)
+
+  if (!roleLabel) {
+    return undefined
+  }
+
+  const normalizedRole = normalizeDisplayPart(roleLabel)
+  const nameTokens = displayName
+    .split(/\s+/)
+    .map(normalizeDisplayPart)
+    .filter(Boolean)
+
+  if (nameTokens.length === 0) {
+    return roleLabel
+  }
+
+  if (nameTokens.every((token) => token === normalizedRole)) {
+    return undefined
+  }
+
+  return roleLabel
 }
 
 export const getAuthUserAvatarUrl = (

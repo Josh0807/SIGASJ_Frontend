@@ -4855,6 +4855,8 @@ body,
 }
 
 .admin-header {
+  container-type: inline-size;
+  container-name: admin-header;
   display: flex;
   flex: 0 0 auto;
   flex-wrap: wrap;
@@ -4898,8 +4900,8 @@ body,
 
 .admin-header__account {
   display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
+  flex: 1 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
   gap: 10px 12px;
@@ -4968,12 +4970,18 @@ body,
 .admin-header__actions {
   display: flex;
   flex: 0 1 auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
   min-width: 0;
   max-width: 100%;
+}
+.admin-header__actions > * {
+  flex: 0 0 auto;
+}
+.admin-header__action--public {
+  white-space: nowrap;
 }
 
 .notificaciones-campana {
@@ -5084,6 +5092,22 @@ body,
   display: none;
 }
 
+@container admin-header (max-width: 780px) {
+  .admin-header__user-copy {
+    display: none;
+  }
+
+  .admin-header__action-label--full,
+  .admin-account-menu__trigger-label--full {
+    display: none;
+  }
+
+  .admin-header__action-label--short,
+  .admin-account-menu__trigger-label--short {
+    display: inline;
+  }
+}
+
 .admin-header__action {
   display: inline-flex;
   align-items: center;
@@ -5152,6 +5176,7 @@ body,
 
 .admin-account-menu__trigger--user {
   justify-content: flex-start;
+  align-items: center;
   gap: 10px;
   min-height: 52px;
   padding: 5px 10px 5px 5px;
@@ -5165,6 +5190,7 @@ body,
 }
 
 .admin-account-menu__chevron {
+  display: block;
   flex: 0 0 auto;
   color: #61788d;
   transition: color .2s ease, transform .2s ease;
@@ -7399,16 +7425,18 @@ body,
   }
 
   .admin-header__start {
-    flex: 1 1 calc(100% - 15rem);
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .admin-header__account {
-    flex: 1 1 100%;
+    flex: 1 0 auto;
+    flex-wrap: nowrap;
     justify-content: flex-end;
   }
 
   .admin-header__user {
-    max-width: min(14rem, 48%);
+    max-width: min(18rem, 100%);
   }
 }
 
@@ -7618,7 +7646,7 @@ body,
     flex-wrap: nowrap;
     justify-content: flex-end;
     gap: 8px;
-    max-width: min(100%, 16rem);
+    max-width: 100%;
   }
 
   .admin-header__user {
@@ -11354,6 +11382,41 @@ body,
 .materials-admin__header, .materials-admin__filters, .materials-admin__form { padding: 22px 24px; border: 1px solid #d7e5f1; border-radius: 16px; background: #fff; box-shadow: 0 4px 18px rgba(18,63,112,.06); }
 .materials-admin__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .materials-admin__header h1 { margin: 0; color: #123f70; font-size: clamp(1.35rem,2.2vw,1.8rem); }
+.inventory-catalog__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.inventory-catalog__heading h1 {
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+}
+.inventory-catalog__heading .materials-admin__count {
+  flex: 0 0 auto;
+}
+
+.inventory-module-shell :is(.materials-admin__filters, .material-tracking__filters, .gallery-admin__filters, .inventario-reportes .gallery-admin__filters) > label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: #123f70;
+  font-weight: 650;
+}
+.inventory-module-shell :is(.materials-admin__filters, .material-tracking__filters, .gallery-admin__filters) .provider-admin__control {
+  width: 100%;
+}
+.inventory-module-shell .material-tracking__filters {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  align-items: end;
+  gap: 16px !important;
+}
+.inventory-module-shell .material-tracking__filters > [role="status"],
+.inventory-module-shell .material-tracking__filters > .material-tracking__filter-action {
+  align-self: end;
+}
 .materials-admin__header p:last-child { margin: 8px 0 0; color: #4a647c; }
 .materials-admin__eyebrow { margin: 0 0 6px; color: #3781a9; font-size: .78rem; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
 .materials-admin__count { flex: none; padding: 7px 12px; border-radius: 99px; background: #edf7fc; color: #185a81; font-weight: 700; }
@@ -11560,36 +11623,269 @@ body,
 .inventory-exit__availability.is-error { border-color: #efcaca; background: #fff5f5; }
 .inventory-exit__relations strong, .inventory-exit__responsible strong { color: #123f70; }
 
-.inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header):has(> .inventory-module-menu) {
+.inventory-module-shell {
+  container-type: inline-size;
+  container-name: inventory-shell;
+  min-width: 0;
+  max-width: 100%;
+}
+.inventory-module-shell :is(.materials-admin, .gallery-admin, .gallery-admin__shell, .materials-admin__filters, .gallery-admin__filters) {
+  min-width: 0;
+  max-width: 100%;
+}
+.inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header):has(> .inventory-module-menu) {
   position: relative;
   z-index: 20;
-  min-height: 190px;
-  padding-right: 300px !important;
   overflow: visible !important;
 }
-.inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header):has(> .inventory-module-menu) > :nth-child(2):not(.inventory-module-menu) {
+.inventory-module-shell .providers-admin__header:has(> .inventory-module-menu) > .inventory-module-menu {
   position: absolute;
-  right: 24px;
-  bottom: 24px;
-  max-width: calc(100% - 48px);
+  z-index: 30;
 }
 
-@media (max-width: 900px) {
-  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header):has(> .inventory-module-menu) {
-    min-height: 0;
+.inventory-module-menu {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 30;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: calc(100% - 48px);
+  box-sizing: border-box;
+}
+.inventory-module-menu > button {
+  display: inline-flex;
+  box-sizing: border-box;
+  min-height: 52px;
+  width: 230px;
+  max-width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #fff;
+  color: #064b93;
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgba(30, 90, 156, .1);
+  cursor: pointer;
+}
+.inventory-module-menu__trigger-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  line-height: 1;
+}
+.inventory-module-menu__trigger-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+}
+.inventory-module-menu__trigger-icon svg,
+.inventory-module-menu__chevron {
+  display: block;
+  flex: 0 0 auto;
+}
+.inventory-module-menu__chevron--open {
+  transform: rotate(180deg);
+}
+.inventory-module-menu > nav {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  width: min(720px, calc(100cqi - 48px));
+  max-width: calc(100cqi - 48px);
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid #e0f2fe;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 63, 110, .2);
+}
+.inventory-module-menu > nav > div:first-child {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 4px 12px 12px;
+}
+.inventory-module-menu > nav > div:first-child strong {
+  display: block;
+  color: #0f172a;
+  font-size: .875rem;
+}
+.inventory-module-menu > nav > div:first-child span {
+  color: #64748b;
+  font-size: .75rem;
+}
+.inventory-module-menu > nav > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding-top: 12px;
+}
+.inventory-module-menu > nav a {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  color: #334155;
+  text-decoration: none;
+}
+.inventory-module-menu > nav a:hover {
+  background: #f8fafc;
+  color: #1d4ed8;
+}
+.inventory-module-menu > nav a[aria-current="page"] {
+  background: #eff6ff;
+  color: #1e40af;
+}
+.inventory-module-menu > nav a > span:first-child {
+  display: grid;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: #f0f9ff;
+  color: #2563eb;
+}
+.inventory-module-menu > nav a[aria-current="page"] > span:first-child {
+  background: #2563eb;
+  color: #fff;
+}
+.inventory-module-menu > nav a strong,
+.inventory-module-menu > nav a small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inventory-module-menu > nav a strong { font-size: .875rem; }
+.inventory-module-menu > nav a small { font-size: 11px; color: #64748b; }
+
+.inventario-reportes .gallery-admin__filters,
+.inventario-reportes .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 176px), 1fr));
+  align-items: end;
+}
+.inventario-reportes .gallery-admin__field input,
+.inventario-reportes .gallery-admin__field select {
+  min-width: 0;
+  max-width: 100%;
+}
+.inventario-reportes .actividades-admin-reportes__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.inventario-reportes .actividades-admin-reportes__actions .gallery-admin__button {
+  flex: 1 1 160px;
+}
+.inventario-reportes .gallery-admin__filter-reset {
+  grid-column: auto;
+}
+
+@container inventory-shell (min-width: 900px) {
+  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header):has(> .inventory-module-menu) {
+    min-height: 168px;
+    padding-right: 268px !important;
+  }
+  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header):has(> .inventory-module-menu) > :nth-child(2):not(.inventory-module-menu) {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    z-index: 2;
+    max-width: calc(100% - 48px);
+  }
+}
+
+@container inventory-shell (max-width: 899px) {
+  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header):has(> .inventory-module-menu) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    min-height: 0 !important;
     padding-right: 24px !important;
   }
-  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header):has(> .inventory-module-menu) > :nth-child(2):not(.inventory-module-menu) {
+  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header):has(> .inventory-module-menu) > :first-child {
+    order: 1;
+    min-width: 0;
+  }
+  .inventory-module-shell :is(.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header):has(> .inventory-module-menu) > :nth-child(2):not(.inventory-module-menu) {
     position: static;
+    order: 3;
+    width: 100%;
     max-width: none;
+    justify-content: flex-start;
   }
   .inventory-module-menu {
     position: static !important;
-    order: 3;
+    top: auto;
+    right: auto;
+    order: 2;
+    width: 100%;
+    max-width: 100%;
+    justify-content: stretch;
+  }
+  .inventory-module-menu > button { width: 100%; }
+  .inventory-module-menu > nav {
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+  }
+  .inventory-module-menu > nav > div:last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container inventory-shell (max-width: 520px) {
+  .inventory-module-menu > nav > div:last-child {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .inventario-reportes .gallery-admin__filters,
+  .inventario-reportes .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .inventario-reportes .actividades-admin-reportes__actions .gallery-admin__button {
+    flex: 1 1 100%;
+  }
+}
+
+@container inventory-shell (max-width: 1050px) {
+  .materials-admin__filters,
+  .materials-admin__filters--inventory,
+  .materials-admin__filters--category {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .materials-admin__filters--inventory .materials-admin__secondary,
+  .providers-admin__clear {
+    grid-column: 1 / -1;
     width: 100%;
   }
-  .inventory-module-menu > button { width: 100%; min-width: 0; }
-  .inventory-module-menu > nav { top: calc(100% + 8px); }
+}
+
+@container inventory-shell (max-width: 640px) {
+  .materials-admin__filters,
+  .materials-admin__filters--inventory,
+  .materials-admin__filters--category {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 1050px) {

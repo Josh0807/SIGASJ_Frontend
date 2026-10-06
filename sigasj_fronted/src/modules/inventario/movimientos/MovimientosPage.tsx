@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { IconArrowLeft, IconArrowsExchange, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowsExchange, IconCalendar, IconEye, IconPackage, IconRefresh, IconTrash } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, movimientoDetailPath } from '../inventarioPaths'
 import { useMateriales } from '../useMateriales'
 import { getMovimientosAdmin } from './movimientosApi'
@@ -107,10 +108,9 @@ export default function MovimientosPage() {
         <Link className="material-tracking__detail-link !gap-2" to={MATERIALES_PATH}><IconArrowLeft size={18} aria-hidden="true" />Volver al catálogo</Link>
       </header>
 
-      <div className="material-tracking__filters !grid !grid-cols-1 !gap-4 !p-6 sm:!grid-cols-2 xl:!grid-cols-4">
-        <label className="!grid !gap-2" htmlFor="movimiento-tipo-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Tipo</span>
+      <div className="material-tracking__filters">
+        <InventoryFormField label="Tipo" icon={<IconArrowsExchange size={20} aria-hidden="true" />}>
         <select
-          className="!m-0 !w-full !min-w-0"
           id="movimiento-tipo-filtro"
           value={tipo}
           onChange={(event) => {
@@ -121,11 +121,11 @@ export default function MovimientosPage() {
           {TIPOS_FILTRO.map((option) => (
             <option key={option.label} value={option.value}>{option.label}</option>
           ))}
-        </select></label>
+        </select>
+        </InventoryFormField>
 
-        <label className="!grid !gap-2" htmlFor="movimiento-material-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Material</span>
+        <InventoryFormField label="Material" icon={<IconPackage size={20} aria-hidden="true" />}>
         <select
-          className="!m-0 !w-full !min-w-0"
           id="movimiento-material-filtro"
           value={materialId}
           disabled={materialesLoading}
@@ -138,11 +138,11 @@ export default function MovimientosPage() {
           {materialesResult.data.map((material) => (
             <option key={material.id} value={material.id}>{material.nombre}</option>
           ))}
-        </select></label>
+        </select>
+        </InventoryFormField>
 
-        <label className="!grid !gap-2" htmlFor="movimiento-desde-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Desde</span>
+        <InventoryFormField label="Desde" icon={<IconCalendar size={20} aria-hidden="true" />}>
         <input
-          className="!m-0 !w-full !min-w-0"
           id="movimiento-desde-filtro"
           type="date"
           value={fechaDesde}
@@ -150,11 +150,11 @@ export default function MovimientosPage() {
             setFechaDesde(event.target.value)
             setPage(1)
           }}
-        /></label>
+        />
+        </InventoryFormField>
 
-        <label className="!grid !gap-2" htmlFor="movimiento-hasta-filtro"><span className="!m-0 !text-sm !font-extrabold !text-slate-700">Hasta</span>
+        <InventoryFormField label="Hasta" icon={<IconCalendar size={20} aria-hidden="true" />}>
         <input
-          className="!m-0 !w-full !min-w-0"
           id="movimiento-hasta-filtro"
           type="date"
           value={fechaHasta}
@@ -162,7 +162,8 @@ export default function MovimientosPage() {
             setFechaHasta(event.target.value)
             setPage(1)
           }}
-        /></label>
+        />
+        </InventoryFormField>
 
         {filtered ? (
           <button type="button" className="material-tracking__filter-action sm:!col-span-2 xl:!col-span-4 xl:!ml-auto" onClick={clearFilters}>

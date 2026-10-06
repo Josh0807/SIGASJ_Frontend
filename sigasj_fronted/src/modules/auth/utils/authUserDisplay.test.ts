@@ -5,6 +5,7 @@ import {
   getAuthUserDisplayName,
   getAuthUserHeaderAvatarUrl,
   getAuthUserHeaderName,
+  getAuthUserHeaderRoleLabel,
   getAuthUserInitials,
   getAuthUserRoleLabel,
   resolveAuthUserDisplayName,
@@ -35,6 +36,9 @@ describe('authUserDisplay', () => {
     expect(getAuthUserDisplayName({ lastName: 'López' })).toBe('López')
     expect(getAuthUserDisplayName({ name: '  Ana  ', lastName: '   ' })).toBe('Ana')
     expect(getAuthUserDisplayName({ name: ' ', lastName: 'López' })).toBe('López')
+    expect(
+      getAuthUserDisplayName({ name: 'Administradora', lastName: 'Administradora' }),
+    ).toBe('Administradora')
   })
 
   it('usa fallback neutral cuando no hay nombre utilizable', () => {
@@ -90,6 +94,21 @@ describe('authUserDisplay', () => {
         id: 'user-id-interno',
       }),
     ).toBe(AUTH_USER_DISPLAY_NAME_FALLBACK)
+  })
+
+  it('oculta el rol del header cuando ya está en el nombre', () => {
+    expect(
+      getAuthUserHeaderRoleLabel(
+        { name: 'Administradora', lastName: 'Administradora', role: 'ADMINISTRADORA' },
+        'Administradora',
+      ),
+    ).toBeUndefined()
+    expect(
+      getAuthUserHeaderRoleLabel(
+        { name: 'María', lastName: 'Solís', role: 'ADMINISTRADORA' },
+        'María Solís',
+      ),
+    ).toBe('Administradora')
   })
 
   it('bloquea avatares con indicios de credenciales en AdminHeader', () => {

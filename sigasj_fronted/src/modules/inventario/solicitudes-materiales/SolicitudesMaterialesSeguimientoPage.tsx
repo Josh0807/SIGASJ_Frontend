@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { IconEye, IconPlus, IconRefresh } from '@tabler/icons-react'
+import { IconEye, IconFilter, IconPlus, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { InventoryFormField } from '../InventoryFormField'
 import { SOLICITUD_MATERIALES_NEW_PATH, SOLICITUDES_MATERIALES_PATH } from '../inventarioPaths'
 import { getMisSolicitudesMateriales } from './solicitudesMaterialesApi'
 import {
@@ -80,10 +81,11 @@ export default function SolicitudesMaterialesSeguimientoPage() {
     </header>
 
     <div className="material-tracking__filters">
-      <label htmlFor="solicitud-estado">Filtrar por estado</label>
+      <InventoryFormField label="Filtrar por estado" icon={<IconFilter size={20} aria-hidden="true" />}>
       <select id="solicitud-estado" value={status} onChange={(event) => changeStatus(event.target.value as typeof status)}>
         {STATUS_OPTIONS.map((option) => <option key={option} value={option}>{option === 'TODAS' ? 'Todos los estados' : formatSolicitudStatus(option)}</option>)}
       </select>
+      </InventoryFormField>
       {!loading && !error ? <span role="status">{total} {total === 1 ? 'solicitud' : 'solicitudes'}</span> : null}
     </div>
 

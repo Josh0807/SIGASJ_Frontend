@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react'
+import { IconAlertTriangle, IconFilter, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
 import {
   generarReposicionDesdeAlertaAdmin,
@@ -178,7 +179,7 @@ export default function AlertasReposicionPage() {
       </header>
 
       <div className="material-tracking__filters">
-        <label htmlFor="alerta-estado-filtro">Estado</label>
+        <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
         <select
           id="alerta-estado-filtro"
           value={estado}
@@ -188,6 +189,7 @@ export default function AlertasReposicionPage() {
             <option key={option.label} value={option.value}>{option.label}</option>
           ))}
         </select>
+        </InventoryFormField>
         {!loading && !error ? (
           <span role="status">{total} {total === 1 ? 'alerta' : 'alertas'}</span>
         ) : null}

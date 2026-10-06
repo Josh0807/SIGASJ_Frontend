@@ -46,6 +46,22 @@ describe('AdminHeader', () => {
     expect(markup).toContain('>MS<')
   })
 
+  it('no duplica el nombre cuando coincide con el rol', () => {
+    setAuthUser({
+      name: 'Administradora',
+      lastName: 'Administradora',
+      role: 'ADMINISTRADORA',
+    })
+
+    const markup = renderHeader()
+    const visibleNameMatches = markup.match(/admin-header__user-name">Administradora</g) ?? []
+
+    expect(visibleNameMatches).toHaveLength(1)
+    expect(markup).not.toContain('Administradora Administradora')
+    expect(markup).not.toContain('admin-header__user-detail')
+    expect(markup).toContain('visually-hidden">Administradora<')
+  })
+
   it('renderiza la estructura general del encabezado administrativo', () => {
     const markup = renderHeader()
 

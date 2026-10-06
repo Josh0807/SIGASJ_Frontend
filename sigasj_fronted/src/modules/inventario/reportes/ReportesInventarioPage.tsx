@@ -1,8 +1,8 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { IconArrowsExchange, IconCalendar, IconCategory, IconPackage } from '@tabler/icons-react'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
-import { MATERIALES_PATH } from '../inventarioPaths'
+import { InventoryFormField } from '../InventoryFormField'
 import {
   formatMovimientoCantidad,
   formatMovimientoFecha,
@@ -109,18 +109,13 @@ export default function ReportesInventarioPage() {
   return (
     <main className="gallery-admin inventario-reportes">
       <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
+        <header className="materials-admin__header">
           <div>
-            <span className="gallery-admin__eyebrow">Inventario · Administración</span>
+            <p className="materials-admin__eyebrow">Inventario · Administración</p>
             <h1>Reportes de inventario</h1>
             <p>
               Consulte indicadores y movimientos del inventario. Los cálculos provienen del servidor.
             </p>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to={MATERIALES_PATH}>
-              Volver al catálogo
-            </Link>
           </div>
         </header>
 
@@ -130,8 +125,7 @@ export default function ReportesInventarioPage() {
           onSubmit={handleConsultar}
           noValidate
         >
-          <label className="gallery-admin__field" htmlFor="reporte-fecha-desde">
-            <span>Fecha inicial</span>
+          <InventoryFormField label="Fecha inicial" icon={<IconCalendar size={20} aria-hidden="true" />}>
             <input
               id="reporte-fecha-desde"
               type="date"
@@ -140,10 +134,9 @@ export default function ReportesInventarioPage() {
                 setDraft((current) => ({ ...current, fechaDesde: event.target.value }))
               }
             />
-          </label>
+          </InventoryFormField>
 
-          <label className="gallery-admin__field" htmlFor="reporte-fecha-hasta">
-            <span>Fecha final</span>
+          <InventoryFormField label="Fecha final" icon={<IconCalendar size={20} aria-hidden="true" />}>
             <input
               id="reporte-fecha-hasta"
               type="date"
@@ -152,10 +145,9 @@ export default function ReportesInventarioPage() {
                 setDraft((current) => ({ ...current, fechaHasta: event.target.value }))
               }
             />
-          </label>
+          </InventoryFormField>
 
-          <label className="gallery-admin__field" htmlFor="reporte-material">
-            <span>Material</span>
+          <InventoryFormField label="Material" icon={<IconPackage size={20} aria-hidden="true" />}>
             <select
               id="reporte-material"
               value={draft.materialId}
@@ -164,15 +156,13 @@ export default function ReportesInventarioPage() {
                 setDraft((current) => ({ ...current, materialId: event.target.value }))
               }
             >
-              <option value="">Todos</option>
-              {(materialesResult?.data ?? []).map((material) => (
+              <option value="">Todos los materiales</option>
                 <option key={material.id} value={material.id}>{material.nombre}</option>
               ))}
             </select>
-          </label>
+          </InventoryFormField>
 
-          <label className="gallery-admin__field" htmlFor="reporte-categoria">
-            <span>Categoría</span>
+          <InventoryFormField label="Categoría" icon={<IconCategory size={20} aria-hidden="true" />}>
             <select
               id="reporte-categoria"
               value={draft.categoriaId}
@@ -181,15 +171,14 @@ export default function ReportesInventarioPage() {
                 setDraft((current) => ({ ...current, categoriaId: event.target.value }))
               }
             >
-              <option value="">Todas</option>
+              <option value="">Todas las categorías</option>
               {(categoriasResult?.data ?? []).map((categoria) => (
                 <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>
               ))}
             </select>
-          </label>
+          </InventoryFormField>
 
-          <label className="gallery-admin__field" htmlFor="reporte-tipo">
-            <span>Tipo de movimiento</span>
+          <InventoryFormField label="Tipo de movimiento" icon={<IconArrowsExchange size={20} aria-hidden="true" />}>
             <select
               id="reporte-tipo"
               value={draft.tipo}
@@ -200,11 +189,10 @@ export default function ReportesInventarioPage() {
                 }))
               }
             >
-              <option value="">Todos</option>
-              <option value="ENTRADA">Entradas</option>
+              <option value="">Todos los tipos</option>
               <option value="SALIDA">Salidas</option>
             </select>
-          </label>
+          </InventoryFormField>
 
           <div className="actividades-admin-reportes__actions">
             <button

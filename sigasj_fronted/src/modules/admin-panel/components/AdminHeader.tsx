@@ -6,8 +6,8 @@ import AdminHeaderMenuToggle from './AdminHeaderMenuToggle'
 import NotificacionesCampana from '../../notificaciones/NotificacionesCampana'
 import {
   getAuthUserHeaderAvatarUrl,
+  getAuthUserHeaderRoleLabel,
   getAuthUserInitials,
-  getAuthUserRoleLabel,
   resolveAuthUserHeaderName,
 } from '../../auth/utils/authUserDisplay'
 
@@ -16,7 +16,7 @@ export type { AdminHeaderProps }
 const AdminHeaderUser = () => {
   const user = useAuthUser()
   const displayName = resolveAuthUserHeaderName(user)
-  const roleLabel = getAuthUserRoleLabel(user)
+  const roleLabel = getAuthUserHeaderRoleLabel(user, displayName)
   const avatarUrl = getAuthUserHeaderAvatarUrl(user)
   const initials = getAuthUserInitials(displayName)
   const accessibleSummary = roleLabel
