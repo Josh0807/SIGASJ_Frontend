@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconRefresh, IconTruckDelivery } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { RECEPCIONES_PATH } from '../inventarioPaths'
@@ -152,9 +152,14 @@ export default function RecepcionDetallePage() {
             ) : null}
           </dl>
           {puedeRecibir ? (
-            <section className="material-detail__materials" aria-labelledby="recepcion-materiales-title">
-              <h2 id="recepcion-materiales-title">Materiales a recibir</h2>
-              <p>Indique las cantidades recibidas. El sistema generará las entradas de inventario automáticamente.</p>
+            <section className="material-detail__materials provider-admin__form" aria-labelledby="recepcion-materiales-title">
+              <div className="provider-admin__form-heading">
+                <span><IconTruckDelivery size={25} aria-hidden="true" /></span>
+                <div>
+                  <h2 id="recepcion-materiales-title">Materiales a recibir</h2>
+                  <p>Indique las cantidades recibidas. El sistema generará las entradas automáticamente.</p>
+                </div>
+              </div>
               <div className="material-tracking__table-wrap">
                 <table>
                   <thead>
@@ -193,12 +198,15 @@ export default function RecepcionDetallePage() {
               </div>
               <label className="material-review__motivo">
                 <span>Observación de la recepción</span>
-                <textarea
-                  value={observacion}
-                  maxLength={2000}
-                  disabled={busy}
-                  onChange={(event) => setObservacion(event.target.value)}
-                />
+                <span className="provider-admin__control">
+                  <IconAlignLeft size={20} aria-hidden="true" />
+                  <textarea
+                    value={observacion}
+                    maxLength={2000}
+                    disabled={busy}
+                    onChange={(event) => setObservacion(event.target.value)}
+                  />
+                </span>
               </label>
               <div className="material-review__actions">
                 <button

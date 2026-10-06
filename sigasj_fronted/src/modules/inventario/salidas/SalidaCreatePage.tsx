@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { IconAlignLeft, IconArrowLeft, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconStack2, IconTruckReturn, IconUser } from '@tabler/icons-react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
+import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
 import { MATERIALES_PATH } from '../inventarioPaths'
@@ -66,7 +69,7 @@ export default function SalidaCreatePage() {
     if (submitting.current) return
     const nextErrors = validateSalida(values)
     setErrors(nextErrors)
-    if (Object.keys(nextErrors).length) { setFeedback({ kind: 'error', text: 'Revise los campos señalados.' }); return }
+    if (Object.keys(nextErrors).length) { setFeedback({ kind: 'error', text: 'Revise los campos señalados.' }); focusFirstInvalidInventoryField(event.currentTarget); return }
     if (exceedsKnownStock || availability?.kind === 'invalid') { setFeedback({ kind: 'error', text: availability?.kind === 'invalid' ? availability.message : 'La cantidad supera la existencia disponible conocida.' }); return }
     submitting.current = true; setSaving(true); setFeedback(null)
     try {
@@ -83,22 +86,48 @@ export default function SalidaCreatePage() {
   return <main className="materials-admin materials-admin--form inventory-exit sigasj-stack">
     <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar salida de materiales</h1><p>Indique el material retirado de bodega. El servidor validará y actualizará las existencias al confirmar.</p></div></header>
     {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento SALIDA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}{feedback.kind === 'success' && returnToAveria && <Link to={returnToAveria}>Volver a la avería</Link>}</div>}
-    <form className="materials-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
-      <label className="materials-admin__form-full"><span>Material a retirar *</span><select value={values.materialId} disabled={loading || Boolean(error)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}><option value="">Seleccione un material</option>{availableMaterials.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}</select>{errors.materialId && <small className="materials-admin__field-error" role="alert">{errors.materialId}</small>}</label>
-      {loading && <p className="materials-admin__category-state" role="status">Cargando materiales disponibles…</p>}
-      {error && <div className="materials-admin__category-error" role="alert">{error} <button type="button" onClick={refetch}>Reintentar</button></div>}
-      {!loading && !error && availableMaterials.length === 0 && <div className="materials-admin__category-error" role="alert">No hay materiales activos con existencias disponibles para retirar.</div>}
-      <label><span>Unidad de medida</span><input value={selectedMaterial?.unidadMedida ?? 'Seleccione un material'} readOnly aria-label="Unidad de medida del material" /></label>
-      <label><span>Existencia disponible</span><input value={displayedStock ?? 'Seleccione un material'} readOnly aria-label="Existencia disponible del material" /><small>Referencia informativa; el backend valida nuevamente al registrar.</small></label>
-      <label className="materials-admin__form-full"><span>Cantidad a retirar *</span><input type="number" inputMode="numeric" min="1" step="1" value={values.cantidad} aria-invalid={Boolean(errors.cantidad) || exceedsKnownStock} onChange={(event) => update('cantidad', event.target.value)} />{errors.cantidad && <small className="materials-admin__field-error" role="alert">{errors.cantidad}</small>}{exceedsKnownStock && <small className="inventory-exit__warning" role="alert">La cantidad supera la existencia disponible conocida ({selectedMaterial?.stockActual}).</small>}</label>
+    <form className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
+      <InventoryFormHeading icon={<IconTruckReturn size={25} aria-hidden="true" />} title="Datos de la salida" description="Indique el material retirado. El servidor valida y actualiza las existencias." />
+      <InventoryFormField label="Material a retirar *" icon={<IconPackage size={20} aria-hidden="true" />} error={errors.materialId} full>
+        <select value={values.materialId} disabled={loading || Boolean(error)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}>
+          <option value="">Seleccione un material</option>
+          {availableMaterials.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}
+        </select>
+      </InventoryFormField>
+      {loading && <p className="provider-admin__form-note" role="status">Cargando materiales disponibles…</p>}
+      {error && <div className="materials-admin__category-error materials-admin__form-full" role="alert">{error} <button type="button" onClick={refetch}>Reintentar</button></div>}
+      {!loading && !error && availableMaterials.length === 0 && <div className="materials-admin__category-error materials-admin__form-full" role="alert">No hay materiales activos con existencias disponibles para retirar.</div>}
+      <InventoryFormField label="Unidad de medida" icon={<IconRulerMeasure size={20} aria-hidden="true" />}>
+        <input value={selectedMaterial?.unidadMedida ?? 'Seleccione un material'} readOnly aria-label="Unidad de medida del material" />
+      </InventoryFormField>
+      <InventoryFormField label="Existencia disponible" icon={<IconStack2 size={20} aria-hidden="true" />} hint={<small>Referencia informativa; el backend valida nuevamente al registrar.</small>}>
+        <input value={displayedStock ?? 'Seleccione un material'} readOnly aria-label="Existencia disponible del material" />
+      </InventoryFormField>
+      <InventoryFormField
+        label="Cantidad a retirar *"
+        icon={<IconNumbers size={20} aria-hidden="true" />}
+        error={errors.cantidad}
+        full
+        hint={exceedsKnownStock ? <small className="inventory-exit__warning" role="alert">La cantidad supera la existencia disponible conocida ({selectedMaterial?.stockActual}).</small> : null}
+      >
+        <input type="number" inputMode="numeric" min="1" step="1" value={values.cantidad} aria-invalid={Boolean(errors.cantidad) || exceedsKnownStock} onChange={(event) => update('cantidad', event.target.value)} />
+      </InventoryFormField>
       {availability?.kind === 'checking' && <div className="inventory-exit__availability is-checking materials-admin__form-full" role="status">Verificando disponibilidad…</div>}
       {availability?.kind === 'invalid' && <div className="inventory-exit__availability is-error materials-admin__form-full" role="alert">{availability.message}</div>}
       {availability?.kind === 'valid' && <div className={`inventory-exit__availability ${availability.data.esAgotamientoTotal || availability.data.esBajoMinimo ? 'is-warning' : 'is-valid'} materials-admin__form-full`} role="status"><strong>{availability.data.esAgotamientoTotal ? 'Atención: esta salida dejará en 0 las existencias.' : availability.data.esBajoMinimo ? 'El material quedará en o por debajo del stock mínimo.' : 'Cantidad disponible.'}</strong><span>{availability.data.mensaje}</span></div>}
       {(idAveria || idSolicitud) && <section className="inventory-exit__relations materials-admin__form-full" aria-label="Registros relacionados"><strong>Origen de la salida</strong>{idAveria && <span>Avería relacionada: #{idAveria}</span>}{idSolicitud && <span>Solicitud aprobada relacionada: #{idSolicitud}</span>}{returnToAveria && <Link to={returnToAveria}>Volver a la avería</Link>}</section>}
-      <label className="materials-admin__form-full"><span>Motivo u observación</span><textarea value={values.observacion} maxLength={1000} aria-invalid={Boolean(errors.observacion)} placeholder="Ej. Reparación de fuga en calle central" onChange={(event) => update('observacion', event.target.value)} />{errors.observacion && <small className="materials-admin__field-error" role="alert">{errors.observacion}</small>}<small>{values.observacion.length}/1000 caracteres</small></label>
-      <div className="inventory-exit__responsible materials-admin__form-full" role="note"><strong>Responsable</strong><span>{resolveAuthUserDisplayName(user)} · obtenido de la sesión activa</span></div>
+      <InventoryFormField label="Motivo u observación" icon={<IconAlignLeft size={20} aria-hidden="true" />} error={errors.observacion} full hint={<small>{values.observacion.length}/1000 caracteres</small>}>
+        <textarea value={values.observacion} maxLength={1000} aria-invalid={Boolean(errors.observacion)} placeholder="Ej. Reparación de fuga en calle central" onChange={(event) => update('observacion', event.target.value)} />
+      </InventoryFormField>
+      <div className="inventory-exit__responsible materials-admin__form-full" role="note"><strong><IconUser size={18} aria-hidden="true" /> Responsable</strong><span>{resolveAuthUserDisplayName(user)} · obtenido de la sesión activa</span></div>
       <div className="inventory-entry__notice materials-admin__form-full" role="note"><strong>Control de existencias</strong><span>No se edita el stock final en este formulario. El backend volverá a validar la disponibilidad y registrará el movimiento de forma transaccional.</span></div>
-      <div className="materials-admin__form-actions"><button type="submit" className="materials-admin__primary" disabled={saving || loading || Boolean(error) || availableMaterials.length === 0 || availability?.kind === 'checking' || availability?.kind === 'invalid' || exceedsKnownStock}>{saving ? 'Registrando salida…' : 'Confirmar salida'}</button><Link className="materials-admin__secondary" to={MATERIALES_PATH}>Volver al catálogo</Link></div>
+      <div className="materials-admin__form-actions">
+        <button type="submit" className="materials-admin__primary" disabled={saving || loading || Boolean(error) || availableMaterials.length === 0 || availability?.kind === 'checking' || availability?.kind === 'invalid' || exceedsKnownStock}>
+          <IconDeviceFloppy size={19} aria-hidden="true" />
+          {saving ? 'Registrando salida…' : 'Confirmar salida'}
+        </button>
+        <Link className="materials-admin__secondary" to={MATERIALES_PATH}><IconArrowLeft size={19} aria-hidden="true" />Volver al catálogo</Link>
+      </div>
     </form>
   </main>
 }

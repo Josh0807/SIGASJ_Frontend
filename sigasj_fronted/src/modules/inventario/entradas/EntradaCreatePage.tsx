@@ -1,5 +1,8 @@
 import { useRef, useState, type FormEvent } from 'react'
+import { IconAlignLeft, IconArrowLeft, IconBuildingStore, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconTruckDelivery } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
+import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
+import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { MATERIALES_PATH } from '../inventarioPaths'
 import { useMateriales } from '../useMateriales'
 import { useProveedores } from '../proveedores/useProveedores'
@@ -54,7 +57,7 @@ export default function EntradaCreatePage() {
     event.preventDefault()
     if (submitting.current || pendingMovementId) return
     const nextErrors = validateEntrada(values); setErrors(nextErrors)
-    if (Object.keys(nextErrors).length) { setFeedback({ kind: 'error', text: 'Revise los campos señalados.' }); return }
+    if (Object.keys(nextErrors).length) { setFeedback({ kind: 'error', text: 'Revise los campos señalados.' }); focusFirstInvalidInventoryField(event.currentTarget); return }
     submitting.current = true; setSaving(true); setFeedback(null)
     try {
       const response = await registrarEntrada(toEntradaPayload(values))
@@ -73,20 +76,43 @@ export default function EntradaCreatePage() {
     <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar entrada de materiales</h1><p>Registre los materiales recibidos en bodega. Las existencias serán calculadas y actualizadas por el servidor.</p></div></header>
     {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento ENTRADA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}{pendingMovementId && documents.length > 0 && <button type="button" className="materials-admin__secondary" disabled={saving} onClick={() => void retryDocuments()}>{saving ? 'Cargando documentos…' : 'Reintentar documentos pendientes'}</button>}</div>}
     {uploadedDocuments.length > 0 && <section className="inventory-entry__uploaded" aria-label="Documentos adjuntos"><h2>Documentos adjuntos</h2><ul>{uploadedDocuments.map((document) => <li key={document.id}><span>{document.nombreOriginal}</span><button type="button" onClick={() => void abrirDocumentoEntrada(document.rutaReferenciaArchivo)}>Ver documento</button></li>)}</ul></section>}
-    <form className="materials-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
-      <label><span>Material recibido *</span><select value={values.materialId} disabled={loadingMateriales || Boolean(materialesError)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}><option value="">Seleccione un material</option>{materiales.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}</select>{errors.materialId && <small className="materials-admin__field-error" role="alert">{errors.materialId}</small>}</label>
-      <label><span>Unidad de medida</span><input value={selectedMaterial?.unidadMedida ?? 'Seleccione un material'} readOnly disabled aria-label="Unidad de medida del material" /><small>Se obtiene automáticamente del catálogo.</small></label>
-      {loadingMateriales && <p className="materials-admin__category-state" role="status">Cargando materiales disponibles…</p>}
-      {materialesError && <div className="materials-admin__category-error" role="alert">{materialesError} <button type="button" onClick={refetchMateriales}>Reintentar</button></div>}
-      {!loadingMateriales && !materialesError && materiales.data.length === 0 && <div className="materials-admin__category-error" role="alert">No hay materiales activos disponibles para registrar una entrada.</div>}
-      <label><span>Cantidad recibida *</span><input type="number" inputMode="numeric" min="1" step="1" value={values.cantidad} aria-invalid={Boolean(errors.cantidad)} onChange={(event) => update('cantidad', event.target.value)} />{errors.cantidad && <small className="materials-admin__field-error" role="alert">{errors.cantidad}</small>}</label>
-      <label><span>Proveedor</span><select value={values.proveedorId} disabled={loadingProveedores || Boolean(proveedoresError)} aria-invalid={Boolean(errors.proveedorId)} onChange={(event) => update('proveedorId', event.target.value)}><option value="">Sin proveedor</option>{proveedores.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}</select>{errors.proveedorId && <small className="materials-admin__field-error" role="alert">{errors.proveedorId}</small>}</label>
-      {loadingProveedores && <p className="materials-admin__category-state" role="status">Cargando proveedores disponibles…</p>}
-      {proveedoresError && <div className="materials-admin__category-error" role="alert">No fue posible cargar proveedores. Puede registrar la entrada sin proveedor. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}
-      <label className="materials-admin__form-full"><span>Observaciones</span><textarea value={values.observacion} maxLength={1000} aria-invalid={Boolean(errors.observacion)} placeholder="Ej. Entrega parcial según orden de compra" onChange={(event) => update('observacion', event.target.value)} />{errors.observacion && <small className="materials-admin__field-error" role="alert">{errors.observacion}</small>}<small>{values.observacion.length}/1000 caracteres</small></label>
+    <form className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
+      <InventoryFormHeading icon={<IconTruckDelivery size={25} aria-hidden="true" />} title="Datos de la entrada" description="Indique el material recibido. Las existencias las actualiza el servidor." />
+      <InventoryFormField label="Material recibido *" icon={<IconPackage size={20} aria-hidden="true" />} error={errors.materialId}>
+        <select value={values.materialId} disabled={loadingMateriales || Boolean(materialesError)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}>
+          <option value="">Seleccione un material</option>
+          {materiales.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}
+        </select>
+      </InventoryFormField>
+      <InventoryFormField label="Unidad de medida" icon={<IconRulerMeasure size={20} aria-hidden="true" />} hint={<small>Se obtiene automáticamente del catálogo.</small>}>
+        <input value={selectedMaterial?.unidadMedida ?? 'Seleccione un material'} readOnly disabled aria-label="Unidad de medida del material" />
+      </InventoryFormField>
+      {loadingMateriales && <p className="provider-admin__form-note" role="status">Cargando materiales disponibles…</p>}
+      {materialesError && <div className="materials-admin__category-error materials-admin__form-full" role="alert">{materialesError} <button type="button" onClick={refetchMateriales}>Reintentar</button></div>}
+      {!loadingMateriales && !materialesError && materiales.data.length === 0 && <div className="materials-admin__category-error materials-admin__form-full" role="alert">No hay materiales activos disponibles para registrar una entrada.</div>}
+      <InventoryFormField label="Cantidad recibida *" icon={<IconNumbers size={20} aria-hidden="true" />} error={errors.cantidad}>
+        <input type="number" inputMode="numeric" min="1" step="1" value={values.cantidad} aria-invalid={Boolean(errors.cantidad)} onChange={(event) => update('cantidad', event.target.value)} />
+      </InventoryFormField>
+      <InventoryFormField label="Proveedor" icon={<IconBuildingStore size={20} aria-hidden="true" />} error={errors.proveedorId}>
+        <select value={values.proveedorId} disabled={loadingProveedores || Boolean(proveedoresError)} aria-invalid={Boolean(errors.proveedorId)} onChange={(event) => update('proveedorId', event.target.value)}>
+          <option value="">Sin proveedor</option>
+          {proveedores.data.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}
+        </select>
+      </InventoryFormField>
+      {loadingProveedores && <p className="provider-admin__form-note" role="status">Cargando proveedores disponibles…</p>}
+      {proveedoresError && <div className="materials-admin__category-error materials-admin__form-full" role="alert">No fue posible cargar proveedores. Puede registrar la entrada sin proveedor. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}
+      <InventoryFormField label="Observaciones" icon={<IconAlignLeft size={20} aria-hidden="true" />} error={errors.observacion} full hint={<small>{values.observacion.length}/1000 caracteres</small>}>
+        <textarea value={values.observacion} maxLength={1000} aria-invalid={Boolean(errors.observacion)} placeholder="Ej. Entrega parcial según orden de compra" onChange={(event) => update('observacion', event.target.value)} />
+      </InventoryFormField>
       <DocumentosEntradaField documents={documents} disabled={saving} onChange={(next) => { setDocuments(next); if (pendingMovementId && next.length === 0) setPendingMovementId(null) }} onErrors={(messages) => { if (messages.length) setFeedback({ kind: 'error', text: messages.join(' ') }) }} />
       <div className="inventory-entry__notice materials-admin__form-full" role="note"><strong>Control de existencias</strong><span>El stock actual no se edita en este formulario. El backend sumará la cantidad de forma transaccional y conservará el movimiento.</span></div>
-      <div className="materials-admin__form-actions"><button type="submit" className="materials-admin__primary" disabled={saving || pendingMovementId !== null || loadingMateriales || Boolean(materialesError) || materiales.data.length === 0}>{saving ? documents.length ? 'Registrando y adjuntando…' : 'Registrando entrada…' : pendingMovementId ? 'Documentos pendientes' : 'Registrar entrada'}</button><Link className="materials-admin__secondary" to={MATERIALES_PATH}>Volver al catálogo</Link></div>
+      <div className="materials-admin__form-actions">
+        <button type="submit" className="materials-admin__primary" disabled={saving || pendingMovementId !== null || loadingMateriales || Boolean(materialesError) || materiales.data.length === 0}>
+          <IconDeviceFloppy size={19} aria-hidden="true" />
+          {saving ? documents.length ? 'Registrando y adjuntando…' : 'Registrando entrada…' : pendingMovementId ? 'Documentos pendientes' : 'Registrar entrada'}
+        </button>
+        <Link className="materials-admin__secondary" to={MATERIALES_PATH}><IconArrowLeft size={19} aria-hidden="true" />Volver al catálogo</Link>
+      </div>
     </form>
   </main>
 }

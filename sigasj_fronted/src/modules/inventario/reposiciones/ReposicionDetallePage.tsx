@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconBuildingStore, IconCalendar, IconDeviceFloppy, IconFileText, IconRefresh, IconTruckDelivery } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { REPOSICIONES_PATH } from '../inventarioPaths'
@@ -352,44 +352,58 @@ export default function ReposicionDetallePage() {
             ) : null}
           </div>
           {mostrarCompra ? (
-            <section className="material-detail__materials" aria-labelledby="reposicion-compra-title">
-              <h2 id="reposicion-compra-title">Registrar compra</h2>
-              <p>Complete los datos de la compra. El registro no modificará las existencias del inventario.</p>
+            <section className="material-detail__materials provider-admin__form" aria-labelledby="reposicion-compra-title">
+              <div className="provider-admin__form-heading">
+                <span><IconDeviceFloppy size={25} aria-hidden="true" /></span>
+                <div>
+                  <h2 id="reposicion-compra-title">Registrar compra</h2>
+                  <p>Complete los datos de la compra. El registro no modificará las existencias del inventario.</p>
+                </div>
+              </div>
               <div className="material-tracking__filters">
                 <label htmlFor="reposicion-proveedor">
                   <span>Proveedor</span>
-                  <select
-                    id="reposicion-proveedor"
-                    value={proveedorId}
-                    disabled={busy || proveedoresLoading}
-                    onChange={(event) => setProveedorId(event.target.value)}
-                  >
-                    <option value="">Seleccione un proveedor</option>
-                    {proveedores.map((proveedor) => (
-                      <option key={proveedor.id} value={proveedor.id}>{proveedor.nombre}</option>
-                    ))}
-                  </select>
+                  <span className="provider-admin__control">
+                    <IconBuildingStore size={20} aria-hidden="true" />
+                    <select
+                      id="reposicion-proveedor"
+                      value={proveedorId}
+                      disabled={busy || proveedoresLoading}
+                      onChange={(event) => setProveedorId(event.target.value)}
+                    >
+                      <option value="">Seleccione un proveedor</option>
+                      {proveedores.map((proveedor) => (
+                        <option key={proveedor.id} value={proveedor.id}>{proveedor.nombre}</option>
+                      ))}
+                    </select>
+                  </span>
                 </label>
                 <label htmlFor="reposicion-fecha-compra">
                   <span>Fecha de compra</span>
-                  <input
-                    id="reposicion-fecha-compra"
-                    type="date"
-                    value={fechaCompra}
-                    disabled={busy}
-                    onChange={(event) => setFechaCompra(event.target.value)}
-                  />
+                  <span className="provider-admin__control">
+                    <IconCalendar size={20} aria-hidden="true" />
+                    <input
+                      id="reposicion-fecha-compra"
+                      type="date"
+                      value={fechaCompra}
+                      disabled={busy}
+                      onChange={(event) => setFechaCompra(event.target.value)}
+                    />
+                  </span>
                 </label>
                 <label htmlFor="reposicion-referencia">
                   <span>Referencia (factura u orden)</span>
-                  <input
-                    id="reposicion-referencia"
-                    type="text"
-                    maxLength={100}
-                    value={referenciaCompra}
-                    disabled={busy}
-                    onChange={(event) => setReferenciaCompra(event.target.value)}
-                  />
+                  <span className="provider-admin__control">
+                    <IconFileText size={20} aria-hidden="true" />
+                    <input
+                      id="reposicion-referencia"
+                      type="text"
+                      maxLength={100}
+                      value={referenciaCompra}
+                      disabled={busy}
+                      onChange={(event) => setReferenciaCompra(event.target.value)}
+                    />
+                  </span>
                 </label>
               </div>
               {proveedoresError ? (
@@ -438,12 +452,15 @@ export default function ReposicionDetallePage() {
               </div>
               <label className="material-review__motivo">
                 <span>Observación general de la compra</span>
-                <textarea
-                  value={observacionCompra}
-                  maxLength={2000}
-                  disabled={busy}
-                  onChange={(event) => setObservacionCompra(event.target.value)}
-                />
+                <span className="provider-admin__control">
+                  <IconAlignLeft size={20} aria-hidden="true" />
+                  <textarea
+                    value={observacionCompra}
+                    maxLength={2000}
+                    disabled={busy}
+                    onChange={(event) => setObservacionCompra(event.target.value)}
+                  />
+                </span>
               </label>
               <div className="material-review__actions">
                 <button
@@ -458,9 +475,14 @@ export default function ReposicionDetallePage() {
             </section>
           ) : null}
           {mostrarRecepcion ? (
-            <section className="material-detail__materials" aria-labelledby="reposicion-recepcion-title">
-              <h2 id="reposicion-recepcion-title">Confirmar recepción</h2>
-              <p>Indique las cantidades recibidas. El backend registrará entradas de inventario y actualizará las existencias.</p>
+            <section className="material-detail__materials provider-admin__form" aria-labelledby="reposicion-recepcion-title">
+              <div className="provider-admin__form-heading">
+                <span><IconTruckDelivery size={25} aria-hidden="true" /></span>
+                <div>
+                  <h2 id="reposicion-recepcion-title">Confirmar recepción</h2>
+                  <p>Indique las cantidades recibidas. El backend registrará entradas y actualizará existencias.</p>
+                </div>
+              </div>
               <div className="material-tracking__table-wrap">
                 <table>
                   <thead>
@@ -498,12 +520,15 @@ export default function ReposicionDetallePage() {
               </div>
               <label className="material-review__motivo">
                 <span>Observación de la recepción</span>
-                <textarea
-                  value={observacionRecepcion}
-                  maxLength={2000}
-                  disabled={busy}
-                  onChange={(event) => setObservacionRecepcion(event.target.value)}
-                />
+                <span className="provider-admin__control">
+                  <IconAlignLeft size={20} aria-hidden="true" />
+                  <textarea
+                    value={observacionRecepcion}
+                    maxLength={2000}
+                    disabled={busy}
+                    onChange={(event) => setObservacionRecepcion(event.target.value)}
+                  />
+                </span>
               </label>
               <div className="material-review__actions">
                 <button

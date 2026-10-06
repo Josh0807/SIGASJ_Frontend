@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconAlignLeft, IconClipboardList, IconDeviceFloppy, IconNote, IconNumbers, IconPackage, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -151,7 +151,14 @@ export default function SolicitudMaterialesPage() {
       {returnToAveria ? <Link className="material-request__add" to={returnToAveria}>Volver a la avería</Link> : null}
     </aside> : null}
 
-    <form className="material-request__form" onSubmit={submit} noValidate>
+    <form className="material-request__form provider-admin__form" onSubmit={submit} noValidate>
+      <div className="provider-admin__form-heading">
+        <span><IconClipboardList size={25} aria-hidden="true" /></span>
+        <div>
+          <h2>Detalle de la solicitud</h2>
+          <p>Agregue materiales y una observación. Enviar no modifica el stock.</p>
+        </div>
+      </div>
       {(submitError || hasSolicitudMaterialesErrors(errors)) ? <div className="material-request__alert" ref={errorSummaryRef} tabIndex={-1} role="alert">
         <strong>No se pudo enviar la solicitud.</strong>
         <span>{submitError || errors.form || 'Revise los campos marcados.'}</span>
@@ -175,18 +182,30 @@ export default function SolicitudMaterialesPage() {
           return <fieldset className="material-request__row" key={row.key} disabled={submitting || loading || Boolean(loadError)}>
             <legend>Material {index + 1}</legend>
             <label className="material-request__material-field">Material <span aria-hidden="true">*</span>
-              <select value={row.materialId} onChange={(event) => updateRow(row.key, 'materialId', event.target.value)} aria-invalid={Boolean(rowErrors.materialId)} aria-describedby={rowErrors.materialId ? `${row.key}-material-error` : undefined}>
-                <option value="">Seleccione un material</option>
-                {materials.map((material) => <option key={material.id} value={material.id} disabled={selectedIds.has(String(material.id)) && row.materialId !== String(material.id)}>{material.nombre} · {material.unidadMedida}</option>)}
-              </select>
+              <span className="provider-admin__control">
+                <IconPackage size={20} aria-hidden="true" />
+                <select value={row.materialId} onChange={(event) => updateRow(row.key, 'materialId', event.target.value)} aria-invalid={Boolean(rowErrors.materialId)} aria-describedby={rowErrors.materialId ? `${row.key}-material-error` : undefined}>
+                  <option value="">Seleccione un material</option>
+                  {materials.map((material) => <option key={material.id} value={material.id} disabled={selectedIds.has(String(material.id)) && row.materialId !== String(material.id)}>{material.nombre} · {material.unidadMedida}</option>)}
+                </select>
+              </span>
               {rowErrors.materialId ? <small id={`${row.key}-material-error`} className="material-request__field-error">{rowErrors.materialId}</small> : null}
             </label>
             <label>Cantidad <span aria-hidden="true">*</span>
-              <div className="material-request__quantity"><input type="number" min="1" step="1" inputMode="numeric" value={row.cantidad} onChange={(event) => updateRow(row.key, 'cantidad', event.target.value)} aria-invalid={Boolean(rowErrors.cantidad)} aria-describedby={rowErrors.cantidad ? `${row.key}-cantidad-error` : undefined} /><span>{selectedMaterial?.unidadMedida || 'unidad'}</span></div>
+              <div className="material-request__quantity">
+                <span className="provider-admin__control">
+                  <IconNumbers size={20} aria-hidden="true" />
+                  <input type="number" min="1" step="1" inputMode="numeric" value={row.cantidad} onChange={(event) => updateRow(row.key, 'cantidad', event.target.value)} aria-invalid={Boolean(rowErrors.cantidad)} aria-describedby={rowErrors.cantidad ? `${row.key}-cantidad-error` : undefined} />
+                </span>
+                <span>{selectedMaterial?.unidadMedida || 'unidad'}</span>
+              </div>
               {rowErrors.cantidad ? <small id={`${row.key}-cantidad-error`} className="material-request__field-error">{rowErrors.cantidad}</small> : null}
             </label>
             <label className="material-request__note-field">Nota del material <small>(opcional)</small>
-              <input maxLength={255} value={row.observacion} onChange={(event) => updateRow(row.key, 'observacion', event.target.value)} placeholder="Ej. Para tubería principal" aria-invalid={Boolean(rowErrors.observacion)} />
+              <span className="provider-admin__control">
+                <IconNote size={20} aria-hidden="true" />
+                <input maxLength={255} value={row.observacion} onChange={(event) => updateRow(row.key, 'observacion', event.target.value)} placeholder="Ej. Para tubería principal" aria-invalid={Boolean(rowErrors.observacion)} />
+              </span>
               {rowErrors.observacion ? <small className="material-request__field-error">{rowErrors.observacion}</small> : null}
             </label>
             <button type="button" className="material-request__remove" onClick={() => removeRow(row.key)} aria-label={`Eliminar material ${index + 1}`} disabled={submitting} title="Eliminar material"><IconTrash size={19} aria-hidden="true" /><span>Eliminar</span></button>
@@ -196,15 +215,21 @@ export default function SolicitudMaterialesPage() {
 
       {rows.length === 0 ? <button type="button" className="material-request__empty-add" onClick={() => setRows([createEmptyMaterialRow()])}><IconPlus size={19} aria-hidden="true" /> Agregar el primer material</button> : null}
 
-      <label className="material-request__motive">Observación general <small>(opcional)</small>
-        <textarea value={motivo} onChange={(event) => { setMotivo(event.target.value); setErrors((current) => ({ ...current, motivo: undefined })) }} maxLength={1000} placeholder="Describa para qué necesita estos materiales." aria-invalid={Boolean(errors.motivo)} />
+      <label className="material-request__motive materials-admin__form-full">Observación general <small>(opcional)</small>
+        <span className="provider-admin__control">
+          <IconAlignLeft size={20} aria-hidden="true" />
+          <textarea value={motivo} onChange={(event) => { setMotivo(event.target.value); setErrors((current) => ({ ...current, motivo: undefined })) }} maxLength={1000} placeholder="Describa para qué necesita estos materiales." aria-invalid={Boolean(errors.motivo)} />
+        </span>
         <span className="material-request__counter">{motivo.length}/1000</span>
         {errors.motivo ? <small className="material-request__field-error">{errors.motivo}</small> : null}
       </label>
 
-      <footer className="material-request__actions">
+      <footer className="material-request__actions materials-admin__form-actions">
         <p><strong>Importante:</strong> enviar esta solicitud no modifica el stock.</p>
-        <button className="material-request__primary" type="submit" disabled={submitting || loading || Boolean(loadError) || materials.length === 0}>{submitting ? 'Enviando…' : 'Enviar solicitud'}</button>
+        <button className="material-request__primary materials-admin__primary" type="submit" disabled={submitting || loading || Boolean(loadError) || materials.length === 0}>
+          <IconDeviceFloppy size={19} aria-hidden="true" />
+          {submitting ? 'Enviando…' : 'Enviar solicitud'}
+        </button>
       </footer>
     </form>
   </section>

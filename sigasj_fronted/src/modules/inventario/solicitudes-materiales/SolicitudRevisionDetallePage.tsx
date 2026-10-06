@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { SOLICITUDES_REVISION_PATH } from '../inventarioPaths'
@@ -143,7 +143,10 @@ export default function SolicitudRevisionDetallePage() {
       {pending ? <>
         <label className="material-review__motivo">
           <span>Motivo de rechazo (opcional)</span>
-          <textarea value={motivoRechazo} maxLength={1000} disabled={busy} onChange={(event) => setMotivoRechazo(event.target.value)} />
+          <span className="provider-admin__control">
+            <IconAlignLeft size={20} aria-hidden="true" />
+            <textarea value={motivoRechazo} maxLength={1000} disabled={busy} onChange={(event) => setMotivoRechazo(event.target.value)} />
+          </span>
         </label>
         <div className="material-review__actions">
           <button type="button" className="material-review__approve" disabled={busy} onClick={() => setDecision('aprobar')}>{busy ? 'Procesando…' : 'Aprobar'}</button>

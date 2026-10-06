@@ -7,10 +7,13 @@ export function validateProveedor(values: ProveedorFormValues): ProveedorFormErr
   const errors: ProveedorFormErrors = {}
   if (!values.nombre.trim()) errors.nombre = 'El nombre es obligatorio.'
   else if (values.nombre.trim().length > 150) errors.nombre = 'Use un máximo de 150 caracteres.'
+  if (values.razonSocial.trim().length > 200) errors.razonSocial = 'Use un máximo de 200 caracteres.'
   if (values.correo.trim() && !EMAIL.test(values.correo.trim())) errors.correo = 'Ingrese un correo electrónico válido.'
   if (values.correo.trim().length > 150) errors.correo = 'Use un máximo de 150 caracteres.'
   if (values.telefono.trim().length > 30) errors.telefono = 'Use un máximo de 30 caracteres.'
   if (values.identificacion.trim().length > 50) errors.identificacion = 'Use un máximo de 50 caracteres.'
+  if (values.personaContacto.trim().length > 150) errors.personaContacto = 'Use un máximo de 150 caracteres.'
+  if (values.direccion.trim().length > 500) errors.direccion = 'Use un máximo de 500 caracteres.'
   return errors
 }
 
