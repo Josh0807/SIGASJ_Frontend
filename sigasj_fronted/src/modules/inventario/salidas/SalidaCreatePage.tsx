@@ -84,7 +84,7 @@ export default function SalidaCreatePage() {
   }
 
   return <main className="materials-admin materials-admin--form inventory-exit sigasj-stack">
-    <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar salida de materiales</h1><p>Indique el material retirado de bodega. El servidor validará y actualizará las existencias al confirmar.</p></div></header>
+    <header className="materials-admin__header"><div><p className="materials-admin__eyebrow inventory-page-eyebrow">Inventario · Movimientos</p><h1 className="inventory-page-title">Registrar salida de materiales</h1><p className="inventory-page-subtitle">Indique el material retirado de bodega. El servidor validará y actualizará las existencias al confirmar.</p></div></header>
     {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento SALIDA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}{feedback.kind === 'success' && returnToAveria && <Link to={returnToAveria}>Volver a la avería</Link>}</div>}
     <form className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
       <InventoryFormHeading icon={<IconTruckReturn size={25} aria-hidden="true" />} title="Datos de la salida" description="Indique el material retirado. El servidor valida y actualiza las existencias." />
@@ -122,11 +122,11 @@ export default function SalidaCreatePage() {
       <div className="inventory-exit__responsible materials-admin__form-full" role="note"><strong><IconUser size={18} aria-hidden="true" /> Responsable</strong><span>{resolveAuthUserDisplayName(user)} · obtenido de la sesión activa</span></div>
       <div className="inventory-entry__notice materials-admin__form-full" role="note"><strong>Control de existencias</strong><span>No se edita el stock final en este formulario. El backend volverá a validar la disponibilidad y registrará el movimiento de forma transaccional.</span></div>
       <div className="materials-admin__form-actions">
-        <button type="submit" className="materials-admin__primary" disabled={saving || loading || Boolean(error) || availableMaterials.length === 0 || availability?.kind === 'checking' || availability?.kind === 'invalid' || exceedsKnownStock}>
-          <IconDeviceFloppy size={19} aria-hidden="true" />
+        <button type="submit" className="materials-admin__primary group !rounded-2xl !bg-linear-to-r !from-blue-600 !to-sky-500 !shadow-[0_10px_24px_rgba(37,99,235,0.28)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_16px_32px_rgba(37,99,235,0.38)] active:!translate-y-0 active:!scale-[0.97] disabled:!translate-y-0 disabled:!scale-100 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={saving || loading || Boolean(error) || availableMaterials.length === 0 || availability?.kind === 'checking' || availability?.kind === 'invalid' || exceedsKnownStock}>
+          <IconDeviceFloppy className="!transition-transform !duration-300 group-hover:!-rotate-6 group-hover:!scale-110 group-active:!rotate-0 motion-reduce:!transform-none" size={19} aria-hidden="true" />
           {saving ? 'Registrando salida…' : 'Confirmar salida'}
         </button>
-        <Link className="materials-admin__secondary" to={MATERIALES_PATH}><IconArrowLeft size={19} aria-hidden="true" />Volver al catálogo</Link>
+        <Link className="materials-admin__secondary group !rounded-2xl !border-blue-200 !bg-white !shadow-[0_7px_18px_rgba(37,99,235,0.1)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!text-blue-700 hover:!shadow-[0_13px_26px_rgba(37,99,235,0.18)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
       </div>
     </form>
   </main>

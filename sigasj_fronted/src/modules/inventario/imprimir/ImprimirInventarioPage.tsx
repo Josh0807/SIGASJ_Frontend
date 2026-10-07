@@ -153,7 +153,7 @@ export default function ImprimirInventarioPage() {
         </header>
 
         <form
-          className="materials-admin__filters materials-admin__filters--inventory inventario-print__controls"
+          className="materials-admin__filters materials-admin__filters--inventory inventario-print__controls min-[1100px]:!grid-cols-[minmax(280px,1.55fr)_minmax(250px,.8fr)_minmax(280px,1fr)_minmax(300px,1fr)]"
           aria-label="Filtros del listado a imprimir"
           onSubmit={handleConsultar}
         >
@@ -214,7 +214,7 @@ export default function ImprimirInventarioPage() {
               ))}
             </select>
           </InventoryFormField>
-          <div className="actividades-admin-reportes__actions [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:gap-2.5">
+          <div className="actividades-admin-reportes__actions !col-span-full !grid !w-full !grid-cols-1 !gap-4 sm:!grid-cols-3 [&>button]:!col-auto [&>button]:!m-0 [&>button]:!inline-flex [&>button]:!w-full [&>button]:!items-center [&>button]:!justify-center [&>button]:!gap-2.5">
             <button
               type="submit"
               className="group relative isolate overflow-hidden gallery-admin__button gallery-admin__button--primary !min-h-14 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-7 !text-white !shadow-[0_10px_24px_rgba(29,78,216,0.28)] transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.03] hover:!shadow-[0_16px_32px_rgba(29,78,216,0.36)] active:translate-y-0 active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none motion-reduce:transform-none motion-reduce:transition-none"

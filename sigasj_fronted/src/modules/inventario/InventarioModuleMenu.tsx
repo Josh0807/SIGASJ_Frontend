@@ -56,7 +56,6 @@ const adminItems = [
 const plumberItems = [
   adminItems[0],
   adminItems[2],
-  adminItems[3],
   adminItems[5],
   { label: 'Mis solicitudes', description: 'Seguimiento de materiales', to: SOLICITUDES_MATERIALES_PATH, icon: IconClipboardCheck },
 ]
@@ -91,14 +90,14 @@ export default function InventarioModuleMenu() {
     <div ref={containerRef} className="inventory-module-menu">
       <button
         type="button"
-        className="flex min-h-[52px] items-center justify-between gap-3"
+        className="group flex min-h-[52px] items-center justify-between gap-3 !rounded-2xl transition-all duration-300 ease-out hover:-translate-y-0.5 hover:!border-blue-300 hover:!bg-blue-50/70 hover:shadow-[0_10px_24px_rgba(37,99,235,0.12)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 motion-reduce:transform-none motion-reduce:transition-none"
         aria-expanded={open}
         aria-controls="inventory-module-menu"
         onClick={() => setOpen((value) => !value)}
       >
         <span className="inventory-module-menu__trigger-label">
           <span className="inventory-module-menu__trigger-icon">
-            <IconLayoutGrid size={18} aria-hidden="true" />
+            <IconLayoutGrid className="transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={18} aria-hidden="true" />
           </span>
           Operaciones
         </span>
