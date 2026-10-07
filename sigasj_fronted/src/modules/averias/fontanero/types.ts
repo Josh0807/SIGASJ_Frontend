@@ -25,6 +25,7 @@ export type AveriaFontaneroListItem = {
 
 export type AveriasFontaneroListado = {
   data: AveriaFontaneroListItem[]
+  dentroDeHorario?: boolean
 }
 
 /**
@@ -48,6 +49,7 @@ export type AveriaFontaneroDetail = {
   fechaResolucion: string | null
   observacionesAtencion: string
   observaciones?: AveriaObservacionItem[]
+  dentroDeHorario?: boolean
 }
 
 export type ResolverAveriaResponse = {
@@ -180,6 +182,9 @@ export const AVERIAS_FONTANERO_CALIFICAR_FORBIDDEN =
 
 export const AVERIAS_FONTANERO_CALIFICAR_INVALIDA =
   'Seleccione una prioridad y un tipo válidos.'
+
+export const AVERIAS_FONTANERO_CALIFICAR_ANTES =
+  'Guarde la prioridad y el tipo antes de iniciar la atención.'
 
 export const OBSERVACION_AVERIA_MAX_LENGTH = 2000
 

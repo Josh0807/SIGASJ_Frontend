@@ -145,10 +145,12 @@ const AveriasFontaneroDetailPage = ({
           <div>
             <p className="gallery-admin__eyebrow">Atención de campo</p>
             <h1>Avería asignada</h1>
-            <p className="averias-admin__codigo">{averia.codigoSeguimiento}</p>
-            <p className="averias-admin__header-badge">
-              <AveriaStatusBadge estado={averia.estado} />
-            </p>
+            <div className="averias-fontanero__header-meta">
+              <p className="averias-admin__codigo">{averia.codigoSeguimiento}</p>
+              <p className="averias-admin__header-badge">
+                <AveriaStatusBadge estado={averia.estado} />
+              </p>
+            </div>
           </div>
           <div className="gallery-admin__header-actions">
             <Link className="gallery-admin__link" to={FONTANERO_AVERIAS_PATH}>

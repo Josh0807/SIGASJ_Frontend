@@ -3586,7 +3586,8 @@ button.announcements-section__more {
 }
 
 /* Solicitud de materiales del fontanero */
-.material-request { display: grid; gap: 20px; width: 100%; max-width: 1080px; margin-inline: auto; color: #193f61; }
+.material-request { display: grid; gap: 20px; width: 100%; max-width: none; margin-inline: 0; color: #193f61; }
+.material-request > .material-request__form { width: 100%; max-width: none; }
 .material-request__header, .material-request__form, .material-request__success { border: 1px solid #d7e5f1; border-radius: 16px; background: #fff; box-shadow: 0 4px 18px rgba(18,63,112,.06); }
 .material-request__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 24px; }
 .material-request__header h1, .material-request__success h1 { margin: 0; color: #123f70; font-size: clamp(1.4rem, 2.5vw, 1.9rem); }
@@ -3600,27 +3601,40 @@ button.announcements-section__more {
 .material-request__section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .material-request__section-heading h2 { margin: 0; color: #123f70; font-size: 1.08rem; }
 .material-request__section-heading p { margin: 4px 0 0; color: #637b8e; }
-.material-request__add, .material-request__empty-add, .material-request__primary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 9px 15px; border-radius: 9px; font: inherit; font-weight: 700; cursor: pointer; }
-.material-request__add, .material-request__empty-add { border: 1px solid #1e6592; background: #fff; color: #1e6592; }
-.material-request__primary { border: 1px solid #1e6592; background: #1e6592; color: #fff; }
+.material-request__add, .material-request__empty-add, .material-request__primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 10px 18px; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.material-request__add, .material-request__empty-add { border: 1px solid #bfdbfe; background: #fff; color: #125eaf; box-shadow: 0 6px 16px rgba(23, 111, 209, .08); }
+.material-request__add:hover:not(:disabled), .material-request__empty-add:hover:not(:disabled) { background: #f3f8ff; border-color: #93c5fd; }
+.material-request__primary { border: 1px solid #176fd1; background: linear-gradient(135deg, #176fd1, #0e87e7); color: #fff; box-shadow: 0 8px 18px rgba(23, 111, 209, .2); }
+.material-request__primary:hover:not(:disabled) { background: linear-gradient(135deg, #125eaf, #0b73c6); }
 .material-request button:disabled, .material-request fieldset:disabled { opacity: .58; cursor: not-allowed; }
 .material-request__rows { display: grid; gap: 14px; }
-.material-request__row { position: relative; display: grid; grid-template-columns: minmax(220px, 1.5fr) minmax(150px, .7fr) minmax(210px, 1fr) auto; align-items: start; gap: 14px; margin: 0; padding: 18px 16px 16px; border: 1px solid #d7e5f1; border-radius: 12px; min-width: 0; }
-.material-request__row legend { padding: 0 6px; color: #315b79; font-size: .82rem; font-weight: 750; }
+.material-request__row { position: relative; display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 1.2fr); align-items: start; gap: 14px 16px; margin: 0; padding: 62px 16px 16px; border: 1px solid #d7e5f1; border-radius: 16px; min-width: 0; background: #fff; }
+.material-request__row-top { position: absolute; top: 12px; right: 16px; left: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 0 0 10px; border-bottom: 1px solid #e6eef5; color: #123f70; font-size: .95rem; font-weight: 750; }
+.material-request__material-field { grid-column: 1 / -1; }
 .material-request__row label, .material-request__motive { display: grid; gap: 6px; font-weight: 650; }
 .material-request__row label > small, .material-request__motive > small { color: #637b8e; font-weight: 500; }
 .material-request select, .material-request input, .material-request textarea { box-sizing: border-box; width: 100%; padding: 10px 12px; border: 1px solid #bfd2e1; border-radius: 9px; background: #fff; color: #193f61; font: inherit; }
 .material-request select:focus, .material-request input:focus, .material-request textarea:focus { outline: 3px solid rgba(44,132,180,.18); border-color: #2c84b4; }
 .material-request select[aria-invalid='true'], .material-request input[aria-invalid='true'], .material-request textarea[aria-invalid='true'] { border-color: #c94a4a; }
-.material-request__quantity { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; }
-.material-request__quantity input { border-radius: 13px 0 0 13px; }
-.material-request__quantity > span:not(.provider-admin__control) { display: flex; align-items: center; max-width: 110px; min-height: 54px; padding: 0 10px; border: 1px solid #d5e4ef; border-left: 0; border-radius: 0 13px 13px 0; background: #f3f8fc; color: #526d82; font-size: .86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.material-request__remove { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; margin-top: 22px; padding: 8px 10px; border: 1px solid #e2b7b7; border-radius: 9px; background: #fff; color: #9b3232; font: inherit; font-weight: 700; cursor: pointer; }
+.material-request__quantity { display: flex; align-items: stretch; min-height: 54px; overflow: hidden; border: 1px solid #d5e4ef; border-radius: 13px; background: #fbfdff; }
+.material-request__quantity input { width: 64px; min-width: 64px; flex: none; margin: 0; padding: 0 4px; border: 0; border-radius: 0; background: transparent; text-align: center; font-weight: 750; -moz-appearance: textfield; appearance: textfield; }
+.material-request__quantity input::-webkit-outer-spin-button,
+.material-request__quantity input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.material-request__quantity input:focus { outline: none; box-shadow: none; }
+.material-request__quantity:focus-within { border-color: #2c84b4; box-shadow: 0 0 0 4px rgba(44, 132, 180, .12); background: #fff; }
+.material-request__quantity:has(input[aria-invalid='true']) { border-color: #c94a4a; background: #fff8f8; }
+.material-request__step { display: inline-flex; flex: none; width: 44px; align-items: center; justify-content: center; border: 0; background: #eef6fc; color: #1468b3; cursor: pointer; }
+.material-request__step:first-child { border-right: 1px solid #d5e4ef; }
+.material-request__step:hover:not(:disabled) { background: #e3f1fb; }
+.material-request__unit { display: flex; flex: 1 1 auto; align-items: center; min-width: 0; max-width: 110px; padding: 0 12px; border-left: 1px solid #d5e4ef; background: #f3f8fc; color: #526d82; font-size: .86rem; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.material-request__remove { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 6px; min-height: 40px; margin: 0; padding: 8px 14px; border: 1px solid #fecaca; border-radius: 12px; background: #fff; color: #b42318; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.material-request__remove:hover:not(:disabled) { background: #fff5f5; }
 .material-request__field-error { color: #a12e2e !important; font-size: .8rem; font-weight: 650 !important; }
 .material-request__motive { position: relative; }
 .material-request textarea { min-height: 105px; resize: vertical; }
 .material-request__counter { justify-self: end; color: #637b8e; font-size: .78rem; }
-.material-request__actions { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 18px; border-top: 1px solid #e2ebf2; }
+.material-request__actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 18px; border-top: 1px solid #e2ebf2; }
+.material-request__actions .material-request__primary { flex: none; min-width: 190px; }
 .material-request__actions p { margin: 0; color: #526d82; font-size: .9rem; }
 .material-request__alert, .material-request__state { display: flex; align-items: center; gap: 10px; padding: 13px 15px; border: 1px solid #efcaca; border-radius: 10px; background: #fff5f5; color: #912f2f; }
 .material-request__alert { flex-wrap: wrap; }
@@ -3635,20 +3649,21 @@ button.announcements-section__more {
 .material-request__success-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .material-request__success-actions .material-request__primary { text-decoration: none; }
 
-@media (max-width: 900px) {
-  .material-request__row { grid-template-columns: 1fr 1fr; }
-  .material-request__material-field, .material-request__note-field { grid-column: span 1; }
-  .material-request__remove { align-self: end; margin-top: 0; width: fit-content; }
+@media (max-width: 720px) {
+  .material-request__row { grid-template-columns: 1fr; }
+  .material-request__quantity-field, .material-request__note-field { grid-column: 1 / -1; }
+  .material-request__quantity { width: 100%; }
+  .material-request__unit { max-width: none; }
 }
 
 @media (max-width: 620px) {
   .material-request__header, .material-request__section-heading, .material-request__actions { flex-direction: column; align-items: stretch; }
   .material-request__header, .material-request__form { padding: 18px; }
   .material-request__identity { min-width: 0; }
-  .material-request__row { grid-template-columns: 1fr; padding: 16px 13px 14px; }
-  .material-request__material-field, .material-request__note-field { grid-column: auto; }
-  .material-request__add, .material-request__empty-add, .material-request__primary, .material-request__remove { width: 100%; }
-  .material-request__remove { justify-content: center; }
+  .material-request__row { grid-template-columns: 1fr; padding: 62px 13px 14px; }
+  .material-request__material-field, .material-request__note-field, .material-request__quantity-field { grid-column: 1 / -1; }
+  .material-request__add, .material-request__empty-add, .material-request__primary { width: 100%; }
+  .material-request__remove { width: auto; }
 }
 
 /* Seguimiento de solicitudes de materiales */
@@ -4668,7 +4683,7 @@ body,
 #root {
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .admin-layout {
@@ -4678,7 +4693,7 @@ body,
   max-width: 100%;
   min-width: 0;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   background: var(--admin-bg-body);
   color: #17324d;
 }
@@ -7442,7 +7457,7 @@ body,
 
 @media (max-width: 760px) {
   .admin-layout {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   .admin-menu-toggle {
@@ -12014,6 +12029,44 @@ body,
     z-index: 2;
     max-width: calc(100% - 48px);
   }
+  .inventory-module-shell .material-request__header:has(> .inventory-module-menu) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 250px;
+    align-items: start;
+    column-gap: 28px;
+    row-gap: 12px;
+    min-height: 0 !important;
+    padding-right: 28px !important;
+  }
+  .inventory-module-shell .material-request__header:has(> .inventory-module-menu) > :first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
+    min-width: 0;
+  }
+  .inventory-module-shell .material-request__header:has(> .inventory-module-menu) > .inventory-module-menu {
+    position: relative !important;
+    top: auto;
+    right: auto;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    max-width: none;
+    justify-content: stretch;
+  }
+  .inventory-module-shell .material-request__header:has(> .inventory-module-menu) > .inventory-module-menu > button {
+    width: 100%;
+  }
+  .inventory-module-shell .material-request__header:has(> .inventory-module-menu) > .material-request__identity:nth-child(2) {
+    position: static;
+    right: auto;
+    bottom: auto;
+    grid-column: 2;
+    grid-row: 2;
+    width: auto;
+    max-width: none;
+    justify-self: stretch;
+  }
 }
 
 @container inventory-shell (max-width: 899px) {
@@ -12401,7 +12454,12 @@ body,
 .averias-admin__table--listado table {
   min-width: 0;
   border-collapse: separate;
-  border-spacing: 0 12px;
+  border-spacing: 0;
+}
+
+.averias-admin__table--listado caption.visually-hidden,
+.averias-admin__table--listado thead.visually-hidden {
+  display: none;
 }
 
 .averias-admin__table--listado tbody td {
@@ -12410,8 +12468,12 @@ body,
   background: transparent;
 }
 
+.averias-admin__table--listado tbody tr + tr td {
+  padding-top: 16px;
+}
+
 .averias-admin__fila {
-  padding: 16px 18px;
+  padding: 20px 22px;
   border: 1px solid #e3eef6;
   border-radius: 14px;
   background: #ffffff;
@@ -12424,33 +12486,50 @@ body,
 
 .averias-admin__fila-cuerpo {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 15.5rem;
+  grid-template-columns: minmax(0, 1fr) 16.5rem;
   gap: 12px 24px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .averias-admin__fila-identidad {
   display: grid;
-  gap: 4px;
+  grid-template-rows: auto auto 1fr auto;
+  align-content: space-between;
+  gap: 8px;
   min-width: 0;
+  padding: 2px 0;
+}
+
+.averias-admin__fila-titulo .averias-admin__codigo {
+  min-height: 30px;
+  padding: 4px 12px;
+  font-size: 0.95rem;
+}
+
+.averias-admin__fila .averias-admin__direccion {
+  align-self: center;
 }
 
 .averias-admin__fila-titulo {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 12px;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.averias-admin__fila-titulo .averias-admin__persona {
+  font-size: 1.12rem;
 }
 
 .averias-admin__fila-sub {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
   color: #5d7388;
-  font-size: 0.86rem;
-  line-height: 1.35;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .averias-admin__fila .averias-admin__fecha,
@@ -12462,35 +12541,173 @@ body,
 
 .averias-admin__fila-lado {
   display: grid;
+  align-content: center;
   justify-items: stretch;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: #f7fbfe;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  border: 1px solid #dbe8f4;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f9fe 100%);
+  box-shadow: 0 4px 14px rgba(18, 63, 112, 0.06);
 }
 
-.averias-admin__fila-marcas {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
-}
-
-.averias-admin__fila-lado .averias-admin__estado-note {
-  display: block;
+.averias-admin__fila-datos {
+  display: grid;
   margin: 0;
-  padding: 0;
-  background: transparent;
+}
+
+.averias-admin__fila-datos > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  padding: 4px 0;
+}
+
+.averias-admin__fila-datos > div + div {
+  border-top: 1px dashed #dbe6f1;
+}
+
+.averias-admin__fila-datos dt {
+  color: #6a8299;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.averias-admin__fila-datos dd {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  margin: 0;
+}
+
+.averias-admin__fila-datos .averias-admin__badge {
+  gap: 6px;
+  padding: 4px 11px;
+  font-size: 0.8rem;
+}
+
+.averias-admin__fila-datos .averias-admin__badge::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+.averias-admin__fila-datos .averias-admin__badge--vacio::before {
+  display: none;
+}
+
+.averias-admin__fila-datos .averias-admin__badge--estado.is-resuelta {
+  background: #e8f6ee;
+  color: #17673b;
+  box-shadow: inset 0 0 0 1px #b9e2c9;
+}
+
+.averias-admin__fila-datos .averias-admin__badge--estado.is-cancelada {
+  box-shadow: inset 0 0 0 1px #f2c2c2;
+}
+
+.averias-admin__fila {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.averias-admin__fila::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: #b9cfe4;
+}
+
+.averias-admin__fila:hover {
+  box-shadow: 0 10px 26px rgba(18, 63, 112, 0.09);
+}
+
+.averias-admin__fila--recibida::before { background: #3e8fd6; }
+.averias-admin__fila--en-revision::before { background: #8a6bc4; }
+.averias-admin__fila--asignada::before { background: #2f9a5c; }
+.averias-admin__fila--pendiente::before { background: #e09a2b; }
+.averias-admin__fila--en-atencion::before { background: #1e5a9c; }
+.averias-admin__fila--resuelta::before { background: #2fa866; }
+.averias-admin__fila--cancelada::before { background: #d05656; }
+
+.averias-admin__table--listado .averias-admin__fila-lado .averias-admin__estado-note,
+.averias-admin__fila-lado .averias-admin__estado-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: #fff6e6;
   color: #8a5a12;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.3;
-  text-align: right;
+}
+
+.averias-admin__fila-lado .averias-admin__estado-note::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e09a2b;
+}
+
+.averias-admin__fila .averias-admin__direccion,
+.averias-admin__fila .averias-admin__detalle {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.averias-admin__fila .averias-admin__detalle {
+  -webkit-line-clamp: 2;
+}
+
+.averias-admin .averias-admin__fila-lado .gallery-admin__button {
+  gap: 8px;
+  border: 1px solid #176fd1;
+  background: linear-gradient(135deg, #176fd1, #0e87e7);
+  color: #ffffff;
+  font-weight: 750;
+  box-shadow: 0 6px 16px rgba(23, 111, 209, 0.22);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.averias-admin .averias-admin__fila-lado .gallery-admin__button::after {
+  content: '→';
+  font-weight: 800;
+  transition: transform 0.15s ease;
+}
+
+.averias-admin .averias-admin__fila-lado .gallery-admin__button:hover {
+  background: linear-gradient(135deg, #125eaf, #0b73c6);
+  box-shadow: 0 8px 20px rgba(23, 111, 209, 0.3);
+  transform: translateY(-1px);
+}
+
+.averias-admin .averias-admin__fila-lado .gallery-admin__button:hover::after {
+  transform: translateX(3px);
 }
 
 .averias-admin__fila-lado .gallery-admin__button {
   width: 100%;
-  min-height: 36px;
+  min-height: 40px;
   padding: 6px 14px;
   border-radius: 8px;
   justify-content: center;
@@ -12548,7 +12765,16 @@ body,
 }
 
 .averias-admin__fila .averias-admin__direccion {
-  margin-top: 6px;
+  margin-top: 4px;
+  color: #1f3a55;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.averias-admin__fila .averias-admin__detalle {
+  padding-top: 8px;
+  border-top: 1px dashed #e1ebf4;
+  font-size: 0.98rem;
 }
 
 .averias-admin__direccion {
@@ -12908,6 +13134,68 @@ body,
   font-weight: 700;
 }
 
+.averias-evento__desplegable > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.averias-evento__desplegable > summary::-webkit-details-marker {
+  display: none;
+}
+
+.averias-evento__desplegable > summary::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+  border-right: 2px solid #123f70;
+  border-bottom: 2px solid #123f70;
+  transform: rotate(45deg);
+}
+
+.averias-evento__desplegable[open] > summary::after {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+.averias-evento__desplegable > summary h2 {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.averias-evento__desplegable[open] > summary {
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e6eef6;
+}
+
+.averias-evento__conteo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #eef5fb;
+  color: #1e5a9c;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.averias-evento__panel {
+  min-width: 0;
+}
+
 .averias-evento__lista {
   list-style: none;
   margin: 0;
@@ -13159,6 +13447,28 @@ body,
   margin: 0;
 }
 
+.averias-fontanero__grupos {
+  display: grid;
+  gap: 22px;
+}
+
+.averias-fontanero__grupos h3 {
+  margin: 0 0 10px;
+  color: #123f70;
+  font-size: 1.05rem;
+}
+
+.averias-fontanero__enlace {
+  color: #0872d3;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.averias-admin__prewrap + .averias-fontanero__enlace {
+  margin-left: 8px;
+}
+
 .averias-fontanero__meta {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px 20px;
@@ -13188,6 +13498,173 @@ body,
 .averias-fontanero__detail {
   display: grid;
   gap: 16px;
+}
+
+.averias-admin__detail .averias-admin__section {
+  padding: 20px 22px;
+}
+
+.averias-admin__detail .averias-admin__section h2 {
+  margin-bottom: 14px;
+  font-size: 1.18rem;
+}
+
+.averias-admin__detail .averias-admin__fields {
+  gap: 14px 22px;
+}
+
+.averias-admin__detail .averias-admin__section--ficha {
+  display: flex;
+  flex-direction: column;
+}
+
+.averias-admin__detail .averias-admin__ficha-filas {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(52px, 1fr);
+  gap: 0;
+}
+
+.averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.8fr) minmax(0, 1.4fr);
+  align-items: center;
+  gap: 16px;
+  padding: 10px 4px;
+}
+
+.averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field + .averias-admin__field {
+  border-top: 1px solid #edf3f8;
+}
+
+.averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 520px) {
+  .averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+
+.averias-admin__detail .averias-admin__field dt {
+  color: #2a6a96;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.averias-admin__detail .averias-admin__field dd {
+  margin-top: 4px;
+  color: #1b3550;
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.averias-admin__detail .averias-admin__hint,
+.averias-admin__detail .averias-admin__horario-hint,
+.averias-admin__detail .averias-admin__muted,
+.averias-admin__detail .averias-admin__empty-note {
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.averias-admin__detail .averias-admin__estado-label {
+  color: #2a6a96;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.averias-admin__detail .averias-admin__estado-panel .averias-admin__badge {
+  min-height: 28px;
+  padding: 4px 12px;
+  font-size: 0.86rem;
+}
+
+.averias-admin__detail .averias-admin__gestion-bloque {
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+.averias-admin__detail .averias-admin__gestion-caption {
+  color: #123f70;
+  font-size: 0.8rem;
+}
+
+.averias-fontanero .gallery-admin__header .gallery-admin__eyebrow {
+  margin: 0 0 6px;
+}
+
+.averias-fontanero .gallery-admin__header h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  line-height: 1.15;
+}
+
+.averias-fontanero__header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.averias-fontanero__header-meta > p {
+  margin: 0;
+}
+
+.averias-fontanero .gallery-admin__header .averias-admin__codigo {
+  font-size: 0.95rem;
+}
+
+.averias-fontanero .activity-feedback {
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.averias-fontanero__detail .averias-admin__section h2 {
+  font-size: 1.18rem;
+}
+
+.averias-fontanero__detail .averias-admin__field dt {
+  color: #2a6a96;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.averias-fontanero__detail .averias-admin__field dd {
+  margin-top: 6px;
+  color: #1b3550;
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.averias-fontanero__detail .averias-admin__field dd .averias-admin__badge {
+  font-size: 0.85rem;
+}
+
+.averias-fontanero__detail .averias-admin__hint,
+.averias-fontanero__detail .averias-admin__horario-hint,
+.averias-fontanero__detail .averias-admin__muted {
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+.averias-fontanero__detail .averias-admin__horario-hint {
+  padding: 12px 14px;
+  color: #5c3a0b;
+  font-weight: 600;
+}
+
+.averias-fontanero__detail .averias-fontanero__enlace {
+  font-size: 0.98rem;
 }
 
 .averias-fontanero__ubicacion {

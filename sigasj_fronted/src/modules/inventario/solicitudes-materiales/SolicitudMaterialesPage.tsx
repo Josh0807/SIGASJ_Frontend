@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { IconAlignLeft, IconClipboardList, IconDeviceFloppy, IconNote, IconNumbers, IconPackage, IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconAlignLeft, IconClipboardList, IconDeviceFloppy, IconMinus, IconNote, IconPackage, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -76,6 +76,14 @@ export default function SolicitudMaterialesPage() {
   const updateRow = (key: string, field: 'materialId' | 'cantidad' | 'observacion', value: string) => {
     setRows((current) => current.map((row) => row.key === key ? { ...row, [field]: value } : row))
     setErrors((current) => ({ ...current, form: undefined, rows: { ...current.rows, [key]: { ...current.rows[key], [field]: undefined } } }))
+  }
+
+  const stepCantidad = (key: string, delta: number) => {
+    const row = rows.find((item) => item.key === key)
+    const actual = Number.parseInt(row?.cantidad ?? '', 10)
+    const base = Number.isInteger(actual) && actual > 0 ? actual : 0
+    const siguiente = Math.max(1, base + delta)
+    updateRow(key, 'cantidad', String(siguiente))
   }
 
   const removeRow = (key: string) => {
@@ -180,7 +188,10 @@ export default function SolicitudMaterialesPage() {
           const selectedMaterial = materials.find((material) => String(material.id) === row.materialId)
           const rowErrors = errors.rows[row.key] ?? {}
           return <fieldset className="material-request__row" key={row.key} disabled={submitting || loading || Boolean(loadError)}>
-            <legend>Material {index + 1}</legend>
+            <legend className="material-request__row-top">
+              <span>Material {index + 1}</span>
+              <button type="button" className="material-request__remove" onClick={() => removeRow(row.key)} aria-label={`Eliminar material ${index + 1}`} disabled={submitting} title="Eliminar material"><IconTrash size={18} aria-hidden="true" /><span>Eliminar</span></button>
+            </legend>
             <label className="material-request__material-field">Material <span aria-hidden="true">*</span>
               <span className="provider-admin__control">
                 <IconPackage size={20} aria-hidden="true" />
@@ -191,13 +202,16 @@ export default function SolicitudMaterialesPage() {
               </span>
               {rowErrors.materialId ? <small id={`${row.key}-material-error`} className="material-request__field-error">{rowErrors.materialId}</small> : null}
             </label>
-            <label>Cantidad <span aria-hidden="true">*</span>
+            <label className="material-request__quantity-field">Cantidad <span aria-hidden="true">*</span>
               <div className="material-request__quantity">
-                <span className="provider-admin__control">
-                  <IconNumbers size={20} aria-hidden="true" />
-                  <input type="number" min="1" step="1" inputMode="numeric" value={row.cantidad} onChange={(event) => updateRow(row.key, 'cantidad', event.target.value)} aria-invalid={Boolean(rowErrors.cantidad)} aria-describedby={rowErrors.cantidad ? `${row.key}-cantidad-error` : undefined} />
-                </span>
-                <span>{selectedMaterial?.unidadMedida || 'unidad'}</span>
+                <button type="button" className="material-request__step" aria-label={`Disminuir cantidad del material ${index + 1}`} onClick={() => stepCantidad(row.key, -1)}>
+                  <IconMinus size={16} aria-hidden="true" />
+                </button>
+                <input type="number" min="1" step="1" inputMode="numeric" value={row.cantidad} onChange={(event) => updateRow(row.key, 'cantidad', event.target.value)} aria-invalid={Boolean(rowErrors.cantidad)} aria-describedby={rowErrors.cantidad ? `${row.key}-cantidad-error` : undefined} />
+                <button type="button" className="material-request__step" aria-label={`Aumentar cantidad del material ${index + 1}`} onClick={() => stepCantidad(row.key, 1)}>
+                  <IconPlus size={16} aria-hidden="true" />
+                </button>
+                <span className="material-request__unit">{selectedMaterial?.unidadMedida || 'unidad'}</span>
               </div>
               {rowErrors.cantidad ? <small id={`${row.key}-cantidad-error`} className="material-request__field-error">{rowErrors.cantidad}</small> : null}
             </label>
@@ -208,7 +222,6 @@ export default function SolicitudMaterialesPage() {
               </span>
               {rowErrors.observacion ? <small className="material-request__field-error">{rowErrors.observacion}</small> : null}
             </label>
-            <button type="button" className="material-request__remove" onClick={() => removeRow(row.key)} aria-label={`Eliminar material ${index + 1}`} disabled={submitting} title="Eliminar material"><IconTrash size={19} aria-hidden="true" /><span>Eliminar</span></button>
           </fieldset>
         })}
       </div>

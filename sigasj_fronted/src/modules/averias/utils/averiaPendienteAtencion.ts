@@ -26,9 +26,22 @@ export function puedeIntentarIniciarAtencion(estado: string): boolean {
   return esAsignada(estado) || esPendienteDeAtencion(estado)
 }
 
-/** El Fontanero puede iniciar la atención a cualquier hora. */
-export function mostrarAvisoHorarioFontanero(_estado: string): boolean {
-  return false
+/**
+ * Fuera de jornada no se inicia la reparación.
+ * Si el Backend no indica la jornada, Pendiente de atención se trata como fuera de horario:
+ * ese estado nace al asignar cuando el Fontanero no está en jornada.
+ */
+export function mostrarAvisoHorarioFontanero(
+  estado: string,
+  dentroDeHorario?: boolean,
+): boolean {
+  if (!puedeIntentarIniciarAtencion(estado)) {
+    return false
+  }
+  if (dentroDeHorario === false) {
+    return true
+  }
+  return dentroDeHorario == null && esPendienteDeAtencion(estado)
 }
 
 export function mostrarAvisoPendienteAdmin(

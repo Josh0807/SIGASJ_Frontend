@@ -15,6 +15,8 @@ import AveriasFontaneroClasificacionForm from './AveriasFontaneroClasificacionFo
 import AveriasFontaneroObservacionForm from './AveriasFontaneroObservacionForm'
 import AveriasFontaneroResolverDialog from './AveriasFontaneroResolverDialog'
 import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
+import { averiaCalificadaParaAtencion } from './averiaCalificada'
+import { mapasHref, telefonoHref } from './contactoAveria'
 import {
   puedeCalificarAveria,
   puedeIntentarIniciarAtencionAveria,
@@ -29,6 +31,7 @@ import {
 } from './fontaneroAveriaPresentation'
 import {
   AVERIAS_FONTANERO_ATENCION_NO_INICIADA,
+  AVERIAS_FONTANERO_CALIFICAR_ANTES,
   AVERIAS_FONTANERO_INICIAR_ERROR,
   AVERIAS_FONTANERO_INICIAR_FORBIDDEN,
   AVERIAS_FONTANERO_INICIAR_LABEL,
@@ -65,10 +68,14 @@ const AveriasFontaneroDetailView = ({
   const prioridadModifier = getFontaneroPrioridadModifier(averia.prioridad)
   const estado = String(averia.estado)
   const puedeResolver = puedeMarcarAveriaResuelta(estado)
-  const puedeIniciar = puedeIntentarIniciarAtencionAveria(estado)
+  const estadoPermiteInicio = puedeIntentarIniciarAtencionAveria(estado)
+  const clasificada = averiaCalificadaParaAtencion(averia.prioridad, averia.tipoAveria)
+  const avisoHorario = mostrarAvisoHorarioFontanero(estado, averia.dentroDeHorario)
+  const puedeIniciar = estadoPermiteInicio && clasificada && !avisoHorario
   const puedeRegistrar = puedeRegistrarObservacionAveria(estado)
   const puedeCalificar = puedeCalificarAveria(estado)
-  const avisoHorario = mostrarAvisoHorarioFontanero(estado)
+  const enlaceTelefono = telefonoHref(averia.telefonoReportante)
+  const enlaceMapas = mapasHref(averia.ubicacion)
   const [resolverOpen, setResolverOpen] = useState(false)
   const [iniciarError, setIniciarError] = useState<string | null>(null)
   const [iniciando, setIniciando] = useState(false)
@@ -94,7 +101,17 @@ const AveriasFontaneroDetailView = ({
             {averia.descripcion}
           </AveriasDetailField>
           <AveriasDetailField label="Dirección" multiline>
-            {averia.ubicacion}
+            <span className="averias-admin__prewrap">{averia.ubicacion}</span>
+            {enlaceMapas ? (
+              <a
+                className="averias-fontanero__enlace"
+                href={enlaceMapas}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Cómo llegar
+              </a>
+            ) : null}
           </AveriasDetailField>
         </dl>
       </section>
@@ -159,6 +176,11 @@ const AveriasFontaneroDetailView = ({
           {iniciarError ? (
             <ActivityFeedback variant="error" message={iniciarError} />
           ) : null}
+          {estadoPermiteInicio && !clasificada && !avisoHorario ? (
+            <p className="averias-admin__hint" role="status">
+              {AVERIAS_FONTANERO_CALIFICAR_ANTES}
+            </p>
+          ) : null}
           {puedeIniciar ? (
             <button
               className="gallery-admin__button"
@@ -213,7 +235,7 @@ const AveriasFontaneroDetailView = ({
               {AVERIAS_FONTANERO_RESOLVER_LABEL}
             </button>
           ) : null}
-          {!puedeIniciar && !puedeResolver ? (
+          {!estadoPermiteInicio && !puedeResolver ? (
             <p>{AVERIAS_FONTANERO_NO_ACTIONS}</p>
           ) : null}
         </div>
@@ -242,7 +264,13 @@ const AveriasFontaneroDetailView = ({
             {averia.nombreReportante}
           </AveriasDetailField>
           <AveriasDetailField label="Teléfono de contacto">
-            {averia.telefonoReportante}
+            {enlaceTelefono ? (
+              <a className="averias-fontanero__enlace" href={enlaceTelefono}>
+                {averia.telefonoReportante}
+              </a>
+            ) : (
+              averia.telefonoReportante
+            )}
           </AveriasDetailField>
         </dl>
       </section>

@@ -131,7 +131,7 @@ describe('AveriasFontaneroDetailPage', () => {
     expect(container.textContent).toContain(assigned.descripcion)
     expect(container.textContent).toContain(assigned.nombreReportante)
     expect(container.textContent).toContain(assigned.telefonoReportante)
-    expect(container.textContent).toContain('Tubería dañada')
+    expect(container.textContent).toContain('Tubo madre')
     expect(container.textContent).toContain('Alta')
     expect(container.textContent).toContain(
       formatAveriaAdminDateTime(assigned.fechaReporte),
@@ -168,7 +168,7 @@ describe('AveriasFontaneroDetailPage', () => {
       { ...assigned, prioridad: 'MEDIA' },
     )
     vi.mocked(averiasFontaneroApi.patchFontaneroAveriaClasificacion).mockResolvedValueOnce(
-      { ...assigned, prioridad: 'MEDIA', tipoAveria: 'TUBO_MADRE' },
+      { ...assigned, prioridad: 'MEDIA', tipoAveria: 'TUBO_MEDIDOR' },
     )
 
     await renderAt(`${FONTANERO_AVERIAS_PATH}/25`)
@@ -181,7 +181,7 @@ describe('AveriasFontaneroDetailPage', () => {
     await act(async () => {
       prioridad.value = 'MEDIA'
       prioridad.dispatchEvent(new Event('change', { bubbles: true }))
-      tipo.value = 'TUBO_MADRE'
+      tipo.value = 'TUBO_MEDIDOR'
       tipo.dispatchEvent(new Event('change', { bubbles: true }))
     })
     const guardar = Array.from(container.querySelectorAll('button')).find(
@@ -199,7 +199,7 @@ describe('AveriasFontaneroDetailPage', () => {
     )
     expect(averiasFontaneroApi.patchFontaneroAveriaClasificacion).toHaveBeenCalledWith(
       25,
-      'TUBO_MADRE',
+      'TUBO_MEDIDOR',
     )
     expect(container.textContent).toContain(AVERIAS_FONTANERO_CALIFICAR_SUCCESS)
   })
@@ -266,7 +266,12 @@ describe('AveriasFontaneroDetailPage', () => {
     expect(container.textContent).toContain(asignada.codigoSeguimiento)
     expect(container.textContent).toContain(pendiente.codigoSeguimiento)
     expect(container.textContent).toContain(enAtencion.codigoSeguimiento)
-    expect(container.textContent).toContain(AVERIAS_FONTANERO_ATENCION_NO_INICIADA)
+    expect(container.textContent).toContain('En atención')
+    expect(container.textContent).toContain('Asignadas')
+    expect(container.textContent).toContain('Pendientes de atención')
+    expect(container.textContent).toContain(
+      'todavía no puede iniciarse la atención debido al horario laboral',
+    )
     expect(container.textContent).not.toContain('Fuera de horario')
     expect(
       container.querySelector(`a[href="${FONTANERO_AVERIAS_PATH}/29"]`),
@@ -285,18 +290,14 @@ describe('AveriasFontaneroDetailPage', () => {
     await renderAt(`${FONTANERO_AVERIAS_PATH}/29`)
     expect(container.textContent).toContain('Pendiente de atención')
     expect(container.textContent).toContain(
-      'Usted actualiza el estado al atender o resolver esta avería.',
-    )
-    expect(container.textContent).not.toContain(
       'todavía no puede iniciarse la atención debido al horario laboral',
     )
-    expect(container.textContent).toContain(AVERIAS_FONTANERO_ATENCION_NO_INICIADA)
-    expect(container.textContent).toContain(AVERIAS_FONTANERO_INICIAR_LABEL)
+    expect(container.textContent).not.toContain(AVERIAS_FONTANERO_INICIAR_LABEL)
     expect(container.textContent).not.toContain('Fuera de horario')
-    const iniciar = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent?.includes(AVERIAS_FONTANERO_INICIAR_LABEL),
-    ) as HTMLButtonElement
-    expect(iniciar.disabled).toBe(false)
+    expect(container.querySelector('a[href^="tel:"]')?.textContent).toContain('8888-5555')
+    expect(container.querySelector('a[href*="google.com/maps"]')?.textContent).toBe(
+      'Cómo llegar',
+    )
   })
 
   it('muestra el rechazo de horario al intentar iniciar la atención', async () => {
@@ -305,18 +306,18 @@ describe('AveriasFontaneroDetailPage', () => {
         'HTTP 400: La atención no puede iniciarse en este momento porque se encuentra fuera del horario laboral establecido.',
       ),
     )
-    await renderAt(`${FONTANERO_AVERIAS_PATH}/29`)
+    await renderAt(`${FONTANERO_AVERIAS_PATH}/25`)
     const iniciar = Array.from(container.querySelectorAll('button')).find(
       (button) => button.textContent?.includes(AVERIAS_FONTANERO_INICIAR_LABEL),
     )
     await act(async () => {
       iniciar?.click()
     })
-    expect(averiasFontaneroApi.iniciarFontaneroAtencion).toHaveBeenCalledWith(29)
+    expect(averiasFontaneroApi.iniciarFontaneroAtencion).toHaveBeenCalledWith(25)
     expect(container.textContent).toContain(
       'La atención no puede iniciarse en este momento porque se encuentra fuera del horario laboral establecido.',
     )
-    expect(container.textContent).toContain('Pendiente de atención')
+    expect(container.textContent).toContain('Asignada')
     expect(container.textContent).not.toContain(AVERIAS_FONTANERO_INICIAR_SUCCESS)
     expect(container.textContent).not.toContain('TypeORM')
   })
@@ -341,11 +342,11 @@ describe('AveriasFontaneroDetailPage', () => {
 
   it('actualiza el detalle cuando el Backend acepta iniciar la atención', async () => {
     vi.mocked(averiasFontaneroApi.iniciarFontaneroAtencion).mockResolvedValueOnce({
-      ...findFontaneroAveriaFixture(29)!,
+      ...findFontaneroAveriaFixture(25)!,
       estado: 'EN_ATENCION',
       fechaInicioAtencion: '2026-09-19T14:00:00.000Z',
     })
-    await renderAt(`${FONTANERO_AVERIAS_PATH}/29`)
+    await renderAt(`${FONTANERO_AVERIAS_PATH}/25`)
     const iniciar = Array.from(container.querySelectorAll('button')).find(
       (button) => button.textContent?.includes(AVERIAS_FONTANERO_INICIAR_LABEL),
     )

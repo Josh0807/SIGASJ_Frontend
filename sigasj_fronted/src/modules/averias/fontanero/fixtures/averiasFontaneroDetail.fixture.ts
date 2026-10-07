@@ -13,7 +13,7 @@ export const AVERIAS_FONTANERO_DETAIL_FIXTURE: AveriaFontaneroDetail[] = [
       'Rotura en tubería secundaria junto al medidor comunitario. El agua llega al patio de tres viviendas.',
     nombreReportante: 'Juan Pérez',
     telefonoReportante: '8888-2222',
-    tipoAveria: 'TUBERIA_DANADA',
+    tipoAveria: 'TUBO_MADRE',
     prioridad: 'ALTA',
     fechaInicioAtencion: null,
     fechaResolucion: null,

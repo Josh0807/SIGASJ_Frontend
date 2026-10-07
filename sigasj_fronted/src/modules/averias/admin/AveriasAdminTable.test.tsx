@@ -64,7 +64,7 @@ describe('AveriasAdminTable', () => {
   it('muestra prioridad, tipo y nombre de Fontanero cuando existen', async () => {
     await renderTable([AVERIAS_ADMIN_UI_FIXTURE_ITEMS[1]])
     expect(container.textContent).toContain('Alta')
-    expect(container.textContent).toContain('TUBERIA')
+    expect(container.textContent).toContain('Tubo madre')
     expect(container.textContent).toContain('Luis Campos')
     expect(container.textContent).not.toContain('[object Object]')
   })
