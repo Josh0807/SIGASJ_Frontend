@@ -5,7 +5,12 @@ import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
 import { useFontaneroAverias } from '../hooks/useFontaneroAverias'
 import AveriaStatusBadge from '../admin/AveriaStatusBadge'
 import { formatAveriaAdminDateTime } from '../admin/formatAveriaAdminDate'
-import { esPendienteDeAtencion } from '../utils/averiaPendienteAtencion'
+import { agruparColaFontanero } from './colaFontanero'
+import {
+  MENSAJE_PENDIENTE_HORARIO_FONTANERO,
+  esPendienteDeAtencion,
+  mostrarAvisoHorarioFontanero,
+} from '../utils/averiaPendienteAtencion'
 import {
   FONTANERO_AVERIAS_TITLE,
   averiasFontaneroDetailPath,
@@ -25,6 +30,7 @@ import {
 
 export type AveriasFontaneroListPageProps = {
   items?: AveriaFontaneroListItem[]
+  dentroDeHorario?: boolean
   loading?: boolean
   error?: string | null
   unauthorized?: boolean
@@ -33,6 +39,7 @@ export type AveriasFontaneroListPageProps = {
 
 const AveriasFontaneroListPage = ({
   items: itemsProp,
+  dentroDeHorario: dentroDeHorarioProp,
   loading: loadingProp,
   error: errorProp,
   unauthorized: unauthorizedProp,
@@ -40,6 +47,7 @@ const AveriasFontaneroListPage = ({
 }: AveriasFontaneroListPageProps) => {
   const remoteEnabled =
     itemsProp === undefined &&
+    dentroDeHorarioProp === undefined &&
     loadingProp === undefined &&
     errorProp === undefined &&
     unauthorizedProp === undefined &&
@@ -51,6 +59,8 @@ const AveriasFontaneroListPage = ({
   }
 
   const items = itemsProp ?? remote.items
+  const dentroDeHorario = dentroDeHorarioProp ?? remote.dentroDeHorario
+  const grupos = agruparColaFontanero(items)
   const loading = loadingProp ?? remote.loading
   const error = errorProp === undefined ? remote.error : errorProp
   const forbidden = forbiddenProp ?? remote.forbidden
@@ -97,54 +107,65 @@ const AveriasFontaneroListPage = ({
               {AVERIAS_FONTANERO_LIST_EMPTY}
             </p>
           ) : (
-            <ul className="averias-admin__cards averias-fontanero__list">
-              {items.map((item) => (
-                <li className="averias-admin__card averias-fontanero__item" key={item.id}>
-                  <header className="averias-fontanero__item-head">
-                    <div className="averias-fontanero__item-identidad">
-                      <span className="averias-admin__codigo">
-                        {item.codigoSeguimiento}
-                      </span>
-                      <AveriaStatusBadge estado={item.estado} />
-                      {esPendienteDeAtencion(String(item.estado)) ? (
-                        <p className="averias-admin__estado-note averias-fontanero__nota">
-                          {AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
-                        </p>
-                      ) : null}
-                    </div>
-                    <Link
-                      className="gallery-admin__button averias-fontanero__detail-link"
-                      to={averiasFontaneroDetailPath(item.id)}
-                    >
-                      Ver detalle
-                    </Link>
-                  </header>
-                  <dl className="averias-admin__card-meta averias-fontanero__meta">
-                    <div>
-                      <dt>Asignación</dt>
-                      <dd>{formatAveriaAdminDateTime(item.fechaAsignacion)}</dd>
-                    </div>
-                    <div>
-                      <dt>Sector</dt>
-                      <dd>{item.sectorComunidad}</dd>
-                    </div>
-                    <div>
-                      <dt>Prioridad</dt>
-                      <dd>{getFontaneroPrioridadLabel(item.prioridad)}</dd>
-                    </div>
-                    <div>
-                      <dt>Tipo</dt>
-                      <dd>{getFontaneroTipoLabel(item.tipoAveria)}</dd>
-                    </div>
-                    <div className="averias-fontanero__meta-wide">
-                      <dt>Ubicación</dt>
-                      <dd>{item.ubicacion}</dd>
-                    </div>
-                  </dl>
-                </li>
-              ))}
-            </ul>
-          )}
+            <div className="averias-fontanero__grupos">
+              {grupos.map((grupo) => (
+                <section key={grupo.id} aria-labelledby={`averias-fontanero-grupo-${grupo.id}`}>
+                  <h3 id={`averias-fontanero-grupo-${grupo.id}`}>{grupo.titulo}</h3>
+                  <ul className="averias-admin__cards averias-fontanero__list">
+                    {grupo.items.map((item) => (
+                      <li className="averias-admin__card averias-fontanero__item" key={item.id}>
+                        <header className="averias-fontanero__item-head">
+                          <div className="averias-fontanero__item-identidad">
+                            <span className="averias-admin__codigo">
+                              {item.codigoSeguimiento}
+                            </span>
+                            <AveriaStatusBadge estado={item.estado} />
+                            {mostrarAvisoHorarioFontanero(String(item.estado), dentroDeHorario) ? (
+                              <p className="averias-admin__estado-note averias-fontanero__nota">
+                                {MENSAJE_PENDIENTE_HORARIO_FONTANERO}
+                              </p>
+                            ) : esPendienteDeAtencion(String(item.estado)) ? (
+                              <p className="averias-admin__estado-note averias-fontanero__nota">
+                                {AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
+                              </p>
+                            ) : null}
+                          </div>
+                            <Link
+                              className="gallery-admin__button averias-fontanero__detail-link"
+                              to={averiasFontaneroDetailPath(item.id)}
+                            >
+                              Ver detalle
+                            </Link>
+                          </header>
+                          <dl className="averias-admin__card-meta averias-fontanero__meta">
+                            <div>
+                              <dt>Asignación</dt>
+                              <dd>{formatAveriaAdminDateTime(item.fechaAsignacion)}</dd>
+                            </div>
+                            <div>
+                              <dt>Sector</dt>
+                              <dd>{item.sectorComunidad}</dd>
+                            </div>
+                            <div>
+                              <dt>Prioridad</dt>
+                              <dd>{getFontaneroPrioridadLabel(item.prioridad)}</dd>
+                            </div>
+                            <div>
+                              <dt>Tipo</dt>
+                              <dd>{getFontaneroTipoLabel(item.tipoAveria)}</dd>
+                            </div>
+                            <div className="averias-fontanero__meta-wide">
+                              <dt>Ubicación</dt>
+                              <dd>{item.ubicacion}</dd>
+                            </div>
+                          </dl>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            )}
         </section>
       </div>
     </main>

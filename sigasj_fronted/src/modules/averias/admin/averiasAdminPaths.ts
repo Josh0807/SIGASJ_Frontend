@@ -6,5 +6,7 @@ export const AVERIAS_ADMIN_HISTORIAL_PATH = `${AVERIAS_ADMIN_PATH}/historial`
 
 export const AVERIAS_ADMIN_REPORTE_PATH = `${AVERIAS_ADMIN_PATH}/reportes/resumen`
 
+export const AVERIAS_ADMIN_IMPRIMIR_PATH = `${AVERIAS_ADMIN_PATH}/reportes/imprimir`
+
 export const averiasAdminDetailPath = (id: number | string) =>
   `${AVERIAS_ADMIN_PATH}/${id}`

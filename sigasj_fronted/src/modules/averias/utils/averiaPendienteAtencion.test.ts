@@ -23,9 +23,13 @@ describe('averiaPendienteAtencion', () => {
     expect(puedeIntentarIniciarAtencion('EN_ATENCION')).toBe(false)
   })
 
-  it('no bloquea el inicio con un aviso de horario', () => {
-    expect(mostrarAvisoHorarioFontanero('PENDIENTE')).toBe(false)
-    expect(mostrarAvisoHorarioFontanero('ASIGNADA')).toBe(false)
+  it('avisa el horario cuando no se puede iniciar la reparación', () => {
+    expect(mostrarAvisoHorarioFontanero('PENDIENTE')).toBe(true)
+    expect(mostrarAvisoHorarioFontanero('PENDIENTE', false)).toBe(true)
+    expect(mostrarAvisoHorarioFontanero('ASIGNADA', false)).toBe(true)
+    expect(mostrarAvisoHorarioFontanero('ASIGNADA', true)).toBe(false)
+    expect(mostrarAvisoHorarioFontanero('PENDIENTE', true)).toBe(false)
+    expect(mostrarAvisoHorarioFontanero('EN_ATENCION', false)).toBe(false)
     expect(mostrarAvisoPendienteAdmin('PENDIENTE', true)).toBe(true)
     expect(mostrarAvisoPendienteAdmin('PENDIENTE', false)).toBe(false)
     expect(mostrarAvisoPendienteAdmin('ASIGNADA', true)).toBe(false)

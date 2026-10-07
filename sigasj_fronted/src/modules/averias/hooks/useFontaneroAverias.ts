@@ -12,6 +12,7 @@ import { getFontaneroAverias } from '../services/averiasFontaneroApi'
 
 export type UseFontaneroAveriasResult = {
   items: AveriaFontaneroListItem[]
+  dentroDeHorario?: boolean
   loading: boolean
   error: string | null
   unauthorized: boolean
@@ -24,6 +25,9 @@ export function useFontaneroAverias(
 ): UseFontaneroAveriasResult {
   const enabled = options.enabled ?? true
   const [items, setItems] = useState<AveriaFontaneroListItem[]>([])
+  const [dentroDeHorario, setDentroDeHorario] = useState<boolean | undefined>(
+    undefined,
+  )
   const [fetchLoading, setFetchLoading] = useState(enabled)
   const [error, setError] = useState<string | null>(null)
   const [unauthorized, setUnauthorized] = useState(false)
@@ -52,6 +56,7 @@ export function useFontaneroAverias(
         const result = await getFontaneroAverias(controller.signal)
         if (!cancelled) {
           setItems(result.data)
+          setDentroDeHorario(result.dentroDeHorario)
         }
       } catch (caught) {
         if (cancelled || isAbortError(caught)) {
@@ -60,6 +65,7 @@ export function useFontaneroAverias(
 
         const parsed = parseAveriaAdminError(caught)
         setItems([])
+        setDentroDeHorario(undefined)
 
         if (parsed.kind === 'unauthorized') {
           clearAccessToken()
@@ -86,6 +92,7 @@ export function useFontaneroAverias(
 
   return {
     items: enabled ? items : [],
+    dentroDeHorario: enabled ? dentroDeHorario : undefined,
     loading: enabled && fetchLoading,
     error: enabled ? error : null,
     unauthorized: enabled && unauthorized,

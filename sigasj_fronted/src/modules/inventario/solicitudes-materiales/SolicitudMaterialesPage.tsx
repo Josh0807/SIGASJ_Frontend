@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { IconAlignLeft, IconArrowLeft, IconArrowRight, IconCircleCheck, IconClipboardList, IconDeviceFloppy, IconNote, IconNumbers, IconPackage, IconPlus, IconTrash, IconUser } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconArrowRight, IconCircleCheck, IconClipboardList, IconDeviceFloppy, IconMinus, IconNote, IconPackage, IconPlus, IconTrash, IconUser } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -76,6 +76,14 @@ export default function SolicitudMaterialesPage() {
   const updateRow = (key: string, field: 'materialId' | 'cantidad' | 'observacion', value: string) => {
     setRows((current) => current.map((row) => row.key === key ? { ...row, [field]: value } : row))
     setErrors((current) => ({ ...current, form: undefined, rows: { ...current.rows, [key]: { ...current.rows[key], [field]: undefined } } }))
+  }
+
+  const stepCantidad = (key: string, delta: number) => {
+    const row = rows.find((item) => item.key === key)
+    const actual = Number.parseInt(row?.cantidad ?? '', 10)
+    const base = Number.isInteger(actual) && actual > 0 ? actual : 0
+    const siguiente = Math.max(1, base + delta)
+    updateRow(key, 'cantidad', String(siguiente))
   }
 
   const removeRow = (key: string) => {
@@ -183,8 +191,11 @@ export default function SolicitudMaterialesPage() {
         {rows.map((row, index) => {
           const selectedMaterial = materials.find((material) => String(material.id) === row.materialId)
           const rowErrors = errors.rows[row.key] ?? {}
-          return <fieldset className="material-request__row !grid-cols-[minmax(280px,1.5fr)_minmax(220px,0.7fr)_minmax(280px,1fr)_auto] !gap-4 !rounded-[22px] !border-sky-100 !bg-linear-to-br !from-white !to-sky-50/40 !p-5 !shadow-[0_8px_24px_rgba(30,90,156,0.06)] max-[1050px]:!grid-cols-2 max-[700px]:!grid-cols-1" key={row.key} disabled={submitting || loading || Boolean(loadError)}>
-            <legend className="!rounded-full !bg-blue-50 !px-3 !py-1 !text-xs !font-extrabold !text-blue-700">Material {index + 1}</legend>
+          return <fieldset className="material-request__row !rounded-[22px] !border-sky-100 !bg-linear-to-br !from-white !to-sky-50/40 !shadow-[0_8px_24px_rgba(30,90,156,0.06)]" key={row.key} disabled={submitting || loading || Boolean(loadError)}>
+            <legend className="material-request__row-top">
+              <span className="!rounded-full !bg-blue-50 !px-3 !py-1 !text-xs !font-extrabold !text-blue-700">Material {index + 1}</span>
+              <button type="button" className="material-request__remove" onClick={() => removeRow(row.key)} aria-label={`Eliminar material ${index + 1}`} disabled={submitting} title="Eliminar material"><IconTrash size={18} aria-hidden="true" /><span>Eliminar</span></button>
+            </legend>
             <label className="material-request__material-field"><span className="!inline-flex !items-center !gap-1">Material <strong className="!text-rose-500" aria-hidden="true">*</strong></span>
               <span className="provider-admin__control">
                 <IconPackage size={20} aria-hidden="true" />
@@ -195,13 +206,16 @@ export default function SolicitudMaterialesPage() {
               </span>
               {rowErrors.materialId ? <small id={`${row.key}-material-error`} className="material-request__field-error">{rowErrors.materialId}</small> : null}
             </label>
-            <label><span className="!inline-flex !items-center !gap-1">Cantidad <strong className="!text-rose-500" aria-hidden="true">*</strong></span>
-              <div className="material-request__quantity !overflow-hidden !rounded-xl !border !border-sky-200 !bg-white !shadow-sm focus-within:!border-blue-400 focus-within:!ring-4 focus-within:!ring-blue-100">
-                <span className="provider-admin__control !border-0 !shadow-none">
-                  <IconNumbers size={20} aria-hidden="true" />
-                  <input className="!min-h-[52px] !border-0 !shadow-none !outline-none !ring-0" type="number" min="1" step="1" inputMode="numeric" value={row.cantidad} onChange={(event) => updateRow(row.key, 'cantidad', event.target.value)} aria-invalid={Boolean(rowErrors.cantidad)} aria-describedby={rowErrors.cantidad ? `${row.key}-cantidad-error` : undefined} />
-                </span>
-                <span className="!min-h-[52px] !max-w-[120px] !border-0 !border-l !border-sky-100 !bg-slate-50 !px-3 !font-bold !text-slate-600">{selectedMaterial?.unidadMedida || 'unidad'}</span>
+            <label className="material-request__quantity-field"><span className="!inline-flex !items-center !gap-1">Cantidad <strong className="!text-rose-500" aria-hidden="true">*</strong></span>
+              <div className="material-request__quantity">
+                <button type="button" className="material-request__step" aria-label={`Disminuir cantidad del material ${index + 1}`} onClick={() => stepCantidad(row.key, -1)}>
+                  <IconMinus size={16} aria-hidden="true" />
+                </button>
+                <input type="number" min="1" step="1" inputMode="numeric" value={row.cantidad} onChange={(event) => updateRow(row.key, 'cantidad', event.target.value)} aria-invalid={Boolean(rowErrors.cantidad)} aria-describedby={rowErrors.cantidad ? `${row.key}-cantidad-error` : undefined} />
+                <button type="button" className="material-request__step" aria-label={`Aumentar cantidad del material ${index + 1}`} onClick={() => stepCantidad(row.key, 1)}>
+                  <IconPlus size={16} aria-hidden="true" />
+                </button>
+                <span className="material-request__unit">{selectedMaterial?.unidadMedida || 'unidad'}</span>
               </div>
               {rowErrors.cantidad ? <small id={`${row.key}-cantidad-error`} className="material-request__field-error">{rowErrors.cantidad}</small> : null}
             </label>
@@ -212,7 +226,6 @@ export default function SolicitudMaterialesPage() {
               </span>
               {rowErrors.observacion ? <small className="material-request__field-error">{rowErrors.observacion}</small> : null}
             </label>
-            <button type="button" className="material-request__remove !mt-[27px] !min-h-[52px] !rounded-xl !border-rose-200 !bg-rose-50 !px-4 !text-rose-700 !shadow-sm !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-rose-300 hover:!bg-rose-100 hover:!shadow-md active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none max-[1050px]:!mt-0 max-[1050px]:!self-end" onClick={() => removeRow(row.key)} aria-label={`Eliminar material ${index + 1}`} disabled={submitting} title="Eliminar material"><IconTrash size={19} aria-hidden="true" /><span>Eliminar</span></button>
           </fieldset>
         })}
       </div>

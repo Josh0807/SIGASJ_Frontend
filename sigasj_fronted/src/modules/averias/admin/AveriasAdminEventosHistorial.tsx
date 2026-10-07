@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAdminAveriaEventosHistorial } from '../hooks/useAdminAveriaEventosHistorial'
 import {
   etiquetaTipoEvento,
@@ -24,6 +24,14 @@ const AveriasAdminEventosHistorial = ({
   onForbidden,
 }: AveriasAdminEventosHistorialProps) => {
   const historial = useAdminAveriaEventosHistorial(averiaId)
+  const [abierto, setAbierto] = useState(false)
+  const cantidad = historial.eventos.length
+  const conteo =
+    historial.loading || historial.error
+      ? null
+      : cantidad === 1
+        ? '1 evento'
+        : `${cantidad} eventos`
 
   useEffect(() => {
     if (historial.unauthorized) {
@@ -37,13 +45,30 @@ const AveriasAdminEventosHistorial = ({
     }
   }, [historial.forbidden, onForbidden])
 
+  useEffect(() => {
+    if (historial.error) {
+      setAbierto(true)
+    }
+  }, [historial.error])
+
   return (
     <section
       className="averias-admin__section averias-evento"
       aria-labelledby="averia-historial-heading"
       aria-busy={historial.loading || undefined}
     >
-      <h2 id="averia-historial-heading">Historial de la avería</h2>
+      <details
+        className="averias-evento__desplegable"
+        open={abierto}
+        onToggle={(event) => setAbierto(event.currentTarget.open)}
+      >
+      <summary className="averias-evento__resumen">
+        <h2 id="averia-historial-heading">
+          Historial de la avería
+          {conteo ? <span className="averias-evento__conteo">{conteo}</span> : null}
+        </h2>
+      </summary>
+      <div className="averias-evento__panel">
       {historial.loading ? (
         <div role="status" aria-live="polite">
           <span className="visually-hidden">{AVERIAS_EVENTOS_LOADING_MESSAGE}</span>
@@ -112,6 +137,8 @@ const AveriasAdminEventosHistorial = ({
           })}
         </ol>
       ) : null}
+      </div>
+      </details>
     </section>
   )
 }

@@ -8,6 +8,7 @@ import type {
   AveriaFontanerosResponse,
   AveriasAdminListado,
   AveriasAdminQuery,
+  AveriaHistorialItem,
   AveriasHistorialListado,
   AveriasHistorialQuery,
   AveriasReporteResumen,
@@ -96,6 +97,38 @@ export async function getAdminAveriasReporteResumen(
     params: toReporteResumenParams(query),
     signal,
   })
+}
+
+const ESTADOS_AVERIAS_ATENDIDAS = ['EN_ATENCION', 'RESUELTA'] as const
+
+export async function getAveriasAtendidasParaImpresion(
+  query: Pick<AveriasHistorialQuery, 'fechaDesde' | 'fechaHasta'> = {},
+  signal?: AbortSignal,
+): Promise<AveriaHistorialItem[]> {
+  const paginas = await Promise.all(
+    ESTADOS_AVERIAS_ATENDIDAS.map((estado) =>
+      recolectarHistorialAverias({ ...query, estado }, signal),
+    ),
+  )
+  return paginas.flat()
+}
+
+async function recolectarHistorialAverias(
+  query: AveriasHistorialQuery,
+  signal?: AbortSignal,
+): Promise<AveriaHistorialItem[]> {
+  const limite = 100
+  const primera = await getAdminAveriasHistorial({ ...query, page: 1, limit: limite }, signal)
+  const acumulado = [...primera.data]
+  const tope = Math.min(primera.totalPages, 5)
+  for (let page = 2; page <= tope; page += 1) {
+    const siguiente = await getAdminAveriasHistorial(
+      { ...query, page, limit: limite },
+      signal,
+    )
+    acumulado.push(...siguiente.data)
+  }
+  return acumulado
 }
 
 export async function getAdminAveriasHistorial(

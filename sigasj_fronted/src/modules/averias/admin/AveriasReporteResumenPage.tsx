@@ -5,7 +5,7 @@ import {
 } from '../../../app/router/routePaths'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
 import { useAdminAveriasReporteResumen } from '../hooks/useAdminAveriasReporteResumen'
-import { AVERIAS_ADMIN_PATH } from './averiasAdminPaths'
+import { AVERIAS_ADMIN_IMPRIMIR_PATH, AVERIAS_ADMIN_PATH } from './averiasAdminPaths'
 import {
   buildReporteFechas,
   formatRangoReporte,
@@ -95,6 +95,12 @@ const AveriasReporteResumenPage = ({
             <p>Cantidad de averías registradas según su estado actual.</p>
           </div>
           <div className="gallery-admin__header-actions">
+            <Link
+              className="gallery-admin__button"
+              to={`${AVERIAS_ADMIN_IMPRIMIR_PATH}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`}
+            >
+              Imprimir averías atendidas
+            </Link>
             <Link className="gallery-admin__button" to={AVERIAS_ADMIN_PATH}>
               Volver a gestión
             </Link>

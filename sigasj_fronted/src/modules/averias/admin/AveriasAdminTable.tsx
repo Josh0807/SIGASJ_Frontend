@@ -53,7 +53,9 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
             {items.map((item) => (
               <tr key={item.id}>
                 <td colSpan={5}>
-                  <article className="averias-admin__fila">
+                  <article
+                    className={`averias-admin__fila averias-admin__fila--${String(item.estado).toLowerCase().replace(/_/g, '-')}`}
+                  >
                     <div className="averias-admin__fila-cuerpo">
                       <div className="averias-admin__fila-identidad">
                         <div className="averias-admin__fila-titulo">
@@ -89,27 +91,42 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
                         </p>
                       </div>
                       <div className="averias-admin__fila-lado">
-                        <div className="averias-admin__fila-marcas">
-                          <AveriaStatusBadge estado={item.estado} />
-                          <span
-                            className={
-                              item.prioridad
-                                ? `averias-admin__badge averias-admin__badge--prioridad is-${item.prioridad.toLowerCase()}`
-                                : 'averias-admin__badge averias-admin__badge--vacio'
-                            }
-                          >
-                            {getPrioridadLabel(item.prioridad)}
-                          </span>
-                          <span
-                            className={
-                              item.tipoAveria
-                                ? 'averias-admin__badge averias-admin__badge--tipo'
-                                : 'averias-admin__badge averias-admin__badge--vacio'
-                            }
-                          >
-                            {getTipoAveriaDetailLabel(item.tipoAveria)}
-                          </span>
-                        </div>
+                        <dl className="averias-admin__fila-datos">
+                          <div>
+                            <dt>Estado</dt>
+                            <dd>
+                              <AveriaStatusBadge estado={item.estado} />
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Prioridad</dt>
+                            <dd>
+                              <span
+                                className={
+                                  item.prioridad
+                                    ? `averias-admin__badge averias-admin__badge--prioridad is-${item.prioridad.toLowerCase()}`
+                                    : 'averias-admin__badge averias-admin__badge--vacio'
+                                }
+                              >
+                                {getPrioridadLabel(item.prioridad)}
+                              </span>
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Tipo</dt>
+                            <dd>
+                              <span
+                                className={
+                                  item.tipoAveria
+                                    ? 'averias-admin__badge averias-admin__badge--tipo'
+                                    : 'averias-admin__badge averias-admin__badge--vacio'
+                                }
+                              >
+                                {getTipoAveriaDetailLabel(item.tipoAveria)}
+                              </span>
+                            </dd>
+                          </div>
+                        </dl>
                         {esPendienteDeAtencion(String(item.estado)) &&
                         item.fontanero != null ? (
                           <p className="averias-admin__estado-note">

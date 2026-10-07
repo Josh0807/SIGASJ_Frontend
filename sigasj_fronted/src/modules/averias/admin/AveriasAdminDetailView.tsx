@@ -5,10 +5,6 @@ import AveriasDetailField from './AveriasDetailField'
 import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import {
-  MENSAJE_ATENCION_NO_INICIADA,
-  mostrarAvisoPendienteAdmin,
-} from '../utils/averiaPendienteAtencion'
-import {
   AVERIA_UNAVAILABLE_LABEL,
   getAbonadoRelacionadoLabel,
   getObservacionesLabel,
@@ -36,25 +32,19 @@ const AveriasAdminDetailView = ({
   onForbidden,
 }: AveriasAdminDetailViewProps) => (
   <div className="averias-admin__detail">
-    <section className="averias-admin__section" aria-labelledby="averia-reporte-heading">
-      <h2 id="averia-reporte-heading">Información del reporte</h2>
-      <dl className="averias-admin__fields">
-        <AveriasDetailField label="Fecha y hora del reporte">
-          {formatAveriaAdminDateTimeOrUnavailable(
-            averia.fechaReporte,
-            AVERIA_UNAVAILABLE_LABEL,
-          )}
-        </AveriasDetailField>
-      </dl>
-    </section>
-
     <div className="averias-admin__detail-grid">
       <section
-        className="averias-admin__section"
+        className="averias-admin__section averias-admin__section--ficha"
         aria-labelledby="averia-reportante-heading"
       >
         <h2 id="averia-reportante-heading">Datos del Reportante</h2>
-        <dl className="averias-admin__fields">
+        <dl className="averias-admin__fields averias-admin__ficha-filas">
+          <AveriasDetailField label="Fecha y hora del reporte">
+            {formatAveriaAdminDateTimeOrUnavailable(
+              averia.fechaReporte,
+              AVERIA_UNAVAILABLE_LABEL,
+            )}
+          </AveriasDetailField>
           <AveriasDetailField label="Nombre completo">
             {averia.nombreReportante}
           </AveriasDetailField>
@@ -76,30 +66,9 @@ const AveriasAdminDetailView = ({
       <section className="averias-admin__section" aria-labelledby="averia-gestion-heading">
         <h2 id="averia-gestion-heading">Gestión de la avería</h2>
         <AveriasAdminGestionControls
-          key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}`}
+          key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}:${averia.fechaInicioAtencion ?? ''}:${averia.fechaResolucion ?? ''}`}
           averia={averia}
         />
-        <dl className="averias-admin__fields">
-          <AveriasDetailField label="Inicio de atención">
-            {averia.fechaInicioAtencion
-              ? formatAveriaAdminDateTimeOrUnavailable(
-                  averia.fechaInicioAtencion,
-                  AVERIA_UNAVAILABLE_LABEL,
-                )
-              : mostrarAvisoPendienteAdmin(
-                    String(averia.estado),
-                    averia.fontanero != null,
-                  )
-                ? MENSAJE_ATENCION_NO_INICIADA
-                : AVERIA_UNAVAILABLE_LABEL}
-          </AveriasDetailField>
-          <AveriasDetailField label="Fecha de resolución">
-            {formatAveriaAdminDateTimeOrUnavailable(
-              averia.fechaResolucion,
-              AVERIA_UNAVAILABLE_LABEL,
-            )}
-          </AveriasDetailField>
-        </dl>
       </section>
     </div>
 
