@@ -6,6 +6,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type RefObject,
 } from 'react'
+import { createPortal } from 'react-dom'
 
 export type ConfirmDialogProps = {
   isOpen: boolean
@@ -110,7 +111,7 @@ const ConfirmDialog = ({
     return null
   }
 
-  return (
+  const dialog = (
     <div
       className="confirm-dialog"
       role="presentation"
@@ -154,6 +155,10 @@ const ConfirmDialog = ({
       </div>
     </div>
   )
+
+  const adminLayoutTarget = returnFocusRef?.current?.closest('.admin-layout')
+
+  return adminLayoutTarget ? createPortal(dialog, adminLayoutTarget) : dialog
 }
 
 export default ConfirmDialog

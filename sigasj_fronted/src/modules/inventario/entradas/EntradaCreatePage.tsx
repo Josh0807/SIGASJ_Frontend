@@ -107,11 +107,11 @@ export default function EntradaCreatePage() {
       <DocumentosEntradaField documents={documents} disabled={saving} onChange={(next) => { setDocuments(next); if (pendingMovementId && next.length === 0) setPendingMovementId(null) }} onErrors={(messages) => { if (messages.length) setFeedback({ kind: 'error', text: messages.join(' ') }) }} />
       <div className="inventory-entry__notice materials-admin__form-full" role="note"><strong>Control de existencias</strong><span>El stock actual no se edita en este formulario. El backend sumará la cantidad de forma transaccional y conservará el movimiento.</span></div>
       <div className="materials-admin__form-actions">
-        <button type="submit" className="materials-admin__primary" disabled={saving || pendingMovementId !== null || loadingMateriales || Boolean(materialesError) || materiales.data.length === 0}>
-          <IconDeviceFloppy size={19} aria-hidden="true" />
+        <button type="submit" className="materials-admin__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_11px_26px_rgba(37,99,235,0.3)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-800 hover:!to-cyan-500 hover:!shadow-[0_17px_34px_rgba(37,99,235,0.4)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={saving || pendingMovementId !== null || loadingMateriales || Boolean(materialesError) || materiales.data.length === 0}>
+          <IconDeviceFloppy className="!transition-transform !duration-300 group-hover:!scale-110 group-hover:!-rotate-6 motion-reduce:!transform-none" size={19} aria-hidden="true" />
           {saving ? documents.length ? 'Registrando y adjuntando…' : 'Registrando entrada…' : pendingMovementId ? 'Documentos pendientes' : 'Registrar entrada'}
         </button>
-        <Link className="materials-admin__secondary" to={MATERIALES_PATH}><IconArrowLeft size={19} aria-hidden="true" />Volver al catálogo</Link>
+        <Link className="materials-admin__secondary group !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-extrabold !text-blue-900 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!text-blue-700 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
       </div>
     </form>
   </main>

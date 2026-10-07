@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconEye, IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconClipboardCheck, IconEye, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MATERIALES_PATH, solicitudRevisionDetailPath } from '../inventarioPaths'
 import { getSolicitudesMaterialesAdmin } from './solicitudesMaterialesApi'
@@ -62,11 +62,18 @@ export default function SolicitudesRevisionPage() {
         <h1 id="solicitud-revision-title">Revisión de solicitudes de materiales</h1>
         <p>Consulte las solicitudes pendientes enviadas por los fontaneros y abra el detalle para revisarlas.</p>
       </div>
-      <Link className="material-tracking__detail-link" to={MATERIALES_PATH}>Volver al catálogo</Link>
+      <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
     </header>
 
-    {!loading && !error ? <div className="material-tracking__filters">
-      <span role="status">{total} {total === 1 ? 'solicitud pendiente' : 'solicitudes pendientes'}</span>
+    {!loading && !error ? <div className="material-tracking__filters !flex !items-center !justify-between !gap-5 !overflow-hidden !rounded-3xl !border-indigo-100 !bg-linear-to-r !from-white !via-indigo-50/40 !to-blue-50/70 !p-6 !shadow-[0_12px_32px_rgba(79,70,229,0.1)] max-[640px]:!flex-col max-[640px]:!items-stretch">
+      <div className="!flex !items-center !gap-4">
+        <span className="!grid !size-12 !shrink-0 !place-items-center !rounded-2xl !bg-linear-to-br !from-indigo-600 !to-blue-500 !text-white !shadow-[0_9px_20px_rgba(79,70,229,0.25)]"><IconClipboardCheck size={24} aria-hidden="true" /></span>
+        <div>
+          <strong className="!block !text-base !font-extrabold !text-[#073b73]">Solicitudes por revisar</strong>
+          <small className="!mt-1 !block !text-sm !text-slate-500">Materiales pendientes de aprobación administrativa.</small>
+        </div>
+      </div>
+      <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-indigo-200 !bg-white !px-5 !py-3 !font-extrabold !text-indigo-700 !shadow-[0_7px_18px_rgba(79,70,229,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(79,70,229,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none max-[640px]:!w-fit" role="status"><span className="!size-2 !rounded-full !bg-indigo-500 !shadow-[0_0_0_5px_rgba(99,102,241,0.12)]" aria-hidden="true" />{total} {total === 1 ? 'solicitud pendiente' : 'solicitudes pendientes'}</span>
     </div> : null}
 
     {loading ? <div className="material-tracking__state" role="status"><span className="material-request__spinner" />Cargando solicitudes pendientes…</div> : null}

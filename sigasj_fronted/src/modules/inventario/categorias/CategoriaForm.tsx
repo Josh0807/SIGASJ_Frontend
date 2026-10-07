@@ -102,12 +102,12 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
           />
         </InventoryFormField>
         <div className="materials-admin__form-actions">
-          <button type="submit" className="materials-admin__primary" disabled={saving}>
-            <IconDeviceFloppy size={19} aria-hidden="true" />
+          <button type="submit" className="materials-admin__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_11px_26px_rgba(37,99,235,0.3)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-800 hover:!to-cyan-500 hover:!shadow-[0_17px_34px_rgba(37,99,235,0.4)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={saving}>
+            <IconDeviceFloppy className="!transition-transform !duration-300 group-hover:!scale-110 group-hover:!-rotate-6 motion-reduce:!transform-none" size={19} aria-hidden="true" />
             {saving ? 'Guardando…' : mode === 'create' ? 'Registrar categoría' : 'Guardar cambios'}
           </button>
-          <Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>
-            <IconArrowLeft size={19} aria-hidden="true" />
+          <Link className="materials-admin__secondary group !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-extrabold !text-blue-900 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!text-blue-700 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={CATEGORIAS_PATH}>
+            <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
             Volver al listado
           </Link>
         </div>

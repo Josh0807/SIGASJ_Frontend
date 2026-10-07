@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconRefresh, IconTruckDelivery } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MATERIALES_PATH, recepcionDetailPath } from '../inventarioPaths'
 import { getReposicionesAdmin } from '../reposiciones/reposicionesApi'
@@ -71,11 +71,20 @@ export default function RecepcionesPage() {
           <h1 id="recepciones-title">Recepción de materiales</h1>
           <p>Consulte las compras pendientes de entrega y registre la recepción física en bodega.</p>
         </div>
-        <Link className="material-tracking__detail-link" to={MATERIALES_PATH}>Volver al catálogo</Link>
+        <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
       </header>
 
       {!loading && !error ? (
-        <p role="status">{total} {total === 1 ? 'compra pendiente' : 'compras pendientes'} de recepción</p>
+        <div className="!flex !w-full !items-center !justify-between !gap-5 !overflow-hidden !rounded-3xl !border !border-teal-100 !bg-linear-to-r !from-white !via-teal-50/40 !to-cyan-50/70 !p-6 !shadow-[0_12px_32px_rgba(13,148,136,0.1)] max-[640px]:!flex-col max-[640px]:!items-stretch">
+          <div className="!flex !items-center !gap-4">
+            <span className="!grid !size-12 !shrink-0 !place-items-center !rounded-2xl !bg-linear-to-br !from-teal-600 !to-cyan-500 !text-white !shadow-[0_9px_20px_rgba(13,148,136,0.25)]"><IconTruckDelivery size={24} aria-hidden="true" /></span>
+            <div>
+              <strong className="!block !text-base !font-extrabold !text-[#073b73]">Recepciones por confirmar</strong>
+              <small className="!mt-1 !block !text-sm !leading-6 !text-slate-500">Compras que se encuentran pendientes de entrega en bodega.</small>
+            </div>
+          </div>
+          <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-teal-200 !bg-white !px-5 !py-3 !font-extrabold !text-teal-700 !shadow-[0_7px_18px_rgba(13,148,136,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(13,148,136,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none max-[640px]:!w-fit" role="status"><span className="!size-2 !rounded-full !bg-teal-500 !shadow-[0_0_0_5px_rgba(20,184,166,0.12)]" aria-hidden="true" />{total} {total === 1 ? 'compra pendiente' : 'compras pendientes'} de recepción</span>
+        </div>
       ) : null}
 
       {loading ? (
