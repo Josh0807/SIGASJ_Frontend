@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { averiasAdminDetailPath } from './averiasAdminPaths'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
@@ -56,85 +57,73 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
                   <article
                     className={`averias-admin__fila averias-admin__fila--${String(item.estado).toLowerCase().replace(/_/g, '-')}`}
                   >
+                    <span className="averias-admin__fila-icono" aria-hidden="true">
+                      <AdminNavIcon name="averias" />
+                    </span>
                     <div className="averias-admin__fila-cuerpo">
-                      <div className="averias-admin__fila-identidad">
-                        <div className="averias-admin__fila-titulo">
-                          <span className="averias-admin__codigo">
-                            {item.codigoSeguimiento}
+                      <div className="averias-admin__fila-titulo">
+                        <span className="averias-admin__codigo">
+                          {item.codigoSeguimiento}
+                        </span>
+                        <span className="averias-admin__persona">
+                          {item.nombreReportante}
+                        </span>
+                        <AveriaStatusBadge estado={item.estado} />
+                      </div>
+                      <p className="averias-admin__fila-sub">
+                        <span className="averias-admin__fecha">
+                          {formatAveriaAdminDateTime(item.fechaReporte)}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span className="averias-admin__sector">
+                          {item.sectorComunidad}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span
+                          className={
+                            item.fontanero ? undefined : 'averias-admin__muted'
+                          }
+                        >
+                          {getFontaneroLabel(item.fontanero)}
+                        </span>
+                      </p>
+                      <p className="averias-admin__direccion" title={item.ubicacion}>
+                        {item.ubicacion}
+                      </p>
+                      <div className="averias-admin__fila-pie">
+                        <span
+                          className={
+                            item.prioridad
+                              ? `averias-admin__badge averias-admin__badge--prioridad is-${item.prioridad.toLowerCase()}`
+                              : 'averias-admin__badge averias-admin__badge--vacio'
+                          }
+                        >
+                          <span className="averias-admin__fila-etiqueta">Prioridad</span>
+                          {getPrioridadLabel(item.prioridad)}
+                        </span>
+                        <span
+                          className={
+                            item.tipoAveria
+                              ? 'averias-admin__badge averias-admin__badge--tipo'
+                              : 'averias-admin__badge averias-admin__badge--vacio'
+                          }
+                        >
+                          <span className="averias-admin__fila-etiqueta">Tipo</span>
+                          {getTipoAveriaDetailLabel(item.tipoAveria)}
+                        </span>
+                        {esPendienteDeAtencion(String(item.estado)) &&
+                        item.fontanero != null ? (
+                          <span className="averias-admin__fila-aviso">
+                            Atención no iniciada
                           </span>
-                          <span className="averias-admin__persona">
-                            {item.nombreReportante}
-                          </span>
-                        </div>
-                        <p className="averias-admin__fila-sub">
-                          <span className="averias-admin__fecha">
-                            {formatAveriaAdminDateTime(item.fechaReporte)}
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span className="averias-admin__sector">
-                            {item.sectorComunidad}
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span
-                            className={
-                              item.fontanero ? undefined : 'averias-admin__muted'
-                            }
-                          >
-                            {getFontaneroLabel(item.fontanero)}
-                          </span>
-                        </p>
-                        <p className="averias-admin__direccion" title={item.ubicacion}>
-                          {item.ubicacion}
-                        </p>
+                        ) : null}
                         <p className="averias-admin__detalle" title={item.descripcion}>
                           {item.descripcion}
                         </p>
                       </div>
-                      <div className="averias-admin__fila-lado">
-                        <dl className="averias-admin__fila-datos">
-                          <div>
-                            <dt>Estado</dt>
-                            <dd>
-                              <AveriaStatusBadge estado={item.estado} />
-                            </dd>
-                          </div>
-                          <div>
-                            <dt>Prioridad</dt>
-                            <dd>
-                              <span
-                                className={
-                                  item.prioridad
-                                    ? `averias-admin__badge averias-admin__badge--prioridad is-${item.prioridad.toLowerCase()}`
-                                    : 'averias-admin__badge averias-admin__badge--vacio'
-                                }
-                              >
-                                {getPrioridadLabel(item.prioridad)}
-                              </span>
-                            </dd>
-                          </div>
-                          <div>
-                            <dt>Tipo</dt>
-                            <dd>
-                              <span
-                                className={
-                                  item.tipoAveria
-                                    ? 'averias-admin__badge averias-admin__badge--tipo'
-                                    : 'averias-admin__badge averias-admin__badge--vacio'
-                                }
-                              >
-                                {getTipoAveriaDetailLabel(item.tipoAveria)}
-                              </span>
-                            </dd>
-                          </div>
-                        </dl>
-                        {esPendienteDeAtencion(String(item.estado)) &&
-                        item.fontanero != null ? (
-                          <p className="averias-admin__estado-note">
-                            Atención no iniciada
-                          </p>
-                        ) : null}
-                        {detailAction(item.id)}
-                      </div>
+                    </div>
+                    <div className="averias-admin__fila-accion">
+                      {detailAction(item.id)}
                     </div>
                   </article>
                 </td>
