@@ -8,10 +8,20 @@ import {
   type AveriaFontaneroAsignable,
 } from '../admin/types'
 import {
+  getAdminAveriaAyudantes,
   getAdminAveriaFontaneros,
   patchAdminAveriaAsignacion,
   patchAdminAveriaEstado,
 } from '../services/averiasAdminApi'
+
+function parseUsuarioId(value: string): number | null {
+  const trimmed = value.trim()
+  if (trimmed === '') {
+    return null
+  }
+  const parsed = Number.parseInt(trimmed, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+}
 
 export type AveriaAsignacionFeedback = {
   variant: 'success' | 'error'
@@ -24,11 +34,15 @@ export function useAveriaAdminAsignacion(
 ) {
   const { loadFontaneros } = options
   const [fontaneros, setFontaneros] = useState<AveriaFontaneroAsignable[]>([])
+  const [ayudantes, setAyudantes] = useState<AveriaFontaneroAsignable[]>([])
   const [listLoading, setListLoading] = useState(loadFontaneros)
   const [listError, setListError] = useState<string | null>(null)
   const [reloadTrigger, setReloadTrigger] = useState(0)
 
   const [selectedFontaneroId, setSelectedFontaneroId] = useState<number | null>(
+    null,
+  )
+  const [selectedAyudanteId, setSelectedAyudanteId] = useState<number | null>(
     null,
   )
   const [assigning, setAssigning] = useState(false)
@@ -53,15 +67,25 @@ export function useAveriaAdminAsignacion(
       setListError(null)
 
       try {
-        const result = await getAdminAveriaFontaneros(controller.signal)
+        const [resultFontaneros, resultAyudantes] = await Promise.all([
+          getAdminAveriaFontaneros(controller.signal),
+          getAdminAveriaAyudantes(controller.signal).catch((caught) => {
+            if (isAbortError(caught)) {
+              throw caught
+            }
+            return { data: [] as AveriaFontaneroAsignable[] }
+          }),
+        ])
         if (!cancelled) {
-          setFontaneros(result.data ?? [])
+          setFontaneros(resultFontaneros.data ?? [])
+          setAyudantes(resultAyudantes.data ?? [])
         }
       } catch (caught) {
         if (cancelled || isAbortError(caught)) {
           return
         }
         setFontaneros([])
+        setAyudantes([])
         setListError(AVERIAS_ADMIN_FONTANEROS_LOAD_ERROR)
       } finally {
         if (!cancelled) {
@@ -83,7 +107,12 @@ export function useAveriaAdminAsignacion(
   }, [])
 
   const assignFontanero = useCallback(
-    async (averiaId: number, fontaneroId: number, estadoActual?: string) => {
+    async (
+      averiaId: number,
+      fontaneroId: number,
+      estadoActual?: string,
+      ayudanteId?: number | null,
+    ) => {
       setAssigning(true)
       setFeedback(null)
 
@@ -91,14 +120,24 @@ export function useAveriaAdminAsignacion(
         if (estadoActual === 'RECIBIDA') {
           await patchAdminAveriaEstado(averiaId, 'EN_REVISION')
         }
-        const updated = await patchAdminAveriaAsignacion(averiaId, fontaneroId)
+        const updated = await patchAdminAveriaAsignacion(
+          averiaId,
+          fontaneroId,
+          ayudanteId,
+        )
         onUpdated(updated)
         const fontaneroForMessage = updated.fontanero ?? { id: fontaneroId }
+        const ayudanteForMessage =
+          updated.ayudante ?? (ayudanteId != null ? { id: ayudanteId } : null)
         setFeedback({
           variant: 'success',
-          message: buildAveriaAsignacionSuccessMessage(fontaneroForMessage),
+          message: buildAveriaAsignacionSuccessMessage(
+            fontaneroForMessage,
+            ayudanteForMessage,
+          ),
         })
         setSelectedFontaneroId(null)
+        setSelectedAyudanteId(null)
       } catch (error) {
         setFeedback({
           variant: 'error',
@@ -114,22 +153,24 @@ export function useAveriaAdminAsignacion(
 
   const selectFontaneroIdFromString = useCallback((value: string) => {
     clearFeedback()
-    const trimmed = value.trim()
-    if (trimmed === '') {
-      setSelectedFontaneroId(null)
-      return
-    }
-    const parsed = Number.parseInt(trimmed, 10)
-    setSelectedFontaneroId(Number.isFinite(parsed) && parsed > 0 ? parsed : null)
+    setSelectedFontaneroId(parseUsuarioId(value))
+  }, [clearFeedback])
+
+  const selectAyudanteIdFromString = useCallback((value: string) => {
+    clearFeedback()
+    setSelectedAyudanteId(parseUsuarioId(value))
   }, [clearFeedback])
 
   return {
     fontaneros: loadFontaneros ? fontaneros : [],
+    ayudantes: loadFontaneros ? ayudantes : [],
     listLoading: loadFontaneros && listLoading,
     listError: loadFontaneros ? listError : null,
     refetchFontaneros,
     selectedFontaneroId,
     selectFontaneroIdFromString,
+    selectedAyudanteId,
+    selectAyudanteIdFromString,
     assigning,
     feedback,
     clearFeedback,

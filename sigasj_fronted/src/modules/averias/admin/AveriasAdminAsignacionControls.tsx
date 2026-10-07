@@ -13,10 +13,12 @@ import {
 import AveriasDetailField from './AveriasDetailField'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import {
+  AVERIA_SIN_AYUDANTE_LABEL,
   AVERIA_UNAVAILABLE_LABEL,
   AVERIA_UNASSIGNED_LABEL,
   AVERIAS_ADMIN_FONTANEROS_EMPTY,
   buildAveriaAsignacionConfirmMessage,
+  getAyudanteLabel,
   getFontaneroAsignableLabel,
   getFontaneroLabel,
   type AveriaDetail,
@@ -24,6 +26,7 @@ import {
 import './AveriasAdminAsignacionControls.css'
 
 const FONTANERO_SELECT_ID = 'averia-asignacion-fontanero'
+const AYUDANTE_SELECT_ID = 'averia-asignacion-ayudante'
 
 export type AveriasAdminAsignacionControlsProps = {
   averia: AveriaDetail
@@ -42,11 +45,14 @@ const AveriasAdminAsignacionControls = ({
 
   const {
     fontaneros,
+    ayudantes,
     listLoading,
     listError,
     refetchFontaneros,
     selectedFontaneroId,
     selectFontaneroIdFromString,
+    selectedAyudanteId,
+    selectAyudanteIdFromString,
     assigning,
     feedback,
     clearFeedback,
@@ -60,9 +66,13 @@ const AveriasAdminAsignacionControls = ({
     selectedFontaneroId != null
       ? fontaneros.find((item) => item.id === selectedFontaneroId)
       : undefined
+  const selectedAyudante =
+    selectedAyudanteId != null
+      ? ayudantes.find((item) => item.id === selectedAyudanteId)
+      : undefined
   const confirmMessage =
     selectedFontanero != null
-      ? buildAveriaAsignacionConfirmMessage(selectedFontanero)
+      ? buildAveriaAsignacionConfirmMessage(selectedFontanero, selectedAyudante)
       : '¿Desea asignar esta avería al fontanero seleccionado?'
 
   const handleAssignClick = () => {
@@ -82,6 +92,7 @@ const AveriasAdminAsignacionControls = ({
       averia.id,
       selectedFontaneroId,
       String(averia.estado),
+      selectedAyudanteId,
     ).catch(() => undefined)
   }
 
@@ -94,6 +105,9 @@ const AveriasAdminAsignacionControls = ({
       <dl className="averias-admin__fields">
         <AveriasDetailField label="Fontanero asignado">
           {getFontaneroLabel(averia.fontanero)}
+        </AveriasDetailField>
+        <AveriasDetailField label="Ayudante del fontanero">
+          {getAyudanteLabel(averia.ayudante)}
         </AveriasDetailField>
         <AveriasDetailField label="Fecha de asignación">
           {formatAveriaAdminDateTimeOrUnavailable(
@@ -189,6 +203,28 @@ const AveriasAdminAsignacionControls = ({
               {fontaneros.map((fontanero) => (
                 <option key={fontanero.id} value={String(fontanero.id)}>
                   {getFontaneroAsignableLabel(fontanero)}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="gallery-admin__field" htmlFor={AYUDANTE_SELECT_ID}>
+            <span>Ayudante del fontanero (opcional)</span>
+            <select
+              id={AYUDANTE_SELECT_ID}
+              name="ayudanteId"
+              value={
+                selectedAyudanteId != null ? String(selectedAyudanteId) : ''
+              }
+              disabled={busy}
+              onChange={(event) =>
+                selectAyudanteIdFromString(event.target.value)
+              }
+            >
+              <option value="">{AVERIA_SIN_AYUDANTE_LABEL}</option>
+              {ayudantes.map((ayudante) => (
+                <option key={ayudante.id} value={String(ayudante.id)}>
+                  {getFontaneroAsignableLabel(ayudante)}
                 </option>
               ))}
             </select>

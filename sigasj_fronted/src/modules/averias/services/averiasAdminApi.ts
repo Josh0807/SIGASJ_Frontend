@@ -211,19 +211,31 @@ export async function getAdminAveriaFontaneros(
   )
 }
 
+export async function getAdminAveriaAyudantes(
+  signal?: AbortSignal,
+): Promise<AveriaFontanerosResponse> {
+  return fetchWithAuth<AveriaFontanerosResponse>(
+    `${ADMIN_AVERIAS_ENDPOINT}/ayudantes`,
+    { signal },
+  )
+}
+
 /** @deprecated Usar getAdminAveriaFontaneros */
 export const getAdminAveriasFontanerosAsignables = getAdminAveriaFontaneros
 
 export async function patchAdminAveriaAsignacion(
   id: number,
   fontaneroId: number,
+  ayudanteId?: number | null,
   signal?: AbortSignal,
 ): Promise<AveriaDetail> {
   return fetchWithAuth<AveriaDetail>(
     `${ADMIN_AVERIAS_ENDPOINT}/${id}/asignacion`,
     {
       method: 'PATCH',
-      body: JSON.stringify({ fontaneroId }),
+      body: JSON.stringify(
+        ayudanteId != null ? { fontaneroId, ayudanteId } : { fontaneroId },
+      ),
       signal,
     },
   )

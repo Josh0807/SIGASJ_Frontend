@@ -23,6 +23,8 @@ import {
   AVERIAS_FONTANERO_DETAIL_LOADING_MESSAGE,
   AVERIAS_FONTANERO_DETAIL_NOT_FOUND,
   AVERIAS_FONTANERO_ATENCION_NO_INICIADA,
+  AVERIAS_FONTANERO_CALIFICAR_CONFIRM_ACEPTAR,
+  AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO,
   AVERIAS_FONTANERO_CALIFICAR_GUARDAR,
   AVERIAS_FONTANERO_CALIFICAR_SUCCESS,
   AVERIAS_FONTANERO_LIST_EMPTY,
@@ -190,6 +192,18 @@ describe('AveriasFontaneroDetailPage', () => {
     await act(async () => {
       guardar?.click()
       await Promise.resolve()
+    })
+
+    expect(averiasFontaneroApi.patchFontaneroAveriaPrioridad).not.toHaveBeenCalled()
+    expect(container.textContent).toContain(AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO)
+    expect(container.textContent).toContain('Prioridad: Media. Tipo: Tubo medidor.')
+
+    const aceptar = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === AVERIAS_FONTANERO_CALIFICAR_CONFIRM_ACEPTAR,
+    )
+    await act(async () => {
+      aceptar?.click()
+      await Promise.resolve()
       await Promise.resolve()
     })
 
@@ -202,6 +216,38 @@ describe('AveriasFontaneroDetailPage', () => {
       'TUBO_MEDIDOR',
     )
     expect(container.textContent).toContain(AVERIAS_FONTANERO_CALIFICAR_SUCCESS)
+  })
+
+  it('al cancelar la confirmación no guarda la calificación', async () => {
+    await renderAt(`${FONTANERO_AVERIAS_PATH}/25`)
+    const prioridad = container.querySelector(
+      '#averia-fontanero-prioridad',
+    ) as HTMLSelectElement
+    const tipo = container.querySelector(
+      '#averia-fontanero-clasificacion',
+    ) as HTMLSelectElement
+    await act(async () => {
+      prioridad.value = 'ALTA'
+      prioridad.dispatchEvent(new Event('change', { bubbles: true }))
+      tipo.value = 'TUBO_MADRE'
+      tipo.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    const guardar = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent?.includes(AVERIAS_FONTANERO_CALIFICAR_GUARDAR),
+    )
+    await act(async () => {
+      guardar?.click()
+    })
+    const cancelar = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Cancelar',
+    )
+    await act(async () => {
+      cancelar?.click()
+    })
+
+    expect(container.textContent).not.toContain(AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO)
+    expect(averiasFontaneroApi.patchFontaneroAveriaPrioridad).not.toHaveBeenCalled()
+    expect(averiasFontaneroApi.patchFontaneroAveriaClasificacion).not.toHaveBeenCalled()
   })
 
   it('no muestra calificación en una avería resuelta', async () => {
