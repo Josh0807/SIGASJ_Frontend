@@ -283,8 +283,8 @@ export default function ReportesInventarioPage() {
                 <IconCategory size={26} />
               </span>
               <div>
-                <h2 id="reporte-categorias-title">Resumen por categoría</h2>
-                <p>Distribución de materiales y alertas de existencias por clasificación.</p>
+                <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#062e63]" id="reporte-categorias-title">Resumen por categoría</h2>
+                <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Distribución de materiales y alertas de existencias por clasificación.</p>
               </div>
             </header>
             <div className="inventario-reportes__category-table">
@@ -319,8 +319,8 @@ export default function ReportesInventarioPage() {
                   <IconArrowsExchange size={28} />
                 </span>
                 <div>
-                  <h2 className="!m-0 text-2xl font-extrabold tracking-tight text-slate-800" id="reporte-movimientos-title">Movimientos del periodo</h2>
-                  <p className="!mt-1.5 !mb-0 text-sm text-slate-600">Detalle de entradas y salidas según los filtros aplicados.</p>
+                  <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#062e63]" id="reporte-movimientos-title">Movimientos del periodo</h2>
+                  <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Detalle de entradas y salidas según los filtros aplicados.</p>
                 </div>
               </div>
             </header>

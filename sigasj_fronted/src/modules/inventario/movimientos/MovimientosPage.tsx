@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconArrowLeft, IconArrowsExchange, IconCalendar, IconEye, IconPackage, IconRefresh, IconTrash } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowsExchange, IconCalendar, IconEye, IconHistory, IconPackage, IconRefresh, IconTrash } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, movimientoDetailPath } from '../inventarioPaths'
@@ -97,18 +97,15 @@ export default function MovimientosPage() {
   return (
     <section className="material-tracking !mx-auto !w-full !max-w-[1480px] !gap-6" aria-labelledby="movimientos-title">
       <header className="material-tracking__header !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8 !shadow-[0_12px_32px_rgba(30,90,156,0.08)]">
-        <div className="flex items-start gap-4">
-          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-cyan-50 text-cyan-700"><IconArrowsExchange size={25} aria-hidden="true" /></span>
-          <div>
+        <div>
           <p className="material-request__eyebrow !mb-2 !text-xs !font-black !tracking-[0.12em] !text-cyan-700">Inventario · Administración</p>
           <h1 className="!text-3xl !font-black !tracking-tight !text-slate-900" id="movimientos-title">Historial de movimientos</h1>
           <p className="!mt-2 !text-base !text-slate-500">Consulte las entradas y salidas registradas sobre los materiales de bodega.</p>
-          </div>
         </div>
-        <Link className="material-tracking__detail-link !gap-2" to={MATERIALES_PATH}><IconArrowLeft size={18} aria-hidden="true" />Volver al catálogo</Link>
+        <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
       </header>
 
-      <div className="material-tracking__filters">
+      <div className="material-tracking__filters !grid !grid-cols-1 !items-end !gap-5 !rounded-3xl !border-blue-100 !bg-linear-to-br !from-white !via-blue-50/30 !to-sky-50/60 !p-6 !shadow-[0_12px_32px_rgba(30,90,156,0.09)] md:!grid-cols-2 xl:!grid-cols-4 [&>label]:!w-full [&>label]:!justify-items-start [&>label]:!text-left [&>label>span:first-child]:!ml-1 [&>label>span:first-child]:!w-auto [&>label>span:first-child]:!justify-self-start [&>label>span:first-child]:!text-left [&_.provider-admin__control]:!w-full [&_.provider-admin__control]:!rounded-2xl [&_.provider-admin__control]:!border [&_.provider-admin__control]:!border-blue-100 [&_.provider-admin__control]:!bg-white [&_.provider-admin__control]:!shadow-[0_7px_18px_rgba(37,99,235,0.08)] [&_.provider-admin__control]:!transition-all [&_.provider-admin__control]:!duration-300 hover:[&_.provider-admin__control]:!border-blue-300 hover:[&_.provider-admin__control]:!shadow-[0_10px_24px_rgba(37,99,235,0.14)] focus-within:[&_.provider-admin__control]:!border-blue-400 focus-within:[&_.provider-admin__control]:!ring-4 focus-within:[&_.provider-admin__control]:!ring-blue-100">
         <InventoryFormField label="Tipo" icon={<IconArrowsExchange size={20} aria-hidden="true" />}>
         <select
           id="movimiento-tipo-filtro"
@@ -166,14 +163,14 @@ export default function MovimientosPage() {
         </InventoryFormField>
 
         {filtered ? (
-          <button type="button" className="material-tracking__filter-action sm:!col-span-2 xl:!col-span-4 xl:!ml-auto" onClick={clearFilters}>
-            <IconTrash size={17} aria-hidden="true" /> Limpiar filtros
+          <button type="button" className="material-tracking__filter-action group sm:!col-span-2 xl:!col-span-4 xl:!ml-auto !rounded-2xl !border-blue-200 !bg-white !px-5 !font-extrabold !text-blue-700 !shadow-[0_7px_18px_rgba(37,99,235,0.1)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_11px_24px_rgba(37,99,235,0.18)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" onClick={clearFilters}>
+            <IconTrash className="!transition-transform !duration-300 group-hover:!rotate-6 group-hover:!scale-110 motion-reduce:!transform-none" size={17} aria-hidden="true" /> Limpiar filtros
           </button>
         ) : null}
       </div>
 
       {!loading && !error ? (
-        <p role="status">{total} {total === 1 ? 'movimiento registrado' : 'movimientos registrados'}</p>
+        <p className="!m-0 !inline-flex !w-fit !items-center !gap-2.5 !rounded-2xl !border !border-cyan-200 !bg-linear-to-r !from-cyan-50 !to-blue-50 !px-4 !py-2.5 !font-bold !text-cyan-800 !shadow-[0_7px_18px_rgba(8,145,178,0.1)]" role="status"><IconHistory size={19} aria-hidden="true" />{total} {total === 1 ? 'movimiento registrado' : 'movimientos registrados'}</p>
       ) : null}
 
       {loading ? (
@@ -205,8 +202,8 @@ export default function MovimientosPage() {
       ) : null}
 
       {!loading && !error && movimientos.length > 0 ? (
-        <div className="material-tracking__table-wrap">
-          <table>
+        <div className="material-tracking__table-wrap !overflow-hidden !rounded-3xl !border-blue-100 !bg-white !shadow-[0_14px_34px_rgba(30,90,156,0.1)]">
+          <table className="[&_thead]:!bg-linear-to-r [&_thead]:!from-slate-50 [&_thead]:!to-blue-50/70 [&_th]:!bg-transparent [&_th]:!py-4 [&_th]:!font-extrabold [&_th]:!tracking-[0.06em] [&_tbody_tr]:!transition-colors [&_tbody_tr]:!duration-200 hover:[&_tbody_tr]:!bg-blue-50/50 [&_td]:!py-4">
             <caption className="visually-hidden">Historial de movimientos de inventario</caption>
             <thead>
               <tr>
@@ -225,7 +222,8 @@ export default function MovimientosPage() {
                   <td data-label="Fecha">{formatMovimientoFecha(movimiento.fechaMovimiento)}</td>
                   <td data-label="Material">{getMovimientoMaterialNombre(movimiento)}</td>
                   <td data-label="Tipo">
-                    <span className="material-tracking__badge" data-status={movimiento.tipo}>
+                    <span className={`material-tracking__badge !inline-flex !items-center !gap-2 !rounded-full !px-3.5 !py-2 !font-extrabold !shadow-sm ${movimiento.tipo === 'ENTRADA' ? '!border-emerald-200 !bg-emerald-50 !text-emerald-700' : '!border-rose-200 !bg-rose-50 !text-rose-700'}`} data-status={movimiento.tipo}>
+                      <span className={`size-2 rounded-full ${movimiento.tipo === 'ENTRADA' ? 'bg-emerald-500' : 'bg-rose-500'}`} aria-hidden="true" />
                       {formatMovimientoTipo(movimiento.tipo)}
                     </span>
                   </td>
@@ -233,8 +231,8 @@ export default function MovimientosPage() {
                   <td data-label="Responsable">{getMovimientoResponsable(movimiento)}</td>
                   <td data-label="Referencia">{getMovimientoReferencia(movimiento)}</td>
                   <td data-label="Acciones">
-                    <Link className="material-tracking__detail-link !gap-2" to={movimientoDetailPath(movimiento.id)}>
-                      <IconEye size={17} aria-hidden="true" /> Ver detalle
+                    <Link className="material-tracking__detail-link group !gap-2 !rounded-xl !border-blue-100 !bg-blue-50/70 !px-3.5 !py-2 !text-blue-700 !shadow-none !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-300 hover:!bg-blue-100 hover:!shadow-[0_7px_16px_rgba(37,99,235,0.14)] motion-reduce:!transform-none motion-reduce:!transition-none" to={movimientoDetailPath(movimiento.id)}>
+                      <IconEye className="!transition-transform !duration-300 group-hover:!scale-110" size={17} aria-hidden="true" /> Ver detalle
                     </Link>
                   </td>
                 </tr>

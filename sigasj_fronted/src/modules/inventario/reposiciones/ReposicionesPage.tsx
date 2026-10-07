@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconBox, IconFilter, IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconBox, IconFilter, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
@@ -104,10 +104,10 @@ export default function ReposicionesPage() {
           <h1 id="reposiciones-title">Reposiciones de materiales</h1>
           <p>Consulte y gestione las reposiciones generadas por alertas, solicitudes o acciones administrativas.</p>
         </div>
-        <Link className="material-tracking__detail-link" to={MATERIALES_PATH}>Volver al catálogo</Link>
+        <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
       </header>
 
-      <div className="material-tracking__filters">
+      <div className="material-tracking__filters !flex !items-end !justify-between !gap-5 !overflow-hidden !rounded-3xl !border-blue-100 !bg-linear-to-r !from-white !via-blue-50/35 !to-sky-50/70 !p-6 !shadow-[0_12px_32px_rgba(30,90,156,0.09)] [&>label]:!w-full [&>label]:!max-w-[470px] [&>label]:!justify-items-start [&>label]:!text-left [&>label>span:first-child]:!ml-1 [&>label>span:first-child]:!w-auto [&>label>span:first-child]:!justify-self-start [&>label>span:first-child]:!text-left [&_.provider-admin__control]:!w-full [&_.provider-admin__control]:!rounded-2xl [&_.provider-admin__control]:!border [&_.provider-admin__control]:!border-blue-100 [&_.provider-admin__control]:!bg-white [&_.provider-admin__control]:!shadow-[0_7px_18px_rgba(37,99,235,0.08)] [&_.provider-admin__control]:!transition-all [&_.provider-admin__control]:!duration-300 hover:[&_.provider-admin__control]:!border-blue-300 hover:[&_.provider-admin__control]:!shadow-[0_10px_24px_rgba(37,99,235,0.14)] focus-within:[&_.provider-admin__control]:!border-blue-400 focus-within:[&_.provider-admin__control]:!ring-4 focus-within:[&_.provider-admin__control]:!ring-blue-100 max-[850px]:!grid max-[850px]:!grid-cols-1 max-[850px]:!items-stretch max-[850px]:[&>label]:!max-w-none">
         <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
         <select
           id="reposicion-estado-filtro"
@@ -131,7 +131,7 @@ export default function ReposicionesPage() {
         </select>
         </InventoryFormField>
         {!loading && !error ? (
-          <span role="status">{total} {total === 1 ? 'reposición' : 'reposiciones'}</span>
+          <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-orange-200 !bg-linear-to-r !from-orange-50 !to-amber-50 !px-5 !py-3 !font-extrabold !text-orange-700 !shadow-[0_7px_18px_rgba(234,88,12,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(234,88,12,0.18)] motion-reduce:!transform-none motion-reduce:!transition-none max-[850px]:!w-fit" role="status"><IconBox size={19} aria-hidden="true" />{total} {total === 1 ? 'reposición' : 'reposiciones'}</span>
         ) : null}
       </div>
 

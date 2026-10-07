@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { IconAlignLeft, IconClipboardList, IconDeviceFloppy, IconMinus, IconNote, IconPackage, IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconArrowRight, IconCircleCheck, IconClipboardList, IconDeviceFloppy, IconMinus, IconNote, IconPackage, IconPlus, IconTrash, IconUser } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -123,32 +123,36 @@ export default function SolicitudMaterialesPage() {
   }
 
   if (created) {
-    return <section className="material-request material-request--success" aria-labelledby="solicitud-title">
-      <div className="material-request__success" role="status">
-        <span className="material-request__eyebrow">Solicitud registrada</span>
-        <h1 id="solicitud-title">{created.codigo}</h1>
-        <p>La solicitud quedó en estado <strong>{created.estado}</strong>. El inventario no fue modificado.</p>
+    return <section className="material-request material-request--success !mx-auto !w-full !max-w-4xl" aria-labelledby="solicitud-title">
+      <div className="material-request__success !relative !isolate !overflow-hidden !rounded-[28px] !border-emerald-100 !bg-linear-to-br !from-white !via-emerald-50/45 !to-cyan-50/70 !p-10 !shadow-[0_20px_50px_rgba(15,118,110,0.14)] before:!absolute before:!-right-20 before:!-top-20 before:!-z-10 before:!size-64 before:!rounded-full before:!bg-emerald-200/25 max-[640px]:!p-6" role="status">
+        <span className="!grid !size-16 !place-items-center !rounded-2xl !bg-linear-to-br !from-emerald-500 !to-teal-600 !text-white !shadow-[0_12px_28px_rgba(5,150,105,0.3)]"><IconCircleCheck size={34} stroke={2.2} aria-hidden="true" /></span>
+        <span className="material-request__eyebrow !mb-0 !mt-2 !text-emerald-700">Solicitud registrada</span>
+        <h1 className="!text-[clamp(2rem,5vw,3rem)] !font-black !tracking-[-0.035em] !text-[#062e63]" id="solicitud-title">{created.codigo}</h1>
+        <p className="!text-lg !text-slate-600">La solicitud quedó en estado <strong className="!inline-flex !rounded-full !border !border-amber-200 !bg-amber-50 !px-3 !py-1 !text-sm !font-extrabold !text-amber-700 !shadow-sm">{created.estado}</strong>. El inventario no fue modificado.</p>
         {created.idAveria ? <p>Avería relacionada: <strong>#{created.idAveria}</strong></p> : null}
         <div className="material-request__success-actions">
-          {returnToAveria ? <Link className="material-request__primary" to={returnToAveria}>Volver a la avería</Link> : null}
-          <Link className="material-request__primary" to={SOLICITUDES_MATERIALES_PATH}>Ver mis solicitudes</Link>
-          <button className="material-request__add" type="button" onClick={() => setCreated(null)}>Crear otra solicitud</button>
+          {returnToAveria ? <Link className="material-request__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.28)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_16px_32px_rgba(37,99,235,0.38)] motion-reduce:!transform-none motion-reduce:!transition-none" to={returnToAveria}>Volver a la avería</Link> : null}
+          <Link className="material-request__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.28)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!shadow-[0_16px_32px_rgba(37,99,235,0.38)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={SOLICITUDES_MATERIALES_PATH}>Ver mis solicitudes<IconArrowRight className="!transition-transform !duration-300 group-hover:!translate-x-1" size={19} aria-hidden="true" /></Link>
+          <button className="material-request__add group !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" type="button" onClick={() => setCreated(null)}><IconPlus className="!transition-transform !duration-300 group-hover:!rotate-90" size={19} aria-hidden="true" />Crear otra solicitud</button>
         </div>
       </div>
     </section>
   }
 
-  return <section className="material-request" aria-labelledby="solicitud-title">
-    <header className="material-request__header">
+  return <section className="material-request !max-w-none !gap-8" aria-labelledby="solicitud-title">
+    <header className="material-request__header !min-h-[260px] !items-center !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.08)] max-[899px]:!min-h-0">
       <div>
-        <p className="material-request__eyebrow">Inventario · Fontanero</p>
-        <h1 id="solicitud-title">Nueva solicitud de materiales</h1>
-        <p>Seleccione los materiales requeridos. Esta solicitud no descuenta ni reserva existencias.</p>
+        <p className="material-request__eyebrow inventory-page-eyebrow">Inventario · Fontanero</p>
+        <h1 className="inventory-page-title" id="solicitud-title">Nueva solicitud de materiales</h1>
+        <p className="inventory-page-subtitle">Seleccione los materiales requeridos. Esta solicitud no descuenta ni reserva existencias.</p>
       </div>
-      <div className="material-request__identity">
-        <span>Solicitante</span>
-        <strong>{resolveAuthUserDisplayName(user)}</strong>
-        <small>Obtenido de la sesión activa</small>
+      <div className="material-request__identity group !relative !w-[230px] !min-w-[230px] !overflow-hidden !rounded-[22px] !border !border-blue-200/70 !bg-linear-to-br !from-white !via-blue-50 !to-sky-100 !p-4 !shadow-[0_12px_30px_rgba(37,99,235,0.14)] !transition-all !duration-300 before:!absolute before:!-right-8 before:!-top-8 before:!size-24 before:!rounded-full before:!bg-blue-300/20 hover:!-translate-y-1 hover:!shadow-[0_18px_38px_rgba(37,99,235,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none max-[899px]:!w-full max-[899px]:!min-w-0">
+        <span className="!flex !items-center !gap-3 !text-blue-700">
+          <span className="!grid !size-10 !place-items-center !rounded-xl !bg-linear-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_8px_18px_rgba(37,99,235,0.28)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-105 motion-reduce:!transform-none"><IconUser size={20} stroke={2} aria-hidden="true" /></span>
+          Solicitante
+        </span>
+        <strong className="!mt-2 !text-xl !font-black !tracking-[-0.015em] !text-[#062e63]">{resolveAuthUserDisplayName(user)}</strong>
+        <small className="!flex !items-center !gap-2 !text-sm !font-medium !text-slate-500 before:!size-2 before:!rounded-full before:!bg-emerald-500 before:!shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">Obtenido de la sesión activa</small>
       </div>
     </header>
 
@@ -159,9 +163,9 @@ export default function SolicitudMaterialesPage() {
       {returnToAveria ? <Link className="material-request__add" to={returnToAveria}>Volver a la avería</Link> : null}
     </aside> : null}
 
-    <form className="material-request__form provider-admin__form" onSubmit={submit} noValidate>
-      <div className="provider-admin__form-heading">
-        <span><IconClipboardList size={25} aria-hidden="true" /></span>
+    <form className="material-request__form provider-admin__form !w-full !max-w-none !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_16px_42px_rgba(30,90,156,0.09)]" onSubmit={submit} noValidate>
+      <div className="provider-admin__form-heading !border-b !border-slate-100 !pb-6">
+        <span className="!grid !size-14 !place-items-center !rounded-2xl !bg-linear-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_10px_22px_rgba(37,99,235,0.28)]"><IconClipboardList size={25} aria-hidden="true" /></span>
         <div>
           <h2>Detalle de la solicitud</h2>
           <p>Agregue materiales y una observación. Enviar no modifica el stock.</p>
@@ -172,9 +176,9 @@ export default function SolicitudMaterialesPage() {
         <span>{submitError || errors.form || 'Revise los campos marcados.'}</span>
       </div> : null}
 
-      <div className="material-request__section-heading">
+      <div className="material-request__section-heading !items-center !rounded-2xl !bg-slate-50/80 !p-5">
         <div><h2>Materiales requeridos</h2><p>Agregue uno o varios materiales y su cantidad.</p></div>
-        <button type="button" className="material-request__add" onClick={() => setRows((current) => [...current, createEmptyMaterialRow()])} disabled={loading || materials.length === 0 || selectedIds.size >= materials.length}>
+        <button type="button" className="material-request__add !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-5 !font-extrabold !text-white !shadow-[0_9px_20px_rgba(37,99,235,0.24)] !transition-all !duration-300 hover:!-translate-y-1 hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.34)] active:!translate-y-0 active:!scale-[0.98] motion-reduce:!transform-none motion-reduce:!transition-none" onClick={() => setRows((current) => [...current, createEmptyMaterialRow()])} disabled={loading || materials.length === 0 || selectedIds.size >= materials.length}>
           <IconPlus size={19} aria-hidden="true" /> Agregar material
         </button>
       </div>
@@ -187,12 +191,12 @@ export default function SolicitudMaterialesPage() {
         {rows.map((row, index) => {
           const selectedMaterial = materials.find((material) => String(material.id) === row.materialId)
           const rowErrors = errors.rows[row.key] ?? {}
-          return <fieldset className="material-request__row" key={row.key} disabled={submitting || loading || Boolean(loadError)}>
+          return <fieldset className="material-request__row !rounded-[22px] !border-sky-100 !bg-linear-to-br !from-white !to-sky-50/40 !shadow-[0_8px_24px_rgba(30,90,156,0.06)]" key={row.key} disabled={submitting || loading || Boolean(loadError)}>
             <legend className="material-request__row-top">
-              <span>Material {index + 1}</span>
+              <span className="!rounded-full !bg-blue-50 !px-3 !py-1 !text-xs !font-extrabold !text-blue-700">Material {index + 1}</span>
               <button type="button" className="material-request__remove" onClick={() => removeRow(row.key)} aria-label={`Eliminar material ${index + 1}`} disabled={submitting} title="Eliminar material"><IconTrash size={18} aria-hidden="true" /><span>Eliminar</span></button>
             </legend>
-            <label className="material-request__material-field">Material <span aria-hidden="true">*</span>
+            <label className="material-request__material-field"><span className="!inline-flex !items-center !gap-1">Material <strong className="!text-rose-500" aria-hidden="true">*</strong></span>
               <span className="provider-admin__control">
                 <IconPackage size={20} aria-hidden="true" />
                 <select value={row.materialId} onChange={(event) => updateRow(row.key, 'materialId', event.target.value)} aria-invalid={Boolean(rowErrors.materialId)} aria-describedby={rowErrors.materialId ? `${row.key}-material-error` : undefined}>
@@ -202,7 +206,7 @@ export default function SolicitudMaterialesPage() {
               </span>
               {rowErrors.materialId ? <small id={`${row.key}-material-error`} className="material-request__field-error">{rowErrors.materialId}</small> : null}
             </label>
-            <label className="material-request__quantity-field">Cantidad <span aria-hidden="true">*</span>
+            <label className="material-request__quantity-field"><span className="!inline-flex !items-center !gap-1">Cantidad <strong className="!text-rose-500" aria-hidden="true">*</strong></span>
               <div className="material-request__quantity">
                 <button type="button" className="material-request__step" aria-label={`Disminuir cantidad del material ${index + 1}`} onClick={() => stepCantidad(row.key, -1)}>
                   <IconMinus size={16} aria-hidden="true" />
@@ -215,7 +219,7 @@ export default function SolicitudMaterialesPage() {
               </div>
               {rowErrors.cantidad ? <small id={`${row.key}-cantidad-error`} className="material-request__field-error">{rowErrors.cantidad}</small> : null}
             </label>
-            <label className="material-request__note-field">Nota del material <small>(opcional)</small>
+            <label className="material-request__note-field"><span className="!inline-flex !items-baseline !gap-2">Nota del material <small className="!font-medium !text-slate-500">(opcional)</small></span>
               <span className="provider-admin__control">
                 <IconNote size={20} aria-hidden="true" />
                 <input maxLength={255} value={row.observacion} onChange={(event) => updateRow(row.key, 'observacion', event.target.value)} placeholder="Ej. Para tubería principal" aria-invalid={Boolean(rowErrors.observacion)} />
@@ -239,10 +243,13 @@ export default function SolicitudMaterialesPage() {
 
       <footer className="material-request__actions materials-admin__form-actions">
         <p><strong>Importante:</strong> enviar esta solicitud no modifica el stock.</p>
-        <button className="material-request__primary materials-admin__primary" type="submit" disabled={submitting || loading || Boolean(loadError) || materials.length === 0}>
-          <IconDeviceFloppy size={19} aria-hidden="true" />
-          {submitting ? 'Enviando…' : 'Enviar solicitud'}
-        </button>
+        <div className="!ml-auto !flex !flex-wrap !items-center !justify-end !gap-3 max-[700px]:!ml-0 max-[700px]:!w-full max-[700px]:!flex-col [&>*]:max-[700px]:!w-full">
+          <button className="material-request__primary materials-admin__primary group !rounded-2xl !bg-linear-to-r !from-blue-600 !to-sky-500 !shadow-[0_10px_24px_rgba(37,99,235,0.28)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_16px_32px_rgba(37,99,235,0.38)] active:!translate-y-0 active:!scale-[0.97] disabled:!translate-y-0 disabled:!scale-100 motion-reduce:!transform-none motion-reduce:!transition-none" type="submit" disabled={submitting || loading || Boolean(loadError) || materials.length === 0}>
+            <IconDeviceFloppy className="!transition-transform !duration-300 group-hover:!-rotate-6 group-hover:!scale-110 group-active:!rotate-0 motion-reduce:!transform-none" size={19} aria-hidden="true" />
+            {submitting ? 'Enviando…' : 'Enviar solicitud'}
+          </button>
+          <Link className="materials-admin__secondary group !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={SOLICITUDES_MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver a mis solicitudes</Link>
+        </div>
       </footer>
     </form>
   </section>

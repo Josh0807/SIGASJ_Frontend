@@ -206,10 +206,10 @@ const AdminDashboard = () => {
         </div>
         ) : null}
 
-        <div className="admin-dashboard__section">
-          <div className="admin-dashboard__section-header">
-            <h2>Operaciones en tiempo real</h2>
-            <p>Monitoreo de averías del acueducto y bitácora de actividad reciente.</p>
+        <div className="admin-dashboard__section !gap-6">
+          <div className="admin-dashboard__section-header !gap-2">
+            <h2 className="!text-2xl !font-black !tracking-[-0.02em] !text-[#062e63]">Operaciones en tiempo real</h2>
+            <p className="!text-base !leading-7 !text-slate-500">Monitoreo de averías del acueducto y bitácora de actividad reciente.</p>
           </div>
           <div className="admin-dashboard__widgets-grid">
             <ErrorBoundary>
