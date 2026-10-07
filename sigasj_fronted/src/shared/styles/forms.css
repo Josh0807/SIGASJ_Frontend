@@ -113,7 +113,8 @@
 .actividad-registro-form,
 .inventory-entry__form,
 .public-averia-form {
-  max-width: 52rem;
+  width: 100%;
+  max-width: none;
 }
 
 .gallery-admin__form,

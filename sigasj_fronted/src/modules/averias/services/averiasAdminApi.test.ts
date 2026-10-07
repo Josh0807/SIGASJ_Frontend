@@ -192,6 +192,17 @@ describe('averiasAdminApi', () => {
         signal: undefined,
       },
     )
+
+    vi.mocked(fetchWithAuth).mockResolvedValueOnce(detail)
+    await patchAdminAveriaAsignacion(10, 7, 8)
+    expect(fetchWithAuth).toHaveBeenLastCalledWith(
+      `${ADMIN_AVERIAS_ENDPOINT}/10/asignacion`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ fontaneroId: 7, ayudanteId: 8 }),
+        signal: undefined,
+      },
+    )
   })
 
   it('PATCH estado, prioridad y clasificación usan rutas y body del Backend 2.3', async () => {

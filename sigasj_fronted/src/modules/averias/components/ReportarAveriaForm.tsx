@@ -171,7 +171,7 @@ export default function ReportarAveriaForm() {
 
   return (
     <form
-      className="public-averia-form w-full max-w-3xl"
+      className="public-averia-form w-full"
       noValidate
       onSubmit={handleSubmit}
       aria-busy={isSubmitting ? true : undefined}

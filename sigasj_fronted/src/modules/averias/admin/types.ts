@@ -138,6 +138,7 @@ export type AveriaDetail = {
   ubicacion: string
   descripcion: string
   fontanero: AveriaAdminFontanero | null
+  ayudante?: AveriaAdminFontanero | null
   tipoAveria: string | null
   prioridad: string | null
   fechaAsignacion: string | null
@@ -361,22 +362,29 @@ export const getFontaneroAsignableLabel = (
   fontanero: AveriaFontaneroAsignable,
 ): string => getFontaneroLabel(fontanero)
 
+export const AVERIA_SIN_AYUDANTE_LABEL = 'Sin ayudante'
+
+export const getAyudanteLabel = (
+  ayudante: AveriaAdminFontanero | null | undefined,
+): string => (ayudante == null ? AVERIA_SIN_AYUDANTE_LABEL : getFontaneroLabel(ayudante))
+
+const conAyudante = (ayudante: AveriaAdminFontanero | null | undefined): string =>
+  ayudante == null ? '' : ` con el ayudante ${getFontaneroLabel(ayudante)}`
+
 export const buildAveriaAsignacionConfirmMessage = (
   fontanero: AveriaAdminFontanero,
+  ayudante?: AveriaAdminFontanero | null,
 ): string => {
   const label = getFontaneroLabel(fontanero)
-  if (label.startsWith('Fontanero #')) {
-    return `¿Desea asignar esta avería al ${label}?`
-  }
-  return `¿Desea asignar esta avería a ${label}?`
+  const destino = label.startsWith('Fontanero #') ? `al ${label}` : `a ${label}`
+  return `¿Desea asignar esta avería ${destino}${conAyudante(ayudante)}?`
 }
 
 export const buildAveriaAsignacionSuccessMessage = (
   fontanero: AveriaAdminFontanero,
+  ayudante?: AveriaAdminFontanero | null,
 ): string => {
   const label = getFontaneroLabel(fontanero)
-  if (label.startsWith('Fontanero #')) {
-    return `Avería asignada correctamente al ${label}.`
-  }
-  return `Avería asignada correctamente a ${label}.`
+  const destino = label.startsWith('Fontanero #') ? `al ${label}` : `a ${label}`
+  return `Avería asignada correctamente ${destino}${conAyudante(ayudante)}.`
 }

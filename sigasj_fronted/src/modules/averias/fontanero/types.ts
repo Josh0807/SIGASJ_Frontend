@@ -168,6 +168,8 @@ export const AVERIAS_FONTANERO_CALIFICAR_HINT =
   'Califique prioridad (Baja, Media o Alta) y tipo (Tubo madre o Tubo medidor).'
 
 export const AVERIAS_FONTANERO_CALIFICAR_GUARDAR = 'Guardar calificación'
+export const AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO = 'Confirmar calificación'
+export const AVERIAS_FONTANERO_CALIFICAR_CONFIRM_ACEPTAR = 'Aceptar cambios'
 
 export const AVERIAS_FONTANERO_CALIFICAR_LOADING = 'Guardando calificación...'
 

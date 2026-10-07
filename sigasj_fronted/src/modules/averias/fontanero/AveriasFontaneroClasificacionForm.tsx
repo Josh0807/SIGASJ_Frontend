@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
+import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
 import {
   extractHttpErrorMessage,
@@ -12,6 +13,8 @@ import {
   patchFontaneroAveriaPrioridad,
 } from '../services/averiasFontaneroApi'
 import {
+  AVERIAS_FONTANERO_CALIFICAR_CONFIRM_ACEPTAR,
+  AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO,
   AVERIAS_FONTANERO_CALIFICAR_ERROR,
   AVERIAS_FONTANERO_CALIFICAR_FORBIDDEN,
   AVERIAS_FONTANERO_CALIFICAR_GUARDAR,
@@ -72,14 +75,32 @@ const AveriasFontaneroClasificacionForm = ({
   const [tipo, setTipo] = useState(toTipoValue(averia.tipoAveria))
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const guardarRef = useRef<HTMLButtonElement>(null)
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const prioridadLabel =
+    PRIORIDAD_AVERIA_FONTANERO_OPTIONS.find((option) => option.value === prioridad)
+      ?.label ?? prioridad
+  const tipoLabel =
+    TIPO_AVERIA_FONTANERO_OPTIONS.find((option) => option.value === tipo)?.label ??
+    tipo
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (saving) {
       return
     }
     if (!prioridad || !tipo) {
       setError(AVERIAS_FONTANERO_CALIFICAR_INVALIDA)
+      return
+    }
+    setError(null)
+    setConfirmOpen(true)
+  }
+
+  const guardarCalificacion = async () => {
+    setConfirmOpen(false)
+    if (saving || !prioridad || !tipo) {
       return
     }
 
@@ -157,11 +178,26 @@ const AveriasFontaneroClasificacionForm = ({
         </select>
       </label>
       {error ? <ActivityFeedback variant="error" message={error} /> : null}
-      <button className="gallery-admin__button" type="submit" disabled={saving}>
+      <button
+        ref={guardarRef}
+        className="gallery-admin__button"
+        type="submit"
+        disabled={saving}
+      >
         {saving
           ? AVERIAS_FONTANERO_CALIFICAR_LOADING
           : AVERIAS_FONTANERO_CALIFICAR_GUARDAR}
       </button>
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title={AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO}
+        message={`Prioridad: ${prioridadLabel}. Tipo: ${tipoLabel}. ¿Acepta los cambios?`}
+        confirmLabel={AVERIAS_FONTANERO_CALIFICAR_CONFIRM_ACEPTAR}
+        cancelLabel="Cancelar"
+        returnFocusRef={guardarRef}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => void guardarCalificacion()}
+      />
     </form>
   )
 }
