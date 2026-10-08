@@ -15,6 +15,7 @@ import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
 import InventarioRoutes from '../../modules/inventario/InventarioRoutes'
 import AveriasAdminRoutes from '../../modules/averias/admin/AveriasAdminRoutes'
+import AsociadosRoutes from '../../modules/asociados/AsociadosRoutes'
 
 export type PrivateRouteDefinition = {
   segment: string
@@ -36,7 +37,7 @@ export type AdminNavItem = {
 const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   dashboard: <AdminDashboard />,
   usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
-  abonados: <PrivateModulePlaceholder title="Gestión de asociados" />,
+  abonados: <AsociadosRoutes />,
   inventario: <InventarioRoutes />,
   solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
   lecturas: <PrivateModulePlaceholder title="Recursos Humanos" />,
