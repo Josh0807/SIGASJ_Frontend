@@ -30,7 +30,7 @@ export const ALL_QUICK_ACCESS_ITEMS: QuickAccessConfigItem[] = [
   {
     id: 'lecturas',
     title: 'Recursos Humanos',
-    description: 'Administrar personal, planillas y expediente de colaboradores.',
+    description: 'Registrar, consultar y administrar a los colaboradores.',
     path: '/admin/lecturas',
     icon: 'lecturas',
   },
