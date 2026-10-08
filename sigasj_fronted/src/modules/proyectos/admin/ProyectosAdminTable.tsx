@@ -69,7 +69,7 @@ const ProyectosAdminTable = ({
                 <td className={`${mobileCellClass} max-[760px]:[&_.proyectos-admin__estado-select]:min-w-0 max-[760px]:[&_.proyectos-admin__estado-select]:w-full`} data-label="Estado">
                   <div className="proyectos-admin__estado-cell">
                     <select
-                      className="proyectos-admin__estado-select"
+                      className="proyectos-admin__estado-select !min-h-11 !cursor-pointer !appearance-none !rounded-xl !border !border-blue-200 !bg-[linear-gradient(45deg,transparent_50%,#2563eb_50%),linear-gradient(135deg,#2563eb_50%,transparent_50%),linear-gradient(to_right,#dbeafe,#dbeafe)] !bg-[position:calc(100%-18px)_50%,calc(100%-13px)_50%,calc(100%-2.75rem)_50%] !bg-[size:5px_5px,5px_5px,1px_1.75rem] !bg-no-repeat !px-4 !pr-14 !font-bold !text-blue-950 !shadow-sm !outline-none !transition-all !duration-300 hover:!border-blue-400 hover:!shadow-md focus:!border-blue-500 focus:!ring-4 focus:!ring-blue-100"
                       aria-label={`Cambiar estado de ${proyecto.nombre}`}
                       value={proyecto.estado}
                       onChange={(e) =>
@@ -90,7 +90,13 @@ const ProyectosAdminTable = ({
                 <td className={mobileCellClass} data-label="Duración">{duracion ? duracion : '—'}</td>
                 <td className={mobileCellClass} data-label="Visibilidad">
                   <ul className="gallery-admin__badges">
-                    <li className={proyecto.activo ? 'is-active' : 'is-inactive'}>
+                    <li
+                      className={`${proyecto.activo ? 'is-active !border-emerald-200 !bg-emerald-50 !text-emerald-700' : 'is-inactive !border-slate-300 !bg-slate-100 !text-slate-600'} !inline-flex !min-h-9 !items-center !gap-2 !rounded-full !border !px-3.5 !font-extrabold !shadow-sm`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`!h-2.5 !w-2.5 !rounded-full ${proyecto.activo ? '!bg-emerald-500 !shadow-[0_0_0_4px_rgba(16,185,129,0.12)]' : '!bg-slate-400 !shadow-[0_0_0_4px_rgba(148,163,184,0.14)]'}`}
+                      />
                       {visibilidadLabel(proyecto.activo)}
                     </li>
                   </ul>

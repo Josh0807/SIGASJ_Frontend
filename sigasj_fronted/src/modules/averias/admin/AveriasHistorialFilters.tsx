@@ -56,7 +56,12 @@ const AveriasHistorialFilters = ({
   )
 
   return (
-    <section className="gallery-admin__filters w-full" aria-label="Filtros del historial">
+    <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]" aria-label="Filtros del historial">
+      <div className="col-span-full border-b border-blue-100 pb-5">
+        <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Consulta del historial</p>
+        <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar averías</h2>
+        <p className="mt-2 text-base text-slate-500">Use uno o varios criterios para encontrar los casos registrados.</p>
+      </div>
       <form
         className="sigasj-filter-search"
         role="search"

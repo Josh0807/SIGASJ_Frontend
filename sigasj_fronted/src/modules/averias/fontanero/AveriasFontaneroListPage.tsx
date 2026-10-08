@@ -1,5 +1,5 @@
 import { Link, Navigate } from 'react-router-dom'
-import { IconArrowLeft } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
@@ -124,7 +124,7 @@ const AveriasFontaneroListPage = ({
                     {grupo.items.map((item) => (
                       <li key={item.id}>
                         <Link
-                          className={`averias-fontanero__tarjeta averias-fontanero__tarjeta--${prioridadTono(item.prioridad)}`}
+                          className={`averias-fontanero__tarjeta group averias-fontanero__tarjeta--${prioridadTono(item.prioridad)}`}
                           to={averiasFontaneroDetailPath(item.id)}
                           aria-label={`Ver detalle de la avería ${item.codigoSeguimiento}`}
                         >
@@ -164,8 +164,9 @@ const AveriasFontaneroListPage = ({
                               ) : null}
                             </ul>
                           </div>
-                          <span className="averias-fontanero__tarjeta-flecha" aria-hidden="true">
+                          <span className="averias-fontanero__tarjeta-flecha !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3 !font-extrabold !text-white !no-underline !shadow-[0_10px_22px_rgba(37,99,235,0.24)] !transition-all !duration-300 group-hover:!-translate-y-0.5 group-hover:!from-blue-700 group-hover:!to-sky-600 group-hover:!shadow-[0_14px_28px_rgba(37,99,235,0.32)]" aria-hidden="true">
                             Ver detalle
+                            <IconArrowRight size={19} stroke={2.2} />
                           </span>
                         </Link>
                       </li>

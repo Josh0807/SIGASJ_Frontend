@@ -17,6 +17,7 @@ import {
 import type { SolicitudMaterialFormErrors, SolicitudMateriales } from './types'
 import { SOLICITUDES_MATERIALES_PATH } from '../inventarioPaths'
 import { readSafeAveriaReturnPath } from '../../averias/inventario/averiaInventarioPaths'
+import InventarioModuleMenu from '../InventarioModuleMenu'
 
 const EMPTY_ERRORS: SolicitudMaterialFormErrors = { rows: {} }
 
@@ -140,27 +141,32 @@ export default function SolicitudMaterialesPage() {
   }
 
   return <section className="material-request !max-w-none !gap-8" aria-labelledby="solicitud-title">
-    <header className="material-request__header !min-h-[260px] !items-center !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.08)] max-[899px]:!min-h-0">
+    <header className="material-request__header material-request__header--new-request material-request__header--rail-fixed !relative !block !min-h-[280px] !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.08)] min-[900px]:!pr-[384px] max-[899px]:!min-h-0 max-[899px]:!p-6">
       <div>
         <p className="material-request__eyebrow inventory-page-eyebrow">Inventario · Fontanero</p>
         <h1 className="inventory-page-title" id="solicitud-title">Nueva solicitud de materiales</h1>
         <p className="inventory-page-subtitle">Seleccione los materiales requeridos. Esta solicitud no descuenta ni reserva existencias.</p>
       </div>
-      <div className="material-request__identity group !relative !w-[230px] !min-w-[230px] !overflow-hidden !rounded-[22px] !border !border-blue-200/70 !bg-linear-to-br !from-white !via-blue-50 !to-sky-100 !p-4 !shadow-[0_12px_30px_rgba(37,99,235,0.14)] !transition-all !duration-300 before:!absolute before:!-right-8 before:!-top-8 before:!size-24 before:!rounded-full before:!bg-blue-300/20 hover:!-translate-y-1 hover:!shadow-[0_18px_38px_rgba(37,99,235,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none max-[899px]:!w-full max-[899px]:!min-w-0">
-        <span className="!flex !items-center !gap-3 !text-blue-700">
-          <span className="!grid !size-10 !place-items-center !rounded-xl !bg-linear-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_8px_18px_rgba(37,99,235,0.28)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-105 motion-reduce:!transform-none"><IconUser size={20} stroke={2} aria-hidden="true" /></span>
-          Solicitante
-        </span>
-        <strong className="!mt-2 !text-xl !font-black !tracking-[-0.015em] !text-[#062e63]">{resolveAuthUserDisplayName(user)}</strong>
-        <small className="!flex !items-center !gap-2 !text-sm !font-medium !text-slate-500 before:!size-2 before:!rounded-full before:!bg-emerald-500 before:!shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">Obtenido de la sesión activa</small>
+      <div className="material-request__right-rail !grid !min-w-0 !gap-4 min-[900px]:!absolute min-[900px]:!top-8 min-[900px]:!right-8 min-[900px]:!w-[320px] max-[899px]:!mt-6 max-[899px]:!w-full">
+        <InventarioModuleMenu inline />
+        <div className="material-request__identity material-request__identity--new-request group !relative !inset-auto !m-0 !w-full !min-w-0 !max-w-none !overflow-hidden !rounded-[22px] !border !border-blue-200/70 !bg-linear-to-br !from-white !via-blue-50 !to-sky-100 !p-4 !shadow-[0_12px_30px_rgba(37,99,235,0.14)] !transition-all !duration-300 before:!absolute before:!-right-8 before:!-top-8 before:!size-24 before:!rounded-full before:!bg-blue-300/20 hover:!-translate-y-1 hover:!shadow-[0_18px_38px_rgba(37,99,235,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none">
+          <span className="!flex !items-center !gap-3 !text-blue-700">
+            <span className="!grid !size-10 !place-items-center !rounded-xl !bg-linear-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_8px_18px_rgba(37,99,235,0.28)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-105 motion-reduce:!transform-none"><IconUser size={20} stroke={2} aria-hidden="true" /></span>
+            Solicitante
+          </span>
+          <strong className="!mt-2 !text-xl !font-black !tracking-[-0.015em] !text-[#062e63]">{resolveAuthUserDisplayName(user)}</strong>
+          <small className="!flex !items-center !gap-2 !text-sm !font-medium !text-slate-500 before:!size-2 before:!rounded-full before:!bg-emerald-500 before:!shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">Obtenido de la sesión activa</small>
+        </div>
       </div>
     </header>
 
-    {idAveria ? <aside className="material-request__averia" aria-label="Avería relacionada">
-      <span>Avería relacionada</span>
-      <strong>{referenciaAveria || `Avería #${idAveria}`}</strong>
-      <small>Identificador #{idAveria}</small>
-      {returnToAveria ? <Link className="material-request__add" to={returnToAveria}>Volver a la avería</Link> : null}
+    {idAveria ? <aside className="material-request__averia !grid !grid-cols-1 !gap-2 !overflow-hidden !rounded-[24px] !border !border-blue-100 !bg-linear-to-br !from-white !via-blue-50/50 !to-sky-100/70 !p-6 !shadow-[0_12px_32px_rgba(30,90,156,0.10)] md:!grid-cols-[minmax(0,1fr)_auto] md:!items-center" aria-label="Avería relacionada">
+      <div className="!grid !gap-1">
+        <span className="!text-xs !font-extrabold !uppercase !tracking-[0.09em] !text-blue-600">Avería relacionada</span>
+        <strong className="!text-xl !font-black !tracking-[-0.015em] !text-[#062e63]">{referenciaAveria || `Avería #${idAveria}`}</strong>
+        <small className="!text-sm !font-medium !text-slate-500">Identificador #{idAveria}</small>
+      </div>
+      {returnToAveria ? <Link className="material-request__add group !inline-flex !min-h-12 !items-center !justify-center !rounded-2xl !border !border-blue-200 !bg-white !px-6 !font-extrabold !text-blue-700 !no-underline !shadow-[0_8px_20px_rgba(37,99,235,0.13)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.22)] active:!translate-y-0 active:!scale-[0.97]" to={returnToAveria}>Volver a la avería</Link> : null}
     </aside> : null}
 
     <form className="material-request__form provider-admin__form !w-full !max-w-none !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_16px_42px_rgba(30,90,156,0.09)]" onSubmit={submit} noValidate>

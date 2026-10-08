@@ -71,8 +71,8 @@ const AveriasFontaneroClasificacionForm = ({
   onUpdated,
   onUnauthorized,
 }: AveriasFontaneroClasificacionFormProps) => {
-  const [prioridad, setPrioridad] = useState(toPrioridadValue(averia.prioridad))
-  const [tipo, setTipo] = useState(toTipoValue(averia.tipoAveria))
+  const [prioridad, setPrioridad] = useState<'BAJA' | 'MEDIA' | 'ALTA' | ''>('')
+  const [tipo, setTipo] = useState<'TUBO_MADRE' | 'TUBO_MEDIDOR' | ''>('')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -132,14 +132,17 @@ const AveriasFontaneroClasificacionForm = ({
 
   return (
     <form
-      className="averias-admin__gestion-controls averias-fontanero__calificar"
+      className="averias-admin__gestion-controls averias-fontanero__calificar !grid !min-w-0 !grid-cols-1 !gap-5 !rounded-3xl !border !border-blue-100 !bg-linear-to-br !from-white !to-blue-50/70 !p-6 !shadow-[0_10px_28px_rgba(30,90,156,0.10)] md:!grid-cols-2"
       onSubmit={handleSubmit}
     >
-      <p className="averias-admin__estado-label">{AVERIAS_FONTANERO_CALIFICAR_TITULO}</p>
-      <p className="averias-admin__hint">{AVERIAS_FONTANERO_CALIFICAR_HINT}</p>
-      <label className="gallery-admin__field" htmlFor={PRIORIDAD_SELECT_ID}>
-        <span>Prioridad</span>
+      <div className="!col-span-full !border-b !border-blue-100 !pb-4">
+        <p className="averias-admin__estado-label !m-0 !text-xl !font-black !tracking-[-0.02em] !text-[#073b73]">{AVERIAS_FONTANERO_CALIFICAR_TITULO}</p>
+        <p className="averias-admin__hint !mt-2 !mb-0 !max-w-2xl !text-sm !leading-relaxed !text-slate-500">{AVERIAS_FONTANERO_CALIFICAR_HINT}</p>
+      </div>
+      <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor={PRIORIDAD_SELECT_ID}>
+        <span className="!text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-blue-600">Prioridad</span>
         <select
+          className="!box-border !min-h-14 !w-full !min-w-0 !max-w-full !rounded-2xl !border !border-blue-200 !bg-white !px-4 !text-base !font-bold !text-[#073b73] !shadow-sm !outline-none !transition-all !duration-200 hover:!border-blue-300 focus:!border-blue-500 focus:!ring-4 focus:!ring-blue-100 disabled:!cursor-not-allowed disabled:!opacity-60"
           id={PRIORIDAD_SELECT_ID}
           name="prioridad"
           value={prioridad}
@@ -157,9 +160,10 @@ const AveriasFontaneroClasificacionForm = ({
           ))}
         </select>
       </label>
-      <label className="gallery-admin__field" htmlFor={TIPO_SELECT_ID}>
-        <span>Tipo</span>
+      <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor={TIPO_SELECT_ID}>
+        <span className="!text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-blue-600">Tipo</span>
         <select
+          className="!box-border !min-h-14 !w-full !min-w-0 !max-w-full !rounded-2xl !border !border-blue-200 !bg-white !px-4 !text-base !font-bold !text-[#073b73] !shadow-sm !outline-none !transition-all !duration-200 hover:!border-blue-300 focus:!border-blue-500 focus:!ring-4 focus:!ring-blue-100 disabled:!cursor-not-allowed disabled:!opacity-60"
           id={TIPO_SELECT_ID}
           name="clasificacion"
           value={tipo}
@@ -180,7 +184,7 @@ const AveriasFontaneroClasificacionForm = ({
       {error ? <ActivityFeedback variant="error" message={error} /> : null}
       <button
         ref={guardarRef}
-        className="gallery-admin__button"
+        className="gallery-admin__button !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(37,99,235,0.35)] active:!translate-y-0 active:!scale-[0.97] disabled:!cursor-not-allowed disabled:!opacity-55 disabled:hover:!translate-y-0"
         type="submit"
         disabled={saving}
       >

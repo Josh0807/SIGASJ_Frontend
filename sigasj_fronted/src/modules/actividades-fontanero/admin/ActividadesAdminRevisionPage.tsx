@@ -274,23 +274,24 @@ const ActividadesAdminRevisionPage = () => {
 
   return (
     <main className="gallery-admin actividades-admin-revision">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div>
+      <div className="gallery-admin__shell sigasj-stack !gap-7">
+        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+          <div className="min-w-0 space-y-3">
             <span className="gallery-admin__eyebrow">Actividades del Fontanero · Administradora</span>
             <h1>Revisión de actividades</h1>
             <p>Consulte la información reportada y confirme las actividades correctas.</p>
           </div>
-          <Link className="gallery-admin__link" to={ACTIVIDADES_ADMIN_PATHS.reportes}>Ver reportes</Link>
+          <Link className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-blue-50" to={ACTIVIDADES_ADMIN_PATHS.reportes}>Ver reportes</Link>
         </header>
 
-        <form className="gallery-admin__filters actividades-admin-revision__filters" onSubmit={search} aria-label="Filtros de actividades">
+        <form className="gallery-admin__filters actividades-admin-revision__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]" onSubmit={search} aria-label="Filtros de actividades">
+          <div className="col-span-full border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Consulta de actividades</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Buscar actividades registradas</h2><p className="mt-2 text-base text-slate-500">Seleccione los criterios para revisar los registros enviados.</p></div>
           <label className="gallery-admin__field"><span>Fontanero</span><select value={draft.fontaneroId} onChange={(e) => setDraft({ ...draft, fontaneroId: e.target.value })}><option value="">Todos</option>{fontaneros.map((id) => <option key={id} value={id}>{id}</option>)}</select></label>
           <label className="gallery-admin__field"><span>Actividad</span><select disabled={tiposLoading} value={draft.tipoActividadId} onChange={(e) => setDraft({ ...draft, tipoActividadId: e.target.value })}><option value="">Todas</option>{tipoOptions.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>)}</select></label>
           <label className="gallery-admin__field"><span>Estado</span><select value={draft.estado} onChange={(e) => setDraft({ ...draft, estado: e.target.value })}><option value="">Todos</option><option value="REPORTADA">Pendiente</option><option value="REVISADA">Revisada</option><option value="REQUIERE_CORRECCION">Requiere corrección</option></select></label>
           <label className="gallery-admin__field"><span>Desde</span><input type="date" value={draft.fechaInicio} onChange={(e) => setDraft({ ...draft, fechaInicio: e.target.value })} /></label>
           <label className="gallery-admin__field"><span>Hasta</span><input type="date" value={draft.fechaFin} onChange={(e) => setDraft({ ...draft, fechaFin: e.target.value })} /></label>
-          <div className="actividades-admin-revision__filter-actions"><button className="gallery-admin__button gallery-admin__button--primary" disabled={loading}>Buscar</button><button type="button" className="gallery-admin__button" onClick={clear} disabled={loading}>Limpiar filtros</button></div>
+          <div className="actividades-admin-revision__filter-actions"><button className="gallery-admin__button gallery-admin__button--primary !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200" disabled={loading}>Buscar</button><button type="button" className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md" onClick={clear} disabled={loading}>Limpiar filtros</button></div>
         </form>
 
         {notice ? (
@@ -322,7 +323,7 @@ const ActividadesAdminRevisionPage = () => {
           />
         ) : null}
 
-        <section className="actividades-admin-revision__list" aria-label="Actividades registradas">
+        <section className="actividades-admin-revision__list !rounded-[28px] !border !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]" aria-label="Actividades registradas">
           {!loading && !error ? <div className="actividades-admin-revision__summary"><strong>{total}</strong> actividades encontradas</div> : null}
           {loading ? <div className="gallery-admin__skeleton" aria-busy="true" aria-label="Cargando actividades"><div className="gallery-admin__skeleton-row" /><div className="gallery-admin__skeleton-row" /><div className="gallery-admin__skeleton-row" /></div> : null}
           {!loading && !error && actividades.length === 0 ? <div className="gallery-admin__empty" role="status"><p>No se encontraron actividades con los filtros seleccionados.</p></div> : null}

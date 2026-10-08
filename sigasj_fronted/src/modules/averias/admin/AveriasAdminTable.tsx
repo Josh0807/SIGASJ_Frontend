@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { IconArrowRight } from '@tabler/icons-react'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { averiasAdminDetailPath } from './averiasAdminPaths'
@@ -20,12 +21,13 @@ const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
   const location = useLocation()
   const detailAction = (id: number) => (
     <Link
-      className="gallery-admin__button"
+      className="gallery-admin__button group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-6 !py-3 !font-extrabold !text-white !no-underline !shadow-[0_10px_22px_rgba(37,99,235,0.24)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.32)] focus-visible:!ring-4 focus-visible:!ring-blue-200"
       to={averiasAdminDetailPath(id)}
       state={{ listSearch: location.search }}
       onClick={() => onViewDetail?.(id)}
     >
       Ver detalle
+      <IconArrowRight className="transition-transform duration-300 group-hover:translate-x-1" size={19} stroke={2.2} aria-hidden="true" />
     </Link>
   )
 

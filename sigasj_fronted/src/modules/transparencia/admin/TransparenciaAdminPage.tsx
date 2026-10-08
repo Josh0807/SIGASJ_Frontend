@@ -196,7 +196,7 @@ const TransparenciaAdminPage = () => {
       : emptyTransparenciaFormValues()
 
   return (
-    <main className="gallery-admin">
+    <main className="gallery-admin admin-content-modern">
       <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
@@ -205,11 +205,8 @@ const TransparenciaAdminPage = () => {
             <p>Administra documentos e imágenes visibles en la landing pública.</p>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to="/#transparencia">
-              Ver sección pública
-            </Link>
-            <Link className="gallery-admin__link" to="/admin/galeria">
-              Ir a galería
+            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
+              Volver inicio
             </Link>
             <button
               type="button"

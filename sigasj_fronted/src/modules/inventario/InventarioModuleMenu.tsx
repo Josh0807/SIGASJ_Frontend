@@ -60,7 +60,11 @@ const plumberItems = [
   { label: 'Mis solicitudes', description: 'Seguimiento de materiales', to: SOLICITUDES_MATERIALES_PATH, icon: IconClipboardCheck },
 ]
 
-export default function InventarioModuleMenu() {
+type InventarioModuleMenuProps = {
+  inline?: boolean
+}
+
+export default function InventarioModuleMenu({ inline = false }: InventarioModuleMenuProps) {
   const { user } = useAuth()
   const location = useLocation()
   const [open, setOpen] = useState(false)
@@ -70,11 +74,15 @@ export default function InventarioModuleMenu() {
   const items = isAdmin ? adminItems : plumberItems
 
   useEffect(() => {
+    if (inline) {
+      setHeaderTarget(null)
+      return
+    }
     const frame = window.requestAnimationFrame(() => {
-      setHeaderTarget(document.querySelector<HTMLElement>('.materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header'))
+      setHeaderTarget(document.querySelector<HTMLElement>('.inventory-module-menu-slot, .materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header'))
     })
     return () => window.cancelAnimationFrame(frame)
-  }, [location.pathname])
+  }, [inline, location.pathname])
 
   useEffect(() => {
     const closeOnOutsideClick = (event: MouseEvent) => {
@@ -84,13 +92,11 @@ export default function InventarioModuleMenu() {
     return () => document.removeEventListener('mousedown', closeOnOutsideClick)
   }, [])
 
-  if (!headerTarget) return null
-
-  return createPortal(
-    <div ref={containerRef} className="inventory-module-menu">
+  const menu = (
+    <div ref={containerRef} className={`inventory-module-menu${inline ? ' !static !inset-auto !m-0 !w-full !max-w-none !justify-stretch' : ''}`}>
       <button
         type="button"
-        className="group flex min-h-[52px] items-center justify-between gap-3 !rounded-2xl transition-all duration-300 ease-out hover:-translate-y-0.5 hover:!border-blue-300 hover:!bg-blue-50/70 hover:shadow-[0_10px_24px_rgba(37,99,235,0.12)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 motion-reduce:transform-none motion-reduce:transition-none"
+        className={`group flex min-h-[52px] items-center justify-between gap-3 !rounded-2xl transition-all duration-300 ease-out hover:-translate-y-0.5 hover:!border-blue-300 hover:!bg-blue-50/70 hover:shadow-[0_10px_24px_rgba(37,99,235,0.12)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 motion-reduce:transform-none motion-reduce:transition-none${inline ? ' !w-full' : ''}`}
         aria-expanded={open}
         aria-controls="inventory-module-menu"
         onClick={() => setOpen((value) => !value)}
@@ -141,7 +147,10 @@ export default function InventarioModuleMenu() {
           </div>
         </nav>
       ) : null}
-    </div>,
-    headerTarget,
+    </div>
   )
+
+  if (inline) return menu
+  if (!headerTarget) return null
+  return createPortal(menu, headerTarget)
 }

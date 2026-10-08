@@ -119,7 +119,8 @@ const TransparenciaAdminForm = ({
   }
 
   return (
-    <form className="gallery-admin__form w-full max-w-3xl" onSubmit={handleSubmit}>
+    <form className="gallery-admin__form admin-modern-form w-full !max-w-none" onSubmit={handleSubmit}>
+      <p className="admin-modern-form__eyebrow">Formulario de transparencia</p>
       <h2>{mode === 'create' ? 'Nueva publicación' : 'Editar publicación'}</h2>
 
       <label className="gallery-admin__field">

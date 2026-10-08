@@ -27,6 +27,7 @@ import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistr
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { useAuth } from '../../auth/components/AuthContext'
+import { IconArrowLeft, IconCheck, IconDeviceFloppy } from '@tabler/icons-react'
 
 type ActividadRegistroFormShellMode = 'registrar' | 'corregir'
 
@@ -164,21 +165,32 @@ const ActividadRegistroFormShell = ({
 
   return (
     <section
-      className={`actividades-fontanero-registro${
+      className={`actividades-fontanero-registro !mx-0 !max-w-none !gap-7${
         isCorregirMode ? ' actividades-fontanero-registro--corregir' : ''
       }`}
       aria-labelledby="actividad-registro-title"
     >
-      <header className="actividades-fontanero-registro__header">
-        <p className="actividades-fontanero-registro__eyebrow">Registro de Actividades</p>
-        <h1 id="actividad-registro-title">
+      <header className="actividades-fontanero-registro__header !block !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 space-y-3">
+            <p className="actividades-fontanero-registro__eyebrow !text-sm !font-black !tracking-[0.12em] !text-blue-600">Registro de Actividades</p>
+            <h1 id="actividad-registro-title" className="!text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">
           {isCorregirMode ? `Corregir: ${tipo.nombre}` : `Registrar: ${tipo.nombre}`}
         </h1>
-        <p className="actividades-fontanero-registro__intro">
+        <p className="actividades-fontanero-registro__intro !text-lg !leading-relaxed !text-slate-500">
           {isCorregirMode
             ? 'Revise el motivo de corrección, ajuste los campos permitidos y reenvíe la actividad.'
             : 'Complete la información general y los campos del formulario correspondiente.'}
-        </p>
+            </p>
+          </div>
+          <Link
+            to={isCorregirMode ? ACTIVIDADES_FONTANERO_PATHS.correcciones : ACTIVIDADES_FONTANERO_PATHS.nueva}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline focus:!no-underline"
+          >
+            <IconArrowLeft size={20} aria-hidden="true" />
+            {isCorregirMode ? 'Volver a correcciones' : 'Cambiar tipo de actividad'}
+          </Link>
+        </div>
       </header>
 
       {isCorregirMode && observacionCorreccion ? (
@@ -233,11 +245,16 @@ const ActividadRegistroFormShell = ({
       ) : (
         <form
           ref={formRef}
-          className="actividad-registro-form"
+          className="actividad-registro-form !gap-7 !rounded-[28px] !border-blue-100 !bg-white/90 !p-5 !shadow-[0_14px_38px_rgba(30,90,156,0.08)] md:!p-8"
           onSubmit={handleSubmit}
           noValidate
           aria-busy={isSubmitting}
         >
+          <div className="border-b border-blue-100 pb-6">
+            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Formulario de registro</p>
+            <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Datos de {tipo.nombre}</h2>
+            <p className="mt-2 text-base leading-relaxed text-slate-500">Complete los datos generales y la información específica de esta actividad.</p>
+          </div>
           {Object.keys(errors).length > 0 || submitError ? (
             <ActividadRegistroValidationSummary
               errors={errors}
@@ -245,7 +262,7 @@ const ActividadRegistroFormShell = ({
             />
           ) : null}
 
-          <fieldset className="actividad-registro-form__section" disabled={isSubmitting}>
+          <fieldset className="actividad-registro-form__section !grid !grid-cols-1 !gap-5 !rounded-3xl !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/50 !p-5 md:!grid-cols-2 md:!p-7" disabled={isSubmitting}>
             <legend className="actividad-registro-form__legend">Información general</legend>
 
             <div
@@ -315,7 +332,7 @@ const ActividadRegistroFormShell = ({
             </div>
 
             <div
-              className={`actividad-registro-form__field${
+              className={`actividad-registro-form__field md:!col-span-2${
                 errors.descripcion ? ' actividad-registro-form__field--invalid' : ''
               }`}
             >
@@ -371,7 +388,7 @@ const ActividadRegistroFormShell = ({
               ) : null}
             </div>
 
-            <div className="actividad-registro-form__field">
+            <div className="actividad-registro-form__field md:!col-span-2">
               <label className="actividad-registro-form__label" htmlFor="observaciones">
                 Observaciones
               </label>
@@ -407,23 +424,25 @@ const ActividadRegistroFormShell = ({
             }}
           />
 
-          <div className="actividad-registro-form__actions">
+          <div className="actividad-registro-form__actions !gap-4 !border-t !border-blue-100 !pt-6">
             <Link
               to={
                 isCorregirMode
                   ? ACTIVIDADES_FONTANERO_PATHS.correcciones
                   : ACTIVIDADES_FONTANERO_PATHS.nueva
               }
-              className="actividad-registro-form__button actividad-registro-form__button--secondary"
+              className="actividad-registro-form__button actividad-registro-form__button--secondary !order-2 !gap-2 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md transition hover:!-translate-y-0.5 hover:!bg-blue-50"
             >
+              <IconArrowLeft size={20} aria-hidden="true" />
               Cancelar
             </Link>
             <button
               type="submit"
-              className="actividad-registro-form__button actividad-registro-form__button--primary"
+              className="actividad-registro-form__button actividad-registro-form__button--primary !order-1 !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200 transition hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
               disabled={isSubmitting}
               aria-disabled={isSubmitting}
             >
+              {isSubmitting ? null : isCorregirMode ? <IconCheck size={20} aria-hidden="true" /> : <IconDeviceFloppy size={20} aria-hidden="true" />}
               {isSubmitting
                 ? isCorregirMode
                   ? 'Reenviando…'
@@ -443,8 +462,9 @@ const ActividadRegistroFormShell = ({
               ? ACTIVIDADES_FONTANERO_PATHS.correcciones
               : ACTIVIDADES_FONTANERO_PATHS.nueva
           }
-          className="actividades-fontanero-registro__back"
+          className="actividades-fontanero-registro__back !hidden"
         >
+          <IconArrowLeft size={20} aria-hidden="true" />
           {isCorregirMode
             ? 'Volver a correcciones pendientes'
             : 'Cambiar tipo de actividad'}

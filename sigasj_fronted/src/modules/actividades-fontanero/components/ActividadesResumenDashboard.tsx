@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import { useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -29,6 +29,9 @@ type DateDraft = {
 }
 
 const EMPTY_DRAFT: DateDraft = { fechaInicio: '', fechaFin: '' }
+
+const MODERN_INDICATOR_CLASS =
+  'activities-indicator-modern group !min-h-[270px] !overflow-hidden !rounded-[24px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/60 !p-6 !shadow-[0_12px_30px_rgba(30,90,156,0.09)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-200 hover:!shadow-[0_18px_38px_rgba(30,90,156,0.16)]'
 
 const toAppliedFilters = (draft: DateDraft): ResumenActividadesFilters => ({
   fechaInicio: draft.fechaInicio.trim() || undefined,
@@ -106,17 +109,20 @@ const ActividadesResumenDashboard = ({
   const eyebrow = isFontanero
     ? 'Módulo operativo · Fontanero'
     : 'Módulo administrativo · Administradora'
+  const estadosConActividad = Object.entries(resumen.porEstado).filter(
+    ([, cantidad]) => cantidad > 0,
+  )
 
   return (
     <main
-      className="gallery-admin actividades-resumen-dashboard"
+      className="gallery-admin actividades-resumen-dashboard !grid !w-full !gap-6"
       aria-labelledby="actividades-resumen-title"
     >
-      <header className="actividades-fontanero-home__welcome">
-        <div className="actividades-fontanero-home__welcome-content">
-          <span className="actividades-fontanero-home__eyebrow">{eyebrow}</span>
-          <h1 id="actividades-resumen-title">{title}</h1>
-          <p className="actividades-fontanero-home__welcome-text">
+      <header className="actividades-fontanero-home__welcome !m-0 !flex !min-h-[220px] !w-full !items-center !justify-between !gap-8 !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] max-[760px]:!min-h-0 max-[760px]:!flex-col max-[760px]:!items-stretch">
+        <div className="actividades-fontanero-home__welcome-content !grid !min-w-0 !gap-3">
+          <span className="actividades-fontanero-home__eyebrow !m-0 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-blue-600">{eyebrow}</span>
+          <h1 className="!m-0 !text-[clamp(2.25rem,4vw,3rem)] !font-black !leading-[1.08] !tracking-[-0.035em] !text-[#062e63]" id="actividades-resumen-title">{title}</h1>
+          <p className="actividades-fontanero-home__welcome-text !m-0 !max-w-3xl !text-lg !font-normal !leading-8 !text-slate-500">
             {isFontanero
               ? 'Resumen de sus actividades registradas y accesos rápidos al módulo.'
               : 'Resumen general de actividades reportadas y accesos a revisión y reportes.'}
@@ -128,20 +134,22 @@ const ActividadesResumenDashboard = ({
               ? ACTIVIDADES_FONTANERO_PATHS.home
               : ACTIVIDADES_ADMIN_PATHS.revision
           }
-          className="actividades-fontanero-home__back-link"
+          className="actividades-fontanero-home__back-link group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !font-extrabold !text-blue-700 !no-underline !shadow-[0_8px_20px_rgba(37,99,235,0.13)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.22)] active:!translate-y-0 active:!scale-[0.97]"
         >
+          <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1" size={18} aria-hidden="true" />
           {isFontanero ? 'Volver al inicio del módulo' : 'Ir a revisión'}
         </Link>
       </header>
 
       <section
-        className="actividades-resumen-dashboard__filters"
+        className="actividades-resumen-dashboard__filters !m-0 !w-full !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)]"
         aria-label="Filtros del resumen"
       >
-        <form className="gallery-admin__filters" onSubmit={handleConsultar}>
-          <label className="gallery-admin__field" htmlFor="resumen-fecha-inicio">
+        <form className="gallery-admin__filters !m-0 !grid !gap-5 !border-0 !bg-transparent !p-0 !shadow-none lg:!grid-cols-2" onSubmit={handleConsultar}>
+          <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor="resumen-fecha-inicio">
             <span>Fecha inicial</span>
             <input
+              className="!box-border !min-h-14 !w-full !rounded-2xl !border !border-blue-200 !bg-slate-50/60 !px-4 !text-base !font-semibold !text-[#073b73] !shadow-sm !outline-none !transition-all hover:!border-blue-300 focus:!border-blue-500 focus:!bg-white focus:!ring-4 focus:!ring-blue-100"
               id="resumen-fecha-inicio"
               type="date"
               value={draft.fechaInicio}
@@ -154,9 +162,10 @@ const ActividadesResumenDashboard = ({
             />
           </label>
 
-          <label className="gallery-admin__field" htmlFor="resumen-fecha-fin">
+          <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor="resumen-fecha-fin">
             <span>Fecha final</span>
             <input
+              className="!box-border !min-h-14 !w-full !rounded-2xl !border !border-blue-200 !bg-slate-50/60 !px-4 !text-base !font-semibold !text-[#073b73] !shadow-sm !outline-none !transition-all hover:!border-blue-300 focus:!border-blue-500 focus:!bg-white focus:!ring-4 focus:!ring-blue-100"
               id="resumen-fecha-fin"
               type="date"
               value={draft.fechaFin}
@@ -169,17 +178,17 @@ const ActividadesResumenDashboard = ({
             />
           </label>
 
-          <div className="actividades-admin-reportes__actions">
+          <div className="actividades-admin-reportes__actions !col-span-full !flex !flex-wrap !gap-3 !border-t !border-blue-100 !pt-5">
             <button
               type="submit"
-              className="gallery-admin__button gallery-admin__button--primary"
+              className="gallery-admin__button gallery-admin__button--primary !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(37,99,235,0.35)]"
               disabled={loading}
             >
               {loading ? 'Consultando…' : 'Consultar'}
             </button>
             <button
               type="button"
-              className="gallery-admin__button gallery-admin__filter-reset"
+              className="gallery-admin__button gallery-admin__filter-reset !min-h-12 !rounded-2xl !border !border-blue-200 !bg-white !px-6 !font-extrabold !text-blue-700 !shadow-sm !transition-all hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-md"
               onClick={handleLimpiar}
               disabled={
                 loading ||
@@ -193,7 +202,7 @@ const ActividadesResumenDashboard = ({
             </button>
             <button
               type="button"
-              className="admin-dashboard__refresh-btn"
+              className="admin-dashboard__refresh-btn !min-h-12 !rounded-2xl !border !border-blue-200 !bg-white !px-6 !font-extrabold !text-blue-700 !shadow-sm !transition-all hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-md"
               onClick={() => refetch()}
               disabled={loading}
               aria-label="Actualizar resumen de actividades"
@@ -232,10 +241,10 @@ const ActividadesResumenDashboard = ({
       ) : null}
 
       <section
-        className="actividades-resumen-dashboard__indicators"
+        className="actividades-resumen-dashboard__indicators !m-0 !w-full"
         aria-label="Indicadores del resumen"
       >
-        <div className="admin-dashboard__indicators-grid">
+        <div className="admin-dashboard__indicators-grid !grid !grid-cols-1 !gap-5 md:!grid-cols-2 xl:!grid-cols-4">
           <IndicatorCard
             title={isFontanero ? 'Actividades registradas' : 'Actividades reportadas'}
             value={loading ? null : metricas.total}
@@ -249,6 +258,7 @@ const ActividadesResumenDashboard = ({
                 ? ACTIVIDADES_FONTANERO_PATHS.misActividades
                 : ACTIVIDADES_ADMIN_PATHS.revision
             }
+            className={MODERN_INDICATOR_CLASS}
           />
           <IndicatorCard
             title="Pendientes de revisión"
@@ -263,6 +273,7 @@ const ActividadesResumenDashboard = ({
                 ? ACTIVIDADES_FONTANERO_PATHS.misActividades
                 : ACTIVIDADES_ADMIN_PATHS.revision
             }
+            className={MODERN_INDICATOR_CLASS}
           />
           <IndicatorCard
             title="Revisadas"
@@ -281,6 +292,7 @@ const ActividadesResumenDashboard = ({
                 ? ACTIVIDADES_FONTANERO_PATHS.historial
                 : ACTIVIDADES_ADMIN_PATHS.revision
             }
+            className={MODERN_INDICATOR_CLASS}
           />
           <IndicatorCard
             title={
@@ -307,26 +319,26 @@ const ActividadesResumenDashboard = ({
                 ? ACTIVIDADES_FONTANERO_PATHS.correcciones
                 : ACTIVIDADES_ADMIN_PATHS.revision
             }
+            className={MODERN_INDICATOR_CLASS}
           />
         </div>
       </section>
 
-      {!loading && !filterError && Object.keys(resumen.porEstado).length > 0 ? (
+      {!loading && !filterError && estadosConActividad.length > 0 ? (
         <section
           className="actividades-resumen-dashboard__estados"
           aria-label="Desglose por estado"
         >
           <h2>Desglose por estado</h2>
-          <div className="admin-dashboard__indicators-grid">
-            {Object.entries(resumen.porEstado)
-              .filter(([, cantidad]) => cantidad > 0)
-              .map(([estado, cantidad]) => (
+          <div className="admin-dashboard__indicators-grid !grid !grid-cols-1 !gap-5 md:!grid-cols-2 xl:!grid-cols-4">
+            {estadosConActividad.map(([estado, cantidad]) => (
                 <IndicatorCard
                   key={estado}
                   title={formatActividadEstado(estado)}
                   value={cantidad}
                   badgeText={estado}
                   badgeType="default"
+                  className={MODERN_INDICATOR_CLASS}
                 />
               ))}
           </div>
@@ -334,10 +346,10 @@ const ActividadesResumenDashboard = ({
       ) : null}
 
       <section
-        className="actividades-resumen-dashboard__nav"
+        className="actividades-resumen-dashboard__nav !m-0 !w-full !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)]"
         aria-label="Accesos rápidos del módulo"
       >
-        <h2>Accesos rápidos</h2>
+        <h2 className="!mb-6 !border-b !border-blue-100 !pb-4 !text-2xl !font-black !tracking-[-0.02em] !text-[#062e63]">Accesos rápidos</h2>
         <div className="actividades-fontanero-home__actions" role="list">
           {isFontanero ? (
             <>

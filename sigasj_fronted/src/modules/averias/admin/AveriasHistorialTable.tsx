@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { IconArrowRight } from '@tabler/icons-react'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { AVERIAS_ADMIN_HISTORIAL_PATH, averiasAdminDetailPath } from './averiasAdminPaths'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
@@ -19,14 +20,14 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
 
   const detailAction = (id: number) => (
     <Link
-      className="gallery-admin__button"
+      className="gallery-admin__button !inline-flex !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3 !font-bold !text-white !no-underline !shadow-lg !shadow-blue-200 transition hover:-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
       to={averiasAdminDetailPath(id)}
       state={{
         listSearch: location.search,
         listBase: AVERIAS_ADMIN_HISTORIAL_PATH,
       }}
     >
-      Ver detalle
+      Ver detalle <IconArrowRight size={18} aria-hidden="true" />
     </Link>
   )
 

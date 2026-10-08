@@ -141,19 +141,19 @@ const AveriasFontaneroDetailPage = ({
   return (
     <main className="gallery-admin averias-admin averias-fontanero w-full min-w-0">
       <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
+        <header className="gallery-admin__header !w-full !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-blue-50/25 !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)]">
           <div>
-            <p className="gallery-admin__eyebrow">Atención de campo</p>
-            <h1>Avería asignada</h1>
-            <div className="averias-fontanero__header-meta">
-              <p className="averias-admin__codigo">{averia.codigoSeguimiento}</p>
-              <p className="averias-admin__header-badge">
+            <p className="gallery-admin__eyebrow !mb-3 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-blue-600">Atención de campo</p>
+            <h1 className="!text-[clamp(2rem,4vw,2.75rem)] !font-black !tracking-[-0.03em] !text-[#062e63]">Avería asignada</h1>
+            <div className="averias-fontanero__header-meta !mt-4 !flex !flex-wrap !items-center !gap-3">
+              <p className="averias-admin__codigo !m-0 !rounded-full !border !border-slate-200 !bg-white !px-4 !py-2 !font-extrabold !text-slate-600 !shadow-sm">{averia.codigoSeguimiento}</p>
+              <p className="averias-admin__header-badge !m-0 [&>*]:!shadow-sm">
                 <AveriaStatusBadge estado={averia.estado} />
               </p>
             </div>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to={FONTANERO_AVERIAS_PATH}>
+            <Link className="gallery-admin__link group !inline-flex !min-h-12 !items-center !justify-center !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !no-underline !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={FONTANERO_AVERIAS_PATH}>
               {AVERIAS_FONTANERO_BACK_LABEL}
             </Link>
           </div>
