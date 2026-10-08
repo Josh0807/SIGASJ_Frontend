@@ -31,6 +31,7 @@ export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
     'activities.read_all',
     'activities.review',
     'inventory.read',
+    'staff.manage',
   ],
   [InternalAdminRoleName.Secretaria]: [
     'subscribers.read',
@@ -120,11 +121,9 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'lecturas',
     title: 'Recursos Humanos',
-    allowedRoles: [
-      InternalAdminRoleName.Administradora,
-      InternalAdminRoleName.Secretaria,
-    ],
-    requiredPermissions: ['subscribers.read'],
+    // El API de colaboradores (/rrhh/colaboradores) solo admite ADMINISTRADORA.
+    allowedRoles: [InternalAdminRoleName.Administradora],
+    requiredPermissions: ['staff.manage'],
     availableInNav: true,
   },
   {
