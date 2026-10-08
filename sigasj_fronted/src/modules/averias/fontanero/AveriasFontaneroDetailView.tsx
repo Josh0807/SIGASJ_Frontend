@@ -16,7 +16,7 @@ import AveriasFontaneroObservacionForm from './AveriasFontaneroObservacionForm'
 import AveriasFontaneroResolverDialog from './AveriasFontaneroResolverDialog'
 import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
 import { averiaCalificadaParaAtencion } from './averiaCalificada'
-import { mapasHref, telefonoHref } from './contactoAveria'
+import { telefonoHref } from './contactoAveria'
 import {
   puedeCalificarAveria,
   puedeIntentarIniciarAtencionAveria,
@@ -75,7 +75,6 @@ const AveriasFontaneroDetailView = ({
   const puedeRegistrar = puedeRegistrarObservacionAveria(estado)
   const puedeCalificar = puedeCalificarAveria(estado)
   const enlaceTelefono = telefonoHref(averia.telefonoReportante)
-  const enlaceMapas = mapasHref(averia.ubicacion)
   const [resolverOpen, setResolverOpen] = useState(false)
   const [iniciarError, setIniciarError] = useState<string | null>(null)
   const [iniciando, setIniciando] = useState(false)
@@ -83,49 +82,39 @@ const AveriasFontaneroDetailView = ({
   const observaciones = sortObservacionesAtencion(averia.observaciones ?? [])
 
   return (
-    <div className="averias-admin__detail averias-fontanero__detail">
+    <div className="averias-admin__detail averias-fontanero__detail !grid !w-full !gap-6 [&_.averias-admin__section]:!w-full [&_.averias-admin__section]:!overflow-hidden [&_.averias-admin__section]:!rounded-[26px] [&_.averias-admin__section]:!border [&_.averias-admin__section]:!border-blue-100 [&_.averias-admin__section]:!bg-linear-to-br [&_.averias-admin__section]:!from-white [&_.averias-admin__section]:!via-blue-50/20 [&_.averias-admin__section]:!to-sky-50/45 [&_.averias-admin__section]:!p-7 [&_.averias-admin__section]:!shadow-[0_12px_34px_rgba(30,90,156,0.09)] [&_.averias-admin__section>h2]:!mb-5 [&_.averias-admin__section>h2]:!border-b [&_.averias-admin__section>h2]:!border-blue-100 [&_.averias-admin__section>h2]:!pb-4 [&_.averias-admin__section>h2]:!text-2xl [&_.averias-admin__section>h2]:!font-black [&_.averias-admin__section>h2]:!tracking-[-0.02em] [&_.averias-admin__section>h2]:!text-[#073b73] [&_.averias-admin__fields]:!gap-4 [&_.averias-admin__fields>div]:!rounded-2xl [&_.averias-admin__fields>div]:!border [&_.averias-admin__fields>div]:!border-blue-100 [&_.averias-admin__fields>div]:!bg-white/90 [&_.averias-admin__fields>div]:!p-5 [&_.averias-admin__fields>div]:!shadow-[0_6px_16px_rgba(30,90,156,0.06)] [&_.averias-admin__fields>div]:!transition-all [&_.averias-admin__fields>div]:!duration-300 hover:[&_.averias-admin__fields>div]:!-translate-y-0.5 hover:[&_.averias-admin__fields>div]:!border-blue-200 hover:[&_.averias-admin__fields>div]:!shadow-[0_10px_22px_rgba(30,90,156,0.11)] [&_.averias-admin__fields_dt]:!mb-2 [&_.averias-admin__fields_dt]:!font-extrabold [&_.averias-admin__fields_dt]:!tracking-[0.05em] [&_.averias-admin__fields_dt]:!text-slate-500 [&_.averias-admin__fields_dd]:!font-bold [&_.averias-admin__fields_dd]:!text-[#073b73] [&_.averias-fontanero__enlace]:!inline-flex [&_.averias-fontanero__enlace]:!items-center [&_.averias-fontanero__enlace]:!rounded-xl [&_.averias-fontanero__enlace]:!bg-blue-50 [&_.averias-fontanero__enlace]:!px-3 [&_.averias-fontanero__enlace]:!py-1.5 [&_.averias-fontanero__enlace]:!font-extrabold [&_.averias-fontanero__enlace]:!text-blue-700 [&_.averias-fontanero__enlace]:!transition-all hover:[&_.averias-fontanero__enlace]:!bg-blue-100 [&_.averias-admin__horario-hint]:!rounded-2xl [&_.averias-admin__horario-hint]:!border [&_.averias-admin__horario-hint]:!border-amber-200 [&_.averias-admin__horario-hint]:!bg-linear-to-r [&_.averias-admin__horario-hint]:!from-amber-50 [&_.averias-admin__horario-hint]:!to-orange-50 [&_.averias-admin__horario-hint]:!p-4 [&_.averias-admin__horario-hint]:!font-bold [&_.averias-admin__horario-hint]:!text-amber-800 [&_.averias-admin__horario-hint]:!shadow-sm [&_.averias-fontanero__gestion-paneles>*]:!rounded-2xl [&_.averias-fontanero__gestion-paneles>*]:!border [&_.averias-fontanero__gestion-paneles>*]:!border-blue-100 [&_.averias-fontanero__gestion-paneles>*]:!bg-white/90 [&_.averias-fontanero__gestion-paneles>*]:!p-5 [&_.averias-fontanero__gestion-paneles>*]:!shadow-[0_7px_18px_rgba(30,90,156,0.07)] [&_.gallery-admin__button]:!min-h-12 [&_.gallery-admin__button]:!rounded-2xl [&_.gallery-admin__button]:!border-0 [&_.gallery-admin__button]:!bg-linear-to-r [&_.gallery-admin__button]:!from-blue-700 [&_.gallery-admin__button]:!to-cyan-500 [&_.gallery-admin__button]:!px-6 [&_.gallery-admin__button]:!font-extrabold [&_.gallery-admin__button]:!text-white [&_.gallery-admin__button]:!shadow-[0_9px_22px_rgba(37,99,235,0.25)] [&_.gallery-admin__button]:!transition-all [&_.gallery-admin__button]:!duration-300 hover:[&_.gallery-admin__button]:!-translate-y-1 hover:[&_.gallery-admin__button]:!shadow-[0_14px_28px_rgba(37,99,235,0.35)] active:[&_.gallery-admin__button]:!translate-y-0 active:[&_.gallery-admin__button]:!scale-[0.97] [&_.averias-fontanero__observaciones-list>li]:!rounded-2xl [&_.averias-fontanero__observaciones-list>li]:!border [&_.averias-fontanero__observaciones-list>li]:!border-blue-100 [&_.averias-fontanero__observaciones-list>li]:!bg-white [&_.averias-fontanero__observaciones-list>li]:!p-5 [&_.averias-fontanero__observaciones-list>li]:!shadow-sm [&_.averias-admin__empty-note]:!rounded-2xl [&_.averias-admin__empty-note]:!border [&_.averias-admin__empty-note]:!border-dashed [&_.averias-admin__empty-note]:!border-blue-200 [&_.averias-admin__empty-note]:!bg-blue-50/60 [&_.averias-admin__empty-note]:!p-6 [&_.averias-admin__empty-note]:!text-center [&_.averias-admin__empty-note]:!text-slate-500">
       {successMessage ? (
         <ActivityFeedback variant="success" message={successMessage} />
       ) : null}
 
       <section
-        className="averias-admin__section averias-fontanero__ubicacion"
+        className="averias-admin__section averias-fontanero__ubicacion averia-hierarchy-card !w-full"
         aria-labelledby="averia-fontanero-ubicacion-heading"
       >
-        <h2 id="averia-fontanero-ubicacion-heading">Ubicación de la avería</h2>
+        <h2 className="averia-hierarchy-card__title" id="averia-fontanero-ubicacion-heading">Ubicación de la avería</h2>
         <dl className="averias-admin__fields averias-admin__fields--ubicacion">
-          <AveriasDetailField label="Sector / comunidad">
+          <AveriasDetailField label="Sector / comunidad" modern>
             {averia.sectorComunidad}
           </AveriasDetailField>
-          <AveriasDetailField label="Descripción del problema">
+          <AveriasDetailField label="Descripción del problema" modern>
             {averia.descripcion}
           </AveriasDetailField>
-          <AveriasDetailField label="Dirección" multiline>
+          <AveriasDetailField label="Dirección" multiline modern>
             <span className="averias-admin__prewrap">{averia.ubicacion}</span>
-            {enlaceMapas ? (
-              <a
-                className="averias-fontanero__enlace"
-                href={enlaceMapas}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Cómo llegar
-              </a>
-            ) : null}
           </AveriasDetailField>
         </dl>
       </section>
 
       <section
-        className="averias-admin__section averias-fontanero__gestion"
+        className="averias-admin__section averias-fontanero__gestion averia-hierarchy-card !w-full"
         aria-labelledby="averia-fontanero-gestion-heading"
       >
-        <h2 id="averia-fontanero-gestion-heading">Gestión de la avería</h2>
-        <dl className="averias-admin__fields averias-fontanero__resumen">
-          <AveriasDetailField label="Tipo">
+        <h2 className="averia-hierarchy-card__title" id="averia-fontanero-gestion-heading">Gestión de la avería</h2>
+        <dl className="averias-admin__fields averias-fontanero__resumen averia-management-fields">
+          <AveriasDetailField label="Tipo" modern>
             {getFontaneroTipoLabel(averia.tipoAveria)}
           </AveriasDetailField>
-          <AveriasDetailField label="Prioridad">
+          <AveriasDetailField label="Prioridad" modern>
             <span
               className={
                 prioridadModifier
@@ -136,10 +125,10 @@ const AveriasFontaneroDetailView = ({
               {prioridadLabel}
             </span>
           </AveriasDetailField>
-          <AveriasDetailField label="Estado">
+          <AveriasDetailField label="Estado" modern>
             <AveriaStatusBadge estado={averia.estado} />
           </AveriasDetailField>
-          <AveriasDetailField label="Inicio de atención">
+          <AveriasDetailField label="Inicio de atención" modern>
             {averia.fechaInicioAtencion
               ? formatAveriaAdminDateTimeOrUnavailable(
                   averia.fechaInicioAtencion,
@@ -147,7 +136,7 @@ const AveriasFontaneroDetailView = ({
                 )
               : AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
           </AveriasDetailField>
-          <AveriasDetailField label="Fecha de resolución">
+          <AveriasDetailField label="Fecha de resolución" modern>
             {formatAveriaAdminDateTimeOrUnavailable(
               averia.fechaResolucion,
               AVERIA_UNAVAILABLE_LABEL,
@@ -171,6 +160,11 @@ const AveriasFontaneroDetailView = ({
             onUnauthorized={onUnauthorized}
           />
         ) : null}
+        {puedeIniciar ||
+        puedeResolver ||
+        iniciarError ||
+        (estadoPermiteInicio && !clasificada && !avisoHorario) ||
+        (!estadoPermiteInicio && !puedeResolver) ? (
         <div className="averias-fontanero__acciones">
           <p className="averias-admin__muted">Acciones disponibles</p>
           {iniciarError ? (
@@ -183,7 +177,7 @@ const AveriasFontaneroDetailView = ({
           ) : null}
           {puedeIniciar ? (
             <button
-              className="gallery-admin__button"
+              className="gallery-admin__button !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(37,99,235,0.35)] active:!translate-y-0 active:!scale-[0.97] disabled:!cursor-not-allowed disabled:!opacity-55 disabled:hover:!translate-y-0"
               type="button"
               disabled={iniciando}
               aria-busy={iniciando}
@@ -228,7 +222,7 @@ const AveriasFontaneroDetailView = ({
           ) : null}
           {puedeResolver ? (
             <button
-              className="gallery-admin__button"
+              className="gallery-admin__button !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(37,99,235,0.35)] active:!translate-y-0 active:!scale-[0.97]"
               type="button"
               onClick={() => setResolverOpen(true)}
             >
@@ -239,31 +233,32 @@ const AveriasFontaneroDetailView = ({
             <p>{AVERIAS_FONTANERO_NO_ACTIONS}</p>
           ) : null}
         </div>
+        ) : null}
         </div>
       </section>
 
       <section
-        className="averias-admin__section averias-fontanero__reporte"
+        className="averias-admin__section averias-fontanero__reporte averia-hierarchy-card !w-full"
         aria-labelledby="averia-fontanero-reporte-heading"
       >
-        <h2 id="averia-fontanero-reporte-heading">Información del reporte</h2>
+        <h2 className="averia-hierarchy-card__title" id="averia-fontanero-reporte-heading">Información del reporte</h2>
         <dl className="averias-admin__fields">
-          <AveriasDetailField label="Fecha y hora del reporte">
+          <AveriasDetailField label="Fecha y hora del reporte" modern>
             {formatAveriaAdminDateTimeOrUnavailable(
               averia.fechaReporte,
               AVERIA_UNAVAILABLE_LABEL,
             )}
           </AveriasDetailField>
-          <AveriasDetailField label="Fecha y hora de asignación">
+          <AveriasDetailField label="Fecha y hora de asignación" modern>
             {formatAveriaAdminDateTimeOrUnavailable(
               averia.fechaAsignacion,
               AVERIA_UNAVAILABLE_LABEL,
             )}
           </AveriasDetailField>
-          <AveriasDetailField label="Nombre del Reportante">
+          <AveriasDetailField label="Nombre del Reportante" modern>
             {averia.nombreReportante}
           </AveriasDetailField>
-          <AveriasDetailField label="Teléfono de contacto">
+          <AveriasDetailField label="Teléfono de contacto" modern>
             {enlaceTelefono ? (
               <a className="averias-fontanero__enlace" href={enlaceTelefono}>
                 {averia.telefonoReportante}
@@ -276,28 +271,28 @@ const AveriasFontaneroDetailView = ({
       </section>
 
       <section
-        className="averias-admin__section averias-fontanero__observaciones"
+        className="averias-admin__section averias-fontanero__observaciones averia-hierarchy-card !w-full"
         aria-labelledby="averia-fontanero-obs-heading"
       >
-        <h2 id="averia-fontanero-obs-heading">
+        <h2 className="averia-hierarchy-card__title" id="averia-fontanero-obs-heading">
           {AVERIAS_FONTANERO_OBSERVACIONES_TITULO}
         </h2>
         {observaciones.length > 0 ? (
-          <ol className="averias-fontanero__observaciones-list">
+          <ol className="averias-fontanero__observaciones-list !m-0 !grid !gap-4 !p-0">
             {observaciones.map((item, index) => {
               const esFinal =
                 String(averia.estado) === 'RESUELTA' &&
                 index === observaciones.length - 1
               return (
-                <li key={item.id}>
-                  <p className="averias-fontanero__observacion-fecha">
+                <li className="!list-none !rounded-2xl !border !border-blue-100 !bg-white !p-5 !shadow-[0_7px_18px_rgba(30,90,156,0.07)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-200 hover:!shadow-[0_11px_24px_rgba(30,90,156,0.12)]" key={item.id}>
+                  <p className="averias-fontanero__observacion-fecha !mb-1 !text-sm !font-extrabold !text-blue-700">
                     {formatAveriaAdminDateTimeOrUnavailable(
                       item.fechaCreacion,
                       AVERIA_UNAVAILABLE_LABEL,
                     )}
                   </p>
-                  <p className="averias-admin__muted">{item.autor.nombre}</p>
-                  <p className="averias-admin__prewrap">
+                  <p className="averias-admin__muted !mb-3 !text-xs !font-bold !uppercase !tracking-[0.06em] !text-slate-500">{item.autor.nombre}</p>
+                  <p className="averias-admin__prewrap !m-0 !rounded-xl !bg-slate-50 !p-4 !font-medium !leading-relaxed !text-[#073b73]">
                     {esFinal ? <strong>Observación final. </strong> : null}
                     {item.observacion}
                   </p>
@@ -306,7 +301,7 @@ const AveriasFontaneroDetailView = ({
             })}
           </ol>
         ) : (
-          <p className="averias-admin__empty-note">
+          <p className="averias-admin__empty-note !rounded-2xl !border !border-dashed !border-blue-200 !bg-blue-50/60 !p-6 !text-center !font-medium !text-slate-500">
             {AVERIAS_FONTANERO_OBSERVACIONES_LISTA_VACIA}
           </p>
         )}

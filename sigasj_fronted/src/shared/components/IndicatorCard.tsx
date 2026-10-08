@@ -33,6 +33,7 @@ const IndicatorCard = ({
   errorMessage = 'No se pudo cargar este dato',
   onRetry,
 }: IndicatorCardProps) => {
+  const modernActivitiesStyle = className.includes('activities-indicator-modern')
   // 1. Estado de Carga (Skeleton Loader)
   if (isLoading) {
     return (
@@ -89,30 +90,30 @@ const IndicatorCard = ({
 
   const cardContent = (
     <>
-      <div className="indicator-card__top">
-        {icon ? <span className="indicator-card__icon" aria-hidden="true">{icon}</span> : <div />}
+      {icon || badgeText || !modernActivitiesStyle ? <div className={`indicator-card__top${modernActivitiesStyle ? ' !items-start' : ''}`}>
+        {icon ? <span className={`indicator-card__icon${modernActivitiesStyle ? ' !grid !size-14 !place-items-center !rounded-2xl !border-0 !bg-linear-to-br !from-blue-600 !to-sky-500 !text-white !shadow-[0_9px_20px_rgba(37,99,235,0.25)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-105' : ''}`} aria-hidden="true">{icon}</span> : <div />}
         {badgeText ? (
-          <span className={`indicator-card__badge indicator-card__badge--${badgeType}`}>
+          <span className={`indicator-card__badge indicator-card__badge--${badgeType}${modernActivitiesStyle ? ' !border !border-current/15 !px-3 !py-1.5 !font-extrabold' : ''}`}>
             {badgeText}
           </span>
         ) : null}
-      </div>
+      </div> : null}
 
-      <div className="indicator-card__body">
+      <div className={`indicator-card__body${modernActivitiesStyle ? ' !mb-5' : ''}`}>
         <span
           className={`indicator-card__value ${
             !hasValue ? 'indicator-card__value--unavailable' : ''
-          }`}
+          }${modernActivitiesStyle ? ' !text-[2.5rem] !font-black !tracking-[-0.04em] !text-[#062e63]' : ''}`}
           aria-label={!hasValue ? `${title}: No disponible` : undefined}
         >
           {displayValue}
         </span>
-        <h3 className="indicator-card__title">{title}</h3>
-        {description ? <p className="indicator-card__description">{description}</p> : null}
+        <h3 className={`indicator-card__title${modernActivitiesStyle ? ' !text-base !font-extrabold !text-[#073b73]' : ''}`}>{title}</h3>
+        {description ? <p className={`indicator-card__description${modernActivitiesStyle ? ' !leading-relaxed' : ''}`}>{description}</p> : null}
       </div>
 
       {link ? (
-        <span className="indicator-card__link-text" aria-hidden="true">
+        <span className={`indicator-card__link-text${modernActivitiesStyle ? ' !inline-flex !w-fit !items-center !justify-center !rounded-xl !border !border-blue-200 !bg-blue-50 !px-4 !py-2.5 !font-extrabold !text-blue-700 !shadow-sm !transition-all !duration-300 group-hover:!border-blue-600 group-hover:!bg-blue-600 group-hover:!text-white group-hover:!shadow-md' : ''}`} aria-hidden="true">
           Ver detalles &rarr;
         </span>
       ) : null}

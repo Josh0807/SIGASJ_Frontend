@@ -145,7 +145,7 @@ const ComunicadosAdminPage = () => {
       : emptyComunicadoFormValues()
 
   return (
-    <main className="gallery-admin">
+    <main className="gallery-admin admin-content-modern">
       <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
@@ -154,8 +154,8 @@ const ComunicadosAdminPage = () => {
             <p>Cree, edite y active los avisos visibles en la landing pública.</p>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to="/#comunicados">
-              Ver sitio público
+            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
+              Volver inicio
             </Link>
             <button
               type="button"

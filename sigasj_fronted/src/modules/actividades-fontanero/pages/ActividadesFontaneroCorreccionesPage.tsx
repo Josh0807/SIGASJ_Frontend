@@ -6,6 +6,7 @@ import CorreccionPendienteCard from '../components/CorreccionPendienteCard'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useCorreccionesPendientes } from '../hooks/useCorreccionesPendientes'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
+import { IconArrowLeft, IconChecks } from '@tabler/icons-react'
 
 const ActividadesFontaneroCorreccionesPage = () => {
   const navigate = useNavigate()
@@ -30,20 +31,25 @@ const ActividadesFontaneroCorreccionesPage = () => {
 
   return (
     <section
-      className="actividades-fontanero-correcciones"
+      className="actividades-fontanero-correcciones !mx-0 !max-w-none !gap-7"
       aria-labelledby="correcciones-pendientes-title"
     >
-      <header className="actividades-fontanero-correcciones__header">
-        <div>
-          <p className="actividades-fontanero-correcciones__eyebrow">
+      <header className="actividades-fontanero-correcciones__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+        <div className="min-w-0 space-y-3">
+          <p className="actividades-fontanero-correcciones__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-blue-600">
             Registro de Actividades
           </p>
-          <h1 id="correcciones-pendientes-title">Correcciones pendientes</h1>
-          <p className="actividades-fontanero-correcciones__intro">
+          <h1 id="correcciones-pendientes-title" className="!m-0 !text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">Correcciones pendientes</h1>
+          <p className="actividades-fontanero-correcciones__intro !m-0 !text-lg !leading-relaxed !text-slate-500">
             Revise las actividades que requieren ajuste, lea el motivo indicado y
             reenvíe la información corregida.
           </p>
         </div>
+        <div className="flex shrink-0 flex-col items-stretch gap-3 lg:items-end">
+          <Link to={ACTIVIDADES_FONTANERO_PATHS.home} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline">
+            <IconArrowLeft size={20} aria-hidden="true" />
+            Volver al menú de actividades
+          </Link>
         {!isLoading && !isError && total > 0 ? (
           <p
             className="actividades-fontanero-correcciones__count"
@@ -53,6 +59,7 @@ const ActividadesFontaneroCorreccionesPage = () => {
             {total} {total === 1 ? 'actividad pendiente' : 'actividades pendientes'}
           </p>
         ) : null}
+        </div>
       </header>
 
       {isLoading ? (
@@ -91,11 +98,12 @@ const ActividadesFontaneroCorreccionesPage = () => {
 
       {isEmpty ? (
         <div
-          className="actividades-fontanero-correcciones__empty"
+          className="actividades-fontanero-correcciones__empty !rounded-[28px] !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-8 !shadow-[0_12px_32px_rgba(30,90,156,0.08)]"
           role="status"
           data-testid="correcciones-lista-vacia"
         >
-          <p className="actividades-fontanero-correcciones__empty-title">
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconChecks size={28} aria-hidden="true" /></span>
+          <p className="actividades-fontanero-correcciones__empty-title !text-xl !font-black !text-[#07376f]">
             Sin correcciones pendientes
           </p>
           <p className="actividades-fontanero-correcciones__empty-text">
@@ -121,7 +129,7 @@ const ActividadesFontaneroCorreccionesPage = () => {
 
       <Link
         to={ACTIVIDADES_FONTANERO_PATHS.home}
-        className="actividades-fontanero-correcciones__back"
+        className="actividades-fontanero-correcciones__back !hidden"
       >
         Volver al menú de actividades
       </Link>

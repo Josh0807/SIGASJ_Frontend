@@ -3,7 +3,6 @@ import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import {
   deleteProyectoImagen,
   removeProyectoImagenPrincipal,
-  reorderProyectoImagenes,
   uploadProyectoImagenPrincipal,
   uploadProyectoImagenes,
 } from '../services/proyectosApi'
@@ -28,6 +27,7 @@ const ProyectoImagenesGaleria = ({
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [confirmState, setConfirmState] = useState<ConfirmState>(null)
+  const [viewerImage, setViewerImage] = useState<AdminProyectoImagen | null>(null)
 
   const coverInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
@@ -135,36 +135,6 @@ const ProyectoImagenesGaleria = ({
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : 'No fue posible retirar la fotografía.'
-      setError(msg)
-    } finally {
-      setLoading(false)
-      setLoadingMessage(null)
-    }
-  }
-
-  const handleMoveImage = async (index: number, direction: -1 | 1) => {
-    const targetIndex = index + direction
-    if (targetIndex < 0 || targetIndex >= imagenesSorted.length) return
-
-    const newSorted = [...imagenesSorted]
-    const [movedItem] = newSorted.splice(index, 1)
-    newSorted.splice(targetIndex, 0, movedItem)
-
-    const ordenes = newSorted.map((img, idx) => ({
-      id: img.id,
-      orden: idx + 1,
-    }))
-
-    setError(null)
-    setLoading(true)
-    setLoadingMessage('Actualizando orden…')
-
-    try {
-      const updated = await reorderProyectoImagenes(proyecto.id, ordenes)
-      onProyectoUpdated(updated)
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : 'No fue posible reordenar las fotografías.'
       setError(msg)
     } finally {
       setLoading(false)
@@ -299,7 +269,12 @@ const ProyectoImagenesGaleria = ({
                 key={img.id}
                 className="proyecto-imagenes-galeria__item-card"
               >
-                <div className="proyecto-imagenes-galeria__item-thumb">
+                <button
+                  type="button"
+                  className="proyecto-imagenes-galeria__item-thumb !block !w-full !cursor-zoom-in !border-0 !p-0"
+                  onClick={() => setViewerImage(img)}
+                  aria-label={`Ver fotografía ${index + 1} en tamaño completo`}
+                >
                   <img
                     src={img.url}
                     alt={img.descripcion || `Fotografía ${index + 1} de la galería`}
@@ -307,32 +282,12 @@ const ProyectoImagenesGaleria = ({
                   <span className="proyecto-imagenes-galeria__badge">
                     Orden #{index + 1}
                   </span>
-                </div>
+                </button>
 
                 <div className="proyecto-imagenes-galeria__item-controls">
-                  <div className="proyecto-imagenes-galeria__reorder-btns">
-                    <button
-                      type="button"
-                      className="gallery-admin__button"
-                      disabled={loading || index === 0}
-                      title="Mover foto a la izquierda / arriba"
-                      onClick={() => handleMoveImage(index, -1)}
-                    >
-                      Subir
-                    </button>
-                    <button
-                      type="button"
-                      className="gallery-admin__button"
-                      disabled={loading || index === imagenesSorted.length - 1}
-                      title="Mover foto a la derecha / abajo"
-                      onClick={() => handleMoveImage(index, 1)}
-                    >
-                      Bajar
-                    </button>
-                  </div>
                   <button
                     type="button"
-                    className="gallery-admin__button gallery-admin__button--danger"
+                    className="gallery-admin__button gallery-admin__button--danger !w-full"
                     disabled={loading}
                     onClick={() =>
                       setConfirmState({ type: 'gallery', image: img })
@@ -346,6 +301,34 @@ const ProyectoImagenesGaleria = ({
           </div>
         )}
       </section>
+
+      {viewerImage ? (
+        <div
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista ampliada de la fotografía"
+          onMouseDown={(event) => {
+            if (event.currentTarget === event.target) setViewerImage(null)
+          }}
+        >
+          <div className="relative max-h-[92vh] max-w-6xl overflow-hidden rounded-3xl bg-white p-2 shadow-2xl">
+            <button
+              type="button"
+              className="absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-full bg-slate-950/80 text-2xl font-bold text-white shadow-lg transition hover:bg-slate-950"
+              onClick={() => setViewerImage(null)}
+              aria-label="Cerrar fotografía"
+            >
+              ×
+            </button>
+            <img
+              src={viewerImage.url}
+              alt={viewerImage.descripcion || 'Fotografía ampliada del proyecto'}
+              className="max-h-[88vh] w-auto max-w-full rounded-[1.25rem] object-contain"
+            />
+          </div>
+        </div>
+      ) : null}
 
       {/* --- CONFIRMATION DIALOGS --- */}
       <ConfirmDialog

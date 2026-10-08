@@ -8,6 +8,687 @@
   scroll-padding-top: 104px;
 }
 
+.averias-admin .gallery-admin__header h1 {
+  margin: 0;
+  color: #07376f;
+  font-size: clamp(1.875rem, 3vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}
+
+.averias-admin .gallery-admin__header > div:first-child > p:last-child {
+  margin: 0;
+  color: #64748b;
+  font-size: 1.125rem;
+  line-height: 1.65;
+}
+
+/* Nueva solicitud: columna de acciones estable, por encima de reglas heredadas. */
+@media (min-width: 900px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request.material-request__header--new-request {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 320px !important;
+    grid-template-rows: auto auto !important;
+    align-items: start !important;
+    gap: 18px 32px !important;
+    min-height: 0 !important;
+    padding: 32px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > :first-child {
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    min-width: 0 !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .inventory-module-menu {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    justify-content: stretch !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .inventory-module-menu > button {
+    width: 100% !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .material-request__identity--new-request {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
+
+/* Prioridad final: jerarquía de las vistas administrativas de averías. */
+.averias-admin .gallery-admin__header h1 {
+  margin: 0 !important;
+  color: #07376f !important;
+  font-size: clamp(1.875rem, 3vw, 2.25rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.averias-admin .gallery-admin__header > div:first-child > p:last-child {
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 1.125rem !important;
+  line-height: 1.65 !important;
+}
+
+.averias-admin .gallery-admin__filters .gallery-admin__field > span {
+  color: #174f87 !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+.averias-admin .gallery-admin__filters :is(input, select) {
+  min-height: 56px !important;
+  padding-inline: 16px !important;
+  border-color: #bfdbfe !important;
+  border-radius: 16px !important;
+  background-color: #fff !important;
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+}
+
+.averias-admin .gallery-admin__filters :is(input, select):focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13), 0 8px 20px rgba(30, 90, 156, 0.08) !important;
+}
+
+.averias-summary-indicators .admin-dashboard__indicators-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+.averias-summary-indicators .indicator-card {
+  min-height: 0 !important;
+  justify-content: flex-start !important;
+  padding: 22px !important;
+  border-color: #dbeafe !important;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg, #ffffff, #f7fbff) !important;
+  box-shadow: 0 8px 22px rgba(30, 90, 156, 0.07) !important;
+}
+
+.averias-summary-indicators .indicator-card__body {
+  margin: 0 !important;
+}
+
+.averias-summary-indicators .indicator-card__value {
+  margin-bottom: 8px !important;
+  color: #07376f !important;
+  font-size: 2.25rem !important;
+  font-weight: 900 !important;
+}
+
+.averias-summary-indicators .indicator-card__title {
+  color: #174f87 !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+}
+
+/* Jerarquía moderna: revisión y reportes de actividades administrativas. */
+:is(.actividades-admin-revision, .actividades-admin-reportes) .gallery-admin__header h1 {
+  margin: 0 !important;
+  color: #07376f !important;
+  font-size: clamp(1.875rem, 3vw, 2.25rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em !important;
+}
+
+:is(.actividades-admin-revision, .actividades-admin-reportes) .gallery-admin__header > div:first-child > p {
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 1.125rem !important;
+  line-height: 1.65 !important;
+}
+
+:is(.actividades-admin-revision, .actividades-admin-reportes) .gallery-admin__field > span {
+  color: #174f87 !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+:is(.actividades-admin-revision, .actividades-admin-reportes) .gallery-admin__filters :is(input, select) {
+  min-height: 56px !important;
+  padding-inline: 16px !important;
+  border-color: #bfdbfe !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+}
+
+:is(.actividades-admin-revision, .actividades-admin-reportes) .gallery-admin__filters :is(input, select):focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13) !important;
+}
+
+/* Formularios modernos de contenido administrativo. */
+.admin-modern-form {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  padding: 30px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 28px !important;
+  background: linear-gradient(145deg, #fff, rgba(240, 249, 255, 0.72)) !important;
+  box-shadow: 0 14px 38px rgba(30, 90, 156, 0.09) !important;
+}
+
+.admin-modern-form__eyebrow {
+  grid-column: 1 / -1;
+  margin: 0 0 -12px !important;
+  color: #2563eb !important;
+  font-size: 0.8rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-modern-form > h2 {
+  grid-column: 1 / -1;
+  margin: 0 0 4px !important;
+  padding-bottom: 18px !important;
+  border-bottom: 1px solid #dbeafe !important;
+  color: #07376f !important;
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.admin-modern-form .gallery-admin__field > span {
+  color: #174f87 !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-modern-form :is(input, select, textarea) {
+  min-height: 56px !important;
+  padding: 14px 16px !important;
+  border-color: #bfdbfe !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+}
+
+.admin-modern-form textarea {
+  min-height: 120px !important;
+}
+
+.admin-modern-form :is(input, select, textarea):focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13) !important;
+}
+
+.admin-modern-form .gallery-admin__form-actions {
+  grid-column: 1 / -1;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 14px !important;
+  justify-content: flex-end !important;
+  padding-top: 22px !important;
+  border-top: 1px solid #dbeafe !important;
+}
+
+.admin-modern-form .gallery-admin__form-actions .gallery-admin__button--primary {
+  order: 1 !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(90deg, #2563eb, #0ea5e9) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22) !important;
+}
+
+.admin-modern-form .gallery-admin__form-actions .gallery-admin__button:not(.gallery-admin__button--primary) {
+  order: 2 !important;
+  border-color: #bfdbfe !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  color: #1d4ed8 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 5px 14px rgba(30, 90, 156, 0.09) !important;
+}
+
+@media (max-width: 760px) {
+  .admin-modern-form {
+    grid-template-columns: 1fr !important;
+    padding: 22px !important;
+  }
+}
+
+.admin-content-modern .gallery-admin__shell {
+  gap: 28px !important;
+}
+
+.admin-content-modern .gallery-admin__header {
+  padding: 32px 40px !important;
+  border-color: #dbeafe !important;
+  border-radius: 28px !important;
+  background: linear-gradient(145deg, #fff, rgba(240, 249, 255, 0.72)) !important;
+  box-shadow: 0 14px 38px rgba(30, 90, 156, 0.1) !important;
+}
+
+.admin-content-modern .gallery-admin__eyebrow {
+  color: #2563eb !important;
+  font-size: 0.8rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.admin-content-modern .gallery-admin__header h1 {
+  margin-block: 10px !important;
+  color: #07376f !important;
+  font-size: clamp(1.875rem, 3vw, 2.4rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.admin-content-modern .gallery-admin__header > div:first-child > p:last-child {
+  color: #64748b !important;
+  font-size: 1.125rem !important;
+  line-height: 1.65 !important;
+}
+
+.admin-content-modern .gallery-admin__filters {
+  padding: 28px !important;
+  border-color: #dbeafe !important;
+  border-radius: 28px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 14px 38px rgba(30, 90, 156, 0.08) !important;
+}
+
+.admin-content-modern .gallery-admin__filters::before {
+  content: "Buscar y filtrar registros";
+  grid-column: 1 / -1;
+  display: block;
+  margin-bottom: 4px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #dbeafe;
+  color: #07376f;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.admin-content-modern .gallery-admin__filters .gallery-admin__field > span {
+  color: #174f87 !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-content-modern .gallery-admin__filters :is(input, select) {
+  min-height: 56px !important;
+  padding-inline: 16px !important;
+  border-color: #bfdbfe !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+}
+
+.admin-content-modern .gallery-admin__button--primary {
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(90deg, #2563eb, #0ea5e9) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22) !important;
+}
+
+.admin-content-modern .admin-modern-home-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 52px !important;
+  padding: 12px 22px !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  color: #1d4ed8 !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  box-shadow: 0 7px 18px rgba(30, 90, 156, 0.11) !important;
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease !important;
+}
+
+.admin-content-modern .admin-modern-home-link:hover {
+  transform: translateY(-2px);
+  background: #eff6ff !important;
+  box-shadow: 0 11px 24px rgba(30, 90, 156, 0.16) !important;
+}
+
+.admin-content-modern .gallery-admin__list {
+  gap: 20px !important;
+}
+
+.admin-content-modern .gallery-admin__item {
+  padding: 22px !important;
+  border-color: #dbeafe !important;
+  border-radius: 24px !important;
+  background: linear-gradient(145deg, #fff, rgba(240, 249, 255, 0.58)) !important;
+  box-shadow: 0 10px 28px rgba(30, 90, 156, 0.08) !important;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+.admin-content-modern .gallery-admin__item:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd !important;
+  box-shadow: 0 16px 34px rgba(30, 90, 156, 0.13) !important;
+}
+
+.admin-content-modern .gallery-admin__thumb {
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  box-shadow: 0 7px 18px rgba(30, 90, 156, 0.12) !important;
+}
+
+.admin-content-modern .gallery-admin__meta h2 {
+  color: #07376f !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.admin-content-modern .gallery-admin__actions {
+  gap: 10px !important;
+}
+
+.admin-content-modern .gallery-admin__actions button {
+  min-height: 46px !important;
+  padding: 10px 16px !important;
+  border-color: #bfdbfe !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  color: #174f87 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(30, 90, 156, 0.07) !important;
+  transition: transform 160ms ease, background 160ms ease !important;
+}
+
+.admin-content-modern .gallery-admin__actions button:first-child {
+  border: 0 !important;
+  background: linear-gradient(90deg, #2563eb, #0ea5e9) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2) !important;
+}
+
+.admin-content-modern .gallery-admin__actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.admin-content-modern .gallery-admin__actions .gallery-admin__danger {
+  border: 1px solid #fecaca !important;
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  box-shadow: none !important;
+}
+
+.admin-content-modern .gallery-admin__actions button:disabled {
+  background: #f8fafc !important;
+  color: #94a3b8 !important;
+  box-shadow: none !important;
+}
+
+.admin-content-modern .table-responsive {
+  overflow: hidden;
+  border: 1px solid #dbeafe !important;
+  border-radius: 24px !important;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(30, 90, 156, 0.08) !important;
+}
+
+.admin-content-modern table thead {
+  background: linear-gradient(90deg, #eff6ff, #f0f9ff) !important;
+}
+
+.admin-content-modern table th {
+  color: #174f87 !important;
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.055em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-content-modern table td {
+  border-color: #e2e8f0 !important;
+}
+
+.admin-content-modern table tbody tr:hover {
+  background: #f8fbff !important;
+}
+
+.admin-modern-form .proyectos-admin__cover-preview-wrapper > .proyectos-admin__cover-badge {
+  position: absolute !important;
+  inset: 12px auto auto 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 24px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #1d4ed8 !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.admin-modern-form .proyectos-admin__cover-preview-wrapper > .proyectos-admin__cover-badge--new {
+  background: rgba(236, 253, 245, 0.96) !important;
+  color: #047857 !important;
+}
+
+@media (max-width: 900px) {
+  .averias-summary-indicators .admin-dashboard__indicators-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .averias-summary-indicators .admin-dashboard__indicators-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request.material-request__header--new-request {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 18px !important;
+    min-height: 0 !important;
+    padding: 24px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > :first-child {
+    order: 1 !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .inventory-module-menu {
+    position: relative !important;
+    inset: auto !important;
+    order: 2 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .material-request__identity--new-request {
+    position: relative !important;
+    inset: auto !important;
+    order: 3 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
+
+/* Jerarquía moderna de las vistas administrativas de averías. */
+.averias-admin .gallery-admin__header h1 {
+  margin: 0 !important;
+  color: #07376f !important;
+  font-size: clamp(1.875rem, 3vw, 2.25rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.averias-admin .gallery-admin__header > div:first-child > p:last-child {
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 1.125rem !important;
+  line-height: 1.65 !important;
+}
+
+.averias-admin .gallery-admin__filters .gallery-admin__field > span {
+  color: #174f87 !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+.averias-admin .gallery-admin__filters :is(input, select) {
+  min-height: 56px !important;
+  padding-inline: 16px !important;
+  border-color: #bfdbfe !important;
+  border-radius: 16px !important;
+  background-color: #fff !important;
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+  transition: border-color 160ms ease, box-shadow 160ms ease !important;
+}
+
+.averias-admin .gallery-admin__filters :is(input, select):focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13), 0 8px 20px rgba(30, 90, 156, 0.08) !important;
+}
+
+/* Override definitivo de la composición solicitada. */
+@media (min-width: 900px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed.material-request__header--rail-fixed {
+    position: relative !important;
+    display: block !important;
+    min-height: 280px !important;
+    padding: 32px 384px 32px 32px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed > .material-request__right-rail {
+    position: absolute !important;
+    top: 32px !important;
+    right: 32px !important;
+    bottom: auto !important;
+    left: auto !important;
+    display: grid !important;
+    width: 320px !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed.material-request__header--rail-fixed {
+    position: relative !important;
+    display: block !important;
+    min-height: 0 !important;
+    padding: 24px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed > .material-request__right-rail {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    margin-top: 24px !important;
+  }
+}
+
+/* Posición final solicitada: Operaciones a la derecha y Solicitante debajo. */
+@media (min-width: 900px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed.material-request__header--rail-fixed {
+    position: relative !important;
+    display: block !important;
+    min-height: 280px !important;
+    padding: 32px 384px 32px 32px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed > .material-request__right-rail {
+    position: absolute !important;
+    top: 32px !important;
+    right: 32px !important;
+    bottom: auto !important;
+    left: auto !important;
+    display: grid !important;
+    width: 320px !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed.material-request__header--rail-fixed {
+    position: relative !important;
+    display: block !important;
+    min-height: 0 !important;
+    padding: 24px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed > .material-request__right-rail {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    margin-top: 24px !important;
+  }
+}
+
+.inventory-module-shell .inventory-module-menu-slot > .inventory-module-menu {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  justify-content: stretch !important;
+}
+
+.inventory-module-shell .inventory-module-menu-slot > .inventory-module-menu > button {
+  width: 100% !important;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10798,6 +11479,79 @@ body,
   cursor: not-allowed;
 }
 
+/* Registro de actividades: acabado moderno complementario a las utilidades Tailwind. */
+.actividades-fontanero-registro .actividad-registro-form__legend {
+  padding-inline: 12px;
+  color: #07376f;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.actividades-fontanero-registro .actividad-registro-form__label {
+  color: #174f87;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.actividades-fontanero-registro .actividad-registro-form__input,
+.actividades-fontanero-registro .actividad-registro-form__textarea,
+.actividades-fontanero-registro .documento-uploader__input {
+  min-height: 56px;
+  padding: 14px 16px;
+  border-color: #bfdbfe;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.actividades-fontanero-registro .actividad-registro-form__textarea {
+  min-height: 120px;
+}
+
+.actividades-fontanero-registro .actividad-registro-form__input:focus,
+.actividades-fontanero-registro .actividad-registro-form__textarea:focus,
+.actividades-fontanero-registro .documento-uploader__input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13), 0 8px 20px rgba(30, 90, 156, 0.08);
+}
+
+.actividades-fontanero-registro .documento-uploader__input::file-selector-button {
+  margin-right: 16px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: #fff;
+  font-weight: 750;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+}
+
+.actividades-fontanero-registro .documento-uploader__file {
+  padding: 14px 16px;
+  border-color: #dbeafe;
+  border-radius: 16px;
+  box-shadow: 0 5px 16px rgba(30, 90, 156, 0.05);
+}
+
+.actividades-fontanero-registro .documento-uploader__remove {
+  padding: 9px 14px;
+  border-color: #fecaca;
+  border-radius: 12px;
+  background: #fff1f2;
+  color: #be123c;
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .actividades-fontanero-registro {
+    gap: 18px !important;
+  }
+}
+
 .actividades-fontanero-correcciones {
   display: flex;
   flex-direction: column;
@@ -11863,6 +12617,48 @@ body,
     left: 24px !important;
     max-width: none !important;
     justify-content: flex-end;
+  }
+}
+
+@container inventory-shell (min-width: 900px) {
+  .inventory-module-shell .material-request__header--new-request:has(> .inventory-module-menu) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 320px) !important;
+    grid-template-rows: auto auto !important;
+    align-items: start !important;
+    gap: 18px 32px !important;
+    min-height: 0 !important;
+    padding: 32px !important;
+  }
+
+  .inventory-module-shell .material-request__header--new-request:has(> .inventory-module-menu) > :first-child {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+  }
+
+  .inventory-module-shell .material-request__header--new-request:has(> .inventory-module-menu) > .inventory-module-menu {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .inventory-module-shell .material-request__header--new-request:has(> .inventory-module-menu) > .inventory-module-menu > button {
+    width: 100% !important;
+  }
+
+  .inventory-module-shell .material-request__header--new-request:has(> .inventory-module-menu) > .material-request__identity--new-request {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    justify-self: stretch !important;
   }
 }
 .providers-admin__header .materials-admin__primary svg:first-child { padding: 3px; border-radius: 50%; background: #49b9ff; }
@@ -13320,13 +14116,34 @@ body,
 .averias-admin__badge {
   display: inline-flex;
   align-items: center;
-  min-height: 26px;
-  padding: 2px 8px;
+  gap: 7px;
+  min-height: 34px;
+  padding: 6px 13px;
+  border: 1px solid transparent;
   border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.82rem;
+  font-weight: 800;
   line-height: 1.2;
   white-space: nowrap;
+  box-shadow: 0 5px 14px rgba(15, 69, 120, 0.1);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.averias-admin__badge--estado::before,
+.averias-admin__badge--prioridad::before {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.72);
+  content: '';
+}
+
+.averias-admin__badge--estado:hover,
+.averias-admin__badge--prioridad:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 69, 120, 0.15);
 }
 
 .averias-admin__estado-cell {
@@ -13372,65 +14189,76 @@ body,
 }
 
 .averias-admin__badge--estado.is-recibida {
-  background: #edf4fb;
-  color: #1e5a9c;
+  border-color: #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #1d4ed8;
 }
 
 .averias-admin__badge--estado.is-en-revision {
-  background: #f3eef9;
-  color: #5a3d8a;
+  border-color: #ddd6fe;
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  color: #6d28d9;
 }
 
 .averias-admin__badge--estado.is-asignada {
-  background: #eef6f0;
-  color: #1f6b3a;
+  border-color: #a5f3fc;
+  background: linear-gradient(135deg, #ecfeff, #cffafe);
+  color: #0e7490;
 }
 
 .averias-admin__badge--estado.is-pendiente {
-  background: #fff3d6;
-  color: #7a4b00;
-  box-shadow: inset 0 0 0 1px #e6c27a;
+  border-color: #fde68a;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  color: #a16207;
 }
 
 .averias-admin__badge--estado.is-en-atencion {
-  background: #e4eefc;
-  color: #163f7a;
-  box-shadow: inset 0 0 0 1px #9bb6e0;
+  border-color: #93c5fd;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #0757b5;
 }
 
 .averias-admin__badge--estado.is-resuelta {
-  background: #f3f5f7;
-  color: #3d4d5c;
+  border-color: #a7f3d0;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  color: #047857;
 }
 
 .averias-admin__badge--estado.is-cancelada {
-  background: #fdecec;
-  color: #8a1f1f;
+  border-color: #fecaca;
+  background: linear-gradient(135deg, #fff1f2, #fee2e2);
+  color: #be123c;
 }
 
 .averias-admin__badge--estado.is-desconocido {
-  background: #f4f1f1;
-  color: #6b4a4a;
+  border-color: #cbd5e1;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  color: #475569;
 }
 
 .averias-admin__badge--prioridad.is-alta {
-  background: #fdecec;
-  color: #9b1c1c;
+  border-color: #fdba74;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  color: #c2410c;
 }
 
 .averias-admin__badge--prioridad.is-media {
-  background: #fff6e8;
-  color: #8a5a12;
+  border-color: #fde68a;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  color: #a16207;
 }
 
 .averias-admin__badge--prioridad.is-baja {
-  background: #f3f5f7;
-  color: #445566;
+  border-color: #bae6fd;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  color: #0369a1;
 }
 
 .averias-admin__badge--prioridad.is-urgente {
-  background: #fdecec;
-  color: #7a1010;
+  border-color: #fda4af;
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+  color: #be123c;
+  box-shadow: 0 6px 16px rgba(190, 18, 60, 0.16);
 }
 
 .averias-admin__cards {
@@ -14282,9 +15110,64 @@ body,
   border-color: #9ec4e0;
 }
 
+/* Mantiene todas las tarjetas del detalle al mismo nivel visual que el encabezado. */
+.averias-fontanero .averias-fontanero__detail .averia-hierarchy-card {
+  width: 100% !important;
+  overflow: hidden !important;
+  padding: 32px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 28px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 58%, #f0f9ff 100%) !important;
+  box-shadow: 0 14px 38px rgba(30, 90, 156, 0.1) !important;
+}
+
+.averias-fontanero .averias-fontanero__detail .averia-hierarchy-card__title {
+  margin: 0 0 24px !important;
+  padding: 0 0 16px !important;
+  border-bottom: 1px solid #dbeafe !important;
+  color: #062e63 !important;
+  font-size: clamp(1.35rem, 2.2vw, 1.65rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em !important;
+  text-decoration: none !important;
+}
+
 .averias-fontanero__resumen,
 .averias-fontanero__reporte .averias-admin__fields {
   grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+}
+
+.averias-fontanero .averia-management-fields {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.averias-fontanero .averia-management-fields > .averias-admin__field {
+  min-height: 148px;
+  min-width: 0;
+}
+
+.averias-fontanero .averia-management-fields .averias-admin__badge {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+@media (max-width: 1180px) {
+  .averias-fontanero .averia-management-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .averias-fontanero .averia-management-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .averias-fontanero .averia-management-fields > .averias-admin__field {
+    min-height: auto;
+  }
 }
 
 .averias-fontanero__estado-hint,
@@ -14583,5 +15466,132 @@ body,
   .averias-fontanero__acciones .gallery-admin__button {
     width: 100%;
     justify-self: stretch;
+  }
+}
+
+/* Anclaje de máxima prioridad para la columna derecha de Nueva solicitud. */
+@media (min-width: 900px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed.material-request__header--rail-fixed.material-request__header--rail-fixed {
+    position: relative !important;
+    display: block !important;
+    min-height: 280px !important;
+    padding: 32px 384px 32px 32px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed > .material-request__right-rail {
+    position: absolute !important;
+    top: 32px !important;
+    right: 32px !important;
+    bottom: auto !important;
+    left: auto !important;
+    display: grid !important;
+    width: 320px !important;
+    gap: 16px !important;
+    margin: 0 !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed .inventory-module-menu-slot > .inventory-module-menu {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed .inventory-module-menu-slot > .inventory-module-menu > button {
+    width: 100% !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--rail-fixed > .inventory-module-menu {
+    position: absolute !important;
+    top: 32px !important;
+    right: 32px !important;
+    bottom: auto !important;
+    left: auto !important;
+    width: 320px !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
+
+/* Nueva solicitud: columna derecha fija para Operaciones y Solicitante. */
+@media (min-width: 900px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request.material-request__header--new-request {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 320px !important;
+    grid-template-rows: auto auto !important;
+    align-items: start !important;
+    gap: 18px 32px !important;
+    min-height: 0 !important;
+    padding: 32px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > :first-child {
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    min-width: 0 !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .inventory-module-menu {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    justify-content: stretch !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .inventory-module-menu > button {
+    width: 100% !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .material-request__identity--new-request {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request.material-request__header--new-request {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 18px !important;
+    min-height: 0 !important;
+    padding: 24px !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > :first-child {
+    order: 1 !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .inventory-module-menu {
+    position: relative !important;
+    inset: auto !important;
+    order: 2 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .inventory-module-shell.inventory-module-shell .material-request__header--new-request > .material-request__identity--new-request {
+    position: relative !important;
+    inset: auto !important;
+    order: 3 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
   }
 }

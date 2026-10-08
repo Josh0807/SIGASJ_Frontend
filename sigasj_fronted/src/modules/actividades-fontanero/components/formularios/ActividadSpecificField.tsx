@@ -24,7 +24,7 @@ const ActividadSpecificField = ({
   multiline = false,
 }: Props) => {
   const errorId = `${field}-error`
-  const inputClass = `actividad-registro-form__input${
+  const inputClass = `actividad-registro-form__input !min-h-14 !rounded-2xl !border-blue-200 !bg-white !px-4 !shadow-sm transition focus:!border-blue-500 focus:!outline-none focus:!ring-4 focus:!ring-blue-100${
     error ? ' actividad-registro-form__input--error' : ''
   }`
   const common = {
@@ -50,7 +50,7 @@ const ActividadSpecificField = ({
         {unit ? <span className="actividad-registro-form__unit"> ({unit})</span> : null}
       </label>
       {multiline ? (
-        <textarea {...common} rows={4} className="actividad-registro-form__textarea" />
+        <textarea {...common} rows={4} className="actividad-registro-form__textarea !min-h-32 !rounded-2xl !border-blue-200 !bg-white !p-4 !shadow-sm transition focus:!border-blue-500 focus:!outline-none focus:!ring-4 focus:!ring-blue-100" />
       ) : (
         <input
           {...common}

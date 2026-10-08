@@ -45,7 +45,12 @@ const AveriasAdminFilters = ({
   onClear,
   hasActiveFilters,
 }: AveriasAdminFiltersProps) => (
-  <section className="gallery-admin__filters w-full" aria-label="Búsqueda y filtros">
+  <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]" aria-label="Búsqueda y filtros">
+    <div className="col-span-full border-b border-blue-100 pb-5">
+      <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Consulta de averías</p>
+      <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Buscar y filtrar casos</h2>
+      <p className="mt-2 text-base leading-relaxed text-slate-500">Utilice uno o varios criterios para localizar las averías registradas.</p>
+    </div>
     <form
       className="sigasj-filter-search"
       role="search"
@@ -135,7 +140,7 @@ const AveriasAdminFilters = ({
       <p className="gallery-admin__filter-reset">
         <button
           type="button"
-          className="gallery-admin__button"
+          className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3 !font-bold !text-blue-700 !shadow-md transition hover:-translate-y-0.5 hover:!bg-blue-50"
           onClick={onClear}
         >
           Limpiar filtros

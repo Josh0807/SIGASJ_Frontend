@@ -242,18 +242,18 @@ const AveriasAdminPage = ({
 
   return (
     <main className="gallery-admin averias-admin w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div>
-            <p className="gallery-admin__eyebrow">Panel administrativo</p>
+      <div className="gallery-admin__shell sigasj-stack !gap-7">
+        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+          <div className="min-w-0 space-y-3">
+            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !uppercase !tracking-[0.12em] !text-blue-600">Panel administrativo</p>
             <h1>Gestión de averías</h1>
             <p>Consulte y dé seguimiento a las averías reportadas.</p>
           </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__button" to={AVERIAS_ADMIN_REPORTE_PATH}>
+          <div className="gallery-admin__header-actions !gap-3">
+            <Link className="gallery-admin__button !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-6 !py-3.5 !font-bold !text-white !no-underline !shadow-lg !shadow-blue-200 transition hover:-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600" to={AVERIAS_ADMIN_REPORTE_PATH}>
               Resumen
             </Link>
-            <Link className="gallery-admin__button" to={AVERIAS_ADMIN_HISTORIAL_PATH}>
+            <Link className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-blue-50" to={AVERIAS_ADMIN_HISTORIAL_PATH}>
               Historial
             </Link>
           </div>

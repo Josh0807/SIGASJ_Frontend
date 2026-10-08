@@ -250,15 +250,16 @@ const ProyectosAdminForm = ({
 
   return (
     <form
-      className="gallery-admin__form proyectos-admin__form sigasj-project-form w-full max-w-3xl"
+      className="gallery-admin__form proyectos-admin__form sigasj-project-form admin-modern-form w-full !max-w-none"
       onSubmit={handleSubmit}
       noValidate
       aria-busy={isSubmitting ? true : undefined}
       aria-describedby={formError ? FORM_ERROR_ID : undefined}
     >
+      <p className="admin-modern-form__eyebrow">Formulario de proyectos</p>
       <h2>{mode === 'create' ? 'Nuevo proyecto' : 'Editar proyecto'}</h2>
 
-      <label className="gallery-admin__field" htmlFor={NOMBRE_INPUT_ID}>
+      <label className="gallery-admin__field md:!col-span-2" htmlFor={NOMBRE_INPUT_ID}>
         <span>Nombre del proyecto *</span>
         <input
           id={NOMBRE_INPUT_ID}
@@ -276,7 +277,7 @@ const ProyectosAdminForm = ({
         {fieldAlert('nombre')}
       </label>
 
-      <div className="gallery-admin__field proyectos-admin__cover-field">
+      <div className="gallery-admin__field proyectos-admin__cover-field md:!col-span-2">
         <label htmlFor={IMAGEN_INPUT_ID}>
           <span>Fotografía de portada (Imagen principal)</span>
         </label>
@@ -288,7 +289,7 @@ const ProyectosAdminForm = ({
                 alt="Vista previa de portada seleccionada"
                 className="proyectos-admin__cover-preview"
               />
-              <span className="proyectos-admin__cover-badge proyectos-admin__cover-badge--new">
+              <span className="proyectos-admin__cover-badge proyectos-admin__cover-badge--new !absolute !inset-auto !left-3 !top-3 !h-auto !min-h-0 !w-auto !max-w-[calc(100%-1.5rem)] !rounded-xl !bg-emerald-50/95 !px-3 !py-1.5 !text-xs !font-extrabold !leading-tight !text-emerald-700 !shadow-md">
                 Nueva portada (sin guardar)
               </span>
             </div>
@@ -299,7 +300,7 @@ const ProyectosAdminForm = ({
                 alt="Portada actual del proyecto"
                 className="proyectos-admin__cover-preview"
               />
-              <span className="proyectos-admin__cover-badge">
+              <span className="proyectos-admin__cover-badge !absolute !inset-auto !left-3 !top-3 !h-auto !min-h-0 !w-auto !max-w-[calc(100%-1.5rem)] !rounded-xl !bg-white/95 !px-3 !py-1.5 !text-xs !font-extrabold !leading-tight !text-blue-700 !shadow-md">
                 Portada actual
               </span>
             </div>
@@ -351,7 +352,7 @@ const ProyectosAdminForm = ({
         {fieldAlert('imagenPrincipal')}
       </div>
 
-      <label className="gallery-admin__field" htmlFor={DESCRIPCION_INPUT_ID}>
+      <label className="gallery-admin__field md:!col-span-2" htmlFor={DESCRIPCION_INPUT_ID}>
         <span>Descripción</span>
         <textarea
           id={DESCRIPCION_INPUT_ID}

@@ -62,7 +62,7 @@ const ContactoAdminPage = () => {
   }
 
   return (
-    <main className="gallery-admin">
+    <main className="gallery-admin admin-content-modern">
       <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
@@ -73,8 +73,8 @@ const ContactoAdminPage = () => {
             </p>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to="/#contacto">
-              Ver sitio público
+            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
+              Volver inicio
             </Link>
           </div>
         </header>
@@ -84,7 +84,8 @@ const ContactoAdminPage = () => {
             Cargando información…
           </p>
         ) : (
-          <form className="gallery-admin__form w-full max-w-3xl" onSubmit={handleSubmit}>
+          <form className="gallery-admin__form admin-modern-form w-full !max-w-none" onSubmit={handleSubmit}>
+            <p className="admin-modern-form__eyebrow">Formulario de contacto y ubicación</p>
             <h2>Contacto</h2>
 
             <label className="gallery-admin__field">

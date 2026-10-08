@@ -114,7 +114,7 @@ const ProyectosAdminPage = () => {
   }
 
   return (
-    <main className="gallery-admin proyectos-admin">
+    <main className="gallery-admin proyectos-admin admin-content-modern">
       <div className="gallery-admin__shell sigasj-stack">
         <header className="gallery-admin__header">
           <div>
@@ -126,8 +126,8 @@ const ProyectosAdminPage = () => {
             </p>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link" to="/#proyectos">
-              Ver sitio público
+            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
+              Volver inicio
             </Link>
             <Link
               className="gallery-admin__button gallery-admin__button--primary"
