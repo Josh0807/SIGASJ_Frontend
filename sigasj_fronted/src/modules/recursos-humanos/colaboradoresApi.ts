@@ -25,6 +25,12 @@ export const getColaboradores = (filtros: ColaboradoresFiltros, signal?: AbortSi
     signal,
   })
 
+export const getColaboradoresOpciones = (signal?: AbortSignal) =>
+  fetchWithAuth<ColaboradoresListado>(COLABORADORES_ENDPOINT, {
+    params: { page: 1, limit: 100 },
+    signal,
+  })
+
 export const getColaborador = (id: number, signal?: AbortSignal) =>
   fetchWithAuth<Colaborador>(`${COLABORADORES_ENDPOINT}/${id}`, { signal })
 
