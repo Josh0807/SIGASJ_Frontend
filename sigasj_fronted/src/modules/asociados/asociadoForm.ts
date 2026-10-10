@@ -1,7 +1,43 @@
-import type { AsociadoFormValues, RegistrarAsociadoPayload } from './types'
+import type { Asociado, AsociadoFormValues, RegistrarAsociadoPayload } from './types'
 
 export type AsociadoFormErrors = Partial<Record<keyof AsociadoFormValues, string>>
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export const nombreCompleto = (asociado: Pick<Asociado, 'nombre' | 'apellidos'>) =>
+  `${asociado.nombre} ${asociado.apellidos}`.trim()
+
+export const estadoLabel = (activo: boolean) => (activo ? 'Activo' : 'Inactivo')
+
+/** Fecha de registro o inactivación del asociado, en hora de Costa Rica. */
+export const formatearFecha = (valor: string | null | undefined) => {
+  if (!valor) return '—'
+  const fecha = new Date(valor)
+  return Number.isNaN(fecha.getTime())
+    ? '—'
+    : fecha.toLocaleDateString('es-CR', { dateStyle: 'medium', timeZone: 'America/Costa_Rica' })
+}
+
+export const getHttpStatus = (error: unknown): number | null => {
+  const match = /HTTP\s+(\d{3})/i.exec(error instanceof Error ? error.message : '')
+  return match ? Number(match[1]) : null
+}
+
+export const esNoAutenticado = (error: unknown) => getHttpStatus(error) === 401
+
+/** 403 y 404 no cambian al reintentar; el resto (red, 5xx) sí puede resolverse. */
+export const esReintentable = (error: unknown) => {
+  const status = getHttpStatus(error)
+  return status !== 403 && status !== 404
+}
+
+export function asociadoConsultaError(error: unknown, fallback: string): string {
+  const status = getHttpStatus(error)
+  if (status === 403) return 'No tiene permisos para consultar asociados.'
+  if (status === 404) return 'El asociado indicado no existe o fue eliminado.'
+  if (status === 400) return 'Revise los criterios de búsqueda.'
+  if (status === null) return 'No fue posible conectar con el servidor. Revise su conexión.'
+  return fallback
+}
 
 export function validateAsociado(values: AsociadoFormValues): AsociadoFormErrors {
   const errors: AsociadoFormErrors = {}

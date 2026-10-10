@@ -11,6 +11,22 @@ export type Asociado = {
   updatedAt: string
 }
 
+export type AsociadosListado = {
+  data: Asociado[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type EstadoFiltro = 'todos' | 'activos' | 'inactivos'
+
+export type AsociadosFiltros = {
+  search: string
+  estado: EstadoFiltro
+  page: number
+}
+
 export type RegistrarAsociadoPayload = Pick<
   Asociado,
   'nombre' | 'apellidos' | 'cedula' | 'correoElectronico'
