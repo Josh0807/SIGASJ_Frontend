@@ -61,3 +61,51 @@ export type CuentaUsuario = {
   rol: string
   activo: boolean
 }
+
+export type PermisoColaboradorResumen = Pick<
+  Colaborador,
+  'id' | 'nombre' | 'apellidos' | 'cedula' | 'cargo' | 'activo'
+>
+
+export type PermisoColaborador = {
+  id: number
+  colaboradorId: number
+  fechaInicio: string
+  fechaFin: string
+  motivo: string
+  observaciones: string | null
+  colaborador?: PermisoColaboradorResumen | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type PermisosListado = {
+  data: PermisoColaborador[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type PermisosFiltros = {
+  colaboradorId: string
+  fechaInicio: string
+  fechaFin: string
+  page: number
+}
+
+export type PermisoFormValues = {
+  colaboradorId: string
+  fechaInicio: string
+  fechaFin: string
+  motivo: string
+  observaciones: string
+}
+
+export type PermisoPayload = {
+  colaboradorId: number
+  fechaInicio: string
+  fechaFin: string
+  motivo: string
+  observaciones?: string | null
+}

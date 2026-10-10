@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { loginAsRole } from '../../test/authTestHelpers'
 import { AuthProvider } from '../auth/components/AuthContext'
 import RecursosHumanosRoutes from './RecursosHumanosRoutes'
-import type { Colaborador } from './types'
+import type { Colaborador, PermisoColaborador } from './types'
 
 const juan: Colaborador = {
   id: 1,
@@ -357,6 +357,101 @@ describe('Recursos Humanos: colaboradores', () => {
     stubApi(() => response({ message: 'Unauthorized' }, false, 401))
     const view = await mount('/admin/lecturas')
     expect(view.container.textContent).toContain('Pantalla de login')
+    await view.cleanup()
+  })
+})
+
+const permiso: PermisoColaborador = {
+  id: 8,
+  colaboradorId: 1,
+  fechaInicio: '2026-10-12',
+  fechaFin: '2026-10-14',
+  motivo: 'Cita médica',
+  observaciones: null,
+  colaborador: {
+    id: 1,
+    nombre: 'Juan',
+    apellidos: 'Pérez',
+    cedula: '1-1111-1111',
+    cargo: 'Fontanero',
+    activo: true,
+  },
+  createdAt: '2026-10-01T12:00:00.000Z',
+  updatedAt: '2026-10-01T12:00:00.000Z',
+}
+
+const listadoPermisos = (data: PermisoColaborador[]) => ({
+  data,
+  total: data.length,
+  page: 1,
+  limit: 10,
+  totalPages: data.length ? 1 : 0,
+})
+
+describe('Recursos Humanos: permisos', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    localStorage.clear()
+    document.body.innerHTML = ''
+  })
+
+  it('lista permisos con colaborador, fechas y motivo', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.includes('/rrhh/permisos')) return response(listadoPermisos([permiso]))
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/permisos')
+    expect(view.container.textContent).toContain('Permisos del personal')
+    const headers = Array.from(view.container.querySelectorAll('th')).map((th) => th.textContent)
+    expect(headers).toEqual(['Colaborador', 'Inicio', 'Fin', 'Motivo', 'Acción'])
+    expect(view.container.textContent).toContain('Juan Pérez')
+    expect(view.container.textContent).toContain('Cita médica')
+    expect(byText(view.container, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/lecturas/permisos/8')
+    await view.cleanup()
+  })
+
+  it('envía filtros de colaborador y fechas al backend', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.includes('/rrhh/permisos')) return response(listadoPermisos([permiso]))
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/permisos')
+    const colaborador = view.container.querySelector<HTMLSelectElement>('select')!
+    await act(async () => setValue(colaborador, '1'))
+    await flush()
+    const conColaborador = new URL(String(fetchMock.mock.calls.at(-1)?.[0]), 'http://localhost')
+    expect(conColaborador.searchParams.get('colaboradorId')).toBe('1')
+
+    const fechas = view.container.querySelectorAll<HTMLInputElement>('input[type="date"]')
+    await act(async () => setValue(fechas[0], '2026-10-01'))
+    await flush()
+    const conFecha = new URL(String(fetchMock.mock.calls.at(-1)?.[0]), 'http://localhost')
+    expect(conFecha.searchParams.get('fechaInicio')).toBe('2026-10-01')
+    await view.cleanup()
+  })
+
+  it('registra un permiso y muestra el aviso de éxito', async () => {
+    loginAsRole('Administradora')
+    stubApi((url, init) => {
+      if (url.pathname.endsWith('/rrhh/permisos') && init.method === 'POST') {
+        return response(permiso, true, 201)
+      }
+      if (url.pathname.includes('/rrhh/permisos')) return response(listadoPermisos([]))
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/permisos/nuevo')
+    await act(async () => setValue(view.container.querySelector('select')!, '1'))
+    const fechas = view.container.querySelectorAll<HTMLInputElement>('input[type="date"]')
+    await act(async () => setValue(fechas[0], '2026-10-12'))
+    await act(async () => setValue(fechas[1], '2026-10-14'))
+    await act(async () =>
+      setValue(view.container.querySelector<HTMLInputElement>('input[placeholder^="Ej."]')!, 'Cita médica'),
+    )
+    await act(async () => view.container.querySelector('form')!.requestSubmit())
+    await flush()
+    expect(view.container.textContent).toContain('Permiso registrado correctamente')
     await view.cleanup()
   })
 })

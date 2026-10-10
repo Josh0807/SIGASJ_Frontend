@@ -121,7 +121,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'lecturas',
     title: 'Recursos Humanos',
-    // El API de colaboradores (/rrhh/colaboradores) solo admite ADMINISTRADORA.
+    // El API de colaboradores y permisos (/rrhh/*) solo admite ADMINISTRADORA.
     allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['staff.manage'],
     availableInNav: true,
