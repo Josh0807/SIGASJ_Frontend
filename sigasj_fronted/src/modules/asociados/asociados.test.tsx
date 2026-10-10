@@ -346,6 +346,75 @@ describe('Asociados: consulta y búsqueda (5.2)', () => {
     await view.cleanup()
   })
 
+  it('carga el formulario de edición sin permitir modificar el estado', async () => {
+    loginAsRole('Secretaria')
+    const fetchMock = stubApi(() => response(juan))
+    const view = await mount('/admin/abonados/1/editar')
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/asociados\/1$/)
+    expect(view.container.querySelector('h1')?.textContent).toBe('Editar asociado')
+    expect((view.container.querySelector('input[autocomplete="given-name"]') as HTMLInputElement).value).toBe('Juan')
+    expect((view.container.querySelector('input[autocomplete="email"]') as HTMLInputElement).value).toBe('juan@example.com')
+    expect(view.container.querySelector('[name="activo"]')).toBeNull()
+    expect(view.container.textContent).toContain('El estado no se modifica desde este formulario')
+    await view.cleanup()
+  })
+
+  it('no muestra el formulario de edición cuando el asociado no existe', async () => {
+    loginAsRole('Administradora')
+    stubApi(() => response({ message: 'Not Found' }, false, 404))
+    const view = await mount('/admin/abonados/999/editar')
+    expect(view.container.querySelector('[role="alert"]')?.textContent).toContain('no existe')
+    expect(view.container.querySelector('form')).toBeNull()
+    expect(view.container.querySelector('input')).toBeNull()
+    await view.cleanup()
+  })
+
+  it('envía por PATCH únicamente los campos modificados', async () => {
+    loginAsRole('Administradora')
+    let almacenado = juan
+    const fetchMock = stubApi((_url, init) => {
+      if (init.method === 'PATCH') {
+        almacenado = { ...almacenado, ...(JSON.parse(String(init.body)) as Partial<Asociado>) }
+      }
+      return response(almacenado)
+    })
+    const view = await mount('/admin/abonados/1/editar')
+    const nombre = view.container.querySelector('input[autocomplete="given-name"]') as HTMLInputElement
+    await act(async () => setValue(nombre, 'Juan Carlos'))
+    await act(async () => {
+      const guardar = byText(view.container, 'button', 'Guardar cambios') as HTMLButtonElement
+      guardar.click()
+      guardar.click()
+    })
+    await flush()
+    const patchCall = fetchMock.mock.calls.find((call) => (call[1] as RequestInit | undefined)?.method === 'PATCH')
+    expect(patchCall).toBeDefined()
+    expect((patchCall?.[1] as RequestInit).body).toBe('{"nombre":"Juan Carlos"}')
+    expect(view.container.textContent).toContain('Asociado actualizado correctamente.')
+    expect(view.container.querySelector('h1')?.textContent).toBe('Juan Carlos Pérez Rodríguez')
+    expect(fetchMock.mock.calls.filter((call) => (call[1] as RequestInit | undefined)?.method === 'PATCH')).toHaveLength(1)
+    await view.cleanup()
+  })
+
+  it('mantiene el formulario y resalta la cédula ante un 409', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((_url, init) =>
+      init.method === 'PATCH'
+        ? response({ message: 'La cédula ya está registrada' }, false, 409)
+        : response(juan),
+    )
+    const view = await mount('/admin/abonados/1/editar')
+    const cedula = view.container.querySelector('input[autocomplete="off"]') as HTMLInputElement
+    await act(async () => setValue(cedula, '2-2222-2222'))
+    await act(async () => (byText(view.container, 'button', 'Guardar cambios') as HTMLButtonElement).click())
+    await flush()
+    expect(fetchMock.mock.calls.filter((call) => (call[1] as RequestInit | undefined)?.method === 'PATCH')).toHaveLength(1)
+    expect(view.container.querySelector('form')).not.toBeNull()
+    expect(cedula.getAttribute('aria-invalid')).toBe('true')
+    expect(view.container.textContent).toContain('Ya existe un asociado registrado con esta cédula.')
+    await view.cleanup()
+  })
+
   it('el detalle cierra la sesión ante un 401', async () => {
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Unauthorized' }, false, 401))

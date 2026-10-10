@@ -32,6 +32,10 @@ export type RegistrarAsociadoPayload = Pick<
   'nombre' | 'apellidos' | 'cedula' | 'correoElectronico'
 > & { fechaRegistro?: string }
 
+export type ActualizarAsociadoPayload = Partial<
+  Pick<Asociado, 'nombre' | 'apellidos' | 'cedula' | 'correoElectronico'>
+>
+
 export type AsociadoFormValues = Record<
   'nombre' | 'apellidos' | 'cedula' | 'correoElectronico',
   string

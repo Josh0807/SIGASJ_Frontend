@@ -23,6 +23,7 @@ import { ASOCIADOS_PAGE_SIZE, getAsociados } from './asociadosApi'
 import { ASOCIADO_NEW_PATH, ASOCIADOS_TITLE, asociadoDetailPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { AsociadosFiltros, AsociadosListado, EstadoFiltro } from './types'
+import AsociadoFeedback from './AsociadoFeedback'
 
 const SEARCH_DEBOUNCE_MS = 350
 const ESTADOS: EstadoFiltro[] = ['todos', 'activos', 'inactivos']
@@ -139,11 +140,7 @@ export default function AsociadosPage() {
 
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      {aviso ? (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-800 shadow-sm" role="status">
-          {aviso}
-        </div>
-      ) : null}
+      {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
 
       <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
@@ -287,10 +284,10 @@ export default function AsociadosPage() {
                         <Link
                           to={asociadoDetailPath(asociado.id)}
                           state={{ from: `${location.pathname}${location.search}` }}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
+                          className="group inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-[0_5px_14px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500 hover:from-blue-600 hover:to-sky-500 hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(37,99,235,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
                           aria-label={`Ver a ${nombre}`}
                         >
-                          <IconEye size={16} aria-hidden="true" />
+                          <IconEye className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
                           Ver
                         </Link>
                       </div>

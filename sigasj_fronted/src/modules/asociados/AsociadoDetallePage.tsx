@@ -1,4 +1,4 @@
-import { IconArrowLeft, IconRefresh, IconUser } from '@tabler/icons-react'
+import { IconArrowLeft, IconEdit, IconRefresh, IconUser } from '@tabler/icons-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
@@ -11,9 +11,10 @@ import {
   nombreCompleto,
 } from './asociadoForm'
 import { getAsociado } from './asociadosApi'
-import { ASOCIADOS_PATH, ASOCIADOS_TITLE } from './asociadosPaths'
+import { ASOCIADOS_PATH, ASOCIADOS_TITLE, asociadoEditPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { Asociado } from './types'
+import AsociadoFeedback from './AsociadoFeedback'
 
 function Dato({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -47,6 +48,7 @@ export default function AsociadoDetallePage() {
       : resultado.error
   // Al volver se conservan la búsqueda, el filtro y la página del listado.
   const volverA = (location.state as { from?: string } | null)?.from ?? ASOCIADOS_PATH
+  const success = (location.state as { success?: string } | null)?.success
 
   const salirPorSesion = useCallback(() => {
     logout()
@@ -79,11 +81,12 @@ export default function AsociadoDetallePage() {
 
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
+      {success ? <AsociadoFeedback variant="success">{success}</AsociadoFeedback> : null}
       <Link
         to={volverA}
-        className="inline-flex w-fit items-center gap-2 font-bold text-blue-700 no-underline hover:underline"
+        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
       >
-        <IconArrowLeft size={18} aria-hidden="true" />
+        <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
         Volver a {ASOCIADOS_TITLE}
       </Link>
 
@@ -119,7 +122,7 @@ export default function AsociadoDetallePage() {
         </div>
       ) : (
         <>
-          <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
+          <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:flex-row sm:items-center sm:justify-between sm:rounded-3xl sm:p-8">
             <div className="flex min-w-0 items-start gap-4">
               <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)]">
                 <IconUser size={28} aria-hidden="true" />
@@ -137,6 +140,14 @@ export default function AsociadoDetallePage() {
                 </div>
               </div>
             </div>
+            <Link
+              to={asociadoEditPath(asociado.id)}
+              state={{ from: volverA }}
+              className="inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 to-sky-500 px-6 font-extrabold text-white no-underline shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition hover:-translate-y-0.5 hover:text-white hover:no-underline sm:ml-auto sm:w-fit"
+            >
+              <IconEdit size={19} aria-hidden="true" />
+              Editar asociado
+            </Link>
           </header>
 
           <section className="grid gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8">
