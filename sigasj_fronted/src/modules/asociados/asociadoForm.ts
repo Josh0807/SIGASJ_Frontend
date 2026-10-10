@@ -1,4 +1,4 @@
-import type { Asociado, AsociadoFormValues, RegistrarAsociadoPayload } from './types'
+import type { ActualizarAsociadoPayload, Asociado, AsociadoFormValues, RegistrarAsociadoPayload } from './types'
 
 export type AsociadoFormErrors = Partial<Record<keyof AsociadoFormValues, string>>
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -61,6 +61,44 @@ export function toRegistrarAsociadoPayload(values: AsociadoFormValues): Registra
     cedula: values.cedula.trim(),
     correoElectronico: values.correoElectronico.trim().toLowerCase(),
   }
+}
+
+export const asociadoToFormValues = (asociado: Asociado): AsociadoFormValues => ({
+  nombre: asociado.nombre,
+  apellidos: asociado.apellidos,
+  cedula: asociado.cedula,
+  correoElectronico: asociado.correoElectronico,
+})
+
+export function toActualizarAsociadoPayload(
+  values: AsociadoFormValues,
+  initialValues: AsociadoFormValues,
+): ActualizarAsociadoPayload {
+  const current = toRegistrarAsociadoPayload(values)
+  const initial = toRegistrarAsociadoPayload(initialValues)
+  return (Object.keys(current) as Array<keyof ActualizarAsociadoPayload>).reduce(
+    (payload, field) => {
+      if (current[field] !== initial[field]) payload[field] = current[field]
+      return payload
+    },
+    {} as ActualizarAsociadoPayload,
+  )
+}
+
+export function asociadoUpdateError(error: unknown): { message: string; cedula?: string } {
+  const status = getHttpStatus(error)
+  if (status === 409) return {
+    message: 'La cédula ingresada ya pertenece a otro asociado.',
+    cedula: 'Ya existe un asociado registrado con esta cédula.',
+  }
+  if (status === 404) return { message: 'Asociado no encontrado.' }
+  if (status === 403) return { message: 'No tiene permisos para modificar asociados.' }
+  if (status === 400) {
+    const message = asociadoSubmitError(error)
+    const technical = /sql|query|constraint|duplicate key|sequelize|typeorm|prisma|stack|database|nvarchar|violation/i.test(message)
+    return { message: technical ? 'Revise los datos ingresados e inténtelo nuevamente.' : message }
+  }
+  return { message: 'No fue posible guardar los cambios. Inténtelo nuevamente.' }
 }
 
 export function asociadoSubmitError(error: unknown): string {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { asociadoSubmitError, toRegistrarAsociadoPayload, validateAsociado } from './asociadoForm'
+import { asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado } from './asociadoForm'
 
 describe('formulario de asociados', () => {
   it('marca todos los campos obligatorios', () => {
@@ -42,5 +42,23 @@ describe('formulario de asociados', () => {
     ).toBe(
       'El correo electrónico no tiene un formato válido. El nombre es obligatorio.',
     )
+  })
+
+  it('envía solamente los datos modificados al actualizar', () => {
+    const initial = { nombre: 'Ana', apellidos: 'Mora', cedula: '1-1111', correoElectronico: 'ana@example.com' }
+    expect(toActualizarAsociadoPayload({ ...initial, nombre: ' Ana María ' }, initial)).toEqual({ nombre: 'Ana María' })
+    expect(toActualizarAsociadoPayload(initial, initial)).toEqual({})
+  })
+
+  it('identifica la cédula duplicada como error de campo', () => {
+    expect(asociadoUpdateError(new Error('HTTP 409: duplicada')).cedula).toContain('cédula')
+  })
+
+  it('no expone detalles técnicos de SQL Server', () => {
+    const result = asociadoUpdateError(
+      new Error('HTTP 400: SQL Server duplicate key constraint UQ_asociados_cedula'),
+    )
+    expect(result.message).toBe('Revise los datos ingresados e inténtelo nuevamente.')
+    expect(result.message).not.toMatch(/sql|constraint|duplicate key/i)
   })
 })

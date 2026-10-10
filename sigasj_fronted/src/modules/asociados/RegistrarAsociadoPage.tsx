@@ -7,6 +7,7 @@ import { asociadoSubmitError, toRegistrarAsociadoPayload, validateAsociado, type
 import { registrarAsociado } from './asociadosApi'
 import { ASOCIADOS_PATH } from './asociadosPaths'
 import type { AsociadoFormValues } from './types'
+import AsociadoFeedback from './AsociadoFeedback'
 
 const EMPTY_VALUES: AsociadoFormValues = { nombre: '', apellidos: '', cedula: '', correoElectronico: '' }
 type FieldName = keyof AsociadoFormValues
@@ -67,7 +68,7 @@ export default function RegistrarAsociadoPage() {
       <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">Registrar asociado</h1>
       <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">Ingrese la información personal y de contacto del nuevo asociado.</p>
     </header>
-    {submitError ? <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 font-semibold text-red-800" role="alert">{submitError}</div> : null}
+    {submitError ? <AsociadoFeedback variant="error">{submitError}</AsociadoFeedback> : null}
     <form className="grid w-full gap-7 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10" noValidate onSubmit={submit} aria-busy={saving}>
       <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-700 sm:size-12"><IconUser size={25} aria-hidden="true" /></span><div className="min-w-0"><h2 className="text-lg font-extrabold leading-tight tracking-tight text-[#073b73] sm:text-xl">Información del asociado</h2><p className="mt-2 text-sm leading-6 text-slate-500">Todos los campos marcados con <span className="font-bold text-red-600">*</span> son obligatorios.</p></div></div>
       <div className="grid gap-x-7 gap-y-6 lg:grid-cols-2 lg:gap-y-7">

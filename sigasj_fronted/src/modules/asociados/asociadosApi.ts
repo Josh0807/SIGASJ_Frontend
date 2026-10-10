@@ -3,6 +3,7 @@ import type {
   Asociado,
   AsociadosFiltros,
   AsociadosListado,
+  ActualizarAsociadoPayload,
   RegistrarAsociadoPayload,
 } from './types'
 
@@ -29,5 +30,11 @@ export const getAsociado = (id: number, signal?: AbortSignal) =>
 export const registrarAsociado = (payload: RegistrarAsociadoPayload) =>
   fetchWithAuth<Asociado>(ASOCIADOS_ENDPOINT, {
     method: 'POST',
+    body: JSON.stringify(payload),
+  })
+
+export const actualizarAsociado = (id: number, payload: ActualizarAsociadoPayload) =>
+  fetchWithAuth<Asociado>(`${ASOCIADOS_ENDPOINT}/${id}`, {
+    method: 'PATCH',
     body: JSON.stringify(payload),
   })
