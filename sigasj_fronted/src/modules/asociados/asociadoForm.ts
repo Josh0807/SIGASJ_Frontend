@@ -39,6 +39,29 @@ export function asociadoConsultaError(error: unknown, fallback: string): string 
   return fallback
 }
 
+/** Igual al largo de la columna Asociado.motivoInactivacion en el backend. */
+export const MOTIVO_INACTIVACION_MAX_LENGTH = 500
+
+export function validarMotivoInactivacion(motivo: string): string | undefined {
+  const limpio = motivo.trim()
+  if (!limpio) return 'Indique el motivo de la inactivación.'
+  if (limpio.length > MOTIVO_INACTIVACION_MAX_LENGTH) {
+    return `Use un máximo de ${MOTIVO_INACTIVACION_MAX_LENGTH} caracteres.`
+  }
+  return undefined
+}
+
+export function asociadoEstadoError(error: unknown, activar: boolean): string {
+  const status = getHttpStatus(error)
+  if (status === 403) return 'No tiene permisos para cambiar el estado de asociados.'
+  if (status === 404) return 'El asociado indicado no existe o fue eliminado.'
+  if (status === 400) return asociadoSubmitError(error)
+  if (status === null) return 'No fue posible conectar con el servidor. Revise su conexión.'
+  return activar
+    ? 'No fue posible reactivar el asociado. Inténtelo nuevamente.'
+    : 'No fue posible inactivar el asociado. Inténtelo nuevamente.'
+}
+
 export function validateAsociado(values: AsociadoFormValues): AsociadoFormErrors {
   const errors: AsociadoFormErrors = {}
   if (!values.nombre.trim()) errors.nombre = 'El nombre es obligatorio.'

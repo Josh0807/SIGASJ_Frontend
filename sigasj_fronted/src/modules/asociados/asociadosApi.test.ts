@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { actualizarAsociado, getAsociado, getAsociados, registrarAsociado, toAsociadosParams } from './asociadosApi'
+import { actualizarAsociado, getAsociado, getAsociados, registrarAsociado, toAsociadosParams, cambiarEstadoAsociado } from './asociadosApi'
 
 const ok = (body: unknown, status = 200) => ({ ok: true, status, json: async () => body }) as Response
 const listadoVacio = { data: [], total: 0, page: 1, limit: 10, totalPages: 0 }
@@ -55,5 +55,22 @@ describe('contrato API de asociados', () => {
     expect(options.method).toBe('PATCH')
     expect(options.body).toBe('{"nombre":"Carlos"}')
     expect(options.body).not.toContain('activo')
+  })
+
+  it('inactiva con PATCH /estado enviando el motivo', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(ok({ id: 3, activo: false }))
+    vi.stubGlobal('fetch', fetchMock)
+    await cambiarEstadoAsociado(3, false, 'Venta de la propiedad')
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/asociados\/3\/estado$/)
+    const options = fetchMock.mock.calls[0][1] as RequestInit
+    expect(options.method).toBe('PATCH')
+    expect(JSON.parse(String(options.body))).toEqual({ activo: false, motivo: 'Venta de la propiedad' })
+  })
+
+  it('reactiva con PATCH /estado sin enviar motivo', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(ok({ id: 3, activo: true }))
+    vi.stubGlobal('fetch', fetchMock)
+    await cambiarEstadoAsociado(3, true, 'ignorado')
+    expect(JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body))).toEqual({ activo: true })
   })
 })

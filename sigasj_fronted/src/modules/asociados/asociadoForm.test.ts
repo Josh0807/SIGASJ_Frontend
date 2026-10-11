@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado } from './asociadoForm'
+import { asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado, asociadoEstadoError, validarMotivoInactivacion } from './asociadoForm'
 
 describe('formulario de asociados', () => {
   it('marca todos los campos obligatorios', () => {
@@ -60,5 +60,21 @@ describe('formulario de asociados', () => {
     )
     expect(result.message).toBe('Revise los datos ingresados e inténtelo nuevamente.')
     expect(result.message).not.toMatch(/sql|constraint|duplicate key/i)
+  })
+
+  it('exige un motivo de inactivación de hasta 500 caracteres', () => {
+    expect(validarMotivoInactivacion('')).toBe('Indique el motivo de la inactivación.')
+    expect(validarMotivoInactivacion('    ')).toBe('Indique el motivo de la inactivación.')
+    expect(validarMotivoInactivacion('a'.repeat(501))).toBe('Use un máximo de 500 caracteres.')
+    expect(validarMotivoInactivacion('  ' + 'a'.repeat(500) + '  ')).toBeUndefined()
+  })
+
+  it('traduce los errores del cambio de estado', () => {
+    expect(asociadoEstadoError(new Error('HTTP 403: Forbidden'), true)).toBe('No tiene permisos para cambiar el estado de asociados.')
+    expect(asociadoEstadoError(new Error('HTTP 404: Not Found'), false)).toContain('no existe')
+    expect(asociadoEstadoError(new Error('HTTP 400: ["El motivo de inactivación es obligatorio"]'), false)).toBe('El motivo de inactivación es obligatorio.')
+    expect(asociadoEstadoError(new Error('Failed to fetch'), false)).toContain('No fue posible conectar')
+    expect(asociadoEstadoError(new Error('HTTP 500: error'), true)).toBe('No fue posible reactivar el asociado. Inténtelo nuevamente.')
+    expect(asociadoEstadoError(new Error('HTTP 500: error'), false)).toBe('No fue posible inactivar el asociado. Inténtelo nuevamente.')
   })
 })

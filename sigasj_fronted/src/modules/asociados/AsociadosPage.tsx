@@ -22,8 +22,9 @@ import {
 import { ASOCIADOS_PAGE_SIZE, getAsociados } from './asociadosApi'
 import { ASOCIADO_NEW_PATH, ASOCIADOS_TITLE, asociadoDetailPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
-import type { AsociadosFiltros, AsociadosListado, EstadoFiltro } from './types'
+import type { Asociado, AsociadosFiltros, AsociadosListado, EstadoFiltro } from './types'
 import AsociadoFeedback from './AsociadoFeedback'
+import CambiarEstadoAsociado from './CambiarEstadoAsociado'
 
 const SEARCH_DEBOUNCE_MS = 350
 const ESTADOS: EstadoFiltro[] = ['todos', 'activos', 'inactivos']
@@ -55,7 +56,10 @@ export default function AsociadosPage() {
     reintentable: boolean
   }>({ clave: '', error: null, reintentable: true })
   const [recarga, setRecarga] = useState(0)
-  const aviso = (location.state as { success?: string } | null)?.success ?? null
+  const [aviso, setAviso] = useState<string | null>(
+    (location.state as { success?: string } | null)?.success ?? null,
+  )
+  const [accionError, setAccionError] = useState<string | null>(null)
 
   const salirPorSesion = useCallback(() => {
     logout()
@@ -126,6 +130,21 @@ export default function AsociadosPage() {
     return () => controller.abort()
   }, [clave, search, estado, page, salirPorSesion, actualizarFiltros])
 
+  const reemplazarAsociado = (actualizado: Asociado) => {
+    setAccionError(null)
+    setAviso(
+      `${nombreCompleto(actualizado)} fue ${actualizado.activo ? 'reactivado' : 'inactivado'} correctamente.`,
+    )
+    setListado((actual) =>
+      actual
+        ? {
+            ...actual,
+            data: actual.data.map((fila) => (fila.id === actualizado.id ? actualizado : fila)),
+          }
+        : actual,
+    )
+  }
+
   const hayFiltros = Boolean(search || estado !== 'todos')
   const limpiarFiltros = () => {
     setBusqueda('')
@@ -141,6 +160,7 @@ export default function AsociadosPage() {
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
+      {accionError ? <AsociadoFeedback variant="error">{accionError}</AsociadoFeedback> : null}
 
       <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
@@ -290,6 +310,16 @@ export default function AsociadosPage() {
                           <IconEye className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
                           Ver
                         </Link>
+                        <CambiarEstadoAsociado
+                          asociado={asociado}
+                          compacto
+                          onCambiado={reemplazarAsociado}
+                          onError={(mensaje) => {
+                            setAviso(null)
+                            setAccionError(mensaje)
+                          }}
+                          onNoAutenticado={salirPorSesion}
+                        />
                       </div>
                     </td>
                   </tr>
