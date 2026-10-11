@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { PERMISOS_PATH, RRHH_PATH } from './recursosHumanosPaths'
+import { PERMISOS_PATH, RRHH_PATH, VACACIONES_PATH } from './recursosHumanosPaths'
 
 const items = [
   { to: RRHH_PATH, label: 'Colaboradores', end: true },
   { to: PERMISOS_PATH, label: 'Permisos', end: false },
+  { to: VACACIONES_PATH, label: 'Vacaciones', end: false },
 ]
 
 export default function RrhhSubnav() {

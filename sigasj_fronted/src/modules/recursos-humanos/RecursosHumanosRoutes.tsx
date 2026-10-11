@@ -5,12 +5,14 @@ import ColaboradoresPage from './ColaboradoresPage'
 import PermisoDetallePage from './PermisoDetallePage'
 import PermisoFormPage from './PermisoFormPage'
 import PermisosPage from './PermisosPage'
+import VacacionesPage from './VacacionesPage'
 
 export default function RecursosHumanosRoutes() {
   return (
     <Routes>
       <Route index element={<ColaboradoresPage />} />
       <Route path="nuevo" element={<ColaboradorFormPage />} />
+      <Route path="vacaciones" element={<VacacionesPage />} />
       <Route path="permisos" element={<PermisosPage />} />
       <Route path="permisos/nuevo" element={<PermisoFormPage />} />
       <Route path="permisos/:id" element={<PermisoDetallePage />} />
