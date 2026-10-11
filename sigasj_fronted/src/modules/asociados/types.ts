@@ -7,6 +7,7 @@ export type Asociado = {
   activo: boolean
   fechaRegistro: string
   fechaInactivacion: string | null
+  motivoInactivacion: string | null
   createdAt: string
   updatedAt: string
 }

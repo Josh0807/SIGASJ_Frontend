@@ -38,3 +38,10 @@ export const actualizarAsociado = (id: number, payload: ActualizarAsociadoPayloa
     method: 'PATCH',
     body: JSON.stringify(payload),
   })
+
+/** PBI 5.4: inactiva (con motivo obligatorio) o reactiva un asociado. */
+export const cambiarEstadoAsociado = (id: number, activo: boolean, motivo?: string) =>
+  fetchWithAuth<Asociado>(`${ASOCIADOS_ENDPOINT}/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify(activo ? { activo } : { activo, motivo }),
+  })

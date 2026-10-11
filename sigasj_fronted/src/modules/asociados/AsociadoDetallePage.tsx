@@ -15,6 +15,7 @@ import { ASOCIADOS_PATH, ASOCIADOS_TITLE, asociadoEditPath } from './asociadosPa
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { Asociado } from './types'
 import AsociadoFeedback from './AsociadoFeedback'
+import CambiarEstadoAsociado from './CambiarEstadoAsociado'
 
 function Dato({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -48,7 +49,10 @@ export default function AsociadoDetallePage() {
       : resultado.error
   // Al volver se conservan la búsqueda, el filtro y la página del listado.
   const volverA = (location.state as { from?: string } | null)?.from ?? ASOCIADOS_PATH
-  const success = (location.state as { success?: string } | null)?.success
+  const [aviso, setAviso] = useState<string | null>(
+    (location.state as { success?: string } | null)?.success ?? null,
+  )
+  const [accionError, setAccionError] = useState<string | null>(null)
 
   const salirPorSesion = useCallback(() => {
     logout()
@@ -81,7 +85,8 @@ export default function AsociadoDetallePage() {
 
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      {success ? <AsociadoFeedback variant="success">{success}</AsociadoFeedback> : null}
+      {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
+      {accionError ? <AsociadoFeedback variant="error">{accionError}</AsociadoFeedback> : null}
       <Link
         to={volverA}
         className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
@@ -140,14 +145,33 @@ export default function AsociadoDetallePage() {
                 </div>
               </div>
             </div>
-            <Link
-              to={asociadoEditPath(asociado.id)}
-              state={{ from: volverA }}
-              className="inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 to-sky-500 px-6 font-extrabold text-white no-underline shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition hover:-translate-y-0.5 hover:text-white hover:no-underline sm:ml-auto sm:w-fit"
-            >
-              <IconEdit size={19} aria-hidden="true" />
-              Editar asociado
-            </Link>
+            <div className="flex w-full shrink-0 flex-col gap-3 sm:ml-auto sm:w-fit sm:flex-row">
+              <CambiarEstadoAsociado
+                asociado={asociado}
+                onCambiado={(actualizado) => {
+                  setAccionError(null)
+                  setAsociado(actualizado)
+                  setAviso(
+                    actualizado.activo
+                      ? 'El asociado fue reactivado correctamente.'
+                      : 'El asociado fue inactivado correctamente.',
+                  )
+                }}
+                onError={(mensaje) => {
+                  setAviso(null)
+                  setAccionError(mensaje)
+                }}
+                onNoAutenticado={salirPorSesion}
+              />
+              <Link
+                to={asociadoEditPath(asociado.id)}
+                state={{ from: volverA }}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 to-sky-500 px-6 font-extrabold text-white no-underline shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition hover:-translate-y-0.5 hover:text-white hover:no-underline sm:w-fit"
+              >
+                <IconEdit size={19} aria-hidden="true" />
+                Editar asociado
+              </Link>
+            </div>
           </header>
 
           <section className="grid gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8">
@@ -161,6 +185,11 @@ export default function AsociadoDetallePage() {
               <Dato label="Fecha de registro">{formatearFecha(asociado.fechaRegistro)}</Dato>
               {asociado.fechaInactivacion ? (
                 <Dato label="Fecha de inactivación">{formatearFecha(asociado.fechaInactivacion)}</Dato>
+              ) : null}
+              {!asociado.activo && asociado.motivoInactivacion ? (
+                <div className="sm:col-span-2 xl:col-span-3">
+                  <Dato label="Motivo de la inactivación">{asociado.motivoInactivacion}</Dato>
+                </div>
               ) : null}
             </dl>
           </section>

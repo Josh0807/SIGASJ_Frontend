@@ -16,6 +16,7 @@ const juan: Asociado = {
   activo: true,
   fechaRegistro: '2026-01-15T14:00:00.000Z',
   fechaInactivacion: null,
+  motivoInactivacion: null,
   createdAt: '2026-01-15T08:00:00.000Z',
   updatedAt: '2026-01-16T09:30:00.000Z',
 }
@@ -29,6 +30,7 @@ const luis: Asociado = {
   correoElectronico: 'luis@example.com',
   activo: false,
   fechaInactivacion: '2026-05-02T16:00:00.000Z',
+  motivoInactivacion: 'Venta de la propiedad',
 }
 
 const response = (body: unknown, ok = true, status = 200) =>
