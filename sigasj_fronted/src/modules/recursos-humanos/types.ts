@@ -109,3 +109,56 @@ export type PermisoPayload = {
   motivo: string
   observaciones?: string | null
 }
+
+export type TipoMovimientoVacaciones = 'ACUMULADO' | 'DISFRUTADO'
+
+export type MovimientoVacaciones = {
+  id: number
+  colaboradorId: number
+  tipo: TipoMovimientoVacaciones
+  cantidadDias: number
+  fecha: string
+  observaciones: string | null
+  colaborador?: PermisoColaboradorResumen | null
+  createdAt: string
+}
+
+export type BalanceVacaciones = {
+  colaboradorId: number
+  colaborador: PermisoColaboradorResumen
+  diasAcumulados: number
+  diasDisfrutados: number
+  diasDisponibles: number
+  totalMovimientos: number
+}
+
+export type MovimientosVacacionesListado = {
+  data: MovimientoVacaciones[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type MovimientosVacacionesFiltros = {
+  colaboradorId: string
+  tipo: TipoMovimientoVacaciones | ''
+  fechaInicio: string
+  fechaFin: string
+  page: number
+}
+
+export type MovimientoVacacionesFormValues = {
+  tipo: TipoMovimientoVacaciones | ''
+  cantidadDias: string
+  fecha: string
+  observaciones: string
+}
+
+export type MovimientoVacacionesPayload = {
+  colaboradorId: number
+  tipo: TipoMovimientoVacaciones
+  cantidadDias: number
+  fecha: string
+  observaciones?: string | null
+}
