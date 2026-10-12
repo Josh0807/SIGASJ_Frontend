@@ -138,6 +138,26 @@ describe('Asociados: consulta y búsqueda (5.2)', () => {
     await view.cleanup()
   })
 
+  it('muestra un mensaje controlado si la cédula está duplicada al registrar', async () => {
+    loginAsRole('Administradora')
+    stubApi(() => response({ message: 'Violation of UNIQUE KEY constraint SQL Server' }, false, 409))
+    const view = await mount('/admin/abonados/nuevo')
+    await act(async () => {
+      setValue(view.container.querySelector('input[autocomplete="given-name"]') as HTMLInputElement, 'María')
+      setValue(view.container.querySelector('input[autocomplete="family-name"]') as HTMLInputElement, 'Mora')
+      setValue(view.container.querySelector('input[autocomplete="off"]') as HTMLInputElement, '1-1234-0567')
+      setValue(view.container.querySelector('input[autocomplete="email"]') as HTMLInputElement, 'maria@example.com')
+    })
+    await act(async () => (byText(view.container, 'button', 'Guardar asociado') as HTMLButtonElement).click())
+    await flush()
+    const cedula = view.container.querySelector('input[autocomplete="off"]') as HTMLInputElement
+    expect(view.container.querySelector('form')).not.toBeNull()
+    expect(cedula.getAttribute('aria-invalid')).toBe('true')
+    expect(view.container.textContent).toContain('Ya existe un asociado registrado con esta cédula.')
+    expect(view.container.textContent).not.toMatch(/sql server|constraint|unique key/i)
+    await view.cleanup()
+  })
+
   it('consulta la primera página por defecto', async () => {
     loginAsRole('Administradora')
     const fetchMock = stubApi(() => response(listado([juan])))

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado, asociadoEstadoError, validarMotivoInactivacion } from './asociadoForm'
+import { asociadoBackendFieldErrors, asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado, asociadoEstadoError, validarMotivoInactivacion } from './asociadoForm'
 
 describe('formulario de asociados', () => {
   it('marca todos los campos obligatorios', () => {
@@ -28,7 +28,9 @@ describe('formulario de asociados', () => {
   })
 
   it('traduce conflictos y permisos a mensajes útiles', () => {
-    expect(asociadoSubmitError(new Error('HTTP 409: duplicado'))).toContain('cédula')
+    expect(asociadoSubmitError(new Error('HTTP 409: duplicate key SQL Server'))).toBe(
+      'Ya existe un asociado registrado con esta cédula.',
+    )
     expect(asociadoSubmitError(new Error('HTTP 403: Forbidden'))).toContain('permisos')
   })
 
@@ -44,6 +46,17 @@ describe('formulario de asociados', () => {
     )
   })
 
+  it('asocia las validaciones 400 del backend con sus campos', () => {
+    expect(asociadoBackendFieldErrors(new Error(
+      'HTTP 400: ["El nombre es obligatorio","Los apellidos no pueden exceder 100 caracteres","La cédula debe ser una cadena de texto","El correo electrónico no tiene un formato válido"]',
+    ))).toEqual({
+      nombre: 'El nombre es obligatorio',
+      apellidos: 'Los apellidos no pueden exceder 100 caracteres',
+      cedula: 'La cédula debe ser una cadena de texto',
+      correoElectronico: 'El correo electrónico no tiene un formato válido',
+    })
+  })
+
   it('envía solamente los datos modificados al actualizar', () => {
     const initial = { nombre: 'Ana', apellidos: 'Mora', cedula: '1-1111', correoElectronico: 'ana@example.com' }
     expect(toActualizarAsociadoPayload({ ...initial, nombre: ' Ana María ' }, initial)).toEqual({ nombre: 'Ana María' })
@@ -52,6 +65,9 @@ describe('formulario de asociados', () => {
 
   it('identifica la cédula duplicada como error de campo', () => {
     expect(asociadoUpdateError(new Error('HTTP 409: duplicada')).cedula).toContain('cédula')
+    expect(asociadoBackendFieldErrors(new Error('HTTP 409: error técnico'))).toEqual({
+      cedula: 'Ya existe un asociado registrado con esta cédula.',
+    })
   })
 
   it('no expone detalles técnicos de SQL Server', () => {
@@ -60,6 +76,18 @@ describe('formulario de asociados', () => {
     )
     expect(result.message).toBe('Revise los datos ingresados e inténtelo nuevamente.')
     expect(result.message).not.toMatch(/sql|constraint|duplicate key/i)
+  })
+
+  it('oculta detalles internos de NestJS y TypeORM en respuestas simples o múltiples', () => {
+    const messages = [
+      asociadoSubmitError(new Error('HTTP 400: TypeORM QueryFailedError: duplicate key')),
+      asociadoSubmitError(new Error('HTTP 400: ["NestJS InternalServerException stack trace"]')),
+    ]
+    expect(messages).toEqual([
+      'Revise los datos ingresados e inténtelo nuevamente.',
+      'Revise los datos ingresados e inténtelo nuevamente.',
+    ])
+    expect(messages.join(' ')).not.toMatch(/nestjs|typeorm|query|stack|duplicate key/i)
   })
 
   it('exige un motivo de inactivación de hasta 500 caracteres', () => {

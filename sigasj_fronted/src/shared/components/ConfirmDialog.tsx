@@ -18,6 +18,7 @@ export type ConfirmDialogProps = {
   onConfirm: () => void
   returnFocusRef?: RefObject<HTMLElement | null>
   confirmDanger?: boolean
+  confirmFirst?: boolean
   dialogRole?: 'dialog' | 'alertdialog'
 }
 
@@ -31,6 +32,7 @@ const ConfirmDialog = ({
   onConfirm,
   returnFocusRef,
   confirmDanger = false,
+  confirmFirst = false,
   dialogRole = 'alertdialog',
 }: ConfirmDialogProps) => {
   const titleId = useId()
@@ -50,7 +52,7 @@ const ConfirmDialog = ({
     const previousOverflow = document.body.style.overflow
     const focusReturnTarget = returnFocusRef?.current
     document.body.style.overflow = 'hidden'
-    cancelRef.current?.focus()
+    ;(confirmFirst ? confirmRef.current : cancelRef.current)?.focus()
 
     return () => {
       document.body.style.overflow = previousOverflow
@@ -59,13 +61,16 @@ const ConfirmDialog = ({
         focusReturnTarget?.focus()
       }
     }
-  }, [isOpen, returnFocusRef])
+  }, [confirmFirst, isOpen, returnFocusRef])
 
   const getFocusableActions = useCallback((): HTMLButtonElement[] => {
-    return [cancelRef.current, confirmRef.current].filter(
+    const ordered = confirmFirst
+      ? [confirmRef.current, cancelRef.current]
+      : [cancelRef.current, confirmRef.current]
+    return ordered.filter(
       (item): item is HTMLButtonElement => item instanceof HTMLButtonElement,
     )
-  }, [])
+  }, [confirmFirst])
 
   const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') {
@@ -111,6 +116,30 @@ const ConfirmDialog = ({
     return null
   }
 
+  const cancelButton = (
+    <button
+      ref={cancelRef}
+      type="button"
+      className="confirm-dialog__button confirm-dialog__button--secondary"
+      onClick={onCancel}
+    >
+      {cancelLabel}
+    </button>
+  )
+
+  const confirmButton = (
+    <button
+      ref={confirmRef}
+      type="button"
+      className={`confirm-dialog__button${
+        confirmDanger ? ' confirm-dialog__button--danger' : ''
+      }`}
+      onClick={handleConfirm}
+    >
+      {confirmLabel}
+    </button>
+  )
+
   const dialog = (
     <div
       className="confirm-dialog"
@@ -133,29 +162,14 @@ const ConfirmDialog = ({
           {message}
         </p>
         <div className="confirm-dialog__actions w-full">
-          <button
-            ref={cancelRef}
-            type="button"
-            className="confirm-dialog__button confirm-dialog__button--secondary"
-            onClick={onCancel}
-          >
-            {cancelLabel}
-          </button>
-          <button
-            ref={confirmRef}
-            type="button"
-            className={`confirm-dialog__button${
-              confirmDanger ? ' confirm-dialog__button--danger' : ''
-            }`}
-            onClick={handleConfirm}
-          >
-            {confirmLabel}
-          </button>
+          {confirmFirst ? <>{confirmButton}{cancelButton}</> : <>{cancelButton}{confirmButton}</>}
         </div>
       </div>
     </div>
   )
 
+  // El destino del portal depende del elemento que abrió el diálogo y se resuelve al renderizarlo.
+  // eslint-disable-next-line react-hooks/refs
   const adminLayoutTarget = returnFocusRef?.current?.closest('.admin-layout')
 
   return adminLayoutTarget ? createPortal(dialog, adminLayoutTarget) : dialog

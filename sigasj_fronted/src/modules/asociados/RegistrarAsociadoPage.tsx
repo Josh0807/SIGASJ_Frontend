@@ -3,7 +3,7 @@ import { useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
-import { asociadoSubmitError, toRegistrarAsociadoPayload, validateAsociado, type AsociadoFormErrors } from './asociadoForm'
+import { asociadoBackendFieldErrors, asociadoSubmitError, toRegistrarAsociadoPayload, validateAsociado, type AsociadoFormErrors } from './asociadoForm'
 import { registrarAsociado } from './asociadosApi'
 import { ASOCIADOS_PATH } from './asociadosPaths'
 import type { AsociadoFormValues } from './types'
@@ -55,6 +55,7 @@ export default function RegistrarAsociadoPage() {
         navigate(LOGIN_ROUTE_PATH, { replace: true })
         return
       }
+      setErrors(asociadoBackendFieldErrors(error))
       setSubmitError(asociadoSubmitError(error))
     } finally {
       submitting.current = false
