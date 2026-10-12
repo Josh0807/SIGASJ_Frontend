@@ -2,6 +2,40 @@ import type { ActualizarAsociadoPayload, Asociado, AsociadoFormValues, Registrar
 
 export type AsociadoFormErrors = Partial<Record<keyof AsociadoFormValues, string>>
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+export const CEDULA_DUPLICADA_MESSAGE = 'Ya existe un asociado registrado con esta cédula.'
+const TECHNICAL_ERROR_PATTERN = /sql|query|constraint|duplicate key|unique key|sequelize|typeorm|nestjs|prisma|stack|database|nvarchar|violation|exception|driver|repository|insert into|update\s+\w+\s+set/i
+const isTechnicalMessage = (message: string) => TECHNICAL_ERROR_PATTERN.test(message)
+
+function backendMessages(error: unknown): string[] {
+  const message = error instanceof Error ? error.message : ''
+  const detail = message.replace(/^HTTP\s+\d{3}:\s*/i, '').trim()
+  if (!detail) return []
+  try {
+    const parsed: unknown = JSON.parse(detail)
+    if (Array.isArray(parsed)) {
+      return parsed.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+    }
+  } catch {
+    // Algunos errores válidos llegan como un único mensaje de texto.
+  }
+  return [detail]
+}
+
+export function asociadoBackendFieldErrors(error: unknown): AsociadoFormErrors {
+  const status = getHttpStatus(error)
+  if (status === 409) {
+    return { cedula: CEDULA_DUPLICADA_MESSAGE }
+  }
+  if (status !== 400) return {}
+  return backendMessages(error).reduce<AsociadoFormErrors>((errors, message) => {
+    const normalized = message.toLocaleLowerCase('es')
+    if (/\bnombre\b/.test(normalized) && !errors.nombre) errors.nombre = message
+    else if (/apellido/.test(normalized) && !errors.apellidos) errors.apellidos = message
+    else if (/c[eé]dula/.test(normalized) && !errors.cedula) errors.cedula = message
+    else if (/correo|email/.test(normalized) && !errors.correoElectronico) errors.correoElectronico = message
+    return errors
+  }, {})
+}
 
 export const nombreCompleto = (asociado: Pick<Asociado, 'nombre' | 'apellidos'>) =>
   `${asociado.nombre} ${asociado.apellidos}`.trim()
@@ -111,22 +145,21 @@ export function toActualizarAsociadoPayload(
 export function asociadoUpdateError(error: unknown): { message: string; cedula?: string } {
   const status = getHttpStatus(error)
   if (status === 409) return {
-    message: 'La cédula ingresada ya pertenece a otro asociado.',
-    cedula: 'Ya existe un asociado registrado con esta cédula.',
+    message: CEDULA_DUPLICADA_MESSAGE,
+    cedula: CEDULA_DUPLICADA_MESSAGE,
   }
   if (status === 404) return { message: 'Asociado no encontrado.' }
   if (status === 403) return { message: 'No tiene permisos para modificar asociados.' }
   if (status === 400) {
     const message = asociadoSubmitError(error)
-    const technical = /sql|query|constraint|duplicate key|sequelize|typeorm|prisma|stack|database|nvarchar|violation/i.test(message)
-    return { message: technical ? 'Revise los datos ingresados e inténtelo nuevamente.' : message }
+    return { message: isTechnicalMessage(message) ? 'Revise los datos ingresados e inténtelo nuevamente.' : message }
   }
   return { message: 'No fue posible guardar los cambios. Inténtelo nuevamente.' }
 }
 
 export function asociadoSubmitError(error: unknown): string {
   const message = error instanceof Error ? error.message : ''
-  if (/HTTP 409/.test(message)) return 'La cédula ingresada ya pertenece a un asociado registrado.'
+  if (/HTTP 409/.test(message)) return CEDULA_DUPLICADA_MESSAGE
   if (/HTTP 403/.test(message)) return 'No tiene permisos para registrar asociados.'
   if (/HTTP 400/.test(message)) {
     const detail = message.replace(/^HTTP 400:\s*/, '').trim()
@@ -138,6 +171,9 @@ export function asociadoSubmitError(error: unknown): string {
           (item): item is string => typeof item === 'string' && Boolean(item.trim()),
         )
         if (readableMessages.length) {
+          if (readableMessages.some(isTechnicalMessage)) {
+            return 'Revise los datos ingresados e inténtelo nuevamente.'
+          }
           return readableMessages
             .map((item) => (/[^.!?]$/.test(item.trim()) ? `${item.trim()}.` : item.trim()))
             .join(' ')
@@ -146,7 +182,9 @@ export function asociadoSubmitError(error: unknown): string {
     } catch {
       // El backend también puede responder un único mensaje de texto.
     }
-    return detail
+    return isTechnicalMessage(detail)
+      ? 'Revise los datos ingresados e inténtelo nuevamente.'
+      : detail
   }
   return 'No fue posible registrar el asociado. Inténtelo nuevamente.'
 }

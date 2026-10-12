@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
 import {
+  asociadoBackendFieldErrors,
   asociadoConsultaError,
   asociadoToFormValues,
   asociadoUpdateError,
@@ -97,7 +98,7 @@ export default function EditarAsociadoPage() {
       if (esNoAutenticado(error)) return leaveForLogin()
       const parsed = asociadoUpdateError(error)
       setSubmitError(parsed.message)
-      if (parsed.cedula) setErrors((current) => ({ ...current, cedula: parsed.cedula }))
+      setErrors({ ...asociadoBackendFieldErrors(error), ...(parsed.cedula ? { cedula: parsed.cedula } : {}) })
     } finally {
       submitting.current = false
       setSaving(false)
