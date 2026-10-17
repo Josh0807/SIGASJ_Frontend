@@ -28,6 +28,20 @@ export type AsociadosFiltros = {
   page: number
 }
 
+export type HistorialEstadoFiltro = 'todos' | 'activo' | 'inactivo'
+export type HistorialOrden = 'ASC' | 'DESC'
+
+export type HistorialAsociadosFiltros = {
+  search: string
+  estado: HistorialEstadoFiltro
+  fechaRegistroDesde: string
+  fechaRegistroHasta: string
+  fechaInactivacionDesde: string
+  fechaInactivacionHasta: string
+  orden: HistorialOrden
+  page: number
+}
+
 export type RegistrarAsociadoPayload = Pick<
   Asociado,
   'nombre' | 'apellidos' | 'cedula' | 'correoElectronico'

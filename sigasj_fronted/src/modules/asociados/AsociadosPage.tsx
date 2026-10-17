@@ -3,6 +3,7 @@ import {
   IconChevronRight,
   IconEye,
   IconFilterOff,
+  IconHistory,
   IconRefresh,
   IconSearch,
   IconUserPlus,
@@ -20,7 +21,7 @@ import {
   nombreCompleto,
 } from './asociadoForm'
 import { ASOCIADOS_PAGE_SIZE, getAsociados } from './asociadosApi'
-import { ASOCIADO_NEW_PATH, ASOCIADOS_TITLE, asociadoDetailPath } from './asociadosPaths'
+import { ASOCIADO_NEW_PATH, ASOCIADOS_HISTORIAL_PATH, ASOCIADOS_TITLE, asociadoDetailPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { Asociado, AsociadosFiltros, AsociadosListado, EstadoFiltro } from './types'
 import AsociadoFeedback from './AsociadoFeedback'
@@ -174,13 +175,16 @@ export default function AsociadosPage() {
             Registre, consulte y busque la información de las personas asociadas.
           </p>
         </div>
-        <Link
-          to={ASOCIADO_NEW_PATH}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none"
-        >
-          <IconUserPlus size={20} aria-hidden="true" />
-          Registrar asociado
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link to={ASOCIADOS_HISTORIAL_PATH} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-6 py-3.5 font-extrabold text-blue-800 no-underline shadow-[0_8px_20px_rgba(37,99,235,0.12)] transition hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50 hover:no-underline"><IconHistory size={20} aria-hidden="true" />Ver historial</Link>
+          <Link
+            to={ASOCIADO_NEW_PATH}
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none"
+          >
+            <IconUserPlus size={20} aria-hidden="true" />
+            Registrar asociado
+          </Link>
+        </div>
       </header>
 
       <section

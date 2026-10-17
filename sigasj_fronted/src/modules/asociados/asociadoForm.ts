@@ -73,6 +73,15 @@ export function asociadoConsultaError(error: unknown, fallback: string): string 
   return fallback
 }
 
+export function historialAsociadosError(error: unknown): string {
+  const status = getHttpStatus(error)
+  if (status === 403) return 'No tiene permisos para consultar el historial de asociados.'
+  if (status === 404) return 'No se encontró el historial de asociados solicitado.'
+  if (status === 400) return 'Revise los filtros del historial e inténtelo nuevamente.'
+  if (status === null) return 'No fue posible conectar con el servidor. Revise su conexión.'
+  return 'No fue posible cargar el historial de asociados.'
+}
+
 /** Igual al largo de la columna Asociado.motivoInactivacion en el backend. */
 export const MOTIVO_INACTIVACION_MAX_LENGTH = 500
 

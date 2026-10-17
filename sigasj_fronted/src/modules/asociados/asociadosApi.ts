@@ -5,10 +5,12 @@ import type {
   AsociadosListado,
   ActualizarAsociadoPayload,
   RegistrarAsociadoPayload,
+  HistorialAsociadosFiltros,
 } from './types'
 
 const ASOCIADOS_ENDPOINT = '/asociados'
 export const ASOCIADOS_PAGE_SIZE = 10
+export const ASOCIADOS_HISTORIAL_PAGE_SIZE = 10
 
 export const toAsociadosParams = (filtros: AsociadosFiltros) => ({
   search: filtros.search.trim() || undefined,
@@ -21,6 +23,24 @@ export const toAsociadosParams = (filtros: AsociadosFiltros) => ({
 export const getAsociados = (filtros: AsociadosFiltros, signal?: AbortSignal) =>
   fetchWithAuth<AsociadosListado>(ASOCIADOS_ENDPOINT, {
     params: toAsociadosParams(filtros),
+    signal,
+  })
+
+export const toHistorialAsociadosParams = (filtros: HistorialAsociadosFiltros) => ({
+  search: filtros.search.trim() || undefined,
+  estado: filtros.estado === 'todos' ? undefined : filtros.estado,
+  fechaRegistroDesde: filtros.fechaRegistroDesde || undefined,
+  fechaRegistroHasta: filtros.fechaRegistroHasta || undefined,
+  fechaInactivacionDesde: filtros.fechaInactivacionDesde || undefined,
+  fechaInactivacionHasta: filtros.fechaInactivacionHasta || undefined,
+  orden: filtros.orden,
+  page: filtros.page,
+  limit: ASOCIADOS_HISTORIAL_PAGE_SIZE,
+})
+
+export const getHistorialAsociados = (filtros: HistorialAsociadosFiltros, signal?: AbortSignal) =>
+  fetchWithAuth<AsociadosListado>(`${ASOCIADOS_ENDPOINT}/historial`, {
+    params: toHistorialAsociadosParams(filtros),
     signal,
   })
 

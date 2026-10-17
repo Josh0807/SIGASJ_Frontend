@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { asociadoBackendFieldErrors, asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado, asociadoEstadoError, validarMotivoInactivacion } from './asociadoForm'
+import { asociadoBackendFieldErrors, asociadoSubmitError, asociadoUpdateError, toActualizarAsociadoPayload, toRegistrarAsociadoPayload, validateAsociado, asociadoEstadoError, historialAsociadosError, validarMotivoInactivacion } from './asociadoForm'
 
 describe('formulario de asociados', () => {
   it('marca todos los campos obligatorios', () => {
@@ -104,5 +104,12 @@ describe('formulario de asociados', () => {
     expect(asociadoEstadoError(new Error('Failed to fetch'), false)).toContain('No fue posible conectar')
     expect(asociadoEstadoError(new Error('HTTP 500: error'), true)).toBe('No fue posible reactivar el asociado. Inténtelo nuevamente.')
     expect(asociadoEstadoError(new Error('HTTP 500: error'), false)).toBe('No fue posible inactivar el asociado. Inténtelo nuevamente.')
+  })
+
+  it('traduce los errores propios del historial', () => {
+    expect(historialAsociadosError(new Error('HTTP 403: Forbidden'))).toContain('permisos')
+    expect(historialAsociadosError(new Error('HTTP 404: Not Found'))).toContain('No se encontró')
+    expect(historialAsociadosError(new Error('HTTP 400: Bad Request'))).toContain('filtros')
+    expect(historialAsociadosError(new Error('Failed to fetch'))).toContain('conectar')
   })
 })
