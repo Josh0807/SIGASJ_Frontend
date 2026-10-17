@@ -1,11 +1,30 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { actualizarAsociado, getAsociado, getAsociados, registrarAsociado, toAsociadosParams, cambiarEstadoAsociado } from './asociadosApi'
+import { actualizarAsociado, getAsociado, getAsociados, getHistorialAsociados, registrarAsociado, toAsociadosParams, cambiarEstadoAsociado } from './asociadosApi'
 
 const ok = (body: unknown, status = 200) => ({ ok: true, status, json: async () => body }) as Response
 const listadoVacio = { data: [], total: 0, page: 1, limit: 10, totalPages: 0 }
 
 describe('contrato API de asociados', () => {
   afterEach(() => vi.unstubAllGlobals())
+
+  it('consulta el historial con filtros, orden y paginación', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(ok(listadoVacio))
+    vi.stubGlobal('fetch', fetchMock)
+    await getHistorialAsociados({
+      search: '  Mora ', estado: 'inactivo', fechaRegistroDesde: '2023-01-01',
+      fechaRegistroHasta: '', fechaInactivacionDesde: '2026-01-01',
+      fechaInactivacionHasta: '2026-12-31', orden: 'DESC', page: 2,
+    })
+    const url = new URL(String(fetchMock.mock.calls[0][0]), 'http://localhost')
+    expect(url.pathname).toMatch(/\/asociados\/historial$/)
+    expect(url.searchParams.get('search')).toBe('Mora')
+    expect(url.searchParams.get('estado')).toBe('inactivo')
+    expect(url.searchParams.get('fechaRegistroDesde')).toBe('2023-01-01')
+    expect(url.searchParams.get('fechaInactivacionHasta')).toBe('2026-12-31')
+    expect(url.searchParams.get('orden')).toBe('DESC')
+    expect(url.searchParams.get('page')).toBe('2')
+    expect(url.searchParams.get('limit')).toBe('10')
+  })
 
   it('consulta el listado con búsqueda, estado y paginación', async () => {
     const fetchMock = vi.fn().mockResolvedValue(ok(listadoVacio))

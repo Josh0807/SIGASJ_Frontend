@@ -437,6 +437,104 @@ describe('Asociados: consulta y búsqueda (5.2)', () => {
     await view.cleanup()
   })
 
+  it('muestra el historial de activos e inactivos como solo consulta', async () => {
+    loginAsRole('Secretaria')
+    const fetchMock = stubApi(() => response(listado([juan, luis])))
+    const view = await mount('/admin/abonados/historial')
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/asociados\/historial/)
+    expect(view.container.querySelector('h1')?.textContent).toBe('Historial de asociados')
+    expect(view.container.textContent).toContain('Juan Pérez Rodríguez')
+    expect(view.container.textContent).toContain('Luis Mora Castro')
+    expect(view.container.textContent).toContain('Activo')
+    expect(view.container.textContent).toContain('Inactivo')
+    expect(view.container.textContent).toContain('2 may 2026')
+    expect(byText(view.container, 'button', 'Inactivar')).toBeUndefined()
+    expect(byText(view.container, 'button', 'Reactivar')).toBeUndefined()
+    expect(byText(view.container, 'a', 'Ver detalle')?.getAttribute('href')).toBe('/admin/abonados/1')
+    await view.cleanup()
+  })
+
+  it('aplica y limpia los filtros del historial', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi(() => response(listado([luis])))
+    const view = await mount('/admin/abonados/historial')
+    const search = view.container.querySelector('input[type="search"]') as HTMLInputElement
+    const estado = view.container.querySelectorAll('select')[0] as HTMLSelectElement
+    const orden = view.container.querySelectorAll('select')[1] as HTMLSelectElement
+    const dates = view.container.querySelectorAll<HTMLInputElement>('input[type="date"]')
+    await act(async () => {
+      setValue(search, 'Mora')
+      setValue(estado, 'inactivo')
+      setValue(orden, 'DESC')
+      setValue(dates[0], '2023-01-01')
+    })
+    await act(async () => byText(view.container, 'button', 'Aplicar filtros')!.click())
+    await flush()
+    let url = ultimaUrl(fetchMock)
+    expect(url.searchParams.get('search')).toBe('Mora')
+    expect(url.searchParams.get('estado')).toBe('inactivo')
+    expect(url.searchParams.get('orden')).toBe('DESC')
+    expect(url.searchParams.get('fechaRegistroDesde')).toBe('2023-01-01')
+    await act(async () => byText(view.container, 'button', 'Limpiar filtros')!.click())
+    await flush()
+    url = ultimaUrl(fetchMock)
+    expect(url.searchParams.has('search')).toBe(false)
+    expect(url.searchParams.has('estado')).toBe(false)
+    await view.cleanup()
+  })
+
+  it('maneja historial vacío y paginación', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => response(listado(url.searchParams.get('page') === '2' ? [luis] : [juan], { total: 12, totalPages: 2, page: Number(url.searchParams.get('page') ?? 1) })))
+    const view = await mount('/admin/abonados/historial')
+    await act(async () => byText(view.container, 'button', 'Siguiente')!.click())
+    await flush()
+    expect(ultimaUrl(fetchMock).searchParams.get('page')).toBe('2')
+    expect(view.container.textContent).toContain('Luis Mora Castro')
+    await view.cleanup()
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response(listado([]))))
+    const empty = await mount('/admin/abonados/historial')
+    expect(empty.container.textContent).toContain('Historial vacío')
+    await empty.cleanup()
+  })
+
+  it.each([
+    [403, 'No tiene permisos para consultar el historial de asociados.'],
+    [404, 'No se encontró el historial de asociados solicitado.'],
+  ])('muestra un error comprensible cuando el historial responde %i', async (status, message) => {
+    loginAsRole('Administradora')
+    stubApi(() => response({ message: 'Error interno' }, false, status))
+    const view = await mount('/admin/abonados/historial')
+    expect(view.container.querySelector('[role="alert"]')?.textContent).toContain(message)
+    expect(view.container.textContent).not.toContain('Error interno')
+    await view.cleanup()
+  })
+
+  it('cierra la sesión si el historial responde 401', async () => {
+    loginAsRole('Administradora')
+    stubApi(() => response({ message: 'Unauthorized' }, false, 401))
+    const view = await mount('/admin/abonados/historial')
+    expect(view.container.textContent).toContain('Pantalla de login')
+    await view.cleanup()
+  })
+
+  it('abre el detalle desde el historial reutilizando la consulta del asociado', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) =>
+      url.pathname.endsWith('/asociados/1') ? response(juan) : response(listado([juan])),
+    )
+    const view = await mount('/admin/abonados/historial')
+    await act(async () => byText(view.container, 'a', 'Ver detalle')!.click())
+    await flush()
+    expect(fetchMock.mock.calls.some(([input]) => String(input).endsWith('/asociados/1'))).toBe(true)
+    expect(view.container.querySelector('h1')?.textContent).toContain('Juan')
+    expect(byText(view.container, 'a', 'Volver a Historial de asociados')?.getAttribute('href')).toBe(
+      '/admin/abonados/historial',
+    )
+    await view.cleanup()
+  })
+
   it('el detalle cierra la sesión ante un 401', async () => {
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Unauthorized' }, false, 401))

@@ -49,6 +49,7 @@ export default function AsociadoDetallePage() {
       : resultado.error
   // Al volver se conservan la búsqueda, el filtro y la página del listado.
   const volverA = (location.state as { from?: string } | null)?.from ?? ASOCIADOS_PATH
+  const volverLabel = volverA.includes('/historial') ? 'Historial de asociados' : ASOCIADOS_TITLE
   const [aviso, setAviso] = useState<string | null>(
     (location.state as { success?: string } | null)?.success ?? null,
   )
@@ -92,7 +93,7 @@ export default function AsociadoDetallePage() {
         className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
       >
         <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
-        Volver a {ASOCIADOS_TITLE}
+        Volver a {volverLabel}
       </Link>
 
       {cargando ? (
