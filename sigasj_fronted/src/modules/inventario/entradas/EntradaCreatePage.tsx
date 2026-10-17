@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react'
-import { IconAlignLeft, IconArrowLeft, IconBuildingStore, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconTruckDelivery } from '@tabler/icons-react'
+import { IconAlertTriangle, IconAlignLeft, IconArrowLeft, IconBuildingStore, IconCheck, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconTrendingUp, IconTruckDelivery } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
 import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
@@ -74,7 +74,33 @@ export default function EntradaCreatePage() {
 
   return <main className="materials-admin materials-admin--form inventory-entry sigasj-stack">
     <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar entrada de materiales</h1><p>Registre los materiales recibidos en bodega. Las existencias serán calculadas y actualizadas por el servidor.</p></div></header>
-    {feedback && <div className={feedback.kind === 'success' ? 'materials-admin__success inventory-entry__success' : 'materials-admin__error inventory-entry__success'} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.movementId && <strong>Movimiento ENTRADA #{feedback.movementId}</strong>}<span>{feedback.text}</span>{feedback.stock && <strong>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</strong>}{feedback.kind === 'success' && <Link to={MATERIALES_PATH}>Ver inventario actualizado</Link>}{pendingMovementId && documents.length > 0 && <button type="button" className="materials-admin__secondary" disabled={saving} onClick={() => void retryDocuments()}>{saving ? 'Cargando documentos…' : 'Reintentar documentos pendientes'}</button>}</div>}
+    {feedback && (
+      <div
+        className={`flex items-start gap-5 overflow-hidden rounded-3xl border p-6 shadow-[0_18px_45px_rgba(15,23,42,0.10)] ${feedback.kind === 'success' ? 'border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-teal-50/70 text-emerald-950' : 'border-rose-200 bg-linear-to-br from-rose-50 via-white to-orange-50/60 text-rose-950'}`}
+        role={feedback.kind === 'error' ? 'alert' : 'status'}
+      >
+        <span className={`flex size-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg ${feedback.kind === 'success' ? 'bg-linear-to-br from-emerald-500 to-teal-600 shadow-emerald-200' : 'bg-linear-to-br from-rose-500 to-red-600 shadow-rose-200'}`}>
+          {feedback.kind === 'success' ? <IconCheck size={30} stroke={3} aria-hidden="true" /> : <IconAlertTriangle size={28} aria-hidden="true" />}
+        </span>
+        <div className="grid min-w-0 flex-1 gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <strong className="text-xl tracking-tight">{feedback.kind === 'success' ? 'Entrada registrada correctamente' : 'No se pudo completar la entrada'}</strong>
+            {feedback.movementId && <span className="rounded-full border border-current/15 bg-white/80 px-3 py-1 text-xs font-extrabold">Movimiento ENTRADA #{feedback.movementId}</span>}
+          </div>
+          <span className="leading-6 opacity-90">{feedback.text}</span>
+          {feedback.stock && (
+            <div className="mt-1 flex w-fit flex-wrap items-center gap-2 rounded-2xl border border-emerald-200/80 bg-white/85 px-4 py-3 font-extrabold text-emerald-900 shadow-sm">
+              <IconTrendingUp size={20} aria-hidden="true" />
+              <span>Stock anterior: {feedback.stock.previous} → Stock actualizado: {feedback.stock.current}</span>
+            </div>
+          )}
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            {feedback.kind === 'success' && <Link className="inline-flex min-h-10 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white no-underline shadow-md transition hover:-translate-y-0.5 hover:bg-emerald-800" to={MATERIALES_PATH}>Ver inventario actualizado</Link>}
+            {pendingMovementId && documents.length > 0 && <button type="button" className="materials-admin__secondary" disabled={saving} onClick={() => void retryDocuments()}>{saving ? 'Cargando documentos…' : 'Reintentar documentos pendientes'}</button>}
+          </div>
+        </div>
+      </div>
+    )}
     {uploadedDocuments.length > 0 && <section className="inventory-entry__uploaded" aria-label="Documentos adjuntos"><h2>Documentos adjuntos</h2><ul>{uploadedDocuments.map((document) => <li key={document.id}><span>{document.nombreOriginal}</span><button type="button" onClick={() => void abrirDocumentoEntrada(document.rutaReferenciaArchivo)}>Ver documento</button></li>)}</ul></section>}
     <form className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
       <InventoryFormHeading icon={<IconTruckDelivery size={25} aria-hidden="true" />} title="Datos de la entrada" description="Indique el material recibido. Las existencias las actualiza el servidor." />

@@ -27,7 +27,7 @@ import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistr
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { useAuth } from '../../auth/components/AuthContext'
-import { IconArrowLeft, IconCheck, IconDeviceFloppy } from '@tabler/icons-react'
+import { IconArrowLeft, IconCheck, IconDeviceFloppy, IconPlus } from '@tabler/icons-react'
 
 type ActividadRegistroFormShellMode = 'registrar' | 'corregir'
 
@@ -214,32 +214,33 @@ const ActividadRegistroFormShell = ({
           variant="success"
           testId="actividad-registro-exito"
           message={
-            <>
-              <p>
-                {isCorregirMode
-                  ? `${ACTIVITY_FEEDBACK_MESSAGES.successCorrect}${
-                      registrada?.id ? ` (registro #${registrada.id})` : ''
-                    }`
-                  : `${ACTIVITY_FEEDBACK_MESSAGES.successRegister.replace(
-                      /\.$/,
-                      '',
-                    )}${tipo.nombre ? `: ${tipo.nombre}` : ''}${
-                      registrada?.id ? ` (registro #${registrada.id})` : ''
-                    }.`}
-              </p>
-              <Link
-                to={
-                  isCorregirMode
-                    ? ACTIVIDADES_FONTANERO_PATHS.correcciones
-                    : ACTIVIDADES_FONTANERO_PATHS.nueva
-                }
-                className="actividades-fontanero-registro__link"
-              >
-                {isCorregirMode
-                  ? 'Volver a correcciones pendientes'
-                  : 'Registrar otra actividad'}
-              </Link>
-            </>
+            <p>
+              {isCorregirMode
+                ? `${ACTIVITY_FEEDBACK_MESSAGES.successCorrect}${
+                    registrada?.id ? ` (registro #${registrada.id})` : ''
+                  }`
+                : `${ACTIVITY_FEEDBACK_MESSAGES.successRegister.replace(
+                    /\.$/,
+                    '',
+                  )}${tipo.nombre ? `: ${tipo.nombre}` : ''}${
+                    registrada?.id ? ` (registro #${registrada.id})` : ''
+                  }.`}
+            </p>
+          }
+          action={
+            <Link
+              to={
+                isCorregirMode
+                  ? ACTIVIDADES_FONTANERO_PATHS.correcciones
+                  : ACTIVIDADES_FONTANERO_PATHS.nueva
+              }
+              className="actividades-fontanero-registro__link"
+            >
+              {isCorregirMode ? <IconArrowLeft size={18} aria-hidden="true" /> : <IconPlus size={19} aria-hidden="true" />}
+              {isCorregirMode
+                ? 'Volver a correcciones pendientes'
+                : 'Nueva actividad'}
+            </Link>
           }
         />
       ) : (
