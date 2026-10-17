@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ColaboradorDetallePage from './ColaboradorDetallePage'
 import ColaboradorFormPage from './ColaboradorFormPage'
+import ColaboradorHistorialPage from './ColaboradorHistorialPage'
 import ColaboradoresPage from './ColaboradoresPage'
 import IncapacidadDetallePage from './IncapacidadDetallePage'
 import IncapacidadFormPage from './IncapacidadFormPage'
@@ -24,6 +25,7 @@ export default function RecursosHumanosRoutes() {
       <Route path="incapacidades/nuevo" element={<IncapacidadFormPage />} />
       <Route path="incapacidades/:id" element={<IncapacidadDetallePage />} />
       <Route path="incapacidades/:id/editar" element={<IncapacidadFormPage />} />
+      <Route path=":id/historial" element={<ColaboradorHistorialPage />} />
       <Route path=":id" element={<ColaboradorDetallePage />} />
       <Route path=":id/editar" element={<ColaboradorFormPage />} />
       <Route path="*" element={<Navigate to="." replace />} />

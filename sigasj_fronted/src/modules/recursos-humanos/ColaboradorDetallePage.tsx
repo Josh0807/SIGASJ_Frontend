@@ -1,4 +1,10 @@
-import { IconArrowLeft, IconPencil, IconRefresh, IconUser } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconHistory,
+  IconPencil,
+  IconRefresh,
+  IconUser,
+} from '@tabler/icons-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
@@ -13,7 +19,12 @@ import {
   formatearFechaAuditoria,
   nombreCompleto,
 } from './colaboradorForm'
-import { RRHH_PATH, RRHH_TITLE, colaboradorEditPath } from './recursosHumanosPaths'
+import {
+  RRHH_PATH,
+  RRHH_TITLE,
+  colaboradorEditPath,
+  colaboradorHistorialPath,
+} from './recursosHumanosPaths'
 import type { Colaborador } from './types'
 
 function Dato({ label, children }: { label: string; children: ReactNode }) {
@@ -151,7 +162,14 @@ export default function ColaboradorDetallePage() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                to={colaboradorHistorialPath(colaborador.id)}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 font-bold text-slate-700 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+              >
+                <IconHistory size={19} aria-hidden="true" />
+                Ver historial
+              </Link>
               <Link
                 to={colaboradorEditPath(colaborador.id)}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-5 py-3 font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"

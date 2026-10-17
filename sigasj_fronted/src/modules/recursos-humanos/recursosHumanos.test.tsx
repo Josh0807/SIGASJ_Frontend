@@ -103,6 +103,9 @@ describe('Recursos Humanos: colaboradores', () => {
     expect(fila?.textContent).toContain('Fontanero')
     expect(fila?.textContent).toContain('Activo')
     expect(byText(fila!, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/lecturas/1')
+    expect(byText(fila!, 'a', 'Historial')?.getAttribute('href')).toBe(
+      '/admin/lecturas/1/historial',
+    )
     await view.cleanup()
   })
 
@@ -265,6 +268,9 @@ describe('Recursos Humanos: colaboradores', () => {
     expect(view.container.textContent).toContain('juan@example.com')
     expect(view.container.textContent).toContain('Sin cuenta vinculada')
     expect(byText(view.container, 'a', 'Editar')?.getAttribute('href')).toBe('/admin/lecturas/1/editar')
+    expect(byText(view.container, 'a', 'Ver historial')?.getAttribute('href')).toBe(
+      '/admin/lecturas/1/historial',
+    )
     await view.cleanup()
 
     const missing = await mount('/admin/lecturas/99')
@@ -803,3 +809,235 @@ describe('Recursos Humanos: incapacidades', () => {
     await view.cleanup()
   })
 })
+
+const historialRespuesta = {
+  colaborador: {
+    id: 1,
+    nombre: 'Juan',
+    apellidos: 'Pérez',
+    cedula: '1-1111-1111',
+    cargo: 'Fontanero',
+  },
+  historial: [
+    {
+      id: 10,
+      tipo: 'VACACION' as const,
+      fecha: '2026-09-01',
+      fechaInicio: null,
+      fechaFin: null,
+      descripcion: '+2 días acumulados',
+      tipoMovimiento: 'ACUMULADO' as const,
+      cantidadDias: 2,
+    },
+    {
+      id: 11,
+      tipo: 'INCAPACIDAD' as const,
+      fecha: '2026-08-22',
+      fechaInicio: '2026-08-22',
+      fechaFin: '2026-08-24',
+      descripcion: 'Incapacidad registrada',
+    },
+    {
+      id: 12,
+      tipo: 'PERMISO' as const,
+      fecha: '2026-08-05',
+      fechaInicio: '2026-08-05',
+      fechaFin: '2026-08-05',
+      descripcion: 'Permiso registrado',
+      motivo: 'Trámite',
+    },
+  ],
+  total: 3,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
+}
+
+describe('Recursos Humanos: historial administrativo', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    localStorage.clear()
+    document.body.innerHTML = ''
+  })
+
+  it('muestra permisos, vacaciones e incapacidades del colaborador', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.endsWith('/colaboradores/1/historial')) {
+        return response(historialRespuesta)
+      }
+      return response({ message: 'Not Found' }, false, 404)
+    })
+    const view = await mount('/admin/lecturas/1/historial')
+    expect(view.container.textContent).toContain('Historial administrativo')
+    expect(view.container.textContent).toContain('Juan Pérez')
+    expect(view.container.textContent).toContain('Fontanero')
+    expect(view.container.textContent).toContain('Vacaciones')
+    expect(view.container.textContent).toContain('+2 días acumulados')
+    expect(view.container.textContent).toContain('Incapacidad')
+    expect(view.container.textContent).toContain('Permiso')
+    expect(view.container.textContent).toContain('Permiso registrado')
+    expect(view.container.textContent).not.toMatch(
+      /\b(Editar|Eliminar|Registrar|Crear)\b/,
+    )
+    const url = new URL(String(fetchMock.mock.calls[0][0]), 'http://localhost')
+    expect(url.pathname).toMatch(/\/rrhh\/colaboradores\/1\/historial$/)
+    expect(url.searchParams.get('page')).toBe('1')
+    expect(url.searchParams.get('limit')).toBe('10')
+    await view.cleanup()
+  })
+
+  it('envía tipo y rango de fechas al backend y limpia filtros', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.endsWith('/colaboradores/1/historial')) {
+        return response({
+          ...historialRespuesta,
+          historial: historialRespuesta.historial.filter(
+            (evento) => evento.tipo === 'INCAPACIDAD',
+          ),
+          total: 1,
+        })
+      }
+      return response({ message: 'Not Found' }, false, 404)
+    })
+    const view = await mount('/admin/lecturas/1/historial')
+    const select = view.container.querySelector('select')!
+    const fechas = view.container.querySelectorAll<HTMLInputElement>(
+      'input[type="date"]',
+    )
+    await act(async () => setValue(select, 'INCAPACIDAD'))
+    await flush()
+    await act(async () => setValue(fechas[0], '2026-01-01'))
+    await flush()
+    await act(async () => setValue(fechas[1], '2026-12-31'))
+    await flush()
+
+    const ultima = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(ultima.searchParams.get('tipo')).toBe('INCAPACIDAD')
+    expect(ultima.searchParams.get('fechaDesde')).toBe('2026-01-01')
+    expect(ultima.searchParams.get('fechaHasta')).toBe('2026-12-31')
+    expect(ultima.searchParams.get('page')).toBe('1')
+
+    await act(async () =>
+      byText(view.container, 'button', 'Limpiar filtros')!.click(),
+    )
+    await flush()
+    const limpia = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(limpia.searchParams.get('tipo')).toBeNull()
+    expect(limpia.searchParams.get('fechaDesde')).toBeNull()
+    expect(limpia.searchParams.get('fechaHasta')).toBeNull()
+    await view.cleanup()
+  })
+
+  it('pagina conservando filtros activos', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.endsWith('/colaboradores/1/historial')) {
+        return response({
+          ...historialRespuesta,
+          total: 12,
+          totalPages: 2,
+          page: Number(url.searchParams.get('page') ?? 1),
+        })
+      }
+      return response({ message: 'Not Found' }, false, 404)
+    })
+    const view = await mount(
+      '/admin/lecturas/1/historial?tipo=PERMISO&fechaDesde=2026-01-01&page=1',
+    )
+    await act(async () => byText(view.container, 'button', 'Siguiente')!.click())
+    await flush()
+    const siguiente = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(siguiente.searchParams.get('tipo')).toBe('PERMISO')
+    expect(siguiente.searchParams.get('fechaDesde')).toBe('2026-01-01')
+    expect(siguiente.searchParams.get('page')).toBe('2')
+    await view.cleanup()
+  })
+
+  it('muestra vacío, filtros sin resultados, 404 y error genérico', async () => {
+    loginAsRole('Administradora')
+    stubApi(() =>
+      response({
+        ...historialRespuesta,
+        historial: [],
+        total: 0,
+        totalPages: 0,
+      }),
+    )
+    const vacio = await mount('/admin/lecturas/1/historial')
+    expect(vacio.container.textContent).toContain(
+      'No hay eventos administrativos registrados para este colaborador.',
+    )
+    await vacio.cleanup()
+
+    stubApi(() =>
+      response({
+        ...historialRespuesta,
+        historial: [],
+        total: 0,
+        totalPages: 0,
+      }),
+    )
+    const filtrado = await mount('/admin/lecturas/1/historial?tipo=VACACION')
+    expect(filtrado.container.textContent).toContain(
+      'No se encontraron eventos con los filtros seleccionados.',
+    )
+    await filtrado.cleanup()
+
+    stubApi(() =>
+      response(
+        { message: 'No se encontró el colaborador solicitado.' },
+        false,
+        404,
+      ),
+    )
+    const missing = await mount('/admin/lecturas/99/historial')
+    expect(missing.container.querySelector('[role="alert"]')?.textContent).toContain(
+      'No se encontró el colaborador solicitado.',
+    )
+    expect(
+      byText(missing.container, 'a', 'Volver a colaboradores')?.getAttribute(
+        'href',
+      ),
+    ).toBe('/admin/lecturas')
+    await missing.cleanup()
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.reject(new Error('Failed to fetch'))),
+    )
+    const error = await mount('/admin/lecturas/1/historial')
+    expect(error.container.querySelector('[role="alert"]')?.textContent).toMatch(
+      /conectar|cargar el historial/i,
+    )
+    await error.cleanup()
+  })
+
+  it('cierra la sesión ante un 401 y muestra acceso denegado en 403', async () => {
+    loginAsRole('Administradora')
+    stubApi(() => response({ message: 'Unauthorized' }, false, 401))
+    const sesion = await mount('/admin/lecturas/1/historial')
+    expect(sesion.container.textContent).toContain('Pantalla de login')
+    await sesion.cleanup()
+
+    loginAsRole('Administradora')
+    stubApi(() => response({ message: 'Forbidden' }, false, 403))
+    const denegado = await mount('/admin/lecturas/1/historial')
+    expect(denegado.container.querySelector('[role="alert"]')?.textContent).toContain(
+      'No tiene acceso para consultar el historial administrativo.',
+    )
+    expect(denegado.container.textContent).not.toContain('Pantalla de login')
+    await denegado.cleanup()
+  })
+})
+
