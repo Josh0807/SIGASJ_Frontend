@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { loginAsRole } from '../../test/authTestHelpers'
 import { AuthProvider } from '../auth/components/AuthContext'
 import RecursosHumanosRoutes from './RecursosHumanosRoutes'
-import type { Colaborador, PermisoColaborador } from './types'
+import type { Colaborador, Incapacidad, PermisoColaborador } from './types'
 
 const juan: Colaborador = {
   id: 1,
@@ -452,6 +452,354 @@ describe('Recursos Humanos: permisos', () => {
     await act(async () => view.container.querySelector('form')!.requestSubmit())
     await flush()
     expect(view.container.textContent).toContain('Permiso registrado correctamente')
+    await view.cleanup()
+  })
+})
+
+const incapacidad: Incapacidad = {
+  id: 12,
+  colaboradorId: 1,
+  fechaInicio: '2026-10-12',
+  fechaFin: '2026-10-20',
+  observaciones: 'Documento entregado a administración',
+  colaborador: {
+    id: 1,
+    nombre: 'Juan',
+    apellidos: 'Pérez',
+    cedula: '1-1111-1111',
+    cargo: 'Fontanero',
+    activo: true,
+  },
+  createdAt: '2026-10-01T12:00:00.000Z',
+  updatedAt: '2026-10-01T12:00:00.000Z',
+}
+
+const listadoIncapacidades = (data: Incapacidad[]) => ({
+  data,
+  total: data.length,
+  page: 1,
+  limit: 10,
+  totalPages: data.length ? 1 : 0,
+})
+
+describe('Recursos Humanos: incapacidades', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    localStorage.clear()
+    document.body.innerHTML = ''
+  })
+
+  it('lista incapacidades con colaborador, fechas y observaciones', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response(listadoIncapacidades([incapacidad]))
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades')
+    expect(view.container.textContent).toContain('Incapacidades del personal')
+    expect(
+      byText(view.container, 'nav a', 'Incapacidades')?.getAttribute('href'),
+    ).toBe('/admin/lecturas/incapacidades')
+    const headers = Array.from(view.container.querySelectorAll('th')).map(
+      (th) => th.textContent,
+    )
+    expect(headers).toEqual([
+      'Colaborador',
+      'Inicio',
+      'Fin',
+      'Observaciones',
+      'Acción',
+    ])
+    expect(view.container.textContent).toContain('Juan Pérez')
+    expect(view.container.textContent).toContain(
+      'Documento entregado a administración',
+    )
+    expect(byText(view.container, 'a', 'Ver detalle')?.getAttribute('href')).toBe(
+      '/admin/lecturas/incapacidades/12',
+    )
+    await view.cleanup()
+  })
+
+  it('envía filtros de colaborador y fechas al backend', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response(listadoIncapacidades([incapacidad]))
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades')
+    const colaborador = view.container.querySelector<HTMLSelectElement>('select')!
+    await act(async () => setValue(colaborador, '1'))
+    await flush()
+    const conColaborador = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(conColaborador.searchParams.get('colaboradorId')).toBe('1')
+
+    const fechas = view.container.querySelectorAll<HTMLInputElement>(
+      'input[type="date"]',
+    )
+    await act(async () => setValue(fechas[0], '2026-10-01'))
+    await flush()
+    const conFecha = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(conFecha.searchParams.get('fechaInicio')).toBe('2026-10-01')
+    await view.cleanup()
+  })
+
+  it('muestra lista vacía sin tratarla como error', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response(listadoIncapacidades([]))
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades')
+    expect(view.container.textContent).toContain(
+      'No se encontraron incapacidades.',
+    )
+    expect(view.container.querySelector('[role="alert"]')).toBeNull()
+    await view.cleanup()
+  })
+
+  it('registra una incapacidad y muestra el aviso de éxito', async () => {
+    loginAsRole('Administradora')
+    stubApi((url, init) => {
+      if (url.pathname.endsWith('/rrhh/incapacidades') && init.method === 'POST') {
+        return response(incapacidad, true, 201)
+      }
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response(listadoIncapacidades([]))
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades/nuevo')
+    await act(async () => setValue(view.container.querySelector('select')!, '1'))
+    const fechas = view.container.querySelectorAll<HTMLInputElement>(
+      'input[type="date"]',
+    )
+    await act(async () => setValue(fechas[0], '2026-10-12'))
+    await act(async () => setValue(fechas[1], '2026-10-20'))
+    await act(async () => view.container.querySelector('form')!.requestSubmit())
+    await flush()
+    expect(view.container.textContent).toContain(
+      'Incapacidad registrada correctamente',
+    )
+    await view.cleanup()
+  })
+
+  it('muestra el detalle y permite volver al listado', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.endsWith('/rrhh/incapacidades/12')) {
+        return response(incapacidad)
+      }
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response(listadoIncapacidades([incapacidad]))
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades/12')
+    expect(view.container.textContent).toContain('Juan Pérez')
+    expect(view.container.textContent).toContain(
+      'Documento entregado a administración',
+    )
+    expect(
+      byText(view.container, 'a', 'Volver a incapacidades')?.getAttribute('href'),
+    ).toBe('/admin/lecturas/incapacidades')
+    await view.cleanup()
+  })
+
+  it('muestra 404 comprensible en detalle inexistente', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.endsWith('/rrhh/incapacidades/99')) {
+        return response(
+          { statusCode: 404, message: 'No se encontró la incapacidad solicitada.' },
+          false,
+          404,
+        )
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades/99')
+    expect(view.container.textContent).toContain(
+      'No se encontró la incapacidad solicitada.',
+    )
+    expect(
+      byText(view.container, 'a', 'Volver al listado')?.getAttribute('href'),
+    ).toBe('/admin/lecturas/incapacidades')
+    await view.cleanup()
+  })
+
+  it('conserva el formulario y muestra 400/404/conexión del backend', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response(listado([juan])))
+      .mockResolvedValueOnce(
+        response(
+          { statusCode: 400, message: 'La fecha final no puede ser anterior a la fecha inicial.' },
+          false,
+          400,
+        ),
+      )
+      .mockResolvedValueOnce(
+        response(
+          { statusCode: 404, message: 'No se encontró el colaborador solicitado.' },
+          false,
+          404,
+        ),
+      )
+      .mockRejectedValueOnce(new Error('Failed to fetch'))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const view = await mount('/admin/lecturas/incapacidades/nuevo')
+    await act(async () => setValue(view.container.querySelector('select')!, '1'))
+    const fechas = view.container.querySelectorAll<HTMLInputElement>(
+      'input[type="date"]',
+    )
+    await act(async () => setValue(fechas[0], '2026-10-12'))
+    await act(async () => setValue(fechas[1], '2026-10-20'))
+
+    await act(async () => view.container.querySelector('form')!.requestSubmit())
+    await flush()
+    expect(view.container.textContent).toMatch(/fecha final/i)
+    expect(view.container.querySelector('select')!).toHaveProperty('value', '1')
+    expect(fechas[0].value).toBe('2026-10-12')
+
+    await act(async () => view.container.querySelector('form')!.requestSubmit())
+    await flush()
+    expect(view.container.textContent).toMatch(/colaborador/i)
+
+    await act(async () => view.container.querySelector('form')!.requestSubmit())
+    await flush()
+    expect(view.container.textContent).toMatch(/conectar/i)
+    expect(fechas[1].value).toBe('2026-10-20')
+    await view.cleanup()
+  })
+
+  it('limpia filtros, reinicia page=1 y reconsulta el backend', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response({
+          data: [incapacidad],
+          total: 25,
+          page: Number(url.searchParams.get('page') ?? 1),
+          limit: 10,
+          totalPages: 3,
+        })
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount(
+      '/admin/lecturas/incapacidades?colaboradorId=1&fechaInicio=2026-10-01&fechaFin=2026-10-31&page=2',
+    )
+    await act(async () =>
+      byText(view.container, 'button', 'Siguiente')?.click(),
+    )
+    await flush()
+    const siguiente = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(siguiente.searchParams.get('page')).toBe('3')
+    expect(siguiente.searchParams.get('colaboradorId')).toBe('1')
+    expect(siguiente.searchParams.get('fechaInicio')).toBe('2026-10-01')
+    expect(siguiente.searchParams.get('fechaFin')).toBe('2026-10-31')
+
+    await act(async () =>
+      byText(view.container, 'button', 'Limpiar filtros')?.click(),
+    )
+    await flush()
+    const limpio = new URL(
+      String(fetchMock.mock.calls.at(-1)?.[0]),
+      'http://localhost',
+    )
+    expect(limpio.searchParams.get('colaboradorId')).toBeNull()
+    expect(limpio.searchParams.get('fechaInicio')).toBeNull()
+    expect(limpio.searchParams.get('fechaFin')).toBeNull()
+    expect(limpio.searchParams.get('page')).toBe('1')
+    await view.cleanup()
+  })
+
+  it('muestra error genérico del listado y permite reintentar', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(response(listado([juan])))
+      .mockRejectedValueOnce(new Error('Failed to fetch'))
+      .mockResolvedValueOnce(response(listadoIncapacidades([incapacidad])))
+    vi.stubGlobal('fetch', fetchMock)
+    const view = await mount('/admin/lecturas/incapacidades')
+    expect(view.container.textContent).toContain(
+      'No fue posible conectar con el servidor. Revise su conexión.',
+    )
+    await act(async () =>
+      byText(view.container, 'button', 'Reintentar')?.click(),
+    )
+    await flush()
+    expect(view.container.textContent).toContain('Juan Pérez')
+    await view.cleanup()
+  })
+
+  it('ante 403 en el listado muestra acceso denegado sin reintentar', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response({ message: 'Forbidden resource' }, false, 403)
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades')
+    expect(view.container.textContent).toMatch(/acceso/i)
+    expect(byText(view.container, 'button', 'Reintentar')).toBeUndefined()
+    await view.cleanup()
+  })
+
+  it('cierra la sesión ante un 401 en incapacidades', async () => {
+    loginAsRole('Administradora')
+    stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response({ message: 'Unauthorized' }, false, 401)
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades')
+    expect(view.container.textContent).toContain('Pantalla de login')
+    await view.cleanup()
+  })
+
+  it('bloquea el envío si falta la fecha inicial', async () => {
+    loginAsRole('Administradora')
+    const fetchMock = stubApi((url) => {
+      if (url.pathname.includes('/rrhh/incapacidades')) {
+        return response(listadoIncapacidades([]))
+      }
+      return response(listado([juan]))
+    })
+    const view = await mount('/admin/lecturas/incapacidades/nuevo')
+    await act(async () => setValue(view.container.querySelector('select')!, '1'))
+    const fechas = view.container.querySelectorAll<HTMLInputElement>(
+      'input[type="date"]',
+    )
+    await act(async () => setValue(fechas[1], '2026-10-20'))
+    await act(async () => view.container.querySelector('form')!.requestSubmit())
+    await flush()
+    expect(view.container.textContent).toMatch(/fecha de inicio/i)
+    expect(
+      fetchMock.mock.calls.some(
+        ([, init]) => (init as RequestInit | undefined)?.method === 'POST',
+      ),
+    ).toBe(false)
     await view.cleanup()
   })
 })

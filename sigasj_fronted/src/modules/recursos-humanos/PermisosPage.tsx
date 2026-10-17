@@ -22,7 +22,6 @@ import {
 import { PERMISOS_PAGE_SIZE, getPermisos } from './permisosApi'
 import {
   PERMISO_NEW_PATH,
-  RRHH_TITLE,
   permisoDetailPath,
   permisoEditPath,
 } from './recursosHumanosPaths'
@@ -55,9 +54,8 @@ export default function PermisosPage() {
     error: string | null
     reintentable: boolean
   }>({ clave: '', error: null, reintentable: true })
-  const [aviso, setAviso] = useState<string | null>(
-    (location.state as { success?: string } | null)?.success ?? null,
-  )
+  const aviso =
+    (location.state as { success?: string } | null)?.success ?? null
   const [recarga, setRecarga] = useState(0)
 
   const salirPorSesion = useCallback(() => {
