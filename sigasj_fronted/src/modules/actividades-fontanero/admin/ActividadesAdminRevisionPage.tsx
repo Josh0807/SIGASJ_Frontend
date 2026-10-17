@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
+import { IconMessageExclamation } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../components/ActivityFeedback'
@@ -84,6 +85,7 @@ const ActividadesAdminRevisionPage = () => {
   const [requestingCorrection, setRequestingCorrection] = useState(false)
   const [correctionNote, setCorrectionNote] = useState('')
   const [correctionError, setCorrectionError] = useState<string | null>(null)
+  const [reviewedInfo, setReviewedInfo] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [fontaneros, setFontaneros] = useState<string[]>([])
   const { tipos, isLoading: tiposLoading } = useTiposActividadFontanero()
@@ -202,6 +204,7 @@ const ActividadesAdminRevisionPage = () => {
     setRequestingCorrection(true)
     setConfirmCorrection(false)
     setCorrectionError(null)
+    setReviewedInfo(false)
     setError(null)
     try {
       const updated = await solicitarCorreccionAdmin(selected.id, observacion)
@@ -237,6 +240,7 @@ const ActividadesAdminRevisionPage = () => {
     setNotice(null)
     setCorrectionNote('')
     setCorrectionError(null)
+    setReviewedInfo(false)
     setConfirmCorrection(false)
     try {
       const detalle = await getActividadAdminDetalle(actividad.id)
@@ -350,11 +354,24 @@ const ActividadesAdminRevisionPage = () => {
               backLabel="Cerrar"
               actions={
                 <div className="actividades-admin-revision__detail-actions">
+                  {reviewedInfo ? (
+                    <ActivityFeedback
+                      variant="info"
+                      message="Esta actividad ya fue revisada; no es necesario procesarla nuevamente."
+                      className="actividades-admin-revision__already-reviewed"
+                    />
+                  ) : null}
                   <button
                     type="button"
                     className="gallery-admin__button gallery-admin__button--primary"
-                    disabled={!canReview || busy}
-                    onClick={() => setConfirmReview(true)}
+                    disabled={busy}
+                    onClick={() => {
+                      if (canReview) {
+                        setConfirmReview(true)
+                      } else {
+                        setReviewedInfo(true)
+                      }
+                    }}
                   >
                     {!canReview
                       ? 'Actividad revisada'
@@ -388,10 +405,11 @@ const ActividadesAdminRevisionPage = () => {
                       ) : null}
                       <button
                         type="button"
-                        className="gallery-admin__button"
+                        className="gallery-admin__button actividades-admin-revision__correction-button"
                         disabled={busy || !correctionNote.trim()}
                         onClick={() => setConfirmCorrection(true)}
                       >
+                        <IconMessageExclamation size={19} aria-hidden="true" />
                         {requestingCorrection
                           ? 'Solicitando…'
                           : 'Solicitar corrección'}

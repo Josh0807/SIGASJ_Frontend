@@ -67,6 +67,9 @@ const DetalleActividad = ({
   }
 
   const revisada = revisionLabel(actividad) === 'Revisada'
+  const estadoLabel = formatActividadEstado(actividad.estado)
+  const estadoRevisionLabel = revisionLabel(actividad)
+  const estadosDuplicados = estadoLabel.toLocaleLowerCase('es') === estadoRevisionLabel.toLocaleLowerCase('es')
 
   return (
     <article
@@ -80,11 +83,11 @@ const DetalleActividad = ({
           <p>{actividad.tipoActividadNombre || 'Sin tipo definido'}</p>
         </div>
         <div className="detalle-actividad__badges">
-          <span data-estado={actividad.estado}>
-            {formatActividadEstado(actividad.estado)}
-          </span>
+          {!estadosDuplicados ? (
+            <span data-estado={actividad.estado}>{estadoLabel}</span>
+          ) : null}
           <span className={revisada ? 'is-reviewed' : 'is-pending'}>
-            {revisionLabel(actividad)}
+            {estadoRevisionLabel}
           </span>
         </div>
       </header>
@@ -219,12 +222,12 @@ const DetalleActividad = ({
 
       {onBack || actions ? (
         <footer className="detalle-actividad__actions">
+          {actions}
           {onBack ? (
             <button type="button" onClick={onBack}>
               {backLabel}
             </button>
           ) : null}
-          {actions}
         </footer>
       ) : null}
     </article>

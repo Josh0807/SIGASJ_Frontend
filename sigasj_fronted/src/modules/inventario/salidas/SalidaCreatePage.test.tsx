@@ -34,7 +34,7 @@ describe('integración del formulario de salida', () => {
   it('consulta activos con stock, verifica disponibilidad y registra una sola salida con la avería', async () => {
     const response = { movimiento: { id: 45, tipo: 'SALIDA', cantidad: 4, idMaterial: 4, idUsuario: 3, idAveria: 42, idSolicitud: null, observacion: 'Reparación', fechaMovimiento: '2026-09-11' }, stockAnterior: 8, stockActual: 4, diferencia: -4, agotadoTotal: false, bajoStockMinimo: false, mensaje: 'Salida física registrada exitosamente.' }
     const fetchMock = vi.fn((url: string, options?: RequestInit) => {
-      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok(availability))
+      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok({ ...availability, disponible: false }))
       if (String(url).endsWith('/inventario/salidas') && options?.method === 'POST') return new Promise<Response>((resolve) => window.setTimeout(() => resolve(ok(response, 201)), 20))
       return Promise.resolve(ok(catalog))
     })
@@ -48,14 +48,19 @@ describe('integración del formulario de salida', () => {
     const observation = view.container.querySelector('textarea') as HTMLTextAreaElement
     await act(async () => { setValue(select, '4'); setValue(quantity, '4'); setValue(observation, 'Reparación'); await waitForPrecheck() })
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/materiales/4/disponibilidad?cantidad=4'))).toBe(true)
+    expect(view.container.textContent).toContain('Salida disponible')
     expect(view.container.textContent).toContain('Avería relacionada: #42')
-    expect(view.container.textContent).toContain('Luis Mora · obtenido de la sesión activa')
+    expect(view.container.textContent).toContain('Responsable de la salida')
+    expect(view.container.textContent).toContain('Luis Mora')
+    expect(view.container.textContent).toContain('Identidad verificada desde la sesión activa')
+    expect(view.container.textContent).not.toContain('Control de existencias')
     const form = view.container.querySelector('form') as HTMLFormElement
     await act(async () => { form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); await new Promise((resolve) => window.setTimeout(resolve, 30)) })
     const posts = fetchMock.mock.calls.filter(([, options]) => (options as RequestInit | undefined)?.method === 'POST')
     expect(posts).toHaveLength(1)
     expect(JSON.parse(String((posts[0][1] as RequestInit).body))).toEqual({ idMaterial: 4, cantidad: 4, idAveria: 42, idSolicitud: null, observacion: 'Reparación' })
     expect(view.container.textContent).toContain('Movimiento SALIDA #45')
+    expect(view.container.textContent).toContain('Salida registrada correctamente')
     expect(view.container.textContent).toContain('Stock anterior: 8 → Stock actualizado: 4')
     expect(select.value).toBe('')
     expect(quantity.value).toBe('')
@@ -77,6 +82,25 @@ describe('integración del formulario de salida', () => {
     expect(view.container.textContent).toContain('Existencias disponibles: 3')
     expect(select.value).toBe('4')
     expect(quantity.value).toBe('4')
+    await view.cleanup()
+  })
+
+  it('impide una salida que deje el material por debajo del stock mínimo', async () => {
+    const fetchMock = vi.fn((url: string) => {
+      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok({ ...availability, cantidadSolicitada: 7, stockResultante: 1, mensaje: 'Salida autorizada.' }))
+      return Promise.resolve(ok(catalog))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    const view = await mount()
+    const select = view.container.querySelector('select') as HTMLSelectElement
+    const quantity = view.container.querySelector('input[type="number"]') as HTMLInputElement
+    await act(async () => { setValue(select, '4'); setValue(quantity, '7'); await waitForPrecheck() })
+    expect(view.container.textContent).toContain('Puede retirar como máximo 6')
+    const submit = view.container.querySelector('button[type="submit"]') as HTMLButtonElement
+    expect(submit.disabled).toBe(false)
+    await act(async () => submit.click())
+    expect(view.container.textContent).toContain('No se pudo registrar la salida')
+    expect(fetchMock.mock.calls.some(([, options]) => (options as RequestInit | undefined)?.method === 'POST')).toBe(false)
     await view.cleanup()
   })
 })

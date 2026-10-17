@@ -15,7 +15,7 @@ export type RegistrarSalidaPayload = {
 export type DisponibilidadMaterial = {
   idMaterial: number
   nombreMaterial: string
-  disponible: boolean
+  disponible?: boolean
   stockActual: number
   stockMinimo: number
   cantidadSolicitada: number

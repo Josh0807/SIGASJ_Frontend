@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { IconAlertTriangle, IconCheck, IconInfoCircle, IconX } from '@tabler/icons-react'
 import type { ActivityFeedbackVariant } from '../utils/activityFeedbackMessages'
 
 export type ActivityFeedbackProps = {
@@ -17,6 +18,13 @@ const variantRole = (
 ): 'alert' | 'status' =>
   variant === 'error' || variant === 'warning' ? 'alert' : 'status'
 
+const variantMeta = {
+  success: { title: 'Operación completada', icon: IconCheck },
+  error: { title: 'No se pudo completar', icon: IconX },
+  warning: { title: 'Atención', icon: IconAlertTriangle },
+  info: { title: 'Información', icon: IconInfoCircle },
+} as const
+
 /**
  * Mensaje visual reutilizable del módulo de actividades (inline, sin toast).
  */
@@ -30,6 +38,8 @@ const ActivityFeedback = ({
   className = '',
   testId,
 }: ActivityFeedbackProps) => {
+  const meta = variantMeta[variant]
+  const FeedbackIcon = meta.icon
   const classes = [
     'activity-feedback',
     `activity-feedback--${variant}`,
@@ -40,8 +50,11 @@ const ActivityFeedback = ({
 
   return (
     <div className={classes} role={variantRole(variant)} data-testid={testId}>
+      <span className="activity-feedback__icon" aria-hidden="true">
+        <FeedbackIcon size={23} stroke={2.5} />
+      </span>
       <div className="activity-feedback__body">
-        {title ? <p className="activity-feedback__title">{title}</p> : null}
+        <p className="activity-feedback__title">{title || meta.title}</p>
         <div className="activity-feedback__message">{message}</div>
         {action ? <div className="activity-feedback__action">{action}</div> : null}
       </div>
