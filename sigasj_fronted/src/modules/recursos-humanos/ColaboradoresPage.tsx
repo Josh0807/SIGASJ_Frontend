@@ -3,6 +3,7 @@ import {
   IconChevronRight,
   IconEye,
   IconFilterOff,
+  IconHistory,
   IconPencil,
   IconRefresh,
   IconSearch,
@@ -28,6 +29,7 @@ import {
   RRHH_TITLE,
   colaboradorDetailPath,
   colaboradorEditPath,
+  colaboradorHistorialPath,
 } from './recursosHumanosPaths'
 import RrhhSubnav from './RrhhSubnav'
 import type { Colaborador, ColaboradoresFiltros, ColaboradoresListado, EstadoFiltro } from './types'
@@ -342,6 +344,14 @@ export default function ColaboradoresPage() {
                         >
                           <IconEye size={16} aria-hidden="true" />
                           Ver
+                        </Link>
+                        <Link
+                          to={colaboradorHistorialPath(colaborador.id)}
+                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+                          aria-label={`Ver historial de ${nombre}`}
+                        >
+                          <IconHistory size={16} aria-hidden="true" />
+                          Historial
                         </Link>
                         <Link
                           to={colaboradorEditPath(colaborador.id)}

@@ -202,3 +202,42 @@ export type MovimientoVacacionesPayload = {
   fecha: string
   observaciones?: string | null
 }
+
+export type TipoEventoHistorialRrhh = 'PERMISO' | 'VACACION' | 'INCAPACIDAD'
+
+export type HistorialColaboradorResumen = {
+  id: number
+  nombre: string
+  apellidos: string
+  cedula: string
+  cargo: string
+}
+
+export type EventoHistorialColaborador = {
+  id: number
+  tipo: TipoEventoHistorialRrhh
+  fecha: string
+  fechaInicio: string | null
+  fechaFin: string | null
+  descripcion: string
+  motivo?: string | null
+  tipoMovimiento?: TipoMovimientoVacaciones
+  cantidadDias?: number
+  observaciones?: string | null
+}
+
+export type HistorialColaboradorRespuesta = {
+  colaborador: HistorialColaboradorResumen
+  historial: EventoHistorialColaborador[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type HistorialColaboradorFiltros = {
+  tipo: TipoEventoHistorialRrhh | ''
+  fechaDesde: string
+  fechaHasta: string
+  page: number
+}
