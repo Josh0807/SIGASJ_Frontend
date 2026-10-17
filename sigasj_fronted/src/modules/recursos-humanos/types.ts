@@ -110,6 +110,46 @@ export type PermisoPayload = {
   observaciones?: string | null
 }
 
+export type Incapacidad = {
+  id: number
+  colaboradorId: number
+  fechaInicio: string
+  fechaFin: string
+  observaciones: string | null
+  colaborador?: PermisoColaboradorResumen | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type IncapacidadesListado = {
+  data: Incapacidad[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type IncapacidadesFiltros = {
+  colaboradorId: string
+  fechaInicio: string
+  fechaFin: string
+  page: number
+}
+
+export type IncapacidadFormValues = {
+  colaboradorId: string
+  fechaInicio: string
+  fechaFin: string
+  observaciones: string
+}
+
+export type IncapacidadPayload = {
+  colaboradorId: number
+  fechaInicio: string
+  fechaFin: string
+  observaciones?: string | null
+}
+
 export type TipoMovimientoVacaciones = 'ACUMULADO' | 'DISFRUTADO'
 
 export type MovimientoVacaciones = {

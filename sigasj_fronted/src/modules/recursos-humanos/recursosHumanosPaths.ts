@@ -12,6 +12,11 @@ export const PERMISO_NEW_PATH = `${PERMISOS_PATH}/nuevo`
 export const permisoDetailPath = (id: number) => `${PERMISOS_PATH}/${id}`
 export const permisoEditPath = (id: number) => `${PERMISOS_PATH}/${id}/editar`
 
+export const INCAPACIDADES_PATH = `${RRHH_PATH}/incapacidades`
+export const INCAPACIDAD_NEW_PATH = `${INCAPACIDADES_PATH}/nuevo`
+export const incapacidadDetailPath = (id: number) => `${INCAPACIDADES_PATH}/${id}`
+export const incapacidadEditPath = (id: number) => `${INCAPACIDADES_PATH}/${id}/editar`
+
 export const VACACIONES_PATH = `${RRHH_PATH}/vacaciones`
 export const vacacionesColaboradorPath = (colaboradorId: number) =>
   `${VACACIONES_PATH}?colaboradorId=${colaboradorId}`
