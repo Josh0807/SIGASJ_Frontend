@@ -16,7 +16,7 @@ import AveriasFontaneroObservacionForm from './AveriasFontaneroObservacionForm'
 import AveriasFontaneroResolverDialog from './AveriasFontaneroResolverDialog'
 import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
 import { averiaCalificadaParaAtencion } from './averiaCalificada'
-import { telefonoHref } from './contactoAveria'
+import { mapasHref, telefonoHref } from './contactoAveria'
 import {
   puedeCalificarAveria,
   puedeIntentarIniciarAtencionAveria,
@@ -75,6 +75,7 @@ const AveriasFontaneroDetailView = ({
   const puedeRegistrar = puedeRegistrarObservacionAveria(estado)
   const puedeCalificar = puedeCalificarAveria(estado)
   const enlaceTelefono = telefonoHref(averia.telefonoReportante)
+  const enlaceMapas = mapasHref(averia.ubicacion)
   const [resolverOpen, setResolverOpen] = useState(false)
   const [iniciarError, setIniciarError] = useState<string | null>(null)
   const [iniciando, setIniciando] = useState(false)
@@ -101,6 +102,16 @@ const AveriasFontaneroDetailView = ({
           </AveriasDetailField>
           <AveriasDetailField label="Dirección" multiline modern>
             <span className="averias-admin__prewrap">{averia.ubicacion}</span>
+            {enlaceMapas ? (
+              <a
+                className="averias-fontanero__enlace"
+                href={enlaceMapas}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Cómo llegar
+              </a>
+            ) : null}
           </AveriasDetailField>
         </dl>
       </section>

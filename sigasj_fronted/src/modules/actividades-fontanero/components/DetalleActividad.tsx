@@ -5,6 +5,7 @@ import { formatActividadEstado } from '../utils/formatActividadEstado'
 import { formatActividadFecha } from '../utils/formatActividadFecha'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import ActivityFeedback from './ActivityFeedback'
+import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 
 type DetalleActividadProps = {
   actividad: ActividadFontaneroRegistrada | null
@@ -123,16 +124,16 @@ const DetalleActividad = ({
             <div>
               <dt>Fecha de registro</dt>
               <dd>
-                {new Date(
+                {formatearFechaHoraAsada(
                   actividad.fechaRegistro || actividad.createdAt,
-                ).toLocaleString('es-CR')}
+                )}
               </dd>
             </div>
           ) : null}
           {revisada && actividad.fechaRevision ? (
             <div>
               <dt>Fecha de revisión</dt>
-              <dd>{new Date(actividad.fechaRevision).toLocaleString('es-CR')}</dd>
+              <dd>{formatearFechaHoraAsada(actividad.fechaRevision)}</dd>
             </div>
           ) : null}
           {revisada && actividad.revisadoPorId ? (

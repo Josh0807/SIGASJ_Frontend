@@ -14,7 +14,8 @@ const toDateInput = (value?: string | null) =>
   value ? value.slice(0, 10) : ''
 
 const toIsoDate = (value: string) =>
-  value ? new Date(`${value}T12:00:00`).toISOString() : ''
+  // Mediodía de Costa Rica (UTC-6): el día no cambia sea cual sea la zona del navegador.
+  value ? new Date(`${value}T12:00:00-06:00`).toISOString() : ''
 
 const ComunicadosAdminPage = () => {
   const [items, setItems] = useState<AdminComunicado[]>([])

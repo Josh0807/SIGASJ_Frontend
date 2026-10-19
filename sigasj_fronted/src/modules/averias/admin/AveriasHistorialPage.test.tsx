@@ -148,7 +148,7 @@ describe('AveriasHistorialPage', () => {
     expect(container.querySelector('.averias-admin__cards')).toBeTruthy()
 
     const detail = [...container.querySelectorAll('a')].find(
-      (anchor) => anchor.textContent === 'Ver detalle',
+      (anchor) => anchor.textContent?.trim() === 'Ver detalle',
     )
     expect(detail?.getAttribute('href')).toBe('/admin/averias/1')
   })
@@ -170,7 +170,7 @@ describe('AveriasHistorialPage', () => {
 
     const detail = [...container.querySelectorAll('a')].find(
       (anchor) =>
-        anchor.textContent === 'Ver detalle' &&
+        anchor.textContent?.trim() === 'Ver detalle' &&
         anchor.getAttribute('href') === '/admin/averias/5',
     )
     await act(async () => {

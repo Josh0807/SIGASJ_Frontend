@@ -51,10 +51,13 @@ describe('formulario de colaborador', () => {
     expect(toColaboradorPayload({ ...valid, usuarioId: '7' }, 'crear').usuarioId).toBe(7)
   })
 
-  it('muestra las fechas de auditoría con la hora guardada en SQL Server', () => {
+  it('muestra las fechas de auditoría en hora de Costa Rica (UTC-6)', () => {
+    // 11:49Z son las 5:49 a. m. en Costa Rica
     const texto = formatearFechaAuditoria('2026-10-08T11:49:14.113Z')
-    expect(texto).toMatch(/11:49/)
+    expect(texto).toMatch(/5:49/)
     expect(texto).toMatch(/2026/)
+    // 02:35Z del 18 sigue siendo el día 17 allá
+    expect(formatearFechaAuditoria('2026-10-18T02:35:47.000Z')).toMatch(/17 oct/)
     expect(formatearFechaAuditoria('no-es-fecha')).toBe('—')
   })
 

@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import type {
   CreateSolicitudMaterialesPayload,
   SolicitudMaterialFormErrors,
@@ -101,7 +102,7 @@ export const formatSolicitudDate = (value: string) => {
   const date = new Date(value)
   return Number.isNaN(date.getTime())
     ? 'Fecha no disponible'
-    : new Intl.DateTimeFormat('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
+    : new Intl.DateTimeFormat('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: ZONA_HORARIA_ASADA }).format(date)
 }
 
 export const formatSolicitudStatus = (status: string) => {

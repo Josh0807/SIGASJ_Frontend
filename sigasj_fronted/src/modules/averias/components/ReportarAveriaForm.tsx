@@ -28,11 +28,16 @@ export default function ReportarAveriaForm() {
   const [submittedReport, setSubmittedReport] = useState<PublicAveriaConfirmation | null>(null)
   const [cedulaMensaje, setCedulaMensaje] = useState<string | null>(null)
   const consultaCedulaRef = useRef(0)
+  const cedulaTimerRef = useRef<number | null>(null)
+  const ultimaCedulaConsultadaRef = useRef('')
 
   useEffect(() => {
     mountedRef.current = true
     return () => {
       mountedRef.current = false
+      if (cedulaTimerRef.current !== null) {
+        window.clearTimeout(cedulaTimerRef.current)
+      }
     }
   }, [])
 
@@ -41,6 +46,17 @@ export default function ReportarAveriaForm() {
     setErrors((current) => ({ ...current, [name]: undefined }))
     if (name === 'identificacionReportante') {
       setCedulaMensaje(null)
+      if (cedulaTimerRef.current !== null) {
+        window.clearTimeout(cedulaTimerRef.current)
+        cedulaTimerRef.current = null
+      }
+      const digitos = value.replace(/D/g, '')
+      // Al completar una cédula válida se consulta sola, sin esperar a salir del campo.
+      if (digitos.length >= 9 && digitos.length <= 12) {
+        cedulaTimerRef.current = window.setTimeout(() => {
+          void consultarIdentificacion(value)
+        }, 600)
+      }
     }
   }
 
@@ -54,6 +70,11 @@ export default function ReportarAveriaForm() {
       )
       return
     }
+
+    if (ultimaCedulaConsultadaRef.current === digitos) {
+      return
+    }
+    ultimaCedulaConsultadaRef.current = digitos
 
     const consultaId = consultaCedulaRef.current + 1
     consultaCedulaRef.current = consultaId
@@ -88,6 +109,7 @@ export default function ReportarAveriaForm() {
       if (error instanceof Error && error.name === 'AbortError') {
         return
       }
+      ultimaCedulaConsultadaRef.current = ''
       setCedulaMensaje(
         'No fue posible consultar la cédula. Puede escribir los datos manualmente.',
       )
@@ -220,32 +242,8 @@ export default function ReportarAveriaForm() {
           <h2 id={`${idPrefix}-reportante`}>Datos del Reportante</h2>
           <div className="public-averia-form__grid public-averia-form__grid--pair">
             <div className="public-averia-form__field">
-              <label htmlFor={fieldId(idPrefix, 'nombreReportante')}>
-                {requiredLabel('Nombre completo')}
-              </label>
-              <input
-                id={fieldId(idPrefix, 'nombreReportante')}
-                name="nombreReportante"
-                type="text"
-                autoComplete="name"
-                maxLength={150}
-                required
-                aria-required="true"
-                aria-invalid={Boolean(errors.nombreReportante)}
-                aria-describedby={errorId('nombreReportante')}
-                value={values.nombreReportante}
-                onChange={(event) => update('nombreReportante', event.target.value)}
-              />
-              {errors.nombreReportante ? (
-                <small id={errorId('nombreReportante')} className="public-averia-form__error" role="alert">
-                  {errors.nombreReportante}
-                </small>
-              ) : null}
-            </div>
-
-            <div className="public-averia-form__field">
               <label htmlFor={fieldId(idPrefix, 'identificacionReportante')}>
-                {optionalLabel('Número de cédula o identificación')}
+                Número de cédula o identificación
               </label>
               <input
                 id={fieldId(idPrefix, 'identificacionReportante')}
@@ -282,6 +280,30 @@ export default function ReportarAveriaForm() {
                   role="status"
                 >
                   {cedulaMensaje}
+                </small>
+              ) : null}
+            </div>
+
+            <div className="public-averia-form__field">
+              <label htmlFor={fieldId(idPrefix, 'nombreReportante')}>
+                {requiredLabel('Nombre completo')}
+              </label>
+              <input
+                id={fieldId(idPrefix, 'nombreReportante')}
+                name="nombreReportante"
+                type="text"
+                autoComplete="name"
+                maxLength={150}
+                required
+                aria-required="true"
+                aria-invalid={Boolean(errors.nombreReportante)}
+                aria-describedby={errorId('nombreReportante')}
+                value={values.nombreReportante}
+                onChange={(event) => update('nombreReportante', event.target.value)}
+              />
+              {errors.nombreReportante ? (
+                <small id={errorId('nombreReportante')} className="public-averia-form__error" role="alert">
+                  {errors.nombreReportante}
                 </small>
               ) : null}
             </div>
