@@ -1,5 +1,6 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import { appendFormValue, fetchPublicApi } from '../../../services/http/publicApi'
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import type { AdminTransparenciaPublication, TransparenciaFormValues } from '../admin/types'
 import type { TransparencyPublication, TransparencyFileType } from '../public/TransparencySectionProps'
 
@@ -29,7 +30,7 @@ export const mapPublicTransparencyPublication = (
   id: String(item.id),
   name: item.nombre || item.name || 'Publicación de transparencia',
   description: item.descripcionBreve || item.descripcion || item.description || '',
-  fileUrl: item.archivoUrl || item.fileUrl || item.url || '',
+  fileUrl: resolveBackendAssetUrl(item.archivoUrl || item.fileUrl || item.url) || '',
   fileType: item.tipoArchivo || item.fileType || 'pdf',
 })
 
@@ -39,7 +40,7 @@ export const mapAdminTransparencyPublication = (
   id: typeof item.id === 'number' ? item.id : Number(item.id),
   nombre: item.nombre || item.name || '',
   descripcionBreve: item.descripcionBreve || item.descripcion || item.description || '',
-  archivoUrl: item.archivoUrl || item.fileUrl || item.url || '',
+  archivoUrl: resolveBackendAssetUrl(item.archivoUrl || item.fileUrl || item.url) || '',
   tipoArchivo: item.tipoArchivo || item.fileType || 'pdf',
   ordenVisualizacion: item.ordenVisualizacion ?? 0,
   activo: item.activa ?? item.activo ?? true,

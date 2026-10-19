@@ -17,6 +17,7 @@ import {
 } from './colaboradorForm'
 import {
   EMPTY_INCAPACIDAD_VALUES,
+  ORIGENES_INCAPACIDAD,
   incapacidadErrorMessage,
   toIncapacidadFormValues,
   toIncapacidadPayload,
@@ -353,6 +354,33 @@ export default function IncapacidadFormPage() {
                     {errors.fechaFin}
                   </small>
                 ) : null}
+              </label>
+
+              <label className="grid min-w-0 gap-2.5 lg:col-span-2">
+                <span className="text-sm font-bold text-[#163f6b]">
+                  Origen (opcional)
+                </span>
+                <select
+                  className="min-h-14 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  value={values.origen}
+                  aria-label="Origen de la incapacidad"
+                  onChange={(event) =>
+                    update(
+                      'origen',
+                      event.target.value as typeof values.origen,
+                    )
+                  }
+                >
+                  <option value="">Sin indicar</option>
+                  {ORIGENES_INCAPACIDAD.map((opcion) => (
+                    <option key={opcion.value} value={opcion.value}>
+                      {opcion.label}
+                    </option>
+                  ))}
+                </select>
+                <small className="text-slate-500">
+                  Solo referencia administrativa (CCSS, INS u otro). Sin datos médicos.
+                </small>
               </label>
 
               <label className="grid min-w-0 gap-2.5 lg:col-span-2">

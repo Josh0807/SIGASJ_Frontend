@@ -1,5 +1,7 @@
 import {
   IconArrowLeft,
+  IconBeach,
+  IconCalendarOff,
   IconHistory,
   IconPencil,
   IconRefresh,
@@ -20,10 +22,12 @@ import {
   nombreCompleto,
 } from './colaboradorForm'
 import {
+  INCAPACIDADES_PATH,
   RRHH_PATH,
   RRHH_TITLE,
   colaboradorEditPath,
   colaboradorHistorialPath,
+  vacacionesColaboradorPath,
 } from './recursosHumanosPaths'
 import type { Colaborador } from './types'
 
@@ -164,11 +168,25 @@ export default function ColaboradorDetallePage() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
+                to={vacacionesColaboradorPath(colaborador.id)}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 font-bold text-emerald-800 no-underline transition hover:border-emerald-400 hover:bg-emerald-100 hover:no-underline"
+              >
+                <IconBeach size={19} aria-hidden="true" />
+                Vacaciones
+              </Link>
+              <Link
+                to={`${INCAPACIDADES_PATH}?colaboradorId=${colaborador.id}`}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 font-bold text-amber-900 no-underline transition hover:border-amber-400 hover:bg-amber-100 hover:no-underline"
+              >
+                <IconCalendarOff size={19} aria-hidden="true" />
+                Incapacidades
+              </Link>
+              <Link
                 to={colaboradorHistorialPath(colaborador.id)}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 font-bold text-slate-700 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
               >
                 <IconHistory size={19} aria-hidden="true" />
-                Ver historial
+                Historial
               </Link>
               <Link
                 to={colaboradorEditPath(colaborador.id)}

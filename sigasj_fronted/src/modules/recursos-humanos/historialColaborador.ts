@@ -43,8 +43,11 @@ export const detalleEventoHistorial = (
     evento.cantidadDias != null &&
     evento.tipoMovimiento
   ) {
-    const signo = evento.tipoMovimiento === 'ACUMULADO' ? '+' : '−'
-    return `${signo}${evento.cantidadDias} día(s)`
+    const n = evento.cantidadDias
+    const dias = `${n} día${n === 1 ? '' : 's'}`
+    return evento.tipoMovimiento === 'ACUMULADO'
+      ? `+${dias} adquirido${n === 1 ? '' : 's'}`
+      : `${dias} disfrutado${n === 1 ? '' : 's'}`
   }
   return 'Sin detalle'
 }

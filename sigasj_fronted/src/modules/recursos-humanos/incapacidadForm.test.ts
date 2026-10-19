@@ -13,6 +13,7 @@ const valid = {
   fechaInicio: '2026-10-12',
   fechaFin: '2026-10-20',
   observaciones: ' Documento entregado ',
+  origen: '' as const,
 }
 
 describe('formulario de incapacidad', () => {
@@ -38,6 +39,7 @@ describe('formulario de incapacidad', () => {
     expect(toIncapacidadPayload(valid)).toEqual({
       colaboradorId: 3,
       fechaInicio: '2026-10-12',
+      origen: null,
       fechaFin: '2026-10-20',
       observaciones: 'Documento entregado',
     })

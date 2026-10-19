@@ -1,16 +1,18 @@
 import { getActividadesAdmin } from '../../actividades-fontanero/services/actividadesFontaneroApi'
 import type { ActividadFontaneroRegistrada } from '../../actividades-fontanero/types/actividadFontaneroApi'
 import { normalizeActividadFontanero } from '../../actividades-fontanero/utils/normalizeActividadFontanero'
+import { getAsociados } from '../../asociados/asociadosApi'
 import { getAdminAverias } from '../../averias/services/averiasAdminApi'
 import { getFontaneroAverias } from '../../averias/services/averiasFontaneroApi'
 import type { AveriaListItem } from '../../averias/admin/types'
 import type { AveriaFontaneroListItem } from '../../averias/fontanero/types'
+import { getAlertasReposicionAdmin } from '../../inventario/alertas-reposicion/alertasReposicionApi'
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import type { ActivityItem, AlertItem } from '../props'
 
 export type DashboardSummaryData = {
   abonadosActivos?: number | string | null
-  lecturasPendientes?: number | string | null
+  alertasReposicionPendientes?: number | string | null
   averiasReportadas?: number | string | null
   solicitudesEnTramite?: number | string | null
 }
@@ -164,39 +166,44 @@ export async function getDashboardSummary(): Promise<DashboardSummaryData> {
 }
 
 /**
- * Asociados activos = usuarios persistidos con rol ABONADO y activo.
- * No hay padrón de abonados aparte en el Backend.
+ * Asociados activos = total del padrón (`GET /asociados?activo=true`).
+ * No se cuentan usuarios con rol ABONADO: el padrón vive en el módulo de asociados.
  */
 export async function getAbonadosSummaryMetric(): Promise<ModuleSummaryMetric> {
   try {
-    const raw = await fetchWithAuth<unknown>('/usuarios')
-    const rows = readList(raw, ['data'])
-    const count = rows.filter((row) => {
-      const item = asRecord(row)
-      if (!item) {
-        return false
-      }
-      const rol = String(item.rol ?? '').trim().toUpperCase()
-      if (rol !== 'ABONADO') {
-        return false
-      }
-      return item.activo !== false
-    }).length
-    return { key: 'abonadosActivos', value: count }
+    const listado = await getAsociados({
+      search: '',
+      estado: 'activos',
+      page: 1,
+    })
+    return {
+      key: 'abonadosActivos',
+      value: typeof listado.total === 'number' ? listado.total : null,
+    }
   } catch {
     return { key: 'abonadosActivos', value: null }
   }
 }
 
 /**
- * No existe módulo de lecturas en el Backend. N/D, sin inventar cifras.
+ * Alertas de reposición en estado PENDIENTE (stock en o bajo mínimo).
  */
-export async function getLecturasSummaryMetric(): Promise<ModuleSummaryMetric> {
+export async function getAlertasReposicionSummaryMetric(): Promise<ModuleSummaryMetric> {
   try {
-    const data = await fetchWithAuth<{ pendientes?: number | string }>('/lecturas/resumen')
-    return { key: 'lecturasPendientes', value: data.pendientes ?? null }
+    const listado = await getAlertasReposicionAdmin({
+      estado: 'PENDIENTE',
+      page: 1,
+      limit: 1,
+    })
+    if (Array.isArray(listado)) {
+      return { key: 'alertasReposicionPendientes', value: listado.length }
+    }
+    return {
+      key: 'alertasReposicionPendientes',
+      value: typeof listado.total === 'number' ? listado.total : null,
+    }
   } catch {
-    return { key: 'lecturasPendientes', value: null }
+    return { key: 'alertasReposicionPendientes', value: null }
   }
 }
 

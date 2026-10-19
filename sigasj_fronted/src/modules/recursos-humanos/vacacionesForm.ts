@@ -16,13 +16,27 @@ export const TIPOS_MOVIMIENTO_VACACIONES: ReadonlyArray<{
   label: string
   descripcion: string
 }> = [
-  { value: 'ACUMULADO', label: 'Acumulado', descripcion: 'Suma días al saldo disponible.' },
-  { value: 'DISFRUTADO', label: 'Disfrutado', descripcion: 'Resta días del saldo disponible.' },
+  {
+    value: 'ACUMULADO',
+    label: 'Adquisición',
+    descripcion: 'Registra días de vacaciones adquiridos (suma al saldo disponible).',
+  },
+  {
+    value: 'DISFRUTADO',
+    label: 'Disfrute',
+    descripcion: 'Registra días disfrutados (resta del saldo disponible).',
+  },
+  {
+    value: 'AJUSTE',
+    label: 'Ajuste',
+    descripcion: 'Corrección administrativa con motivo obligatorio (suma o resta).',
+  },
 ]
 
 export const EMPTY_MOVIMIENTO_VACACIONES_VALUES: MovimientoVacacionesFormValues = {
   tipo: '',
   cantidadDias: '',
+  signoAjuste: '',
   fecha: '',
   observaciones: '',
 }
@@ -30,13 +44,37 @@ export const EMPTY_MOVIMIENTO_VACACIONES_VALUES: MovimientoVacacionesFormValues 
 export const tipoMovimientoLabel = (tipo: TipoMovimientoVacaciones) =>
   TIPOS_MOVIMIENTO_VACACIONES.find((item) => item.value === tipo)?.label ?? tipo
 
-/** `+2` para acumulados y `-3` para disfrutados, como en el historial del requerimiento. */
-export const diasConSigno = (movimiento: Pick<MovimientoVacaciones, 'tipo' | 'cantidadDias'>) =>
-  `${movimiento.tipo === 'DISFRUTADO' ? '-' : '+'}${movimiento.cantidadDias}`
+export const diasConSigno = (
+  movimiento: Pick<MovimientoVacaciones, 'tipo' | 'cantidadDias' | 'signoAjuste'>,
+) => {
+  if (movimiento.tipo === 'DISFRUTADO') return `-${movimiento.cantidadDias}`
+  if (movimiento.tipo === 'AJUSTE') {
+    const signo = movimiento.signoAjuste === -1 ? '-' : '+'
+    return `${signo}${movimiento.cantidadDias}`
+  }
+  return `+${movimiento.cantidadDias}`
+}
 
 export const pluralDias = (cantidad: number) => `${cantidad} día${cantidad === 1 ? '' : 's'}`
 
-/** Formato corto dd/MM/yyyy sin desfase de zona horaria. */
+export const avisoMovimientoRegistrado = (
+  tipo: TipoMovimientoVacaciones,
+  cantidadDias: number,
+  signoAjuste?: 1 | -1 | null,
+) => {
+  const dias = pluralDias(cantidadDias)
+  const unDia = cantidadDias === 1
+  if (tipo === 'ACUMULADO') {
+    return `${unDia ? 'Se registró' : 'Se registraron'} ${dias} adquirido${unDia ? '' : 's'}.`
+  }
+  if (tipo === 'DISFRUTADO') {
+    return `${unDia ? 'Se registró' : 'Se registraron'} ${dias} disfrutado${unDia ? '' : 's'}.`
+  }
+  const verbo = signoAjuste === -1 ? 'restaron' : 'sumaron'
+  const verboUno = signoAjuste === -1 ? 'restó' : 'sumó'
+  return `${unDia ? `Se ${verboUno}` : `Se ${verbo}`} ${dias} de ajuste.`
+}
+
 export const formatearFechaMovimiento = (valor: string) => {
   if (typeof valor !== 'string') return '—'
   const iso = fechaPermisoIso(valor)
@@ -57,7 +95,7 @@ export function validateMovimientoVacaciones(
   if (!values.tipo) {
     errors.tipo = 'Seleccione el tipo de movimiento.'
   } else if (!esTipoMovimiento(values.tipo)) {
-    errors.tipo = 'El tipo debe ser Acumulado o Disfrutado.'
+    errors.tipo = 'El tipo debe ser Adquisición, Disfrute o Ajuste.'
   }
 
   const cantidadTexto = values.cantidadDias.trim()
@@ -74,6 +112,22 @@ export function validateMovimientoVacaciones(
     cantidad > diasDisponibles
   ) {
     errors.cantidadDias = `Solo hay ${pluralDias(diasDisponibles)} disponible${diasDisponibles === 1 ? '' : 's'}.`
+  } else if (
+    values.tipo === 'AJUSTE' &&
+    values.signoAjuste === '-1' &&
+    diasDisponibles !== null &&
+    cantidad > diasDisponibles
+  ) {
+    errors.cantidadDias = `Solo hay ${pluralDias(diasDisponibles)} disponible${diasDisponibles === 1 ? '' : 's'}.`
+  }
+
+  if (values.tipo === 'AJUSTE') {
+    if (values.signoAjuste !== '1' && values.signoAjuste !== '-1') {
+      errors.signoAjuste = 'Indique si el ajuste suma o resta.'
+    }
+    if (!values.observaciones.trim()) {
+      errors.observaciones = 'El motivo del ajuste es obligatorio.'
+    }
   }
 
   if (!values.fecha.trim()) {
@@ -93,13 +147,17 @@ export function toMovimientoVacacionesPayload(
   values: MovimientoVacacionesFormValues,
 ): MovimientoVacacionesPayload {
   const observaciones = values.observaciones.trim()
-  return {
+  const payload: MovimientoVacacionesPayload = {
     colaboradorId,
     tipo: values.tipo as TipoMovimientoVacaciones,
     cantidadDias: Number(values.cantidadDias.trim()),
     fecha: values.fecha.trim(),
     observaciones: observaciones === '' ? null : observaciones,
   }
+  if (values.tipo === 'AJUSTE') {
+    payload.signoAjuste = values.signoAjuste === '-1' ? -1 : 1
+  }
+  return payload
 }
 
 const detalleBackend = (error: unknown): string => {
@@ -115,7 +173,7 @@ const detalleBackend = (error: unknown): string => {
         .join(' ')
     }
   } catch {
-    // El backend también puede responder un único mensaje de texto.
+    // texto plano
   }
   return detail
 }

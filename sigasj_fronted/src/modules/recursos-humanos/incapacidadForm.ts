@@ -14,11 +14,21 @@ export type IncapacidadFormErrors = Partial<
   Record<keyof IncapacidadFormValues, string>
 >
 
+export const ORIGENES_INCAPACIDAD: ReadonlyArray<{
+  value: NonNullable<IncapacidadFormValues['origen']>
+  label: string
+}> = [
+  { value: 'CCSS', label: 'CCSS' },
+  { value: 'INS', label: 'INS' },
+  { value: 'OTRO', label: 'Otro' },
+]
+
 export const EMPTY_INCAPACIDAD_VALUES: IncapacidadFormValues = {
   colaboradorId: '',
   fechaInicio: '',
   fechaFin: '',
   observaciones: '',
+  origen: '',
 }
 
 export { esFechaCalendario, formatearFechaPermiso }
@@ -77,6 +87,7 @@ export function toIncapacidadPayload(
     fechaInicio: values.fechaInicio,
     fechaFin: values.fechaFin,
     observaciones: observaciones === '' ? null : observaciones,
+    origen: values.origen === '' ? null : values.origen,
   }
 }
 
@@ -87,6 +98,7 @@ export const toIncapacidadFormValues = (
   fechaInicio: fechaPermisoIso(incapacidad.fechaInicio),
   fechaFin: fechaPermisoIso(incapacidad.fechaFin),
   observaciones: incapacidad.observaciones ?? '',
+  origen: incapacidad.origen ?? '',
 })
 
 export function incapacidadErrorMessage(

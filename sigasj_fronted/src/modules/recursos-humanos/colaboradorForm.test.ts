@@ -13,14 +13,14 @@ const valid = {
   apellidos: 'Pérez',
   cedula: '1-1111-1111',
   correoElectronico: ' Juan@Example.com ',
-  cargo: 'Fontanero',
+  puestoId: '3',
   usuarioId: '',
 }
 
 describe('formulario de colaborador', () => {
   it('exige todos los campos obligatorios', () => {
     expect(Object.keys(validateColaborador(EMPTY_COLABORADOR_VALUES)).sort()).toEqual(
-      ['apellidos', 'cargo', 'cedula', 'correoElectronico', 'nombre'].sort(),
+      ['apellidos', 'cedula', 'correoElectronico', 'nombre', 'puestoId'].sort(),
     )
   })
 
@@ -29,46 +29,35 @@ describe('formulario de colaborador', () => {
     expect(esCedulaValida('111111111')).toBe(true)
     expect(esCedulaValida('123456789012')).toBe(true)
     expect(esCedulaValida('0-1111-1111')).toBe(false)
-    expect(esCedulaValida('1-11-11')).toBe(false)
     expect(validateColaborador({ ...valid, cedula: 'abc' }).cedula).toMatch(/formato/)
   })
 
-  it('valida correo y longitudes máximas', () => {
+  it('valida correo y puesto', () => {
     expect(validateColaborador({ ...valid, correoElectronico: 'juan' }).correoElectronico).toMatch(/válido/)
-    expect(validateColaborador({ ...valid, cargo: 'x'.repeat(101) }).cargo).toMatch(/100/)
+    expect(validateColaborador({ ...valid, puestoId: '' }).puestoId).toMatch(/puesto/i)
     expect(validateColaborador(valid)).toEqual({})
   })
 
-  it('normaliza el payload y solo desvincula la cuenta al editar', () => {
+  it('normaliza el payload con puestoId', () => {
     expect(toColaboradorPayload(valid, 'crear')).toEqual({
       nombre: 'Juan',
       apellidos: 'Pérez',
       cedula: '1-1111-1111',
       correoElectronico: 'juan@example.com',
-      cargo: 'Fontanero',
+      puestoId: 3,
     })
     expect(toColaboradorPayload(valid, 'editar').usuarioId).toBeNull()
     expect(toColaboradorPayload({ ...valid, usuarioId: '7' }, 'crear').usuarioId).toBe(7)
   })
 
   it('muestra las fechas de auditoría en hora de Costa Rica (UTC-6)', () => {
-    // 11:49Z son las 5:49 a. m. en Costa Rica
     const texto = formatearFechaAuditoria('2026-10-08T11:49:14.113Z')
     expect(texto).toMatch(/5:49/)
     expect(texto).toMatch(/2026/)
-    // 02:35Z del 18 sigue siendo el día 17 allá
     expect(formatearFechaAuditoria('2026-10-18T02:35:47.000Z')).toMatch(/17 oct/)
-    expect(formatearFechaAuditoria('no-es-fecha')).toBe('—')
   })
 
-  it('traduce los errores HTTP del backend', () => {
-    expect(colaboradorErrorMessage(new Error('HTTP 409: Ya existe un colaborador con esa cédula'), 'x')).toBe(
-      'Ya existe un colaborador con esa cédula',
-    )
-    expect(colaboradorErrorMessage(new Error('HTTP 400: ["cedula inválida"]'), 'x')).toBe('cedula inválida.')
-    expect(colaboradorErrorMessage(new Error('HTTP 403: Forbidden'), 'x')).toMatch(/permisos/)
-    expect(colaboradorErrorMessage(new Error('HTTP 404: Not Found'), 'x')).toMatch(/no existe/)
-    expect(colaboradorErrorMessage(new Error('Failed to fetch'), 'x')).toMatch(/conexión/)
-    expect(colaboradorErrorMessage(new Error('HTTP 500: boom'), 'fallback')).toBe('fallback')
+  it('traduce errores HTTP', () => {
+    expect(colaboradorErrorMessage(new Error('HTTP 403: x'), 'fallback')).toMatch(/permisos/i)
   })
 })

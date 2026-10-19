@@ -68,4 +68,26 @@ describe('notificacionesApi', () => {
       }),
     ).toEqual({ data: [], noLeidas: 0 })
   })
+
+  it('acepta notificaciones de solicitud de ausencia sin idAveria', () => {
+    const listado = parseNotificacionesListado({
+      data: [
+        {
+          id: 9,
+          idAveria: null,
+          idSolicitudAusencia: 12,
+          tipo: 'SOLICITUD_AUSENCIA_PENDIENTE_ADMINISTRADORA',
+          titulo: 'Solicitud de permiso pendiente',
+          mensaje: 'Juan Fontanero solicitó permiso (2026-11-01 – 2026-11-02).',
+          leida: false,
+          fechaCreacion: '2026-10-19T15:00:00.000Z',
+          fechaLectura: null,
+        },
+      ],
+      noLeidas: 1,
+    })
+    expect(listado.data).toHaveLength(1)
+    expect(listado.data[0]?.idSolicitudAusencia).toBe(12)
+    expect(listado.data[0]?.idAveria).toBeNull()
+  })
 })

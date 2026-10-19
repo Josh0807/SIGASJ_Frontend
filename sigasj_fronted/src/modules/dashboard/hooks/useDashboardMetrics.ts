@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   getAbonadosSummaryMetric,
+  getAlertasReposicionSummaryMetric,
   getAveriasSummaryMetric,
   getDashboardSummary,
-  getLecturasSummaryMetric,
   getSolicitudesSummaryMetric,
   type DashboardSummaryData,
 } from '../services/dashboardService'
@@ -17,14 +17,14 @@ export type UseDashboardMetricsResult = {
 
 const EMPTY_METRICS: DashboardSummaryData = {
   abonadosActivos: null,
-  lecturasPendientes: null,
+  alertasReposicionPendientes: null,
   averiasReportadas: null,
   solicitudesEnTramite: null,
 }
 
 const DEFAULT_METRIC_KEYS = [
   'abonadosActivos',
-  'lecturasPendientes',
+  'alertasReposicionPendientes',
   'averiasReportadas',
   'solicitudesEnTramite',
 ] as const satisfies readonly (keyof DashboardSummaryData)[]
@@ -33,8 +33,8 @@ const loadMetric = (key: keyof DashboardSummaryData) => {
   if (key === 'abonadosActivos') {
     return getAbonadosSummaryMetric()
   }
-  if (key === 'lecturasPendientes') {
-    return getLecturasSummaryMetric()
+  if (key === 'alertasReposicionPendientes') {
+    return getAlertasReposicionSummaryMetric()
   }
   if (key === 'averiasReportadas') {
     return getAveriasSummaryMetric()
@@ -44,7 +44,7 @@ const loadMetric = (key: keyof DashboardSummaryData) => {
 
 const hasSummaryValues = (summary: DashboardSummaryData): boolean =>
   summary.abonadosActivos !== undefined ||
-  summary.lecturasPendientes !== undefined ||
+  summary.alertasReposicionPendientes !== undefined ||
   summary.averiasReportadas !== undefined ||
   summary.solicitudesEnTramite !== undefined
 
@@ -105,9 +105,6 @@ export function useDashboardMetrics(
           return
         }
         fetchedMetrics[result.value.key] = result.value.value
-        if (result.value.key === 'lecturasPendientes') {
-          return
-        }
         accountable += 1
         if (result.value.value === null) {
           failed += 1

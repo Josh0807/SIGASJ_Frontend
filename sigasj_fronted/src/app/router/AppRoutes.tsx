@@ -11,6 +11,13 @@ import AveriasFontaneroDetailPage from '../../modules/averias/fontanero/AveriasF
 import AveriasFontaneroListPage from '../../modules/averias/fontanero/AveriasFontaneroListPage'
 import { FONTANERO_AVERIAS_PATH } from '../../modules/averias/fontanero/averiasFontaneroPaths'
 import { InternalAdminRoleName } from '../../modules/auth/utils/internalRoles'
+import MiSolicitudAusenciaDetallePage from '../../modules/solicitudes-ausencia/fontanero/MiSolicitudAusenciaDetallePage'
+import MisSolicitudesAusenciaPage from '../../modules/solicitudes-ausencia/fontanero/MisSolicitudesAusenciaPage'
+import SolicitarAusenciaPage from '../../modules/solicitudes-ausencia/fontanero/SolicitarAusenciaPage'
+import {
+  FONTANERO_MIS_SOLICITUDES_PATH,
+  FONTANERO_SOLICITAR_AUSENCIA_PATH,
+} from '../../modules/solicitudes-ausencia/solicitudesAusenciaPaths'
 import {
   ADMIN_CHILD_ROUTES,
   ADMIN_HOME_PATH,
@@ -74,6 +81,37 @@ const AppRoutes = () => (
       >
         <Route index element={<AveriasFontaneroListPage />} />
         <Route path=":id" element={<AveriasFontaneroDetailPage />} />
+      </Route>
+      <Route
+        path="fontanero/solicitar-ausencia"
+        element={
+          <AdminAreaGate>
+            <AuthorizedRoute
+              requiredPath={FONTANERO_SOLICITAR_AUSENCIA_PATH}
+              allowedRoles={[InternalAdminRoleName.Fontanero]}
+            >
+              <AdminLayout />
+            </AuthorizedRoute>
+          </AdminAreaGate>
+        }
+      >
+        <Route index element={<SolicitarAusenciaPage />} />
+      </Route>
+      <Route
+        path="fontanero/mis-solicitudes"
+        element={
+          <AdminAreaGate>
+            <AuthorizedRoute
+              requiredPath={FONTANERO_MIS_SOLICITUDES_PATH}
+              allowedRoles={[InternalAdminRoleName.Fontanero]}
+            >
+              <AdminLayout />
+            </AuthorizedRoute>
+          </AdminAreaGate>
+        }
+      >
+        <Route index element={<MisSolicitudesAusenciaPage />} />
+        <Route path=":id" element={<MiSolicitudAusenciaDetallePage />} />
       </Route>
       <Route
         path={ADMIN_ROUTE_SEGMENT}

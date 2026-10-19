@@ -33,9 +33,9 @@ import {
 import {
   EMPTY_MOVIMIENTO_VACACIONES_VALUES,
   TIPOS_MOVIMIENTO_VACACIONES,
+  avisoMovimientoRegistrado,
   diasConSigno,
   formatearFechaMovimiento,
-  pluralDias,
   tipoMovimientoLabel,
   toMovimientoVacacionesPayload,
   vacacionesErrorMessage,
@@ -62,19 +62,21 @@ function TarjetaSaldo({
 }: {
   label: string
   dias: number
-  tono: 'azul' | 'ambar' | 'verde'
+  tono: 'azul' | 'ambar' | 'violeta' | 'verde'
 }) {
   const tonos = {
     azul: 'border-sky-100 bg-sky-50/70 text-sky-900',
     ambar: 'border-amber-100 bg-amber-50/70 text-amber-900',
+    violeta: 'border-violet-100 bg-violet-50/70 text-violet-900',
     verde: 'border-emerald-100 bg-emerald-50/80 text-emerald-900',
   }
+  const mostrar = Number.isFinite(dias) ? dias : 0
   return (
     <div className={`grid min-w-0 gap-1 rounded-2xl border px-5 py-4 ${tonos[tono]}`}>
       <dt className="text-xs font-extrabold uppercase tracking-wider opacity-70">{label}</dt>
       <dd className="m-0 flex items-baseline gap-1.5">
-        <span className="text-3xl font-black tabular-nums sm:text-4xl">{dias}</span>
-        <span className="font-bold opacity-80">{dias === 1 ? 'día' : 'días'}</span>
+        <span className="text-3xl font-black tabular-nums sm:text-4xl">{mostrar}</span>
+        <span className="font-bold opacity-80">{Math.abs(mostrar) === 1 ? 'día' : 'días'}</span>
       </dd>
     </div>
   )
@@ -239,9 +241,12 @@ export default function VacacionesPage() {
         toMovimientoVacacionesPayload(colaboradorId, values),
       )
       setValues(EMPTY_MOVIMIENTO_VACACIONES_VALUES)
-      const unDia = movimiento.cantidadDias === 1
       setAviso(
-        `${unDia ? 'Se registró' : 'Se registraron'} ${pluralDias(movimiento.cantidadDias)} ${tipoMovimientoLabel(movimiento.tipo).toLowerCase()}${unDia ? '' : 's'}.`,
+        avisoMovimientoRegistrado(
+          movimiento.tipo,
+          movimiento.cantidadDias,
+          movimiento.signoAjuste,
+        ),
       )
       // El saldo lo recalcula el servidor: se vuelve a consultar en lugar de sumar en el cliente.
       setRecarga((n) => n + 1)
@@ -288,8 +293,8 @@ export default function VacacionesPage() {
           Vacaciones del personal
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-          Consulte el saldo de vacaciones de cada colaborador y registre los días acumulados o
-          disfrutados. El saldo lo calcula el sistema a partir del historial.
+          Consulte el saldo de vacaciones de cada colaborador y registre adquisiciones o disfrutes.
+          El saldo lo calcula el sistema a partir del historial.
         </p>
       </header>
 
@@ -325,7 +330,7 @@ export default function VacacionesPage() {
           </span>
           <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Seleccione un colaborador</h2>
           <p className="m-0 max-w-md text-slate-500">
-            Elija un colaborador para ver sus días acumulados, disfrutados y disponibles, y para
+            Elija un colaborador para ver sus días adquiridos, disfrutados y disponibles, y para
             registrar nuevos movimientos.
           </p>
         </div>
@@ -385,9 +390,14 @@ export default function VacacionesPage() {
                       </div>
                     </div>
                   </div>
-                  <dl className={`m-0 grid gap-3 sm:grid-cols-3 ${cargandoBalance ? 'opacity-60' : ''}`}>
-                    <TarjetaSaldo label="Acumulados" dias={balanceVisible.diasAcumulados} tono="azul" />
-                    <TarjetaSaldo label="Disfrutados" dias={balanceVisible.diasDisfrutados} tono="ambar" />
+                  <dl className={`m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 ${cargandoBalance ? 'opacity-60' : ''}`}>
+                    <TarjetaSaldo label="Adquiridas" dias={balanceVisible.diasAcumulados} tono="azul" />
+                    <TarjetaSaldo label="Disfrutadas" dias={balanceVisible.diasDisfrutados} tono="ambar" />
+                    <TarjetaSaldo
+                      label="Ajustes netos"
+                      dias={balanceVisible.diasAjusteNeto ?? 0}
+                      tono="violeta"
+                    />
                     <TarjetaSaldo label="Disponibles" dias={balanceVisible.diasDisponibles} tono="verde" />
                   </dl>
                   <p className="m-0 text-sm text-slate-500">
@@ -405,7 +415,7 @@ export default function VacacionesPage() {
             >
               <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Registrar movimiento</h2>
               <p className="mb-5 mt-1 text-sm text-slate-500">
-                Los días disfrutados no pueden superar el saldo disponible.
+                Disfrutes y ajustes que resten no pueden superar el saldo disponible. El ajuste exige motivo.
               </p>
               {submitError ? (
                 <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800" role="alert">
@@ -417,7 +427,7 @@ export default function VacacionesPage() {
                   <legend className="mb-2 text-sm font-bold text-[#163f6b]">
                     Tipo <span className="text-red-600">*</span>
                   </legend>
-                  <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="grid gap-2 sm:grid-cols-3">
                     {TIPOS_MOVIMIENTO_VACACIONES.map((tipo) => {
                       const activo = values.tipo === tipo.value
                       return (
@@ -438,7 +448,10 @@ export default function VacacionesPage() {
                             value={tipo.value}
                             checked={activo}
                             aria-invalid={Boolean(errors.tipo)}
-                            onChange={() => update('tipo', tipo.value)}
+                            onChange={() => {
+                              update('tipo', tipo.value)
+                              if (tipo.value !== 'AJUSTE') update('signoAjuste', '')
+                            }}
                           />
                           <span className="grid gap-0.5">
                             <span className="font-extrabold text-[#073b73]">{tipo.label}</span>
@@ -452,6 +465,48 @@ export default function VacacionesPage() {
                     <small className="font-semibold text-red-600" role="alert">{errors.tipo}</small>
                   ) : null}
                 </fieldset>
+
+                {values.tipo === 'AJUSTE' ? (
+                  <fieldset className="m-0 grid gap-2 border-0 p-0">
+                    <legend className="mb-2 text-sm font-bold text-[#163f6b]">
+                      Efecto del ajuste <span className="text-red-600">*</span>
+                    </legend>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {(
+                        [
+                          { value: '1' as const, label: 'Suma días' },
+                          { value: '-1' as const, label: 'Resta días' },
+                        ] as const
+                      ).map((opcion) => (
+                        <label
+                          key={opcion.value}
+                          className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition ${
+                            values.signoAjuste === opcion.value
+                              ? 'border-violet-500 bg-violet-50 ring-2 ring-violet-200'
+                              : errors.signoAjuste
+                                ? 'border-red-400 bg-white'
+                                : 'border-slate-200 bg-white hover:border-violet-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="signoAjuste"
+                            className="accent-violet-600"
+                            value={opcion.value}
+                            checked={values.signoAjuste === opcion.value}
+                            onChange={() => update('signoAjuste', opcion.value)}
+                          />
+                          <span className="font-extrabold text-[#073b73]">{opcion.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {errors.signoAjuste ? (
+                      <small className="font-semibold text-red-600" role="alert">
+                        {errors.signoAjuste}
+                      </small>
+                    ) : null}
+                  </fieldset>
+                ) : null}
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <label className="grid min-w-0 gap-2">
@@ -502,11 +557,23 @@ export default function VacacionesPage() {
                 </div>
 
                 <label className="grid min-w-0 gap-2">
-                  <span className="text-sm font-bold text-[#163f6b]">Observaciones (opcional)</span>
+                  <span className="text-sm font-bold text-[#163f6b]">
+                    {values.tipo === 'AJUSTE' ? (
+                      <>
+                        Motivo <span className="text-red-600">*</span>
+                      </>
+                    ) : (
+                      'Observaciones (opcional)'
+                    )}
+                  </span>
                   <textarea
                     className={`min-h-24 w-full rounded-xl border bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-blue-200 ${errors.observaciones ? 'border-red-400' : 'border-slate-200 focus:border-blue-500'}`}
                     maxLength={500}
-                    placeholder="Ej. Vacaciones de fin de año"
+                    placeholder={
+                      values.tipo === 'AJUSTE'
+                        ? 'Motivo del ajuste administrativo'
+                        : 'Ej. Vacaciones de fin de año'
+                    }
                     value={values.observaciones}
                     aria-invalid={Boolean(errors.observaciones)}
                     onChange={(event) => update('observaciones', event.target.value)}

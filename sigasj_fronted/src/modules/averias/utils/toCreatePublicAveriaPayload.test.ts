@@ -15,21 +15,20 @@ const filled = {
 }
 
 describe('toCreatePublicAveriaPayload', () => {
-  it('envía únicamente campos públicos y omite opcionales vacíos', () => {
+  it('incluye cédula obligatoria y omite correo vacío', () => {
     const payload = toCreatePublicAveriaPayload({
       ...filled,
-      identificacionReportante: '   ',
       correoReportante: '',
     })
 
     expect(payload).toEqual({
       nombreReportante: 'María Rodríguez',
+      identificacionReportante: '1-2345-6789',
       telefonoReportante: '8888-8888',
       ubicacion: 'Frente a la escuela',
       sectorComunidad: 'San Juan',
       descripcion: 'Fuga visible en la tubería.',
     })
-    expect(payload).not.toHaveProperty('identificacionReportante')
     expect(payload).not.toHaveProperty('correoReportante')
 
     for (const key of PUBLIC_AVERIA_ADMIN_PAYLOAD_KEYS) {
@@ -37,7 +36,7 @@ describe('toCreatePublicAveriaPayload', () => {
     }
   })
 
-  it('incluye identificación y correo solo cuando tienen valor', () => {
+  it('incluye identificación y correo cuando tienen valor', () => {
     expect(toCreatePublicAveriaPayload(filled)).toEqual({
       nombreReportante: 'María Rodríguez',
       identificacionReportante: '1-2345-6789',

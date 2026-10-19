@@ -7,6 +7,9 @@ import { AuthProvider } from '../auth/components/AuthContext'
 import RecursosHumanosRoutes from './RecursosHumanosRoutes'
 import type { Colaborador, Incapacidad, PermisoColaborador } from './types'
 
+const puestoFontanero = { id: 1, nombre: 'Fontanero', critico: false, activo: true }
+const puestoAyudante = { id: 2, nombre: 'Operación', critico: false, activo: true }
+
 const juan: Colaborador = {
   id: 1,
   nombre: 'Juan',
@@ -14,6 +17,7 @@ const juan: Colaborador = {
   cedula: '1-1111-1111',
   correoElectronico: 'juan@example.com',
   cargo: 'Fontanero',
+  puestoId: 1,
   activo: true,
   usuarioId: null,
   usuario: null,
@@ -173,11 +177,13 @@ describe('Recursos Humanos: colaboradores', () => {
   it('valida y registra un colaborador nuevo', async () => {
     loginAsRole('Administradora')
     const fetchMock = stubApi((url, init) => {
+      if (url.pathname.includes('/rrhh/puestos')) return response([puestoFontanero])
       if (url.pathname.endsWith('/usuarios')) return response({ data: [] })
       if (init.method === 'POST') return response({ ...juan, id: 9 }, true, 201)
       return response(listado([juan]))
     })
     const view = await mount('/admin/lecturas/nuevo')
+    await flush()
     const form = view.container.querySelector('form')!
 
     await act(async () => form.requestSubmit())
@@ -190,7 +196,7 @@ describe('Recursos Humanos: colaboradores', () => {
       setValue(input('family-name'), 'Pérez')
       setValue(input('off'), '1-1111-1111')
       setValue(input('email'), 'juan@example.com')
-      setValue(input('organization-title'), 'Fontanero')
+      setValue(view.container.querySelector<HTMLSelectElement>('select[aria-label="Puesto"]')!, '1')
     })
     await act(async () => form.requestSubmit())
     await flush()
@@ -201,7 +207,7 @@ describe('Recursos Humanos: colaboradores', () => {
       apellidos: 'Pérez',
       cedula: '1-1111-1111',
       correoElectronico: 'juan@example.com',
-      cargo: 'Fontanero',
+      puestoId: 1,
     })
     expect(view.container.textContent).toContain('Colaborador registrado correctamente.')
     await view.cleanup()
@@ -210,6 +216,7 @@ describe('Recursos Humanos: colaboradores', () => {
   it('muestra el conflicto de cédula duplicada', async () => {
     loginAsRole('Administradora')
     stubApi((url, init) => {
+      if (url.pathname.includes('/rrhh/puestos')) return response([puestoFontanero])
       if (url.pathname.endsWith('/usuarios')) return response({ data: [] })
       if (init.method === 'POST') {
         return response({ message: 'Ya existe un colaborador con la cédula 1-1111-1111' }, false, 409)
@@ -217,13 +224,14 @@ describe('Recursos Humanos: colaboradores', () => {
       return response(listado([]))
     })
     const view = await mount('/admin/lecturas/nuevo')
+    await flush()
     const input = (name: string) => view.container.querySelector<HTMLInputElement>(`input[autocomplete="${name}"]`)!
     await act(async () => {
       setValue(input('given-name'), 'Juan')
       setValue(input('family-name'), 'Pérez')
       setValue(input('off'), '1-1111-1111')
       setValue(input('email'), 'juan@example.com')
-      setValue(input('organization-title'), 'Fontanero')
+      setValue(view.container.querySelector<HTMLSelectElement>('select[aria-label="Puesto"]')!, '1')
     })
     await act(async () => view.container.querySelector('form')!.requestSubmit())
     await flush()
@@ -235,23 +243,35 @@ describe('Recursos Humanos: colaboradores', () => {
     loginAsRole('Administradora')
     let actual = juan
     const fetchMock = stubApi((url, init) => {
+      if (url.pathname.includes('/rrhh/puestos')) {
+        return response([puestoFontanero, puestoAyudante])
+      }
       if (url.pathname.endsWith('/usuarios')) return response({ data: [] })
       if (init.method === 'PATCH') {
-        actual = { ...juan, ...JSON.parse(String(init.body)) }
+        const body = JSON.parse(String(init.body)) as Partial<Colaborador>
+        actual = {
+          ...juan,
+          ...body,
+          cargo: body.puestoId === 2 ? 'Operación' : juan.cargo,
+        }
+        return response(actual)
+      }
+      if (url.pathname.endsWith('/rrhh/colaboradores/1') || url.pathname.endsWith('/1')) {
         return response(actual)
       }
       return response(actual)
     })
     const view = await mount('/admin/lecturas/1/editar')
-    const cargo = view.container.querySelector<HTMLInputElement>('input[autocomplete="organization-title"]')!
-    expect(cargo.value).toBe('Fontanero')
-    await act(async () => setValue(cargo, 'Ayudante de fontanero'))
+    await flush()
+    const puesto = view.container.querySelector<HTMLSelectElement>('select[aria-label="Puesto"]')!
+    expect(puesto.value).toBe('1')
+    await act(async () => setValue(puesto, '2'))
     await act(async () => view.container.querySelector('form')!.requestSubmit())
     await flush()
 
     const patch = fetchMock.mock.calls.find(([, init]) => (init as RequestInit | undefined)?.method === 'PATCH')
     expect(JSON.parse(String((patch?.[1] as RequestInit).body))).toMatchObject({
-      cargo: 'Ayudante de fontanero',
+      puestoId: 2,
       usuarioId: null,
     })
     expect(view.container.textContent).toContain('Colaborador actualizado correctamente.')
@@ -268,7 +288,13 @@ describe('Recursos Humanos: colaboradores', () => {
     expect(view.container.textContent).toContain('juan@example.com')
     expect(view.container.textContent).toContain('Sin cuenta vinculada')
     expect(byText(view.container, 'a', 'Editar')?.getAttribute('href')).toBe('/admin/lecturas/1/editar')
-    expect(byText(view.container, 'a', 'Ver historial')?.getAttribute('href')).toBe(
+    expect(byText(view.container, 'a', 'Vacaciones')?.getAttribute('href')).toBe(
+      '/admin/lecturas/vacaciones?colaboradorId=1',
+    )
+    expect(byText(view.container, 'a', 'Incapacidades')?.getAttribute('href')).toBe(
+      '/admin/lecturas/incapacidades?colaboradorId=1',
+    )
+    expect(byText(view.container, 'a', 'Historial')?.getAttribute('href')).toBe(
       '/admin/lecturas/1/historial',
     )
     await view.cleanup()
@@ -283,19 +309,21 @@ describe('Recursos Humanos: colaboradores', () => {
     let resolverPost!: (value: Response) => void
     const fetchMock = vi.fn((input: RequestInfo | URL, init: RequestInit = {}) => {
       const url = String(input)
+      if (url.includes('/rrhh/puestos')) return Promise.resolve(response([puestoFontanero]))
       if (url.endsWith('/usuarios')) return Promise.resolve(response({ data: [] }))
       if (init.method === 'POST') return new Promise<Response>((resolve) => { resolverPost = resolve })
       return Promise.resolve(response(listado([juan])))
     })
     vi.stubGlobal('fetch', fetchMock)
     const view = await mount('/admin/lecturas/nuevo')
+    await flush()
     const input = (name: string) => view.container.querySelector<HTMLInputElement>(`input[autocomplete="${name}"]`)!
     await act(async () => {
       setValue(input('given-name'), 'Juan')
       setValue(input('family-name'), 'Pérez')
       setValue(input('off'), '1-1111-1111')
       setValue(input('email'), 'juan@example.com')
-      setValue(input('organization-title'), 'Fontanero')
+      setValue(view.container.querySelector<HTMLSelectElement>('select[aria-label="Puesto"]')!, '1')
     })
     const form = view.container.querySelector('form')!
     await act(async () => {
@@ -825,7 +853,7 @@ const historialRespuesta = {
       fecha: '2026-09-01',
       fechaInicio: null,
       fechaFin: null,
-      descripcion: '+2 días acumulados',
+      descripcion: '+2 días adquiridos',
       tipoMovimiento: 'ACUMULADO' as const,
       cantidadDias: 2,
     },
@@ -873,7 +901,7 @@ describe('Recursos Humanos: historial administrativo', () => {
     expect(view.container.textContent).toContain('Juan Pérez')
     expect(view.container.textContent).toContain('Fontanero')
     expect(view.container.textContent).toContain('Vacaciones')
-    expect(view.container.textContent).toContain('+2 días acumulados')
+    expect(view.container.textContent).toContain('+2 días adquiridos')
     expect(view.container.textContent).toContain('Incapacidad')
     expect(view.container.textContent).toContain('Permiso')
     expect(view.container.textContent).toContain('Permiso registrado')

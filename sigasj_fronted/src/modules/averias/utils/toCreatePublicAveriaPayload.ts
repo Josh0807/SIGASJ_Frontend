@@ -12,15 +12,11 @@ export function toCreatePublicAveriaPayload(
 ): CreatePublicAveriaPayload {
   const payload: CreatePublicAveriaPayload = {
     nombreReportante: values.nombreReportante.trim(),
+    identificacionReportante: values.identificacionReportante.trim(),
     telefonoReportante: values.telefonoReportante.trim(),
     ubicacion: values.ubicacion.trim(),
     sectorComunidad: values.sectorComunidad.trim(),
     descripcion: values.descripcion.trim(),
-  }
-
-  const identificacionReportante = optionalTrimmed(values.identificacionReportante)
-  if (identificacionReportante) {
-    payload.identificacionReportante = identificacionReportante
   }
 
   const correoReportante = optionalTrimmed(values.correoReportante)

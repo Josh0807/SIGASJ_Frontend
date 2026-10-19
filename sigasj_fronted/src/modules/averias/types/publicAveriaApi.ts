@@ -1,10 +1,10 @@
 export type CreatePublicAveriaPayload = {
   nombreReportante: string
+  identificacionReportante: string
   telefonoReportante: string
   ubicacion: string
   sectorComunidad: string
   descripcion: string
-  identificacionReportante?: string
   correoReportante?: string
 }
 

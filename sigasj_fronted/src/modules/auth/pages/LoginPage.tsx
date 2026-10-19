@@ -51,7 +51,6 @@ const LoginPage = () => {
       role,
       email: userEmail,
       name: name?.trim() || 'Usuario',
-      lastName: role,
     }
     login({ accessToken, user })
     navigate(resolvePostLoginAdminPath(user, redirectTo), { replace: true })

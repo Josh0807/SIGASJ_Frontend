@@ -1,5 +1,6 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import { fetchPublicApi } from '../../../services/http/publicApi'
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import {
   isEstadoProyecto,
   type EstadoProyecto,
@@ -42,16 +43,35 @@ export type PublicProyectoDetalle = {
   imagenes?: PublicProyectoImagen[]
 }
 
+const resolveMediaUrl = (value?: string | null) =>
+  (value ? resolveBackendAssetUrl(value) : undefined) ?? value ?? null
+
+const resolvePublicProyecto = (item: PublicProyecto): PublicProyecto => ({
+  ...item,
+  imagenPrincipal: resolveMediaUrl(item.imagenPrincipal),
+})
+
+const resolvePublicDetalle = (
+  item: PublicProyectoDetalle,
+): PublicProyectoDetalle => ({
+  ...item,
+  imagenPrincipal: resolveMediaUrl(item.imagenPrincipal),
+  imagenes: item.imagenes?.map((imagen) => ({
+    ...imagen,
+    imagenUrl: resolveMediaUrl(imagen.imagenUrl) ?? imagen.imagenUrl,
+  })),
+})
+
 export async function getPublicProyectos(): Promise<PublicProyecto[]> {
   const data = await fetchPublicApi<PublicProyecto[]>(PUBLIC_PROYECTOS_PATHS)
-  return Array.isArray(data) ? data : []
+  return Array.isArray(data) ? data.map(resolvePublicProyecto) : []
 }
 
 export async function getPublicProyectoDetalle(
   id: number | string,
 ): Promise<PublicProyectoDetalle> {
   const paths = [`/v1/public/proyectos/${id}`, `/public/proyectos/${id}`]
-  return await fetchPublicApi<PublicProyectoDetalle>(paths)
+  return resolvePublicDetalle(await fetchPublicApi<PublicProyectoDetalle>(paths))
 }
 
 

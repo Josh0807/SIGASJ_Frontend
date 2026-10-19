@@ -9,6 +9,9 @@ import IncapacidadesPage from './IncapacidadesPage'
 import PermisoDetallePage from './PermisoDetallePage'
 import PermisoFormPage from './PermisoFormPage'
 import PermisosPage from './PermisosPage'
+import SolicitudAusenciaDetallePage from '../solicitudes-ausencia/admin/SolicitudAusenciaDetallePage'
+import SolicitudesAusenciaAdminGate from '../solicitudes-ausencia/admin/SolicitudesAusenciaAdminGate'
+import SolicitudesAusenciaPage from '../solicitudes-ausencia/admin/SolicitudesAusenciaPage'
 import VacacionesPage from './VacacionesPage'
 
 export default function RecursosHumanosRoutes() {
@@ -17,6 +20,22 @@ export default function RecursosHumanosRoutes() {
       <Route index element={<ColaboradoresPage />} />
       <Route path="nuevo" element={<ColaboradorFormPage />} />
       <Route path="vacaciones" element={<VacacionesPage />} />
+      <Route
+        path="solicitudes-ausencia"
+        element={
+          <SolicitudesAusenciaAdminGate>
+            <SolicitudesAusenciaPage />
+          </SolicitudesAusenciaAdminGate>
+        }
+      />
+      <Route
+        path="solicitudes-ausencia/:id"
+        element={
+          <SolicitudesAusenciaAdminGate>
+            <SolicitudAusenciaDetallePage />
+          </SolicitudesAusenciaAdminGate>
+        }
+      />
       <Route path="permisos" element={<PermisosPage />} />
       <Route path="permisos/nuevo" element={<PermisoFormPage />} />
       <Route path="permisos/:id" element={<PermisoDetallePage />} />

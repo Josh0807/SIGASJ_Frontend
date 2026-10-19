@@ -74,18 +74,7 @@ const AdminHeader = ({
             to="/"
             aria-label="Ver sitio público"
           >
-            <span
-              className="admin-header__action-label admin-header__action-label--full"
-              aria-hidden="true"
-            >
-              Ver sitio público
-            </span>
-            <span
-              className="admin-header__action-label admin-header__action-label--short"
-              aria-hidden="true"
-            >
-              Público
-            </span>
+            Sitio público
           </Link>
           <AdminAccountMenu triggerContent={<AdminHeaderUser />} />
         </div>

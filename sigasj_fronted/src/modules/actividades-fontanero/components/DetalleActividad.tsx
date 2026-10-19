@@ -225,7 +225,11 @@ const DetalleActividad = ({
         <footer className="detalle-actividad__actions">
           {actions}
           {onBack ? (
-            <button type="button" onClick={onBack}>
+            <button
+              type="button"
+              className="detalle-actividad__back"
+              onClick={onBack}
+            >
               {backLabel}
             </button>
           ) : null}

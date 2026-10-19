@@ -32,7 +32,7 @@ const respuesta = {
       fecha: '2026-07-15',
       fechaInicio: null,
       fechaFin: null,
-      descripcion: 'Acumulado: 4 día(s). QA historial vacacion',
+      descripcion: '+4 días adquiridos. QA historial vacacion',
       tipoMovimiento: 'ACUMULADO' as const,
       cantidadDias: 4,
     },

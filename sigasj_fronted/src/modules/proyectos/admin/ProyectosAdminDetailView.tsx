@@ -1,3 +1,4 @@
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import { ESTADO_PROYECTO_LABELS } from '../types/estadoProyecto'
 import { formatProyectoAdminDate } from './formatProyectoAdminDate'
 import ProyectosAdminDetailGallery from './ProyectosAdminDetailGallery'
@@ -18,7 +19,7 @@ const ProyectosAdminDetailView = ({ proyecto }: ProyectosAdminDetailViewProps) =
   const visibilidad = proyecto.activo ? 'Activo' : 'Inactivo'
   const estadoLabel =
     ESTADO_PROYECTO_LABELS[proyecto.estado] ?? proyecto.estado
-  const imagenPrincipal = proyecto.imagenPrincipal?.trim()
+  const imagenPrincipal = resolveBackendAssetUrl(proyecto.imagenPrincipal) ?? proyecto.imagenPrincipal?.trim()
 
   return (
     <article
