@@ -165,7 +165,9 @@ const AveriasAdminPage = ({
     return () => window.clearTimeout(timeout)
   }, [applyTipo, tipoInput])
 
-  const remoteEnabled = items === undefined
+  // Con el rango invertido el servidor responde 400; no se consulta hasta corregirlo.
+  const rangoFechasInvalido = Boolean(fechaDesde && fechaHasta && fechaDesde > fechaHasta)
+  const remoteEnabled = items === undefined && !rangoFechasInvalido
   const remote = useAdminAverias(
     {
       page,

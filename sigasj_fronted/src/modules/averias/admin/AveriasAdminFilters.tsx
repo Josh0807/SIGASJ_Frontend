@@ -122,6 +122,7 @@ const AveriasAdminFilters = ({
         id={FECHA_DESDE_ID}
         name="fechaDesde"
         type="date"
+        max={fechaHasta || undefined}
         value={fechaDesde}
         onChange={(event) => onFechaDesdeChange(event.target.value)}
       />
@@ -132,10 +133,16 @@ const AveriasAdminFilters = ({
         id={FECHA_HASTA_ID}
         name="fechaHasta"
         type="date"
+        min={fechaDesde || undefined}
         value={fechaHasta}
         onChange={(event) => onFechaHastaChange(event.target.value)}
       />
     </label>
+    {fechaDesde && fechaHasta && fechaDesde > fechaHasta ? (
+      <p role="alert" className="gallery-admin__filter-reset">
+        La fecha «Desde» no puede ser posterior a la fecha «Hasta».
+      </p>
+    ) : null}
     {hasActiveFilters ? (
       <p className="gallery-admin__filter-reset">
         <button
