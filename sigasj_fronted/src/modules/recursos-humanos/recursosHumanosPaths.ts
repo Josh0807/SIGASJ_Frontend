@@ -22,3 +22,14 @@ export const incapacidadEditPath = (id: number) => `${INCAPACIDADES_PATH}/${id}/
 export const VACACIONES_PATH = `${RRHH_PATH}/vacaciones`
 export const vacacionesColaboradorPath = (colaboradorId: number) =>
   `${VACACIONES_PATH}?colaboradorId=${colaboradorId}`
+
+export const FONTANERO_MI_SALDO_PATH = '/fontanero/mi-saldo-vacaciones'
+export const FONTANERO_MI_SALDO_TITLE = 'Mi saldo de vacaciones'
+
+export const isFontaneroMiSaldoPath = (path: string) => {
+  const normalized = path.split('?')[0]?.replace(/\/+$/, '') || path
+  return (
+    normalized === FONTANERO_MI_SALDO_PATH ||
+    normalized.startsWith(`${FONTANERO_MI_SALDO_PATH}/`)
+  )
+}

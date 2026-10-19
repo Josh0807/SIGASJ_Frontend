@@ -2,6 +2,10 @@ import type { InternalAdminRole } from '../modules/auth/utils/internalRoles'
 import { ADMIN_MODULE_ACCESS } from '../modules/auth/config/adminNavigation.config'
 import { ADMIN_BASE_PATH } from '../app/router/privateRoutes'
 import { FONTANERO_AVERIAS_PATH } from '../modules/averias/fontanero/averiasFontaneroPaths'
+import {
+  FONTANERO_MIS_SOLICITUDES_PATH,
+  FONTANERO_SOLICITAR_AUSENCIA_PATH,
+} from '../modules/solicitudes-ausencia/solicitudesAusenciaPaths'
 
 /** En SIGASJ el rol técnico es `Secretaria` (equivalente a “Secretaria Ejecutiva” en la tarea). */
 export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
@@ -24,7 +28,12 @@ const pathsForRoles = (...roles: InternalAdminRole[]) =>
 export const EXPECTED_NAV_PATHS: Record<InternalAdminRole, readonly string[]> = {
   Administradora: pathsForRoles('Administradora'),
   Secretaria: pathsForRoles('Secretaria'),
-  Fontanero: [...pathsForRoles('Fontanero'), FONTANERO_AVERIAS_PATH],
+  Fontanero: [
+    ...pathsForRoles('Fontanero'),
+    FONTANERO_AVERIAS_PATH,
+    FONTANERO_SOLICITAR_AUSENCIA_PATH,
+    FONTANERO_MIS_SOLICITUDES_PATH,
+  ],
 }
 
 export const EXPECTED_BLOCKED_PATHS: Record<

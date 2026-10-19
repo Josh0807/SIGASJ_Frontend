@@ -47,6 +47,7 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/usuarios')
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/reportes')
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/proyectos')
+    expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/lecturas')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/galeria')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/comunicados')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/contacto')
@@ -59,6 +60,8 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/admin/inventario',
       '/admin/actividades',
       '/fontanero/averias',
+      '/fontanero/solicitar-ausencia',
+      '/fontanero/mis-solicitudes',
     ])
   })
 

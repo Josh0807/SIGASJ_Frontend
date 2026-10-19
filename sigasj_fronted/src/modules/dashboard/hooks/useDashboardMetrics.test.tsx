@@ -46,7 +46,7 @@ describe('useDashboardMetrics', () => {
     const { result, cleanup } = renderMetricsHook()
 
     expect(result.current.metrics.abonadosActivos).toBeNull()
-    expect(result.current.metrics.lecturasPendientes).toBeNull()
+    expect(result.current.metrics.alertasReposicionPendientes).toBeNull()
     expect(result.current.metrics.averiasReportadas).toBeNull()
     expect(result.current.metrics.solicitudesEnTramite).toBeNull()
     expect(result.current.isLoading).toBe(true)
@@ -58,7 +58,7 @@ describe('useDashboardMetrics', () => {
     setAccessToken('token-demo')
     vi.spyOn(dashboardService, 'getDashboardSummary').mockResolvedValue({
       abonadosActivos: 2000,
-      lecturasPendientes: 50,
+      alertasReposicionPendientes: 50,
       averiasReportadas: 1,
       solicitudesEnTramite: 12,
     })
@@ -70,7 +70,7 @@ describe('useDashboardMetrics', () => {
     })
 
     expect(result.current.metrics.abonadosActivos).toBe(2000)
-    expect(result.current.metrics.lecturasPendientes).toBe(50)
+    expect(result.current.metrics.alertasReposicionPendientes).toBe(50)
     expect(result.current.metrics.averiasReportadas).toBe(1)
     expect(result.current.metrics.solicitudesEnTramite).toBe(12)
     expect(result.current.isLoading).toBe(false)
@@ -84,13 +84,12 @@ describe('useDashboardMetrics', () => {
       key: 'abonadosActivos',
       value: 1500,
     })
-    // Falla intencional en averías
     vi.spyOn(dashboardService, 'getAveriasSummaryMetric').mockResolvedValue({
       key: 'averiasReportadas',
       value: null,
     })
-    vi.spyOn(dashboardService, 'getLecturasSummaryMetric').mockResolvedValue({
-      key: 'lecturasPendientes',
+    vi.spyOn(dashboardService, 'getAlertasReposicionSummaryMetric').mockResolvedValue({
+      key: 'alertasReposicionPendientes',
       value: 10,
     })
     vi.spyOn(dashboardService, 'getSolicitudesSummaryMetric').mockResolvedValue({
@@ -104,9 +103,8 @@ describe('useDashboardMetrics', () => {
       await result.current.refetch()
     })
 
-    // Abonados y lecturas se actualizaron; averías queda N/D sin bloquear
     expect(result.current.metrics.abonadosActivos).toBe(1500)
-    expect(result.current.metrics.lecturasPendientes).toBe(10)
+    expect(result.current.metrics.alertasReposicionPendientes).toBe(10)
     expect(result.current.metrics.averiasReportadas).toBeNull()
     expect(result.current.metrics.solicitudesEnTramite).toBe(4)
     expect(result.current.isLoading).toBe(false)

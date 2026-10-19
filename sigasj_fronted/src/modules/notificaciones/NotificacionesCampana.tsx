@@ -2,7 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IconBell } from '@tabler/icons-react'
 import { useAuthUser } from '../auth/hooks/useAuthUser'
-import { rutaAveriaNotificacion } from './rutaAveriaNotificacion'
+import { rutaNotificacionCampana } from './rutaNotificacionCampana'
 import { useNotificacionesAveria } from './useNotificacionesAveria'
 
 const NotificacionesCampana = () => {
@@ -88,7 +88,7 @@ const NotificacionesCampana = () => {
         {!loading && !error && listado.data.length > 0 ? (
           <ul className="notificaciones-campana__list">
             {listado.data.map((item) => {
-              const to = rutaAveriaNotificacion(user, item.idAveria)
+              const to = rutaNotificacionCampana(user, item)
               const content = (
                 <>
                   <span className="notificaciones-campana__title">{item.titulo}</span>

@@ -22,6 +22,16 @@ describe('resolveBackendAssetUrl', () => {
     expect(resolveBackendAssetUrl('blob:http://localhost/preview')).toBe('blob:http://localhost/preview')
   })
 
+  it('apunta fotografías y documentos del backend aunque usen /public/media', () => {
+    vi.stubEnv('VITE_BACKEND_URL', 'https://api.asada.example')
+    expect(resolveBackendAssetUrl('/api/v1/public/media/proyectos/portada.jpg')).toBe(
+      'https://api.asada.example/api/v1/public/media/proyectos/portada.jpg',
+    )
+    expect(resolveBackendAssetUrl('/uploads/galeria/tanque.jpg')).toBe(
+      'https://api.asada.example/uploads/galeria/tanque.jpg',
+    )
+  })
+
   it('normaliza barras invertidas provenientes de datos antiguos', () => {
     vi.stubEnv('VITE_BACKEND_URL', 'http://localhost:3000')
     expect(resolveBackendAssetUrl('uploads\\galeria\\tanque.jpg')).toBe('http://localhost:3000/uploads/galeria/tanque.jpg')

@@ -8,6 +8,7 @@ import type { DashboardSummaryData } from './services/dashboardService'
 import { useAuth } from '../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
 import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
+import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
 import { IconRefresh } from '@tabler/icons-react'
 import welcomeImage from '../../assets/Hero1.png'
@@ -45,13 +46,14 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     link: '/admin/solicitudes',
   },
   {
-    id: 'lecturas',
-    label: 'Pendientes de lectura',
+    id: 'alertas-reposicion',
+    label: 'Alertas de reposición',
     value: null,
-    detail: 'Ciclo en curso',
+    detail: 'Stock bajo el mínimo',
     badgeText: 'Pendientes',
     badgeType: 'warning',
-    icon: 'lecturas',
+    icon: 'inventario',
+    link: ALERTAS_REPOSICION_PATH,
   },
 ]
 
@@ -67,8 +69,8 @@ const indicatorMetricKey = (
   if (indicatorId === 'solicitudes') {
     return 'solicitudesEnTramite'
   }
-  if (indicatorId === 'lecturas') {
-    return 'lecturasPendientes'
+  if (indicatorId === 'alertas-reposicion') {
+    return 'alertasReposicionPendientes'
   }
   return null
 }
@@ -76,12 +78,7 @@ const indicatorMetricKey = (
 const canShowIndicator = (
   user: Parameters<typeof canAccessAdminRoute>[0],
   indicator: DashboardIndicator,
-) => {
-  if (indicator.id === 'lecturas') {
-    return canAccessAdminRoute(user, '/admin/lecturas')
-  }
-  return !indicator.link || canAccessAdminRoute(user, indicator.link)
-}
+) => !indicator.link || canAccessAdminRoute(user, indicator.link)
 
 const AdminDashboard = () => {
   const { user } = useAuth()
@@ -108,8 +105,8 @@ const AdminDashboard = () => {
     if (indicator.id === 'solicitudes') {
       return { ...indicator, value: metrics.solicitudesEnTramite ?? null }
     }
-    if (indicator.id === 'lecturas') {
-      return { ...indicator, value: metrics.lecturasPendientes ?? null }
+    if (indicator.id === 'alertas-reposicion') {
+      return { ...indicator, value: metrics.alertasReposicionPendientes ?? null }
     }
     return indicator
   })

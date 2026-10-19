@@ -1,6 +1,9 @@
 export const TIPO_NOTIFICACION_AVERIA = {
   AVERIA_REGISTRADA_ADMINISTRADORA: 'AVERIA_REGISTRADA_ADMINISTRADORA',
   AVERIA_ASIGNADA_FONTANERO: 'AVERIA_ASIGNADA_FONTANERO',
+  AVERIA_CLASIFICADA_ADMINISTRADORA: 'AVERIA_CLASIFICADA_ADMINISTRADORA',
+  SOLICITUD_AUSENCIA_PENDIENTE_ADMINISTRADORA:
+    'SOLICITUD_AUSENCIA_PENDIENTE_ADMINISTRADORA',
 } as const
 
 export type TipoNotificacionAveria =
@@ -8,7 +11,8 @@ export type TipoNotificacionAveria =
 
 export type NotificacionAveriaItem = {
   id: number
-  idAveria: number
+  idAveria: number | null
+  idSolicitudAusencia: number | null
   tipo: TipoNotificacionAveria | string
   titulo: string
   mensaje: string

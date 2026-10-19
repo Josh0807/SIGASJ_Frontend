@@ -1,3 +1,4 @@
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import { formatProyectoAdminDate } from './formatProyectoAdminDate'
 import type { AdminProyectoImagen } from './types'
 
@@ -34,7 +35,7 @@ const ProyectosAdminDetailGallery = ({
           <li className="gallery-admin__item" key={imagen.id}>
             <div className="gallery-admin__thumb">
               {imagen.url ? (
-                <img src={imagen.url} alt={descripcion || `Imagen ${imagen.orden}`} />
+                <img src={resolveBackendAssetUrl(imagen.url) ?? imagen.url} alt={descripcion || `Imagen ${imagen.orden}`} />
               ) : (
                 <div className="gallery-admin__doc-thumb" aria-hidden="true">
                   —

@@ -10,14 +10,17 @@ export function validatePublicAveriaForm(
 ): PublicAveriaFormErrors {
   const errors: PublicAveriaFormErrors = {}
 
+  if (!values.identificacionReportante.trim()) {
+    errors.identificacionReportante =
+      'Ingrese su número de cédula o identificación.'
+  } else if (values.identificacionReportante.trim().length > 50) {
+    errors.identificacionReportante = 'Use un máximo de 50 caracteres.'
+  }
+
   if (!values.nombreReportante.trim()) {
     errors.nombreReportante = 'Ingrese su nombre completo.'
   } else if (values.nombreReportante.trim().length > 150) {
     errors.nombreReportante = 'Use un máximo de 150 caracteres.'
-  }
-
-  if (values.identificacionReportante.trim().length > 50) {
-    errors.identificacionReportante = 'Use un máximo de 50 caracteres.'
   }
 
   if (!values.telefonoReportante.trim()) {

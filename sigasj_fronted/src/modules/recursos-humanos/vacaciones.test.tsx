@@ -35,6 +35,7 @@ const balanceJuan: BalanceVacaciones = {
   colaborador: resumenJuan,
   diasAcumulados: 20,
   diasDisfrutados: 8,
+  diasAjusteNeto: 0,
   diasDisponibles: 12,
   totalMovimientos: 2,
 }
@@ -101,11 +102,21 @@ function stubVacacionesApi(opciones: { rechazarPost?: { status: number; message:
       const body = JSON.parse(String(init.body)) as MovimientoVacaciones
       const creado: MovimientoVacaciones = { ...body, id: 99, colaborador: resumenJuan, createdAt: '2026-09-01T12:00:00.000Z' }
       registrados.unshift(creado)
-      const delta = creado.tipo === 'ACUMULADO' ? creado.cantidadDias : -creado.cantidadDias
+      const delta =
+        creado.tipo === 'ACUMULADO'
+          ? creado.cantidadDias
+          : creado.tipo === 'DISFRUTADO'
+            ? -creado.cantidadDias
+            : (creado.signoAjuste === -1 ? -1 : 1) * creado.cantidadDias
       balance = {
         ...balance,
         diasAcumulados: balance.diasAcumulados + (creado.tipo === 'ACUMULADO' ? creado.cantidadDias : 0),
         diasDisfrutados: balance.diasDisfrutados + (creado.tipo === 'DISFRUTADO' ? creado.cantidadDias : 0),
+        diasAjusteNeto:
+          balance.diasAjusteNeto +
+          (creado.tipo === 'AJUSTE'
+            ? (creado.signoAjuste === -1 ? -1 : 1) * creado.cantidadDias
+            : 0),
         diasDisponibles: balance.diasDisponibles + delta,
         totalMovimientos: balance.totalMovimientos + 1,
       }
@@ -226,13 +237,13 @@ describe('Recursos Humanos: vacaciones', () => {
     await view.cleanup()
   })
 
-  it('muestra acumulados, disfrutados y disponibles del colaborador', async () => {
+  it('muestra adquiridas, disfrutadas y disponibles del colaborador', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
     const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
     expect(view.container.querySelector('h2')?.textContent).toContain('Juan Pérez')
-    expect(tarjeta(view.container, 'Acumulados')).toBe('Acumulados 20 días')
-    expect(tarjeta(view.container, 'Disfrutados')).toBe('Disfrutados 8 días')
+    expect(tarjeta(view.container, 'Adquiridas')).toBe('Adquiridas 20 días')
+    expect(tarjeta(view.container, 'Disfrutadas')).toBe('Disfrutadas 8 días')
     expect(tarjeta(view.container, 'Disponibles')).toBe('Disponibles 12 días')
     expect(view.container.textContent).toContain('Calculado a partir de 2 movimientos')
     await view.cleanup()
@@ -248,17 +259,17 @@ describe('Recursos Humanos: vacaciones', () => {
       tr.textContent?.replace(/\s+/g, ' ').trim(),
     )
     expect(filas[0]).toContain('15/08/2026')
-    expect(filas[0]).toContain('Disfrutado')
+    expect(filas[0]).toContain('Disfrute')
     expect(filas[0]).toContain('-3')
     expect(filas[0]).toContain('Semana Santa')
     expect(filas[1]).toContain('01/08/2026')
-    expect(filas[1]).toContain('Acumulado')
+    expect(filas[1]).toContain('Adquisición')
     expect(filas[1]).toContain('+2')
     expect(view.container.textContent).toContain('Mostrando 1–2 de 2 movimientos')
     await view.cleanup()
   })
 
-  it('registra un movimiento acumulado y refresca saldo e historial desde el servidor', async () => {
+  it('registra una adquisición y refresca saldo e historial desde el servidor', async () => {
     loginAsRole('Administradora')
     const { fetchMock } = stubVacacionesApi()
     const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
@@ -275,8 +286,8 @@ describe('Recursos Humanos: vacaciones', () => {
       fecha: '2026-09-01',
       observaciones: 'Periodo 2026',
     })
-    expect(view.container.querySelector('[role="status"]')?.textContent).toContain('Se registraron 5 días acumulados')
-    expect(tarjeta(view.container, 'Acumulados')).toBe('Acumulados 25 días')
+    expect(view.container.querySelector('[role="status"]')?.textContent).toContain('Se registraron 5 días adquiridos')
+    expect(tarjeta(view.container, 'Adquiridas')).toBe('Adquiridas 25 días')
     expect(tarjeta(view.container, 'Disponibles')).toBe('Disponibles 17 días')
     expect(view.container.querySelector('tbody tr')?.textContent).toContain('+5')
     expect(q<HTMLInputElement>(view.container, 'input[type="number"]').value).toBe('')
@@ -286,7 +297,7 @@ describe('Recursos Humanos: vacaciones', () => {
     await view.cleanup()
   })
 
-  it('registra un movimiento disfrutado y descuenta del saldo', async () => {
+  it('registra un disfrute y descuenta del saldo', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
     const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
@@ -294,7 +305,7 @@ describe('Recursos Humanos: vacaciones', () => {
     await act(async () => q<HTMLFormElement>(view.container, 'form').requestSubmit())
     await flush()
     expect(view.container.querySelector('[role="status"]')?.textContent).toContain('Se registraron 2 días disfrutados')
-    expect(tarjeta(view.container, 'Disfrutados')).toBe('Disfrutados 10 días')
+    expect(tarjeta(view.container, 'Disfrutadas')).toBe('Disfrutadas 10 días')
     expect(tarjeta(view.container, 'Disponibles')).toBe('Disponibles 10 días')
     expect(view.container.querySelector('tbody tr')?.textContent).toContain('-2')
     await view.cleanup()

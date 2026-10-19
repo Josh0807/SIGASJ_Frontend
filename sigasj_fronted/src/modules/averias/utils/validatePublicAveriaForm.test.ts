@@ -4,6 +4,7 @@ import { validatePublicAveriaForm } from './validatePublicAveriaForm'
 
 const validValues = {
   ...EMPTY_PUBLIC_AVERIA_FORM,
+  identificacionReportante: '1-2345-6789',
   nombreReportante: 'María Rodríguez',
   telefonoReportante: '8888-8888',
   ubicacion: 'Frente a la escuela, 50 m sur',
@@ -12,21 +13,24 @@ const validValues = {
 }
 
 describe('validatePublicAveriaForm', () => {
-  it('exige los campos obligatorios y no marca identificación ni correo vacíos', () => {
+  it('exige cédula y demás campos obligatorios; correo vacío sigue opcional', () => {
     const errors = validatePublicAveriaForm(EMPTY_PUBLIC_AVERIA_FORM)
 
+    expect(errors.identificacionReportante).toBe(
+      'Ingrese su número de cédula o identificación.',
+    )
     expect(errors.nombreReportante).toBe('Ingrese su nombre completo.')
     expect(errors.telefonoReportante).toBe('Ingrese un número telefónico de contacto.')
     expect(errors.ubicacion).toBe('Indique la ubicación de la avería.')
     expect(errors.sectorComunidad).toBe('Indique el sector o comunidad.')
     expect(errors.descripcion).toBe('Describa el problema reportado.')
-    expect(errors.identificacionReportante).toBeUndefined()
     expect(errors.correoReportante).toBeUndefined()
   })
 
   it('trata espacios como vacíos en campos obligatorios', () => {
     const errors = validatePublicAveriaForm({
       ...EMPTY_PUBLIC_AVERIA_FORM,
+      identificacionReportante: '   ',
       nombreReportante: '   ',
       telefonoReportante: '   ',
       ubicacion: '   ',
@@ -34,6 +38,7 @@ describe('validatePublicAveriaForm', () => {
       descripcion: '   ',
     })
 
+    expect(errors.identificacionReportante).toBeDefined()
     expect(errors.nombreReportante).toBeDefined()
     expect(errors.telefonoReportante).toBeDefined()
     expect(errors.ubicacion).toBeDefined()

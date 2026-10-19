@@ -42,7 +42,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     vi.spyOn(useDashboardMetricsModule, 'useDashboardMetrics').mockReturnValue({
       metrics: {
         abonadosActivos: 12,
-        lecturasPendientes: null,
+        alertasReposicionPendientes: 3,
         averiasReportadas: 2,
         solicitudesEnTramite: 1,
       },
@@ -57,15 +57,17 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('12')
     expect(markup).not.toContain('1,248')
     expect(markup).not.toContain('Recursos Humanos')
+    expect(markup).not.toContain('Pendientes de lectura')
     expect(markup).toContain('Averías reportadas')
     expect(markup).toContain('2')
     expect(markup).toContain('Solicitudes en trámite')
     expect(markup).toContain('1')
-    expect(markup).toContain('N/D')
+    expect(markup).toContain('Alertas de reposición')
+    expect(markup).toContain('3')
 
     // Verificar correspondencia con los módulos
     expect(markup).toContain('href="/admin/abonados"')
-    expect(markup).not.toContain('href="/admin/lecturas"')
+    expect(markup).toContain('href="/admin/inventario/alertas-reposicion"')
     expect(markup).toContain('href="/admin/averias"')
     expect(markup).toContain('href="/admin/solicitudes"')
   })
@@ -97,7 +99,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
 
   it('6. Maneja correctamente los errores sin bloquear el dashboard completo y permite reintentar', () => {
     vi.spyOn(useDashboardMetricsModule, 'useDashboardMetrics').mockReturnValue({
-      metrics: { abonadosActivos: null, lecturasPendientes: null },
+      metrics: { abonadosActivos: null, alertasReposicionPendientes: null },
       isLoading: false,
       isError: true,
       refetch: async () => {},
@@ -115,7 +117,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     vi.spyOn(useDashboardMetricsModule, 'useDashboardMetrics').mockReturnValue({
       metrics: {
         abonadosActivos: 0, // Cero real
-        lecturasPendientes: null, // No disponible
+        alertasReposicionPendientes: null, // No disponible
         averiasReportadas: 0,
         solicitudesEnTramite: null,
       },

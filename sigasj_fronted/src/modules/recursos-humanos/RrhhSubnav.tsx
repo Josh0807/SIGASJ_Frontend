@@ -1,4 +1,10 @@
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../auth/components/AuthContext'
+import {
+  InternalAdminRoleName,
+  userHasAllowedRole,
+} from '../auth/utils/adminNavigation'
+import { SOLICITUDES_AUSENCIA_ADMIN_PATH } from '../solicitudes-ausencia/solicitudesAusenciaPaths'
 import {
   INCAPACIDADES_PATH,
   PERMISOS_PATH,
@@ -6,14 +12,22 @@ import {
   VACACIONES_PATH,
 } from './recursosHumanosPaths'
 
-const items = [
-  { to: RRHH_PATH, label: 'Colaboradores', end: true },
-  { to: PERMISOS_PATH, label: 'Permisos', end: false },
-  { to: INCAPACIDADES_PATH, label: 'Incapacidades', end: false },
-  { to: VACACIONES_PATH, label: 'Vacaciones', end: false },
-]
-
 export default function RrhhSubnav() {
+  const { user } = useAuth()
+  const verSolicitudes = userHasAllowedRole(user, [
+    InternalAdminRoleName.Administradora,
+  ])
+
+  const items = [
+    { to: RRHH_PATH, label: 'Colaboradores', end: true },
+    { to: PERMISOS_PATH, label: 'Permisos', end: false },
+    { to: INCAPACIDADES_PATH, label: 'Incapacidades', end: false },
+    { to: VACACIONES_PATH, label: 'Vacaciones', end: false },
+    ...(verSolicitudes
+      ? [{ to: SOLICITUDES_AUSENCIA_ADMIN_PATH, label: 'Solicitudes', end: false }]
+      : []),
+  ]
+
   return (
     <nav
       className="flex flex-wrap gap-2 rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_8px_20px_rgba(30,90,156,0.06)]"

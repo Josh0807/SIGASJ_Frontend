@@ -85,7 +85,6 @@ const ActividadesAdminRevisionPage = () => {
   const [requestingCorrection, setRequestingCorrection] = useState(false)
   const [correctionNote, setCorrectionNote] = useState('')
   const [correctionError, setCorrectionError] = useState<string | null>(null)
-  const [reviewedInfo, setReviewedInfo] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [fontaneros, setFontaneros] = useState<string[]>([])
   const { tipos, isLoading: tiposLoading } = useTiposActividadFontanero()
@@ -204,7 +203,6 @@ const ActividadesAdminRevisionPage = () => {
     setRequestingCorrection(true)
     setConfirmCorrection(false)
     setCorrectionError(null)
-    setReviewedInfo(false)
     setError(null)
     try {
       const updated = await solicitarCorreccionAdmin(selected.id, observacion)
@@ -240,7 +238,6 @@ const ActividadesAdminRevisionPage = () => {
     setNotice(null)
     setCorrectionNote('')
     setCorrectionError(null)
-    setReviewedInfo(false)
     setConfirmCorrection(false)
     try {
       const detalle = await getActividadAdminDetalle(actividad.id)
@@ -327,12 +324,112 @@ const ActividadesAdminRevisionPage = () => {
           />
         ) : null}
 
-        <section className="actividades-admin-revision__list !rounded-[28px] !border !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]" aria-label="Actividades registradas">
-          {!loading && !error ? <div className="actividades-admin-revision__summary"><strong>{total}</strong> actividades encontradas</div> : null}
-          {loading ? <div className="gallery-admin__skeleton" aria-busy="true" aria-label="Cargando actividades"><div className="gallery-admin__skeleton-row" /><div className="gallery-admin__skeleton-row" /><div className="gallery-admin__skeleton-row" /></div> : null}
-          {!loading && !error && actividades.length === 0 ? <div className="gallery-admin__empty" role="status"><p>No se encontraron actividades con los filtros seleccionados.</p></div> : null}
-          {!loading && !error && actividades.length > 0 ? <div className="table-responsive"><table className="actividades-admin-revision__table"><thead><tr><th>Fecha</th><th>Fontanero</th><th>Tipo de actividad</th><th>Estado</th><th>Acción</th></tr></thead><tbody>{actividades.map((actividad) => <tr key={actividad.id}><td data-label="Fecha">{formatActividadFecha(actividad.fechaActividad)}</td><td data-label="Fontanero">{displayFontanero(actividad)}</td><td data-label="Actividad">{actividad.tipoActividadNombre || actividad.titulo}</td><td data-label="Estado"><span className={`actividades-admin-revision__status is-${actividad.estado.toLowerCase()}`}>{displayEstado(actividad.estado)}</span></td><td data-label="Acción"><button className="gallery-admin__button" type="button" onClick={() => void openDetail(actividad)}>Ver detalle</button></td></tr>)}</tbody></table></div> : null}
-          {!loading && totalPages > 1 ? <nav className="gallery-admin__pagination" aria-label="Paginación de actividades"><button type="button" disabled={page <= 1} onClick={() => { setLoading(true); setFilters({ ...filters, page: page - 1 }) }}>Anterior</button><p>Página {page} de {totalPages}</p><button type="button" disabled={page >= totalPages} onClick={() => { setLoading(true); setFilters({ ...filters, page: page + 1 }) }}>Siguiente</button></nav> : null}
+        <section
+          className="actividades-admin-revision__list !rounded-[28px] !border !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]"
+          aria-label="Actividades registradas"
+        >
+          {!loading && !error ? (
+            <div className="actividades-admin-revision__summary">
+              <strong>{total}</strong> actividades encontradas
+            </div>
+          ) : null}
+          {loading ? (
+            <div
+              className="gallery-admin__skeleton"
+              aria-busy="true"
+              aria-label="Cargando actividades"
+            >
+              <div className="gallery-admin__skeleton-row" />
+              <div className="gallery-admin__skeleton-row" />
+              <div className="gallery-admin__skeleton-row" />
+            </div>
+          ) : null}
+          {!loading && !error && actividades.length === 0 ? (
+            <div className="gallery-admin__empty" role="status">
+              <p>No se encontraron actividades con los filtros seleccionados.</p>
+            </div>
+          ) : null}
+          {!loading && !error && actividades.length > 0 ? (
+            <ul className="actividades-fontanero-historial__list m-0 list-none p-0">
+              {actividades.map((actividad) => (
+                <li key={actividad.id}>
+                  <article
+                    className="actividad-historial-card"
+                    aria-labelledby={`admin-actividad-${actividad.id}`}
+                  >
+                    <header className="actividad-historial-card__header">
+                      <div className="actividad-historial-card__heading">
+                        <p className="actividad-historial-card__tipo">
+                          {actividad.tipoActividadNombre || 'Sin tipo'}
+                        </p>
+                        <h2
+                          id={`admin-actividad-${actividad.id}`}
+                          className="actividad-historial-card__titulo"
+                        >
+                          {actividad.titulo}
+                        </h2>
+                      </div>
+                      <span
+                        className="actividad-historial-card__estado"
+                        data-estado={actividad.estado}
+                      >
+                        {displayEstado(actividad.estado)}
+                      </span>
+                    </header>
+                    <dl className="actividad-historial-card__meta">
+                      <div className="actividad-historial-card__meta-item">
+                        <dt>Fecha de actividad</dt>
+                        <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
+                      </div>
+                      <div className="actividad-historial-card__meta-item">
+                        <dt>Fontanero</dt>
+                        <dd>{displayFontanero(actividad)}</dd>
+                      </div>
+                    </dl>
+                    <footer className="actividad-historial-card__footer">
+                      <button
+                        type="button"
+                        className="actividad-historial-card__action"
+                        onClick={() => void openDetail(actividad)}
+                      >
+                        Ver detalle
+                      </button>
+                    </footer>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {!loading && totalPages > 1 ? (
+            <nav
+              className="gallery-admin__pagination"
+              aria-label="Paginación de actividades"
+            >
+              <button
+                type="button"
+                disabled={page <= 1}
+                onClick={() => {
+                  setLoading(true)
+                  setFilters({ ...filters, page: page - 1 })
+                }}
+              >
+                Anterior
+              </button>
+              <p>
+                Página {page} de {totalPages}
+              </p>
+              <button
+                type="button"
+                disabled={page >= totalPages}
+                onClick={() => {
+                  setLoading(true)
+                  setFilters({ ...filters, page: page + 1 })
+                }}
+              >
+                Siguiente
+              </button>
+            </nav>
+          ) : null}
         </section>
       </div>
 
@@ -350,35 +447,45 @@ const ActividadesAdminRevisionPage = () => {
               loading={detailLoading}
               error={detailError}
               showFontanero
-              onBack={() => setSelected(null)}
+              onBack={
+                detailLoading || detailError
+                  ? () => setSelected(null)
+                  : undefined
+              }
               backLabel="Cerrar"
               actions={
                 <div className="actividades-admin-revision__detail-actions">
-                  {reviewedInfo ? (
+                  {!canReview ? (
                     <ActivityFeedback
                       variant="info"
                       message="Esta actividad ya fue revisada; no es necesario procesarla nuevamente."
                       className="actividades-admin-revision__already-reviewed"
                     />
                   ) : null}
-                  <button
-                    type="button"
-                    className="gallery-admin__button gallery-admin__button--primary"
-                    disabled={busy}
-                    onClick={() => {
-                      if (canReview) {
-                        setConfirmReview(true)
-                      } else {
-                        setReviewedInfo(true)
-                      }
-                    }}
-                  >
-                    {!canReview
-                      ? 'Actividad revisada'
-                      : reviewing
-                        ? 'Marcando…'
-                        : 'Marcar como revisada'}
-                  </button>
+                  <div className="actividades-admin-revision__detail-toolbar">
+                    <button
+                      type="button"
+                      className="gallery-admin__button"
+                      disabled={busy}
+                      onClick={() => setSelected(null)}
+                    >
+                      Cerrar
+                    </button>
+                    <button
+                      type="button"
+                      className="gallery-admin__button gallery-admin__button--primary"
+                      disabled={busy || !canReview}
+                      onClick={() => {
+                        if (canReview) setConfirmReview(true)
+                      }}
+                    >
+                      {!canReview
+                        ? 'Actividad revisada'
+                        : reviewing
+                          ? 'Marcando…'
+                          : 'Marcar como revisada'}
+                    </button>
+                  </div>
                   {canRequestCorrection ? (
                     <div className="actividades-admin-revision__correction">
                       <label className="gallery-admin__field" htmlFor="admin-correction-note">

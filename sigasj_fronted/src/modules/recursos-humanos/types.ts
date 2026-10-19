@@ -12,11 +12,19 @@ export type Colaborador = {
   cedula: string
   correoElectronico: string
   cargo: string
+  puestoId?: number | null
   activo: boolean
   usuarioId: number | null
   usuario?: ColaboradorUsuario | null
   createdAt: string
   updatedAt: string
+}
+
+export type Puesto = {
+  id: number
+  nombre: string
+  critico: boolean
+  activo: boolean
 }
 
 export type ColaboradoresListado = {
@@ -41,7 +49,7 @@ export type ColaboradorFormValues = {
   apellidos: string
   cedula: string
   correoElectronico: string
-  cargo: string
+  puestoId: string
   usuarioId: string
 }
 
@@ -50,7 +58,8 @@ export type ColaboradorPayload = {
   apellidos: string
   cedula: string
   correoElectronico: string
-  cargo: string
+  puestoId: number
+  cargo?: string
   usuarioId?: number | null
 }
 
@@ -110,12 +119,15 @@ export type PermisoPayload = {
   observaciones?: string | null
 }
 
+export type OrigenIncapacidad = 'CCSS' | 'INS' | 'OTRO'
+
 export type Incapacidad = {
   id: number
   colaboradorId: number
   fechaInicio: string
   fechaFin: string
   observaciones: string | null
+  origen?: OrigenIncapacidad | null
   colaborador?: PermisoColaboradorResumen | null
   createdAt: string
   updatedAt: string
@@ -141,6 +153,7 @@ export type IncapacidadFormValues = {
   fechaInicio: string
   fechaFin: string
   observaciones: string
+  origen: OrigenIncapacidad | ''
 }
 
 export type IncapacidadPayload = {
@@ -148,15 +161,17 @@ export type IncapacidadPayload = {
   fechaInicio: string
   fechaFin: string
   observaciones?: string | null
+  origen?: OrigenIncapacidad | null
 }
 
-export type TipoMovimientoVacaciones = 'ACUMULADO' | 'DISFRUTADO'
+export type TipoMovimientoVacaciones = 'ACUMULADO' | 'DISFRUTADO' | 'AJUSTE'
 
 export type MovimientoVacaciones = {
   id: number
   colaboradorId: number
   tipo: TipoMovimientoVacaciones
   cantidadDias: number
+  signoAjuste?: 1 | -1 | null
   fecha: string
   observaciones: string | null
   colaborador?: PermisoColaboradorResumen | null
@@ -168,6 +183,7 @@ export type BalanceVacaciones = {
   colaborador: PermisoColaboradorResumen
   diasAcumulados: number
   diasDisfrutados: number
+  diasAjusteNeto: number
   diasDisponibles: number
   totalMovimientos: number
 }
@@ -191,6 +207,7 @@ export type MovimientosVacacionesFiltros = {
 export type MovimientoVacacionesFormValues = {
   tipo: TipoMovimientoVacaciones | ''
   cantidadDias: string
+  signoAjuste: '1' | '-1' | ''
   fecha: string
   observaciones: string
 }
@@ -199,6 +216,7 @@ export type MovimientoVacacionesPayload = {
   colaboradorId: number
   tipo: TipoMovimientoVacaciones
   cantidadDias: number
+  signoAjuste?: 1 | -1 | null
   fecha: string
   observaciones?: string | null
 }

@@ -7,13 +7,14 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const CEDULA_NACIONAL_PATTERN = /^([1-9])-?(\d{4})-?(\d{4})$/
 const CEDULA_DIMEX_PATTERN = /^\d{11,12}$/
 
+/** Sugerencias legacy para filtros de listado (el alta usa el catálogo de puestos). */
 export const CARGOS_SUGERIDOS = [
-  'Administradora',
-  'Secretaria',
+  'Administración',
+  'Secretaría',
   'Fontanero',
-  'Ayudante de fontanero',
-  'Contador',
-  'Lector de medidores',
+  'Operación',
+  'Atención al usuario',
+  'Personal técnico',
 ] as const
 
 export const EMPTY_COLABORADOR_VALUES: ColaboradorFormValues = {
@@ -21,7 +22,7 @@ export const EMPTY_COLABORADOR_VALUES: ColaboradorFormValues = {
   apellidos: '',
   cedula: '',
   correoElectronico: '',
-  cargo: '',
+  puestoId: '',
   usuarioId: '',
 }
 
@@ -61,8 +62,9 @@ export function validateColaborador(values: ColaboradorFormValues): ColaboradorF
   if (nombre) errors.nombre = nombre
   const apellidos = validarTexto(values.apellidos, 'Los apellidos son obligatorios.', 100)
   if (apellidos) errors.apellidos = apellidos
-  const cargo = validarTexto(values.cargo, 'El cargo es obligatorio.', 100)
-  if (cargo) errors.cargo = cargo
+  if (!values.puestoId.trim()) {
+    errors.puestoId = 'Seleccione el puesto.'
+  }
 
   if (!values.cedula.trim()) errors.cedula = 'La cédula es obligatoria.'
   else if (!esCedulaValida(values.cedula)) {
@@ -88,7 +90,7 @@ export function toColaboradorPayload(
     apellidos: values.apellidos.trim(),
     cedula: values.cedula.trim(),
     correoElectronico: values.correoElectronico.trim().toLowerCase(),
-    cargo: values.cargo.trim(),
+    puestoId: Number(values.puestoId),
   }
   if (usuarioId !== null) payload.usuarioId = usuarioId
   else if (modo === 'editar') payload.usuarioId = null
@@ -100,7 +102,7 @@ export const toColaboradorFormValues = (colaborador: Colaborador): ColaboradorFo
   apellidos: colaborador.apellidos,
   cedula: colaborador.cedula,
   correoElectronico: colaborador.correoElectronico,
-  cargo: colaborador.cargo,
+  puestoId: colaborador.puestoId ? String(colaborador.puestoId) : '',
   usuarioId: colaborador.usuarioId ? String(colaborador.usuarioId) : '',
 })
 

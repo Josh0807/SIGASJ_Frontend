@@ -12,18 +12,53 @@ const emptyListado = (): NotificacionesAveriaListado => ({
   noLeidas: 0,
 })
 
-const isItem = (value: unknown): value is NotificacionAveriaItem => {
+const isNullableId = (value: unknown): value is number | null =>
+  value === null || (typeof value === 'number' && Number.isInteger(value))
+
+const normalizeItem = (value: unknown): NotificacionAveriaItem | null => {
   if (!value || typeof value !== 'object') {
-    return false
+    return null
   }
   const row = value as Partial<NotificacionAveriaItem>
-  return (
-    typeof row.id === 'number' &&
-    typeof row.idAveria === 'number' &&
-    typeof row.titulo === 'string' &&
-    typeof row.mensaje === 'string' &&
-    typeof row.leida === 'boolean'
-  )
+  if (
+    typeof row.id !== 'number' ||
+    typeof row.titulo !== 'string' ||
+    typeof row.mensaje !== 'string' ||
+    typeof row.leida !== 'boolean'
+  ) {
+    return null
+  }
+
+  const idAveria = isNullableId(row.idAveria) ? row.idAveria : null
+  const idSolicitudAusencia = isNullableId(row.idSolicitudAusencia)
+    ? row.idSolicitudAusencia
+    : null
+
+  // Exactamente una referencia válida (o ítem legado solo con idAveria).
+  const hasAveria = idAveria != null && idAveria > 0
+  const hasSolicitud = idSolicitudAusencia != null && idSolicitudAusencia > 0
+  if (!hasAveria && !hasSolicitud) {
+    return null
+  }
+  if (hasAveria && hasSolicitud) {
+    return null
+  }
+
+  return {
+    id: row.id,
+    idAveria: hasAveria ? idAveria : null,
+    idSolicitudAusencia: hasSolicitud ? idSolicitudAusencia : null,
+    tipo: typeof row.tipo === 'string' ? row.tipo : '',
+    titulo: row.titulo,
+    mensaje: row.mensaje,
+    leida: row.leida,
+    fechaCreacion:
+      typeof row.fechaCreacion === 'string' ? row.fechaCreacion : '',
+    fechaLectura:
+      row.fechaLectura === null || typeof row.fechaLectura === 'string'
+        ? row.fechaLectura
+        : null,
+  }
 }
 
 export const parseNotificacionesListado = (
@@ -36,7 +71,9 @@ export const parseNotificacionesListado = (
   if (!Array.isArray(raw.data)) {
     return emptyListado()
   }
-  const data = raw.data.filter(isItem)
+  const data = raw.data
+    .map(normalizeItem)
+    .filter((item): item is NotificacionAveriaItem => item != null)
   const noLeidas =
     typeof raw.noLeidas === 'number'
       ? raw.noLeidas

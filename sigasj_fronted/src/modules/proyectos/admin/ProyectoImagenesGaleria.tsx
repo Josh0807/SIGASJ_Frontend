@@ -6,6 +6,7 @@ import {
   uploadProyectoImagenPrincipal,
   uploadProyectoImagenes,
 } from '../services/proyectosApi'
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import { type AdminProyectoDetalle, type AdminProyectoImagen } from './types'
 import { validateProyectoImagenFile } from './validateProyectoForm'
 
@@ -173,7 +174,7 @@ const ProyectoImagenesGaleria = ({
           {proyecto.imagenPrincipal ? (
             <div className="proyecto-imagenes-galeria__cover-preview">
               <img
-                src={proyecto.imagenPrincipal}
+                src={resolveBackendAssetUrl(proyecto.imagenPrincipal) ?? proyecto.imagenPrincipal}
                 alt={`Portada principal del proyecto ${proyecto.nombre}`}
               />
             </div>
@@ -276,7 +277,7 @@ const ProyectoImagenesGaleria = ({
                   aria-label={`Ver fotografía ${index + 1} en tamaño completo`}
                 >
                   <img
-                    src={img.url}
+                    src={resolveBackendAssetUrl(img.url) ?? img.url}
                     alt={img.descripcion || `Fotografía ${index + 1} de la galería`}
                   />
                   <span className="proyecto-imagenes-galeria__badge">
@@ -322,7 +323,7 @@ const ProyectoImagenesGaleria = ({
               ×
             </button>
             <img
-              src={viewerImage.url}
+              src={resolveBackendAssetUrl(viewerImage.url) ?? viewerImage.url}
               alt={viewerImage.descripcion || 'Fotografía ampliada del proyecto'}
               className="max-h-[88vh] w-auto max-w-full rounded-[1.25rem] object-contain"
             />

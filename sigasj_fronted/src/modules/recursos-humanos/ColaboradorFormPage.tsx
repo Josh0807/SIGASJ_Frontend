@@ -20,7 +20,6 @@ import {
   registrarColaborador,
 } from './colaboradoresApi'
 import {
-  CARGOS_SUGERIDOS,
   EMPTY_COLABORADOR_VALUES,
   colaboradorErrorMessage,
   esNoAutenticado,
@@ -30,10 +29,11 @@ import {
   validateColaborador,
   type ColaboradorFormErrors,
 } from './colaboradorForm'
+import { getPuestos } from './puestosApi'
 import { RRHH_PATH, RRHH_TITLE, colaboradorDetailPath } from './recursosHumanosPaths'
-import type { ColaboradorFormValues, CuentaUsuario } from './types'
+import type { ColaboradorFormValues, CuentaUsuario, Puesto } from './types'
 
-type TextField = Exclude<keyof ColaboradorFormValues, 'usuarioId'>
+type TextField = Exclude<keyof ColaboradorFormValues, 'usuarioId' | 'puestoId'>
 
 const fields: Array<{
   name: TextField
@@ -43,13 +43,11 @@ const fields: Array<{
   type?: 'email'
   autoComplete: string
   icon: typeof IconUser
-  list?: string
 }> = [
   { name: 'nombre', label: 'Nombre', placeholder: 'Ej. Juan', maxLength: 100, autoComplete: 'given-name', icon: IconUser },
   { name: 'apellidos', label: 'Apellidos', placeholder: 'Ej. Pérez Rodríguez', maxLength: 100, autoComplete: 'family-name', icon: IconUsers },
   { name: 'cedula', label: 'Cédula', placeholder: 'Ej. 1-1111-1111', maxLength: 14, autoComplete: 'off', icon: IconId },
   { name: 'correoElectronico', label: 'Correo electrónico', placeholder: 'nombre@ejemplo.com', maxLength: 150, type: 'email', autoComplete: 'email', icon: IconAt },
-  { name: 'cargo', label: 'Cargo', placeholder: 'Ej. Fontanero', maxLength: 100, autoComplete: 'organization-title', icon: IconBriefcase, list: 'rrhh-cargos-form' },
 ]
 
 const ROLES_PERSONAL = ['ADMINISTRADORA', 'SECRETARIA', 'FONTANERO', 'AYUDANTE']
@@ -80,6 +78,7 @@ export default function ColaboradorFormPage() {
       : carga.error
   const [cuentas, setCuentas] = useState<CuentaUsuario[]>([])
   const [cuentasError, setCuentasError] = useState(false)
+  const [puestos, setPuestos] = useState<Puesto[]>([])
   const submitting = useRef(false)
 
   const salirPorSesion = useCallback(() => {
@@ -119,6 +118,20 @@ export default function ColaboradorFormPage() {
       })
       .catch(() => {
         if (!controller.signal.aborted) setCuentasError(true)
+      })
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    getPuestos(true, controller.signal)
+      .then((lista) => {
+        if (!controller.signal.aborted) {
+          setPuestos(Array.isArray(lista) ? lista : [])
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setPuestos([])
       })
     return () => controller.abort()
   }, [])
@@ -194,8 +207,8 @@ export default function ColaboradorFormPage() {
         <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">{titulo}</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">
           {modo === 'editar'
-            ? 'Actualice la información personal, el cargo o la cuenta vinculada del colaborador.'
-            : 'Ingrese la información personal y el cargo del nuevo colaborador.'}
+            ? 'Actualice la información personal, el puesto o la cuenta vinculada del colaborador.'
+            : 'Ingrese la información personal y el puesto del nuevo colaborador.'}
         </p>
       </header>
 
@@ -288,11 +301,41 @@ export default function ColaboradorFormPage() {
                   </label>
                 )
               })}
-              <datalist id="rrhh-cargos-form">
-                {CARGOS_SUGERIDOS.map((opcion) => (
-                  <option key={opcion} value={opcion} />
-                ))}
-              </datalist>
+              <label className="grid min-w-0 gap-2.5">
+                <span className="text-sm font-bold text-[#163f6b]">
+                  Puesto <span className="text-red-600" aria-hidden="true">*</span>
+                  <span className="sr-only"> (obligatorio)</span>
+                </span>
+                <span
+                  className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors.puestoId ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-blue-500'}`}
+                >
+                  <IconBriefcase className={errors.puestoId ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
+                  <select
+                    className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-3 text-slate-800 outline-none"
+                    value={values.puestoId}
+                    required
+                    aria-invalid={Boolean(errors.puestoId)}
+                    aria-label="Puesto"
+                    onChange={(event) => update('puestoId', event.target.value)}
+                  >
+                    <option value="">Seleccione un puesto</option>
+                    {puestos.map((puesto) => (
+                      <option key={puesto.id} value={String(puesto.id)}>
+                        {puesto.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+                {errors.puestoId ? (
+                  <small className="font-semibold text-red-600" role="alert">
+                    {errors.puestoId}
+                  </small>
+                ) : (
+                  <small className="text-slate-500">
+                    El nombre del puesto se muestra como cargo en listados y reportes.
+                  </small>
+                )}
+              </label>
 
               <label className="grid min-w-0 gap-2.5">
                 <span className="text-sm font-bold text-[#163f6b]">Cuenta de usuario (opcional)</span>

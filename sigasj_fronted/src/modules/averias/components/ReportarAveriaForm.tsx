@@ -50,7 +50,7 @@ export default function ReportarAveriaForm() {
         window.clearTimeout(cedulaTimerRef.current)
         cedulaTimerRef.current = null
       }
-      const digitos = value.replace(/D/g, '')
+      const digitos = value.replace(/\D/g, '')
       // Al completar una cédula válida se consulta sola, sin esperar a salir del campo.
       if (digitos.length >= 9 && digitos.length <= 12) {
         cedulaTimerRef.current = window.setTimeout(() => {
@@ -191,16 +191,9 @@ export default function ReportarAveriaForm() {
     </span>
   )
 
-  return (
-    <form
-      className="public-averia-form w-full"
-      noValidate
-      onSubmit={handleSubmit}
-      aria-busy={isSubmitting ? true : undefined}
-      aria-describedby={formErrorId}
-      data-submitting={isSubmitting ? 'true' : 'false'}
-    >
-      {submittedReport ? (
+  if (submittedReport) {
+    return (
+      <div className="public-averia-form w-full">
         <FormSuccessResult
           ref={confirmationRef}
           className="public-averia-form__success"
@@ -223,8 +216,31 @@ export default function ReportarAveriaForm() {
           ]}
           hint="Conserve este código para identificar su reporte."
         />
-      ) : null}
+        <div className="public-averia-form__actions">
+          <button
+            type="button"
+            className="receipt-query-page__button receipt-query-page__button--secondary public-averia-form__submit"
+            onClick={() => {
+              setSubmittedReport(null)
+              setCedulaMensaje(null)
+            }}
+          >
+            Registrar otra avería
+          </button>
+        </div>
+      </div>
+    )
+  }
 
+  return (
+    <form
+      className="public-averia-form w-full"
+      noValidate
+      onSubmit={handleSubmit}
+      aria-busy={isSubmitting ? true : undefined}
+      aria-describedby={formErrorId}
+      data-submitting={isSubmitting ? 'true' : 'false'}
+    >
       {formError ? (
         <p id={formErrorId} className="receipt-query-page__error-alert public-averia-form__form-error" role="alert">
           {formError}
@@ -243,7 +259,7 @@ export default function ReportarAveriaForm() {
           <div className="public-averia-form__grid public-averia-form__grid--pair">
             <div className="public-averia-form__field">
               <label htmlFor={fieldId(idPrefix, 'identificacionReportante')}>
-                Número de cédula o identificación
+                {requiredLabel('Número de cédula o identificación')}
               </label>
               <input
                 id={fieldId(idPrefix, 'identificacionReportante')}
@@ -251,6 +267,8 @@ export default function ReportarAveriaForm() {
                 type="text"
                 inputMode="text"
                 maxLength={50}
+                required
+                aria-required="true"
                 aria-invalid={Boolean(errors.identificacionReportante)}
                 aria-describedby={
                   errors.identificacionReportante

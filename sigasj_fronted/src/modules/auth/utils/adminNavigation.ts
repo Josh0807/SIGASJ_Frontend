@@ -10,6 +10,14 @@ import {
   isFontaneroAveriasPath,
 } from '../../averias/fontanero/averiasFontaneroPaths'
 import {
+  FONTANERO_MIS_SOLICITUDES_PATH,
+  FONTANERO_MIS_SOLICITUDES_TITLE,
+  FONTANERO_SOLICITAR_AUSENCIA_PATH,
+  FONTANERO_SOLICITAR_AUSENCIA_TITLE,
+  isFontaneroMisSolicitudesPath,
+  isFontaneroSolicitarAusenciaPath,
+} from '../../solicitudes-ausencia/solicitudesAusenciaPaths'
+import {
   ADMIN_MODULE_ACCESS,
   ADMIN_MODULE_ACCESS_BY_SEGMENT,
   ROLE_PERMISSIONS,
@@ -121,7 +129,11 @@ export function canAccessAdminRoute(
     return false
   }
 
-  if (isFontaneroAveriasPath(path)) {
+  if (
+    isFontaneroAveriasPath(path) ||
+    isFontaneroSolicitarAusenciaPath(path) ||
+    isFontaneroMisSolicitudesPath(path)
+  ) {
     return userHasAllowedRole(user, [InternalAdminRoleName.Fontanero])
   }
 
@@ -136,7 +148,11 @@ export function canAccessAdminRoute(
 export function getAllowedRolesForAdminPath(
   path: string,
 ): readonly InternalAdminRole[] | undefined {
-  if (isFontaneroAveriasPath(path)) {
+  if (
+    isFontaneroAveriasPath(path) ||
+    isFontaneroSolicitarAusenciaPath(path) ||
+    isFontaneroMisSolicitudesPath(path)
+  ) {
     return [InternalAdminRoleName.Fontanero]
   }
 
@@ -161,6 +177,16 @@ export function getAdminNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
       path: FONTANERO_AVERIAS_PATH,
       title: FONTANERO_AVERIAS_TITLE,
       icon: 'averias',
+    })
+    items.push({
+      path: FONTANERO_SOLICITAR_AUSENCIA_PATH,
+      title: FONTANERO_SOLICITAR_AUSENCIA_TITLE,
+      icon: 'lecturas',
+    })
+    items.push({
+      path: FONTANERO_MIS_SOLICITUDES_PATH,
+      title: FONTANERO_MIS_SOLICITUDES_TITLE,
+      icon: 'lecturas',
     })
   }
 

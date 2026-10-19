@@ -57,6 +57,10 @@ const setFieldValue = (input: HTMLInputElement | HTMLTextAreaElement, value: str
 }
 
 const fillRequired = (container: HTMLElement) => {
+  setFieldValue(
+    container.querySelector('[name="identificacionReportante"]') as HTMLInputElement,
+    '1-2345-6789',
+  )
   setFieldValue(container.querySelector('[name="nombreReportante"]') as HTMLInputElement, 'María Rodríguez')
   setFieldValue(container.querySelector('[name="telefonoReportante"]') as HTMLInputElement, '8888-8888')
   setFieldValue(
@@ -203,7 +207,7 @@ describe('Pantalla pública Reportar avería', () => {
     }
   })
 
-  it('envía POST público sin JWT y omite opcionales vacíos y campos administrativos', async () => {
+  it('envía POST público sin JWT e incluye cédula; omite correo vacío y campos administrativos', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
@@ -226,12 +230,12 @@ describe('Pantalla pública Reportar avería', () => {
       expect(headers.Authorization).toBeUndefined()
       expect(body).toEqual({
         nombreReportante: 'María Rodríguez',
+        identificacionReportante: '1-2345-6789',
         telefonoReportante: '8888-8888',
         ubicacion: 'Frente a la escuela, 50 m sur',
         sectorComunidad: 'San Juan',
         descripcion: 'Se observa una fuga en la tubería.',
       })
-      expect(body).not.toHaveProperty('identificacionReportante')
       expect(body).not.toHaveProperty('correoReportante')
       for (const key of PUBLIC_AVERIA_ADMIN_PAYLOAD_KEYS) {
         expect(body).not.toHaveProperty(key)
@@ -312,7 +316,7 @@ describe('Pantalla pública Reportar avería', () => {
     }
   })
 
-  it('incluye identificación y correo en el payload solo cuando tienen valor', async () => {
+  it('incluye correo opcional en el payload cuando tiene valor', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
@@ -321,10 +325,6 @@ describe('Pantalla pública Reportar avería', () => {
       const form = app.container.querySelector('form') as HTMLFormElement
       await act(async () => {
         fillRequired(app.container)
-        setFieldValue(
-          app.container.querySelector('[name="identificacionReportante"]') as HTMLInputElement,
-          '1-2345-6789',
-        )
         setFieldValue(
           app.container.querySelector('[name="correoReportante"]') as HTMLInputElement,
           'prueba.averia.e2e@example.com',
@@ -343,7 +343,7 @@ describe('Pantalla pública Reportar avería', () => {
     }
   })
 
-  it('muestra el código del Backend y limpia el formulario solo después del éxito', async () => {
+  it('tras el éxito solo muestra la confirmación (sin formulario)', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
@@ -358,10 +358,11 @@ describe('Pantalla pública Reportar avería', () => {
       expect(app.container.innerHTML).toContain('Avería registrada correctamente.')
       expect(app.container.innerHTML).toContain('AV-2026-0001')
       expect(app.container.innerHTML).toContain('Conserve este código para identificar su reporte.')
+      expect(app.container.innerHTML).toContain('Registrar otra avería')
       expect(app.container.innerHTML).not.toContain('SMS')
-      expect((app.container.querySelector('[name="nombreReportante"]') as HTMLInputElement).value).toBe('')
-      expect((app.container.querySelector('[name="telefonoReportante"]') as HTMLInputElement).value).toBe('')
-      expect((app.container.querySelector('[name="descripcion"]') as HTMLTextAreaElement).value).toBe('')
+      expect(app.container.innerHTML).not.toContain('Datos del Reportante')
+      expect(app.container.querySelector('[name="nombreReportante"]')).toBeNull()
+      expect(app.container.querySelector('form')).toBeNull()
       expect(app.container.querySelector('.public-averia-form__code')?.textContent).toBe('AV-2026-0001')
     } finally {
       await app.cleanup()
@@ -430,7 +431,8 @@ describe('Pantalla pública Reportar avería', () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(2)
       expect(app.container.innerHTML).toContain('AV-2026-0001')
-      expect((app.container.querySelector('[name="nombreReportante"]') as HTMLInputElement).value).toBe('')
+      expect(app.container.innerHTML).toContain('Avería registrada correctamente.')
+      expect(app.container.querySelector('[name="nombreReportante"]')).toBeNull()
     } finally {
       await app.cleanup()
     }

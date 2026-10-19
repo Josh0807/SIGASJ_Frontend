@@ -18,6 +18,6 @@ export function resolveBackendAssetUrl(value: unknown): string | undefined {
   const path = value.trim().replace(/\\/g, '/')
   if (!path || path === 'null' || path === 'undefined') return undefined
   if (/^(https?:|data:|blob:)/i.test(path)) return path
-  if (!/^\/?(?:api\/v1\/)?uploads\//i.test(path)) return path
+  if (!/^\/?(?:api\/v1\/)?(?:uploads|public\/media)\//i.test(path)) return path
   return `${getBackendOrigin()}${path.startsWith('/') ? path : `/${path}`}`
 }

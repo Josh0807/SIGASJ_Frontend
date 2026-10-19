@@ -169,18 +169,32 @@ const MisActividadesPage = () => {
       ) : null}
 
       {!isLoading && !error && visibles.length > 0 ? (
-        <ul className="m-0 grid list-none gap-4 p-0" data-testid="mis-actividades-lista">
+        <ul
+          className="actividades-fontanero-historial__list m-0 grid list-none gap-4 p-0"
+          data-testid="mis-actividades-lista"
+        >
           {visibles.map((actividad) => (
             <li key={actividad.id}>
-              <article className="actividad-historial-card" aria-labelledby={`mis-actividad-${actividad.id}`}>
+              <article
+                className="actividad-historial-card"
+                aria-labelledby={`mis-actividad-${actividad.id}`}
+              >
                 <header className="actividad-historial-card__header">
                   <div className="actividad-historial-card__heading">
-                    <p className="actividad-historial-card__tipo">{actividad.tipoActividadNombre}</p>
-                    <h2 id={`mis-actividad-${actividad.id}`} className="actividad-historial-card__titulo">
+                    <p className="actividad-historial-card__tipo">
+                      {actividad.tipoActividadNombre}
+                    </p>
+                    <h2
+                      id={`mis-actividad-${actividad.id}`}
+                      className="actividad-historial-card__titulo"
+                    >
                       {actividad.titulo}
                     </h2>
                   </div>
-                  <span className="actividad-historial-card__estado" data-estado={actividad.estado}>
+                  <span
+                    className="actividad-historial-card__estado"
+                    data-estado={actividad.estado}
+                  >
                     {formatActividadEstado(actividad.estado)}
                   </span>
                 </header>
@@ -190,39 +204,48 @@ const MisActividadesPage = () => {
                     <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
                   </div>
                 </dl>
-                <details>
-                  <summary>Ver detalle</summary>
-                  <dl className="actividad-historial-card__meta">
-                    {actividad.ubicacion ? (
-                      <div className="actividad-historial-card__meta-item">
-                        <dt>Ubicación</dt>
-                        <dd>{actividad.ubicacion}</dd>
+                <details className="actividad-historial-card__details">
+                  <summary className="actividad-historial-card__details-toggle">
+                    Ver detalle
+                  </summary>
+                  <div className="actividad-historial-card__details-body">
+                    <dl className="actividad-historial-card__meta">
+                      {actividad.ubicacion ? (
+                        <div className="actividad-historial-card__meta-item">
+                          <dt>Ubicación</dt>
+                          <dd>{actividad.ubicacion}</dd>
+                        </div>
+                      ) : null}
+                      {actividad.descripcion ? (
+                        <div className="actividad-historial-card__meta-item">
+                          <dt>Descripción</dt>
+                          <dd>{actividad.descripcion}</dd>
+                        </div>
+                      ) : null}
+                      {actividad.observaciones ? (
+                        <div className="actividad-historial-card__meta-item">
+                          <dt>Observaciones</dt>
+                          <dd>{actividad.observaciones}</dd>
+                        </div>
+                      ) : null}
+                      {actividad.observacionCorreccion ? (
+                        <div className="actividad-historial-card__meta-item">
+                          <dt>Corrección solicitada</dt>
+                          <dd>{actividad.observacionCorreccion}</dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                    {actividad.estado === 'REQUIERE_CORRECCION' ? (
+                      <div className="actividad-historial-card__footer">
+                        <Link
+                          to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}
+                          className="actividad-historial-card__action"
+                        >
+                          Corregir actividad
+                        </Link>
                       </div>
                     ) : null}
-                    {actividad.descripcion ? (
-                      <div className="actividad-historial-card__meta-item">
-                        <dt>Descripción</dt>
-                        <dd>{actividad.descripcion}</dd>
-                      </div>
-                    ) : null}
-                    {actividad.observaciones ? (
-                      <div className="actividad-historial-card__meta-item">
-                        <dt>Observaciones</dt>
-                        <dd>{actividad.observaciones}</dd>
-                      </div>
-                    ) : null}
-                    {actividad.observacionCorreccion ? (
-                      <div className="actividad-historial-card__meta-item">
-                        <dt>Corrección solicitada</dt>
-                        <dd>{actividad.observacionCorreccion}</dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                  {actividad.estado === 'REQUIERE_CORRECCION' ? (
-                    <Link to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}>
-                      Corregir actividad
-                    </Link>
-                  ) : null}
+                  </div>
                 </details>
               </article>
             </li>
@@ -231,14 +254,25 @@ const MisActividadesPage = () => {
       ) : null}
 
       {!isLoading && !error && totalPages > 1 ? (
-        <nav aria-label="Paginación de mis actividades" className="flex items-center justify-center gap-4">
-          <button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
+        <nav
+          aria-label="Paginación de mis actividades"
+          className="actividades-fontanero-historial__pagination"
+        >
+          <button
+            type="button"
+            disabled={currentPage <= 1}
+            onClick={() => setPage(currentPage - 1)}
+          >
             Anterior
           </button>
-          <span>
+          <p>
             Página {currentPage} de {totalPages}
-          </span>
-          <button type="button" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
+          </p>
+          <button
+            type="button"
+            disabled={currentPage >= totalPages}
+            onClick={() => setPage(currentPage + 1)}
+          >
             Siguiente
           </button>
         </nav>

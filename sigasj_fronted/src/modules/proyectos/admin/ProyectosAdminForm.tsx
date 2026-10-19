@@ -1,4 +1,5 @@
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from 'react'
+import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import {
   ESTADO_PROYECTO_OPTIONS,
   PROYECTO_ESTADO_UPDATE_PENDING,
@@ -296,7 +297,7 @@ const ProyectosAdminForm = ({
           ) : !removeImagen && values.imagenPrincipalUrl ? (
             <div className="proyectos-admin__cover-preview-wrapper">
               <img
-                src={values.imagenPrincipalUrl}
+                src={resolveBackendAssetUrl(values.imagenPrincipalUrl) ?? values.imagenPrincipalUrl ?? undefined}
                 alt="Portada actual del proyecto"
                 className="proyectos-admin__cover-preview"
               />

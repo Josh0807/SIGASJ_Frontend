@@ -27,6 +27,9 @@ export const toMovimientosVacacionesParams = (filtros: MovimientosVacacionesFilt
 export const getBalanceVacaciones = (colaboradorId: number, signal?: AbortSignal) =>
   fetchWithAuth<BalanceVacaciones>(balanceVacacionesEndpoint(colaboradorId), { signal })
 
+export const getBalanceVacacionesPropio = (signal?: AbortSignal) =>
+  fetchWithAuth<BalanceVacaciones>(`${VACACIONES_ENDPOINT}/mias/balance`, { signal })
+
 export const getMovimientosVacaciones = (
   filtros: MovimientosVacacionesFiltros,
   signal?: AbortSignal,
