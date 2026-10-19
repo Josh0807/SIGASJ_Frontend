@@ -1,3 +1,4 @@
+import { formatearFechaAsada } from '../../../shared/utils/fechaAsada'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { IconCalendar, IconMail, IconMessageCircle } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
@@ -7,12 +8,7 @@ import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 
 const TARGET_EMAIL = 'jdasadasanjuan@gmail.com'
 
-const formatDateForDisplay = (date: Date) => {
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const year = date.getFullYear()
-  return `${day}/${month}/${year}`
-}
+const formatDateForDisplay = (date: Date) => formatearFechaAsada(date)
 
 const ComplaintFormPage = () => {
   useLayoutEffect(() => {

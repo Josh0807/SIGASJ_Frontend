@@ -15,8 +15,9 @@ const proyecto = (overrides: Partial<AdminProyecto> = {}): AdminProyecto => ({
   estado: 'EN_PROCESO',
   imagenPrincipal: 'https://ejemplo.com/tanque.jpg',
   activo: false,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-03-15T00:00:00.000Z',
+  // Mediodía UTC = 06:00 en Costa Rica: el día no cambia al convertir a la hora de la ASADA.
+  createdAt: '2026-01-01T12:00:00.000Z',
+  updatedAt: '2026-03-15T12:00:00.000Z',
   ...overrides,
 })
 

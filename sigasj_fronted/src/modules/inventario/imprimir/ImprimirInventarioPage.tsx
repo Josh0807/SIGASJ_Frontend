@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import {
   IconAlertTriangle,
@@ -42,6 +43,7 @@ const formatPrintDate = (value: Date) =>
   value.toLocaleString('es-CR', {
     dateStyle: 'long',
     timeStyle: 'short',
+    timeZone: ZONA_HORARIA_ASADA,
   })
 
 export default function ImprimirInventarioPage() {

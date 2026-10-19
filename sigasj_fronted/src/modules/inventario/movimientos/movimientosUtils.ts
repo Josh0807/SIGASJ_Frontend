@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { getHttpErrorStatus } from '../solicitudes-materiales/solicitudMaterialesUtils'
 import type { MovimientoInventario, MovimientosListResponse } from './types'
 
@@ -14,6 +15,7 @@ export const formatMovimientoFecha = (value?: string | null) => {
   return new Intl.DateTimeFormat('es-CR', {
     dateStyle: 'short',
     timeStyle: 'short',
+    timeZone: ZONA_HORARIA_ASADA,
   }).format(date)
 }
 

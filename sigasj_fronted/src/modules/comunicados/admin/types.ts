@@ -1,3 +1,4 @@
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 export type ComunicadoFormValues = {
   titulo: string
   descripcion: string
@@ -18,6 +19,6 @@ export const emptyComunicadoFormValues = (): ComunicadoFormValues => ({
   prioridad: 'Media',
   estado: 'Activo',
   esPublico: true,
-  fechaPublicacion: new Date().toISOString().slice(0, 10),
+  fechaPublicacion: hoyEnAsada(),
   fechaExpiracion: '',
 })

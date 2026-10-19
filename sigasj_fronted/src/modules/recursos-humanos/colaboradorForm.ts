@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from '../../shared/utils/fechaAsada'
 import type { Colaborador, ColaboradorFormValues, ColaboradorPayload } from './types'
 
 export type ColaboradorFormErrors = Partial<Record<keyof ColaboradorFormValues, string>>
@@ -30,14 +31,16 @@ export const nombreCompleto = (colaborador: Pick<Colaborador, 'nombre' | 'apelli
 export const estadoLabel = (activo: boolean) => (activo ? 'Activo' : 'Inactivo')
 
 /**
- * createdAt/updatedAt los asigna SQL Server con GETDATE() (hora de Costa Rica) y el API
- * los serializa con sufijo Z; se muestran tal cual para no restarles el desfase de UTC.
+ * createdAt/updatedAt los escribe el API como instantes UTC reales (sufijo Z), por lo que
+ * se convierten a la hora de Costa Rica. Antes los asignaba SQL Server con GETDATE() (hora
+ * local) y aquí se mostraban "tal cual"; los registros históricos de esa época pueden verse
+ * 6 horas atrasados hasta aplicar scripts/corregir-fechas-historicas.sql.
  */
 export const formatearFechaAuditoria = (valor: string) => {
   const fecha = new Date(valor)
   return Number.isNaN(fecha.getTime())
     ? '—'
-    : fecha.toLocaleString('es-CR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' })
+    : fecha.toLocaleString('es-CR', { dateStyle: 'medium', timeStyle: 'short', timeZone: ZONA_HORARIA_ASADA })
 }
 
 export const esCedulaValida = (cedula: string) => {

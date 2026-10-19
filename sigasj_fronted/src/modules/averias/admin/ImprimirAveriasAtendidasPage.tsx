@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { IconPrinter } from '@tabler/icons-react'
@@ -16,6 +17,7 @@ const formatPrintDate = (value: Date) =>
   value.toLocaleString('es-CR', {
     dateStyle: 'long',
     timeStyle: 'short',
+    timeZone: ZONA_HORARIA_ASADA,
   })
 
 const etiquetaEstado = (estado: string) =>

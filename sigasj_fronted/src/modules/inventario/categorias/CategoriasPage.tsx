@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from "../../../shared/utils/fechaAsada";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/components/AuthContext";
@@ -19,7 +20,10 @@ import type { Categoria } from "./types";
 import { useCategorias } from "./useCategorias";
 
 const formatDate = (value: string) =>
-  new Intl.DateTimeFormat("es-CR", { dateStyle: "medium" }).format(
+  new Intl.DateTimeFormat("es-CR", {
+    dateStyle: "medium",
+    timeZone: ZONA_HORARIA_ASADA,
+  }).format(
     new Date(value),
   );
 

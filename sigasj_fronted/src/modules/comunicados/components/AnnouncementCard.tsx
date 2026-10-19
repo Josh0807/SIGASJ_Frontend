@@ -1,3 +1,4 @@
+import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { Link } from 'react-router-dom'
 import { IconArrowRight } from '@tabler/icons-react'
 import type { AnnouncementCardProps } from '../types/AnnouncementsSectionProps'
@@ -186,8 +187,9 @@ const formatAnnouncementDate = (value: string): string | undefined => {
   const trimmed = value.trim()
   const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
 
+  // Fecha de calendario: se formatea en UTC para no correr el día. Instante: hora de Costa Rica.
   const date = dateOnly
-    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    ? new Date(Date.UTC(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])))
     : new Date(trimmed)
 
   if (Number.isNaN(date.getTime())) {
@@ -198,6 +200,7 @@ const formatAnnouncementDate = (value: string): string | undefined => {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: dateOnly ? 'UTC' : ZONA_HORARIA_ASADA,
   }).format(date)
 }
 

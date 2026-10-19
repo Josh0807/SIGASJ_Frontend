@@ -1,10 +1,11 @@
+import { anioEnAsada } from '../../../shared/utils/fechaAsada'
 import { IconArrowRight, IconClock, IconMapPin, IconShare } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import facebookLogo from '../../../assets/LogoFacebook.avif'
 import whatsappLogo from '../../../assets/LogoWhatsApp.png'
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = anioEnAsada()
 
   return (
     <footer className="sigasj-footer relative isolate w-full min-w-0 overflow-hidden bg-[radial-gradient(circle_at_50%_0%,#1763a5_0%,#07447f_42%,#032e61_100%)] text-white">
