@@ -243,7 +243,7 @@ export default function ReportarAveriaForm() {
           <div className="public-averia-form__grid public-averia-form__grid--pair">
             <div className="public-averia-form__field">
               <label htmlFor={fieldId(idPrefix, 'identificacionReportante')}>
-                {optionalLabel('Número de cédula o identificación')}
+                Número de cédula o identificación
               </label>
               <input
                 id={fieldId(idPrefix, 'identificacionReportante')}
