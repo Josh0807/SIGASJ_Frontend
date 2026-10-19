@@ -4,7 +4,7 @@ import ActividadesFontaneroCorreccionesPage from './pages/ActividadesFontaneroCo
 import ActividadesFontaneroHistorialPage from './pages/ActividadesFontaneroHistorialPage'
 import ActividadesFontaneroDashboardPage from './pages/ActividadesFontaneroDashboardPage'
 import ActividadesFontaneroHomePage from './pages/ActividadesFontaneroHomePage'
-import ActividadesFontaneroStubPage from './pages/ActividadesFontaneroStubPage'
+import MisActividadesPage from './pages/MisActividadesPage'
 import CorregirActividadPage from './pages/CorregirActividadPage'
 import HistorialActividadDetallePage from './pages/HistorialActividadDetallePage'
 import RegistrarActividadPage from './pages/RegistrarActividadPage'
@@ -24,13 +24,6 @@ const RegistrarActividadAliasRedirect = () => {
 
   return <Navigate to={ACTIVIDADES_FONTANERO_PATHS.nueva} replace />
 }
-
-const MisActividadesPage = () => (
-  <ActividadesFontaneroStubPage
-    title="Mis actividades"
-    description="Consulte el listado de actividades que ha registrado."
-  />
-)
 
 const HistorialActividadesPage = () => <ActividadesFontaneroHistorialPage />
 

@@ -265,6 +265,20 @@ export async function getHistorialActividades(
 }
 
 /**
+ * Todas las actividades registradas por el Fontanero autenticado (cualquier estado).
+ * La identidad sale del JWT; la paginación y el filtro se aplican en el cliente.
+ */
+export async function getMisActividades(): Promise<ActividadFontaneroListado> {
+  const result = await fetchWithAuth<ActividadFontaneroListado>('/fontanero/actividades')
+  const data = Array.isArray(result?.data)
+    ? result.data
+        .map(normalizeActividadFontanero)
+        .filter((item): item is ActividadFontaneroRegistrada => item !== null)
+    : []
+  return { data, total: data.length }
+}
+
+/**
  * Detalle de una actividad propia del Fontanero autenticado.
  */
 export async function getActividadDetalle(
