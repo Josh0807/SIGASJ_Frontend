@@ -65,6 +65,18 @@ describe('AdminSidebar', () => {
     expect(markup).not.toMatch(/<a[^>]+href="https?:\/\//)
   })
 
+  it('organiza formularios oficiales como subseccion desplegable de solicitudes', () => {
+    const activeMarkup = renderSidebar('/admin/solicitudes')
+    const collapsedMarkup = renderSidebar('/admin/dashboard')
+
+    expect(activeMarkup).toContain('aria-controls="admin-solicitudes-submenu"')
+    expect(activeMarkup).toContain('aria-expanded="true"')
+    expect(activeMarkup).toContain('Formularios oficiales')
+    expect(activeMarkup).toContain('id="admin-solicitudes-submenu"')
+    expect(collapsedMarkup).toContain('aria-expanded="false"')
+    expect(collapsedMarkup).toContain('hidden=""')
+  })
+
   it('puede recibir un conjunto distinto de opciones segun el usuario', () => {
     const markup = renderSidebar('/', [
       { path: '/admin/dashboard', title: 'Dashboard', icon: 'dashboard' },

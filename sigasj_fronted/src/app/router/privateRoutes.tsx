@@ -17,6 +17,7 @@ import InventarioRoutes from '../../modules/inventario/InventarioRoutes'
 import AveriasAdminRoutes from '../../modules/averias/admin/AveriasAdminRoutes'
 import AsociadosRoutes from '../../modules/asociados/AsociadosRoutes'
 import RecursosHumanosRoutes from '../../modules/recursos-humanos/RecursosHumanosRoutes'
+import FormulariosOficialesAdminPage from '../../modules/solicitudes-publicas/formularios-oficiales/FormulariosOficialesAdminPage'
 
 export type PrivateRouteDefinition = {
   segment: string
@@ -40,7 +41,7 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
   usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
   abonados: <AsociadosRoutes />,
   inventario: <InventarioRoutes />,
-  solicitudes: <PrivateModulePlaceholder title="Gestión de solicitudes" />,
+  solicitudes: <FormulariosOficialesAdminPage />,
   lecturas: <RecursosHumanosRoutes />,
   averias: <AveriasAdminRoutes />,
   actividades: <ActividadesFontaneroRoutes />,

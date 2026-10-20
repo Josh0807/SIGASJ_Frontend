@@ -3,12 +3,19 @@ export type RequestServiceIcon =
   | 'affiliation'
   | 'payment-plan'
   | 'account-change'
+  | 'boundary-infrastructure'
+  | 'service-availability'
+  | 'downloadable-forms'
+  | 'request-tracking'
 
 export interface RequestService {
   id: string
   name: string
   description: string
-  formHref: string
+  formHref?: string
+  downloadSlug?: string
+  viewHref?: string
+  badge?: string
   icon: RequestServiceIcon
 }
 

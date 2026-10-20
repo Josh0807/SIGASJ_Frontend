@@ -17,14 +17,10 @@ export type FetchOptions = RequestInit & {
   params?: Record<string, string | number | boolean | undefined>
 }
 
-/**
- * Cliente HTTP autenticado centralizado para consumir endpoints privados y públicos.
- * Incluye automáticamente el token de autorización 'Authorization: Bearer <token>' cuando existe.
- */
-export async function fetchWithAuth<T>(
+export async function fetchRawWithAuth(
   endpoint: string,
   options: FetchOptions = {},
-): Promise<T> {
+): Promise<Response> {
   const { params, headers: customHeaders, ...restOptions } = options
   const baseUrl = getApiBaseUrl().replace(/\/$/, '')
   let formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
@@ -37,37 +33,34 @@ export async function fetchWithAuth<T>(
   }
 
   let url = `${baseUrl}${formattedEndpoint}`
-
   if (params) {
     const searchParams = new URLSearchParams()
     Object.entries(params).forEach(([key, val]) => {
-      if (val !== undefined && val !== null) {
-        searchParams.append(key, String(val))
-      }
+      if (val !== undefined && val !== null) searchParams.append(key, String(val))
     })
     const queryString = searchParams.toString()
-    if (queryString) {
-      url += `?${queryString}`
-    }
+    if (queryString) url += `?${queryString}`
   }
 
   const token = getAccessToken()
-  const headers: Record<string, string> = {
-    ...(customHeaders as Record<string, string>),
-  }
-
+  const headers: Record<string, string> = { ...(customHeaders as Record<string, string>) }
   if (!(restOptions.body instanceof FormData) && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json'
   }
+  if (token?.trim()) headers.Authorization = `Bearer ${token.trim()}`
 
-  if (token?.trim()) {
-    headers.Authorization = `Bearer ${token.trim()}`
-  }
+  return fetch(url, { ...restOptions, headers })
+}
 
-  const response = await fetch(url, {
-    ...restOptions,
-    headers,
-  })
+/**
+ * Cliente HTTP autenticado centralizado para consumir endpoints privados y públicos.
+ * Incluye automáticamente el token de autorización 'Authorization: Bearer <token>' cuando existe.
+ */
+export async function fetchWithAuth<T>(
+  endpoint: string,
+  options: FetchOptions = {},
+): Promise<T> {
+  const response = await fetchRawWithAuth(endpoint, options)
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => '')

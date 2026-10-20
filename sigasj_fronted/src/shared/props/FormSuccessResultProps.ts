@@ -13,6 +13,7 @@ export type FormSuccessResultProps = {
   meta?: FormSuccessResultMeta[]
   hint?: string
   actions?: ReactNode
+  icon?: ReactNode
   className?: string
   titleClassName?: string
   highlightLabelClassName?: string
