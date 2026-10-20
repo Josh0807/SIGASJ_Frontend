@@ -1,3 +1,5 @@
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
+
 export type ActividadRegistroFormValues = {
   fechaActividad: string
   titulo: string
@@ -14,8 +16,10 @@ export type ActividadRegistroFormValues = {
 
 export type ActividadRegistroFormField = keyof ActividadRegistroFormValues
 
-export const ACTIVIDAD_REGISTRO_FORM_INITIAL: ActividadRegistroFormValues = {
-  fechaActividad: '',
+export const createActividadRegistroFormInitial = (
+  ahora: Date = new Date(),
+): ActividadRegistroFormValues => ({
+  fechaActividad: hoyEnAsada(ahora),
   titulo: '',
   descripcion: '',
   ubicacion: '',
@@ -26,4 +30,6 @@ export const ACTIVIDAD_REGISTRO_FORM_INITIAL: ActividadRegistroFormValues = {
   cantidadCloro: '',
   caudal: '',
   documentos: [],
-}
+})
+
+export const ACTIVIDAD_REGISTRO_FORM_INITIAL = createActividadRegistroFormInitial()

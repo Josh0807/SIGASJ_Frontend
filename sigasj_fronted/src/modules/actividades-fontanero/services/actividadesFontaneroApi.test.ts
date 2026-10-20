@@ -26,6 +26,22 @@ describe('actividadesFontaneroApi — registrarActividad', () => {
     vi.mocked(fetchWithAuth).mockReset()
   })
 
+  it('omite ubicación y observaciones en Incapacidad o vacaciones', () => {
+    const tipo = TIPOS_ACTIVIDAD_BACKEND.find((item) => item.codigo === 'INCAPACIDAD_VACACIONES')!
+    expect(
+      toRegistrarActividadPayloadFromTipo(tipo, {
+        fechaActividad: '2026-09-07',
+        titulo: 'Incapacidad médica',
+        ubicacion: 'San José',
+        observaciones: 'Reposo',
+      }),
+    ).toEqual({
+      tipoActividadId: tipo.id,
+      fechaActividad: '2026-09-07',
+      titulo: 'Incapacidad médica',
+    })
+  })
+
   it('construye payload sin identidad del fontanero', () => {
     const tipo = TIPOS_ACTIVIDAD_BACKEND[0]
     expect(

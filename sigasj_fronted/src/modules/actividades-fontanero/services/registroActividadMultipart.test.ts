@@ -27,6 +27,8 @@ describe('registro integrado de actividad con documentos', () => {
     expect(formData).toBeInstanceOf(FormData)
     expect(formData.get('tipoActividadId')).toBe(String(tipo.id))
     expect(formData.get('fechaActividad')).toBe('2026-09-07')
+    expect(formData.get('ubicacion')).toBeNull()
+    expect(formData.get('observaciones')).toBeNull()
     expect(formData.getAll('documentos')).toEqual([pdf, png])
     expect(formData.get('archivo')).toBeNull()
     expect(formData.get('fontaneroId')).toBeNull()

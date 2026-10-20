@@ -67,11 +67,13 @@ export const toRegistrarActividadPayload = (
   if (descripcion) {
     payload.descripcion = descripcion
   }
-  if (ubicacion) {
-    payload.ubicacion = ubicacion
-  }
-  if (observaciones) {
-    payload.observaciones = observaciones
+  if (tipoCodigo !== 'INCAPACIDAD_VACACIONES') {
+    if (ubicacion) {
+      payload.ubicacion = ubicacion
+    }
+    if (observaciones) {
+      payload.observaciones = observaciones
+    }
   }
 
   switch (tipoCodigo) {

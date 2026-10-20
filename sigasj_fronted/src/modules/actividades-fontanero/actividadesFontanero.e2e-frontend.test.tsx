@@ -54,6 +54,13 @@ describe('Backlog 7.4 — pruebas funcionales frontend de formularios y document
       for (const field of specificFields.filter((item) => item !== expectedField)) {
         expect(app.container.querySelector(`#${field}`)).toBeNull()
       }
+      if (codigo === 'INCAPACIDAD_VACACIONES') {
+        expect(app.container.querySelector('#ubicacion')).toBeNull()
+        expect(app.container.querySelector('#observaciones')).toBeNull()
+      } else {
+        expect(app.container.querySelector('#ubicacion')).not.toBeNull()
+        expect(app.container.querySelector('#observaciones')).not.toBeNull()
+      }
     } finally { await app.cleanup() }
   })
 

@@ -5,6 +5,7 @@ import { mountAppRoutes } from '../../../test/render-app-routes'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { TIPOS_ACTIVIDAD_BACKEND, respuestaTiposActividad } from '../test/tiposActividadFixture'
 import * as actividadesApi from '../services/actividadesFontaneroApi'
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 
 const loginAsFontanero = () => {
   setAuthSession({
@@ -53,6 +54,48 @@ describe('formulario de registro de actividad (#390 / #932)', () => {
           app.container.querySelector(`[data-testid="tipo-actividad-${tipo.codigo}"]`),
         ).not.toBeNull()
       }
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('preselecciona la fecha actual y permite cambiarla', async () => {
+    loginAsFontanero()
+    const app = await mountAppRoutes(
+      ACTIVIDADES_FONTANERO_PATHS.registrarTipo('CONTROL_FUGAS'),
+    )
+
+    try {
+      const fecha = app.container.querySelector('#fechaActividad') as HTMLInputElement
+      expect(fecha).not.toBeNull()
+      expect(fecha.value).toBe(hoyEnAsada())
+      expect(fecha.readOnly).toBe(false)
+      expect(fecha.disabled).toBe(false)
+
+      await act(async () => {
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+        setter?.call(fecha, '2026-08-15')
+        fecha.dispatchEvent(new Event('input', { bubbles: true }))
+        fecha.dispatchEvent(new Event('change', { bubbles: true }))
+      })
+
+      expect(fecha.value).toBe('2026-08-15')
+    } finally {
+      await app.cleanup()
+    }
+  })
+
+  it('oculta ubicación y observaciones en Incapacidad o vacaciones', async () => {
+    loginAsFontanero()
+    const app = await mountAppRoutes(
+      ACTIVIDADES_FONTANERO_PATHS.registrarTipo('INCAPACIDAD_VACACIONES'),
+    )
+
+    try {
+      expect(app.container.querySelector('#ubicacion')).toBeNull()
+      expect(app.container.querySelector('#observaciones')).toBeNull()
+      expect(app.container.querySelector('#documentos')).not.toBeNull()
+      expect(app.container.querySelector('#fechaActividad')).not.toBeNull()
     } finally {
       await app.cleanup()
     }

@@ -32,6 +32,9 @@ type DraftFilters = {
   fechaFin: string
 }
 
+const PRIMARY_ACTION_CLASS =
+  'gallery-admin__button gallery-admin__button--primary !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200'
+
 const EMPTY_FILTERS: DraftFilters = {
   fontaneroId: '',
   tipoActividadId: '',
@@ -292,7 +295,7 @@ const ActividadesAdminRevisionPage = () => {
           <label className="gallery-admin__field"><span>Estado</span><select value={draft.estado} onChange={(e) => setDraft({ ...draft, estado: e.target.value })}><option value="">Todos</option><option value="REPORTADA">Pendiente</option><option value="REVISADA">Revisada</option><option value="REQUIERE_CORRECCION">Requiere corrección</option></select></label>
           <label className="gallery-admin__field"><span>Desde</span><input type="date" value={draft.fechaInicio} onChange={(e) => setDraft({ ...draft, fechaInicio: e.target.value })} /></label>
           <label className="gallery-admin__field"><span>Hasta</span><input type="date" value={draft.fechaFin} onChange={(e) => setDraft({ ...draft, fechaFin: e.target.value })} /></label>
-          <div className="actividades-admin-revision__filter-actions"><button className="gallery-admin__button gallery-admin__button--primary !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200" disabled={loading}>Buscar</button><button type="button" className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md" onClick={clear} disabled={loading}>Limpiar filtros</button></div>
+          <div className="actividades-admin-revision__filter-actions"><button className={PRIMARY_ACTION_CLASS} disabled={loading}>Buscar</button><button type="button" className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md" onClick={clear} disabled={loading}>Limpiar filtros</button></div>
         </form>
 
         {notice ? (
@@ -389,7 +392,7 @@ const ActividadesAdminRevisionPage = () => {
                     <footer className="actividad-historial-card__footer">
                       <button
                         type="button"
-                        className="actividad-historial-card__action"
+                        className={PRIMARY_ACTION_CLASS}
                         onClick={() => void openDetail(actividad)}
                       >
                         Ver detalle

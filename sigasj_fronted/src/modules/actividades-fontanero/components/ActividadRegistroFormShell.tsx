@@ -2,7 +2,7 @@ import { type FormEvent, useCallback, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
 import {
-  ACTIVIDAD_REGISTRO_FORM_INITIAL,
+  createActividadRegistroFormInitial,
   type ActividadRegistroFormField,
   type ActividadRegistroFormValues,
 } from '../types/actividadRegistroForm'
@@ -53,8 +53,9 @@ const ActividadRegistroFormShell = ({
   const { logout } = useAuth()
   const formRef = useRef<HTMLFormElement>(null)
   const [values, setValues] = useState<ActividadRegistroFormValues>(
-    initialValues ?? ACTIVIDAD_REGISTRO_FORM_INITIAL,
+    () => initialValues ?? createActividadRegistroFormInitial(),
   )
+  const ocultaUbicacionYObservaciones = tipo.codigo === 'INCAPACIDAD_VACACIONES'
   const [errors, setErrors] = useState<ActividadRegistroFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -128,7 +129,7 @@ const ActividadRegistroFormShell = ({
       }
       setIsSuccess(true)
       if (!isCorregirMode) {
-        setValues(ACTIVIDAD_REGISTRO_FORM_INITIAL)
+        setValues(createActividadRegistroFormInitial())
       }
       setErrors({})
       window.dispatchEvent(new CustomEvent('actividades-fontanero:updated'))
@@ -360,50 +361,54 @@ const ActividadRegistroFormShell = ({
               ) : null}
             </div>
 
-            <div
-              className={`actividad-registro-form__field${
-                errors.ubicacion ? ' actividad-registro-form__field--invalid' : ''
-              }`}
-            >
-              <label className="actividad-registro-form__label" htmlFor="ubicacion">
-                Ubicación
-              </label>
-              <input
-                id="ubicacion"
-                name="ubicacion"
-                type="text"
-                maxLength={200}
-                className={`actividad-registro-form__input${
-                  errors.ubicacion ? ' actividad-registro-form__input--error' : ''
-                }`}
-                value={values.ubicacion}
-                onChange={(event) => updateField('ubicacion', event.target.value)}
-                aria-invalid={Boolean(errors.ubicacion)}
-                aria-describedby={errors.ubicacion ? 'ubicacion-error' : undefined}
-              />
-              {errors.ubicacion ? (
-                <ActividadRegistroFieldError
-                  id="ubicacion-error"
-                  message={errors.ubicacion}
-                />
-              ) : null}
-            </div>
+            {ocultaUbicacionYObservaciones ? null : (
+              <>
+                <div
+                  className={`actividad-registro-form__field${
+                    errors.ubicacion ? ' actividad-registro-form__field--invalid' : ''
+                  }`}
+                >
+                  <label className="actividad-registro-form__label" htmlFor="ubicacion">
+                    Ubicación
+                  </label>
+                  <input
+                    id="ubicacion"
+                    name="ubicacion"
+                    type="text"
+                    maxLength={200}
+                    className={`actividad-registro-form__input${
+                      errors.ubicacion ? ' actividad-registro-form__input--error' : ''
+                    }`}
+                    value={values.ubicacion}
+                    onChange={(event) => updateField('ubicacion', event.target.value)}
+                    aria-invalid={Boolean(errors.ubicacion)}
+                    aria-describedby={errors.ubicacion ? 'ubicacion-error' : undefined}
+                  />
+                  {errors.ubicacion ? (
+                    <ActividadRegistroFieldError
+                      id="ubicacion-error"
+                      message={errors.ubicacion}
+                    />
+                  ) : null}
+                </div>
 
-            <div className="actividad-registro-form__field md:!col-span-2">
-              <label className="actividad-registro-form__label" htmlFor="observaciones">
-                Observaciones
-              </label>
-              <textarea
-                id="observaciones"
-                name="observaciones"
-                rows={3}
-                className="actividad-registro-form__textarea"
-                value={values.observaciones}
-                onChange={(event) => updateField('observaciones', event.target.value)}
-                readOnly={isCorregirMode}
-                disabled={isCorregirMode}
-              />
-            </div>
+                <div className="actividad-registro-form__field md:!col-span-2">
+                  <label className="actividad-registro-form__label" htmlFor="observaciones">
+                    Observaciones
+                  </label>
+                  <textarea
+                    id="observaciones"
+                    name="observaciones"
+                    rows={3}
+                    className="actividad-registro-form__textarea"
+                    value={values.observaciones}
+                    onChange={(event) => updateField('observaciones', event.target.value)}
+                    readOnly={isCorregirMode}
+                    disabled={isCorregirMode}
+                  />
+                </div>
+              </>
+            )}
           </fieldset>
 
           <FormularioEspecifico
