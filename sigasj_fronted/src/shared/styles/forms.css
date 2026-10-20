@@ -30,6 +30,18 @@
   outline-offset: 2px;
 }
 
+.form-success-result__icon {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto;
+  place-items: center;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #d1fae5, #ecfdf5);
+  color: #059669;
+  box-shadow: 0 12px 28px rgba(5, 150, 105, 0.18);
+}
+
 .form-success-result__title,
 .public-averia-form__success-title {
   margin: 0;

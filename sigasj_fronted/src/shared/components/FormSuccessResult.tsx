@@ -13,6 +13,7 @@ const FormSuccessResult = forwardRef<HTMLDivElement, FormSuccessResultProps>(
       meta = [],
       hint,
       actions,
+      icon,
       className = '',
       titleClassName = '',
       highlightLabelClassName = '',
@@ -30,6 +31,7 @@ const FormSuccessResult = forwardRef<HTMLDivElement, FormSuccessResultProps>(
 
     return (
       <div ref={ref} className={classes} role="status" tabIndex={-1}>
+        {icon ? <div className="form-success-result__icon" aria-hidden="true">{icon}</div> : null}
         <p className={['form-success-result__title', titleClassName].filter(Boolean).join(' ')}>{title}</p>
         {description ? <p className="form-success-result__description">{description}</p> : null}
 
