@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { IconMessageExclamation } from '@tabler/icons-react'
+import { IconEye, IconMessageExclamation } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../components/ActivityFeedback'
@@ -392,6 +392,7 @@ const ActividadesAdminRevisionPage = () => {
                         className="actividad-historial-card__action"
                         onClick={() => void openDetail(actividad)}
                       >
+                        <IconEye size={19} aria-hidden="true" />
                         Ver detalle
                       </button>
                     </footer>

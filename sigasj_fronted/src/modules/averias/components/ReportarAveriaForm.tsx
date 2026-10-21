@@ -204,6 +204,11 @@ export default function ReportarAveriaForm() {
           description="Su avería fue registrada en SIGASJ."
           highlightLabel="Código de seguimiento"
           highlightValue={submittedReport.codigoSeguimiento}
+          icon={
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          }
           meta={[
             {
               label: 'Fecha del reporte',
@@ -219,7 +224,7 @@ export default function ReportarAveriaForm() {
         <div className="public-averia-form__actions">
           <button
             type="button"
-            className="receipt-query-page__button receipt-query-page__button--secondary public-averia-form__submit"
+            className="receipt-query-page__button public-averia-form__submit public-averia-form__submit--again"
             onClick={() => {
               setSubmittedReport(null)
               setCedulaMensaje(null)

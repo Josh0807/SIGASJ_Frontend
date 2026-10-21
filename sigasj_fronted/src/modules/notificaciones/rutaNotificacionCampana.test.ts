@@ -35,4 +35,55 @@ describe('rutaNotificacionCampana', () => {
       ),
     ).toBe('/fontanero/averias/25')
   })
+
+  it('dirige las solicitudes de materiales según el destinatario', () => {
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Administradora', id: '1' },
+        {
+          tipo: 'SOLICITUD_MATERIALES_PENDIENTE_ADMINISTRADORA',
+          idSolicitudMateriales: 15,
+        },
+      ),
+    ).toBe('/admin/inventario/solicitudes/15')
+
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Fontanero', id: '3' },
+        {
+          tipo: 'SOLICITUD_MATERIALES_APROBADA_FONTANERO',
+          idSolicitudMateriales: 15,
+        },
+      ),
+    ).toBe('/admin/inventario/solicitudes-materiales/15')
+
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Fontanero', id: '3' },
+        {
+          tipo: 'SOLICITUD_MATERIALES_RECHAZADA_FONTANERO',
+          idSolicitudMateriales: 16,
+        },
+      ),
+    ).toBe('/admin/inventario/solicitudes-materiales/16')
+  })
+
+  it('dirige salidas y reposiciones a inventario administrativo', () => {
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Administradora', id: '1' },
+        {
+          tipo: 'SALIDA_INVENTARIO_REGISTRADA_ADMINISTRADORA',
+          idSalidaInventario: 8,
+        },
+      ),
+    ).toBe('/admin/inventario/movimientos/8')
+
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Administradora', id: '1' },
+        { tipo: 'ALERTA_REPOSICION_ADMINISTRADORA', idReposicion: 5 },
+      ),
+    ).toBe('/admin/inventario/reposiciones/5')
+  })
 })

@@ -74,7 +74,7 @@ describe('AdminSidebar', () => {
     expect(activeMarkup).toContain('Formularios oficiales')
     expect(activeMarkup).toContain('id="admin-solicitudes-submenu"')
     expect(collapsedMarkup).toContain('aria-expanded="false"')
-    expect(collapsedMarkup).toContain('hidden=""')
+    expect(collapsedMarkup).not.toContain('id="admin-solicitudes-submenu"')
   })
 
   it('puede recibir un conjunto distinto de opciones segun el usuario', () => {

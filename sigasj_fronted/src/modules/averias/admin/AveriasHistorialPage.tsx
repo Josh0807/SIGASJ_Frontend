@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { IconArrowLeft } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -274,7 +275,8 @@ const AveriasHistorialPage = ({
             </p>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md" to={AVERIAS_ADMIN_PATH}>
+            <Link className="gallery-admin__button group !inline-flex !items-center !gap-2.5 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_12px_26px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.96] motion-reduce:!transform-none motion-reduce:!transition-none" to={AVERIAS_ADMIN_PATH}>
+              <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
               Volver a gestión
             </Link>
           </div>

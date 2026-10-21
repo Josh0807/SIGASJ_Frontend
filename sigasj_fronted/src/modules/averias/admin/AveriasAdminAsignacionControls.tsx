@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { IconLoader2, IconUserPlus } from '@tabler/icons-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
 import { useAveriaAdminAsignacion } from '../hooks/useAveriaAdminAsignacion'
@@ -233,11 +234,16 @@ const AveriasAdminAsignacionControls = ({
           <button
             ref={assignButtonRef}
             type="button"
-            className="gallery-admin__button"
+            className="gallery-admin__button group !inline-flex !min-h-13 !w-full !items-center !justify-center !gap-2.5 !rounded-xl !border-0 !bg-gradient-to-r !from-blue-700 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(23,105,220,0.24)] !transition-all !duration-300 enabled:hover:!-translate-y-0.5 enabled:hover:!brightness-105 enabled:hover:!shadow-[0_14px_30px_rgba(23,105,220,0.32)] active:!translate-y-0 active:!scale-[0.98] disabled:!cursor-not-allowed disabled:!bg-none disabled:!bg-slate-200 disabled:!text-slate-500 disabled:!shadow-none"
             disabled={busy || selectedFontaneroId == null}
             aria-busy={assigning}
             onClick={handleAssignClick}
           >
+            {assigning ? (
+              <IconLoader2 className="!animate-spin" size={20} aria-hidden="true" />
+            ) : (
+              <IconUserPlus className="!transition-transform !duration-300 group-hover:!scale-110" size={20} aria-hidden="true" />
+            )}
             {assigning ? 'Asignando…' : 'Asignar fontanero'}
           </button>
         </div>
