@@ -40,7 +40,7 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
   })
 
   it('cubre los módulos administrativos configurados en el menú', () => {
-    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(15)
+    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(13)
   })
 
   it('Secretaria Ejecutiva no incluye usuarios ni reportes', () => {
@@ -63,6 +63,12 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/fontanero/solicitar-ausencia',
       '/fontanero/mis-solicitudes',
     ])
+    expect(EXPECTED_NAV_PATHS.Administradora).not.toContain(
+      '/fontanero/mi-saldo-vacaciones',
+    )
+    expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain(
+      '/fontanero/mi-saldo-vacaciones',
+    )
   })
 
   it('Gestión de asociados aparece en el menú solo con permiso definido', () => {

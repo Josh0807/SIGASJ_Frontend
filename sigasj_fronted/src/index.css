@@ -5256,7 +5256,50 @@ a.auth-page__submit {
 }
 
 .gallery-admin__item--text {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 20px 28px;
+}
+
+.gallery-admin__item--text .gallery-admin__meta {
+  min-width: 0;
+}
+
+.gallery-admin__item--text .gallery-admin__meta h2 {
+  margin-bottom: 8px;
+  font-size: 1.12rem;
+  line-height: 1.3;
+}
+
+.gallery-admin__item--text .gallery-admin__meta p {
+  margin-bottom: 12px;
+  max-width: 52rem;
+  line-height: 1.55;
+}
+
+.gallery-admin__item--text .gallery-admin__actions {
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 9.5rem;
+}
+
+.gallery-admin__item--text .gallery-admin__actions button {
+  width: 100%;
+}
+
+.gallery-admin__badges li.is-public {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.gallery-admin__badges li.is-private {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.gallery-admin__badges li.is-type {
+  background: #ecfeff;
+  color: #0e7490;
 }
 
 .gallery-admin__thumb {

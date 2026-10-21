@@ -112,7 +112,7 @@ const AdminDashboard = () => {
   })
 
   return (
-    <section className="admin-dashboard w-full min-w-0" aria-labelledby="admin-dashboard-title">
+    <section className="admin-dashboard admin-content-modern w-full min-w-0" aria-labelledby="admin-dashboard-title">
       <div className="admin-dashboard__shell sigasj-stack">
         <header className="admin-dashboard__welcome">
           <img

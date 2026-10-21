@@ -1,0 +1,131 @@
+/**
+ * Superficies admin compartidas (perfil, placeholders, tarjetas de consulta).
+ * Shell canónico: `gallery-admin` + `admin-content-modern` (CMS / proyectos).
+ * Inventario (`materials-admin`) y vision-ui conviven; este archivo alinea tokens.
+ */
+
+/* Puente: estados vacíos/loading de inventario hacia gallery-admin */
+.admin-content-modern .materials-admin__empty,
+.admin-content-modern .materials-admin__error,
+.admin-content-modern .materials-admin__state {
+  border-radius: 14px;
+  border: 1px solid #d7e5f1;
+  background: #f8fbfe;
+  padding: 1.25rem 1.5rem;
+}
+
+.admin-content-modern .materials-admin__header {
+  border-color: #d7e5f1;
+}
+
+/* Alias de botones canónicos (mismo look que gallery-admin__button) */
+.admin-btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px 16px;
+  border: 1px solid #1e5a9c;
+  border-radius: 10px;
+  background: white;
+  color: #1e5a9c;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.admin-btn--primary {
+  border-color: #1e5a9c;
+  background: #1e5a9c;
+  color: white;
+}
+
+.admin-btn--primary:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.admin-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.admin-surface-page {
+  margin-inline: auto;
+  display: grid;
+  width: 100%;
+  max-width: 48rem;
+  gap: 1.5rem;
+  padding: 1.5rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .admin-surface-page {
+    padding-inline: 1.5rem;
+  }
+}
+
+.admin-surface-card {
+  display: grid;
+  gap: 1.25rem;
+  border-radius: 1.625rem;
+  border: 1px solid #dbeafe;
+  background: linear-gradient(to bottom right, #fff, #fff, rgb(239 246 255 / 0.6));
+  padding: 1.75rem;
+  box-shadow: 0 14px 36px rgb(15 63 110 / 0.1);
+}
+
+.admin-surface-stat {
+  border-radius: 1rem;
+  border: 1px solid #e0f2fe;
+  background: rgb(240 249 255 / 0.7);
+  padding: 1rem 1.25rem;
+}
+
+.admin-surface-stat dt {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(12 74 110 / 0.7);
+}
+
+.admin-surface-stat dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0c4a6e;
+  word-break: break-word;
+}
+
+/* Touch targets + foco teclado (inventario / RRHH en tablet-móvil) */
+.materials-admin__action,
+.materials-admin__primary,
+.materials-admin__secondary,
+.materials-admin__error button,
+.materials-admin__pagination button {
+  min-height: 44px;
+}
+
+.materials-admin__action:focus-visible,
+.materials-admin__primary:focus-visible,
+.materials-admin__secondary:focus-visible,
+.materials-admin__error button:focus-visible,
+.materials-admin__pagination button:focus-visible,
+.materials-admin__category-error button:focus-visible {
+  outline: 2px solid #1d6fd6;
+  outline-offset: 3px;
+}
+
+.rrhh-touch-target {
+  min-height: 44px;
+}
+
+.rrhh-touch-target:focus-visible {
+  outline: 2px solid #1d6fd6;
+  outline-offset: 3px;
+}

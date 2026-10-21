@@ -25,7 +25,7 @@ describe('solicitudesMaterialesApi', () => {
     })
 
     const [url, options] = fetchMock.mock.calls[0]
-    expect(url).toBe('http://localhost:3000/api/v1/fontanero/solicitudes-materiales')
+    expect(url).toBe('/api/v1/fontanero/solicitudes-materiales')
     expect(options?.method).toBe('POST')
     expect(options?.headers).toMatchObject({ Authorization: 'Bearer jwt-fontanero' })
     expect(JSON.parse(String(options?.body))).not.toHaveProperty('idFontanero')
@@ -39,8 +39,8 @@ describe('solicitudesMaterialesApi', () => {
     await getMisSolicitudesMateriales({ estado: 'PENDIENTE', page: 1, limit: 10 })
     await getMiSolicitudMateriales(12)
 
-    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/v1/fontanero/solicitudes-materiales?estado=PENDIENTE&page=1&limit=10')
-    expect(fetchMock.mock.calls[1][0]).toBe('http://localhost:3000/api/v1/fontanero/solicitudes-materiales/12')
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/v1/fontanero/solicitudes-materiales?estado=PENDIENTE&page=1&limit=10')
+    expect(fetchMock.mock.calls[1][0]).toBe('/api/v1/fontanero/solicitudes-materiales/12')
     expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({ Authorization: 'Bearer jwt-fontanero' })
   })
 
@@ -55,7 +55,7 @@ describe('solicitudesMaterialesApi', () => {
 
     await getSolicitudesMaterialesAdmin()
 
-    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales?estado=PENDIENTE&page=1&limit=10')
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/v1/admin/solicitudes-materiales?estado=PENDIENTE&page=1&limit=10')
     expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({ Authorization: 'Bearer jwt-admin' })
   })
 
@@ -73,10 +73,10 @@ describe('solicitudesMaterialesApi', () => {
     await aprobarSolicitudMaterialesAdmin(15)
     await rechazarSolicitudMaterialesAdmin(16, 'No justificado')
 
-    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales/15')
-    expect(fetchMock.mock.calls[1][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales/15/aprobar')
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/v1/admin/solicitudes-materiales/15')
+    expect(fetchMock.mock.calls[1][0]).toBe('/api/v1/admin/solicitudes-materiales/15/aprobar')
     expect(fetchMock.mock.calls[1][1]?.method).toBe('PATCH')
-    expect(fetchMock.mock.calls[2][0]).toBe('http://localhost:3000/api/v1/admin/solicitudes-materiales/16/rechazar')
+    expect(fetchMock.mock.calls[2][0]).toBe('/api/v1/admin/solicitudes-materiales/16/rechazar')
     expect(JSON.parse(String(fetchMock.mock.calls[2][1]?.body))).toEqual({ motivoRechazo: 'No justificado' })
   })
 })

@@ -1,6 +1,6 @@
 import { IconArrowRight, IconDroplet, IconNews, IconTool } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
-import heroImage from '../../../assets/Hero1.png'
+import heroImage from '../../../assets/Hero1.webp'
 import type { HeroSectionProps } from '../types/HeroSectionProps'
 import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
 import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'

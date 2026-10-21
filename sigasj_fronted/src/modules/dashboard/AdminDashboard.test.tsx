@@ -79,7 +79,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('Averías Recientes')
     expect(markup).toContain('Bitácora de Actividad')
     expect(markup).toContain('href="/admin/averias"')
-    expect(markup).toContain('href="/admin/reportes"')
+    expect(markup).toMatch(/href="\/admin\/actividades(-fontanero)?"/)
   })
 
   it('5. Renderiza correctamente el estado de carga (Skeleton UI) cuando los datos están cargando', () => {
@@ -165,6 +165,8 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).not.toContain('href="/admin/averias"')
     expect(markup).not.toContain('href="/admin/abonados"')
     expect(markup).not.toContain('Asociados activos')
+    expect(markup).not.toContain('Alertas de reposición')
+    expect(markup).not.toContain('href="/admin/inventario/alertas-reposicion"')
     expect(markup).not.toContain(
       'No se pudieron actualizar algunos indicadores del servidor.',
     )

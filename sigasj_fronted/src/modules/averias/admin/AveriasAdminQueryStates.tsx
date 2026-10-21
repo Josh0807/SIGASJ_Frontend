@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import AdminListQueryStates from '../../../shared/components/AdminListQueryStates'
 import {
   AVERIAS_ADMIN_EMPTY_MESSAGE,
   AVERIAS_ADMIN_LOAD_ERROR,
@@ -15,8 +16,6 @@ type AveriasAdminQueryStatesProps = {
   children: ReactNode
 }
 
-const SKELETON_ROWS = 5
-
 const AveriasAdminQueryStates = ({
   loading,
   error,
@@ -25,52 +24,18 @@ const AveriasAdminQueryStates = ({
   emptyMessage = AVERIAS_ADMIN_EMPTY_MESSAGE,
   onRetry,
   children,
-}: AveriasAdminQueryStatesProps) => {
-  if (loading && !hasResults) {
-    return (
-      <div role="status" aria-live="polite" aria-busy="true">
-        <span className="visually-hidden">{loadingMessage}</span>
-        <div className="gallery-admin__skeleton" aria-hidden="true">
-          {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-            <div className="gallery-admin__skeleton-row" key={index}>
-              <span className="indicator-card__skeleton" />
-              <span className="indicator-card__skeleton indicator-card__skeleton--badge" />
-              <span className="indicator-card__skeleton" />
-              <span className="indicator-card__skeleton indicator-card__skeleton--badge" />
-              <span className="indicator-card__skeleton" />
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="gallery-admin__empty" role="alert">
-        <p>{error || AVERIAS_ADMIN_LOAD_ERROR}</p>
-        {onRetry ? (
-          <button type="button" onClick={onRetry}>
-            Reintentar
-          </button>
-        ) : null}
-      </div>
-    )
-  }
-
-  if (!hasResults) {
-    return (
-      <div className="gallery-admin__empty" role="status">
-        <p>{emptyMessage}</p>
-      </div>
-    )
-  }
-
-  return (
-    <div aria-busy={loading || undefined}>
-      {children}
-    </div>
-  )
-}
+}: AveriasAdminQueryStatesProps) => (
+  <AdminListQueryStates
+    loading={loading}
+    error={error ? error || AVERIAS_ADMIN_LOAD_ERROR : null}
+    hasResults={hasResults}
+    loadingMessage={loadingMessage}
+    emptyMessage={emptyMessage}
+    keepPreviousResultsWhileLoading
+    onRetry={onRetry}
+  >
+    {children}
+  </AdminListQueryStates>
+)
 
 export default AveriasAdminQueryStates

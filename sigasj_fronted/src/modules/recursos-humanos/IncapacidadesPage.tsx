@@ -390,7 +390,7 @@ export default function IncapacidadesPage() {
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                         <Link
                           to={incapacidadDetailPath(incapacidad.id)}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
+                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
                           aria-label={`Ver detalle de incapacidad de ${nombre}`}
                         >
                           <IconEye size={16} aria-hidden="true" />
@@ -398,7 +398,7 @@ export default function IncapacidadesPage() {
                         </Link>
                         <Link
                           to={incapacidadEditPath(incapacidad.id)}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
                           aria-label={`Editar incapacidad de ${nombre}`}
                         >
                           <IconPencil size={16} aria-hidden="true" />
@@ -425,7 +425,7 @@ export default function IncapacidadesPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
@@ -437,7 +437,7 @@ export default function IncapacidadesPage() {
               </span>
               <button
                 type="button"
-                className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >

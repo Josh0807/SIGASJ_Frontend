@@ -4,6 +4,7 @@ import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import { useAuth } from '../../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../../auth/utils/adminNavigation'
 import { ACTIVIDADES_FONTANERO_BASE_PATH } from '../../actividades-fontanero/actividadesFontaneroPaths'
+import { ACTIVIDADES_ADMIN_BASE_PATH } from '../../actividades-fontanero/admin/actividadesAdminPaths'
 import type { ActivityItem, RecentActivityWidgetProps } from '../props'
 import { getRecentDashboardActivities } from '../services/dashboardService'
 
@@ -11,7 +12,6 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
   activities: activitiesProp,
 }) => {
   const { user } = useAuth()
-  const canOpenAdminReportes = canAccessAdminRoute(user, '/admin/reportes')
   const canOpenAdminActividades = canAccessAdminRoute(user, '/admin/actividades-fontanero')
   const canOpenFontaneroActividades = canAccessAdminRoute(user, '/admin/actividades')
   const [activities, setActivities] = useState<ActivityItem[]>(activitiesProp ?? [])
@@ -27,12 +27,11 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
     let cancelled = false
     setIsLoading(true)
 
-    const scope =
-      canOpenAdminActividades || canOpenAdminReportes
-        ? 'admin'
-        : canOpenFontaneroActividades
-          ? 'fontanero'
-          : null
+    const scope = canOpenAdminActividades
+      ? 'admin'
+      : canOpenFontaneroActividades
+        ? 'fontanero'
+        : null
 
     if (scope === null) {
       setActivities([])
@@ -60,10 +59,10 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
     return () => {
       cancelled = true
     }
-  }, [activitiesProp, canOpenAdminActividades, canOpenAdminReportes, canOpenFontaneroActividades])
+  }, [activitiesProp, canOpenAdminActividades, canOpenFontaneroActividades])
 
-  const footerPath = canOpenAdminReportes
-    ? '/admin/reportes'
+  const footerPath = canOpenAdminActividades
+    ? ACTIVIDADES_ADMIN_BASE_PATH
     : canOpenFontaneroActividades
       ? ACTIVIDADES_FONTANERO_BASE_PATH
       : null

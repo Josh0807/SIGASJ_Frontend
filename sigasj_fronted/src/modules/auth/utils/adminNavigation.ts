@@ -18,6 +18,9 @@ import {
   isFontaneroSolicitarAusenciaPath,
 } from '../../solicitudes-ausencia/solicitudesAusenciaPaths'
 import {
+  isFontaneroMiSaldoPath,
+} from '../../recursos-humanos/recursosHumanosPaths'
+import {
   ADMIN_MODULE_ACCESS,
   ADMIN_MODULE_ACCESS_BY_SEGMENT,
   ROLE_PERMISSIONS,
@@ -121,11 +124,71 @@ function resolveAdminModuleFromPath(path: string) {
   return matchedPath ? ADMIN_MODULE_BY_PATH.get(matchedPath) : undefined
 }
 
+/**
+ * Subrutas de inventario con roles más estrictos que el módulo padre.
+ * Alineado con InventarioRoutes (AuthorizedRoute anidados).
+ */
+function resolveInventarioPathRoles(
+  path: string,
+): readonly InternalAdminRole[] | undefined {
+  const normalized = normalizeAdminPath(path)
+  if (
+    normalized !== `${ADMIN_BASE_PATH}/inventario` &&
+    !normalized.startsWith(`${ADMIN_BASE_PATH}/inventario/`)
+  ) {
+    return undefined
+  }
+
+  if (normalized.startsWith(`${ADMIN_BASE_PATH}/inventario/solicitudes-materiales`)) {
+    return [InternalAdminRoleName.Fontanero]
+  }
+
+  if (normalized.startsWith(`${ADMIN_BASE_PATH}/inventario/salidas`)) {
+    return [InternalAdminRoleName.Administradora, InternalAdminRoleName.Fontanero]
+  }
+
+  const adminOnlyPrefixes = [
+    `${ADMIN_BASE_PATH}/inventario/alertas-reposicion`,
+    `${ADMIN_BASE_PATH}/inventario/reposiciones`,
+    `${ADMIN_BASE_PATH}/inventario/recepciones`,
+    `${ADMIN_BASE_PATH}/inventario/movimientos`,
+    `${ADMIN_BASE_PATH}/inventario/reportes`,
+    `${ADMIN_BASE_PATH}/inventario/imprimir`,
+    `${ADMIN_BASE_PATH}/inventario/entradas`,
+    `${ADMIN_BASE_PATH}/inventario/solicitudes`,
+    `${ADMIN_BASE_PATH}/inventario/proveedores/nuevo`,
+    `${ADMIN_BASE_PATH}/inventario/materiales/nuevo`,
+    `${ADMIN_BASE_PATH}/inventario/categorias/nueva`,
+  ] as const
+
+  if (
+    adminOnlyPrefixes.some(
+      (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
+    ) ||
+    /\/proveedores\/\d+\/editar$/.test(normalized) ||
+    /\/materiales\/\d+\/editar$/.test(normalized) ||
+    /\/categorias\/\d+\/editar$/.test(normalized)
+  ) {
+    return [InternalAdminRoleName.Administradora]
+  }
+
+  return [
+    InternalAdminRoleName.Administradora,
+    InternalAdminRoleName.Secretaria,
+    InternalAdminRoleName.Fontanero,
+  ]
+}
+
 export function canAccessAdminRoute(
   user: AuthUser | null,
   path: string,
 ): boolean {
   if (!user || isAbonadoRole(user.role)) {
+    return false
+  }
+
+  // Mi saldo: fuera del menú; la ruta no se expone a ningún rol del panel.
+  if (isFontaneroMiSaldoPath(path)) {
     return false
   }
 
@@ -135,6 +198,14 @@ export function canAccessAdminRoute(
     isFontaneroMisSolicitudesPath(path)
   ) {
     return userHasAllowedRole(user, [InternalAdminRoleName.Fontanero])
+  }
+
+  const inventarioRoles = resolveInventarioPathRoles(path)
+  if (inventarioRoles) {
+    return (
+      userHasAllowedRole(user, inventarioRoles) &&
+      canAccessAdminModule(user, 'inventario')
+    )
   }
 
   const module = resolveAdminModuleFromPath(path)
@@ -148,12 +219,21 @@ export function canAccessAdminRoute(
 export function getAllowedRolesForAdminPath(
   path: string,
 ): readonly InternalAdminRole[] | undefined {
+  if (isFontaneroMiSaldoPath(path)) {
+    return []
+  }
+
   if (
     isFontaneroAveriasPath(path) ||
     isFontaneroSolicitarAusenciaPath(path) ||
     isFontaneroMisSolicitudesPath(path)
   ) {
     return [InternalAdminRoleName.Fontanero]
+  }
+
+  const inventarioRoles = resolveInventarioPathRoles(path)
+  if (inventarioRoles) {
+    return inventarioRoles
   }
 
   return resolveAdminModuleFromPath(path)?.allowedRoles

@@ -308,7 +308,8 @@ describe('Mi perfil — pruebas funcionales', () => {
       expect(app.currentPath()).toBe(ADMIN_PROFILE_PATH)
       expect(hasAdminChrome(app.container)).toBe(true)
       expect(outletTitle(app.container)).toBe(ADMIN_PROFILE_TITLE)
-      expect(app.container.querySelector('.private-module-placeholder')).not.toBeNull()
+      expect(app.container.querySelector('.admin-surface-page')).not.toBeNull()
+      expect(app.container.innerHTML).toContain('Usuario en sesión')
       expect(consoleSpy.errors).toEqual([])
       expect(consoleSpy.warnings).toEqual([])
     } finally {

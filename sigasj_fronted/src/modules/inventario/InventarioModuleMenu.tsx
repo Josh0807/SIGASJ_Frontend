@@ -60,6 +60,13 @@ const plumberItems = [
   { label: 'Mis solicitudes', description: 'Seguimiento de materiales', to: SOLICITUDES_MATERIALES_PATH, icon: IconClipboardCheck },
 ]
 
+/** Secretaria: consulta de catálogo; sin salidas ni solicitudes de fontanero. */
+const secretariaItems = [
+  adminItems[0],
+  adminItems[2],
+  adminItems[3],
+]
+
 type InventarioModuleMenuProps = {
   inline?: boolean
 }
@@ -70,8 +77,13 @@ export default function InventarioModuleMenu({ inline = false }: InventarioModul
   const [open, setOpen] = useState(false)
   const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const isAdmin = normalizeInternalRole(user?.role) === InternalAdminRoleName.Administradora
-  const items = isAdmin ? adminItems : plumberItems
+  const role = normalizeInternalRole(user?.role)
+  const items =
+    role === InternalAdminRoleName.Administradora
+      ? adminItems
+      : role === InternalAdminRoleName.Secretaria
+        ? secretariaItems
+        : plumberItems
 
   useEffect(() => {
     if (inline) {
@@ -132,7 +144,7 @@ export default function InventarioModuleMenu({ inline = false }: InventarioModul
                   to={to}
                   onClick={() => setOpen(false)}
                   aria-current={active ? 'page' : undefined}
-                  className={`group flex min-h-16 items-center gap-3 rounded-2xl p-3 no-underline transition ${active ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-700'}`}
+                  className={`group flex min-h-16 items-center gap-3 rounded-2xl p-3 no-underline transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 ${active ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-700'}`}
                 >
                   <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${active ? 'bg-blue-600 text-white' : 'bg-sky-50 text-blue-600 group-hover:bg-blue-100'}`}>
                     <Icon size={20} stroke={1.8} aria-hidden="true" />

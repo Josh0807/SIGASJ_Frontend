@@ -374,7 +374,11 @@ export default function ReportarAveriaForm() {
                 autoComplete="email"
                 maxLength={150}
                 aria-invalid={Boolean(errors.correoReportante)}
-                aria-describedby={errorId('correoReportante')}
+                aria-describedby={
+                  errors.correoReportante
+                    ? errorId('correoReportante')
+                    : `${fieldId(idPrefix, 'correoReportante')}-help`
+                }
                 value={values.correoReportante}
                 onChange={(event) => update('correoReportante', event.target.value)}
               />
@@ -382,7 +386,14 @@ export default function ReportarAveriaForm() {
                 <small id={errorId('correoReportante')} className="public-averia-form__error" role="alert">
                   {errors.correoReportante}
                 </small>
-              ) : null}
+              ) : (
+                <small
+                  id={`${fieldId(idPrefix, 'correoReportante')}-help`}
+                  className="public-averia-form__help"
+                >
+                  Opcional. Si lo indica, le avisaremos por correo cuando la avería quede solucionada.
+                </small>
+              )}
             </div>
           </div>
         </section>

@@ -6,13 +6,14 @@ import type { RequestService, RequestServiceIcon, RequestsSectionProps } from '.
 import { OTHER_FORMS_ROUTE, REQUEST_TRACKING_ROUTE, SERVICE_REQUEST_ROUTES } from '../config/serviceRequestRoutes'
 import { downloadFormularioOficial } from '../../solicitudes-publicas/formularios-oficiales/formulariosOficialesApi'
 
+/** Fuente única: rutas de `serviceRequestRoutes` + descarga/consulta. */
 const defaultServices: RequestService[] = [
-  { id: 'arreglo-pago', name: 'Solicitud de Arreglo de Pago Domiciliar', description: 'Permite solicitar un convenio de pago para regularizar saldos pendientes del servicio de agua.', formHref: SERVICE_REQUEST_ROUTES.paymentPlan, downloadSlug: 'arreglo-pago', icon: 'payment-plan' },
-  { id: 'cambio-titular', name: 'Cambio de Nombre del Titular del Servicio', description: 'Permite solicitar el cambio de la persona titular asociada al servicio de agua.', formHref: SERVICE_REQUEST_ROUTES.accountChange, downloadSlug: 'cambio-titular', icon: 'account-change' },
-  { id: 'infraestructura-linderos', name: 'Constancia de Infraestructura Frente a Linderos de un Inmueble', description: 'Permite solicitar una constancia sobre la infraestructura de la ASADA frente a los linderos de un inmueble.', formHref: SERVICE_REQUEST_ROUTES.boundaryInfrastructure, downloadSlug: 'infraestructura-linderos', icon: 'boundary-infrastructure' },
-  { id: 'afiliacion', name: 'Solicitud de Afiliación', description: 'Permite iniciar el proceso de afiliación a la ASADA mediante la solicitud oficial.', formHref: SERVICE_REQUEST_ROUTES.affiliation, downloadSlug: 'afiliacion', icon: 'affiliation' },
-  { id: 'disponibilidad-servicios', name: 'Constancia de Disponibilidad de Servicios', description: 'Permite solicitar una constancia sobre la disponibilidad de los servicios brindados por la ASADA.', formHref: SERVICE_REQUEST_ROUTES.serviceAvailability, downloadSlug: 'disponibilidad-servicios', icon: 'service-availability' },
-  { id: 'servicio-existente', name: 'Constancia de Servicio Existente', description: 'Permite solicitar una constancia que acredite la existencia de un servicio de agua.', formHref: SERVICE_REQUEST_ROUTES.existingService, downloadSlug: 'servicio-existente', icon: 'service-record' },
+  { id: 'arreglo-pago', name: 'Solicitud de Arreglo de Pago Domiciliar', description: 'Permite solicitar un convenio de pago para regularizar saldos pendientes del servicio de agua.', formHref: SERVICE_REQUEST_ROUTES.paymentPlan, downloadSlug: 'arreglo-pago', badge: 'Trámite en línea', icon: 'payment-plan' },
+  { id: 'cambio-titular', name: 'Cambio de Nombre del Titular del Servicio', description: 'Permite solicitar el cambio de la persona titular asociada al servicio de agua. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.accountChange, downloadSlug: 'cambio-titular', badge: 'Trámite en línea', icon: 'account-change' },
+  { id: 'infraestructura-linderos', name: 'Constancia de Infraestructura Frente a Linderos de un Inmueble', description: 'Permite solicitar una constancia sobre la infraestructura de la ASADA frente a los linderos de un inmueble. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.boundaryInfrastructure, downloadSlug: 'infraestructura-linderos', badge: 'Trámite en línea', icon: 'boundary-infrastructure' },
+  { id: 'afiliacion', name: 'Solicitud de Afiliación', description: 'Permite iniciar el proceso de afiliación a la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.affiliation, downloadSlug: 'afiliacion', badge: 'Trámite en línea', icon: 'affiliation' },
+  { id: 'disponibilidad-servicios', name: 'Constancia de Disponibilidad de Servicios', description: 'Permite solicitar una constancia sobre la disponibilidad de los servicios brindados por la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.serviceAvailability, downloadSlug: 'disponibilidad-servicios', badge: 'Trámite en línea', icon: 'service-availability' },
+  { id: 'servicio-existente', name: 'Constancia de Servicio Existente', description: 'Permite solicitar una constancia que acredite la existencia de un servicio de agua. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.existingService, downloadSlug: 'servicio-existente', badge: 'Trámite en línea', icon: 'service-record' },
   { id: 'otros-formularios', name: 'Otros Formularios', description: 'Consulta y descarga otros documentos oficiales publicados por la Administración de la ASADA.', viewHref: OTHER_FORMS_ROUTE, badge: 'Solo descarga', icon: 'downloadable-forms' },
   { id: 'seguimiento', name: 'Seguimiento de Solicitudes', description: 'Consulta el avance de tu solicitud utilizando el código de seguimiento que recibiste al enviarla.', viewHref: REQUEST_TRACKING_ROUTE, badge: 'Consulta pública', icon: 'request-tracking' },
 ]
@@ -96,14 +97,21 @@ const RequestsSection = ({
                 {serviceId === 'seguimiento' ? 'Consultar solicitud' : 'Ver formularios'}
                 {serviceId === 'seguimiento' ? <IconProgressCheck className="shrink-0" size={19} aria-hidden="true" /> : <IconFiles className="shrink-0" size={19} aria-hidden="true" />}
               </Link>
-            ) : (
+            ) : formHref ? (
             <div className="relative z-10 mt-auto grid grid-cols-2 gap-3 max-[520px]:grid-cols-1">
-              <Link className="requests-motion-button flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#0872d3] to-[#2f91da] px-4 text-center text-sm font-bold text-white no-underline shadow-[0_8px_18px_rgba(8,114,211,0.2)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400" to={formHref!}>
+              <Link className="requests-motion-button flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#0872d3] to-[#2f91da] px-4 text-center text-sm font-bold text-white no-underline shadow-[0_8px_18px_rgba(8,114,211,0.2)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400" to={formHref}>
                 Realizar solicitud <IconArrowRight className="shrink-0" size={19} aria-hidden="true" />
               </Link>
               <button className="requests-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-65" type="button" disabled={Boolean(downloadingSlug)} onClick={() => { if (downloadSlug) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
                 Forma Presencial <IconDownload className="shrink-0" size={19} aria-hidden="true" />
               </button>
+            </div>
+            ) : (
+            <div className="relative z-10 mt-auto grid gap-3">
+              <button className="requests-motion-button flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-65" type="button" disabled={Boolean(downloadingSlug) || !downloadSlug} onClick={() => { if (downloadSlug) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
+                Forma Presencial <IconDownload className="shrink-0" size={19} aria-hidden="true" />
+              </button>
+              <p className="m-0 text-center text-xs font-semibold text-[#607a98]">El formulario en línea estará disponible próximamente.</p>
             </div>
             )}
 

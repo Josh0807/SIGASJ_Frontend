@@ -171,11 +171,11 @@ export default function ColaboradoresPage() {
   const hasta = Math.min(page * COLABORADORES_PAGE_SIZE, total)
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
+    <main className="gallery-admin admin-content-modern grid w-full min-w-0 gap-5 sm:gap-6">
       <RrhhSubnav />
-      <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <header className="gallery-admin__header flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          <p className="gallery-admin__eyebrow mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
             Administración · Colaboradores
           </p>
           <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
@@ -187,7 +187,7 @@ export default function ColaboradoresPage() {
         </div>
         <Link
           to={COLABORADOR_NEW_PATH}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none"
+          className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"
         >
           <IconUserPlus size={20} aria-hidden="true" />
           Registrar colaborador
@@ -251,7 +251,7 @@ export default function ColaboradoresPage() {
         </label>
         <button
           type="button"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
+          className="rrhh-touch-target inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
           onClick={limpiarFiltros}
           disabled={!hayFiltros && !busqueda && !cargo}
         >
@@ -339,7 +339,7 @@ export default function ColaboradoresPage() {
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                         <Link
                           to={colaboradorDetailPath(colaborador.id)}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
+                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
                           aria-label={`Ver a ${nombre}`}
                         >
                           <IconEye size={16} aria-hidden="true" />
@@ -347,7 +347,7 @@ export default function ColaboradoresPage() {
                         </Link>
                         <Link
                           to={colaboradorHistorialPath(colaborador.id)}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
                           aria-label={`Ver historial de ${nombre}`}
                         >
                           <IconHistory size={16} aria-hidden="true" />
@@ -355,7 +355,7 @@ export default function ColaboradoresPage() {
                         </Link>
                         <Link
                           to={colaboradorEditPath(colaborador.id)}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
                           aria-label={`Editar a ${nombre}`}
                         >
                           <IconPencil size={16} aria-hidden="true" />
@@ -391,7 +391,7 @@ export default function ColaboradoresPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
@@ -403,7 +403,7 @@ export default function ColaboradoresPage() {
               </span>
               <button
                 type="button"
-                className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >

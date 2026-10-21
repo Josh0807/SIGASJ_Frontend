@@ -110,7 +110,7 @@ export default function MaterialesPage() {
   };
 
   return (
-    <main className="materials-admin sigasj-stack !gap-6">
+    <main className="materials-admin admin-content-modern gallery-admin sigasj-stack !gap-6">
       <header className="materials-admin__header !flex !min-h-[220px] !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8">
         <div>
           <p className="materials-admin__eyebrow inventory-page-eyebrow">

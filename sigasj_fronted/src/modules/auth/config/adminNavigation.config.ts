@@ -85,7 +85,8 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     title: 'Gestión de usuarios',
     allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['users.manage'],
-    availableInNav: true,
+    // Stub: ruta existe pero no hay UI funcional; ocultar del menú hasta implementar.
+    availableInNav: false,
   },
   {
     segment: 'abonados',
@@ -159,7 +160,8 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     title: 'Gestión de reportes',
     allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['audit.read'],
-    availableInNav: true,
+    // Stub: ruta existe pero no hay UI funcional; ocultar del menú hasta implementar.
+    availableInNav: false,
   },
   {
     segment: 'proyectos',

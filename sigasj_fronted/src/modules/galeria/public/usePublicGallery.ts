@@ -45,7 +45,7 @@ export function usePublicGallery(enabled: boolean): UsePublicGalleryResult {
   }, [load])
 
   return {
-    status: status === 'error' ? 'success' : status,
+    status,
     photos,
     total: photos.length,
     retry: () => {

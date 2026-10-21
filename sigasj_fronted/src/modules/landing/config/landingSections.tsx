@@ -1,19 +1,24 @@
-import type { ComponentType } from 'react'
-import AboutSection from '../components/AboutSection'
-import AnnouncementsSection from '../../comunicados/components/AnnouncementsSection'
-import GallerySection from '../../galeria/public/GallerySection'
-import LandingContactBlock from '../components/LandingContactBlock'
-import ProjectsPreview from '../components/ProjectsPreview'
-import ReportFaultSection from '../components/ReportFaultSection'
-import ComplaintsSection from '../components/ComplaintsSection'
-import RequestsSection from '../components/RequestsSection'
-import TransparencySection from '../../transparencia/public/TransparencySection'
+import { lazy, type ComponentType } from 'react'
 
 export type LandingSectionDefinition = {
   id: string
   title: string
   Component: ComponentType
 }
+
+const AboutSection = lazy(() => import('../components/AboutSection'))
+const AnnouncementsSection = lazy(
+  () => import('../../comunicados/components/AnnouncementsSection'),
+)
+const GallerySection = lazy(() => import('../../galeria/public/GallerySection'))
+const LandingContactBlock = lazy(() => import('../components/LandingContactBlock'))
+const ProjectsPreview = lazy(() => import('../components/ProjectsPreview'))
+const ReportFaultSection = lazy(() => import('../components/ReportFaultSection'))
+const ComplaintsSection = lazy(() => import('../components/ComplaintsSection'))
+const RequestsSection = lazy(() => import('../components/RequestsSection'))
+const TransparencySection = lazy(
+  () => import('../../transparencia/public/TransparencySection'),
+)
 
 export const LANDING_SECTIONS: LandingSectionDefinition[] = [
   {

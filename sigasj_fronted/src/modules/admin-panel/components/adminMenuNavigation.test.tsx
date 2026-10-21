@@ -314,9 +314,9 @@ describe('navegación del menú administrativo', () => {
         expect(document.activeElement).toBe(link)
       }
 
-      const reportes = links.find((link) => link.getAttribute('href') === '/admin/reportes')
-      expect(reportes).toBeDefined()
-      reportes?.focus()
+      const averias = links.find((link) => link.getAttribute('href') === '/admin/averias')
+      expect(averias).toBeDefined()
+      averias?.focus()
 
       const enter = new KeyboardEvent('keydown', {
         key: 'Enter',
@@ -324,16 +324,15 @@ describe('navegación del menú administrativo', () => {
         cancelable: true,
       })
       await act(async () => {
-        reportes?.dispatchEvent(enter)
+        averias?.dispatchEvent(enter)
         if (!enter.defaultPrevented) {
-          reportes?.dispatchEvent(
+          averias?.dispatchEvent(
             new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }),
           )
         }
       })
 
-      expect(app.currentPath()).toBe('/admin/reportes')
-      expect(outletTitle(app.container)).toBe('Gestión de reportes')
+      expect(app.currentPath()).toBe('/admin/averias')
       expect(app.container.querySelector('.admin-layout--nav-open')).toBeNull()
     } finally {
       await app.cleanup()

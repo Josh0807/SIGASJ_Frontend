@@ -319,9 +319,13 @@ describe('Pruebas funcionales — /admin/proyectos', () => {
     expect(container.textContent).toContain('Tanque de almacenamiento')
     expect(container.textContent).toContain('Pendiente')
     expect(container.textContent).toContain('Inactivo')
-    expect(container.textContent).toContain('Ver')
     expect(container.textContent).toContain('Editar')
-    expect(container.textContent).toContain('Gestionar imágenes')
+    expect(container.textContent).toContain('Inactivar')
+    expect(container.textContent).toContain('Activar')
+    expect(
+      container.querySelector('[aria-label="Ver Red de agua potable"]'),
+    ).toBeNull()
+    expect(container.textContent).not.toContain('Gestionar imágenes')
     expect(container.querySelectorAll('tbody tr')).toHaveLength(3)
   })
 
@@ -499,7 +503,7 @@ describe('Pruebas funcionales — /admin/proyectos', () => {
     expect(container.textContent).not.toContain('Red de agua potable')
   })
 
-  it('Prueba 9, 10 y 11 — Ver e imágenes no navegan; Editar y Nuevo proyecto usan las rutas reales', async () => {
+  it('Prueba 9, 10 y 11 — Acciones de fila: Editar y Nuevo proyecto usan las rutas reales', async () => {
     const app = await renderApp('/admin/proyectos')
 
     expect(PRIVATE_ROUTE_PATHS).toContain('/admin/proyectos')
@@ -515,30 +519,30 @@ describe('Pruebas funcionales — /admin/proyectos', () => {
     const nuevo = Array.from(container.querySelectorAll('a')).find(
       (item) => item.textContent === 'Nuevo proyecto',
     ) as HTMLAnchorElement
-    const ver = container.querySelector(
-      '[aria-label="Ver Red de agua potable"]',
-    ) as HTMLButtonElement
     const editar = container.querySelector(
       '[aria-label="Editar Red de agua potable"]',
     ) as HTMLAnchorElement
-    const imagenes = container.querySelector(
-      '[aria-label="Gestionar imágenes de Red de agua potable"]',
+    const inactivar = container.querySelector(
+      '[aria-label="Inactivar visibilidad de Red de agua potable"]',
     ) as HTMLButtonElement
 
     expect(nuevo.tagName).toBe('A')
     expect(nuevo.getAttribute('href')).toBe('/admin/proyectos/nuevo')
-    expect(ver.tagName).toBe('BUTTON')
     expect(editar.tagName).toBe('A')
     expect(editar.getAttribute('href')).toBe('/admin/proyectos/7/editar')
-    expect(imagenes.tagName).toBe('BUTTON')
-    expect(imagenes.getAttribute('href')).toBeNull()
-    expect(ver.getAttribute('href')).toBeNull()
+    expect(inactivar.tagName).toBe('BUTTON')
+    expect(inactivar.getAttribute('href')).toBeNull()
+    expect(
+      container.querySelector('[aria-label="Ver Red de agua potable"]'),
+    ).toBeNull()
+    expect(
+      container.querySelector(
+        '[aria-label="Gestionar imágenes de Red de agua potable"]',
+      ),
+    ).toBeNull()
 
     const sidebar = container.querySelector('.admin-sidebar')
     const header = container.querySelector('.admin-header')
-
-    await clickElement(ver)
-    await clickElement(imagenes)
 
     expect(app.currentPath()).toBe('/admin/proyectos')
     expect(container.querySelector('.gallery-admin__form')).toBeNull()
@@ -655,11 +659,13 @@ describe('Pruebas funcionales — /admin/proyectos', () => {
           ?.textContent,
       ).toContain('Estado')
       expect(
-        container.querySelector('[aria-label="Ver Red de agua potable"]'),
+        container.querySelector(
+          '[aria-label="Editar Red de agua potable"]',
+        ),
       ).not.toBeNull()
       expect(
         container.querySelector(
-          '[aria-label="Gestionar imágenes de Red de agua potable"]',
+          '[aria-label="Inactivar visibilidad de Red de agua potable"]',
         ),
       ).not.toBeNull()
 
@@ -706,17 +712,14 @@ describe('Pruebas funcionales — /admin/proyectos', () => {
     expect(document.activeElement).toBe(siguiente)
     expect(siguiente.disabled).toBe(false)
 
-    const ver = container.querySelector(
-      '[aria-label="Ver Red de agua potable"]',
-    ) as HTMLButtonElement
     const editar = container.querySelector(
       '[aria-label="Editar Red de agua potable"]',
     ) as HTMLAnchorElement
-    const imagenes = container.querySelector(
-      '[aria-label="Gestionar imágenes de Red de agua potable"]',
+    const inactivar = container.querySelector(
+      '[aria-label="Inactivar visibilidad de Red de agua potable"]',
     ) as HTMLButtonElement
 
-    for (const control of [ver, editar, imagenes, siguiente, searchInput()]) {
+    for (const control of [editar, inactivar, siguiente, searchInput()]) {
       expect(control.tabIndex).toBeGreaterThanOrEqual(0)
       control.focus()
       expect(document.activeElement).toBe(control)
