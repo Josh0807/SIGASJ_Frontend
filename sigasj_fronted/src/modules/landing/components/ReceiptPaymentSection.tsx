@@ -1,9 +1,31 @@
 import { IconArrowRight, IconBuildingBank, IconBuildingStore, IconClock, IconDeviceMobile, IconMapPin } from '@tabler/icons-react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  DEFAULT_CONTACTO_UBICACION,
+  getPublicContacto,
+} from '../../contacto/services/contactoApi'
 import { BANCO_NACIONAL_URL } from '../config/externalLinks'
 
 const ReceiptPaymentSection = () => {
   const navigate = useNavigate()
+  const [sinpeTelefono, setSinpeTelefono] = useState(DEFAULT_CONTACTO_UBICACION.telefono)
+
+  useEffect(() => {
+    let cancelled = false
+    void getPublicContacto()
+      .then((contacto) => {
+        if (!cancelled && contacto.telefono.trim()) {
+          setSinpeTelefono(contacto.telefono.trim())
+        }
+      })
+      .catch(() => {
+        /* Conserva el teléfono institucional por defecto. */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <section className="sigasj-receipt-section relative isolate min-h-0 overflow-hidden bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-14 max-[640px]:px-4 max-[640px]:py-10" id="pagos" aria-labelledby="receipt-payment-title">
@@ -38,8 +60,11 @@ const ReceiptPaymentSection = () => {
               <h3 className="mb-0 mt-3 text-base font-extrabold text-[#093b82]">SINPE Móvil</h3>
               <p className="mb-0 mt-1 text-sm leading-5 text-[#526d8c]">Realiza el pago de tu recibo mediante SINPE Móvil al número indicado.</p>
               <div className="mt-3 grid gap-3">
-                <p className="m-0 rounded-xl bg-sky-50 px-4 py-3"><span className="block text-[0.62rem] font-bold uppercase text-[#607a98]">Número demostrativo</span><strong className="mt-1 block text-lg tracking-[0.08em] text-[#0872d3]">0000-0000</strong></p>
-                <p className="m-0 rounded-xl border-l-2 border-amber-400 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900" role="note">Todo pago realizado por SinpeMóvil debe ser enviado al WhatsApp de la ASADA San Juan.</p>
+                <p className="m-0 rounded-xl bg-sky-50 px-4 py-3">
+                  <span className="block text-[0.62rem] font-bold uppercase text-[#607a98]">WhatsApp ASADA (SINPE)</span>
+                  <strong className="mt-1 block text-lg tracking-[0.08em] text-[#0872d3]">{sinpeTelefono}</strong>
+                </p>
+                <p className="m-0 rounded-xl border-l-2 border-amber-400 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900" role="note">Todo pago realizado por SINPE Móvil debe confirmarse enviando el comprobante al WhatsApp de la ASADA San Juan.</p>
               </div>
             </article>
 

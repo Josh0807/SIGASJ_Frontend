@@ -53,7 +53,13 @@ describe('adminNavigation helpers', () => {
     expect(paths).toContain('/admin/abonados')
     expect(paths).toContain('/admin/proyectos')
     expect(paths).toContain('/admin/actividades-fontanero')
+    expect(paths).not.toContain('/fontanero/mi-saldo-vacaciones')
     expect(paths).not.toContain('/admin/actividades')
+    expect(paths).not.toContain('/admin/usuarios')
+    expect(paths).not.toContain('/admin/reportes')
+    expect(canAccessAdminRoute(administradora, '/fontanero/mi-saldo-vacaciones')).toBe(
+      false,
+    )
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(true)
@@ -101,15 +107,33 @@ describe('adminNavigation helpers', () => {
     expect(canAccessAdminRoute(fontanero, '/fontanero/mi-saldo-vacaciones')).toBe(
       false,
     )
-    expect(
-      items.map((item) => item.path),
-    ).not.toContain('/fontanero/mi-saldo-vacaciones')
+    expect(items.map((item) => item.path)).not.toContain(
+      '/fontanero/mi-saldo-vacaciones',
+    )
     expect(canAccessAdminRoute(fontanero, '/admin/actividades')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades/nueva')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades-fontanero')).toBe(
       false,
     )
     expect(canAccessAdminRoute(fontanero, '/admin/abonados')).toBe(false)
+    expect(
+      canAccessAdminRoute(fontanero, '/admin/inventario/alertas-reposicion'),
+    ).toBe(false)
+    expect(canAccessAdminRoute(fontanero, '/admin/inventario/salidas')).toBe(
+      true,
+    )
+    expect(
+      canAccessAdminRoute(fontanero, '/admin/inventario/solicitudes-materiales'),
+    ).toBe(true)
+  })
+
+  it('Secretaria no accede a alertas de reposición admin del inventario', () => {
+    expect(
+      canAccessAdminRoute(secretaria, '/admin/inventario/alertas-reposicion'),
+    ).toBe(false)
+    expect(canAccessAdminRoute(secretaria, '/admin/inventario/materiales')).toBe(
+      true,
+    )
   })
 
   it('rol invalido no obtiene acceso administrativo', () => {

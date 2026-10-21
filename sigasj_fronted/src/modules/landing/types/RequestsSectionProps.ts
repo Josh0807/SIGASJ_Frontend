@@ -12,6 +12,7 @@ export interface RequestService {
   id: string
   name: string
   description: string
+  /** Ruta pública del trámite (misma fuente que `SERVICE_REQUEST_ROUTES`). */
   formHref?: string
   downloadSlug?: string
   viewHref?: string

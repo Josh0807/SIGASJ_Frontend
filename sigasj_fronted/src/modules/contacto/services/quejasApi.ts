@@ -37,12 +37,12 @@ export async function submitPublicQueja(
         message: 'Formulario enviado vía FormSubmit con éxito.',
       }
     }
-  } catch {
-    // Continuar a la confirmación en pantalla
-  }
 
-  return {
-    success: true,
-    message: 'Sugerencia o queja procesada correctamente.',
+    throw new Error(`HTTP ${res.status}: No fue posible enviar la queja.`)
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('HTTP ')) {
+      throw error
+    }
+    throw new Error('No fue posible enviar el formulario. Intente nuevamente.')
   }
 }

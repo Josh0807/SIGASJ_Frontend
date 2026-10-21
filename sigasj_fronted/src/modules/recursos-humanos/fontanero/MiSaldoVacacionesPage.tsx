@@ -56,7 +56,7 @@ export default function MiSaldoVacacionesPage() {
   }, [recarga, salirPorSesion])
 
   return (
-    <div className="mx-auto grid w-full max-w-2xl gap-6 px-4 py-6 sm:px-6">
+    <div className="admin-surface-page">
       <header className="grid gap-2">
         <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63]">
           {FONTANERO_MI_SALDO_TITLE}
@@ -66,10 +66,7 @@ export default function MiSaldoVacacionesPage() {
         </p>
       </header>
 
-      <section
-        className="grid gap-5 rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)]"
-        aria-busy={cargando}
-      >
+      <section className="admin-surface-card" aria-busy={cargando}>
         {cargando && !balance ? (
           <p className="m-0 text-slate-500" role="status">
             Cargando saldo…

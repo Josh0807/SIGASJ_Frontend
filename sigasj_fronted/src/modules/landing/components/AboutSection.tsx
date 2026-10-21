@@ -1,6 +1,6 @@
 import { IconArrowRight, IconDroplet, IconEye, IconFileDescription } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
-import asadaPhoto from '../../../assets/FOTOASADA.png'
+import asadaPhoto from '../../../assets/FOTOASADA.webp'
 
 const IdentityIcon = ({ children }: { children: ReactNode }) => (
   <span className="grid size-16 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#edf8ff] to-[#dceffd] text-[#0871cf] max-[640px]:size-12" aria-hidden="true">
@@ -35,7 +35,13 @@ const AboutSection = () => (
 
       <div className="grid grid-cols-[minmax(0,0.43fr)_minmax(0,0.57fr)] gap-6 max-[900px]:grid-cols-1">
         <figure className="m-0 h-[420px] overflow-hidden rounded-[26px] shadow-[0_18px_40px_rgba(32,104,159,0.16)] max-[900px]:h-auto max-[900px]:aspect-[16/10] max-[640px]:rounded-2xl">
-          <img className="h-full w-full object-cover" src={asadaPhoto} alt="Instalaciones de la ASADA San Juan" />
+          <img
+            className="h-full w-full object-cover"
+            src={asadaPhoto}
+            alt="Instalaciones de la ASADA San Juan"
+            loading="lazy"
+            decoding="async"
+          />
         </figure>
 
         <div className="grid h-[420px] grid-rows-2 gap-5 max-[900px]:h-auto">

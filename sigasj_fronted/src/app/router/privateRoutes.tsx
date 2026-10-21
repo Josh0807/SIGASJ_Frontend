@@ -1,23 +1,38 @@
-import type { ReactElement } from 'react'
+import { lazy, Suspense, type ReactElement } from 'react'
 import type { AdminNavIconName } from '../../modules/admin-panel/components/AdminNavIcon'
 import { ADMIN_MODULE_ACCESS } from '../../modules/auth/config/adminNavigation.config'
 import type { InternalAdminRole } from '../../modules/auth/utils/internalRoles'
 import { ADMIN_BASE_PATH, ADMIN_ROUTE_SEGMENT } from './adminPaths'
 import AdminDashboard from '../../modules/dashboard/AdminDashboard'
-import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
-import ComunicadosAdminPage from '../../modules/comunicados/admin/ComunicadosAdminPage'
-import ContactoAdminPage from '../../modules/contacto/admin/ContactoAdminPage'
-import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
-import ProyectosAdminRoutes from '../../modules/proyectos/admin/ProyectosAdminRoutes'
-import ActividadesFontaneroRoutes from '../../modules/actividades-fontanero/ActividadesFontaneroRoutes'
-import ActividadesAdminRoutes from '../../modules/actividades-fontanero/admin/ActividadesAdminRoutes'
 import ProfilePage from '../../modules/auth/pages/ProfilePage'
 import PrivateModulePlaceholder from '../../shared/components/PrivateModulePlaceholder'
-import InventarioRoutes from '../../modules/inventario/InventarioRoutes'
-import AveriasAdminRoutes from '../../modules/averias/admin/AveriasAdminRoutes'
-import AsociadosRoutes from '../../modules/asociados/AsociadosRoutes'
-import RecursosHumanosRoutes from '../../modules/recursos-humanos/RecursosHumanosRoutes'
-import SolicitudesAdminRoutes from '../../modules/solicitudes-publicas/admin/SolicitudesAdminRoutes'
+
+const GalleryAdminPage = lazy(() => import('../../modules/galeria/admin/GalleryAdminPage'))
+const ComunicadosAdminPage = lazy(
+  () => import('../../modules/comunicados/admin/ComunicadosAdminPage'),
+)
+const ContactoAdminPage = lazy(() => import('../../modules/contacto/admin/ContactoAdminPage'))
+const TransparenciaAdminPage = lazy(
+  () => import('../../modules/transparencia/admin/TransparenciaAdminPage'),
+)
+const ProyectosAdminRoutes = lazy(
+  () => import('../../modules/proyectos/admin/ProyectosAdminRoutes'),
+)
+const ActividadesFontaneroRoutes = lazy(
+  () => import('../../modules/actividades-fontanero/ActividadesFontaneroRoutes'),
+)
+const ActividadesAdminRoutes = lazy(
+  () => import('../../modules/actividades-fontanero/admin/ActividadesAdminRoutes'),
+)
+const InventarioRoutes = lazy(() => import('../../modules/inventario/InventarioRoutes'))
+const AveriasAdminRoutes = lazy(() => import('../../modules/averias/admin/AveriasAdminRoutes'))
+const AsociadosRoutes = lazy(() => import('../../modules/asociados/AsociadosRoutes'))
+const RecursosHumanosRoutes = lazy(
+  () => import('../../modules/recursos-humanos/RecursosHumanosRoutes'),
+)
+const SolicitudesAdminRoutes = lazy(
+  () => import('../../modules/solicitudes-publicas/admin/SolicitudesAdminRoutes'),
+)
 
 export type PrivateRouteDefinition = {
   segment: string
@@ -36,25 +51,35 @@ export type AdminNavItem = {
   icon: AdminNavIconName
 }
 
-const ADMIN_MODULE_ELEMENTS: Record<AdminNavIconName, ReactElement> = {
+type AdminRoutableIconName = Exclude<AdminNavIconName, 'menu' | 'menuClose'>
+
+const ModuleFallback = () => (
+  <p className="gallery-admin__empty" role="status">
+    Cargando módulo…
+  </p>
+)
+
+const lazyModule = (element: ReactElement) => (
+  <Suspense fallback={<ModuleFallback />}>{element}</Suspense>
+)
+
+const ADMIN_MODULE_ELEMENTS: Record<AdminRoutableIconName, ReactElement> = {
   dashboard: <AdminDashboard />,
   usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
-  abonados: <AsociadosRoutes />,
-  inventario: <InventarioRoutes />,
-  solicitudes: <SolicitudesAdminRoutes />,
-  lecturas: <RecursosHumanosRoutes />,
-  averias: <AveriasAdminRoutes />,
-  actividades: <ActividadesFontaneroRoutes />,
-  'actividades-fontanero': <ActividadesAdminRoutes />,
+  abonados: lazyModule(<AsociadosRoutes />),
+  inventario: lazyModule(<InventarioRoutes />),
+  solicitudes: lazyModule(<SolicitudesAdminRoutes />),
+  lecturas: lazyModule(<RecursosHumanosRoutes />),
+  averias: lazyModule(<AveriasAdminRoutes />),
+  actividades: lazyModule(<ActividadesFontaneroRoutes />),
+  'actividades-fontanero': lazyModule(<ActividadesAdminRoutes />),
   reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,
-  proyectos: <ProyectosAdminRoutes />,
-  galeria: <GalleryAdminPage />,
-  comunicados: <ComunicadosAdminPage />,
-  contacto: <ContactoAdminPage />,
-  transparencia: <TransparenciaAdminPage />,
+  proyectos: lazyModule(<ProyectosAdminRoutes />),
+  galeria: lazyModule(<GalleryAdminPage />),
+  comunicados: lazyModule(<ComunicadosAdminPage />),
+  contacto: lazyModule(<ContactoAdminPage />),
+  transparencia: lazyModule(<TransparenciaAdminPage />),
   perfil: <ProfilePage />,
-  menu: <PrivateModulePlaceholder title="Menú" />,
-  menuClose: <PrivateModulePlaceholder title="Cerrar menú" />,
 }
 
 export { ADMIN_BASE_PATH, ADMIN_ROUTE_SEGMENT }
@@ -73,7 +98,7 @@ export const PRIVATE_ROUTES: PrivateRouteDefinition[] = ADMIN_MODULE_ACCESS.map(
     availableInNav: module.availableInNav,
     allowedRoles: module.allowedRoles,
     requiredPermissions: module.requiredPermissions,
-    element: ADMIN_MODULE_ELEMENTS[module.segment],
+    element: ADMIN_MODULE_ELEMENTS[module.segment as AdminRoutableIconName],
   }),
 )
 

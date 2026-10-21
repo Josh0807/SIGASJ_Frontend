@@ -43,7 +43,7 @@ export function usePublicTransparencia(
   }, [load])
 
   return {
-    status: status === 'error' ? 'success' : status,
+    status,
     publications,
     total: publications.length,
     retry: () => {

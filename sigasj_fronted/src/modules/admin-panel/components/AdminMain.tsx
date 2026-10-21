@@ -16,7 +16,7 @@ const AdminMain = ({
       onToggleMenu={onToggleMenu}
       menuToggleRef={menuToggleRef}
     />
-    <div className="admin-main__content min-w-0" aria-label="Contenido administrativo">
+    <div className="admin-main__content admin-content-modern min-w-0" aria-label="Contenido administrativo">
       <div className="admin-main__inner w-full min-w-0">
         <ErrorBoundary>{children}</ErrorBoundary>
       </div>

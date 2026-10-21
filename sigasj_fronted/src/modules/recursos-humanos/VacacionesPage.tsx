@@ -698,7 +698,7 @@ export default function VacacionesPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => actualizarParams({ colaboradorId, page: page - 1 })}
                     disabled={page <= 1 || cargandoHistorial}
                   >
@@ -710,7 +710,7 @@ export default function VacacionesPage() {
                   </span>
                   <button
                     type="button"
-                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => actualizarParams({ colaboradorId, page: page + 1 })}
                     disabled={page >= totalPages || cargandoHistorial}
                   >

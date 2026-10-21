@@ -44,7 +44,13 @@ export async function fetchRawWithAuth(
 
   const token = getAccessToken()
   const headers: Record<string, string> = { ...(customHeaders as Record<string, string>) }
-  if (!(restOptions.body instanceof FormData) && !headers['Content-Type']) {
+  const method = String(restOptions.method ?? 'GET').toUpperCase()
+  const shouldSetJsonContentType =
+    !(restOptions.body instanceof FormData) &&
+    !headers['Content-Type'] &&
+    method !== 'GET' &&
+    method !== 'HEAD'
+  if (shouldSetJsonContentType) {
     headers['Content-Type'] = 'application/json'
   }
   if (token?.trim()) headers.Authorization = `Bearer ${token.trim()}`
