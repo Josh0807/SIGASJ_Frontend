@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { IconArrowLeft } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -144,7 +145,11 @@ const AveriasAdminDetailPage = ({
             </div>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__button" to={listPath}>
+            <Link
+              className="gallery-admin__button group !inline-flex !min-h-12 !items-center !gap-2.5 !rounded-xl !border !border-blue-200 !bg-gradient-to-br !from-white !to-blue-50 !px-5 !font-extrabold !text-blue-700 !no-underline !shadow-[0_6px_18px_rgba(37,99,235,0.1)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!from-blue-50 hover:!to-sky-100 hover:!shadow-[0_10px_24px_rgba(37,99,235,0.18)] active:!translate-y-0 active:!scale-[0.98]"
+              to={listPath}
+            >
+              <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1" size={19} aria-hidden="true" />
               {backLabel}
             </Link>
           </div>

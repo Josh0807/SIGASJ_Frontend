@@ -35,7 +35,7 @@ describe('RequestsSection', () => {
       expect(markup).toContain(`href="${formPath}"`)
     }
     expect((markup.match(/Realizar solicitud/g) ?? [])).toHaveLength(6)
-    expect((markup.match(/Descargar formulario/g) ?? [])).toHaveLength(6)
+    expect((markup.match(/Forma Presencial/g) ?? [])).toHaveLength(6)
     expect(markup).not.toContain('/formularios/')
     expect(markup).not.toContain('download=""')
   })

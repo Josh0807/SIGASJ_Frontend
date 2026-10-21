@@ -33,14 +33,32 @@ const normalizeItem = (value: unknown): NotificacionAveriaItem | null => {
   const idSolicitudAusencia = isNullableId(row.idSolicitudAusencia)
     ? row.idSolicitudAusencia
     : null
+  const idSolicitudMateriales = isNullableId(row.idSolicitudMateriales)
+    ? row.idSolicitudMateriales
+    : null
+  const idSalidaInventario = isNullableId(row.idSalidaInventario)
+    ? row.idSalidaInventario
+    : null
+  const idReposicion = isNullableId(row.idReposicion) ? row.idReposicion : null
 
   // Exactamente una referencia válida (o ítem legado solo con idAveria).
   const hasAveria = idAveria != null && idAveria > 0
   const hasSolicitud = idSolicitudAusencia != null && idSolicitudAusencia > 0
-  if (!hasAveria && !hasSolicitud) {
+  const hasSolicitudMateriales =
+    idSolicitudMateriales != null && idSolicitudMateriales > 0
+  const hasSalidaInventario = idSalidaInventario != null && idSalidaInventario > 0
+  const hasReposicion = idReposicion != null && idReposicion > 0
+  const referenceCount = [
+    hasAveria,
+    hasSolicitud,
+    hasSolicitudMateriales,
+    hasSalidaInventario,
+    hasReposicion,
+  ].filter(Boolean).length
+  if (referenceCount === 0) {
     return null
   }
-  if (hasAveria && hasSolicitud) {
+  if (referenceCount > 1) {
     return null
   }
 
@@ -48,6 +66,11 @@ const normalizeItem = (value: unknown): NotificacionAveriaItem | null => {
     id: row.id,
     idAveria: hasAveria ? idAveria : null,
     idSolicitudAusencia: hasSolicitud ? idSolicitudAusencia : null,
+    idSolicitudMateriales: hasSolicitudMateriales
+      ? idSolicitudMateriales
+      : null,
+    idSalidaInventario: hasSalidaInventario ? idSalidaInventario : null,
+    idReposicion: hasReposicion ? idReposicion : null,
     tipo: typeof row.tipo === 'string' ? row.tipo : '',
     titulo: row.titulo,
     mensaje: row.mensaje,

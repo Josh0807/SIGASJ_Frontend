@@ -1,5 +1,6 @@
-import { IconArrowRight, IconDownload, IconFiles, IconProgressCheck } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowRight, IconBuildingCommunity, IconClock, IconDownload, IconFiles, IconMapPin, IconProgressCheck, IconX } from '@tabler/icons-react'
 import { useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import type { RequestService, RequestServiceIcon, RequestsSectionProps } from '../types/RequestsSectionProps'
 import { OTHER_FORMS_ROUTE, REQUEST_TRACKING_ROUTE, SERVICE_REQUEST_ROUTES } from '../config/serviceRequestRoutes'
@@ -50,6 +51,7 @@ const RequestsSection = ({
 }: RequestsSectionProps) => {
   const [downloadingSlug, setDownloadingSlug] = useState<string | null>(null)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [presentialDownload, setPresentialDownload] = useState<{ slug: string; name: string } | null>(null)
 
   const handleDownload = async (slug: string) => {
     if (downloadingSlug) return
@@ -57,6 +59,7 @@ const RequestsSection = ({
     setDownloadError(null)
     try {
       await downloadFormularioOficial(slug)
+      setPresentialDownload(null)
     } catch (error) {
       setDownloadError(error instanceof Error ? error.message : 'No fue posible descargar el formulario oficial.')
     } finally {
@@ -98,8 +101,8 @@ const RequestsSection = ({
               <Link className="requests-motion-button flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#0872d3] to-[#2f91da] px-4 text-center text-sm font-bold text-white no-underline shadow-[0_8px_18px_rgba(8,114,211,0.2)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400" to={formHref!}>
                 Realizar solicitud <IconArrowRight className="shrink-0" size={19} aria-hidden="true" />
               </Link>
-              <button className="requests-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-65" type="button" disabled={Boolean(downloadingSlug)} onClick={() => downloadSlug && void handleDownload(downloadSlug)}>
-                {downloadingSlug === downloadSlug ? 'Descargando…' : 'Descargar formulario'} <IconDownload className="shrink-0" size={19} aria-hidden="true" />
+              <button className="requests-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-65" type="button" disabled={Boolean(downloadingSlug)} onClick={() => { if (downloadSlug) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
+                Forma Presencial <IconDownload className="shrink-0" size={19} aria-hidden="true" />
               </button>
             </div>
             )}
@@ -111,6 +114,33 @@ const RequestsSection = ({
         ))}
       </div>
     </div>
+    {presentialDownload && typeof document !== 'undefined' ? createPortal((
+      <div className="fixed inset-0 z-[1200] grid place-items-center overflow-y-auto bg-slate-950/55 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !downloadingSlug) setPresentialDownload(null) }}>
+        <section className="w-full max-w-[620px] overflow-hidden rounded-[26px] bg-white shadow-[0_28px_80px_rgba(3,35,72,0.3)]" role="dialog" aria-modal="true" aria-labelledby="presential-download-title">
+          <header className="relative bg-gradient-to-br from-[#073b79] to-[#1687d4] px-7 py-6 pr-16 text-white max-[560px]:px-5">
+            <span className="mb-4 grid size-12 place-items-center rounded-2xl bg-white/15"><IconBuildingCommunity size={26} aria-hidden="true" /></span>
+            <p className="m-0 text-xs font-extrabold uppercase tracking-[0.18em] text-sky-200">Modalidad presencial</p>
+            <h3 className="mb-0 mt-2 text-2xl font-extrabold leading-tight text-white" id="presential-download-title">Descargar formulario oficial</h3>
+            <button className="absolute right-5 top-5 grid size-10 cursor-pointer place-items-center rounded-xl border border-white/25 bg-white/10 text-white transition hover:rotate-6 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none" type="button" aria-label="Cerrar" disabled={Boolean(downloadingSlug)} onClick={() => setPresentialDownload(null)}><IconX size={21} aria-hidden="true" /></button>
+          </header>
+          <div className="grid gap-5 p-7 max-[560px]:p-5">
+            <div><strong className="block text-base font-extrabold text-[#073b79]">{presentialDownload.name}</strong><p className="mb-0 mt-2 text-sm leading-6 text-slate-600">Descarga y completa este formulario. Luego entrégalo presencialmente, junto con los documentos requeridos, en la ventanilla de la ASADA.</p></div>
+            <div className="grid grid-cols-2 gap-3 max-[520px]:grid-cols-1">
+              <div className="flex gap-3 rounded-xl bg-sky-50 p-4"><IconClock className="shrink-0 text-[#1476cf]" size={21} aria-hidden="true" /><span><strong className="block text-sm text-[#073b79]">Horario de atención</strong><small className="mt-1 block leading-5 text-slate-600">Lunes a sábado<br />7:30 a.m. – 11:30 a.m.</small></span></div>
+              <div className="flex gap-3 rounded-xl bg-sky-50 p-4"><IconMapPin className="shrink-0 text-[#1476cf]" size={21} aria-hidden="true" /><span><strong className="block text-sm text-[#073b79]">Ventanilla ASADA</strong><small className="mt-1 block leading-5 text-slate-600">San Juan de Santa Cruz, Guanacaste</small></span></div>
+            </div>
+            <aside className="relative overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50 px-5 py-5 text-center shadow-[0_10px_24px_rgba(217,119,6,0.1)]">
+              <span className="mx-auto grid size-10 place-items-center rounded-xl bg-amber-100 text-amber-700" aria-hidden="true"><IconAlertTriangle size={22} /></span>
+              <strong className="mt-3 block text-sm font-extrabold uppercase tracking-[0.08em] text-amber-900">Importante</strong>
+              <p className="mx-auto mb-0 mt-2 max-w-lg text-sm leading-6 text-amber-900">Descargar el formulario no registra una solicitud digital. El trámite se recibe cuando presentas el documento en ventanilla.</p>
+              <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" aria-hidden="true" />
+            </aside>
+            {downloadError ? <p className="m-0 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800" role="alert">{downloadError}</p> : null}
+            <footer className="flex justify-center gap-3 max-[480px]:flex-col-reverse"><button className="min-h-12 cursor-pointer rounded-xl border-2 border-[#1476cf] bg-white px-6 font-bold text-[#0b65b5]" type="button" disabled={Boolean(downloadingSlug)} onClick={() => setPresentialDownload(null)}>Cancelar</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white shadow-[0_10px_22px_rgba(8,114,211,0.24)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] disabled:cursor-wait disabled:opacity-65 motion-reduce:transform-none" type="button" disabled={Boolean(downloadingSlug)} onClick={() => void handleDownload(presentialDownload.slug)}>{downloadingSlug ? 'Descargando…' : 'Descargar PDF'} <IconDownload size={19} aria-hidden="true" /></button></footer>
+          </div>
+        </section>
+      </div>
+    ), document.body) : null}
   </section>
   )
 }
