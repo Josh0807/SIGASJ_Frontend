@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { IconArrowLeft, IconArrowsExchange, IconCalendar, IconEye, IconHistory, IconPackage, IconRefresh, IconTrash } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { InventoryFormField } from '../InventoryFormField'
@@ -45,6 +46,7 @@ export default function MovimientosPage() {
 
   useEffect(() => {
     let active = true
+    const cancelScheduled = runAfterEffect(() => {
     setLoading(true)
     void getMovimientosAdmin({
       ...(tipo ? { tipo } : {}),
@@ -73,8 +75,10 @@ export default function MovimientosPage() {
       .finally(() => {
         if (active) setLoading(false)
       })
+    })
     return () => {
       active = false
+      cancelScheduled()
     }
   }, [tipo, materialId, fechaDesde, fechaHasta, navigate, page, reloadKey])
 

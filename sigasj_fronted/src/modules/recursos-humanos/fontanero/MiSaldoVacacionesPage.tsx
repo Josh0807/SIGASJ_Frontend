@@ -1,5 +1,6 @@
 import { IconBeach, IconRefresh } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -27,6 +28,7 @@ export default function MiSaldoVacacionesPage() {
 
   useEffect(() => {
     const controller = new AbortController()
+    const cancelScheduled = runAfterEffect(() => {
     setCargando(true)
     getBalanceVacacionesPropio(controller.signal)
       .then((data) => {
@@ -52,7 +54,11 @@ export default function MiSaldoVacacionesPage() {
       .finally(() => {
         if (!controller.signal.aborted) setCargando(false)
       })
-    return () => controller.abort()
+    })
+    return () => {
+      cancelScheduled()
+      controller.abort()
+    }
   }, [recarga, salirPorSesion])
 
   return (

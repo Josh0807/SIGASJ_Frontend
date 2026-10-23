@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   LOGIN_ROUTE_PATH,
 } from '../../../app/router/routePaths'
@@ -51,12 +51,14 @@ const AveriasFontaneroDetailPage = ({
   )
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [forceLogin, setForceLogin] = useState(false)
+  const [detailIdSource, setDetailIdSource] = useState(id)
 
-  useEffect(() => {
+  if (id !== detailIdSource) {
+    setDetailIdSource(id)
     setResolvedAveria(null)
     setSuccessMessage(null)
     setForceLogin(false)
-  }, [id])
+  }
 
   if (remote.unauthorized || forceLogin) {
     return <Navigate to={LOGIN_ROUTE_PATH} replace />

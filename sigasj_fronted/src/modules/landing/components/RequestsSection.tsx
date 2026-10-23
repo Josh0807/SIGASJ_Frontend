@@ -3,17 +3,25 @@ import { useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import type { RequestService, RequestServiceIcon, RequestsSectionProps } from '../types/RequestsSectionProps'
-import { OTHER_FORMS_ROUTE, REQUEST_TRACKING_ROUTE, SERVICE_REQUEST_ROUTES } from '../config/serviceRequestRoutes'
+import {
+  OTHER_FORMS_ROUTE,
+  REQUEST_TRACKING_ROUTE,
+  SERVICE_REQUEST_ROUTES,
+  isOnlineServiceRequestPath,
+} from '../config/serviceRequestRoutes'
 import { downloadFormularioOficial } from '../../solicitudes-publicas/formularios-oficiales/formulariosOficialesApi'
 
-/** Fuente única: rutas de `serviceRequestRoutes` + descarga/consulta. */
+const onlineFormHref = (path: string) =>
+  isOnlineServiceRequestPath(path) ? path : undefined
+
+/** Fuente única: disponibilidad online desde `serviceRequestRoutes`. */
 const defaultServices: RequestService[] = [
-  { id: 'arreglo-pago', name: 'Solicitud de Arreglo de Pago Domiciliar', description: 'Permite solicitar un convenio de pago para regularizar saldos pendientes del servicio de agua.', formHref: SERVICE_REQUEST_ROUTES.paymentPlan, downloadSlug: 'arreglo-pago', badge: 'Trámite en línea', icon: 'payment-plan' },
-  { id: 'cambio-titular', name: 'Cambio de Nombre del Titular del Servicio', description: 'Permite solicitar el cambio de la persona titular asociada al servicio de agua. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.accountChange, downloadSlug: 'cambio-titular', badge: 'Trámite en línea', icon: 'account-change' },
-  { id: 'infraestructura-linderos', name: 'Constancia de Infraestructura Frente a Linderos de un Inmueble', description: 'Permite solicitar una constancia sobre la infraestructura de la ASADA frente a los linderos de un inmueble. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.boundaryInfrastructure, downloadSlug: 'infraestructura-linderos', badge: 'Trámite en línea', icon: 'boundary-infrastructure' },
-  { id: 'afiliacion', name: 'Solicitud de Afiliación', description: 'Permite iniciar el proceso de afiliación a la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.affiliation, downloadSlug: 'afiliacion', badge: 'Trámite en línea', icon: 'affiliation' },
-  { id: 'disponibilidad-servicios', name: 'Constancia de Disponibilidad de Servicios', description: 'Permite solicitar una constancia sobre la disponibilidad de los servicios brindados por la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.serviceAvailability, downloadSlug: 'disponibilidad-servicios', badge: 'Trámite en línea', icon: 'service-availability' },
-  { id: 'servicio-existente', name: 'Constancia de Servicio Existente', description: 'Permite solicitar una constancia que acredite la existencia de un servicio de agua. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: SERVICE_REQUEST_ROUTES.existingService, downloadSlug: 'servicio-existente', badge: 'Trámite en línea', icon: 'service-record' },
+  { id: 'arreglo-pago', name: 'Solicitud de Arreglo de Pago Domiciliar', description: 'Permite solicitar un convenio de pago para regularizar saldos pendientes del servicio de agua.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.paymentPlan), downloadSlug: 'arreglo-pago', badge: 'Trámite en línea', icon: 'payment-plan' },
+  { id: 'cambio-titular', name: 'Cambio de Nombre del Titular del Servicio', description: 'Permite solicitar el cambio de la persona titular asociada al servicio de agua. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.accountChange), downloadSlug: 'cambio-titular', badge: 'Trámite en línea', icon: 'account-change' },
+  { id: 'infraestructura-linderos', name: 'Constancia de Infraestructura Frente a Linderos de un Inmueble', description: 'Permite solicitar una constancia sobre la infraestructura de la ASADA frente a los linderos de un inmueble. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.boundaryInfrastructure), downloadSlug: 'infraestructura-linderos', badge: 'Trámite en línea', icon: 'boundary-infrastructure' },
+  { id: 'afiliacion', name: 'Solicitud de Afiliación', description: 'Permite iniciar el proceso de afiliación a la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.affiliation), downloadSlug: 'afiliacion', badge: 'Trámite en línea', icon: 'affiliation' },
+  { id: 'disponibilidad-servicios', name: 'Constancia de Disponibilidad de Servicios', description: 'Permite solicitar una constancia sobre la disponibilidad de los servicios brindados por la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.serviceAvailability), downloadSlug: 'disponibilidad-servicios', badge: 'Trámite en línea', icon: 'service-availability' },
+  { id: 'servicio-existente', name: 'Constancia de Servicio Existente', description: 'Permite solicitar una constancia que acredite la existencia de un servicio de agua. Descargue el formulario para entrega presencial.', downloadSlug: 'servicio-existente', badge: 'Forma presencial', icon: 'service-record' },
   { id: 'otros-formularios', name: 'Otros Formularios', description: 'Consulta y descarga otros documentos oficiales publicados por la Administración de la ASADA.', viewHref: OTHER_FORMS_ROUTE, badge: 'Solo descarga', icon: 'downloadable-forms' },
   { id: 'seguimiento', name: 'Seguimiento de Solicitudes', description: 'Consulta el avance de tu solicitud utilizando el código de seguimiento que recibiste al enviarla.', viewHref: REQUEST_TRACKING_ROUTE, badge: 'Consulta pública', icon: 'request-tracking' },
 ]

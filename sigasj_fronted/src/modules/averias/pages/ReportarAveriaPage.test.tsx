@@ -6,7 +6,6 @@ import { clearAccessToken } from '../../auth/utils/authStorage'
 import { mountAppRoutes } from '../../../test/render-app-routes'
 import { setViewportWidth } from '../../../test/viewportHelpers'
 import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
-import LandingPage from '../../landing/pages/LandingPage'
 import ReportarAveriaPage from './ReportarAveriaPage'
 import { PUBLIC_AVERIA_ADMIN_PAYLOAD_KEYS } from '../types/publicAveriaApi'
 import {
@@ -101,10 +100,13 @@ describe('Pantalla pública Reportar avería', () => {
     }
   })
 
-  it('navega desde la Landing con el botón Reportar avería', () => {
+  it('navega desde la Landing con el botón Reportar avería', async () => {
+    const { default: ReportFaultSection } = await import(
+      '../../landing/components/ReportFaultSection'
+    )
     const markup = renderToStaticMarkup(
       <MemoryRouter>
-        <LandingPage />
+        <ReportFaultSection />
       </MemoryRouter>,
     )
 

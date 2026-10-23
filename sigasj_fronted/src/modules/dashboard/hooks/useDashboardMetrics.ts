@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import {
   getAbonadosSummaryMetric,
   getAlertasReposicionSummaryMetric,
@@ -123,9 +124,9 @@ export function useDashboardMetrics(
     }
   }, [keySignature])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void fetchMetrics()
-  }, [fetchMetrics])
+  }), [fetchMetrics])
 
   return {
     metrics,

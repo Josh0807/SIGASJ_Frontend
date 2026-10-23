@@ -57,7 +57,7 @@ async function mount(path: string, extra?: ReactNode) {
       <MemoryRouter initialEntries={[path]}>
         <AuthProvider>
           <Routes>
-            <Route path="/admin/lecturas/*" element={<RecursosHumanosRoutes />} />
+            <Route path="/admin/rrhh/*" element={<RecursosHumanosRoutes />} />
             <Route path="/login" element={<p>Pantalla de login</p>} />
           </Routes>
           {extra}
@@ -95,7 +95,7 @@ describe('Recursos Humanos: colaboradores', () => {
     loginAsRole('Administradora')
     let resolver!: (value: Response) => void
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((resolve) => { resolver = resolve })))
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
     expect(view.container.textContent).toContain('Cargando colaboradores')
 
     await act(async () => resolver(response(listado([juan]))))
@@ -106,9 +106,9 @@ describe('Recursos Humanos: colaboradores', () => {
     expect(fila?.textContent).toContain('Juan Pérez')
     expect(fila?.textContent).toContain('Fontanero')
     expect(fila?.textContent).toContain('Activo')
-    expect(byText(fila!, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/lecturas/1')
+    expect(byText(fila!, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/rrhh/1')
     expect(byText(fila!, 'a', 'Historial')?.getAttribute('href')).toBe(
-      '/admin/lecturas/1/historial',
+      '/admin/rrhh/1/historial',
     )
     await view.cleanup()
   })
@@ -116,7 +116,7 @@ describe('Recursos Humanos: colaboradores', () => {
   it('envía búsqueda y filtro de estado al backend', async () => {
     loginAsRole('Administradora')
     const fetchMock = stubApi(() => response(listado([juan])))
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
 
     const buscar = view.container.querySelector<HTMLInputElement>('input[type="search"]')!
     await act(async () => setValue(buscar, 'juan'))
@@ -137,7 +137,7 @@ describe('Recursos Humanos: colaboradores', () => {
   it('muestra vacío, error y permite reintentar', async () => {
     loginAsRole('Administradora')
     stubApi(() => response(listado([])))
-    const vacio = await mount('/admin/lecturas')
+    const vacio = await mount('/admin/rrhh')
     expect(vacio.container.textContent).toContain('Aún no hay colaboradores')
     await vacio.cleanup()
 
@@ -145,7 +145,7 @@ describe('Recursos Humanos: colaboradores', () => {
       .mockRejectedValueOnce(new Error('Failed to fetch'))
       .mockResolvedValueOnce(response(listado([juan])))
     vi.stubGlobal('fetch', fetchMock)
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
     expect(view.container.querySelector('[role="alert"]')?.textContent).toContain('No fue posible conectar')
     await act(async () => byText(view.container, 'button', 'Reintentar')!.click())
     await flush()
@@ -160,7 +160,7 @@ describe('Recursos Humanos: colaboradores', () => {
         ? response({ ...juan, activo: false })
         : init.method ? response({}) : response(listado([juan])),
     )
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
     await act(async () => byText(view.container, 'tbody button', 'Inactivar')!.click())
     const dialog = document.querySelector('[role="alertdialog"]')!
     expect(dialog.textContent).toContain('Juan Pérez quedará inactivo')
@@ -182,7 +182,7 @@ describe('Recursos Humanos: colaboradores', () => {
       if (init.method === 'POST') return response({ ...juan, id: 9 }, true, 201)
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/nuevo')
+    const view = await mount('/admin/rrhh/nuevo')
     await flush()
     const form = view.container.querySelector('form')!
 
@@ -223,7 +223,7 @@ describe('Recursos Humanos: colaboradores', () => {
       }
       return response(listado([]))
     })
-    const view = await mount('/admin/lecturas/nuevo')
+    const view = await mount('/admin/rrhh/nuevo')
     await flush()
     const input = (name: string) => view.container.querySelector<HTMLInputElement>(`input[autocomplete="${name}"]`)!
     await act(async () => {
@@ -261,7 +261,7 @@ describe('Recursos Humanos: colaboradores', () => {
       }
       return response(actual)
     })
-    const view = await mount('/admin/lecturas/1/editar')
+    const view = await mount('/admin/rrhh/1/editar')
     await flush()
     const puesto = view.container.querySelector<HTMLSelectElement>('select[aria-label="Puesto"]')!
     expect(puesto.value).toBe('1')
@@ -284,22 +284,22 @@ describe('Recursos Humanos: colaboradores', () => {
     stubApi((url) =>
       url.pathname.endsWith('/1') ? response(juan) : response({ message: 'Not Found' }, false, 404),
     )
-    const view = await mount('/admin/lecturas/1')
+    const view = await mount('/admin/rrhh/1')
     expect(view.container.textContent).toContain('juan@example.com')
     expect(view.container.textContent).toContain('Sin cuenta vinculada')
-    expect(byText(view.container, 'a', 'Editar')?.getAttribute('href')).toBe('/admin/lecturas/1/editar')
+    expect(byText(view.container, 'a', 'Editar')?.getAttribute('href')).toBe('/admin/rrhh/1/editar')
     expect(byText(view.container, 'a', 'Vacaciones')?.getAttribute('href')).toBe(
-      '/admin/lecturas/vacaciones?colaboradorId=1',
+      '/admin/rrhh/vacaciones?colaboradorId=1',
     )
     expect(byText(view.container, 'a', 'Incapacidades')?.getAttribute('href')).toBe(
-      '/admin/lecturas/incapacidades?colaboradorId=1',
+      '/admin/rrhh/incapacidades?colaboradorId=1',
     )
     expect(byText(view.container, 'a', 'Historial')?.getAttribute('href')).toBe(
-      '/admin/lecturas/1/historial',
+      '/admin/rrhh/1/historial',
     )
     await view.cleanup()
 
-    const missing = await mount('/admin/lecturas/99')
+    const missing = await mount('/admin/rrhh/99')
     expect(missing.container.querySelector('[role="alert"]')?.textContent).toContain('no existe')
     await missing.cleanup()
   })
@@ -315,7 +315,7 @@ describe('Recursos Humanos: colaboradores', () => {
       return Promise.resolve(response(listado([juan])))
     })
     vi.stubGlobal('fetch', fetchMock)
-    const view = await mount('/admin/lecturas/nuevo')
+    const view = await mount('/admin/rrhh/nuevo')
     await flush()
     const input = (name: string) => view.container.querySelector<HTMLInputElement>(`input[autocomplete="${name}"]`)!
     await act(async () => {
@@ -346,7 +346,7 @@ describe('Recursos Humanos: colaboradores', () => {
         : Promise.resolve(response(listado([juan]))),
     )
     vi.stubGlobal('fetch', fetchMock)
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
     await act(async () => byText(view.container, 'tbody button', 'Inactivar')!.click())
     const confirmar = byText(document.querySelector('[role="alertdialog"]')!, 'button', 'Inactivar')!
     await act(async () => {
@@ -366,7 +366,7 @@ describe('Recursos Humanos: colaboradores', () => {
   it('ante 403 muestra el permiso sin ofrecer reintentar', async () => {
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Forbidden resource' }, false, 403))
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
     expect(view.container.querySelector('[role="alert"]')?.textContent).toContain('No tiene permisos')
     expect(byText(view.container, 'button', 'Reintentar')).toBeUndefined()
     await view.cleanup()
@@ -375,12 +375,12 @@ describe('Recursos Humanos: colaboradores', () => {
   it('ante 404 en el detalle ofrece volver al listado', async () => {
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Not Found' }, false, 404))
-    const view = await mount('/admin/lecturas/99')
+    const view = await mount('/admin/rrhh/99')
     expect(byText(view.container, 'button', 'Reintentar')).toBeUndefined()
-    expect(byText(view.container, 'a', 'Volver al listado')?.getAttribute('href')).toBe('/admin/lecturas')
+    expect(byText(view.container, 'a', 'Volver al listado')?.getAttribute('href')).toBe('/admin/rrhh')
     await view.cleanup()
 
-    const editar = await mount('/admin/lecturas/99/editar')
+    const editar = await mount('/admin/rrhh/99/editar')
     expect(editar.container.querySelector('[role="alert"]')?.textContent).toContain('no existe')
     expect(editar.container.querySelector('form')).toBeNull()
     await editar.cleanup()
@@ -389,7 +389,7 @@ describe('Recursos Humanos: colaboradores', () => {
   it('cierra la sesión ante un 401', async () => {
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Unauthorized' }, false, 401))
-    const view = await mount('/admin/lecturas')
+    const view = await mount('/admin/rrhh')
     expect(view.container.textContent).toContain('Pantalla de login')
     await view.cleanup()
   })
@@ -435,13 +435,13 @@ describe('Recursos Humanos: permisos', () => {
       if (url.pathname.includes('/rrhh/permisos')) return response(listadoPermisos([permiso]))
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/permisos')
+    const view = await mount('/admin/rrhh/permisos')
     expect(view.container.textContent).toContain('Permisos del personal')
     const headers = Array.from(view.container.querySelectorAll('th')).map((th) => th.textContent)
     expect(headers).toEqual(['Colaborador', 'Inicio', 'Fin', 'Motivo', 'Acción'])
     expect(view.container.textContent).toContain('Juan Pérez')
     expect(view.container.textContent).toContain('Cita médica')
-    expect(byText(view.container, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/lecturas/permisos/8')
+    expect(byText(view.container, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/rrhh/permisos/8')
     await view.cleanup()
   })
 
@@ -451,7 +451,7 @@ describe('Recursos Humanos: permisos', () => {
       if (url.pathname.includes('/rrhh/permisos')) return response(listadoPermisos([permiso]))
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/permisos')
+    const view = await mount('/admin/rrhh/permisos')
     const colaborador = view.container.querySelector<HTMLSelectElement>('select')!
     await act(async () => setValue(colaborador, '1'))
     await flush()
@@ -475,7 +475,7 @@ describe('Recursos Humanos: permisos', () => {
       if (url.pathname.includes('/rrhh/permisos')) return response(listadoPermisos([]))
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/permisos/nuevo')
+    const view = await mount('/admin/rrhh/permisos/nuevo')
     await act(async () => setValue(view.container.querySelector('select')!, '1'))
     const fechas = view.container.querySelectorAll<HTMLInputElement>('input[type="date"]')
     await act(async () => setValue(fechas[0], '2026-10-12'))
@@ -531,11 +531,11 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades')
+    const view = await mount('/admin/rrhh/incapacidades')
     expect(view.container.textContent).toContain('Incapacidades del personal')
     expect(
       byText(view.container, 'nav a', 'Incapacidades')?.getAttribute('href'),
-    ).toBe('/admin/lecturas/incapacidades')
+    ).toBe('/admin/rrhh/incapacidades')
     const headers = Array.from(view.container.querySelectorAll('th')).map(
       (th) => th.textContent,
     )
@@ -551,7 +551,7 @@ describe('Recursos Humanos: incapacidades', () => {
       'Documento entregado a administración',
     )
     expect(byText(view.container, 'a', 'Ver detalle')?.getAttribute('href')).toBe(
-      '/admin/lecturas/incapacidades/12',
+      '/admin/rrhh/incapacidades/12',
     )
     await view.cleanup()
   })
@@ -564,7 +564,7 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades')
+    const view = await mount('/admin/rrhh/incapacidades')
     const colaborador = view.container.querySelector<HTMLSelectElement>('select')!
     await act(async () => setValue(colaborador, '1'))
     await flush()
@@ -595,7 +595,7 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades')
+    const view = await mount('/admin/rrhh/incapacidades')
     expect(view.container.textContent).toContain(
       'No se encontraron incapacidades.',
     )
@@ -614,7 +614,7 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades/nuevo')
+    const view = await mount('/admin/rrhh/incapacidades/nuevo')
     await act(async () => setValue(view.container.querySelector('select')!, '1'))
     const fechas = view.container.querySelectorAll<HTMLInputElement>(
       'input[type="date"]',
@@ -640,14 +640,14 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades/12')
+    const view = await mount('/admin/rrhh/incapacidades/12')
     expect(view.container.textContent).toContain('Juan Pérez')
     expect(view.container.textContent).toContain(
       'Documento entregado a administración',
     )
     expect(
       byText(view.container, 'a', 'Volver a incapacidades')?.getAttribute('href'),
-    ).toBe('/admin/lecturas/incapacidades')
+    ).toBe('/admin/rrhh/incapacidades')
     await view.cleanup()
   })
 
@@ -663,13 +663,13 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades/99')
+    const view = await mount('/admin/rrhh/incapacidades/99')
     expect(view.container.textContent).toContain(
       'No se encontró la incapacidad solicitada.',
     )
     expect(
       byText(view.container, 'a', 'Volver al listado')?.getAttribute('href'),
-    ).toBe('/admin/lecturas/incapacidades')
+    ).toBe('/admin/rrhh/incapacidades')
     await view.cleanup()
   })
 
@@ -695,7 +695,7 @@ describe('Recursos Humanos: incapacidades', () => {
       .mockRejectedValueOnce(new Error('Failed to fetch'))
     vi.stubGlobal('fetch', fetchMock)
 
-    const view = await mount('/admin/lecturas/incapacidades/nuevo')
+    const view = await mount('/admin/rrhh/incapacidades/nuevo')
     await act(async () => setValue(view.container.querySelector('select')!, '1'))
     const fechas = view.container.querySelectorAll<HTMLInputElement>(
       'input[type="date"]',
@@ -735,7 +735,7 @@ describe('Recursos Humanos: incapacidades', () => {
       return response(listado([juan]))
     })
     const view = await mount(
-      '/admin/lecturas/incapacidades?colaboradorId=1&fechaInicio=2026-10-01&fechaFin=2026-10-31&page=2',
+      '/admin/rrhh/incapacidades?colaboradorId=1&fechaInicio=2026-10-01&fechaFin=2026-10-31&page=2',
     )
     await act(async () =>
       byText(view.container, 'button', 'Siguiente')?.click(),
@@ -773,7 +773,7 @@ describe('Recursos Humanos: incapacidades', () => {
       .mockRejectedValueOnce(new Error('Failed to fetch'))
       .mockResolvedValueOnce(response(listadoIncapacidades([incapacidad])))
     vi.stubGlobal('fetch', fetchMock)
-    const view = await mount('/admin/lecturas/incapacidades')
+    const view = await mount('/admin/rrhh/incapacidades')
     expect(view.container.textContent).toContain(
       'No fue posible conectar con el servidor. Revise su conexión.',
     )
@@ -793,7 +793,7 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades')
+    const view = await mount('/admin/rrhh/incapacidades')
     expect(view.container.textContent).toMatch(/acceso/i)
     expect(byText(view.container, 'button', 'Reintentar')).toBeUndefined()
     await view.cleanup()
@@ -807,7 +807,7 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades')
+    const view = await mount('/admin/rrhh/incapacidades')
     expect(view.container.textContent).toContain('Pantalla de login')
     await view.cleanup()
   })
@@ -820,7 +820,7 @@ describe('Recursos Humanos: incapacidades', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/incapacidades/nuevo')
+    const view = await mount('/admin/rrhh/incapacidades/nuevo')
     await act(async () => setValue(view.container.querySelector('select')!, '1'))
     const fechas = view.container.querySelectorAll<HTMLInputElement>(
       'input[type="date"]',
@@ -896,7 +896,7 @@ describe('Recursos Humanos: historial administrativo', () => {
       }
       return response({ message: 'Not Found' }, false, 404)
     })
-    const view = await mount('/admin/lecturas/1/historial')
+    const view = await mount('/admin/rrhh/1/historial')
     expect(view.container.textContent).toContain('Historial administrativo')
     expect(view.container.textContent).toContain('Juan Pérez')
     expect(view.container.textContent).toContain('Fontanero')
@@ -929,7 +929,7 @@ describe('Recursos Humanos: historial administrativo', () => {
       }
       return response({ message: 'Not Found' }, false, 404)
     })
-    const view = await mount('/admin/lecturas/1/historial')
+    const view = await mount('/admin/rrhh/1/historial')
     const select = view.container.querySelector('select')!
     const fechas = view.container.querySelectorAll<HTMLInputElement>(
       'input[type="date"]',
@@ -978,7 +978,7 @@ describe('Recursos Humanos: historial administrativo', () => {
       return response({ message: 'Not Found' }, false, 404)
     })
     const view = await mount(
-      '/admin/lecturas/1/historial?tipo=PERMISO&fechaDesde=2026-01-01&page=1',
+      '/admin/rrhh/1/historial?tipo=PERMISO&fechaDesde=2026-01-01&page=1',
     )
     await act(async () => byText(view.container, 'button', 'Siguiente')!.click())
     await flush()
@@ -1002,7 +1002,7 @@ describe('Recursos Humanos: historial administrativo', () => {
         totalPages: 0,
       }),
     )
-    const vacio = await mount('/admin/lecturas/1/historial')
+    const vacio = await mount('/admin/rrhh/1/historial')
     expect(vacio.container.textContent).toContain(
       'No hay eventos administrativos registrados para este colaborador.',
     )
@@ -1016,7 +1016,7 @@ describe('Recursos Humanos: historial administrativo', () => {
         totalPages: 0,
       }),
     )
-    const filtrado = await mount('/admin/lecturas/1/historial?tipo=VACACION')
+    const filtrado = await mount('/admin/rrhh/1/historial?tipo=VACACION')
     expect(filtrado.container.textContent).toContain(
       'No se encontraron eventos con los filtros seleccionados.',
     )
@@ -1029,7 +1029,7 @@ describe('Recursos Humanos: historial administrativo', () => {
         404,
       ),
     )
-    const missing = await mount('/admin/lecturas/99/historial')
+    const missing = await mount('/admin/rrhh/99/historial')
     expect(missing.container.querySelector('[role="alert"]')?.textContent).toContain(
       'No se encontró el colaborador solicitado.',
     )
@@ -1037,14 +1037,14 @@ describe('Recursos Humanos: historial administrativo', () => {
       byText(missing.container, 'a', 'Volver a colaboradores')?.getAttribute(
         'href',
       ),
-    ).toBe('/admin/lecturas')
+    ).toBe('/admin/rrhh')
     await missing.cleanup()
 
     vi.stubGlobal(
       'fetch',
       vi.fn(() => Promise.reject(new Error('Failed to fetch'))),
     )
-    const error = await mount('/admin/lecturas/1/historial')
+    const error = await mount('/admin/rrhh/1/historial')
     expect(error.container.querySelector('[role="alert"]')?.textContent).toMatch(
       /conectar|cargar el historial/i,
     )
@@ -1054,13 +1054,13 @@ describe('Recursos Humanos: historial administrativo', () => {
   it('cierra la sesión ante un 401 y muestra acceso denegado en 403', async () => {
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Unauthorized' }, false, 401))
-    const sesion = await mount('/admin/lecturas/1/historial')
+    const sesion = await mount('/admin/rrhh/1/historial')
     expect(sesion.container.textContent).toContain('Pantalla de login')
     await sesion.cleanup()
 
     loginAsRole('Administradora')
     stubApi(() => response({ message: 'Forbidden' }, false, 403))
-    const denegado = await mount('/admin/lecturas/1/historial')
+    const denegado = await mount('/admin/rrhh/1/historial')
     expect(denegado.container.querySelector('[role="alert"]')?.textContent).toContain(
       'No tiene acceso para consultar el historial administrativo.',
     )

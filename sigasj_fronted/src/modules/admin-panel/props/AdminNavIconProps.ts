@@ -4,7 +4,7 @@ export type AdminNavIconName =
   | 'abonados'
   | 'inventario'
   | 'solicitudes'
-  | 'lecturas'
+  | 'rrhh'
   | 'averias'
   | 'actividades'
   | 'actividades-fontanero'

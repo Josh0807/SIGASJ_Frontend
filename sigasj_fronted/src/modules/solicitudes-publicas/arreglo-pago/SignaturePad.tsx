@@ -4,9 +4,18 @@ import { useEffect, useRef, useState } from 'react'
 type SignaturePadProps = {
   value: string
   onChange: (value: string) => void
+  /** Etiqueta visible; por defecto «Firma digital». */
+  label?: string
+  /** Si es false, no muestra el marcador «(opcional)». Por defecto true. */
+  optional?: boolean
 }
 
-const SignaturePad = ({ value, onChange }: SignaturePadProps) => {
+const SignaturePad = ({
+  value,
+  onChange,
+  label = 'Firma digital',
+  optional = true,
+}: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawingRef = useRef(false)
   const [hasSignature, setHasSignature] = useState(Boolean(value))
@@ -77,7 +86,14 @@ const SignaturePad = ({ value, onChange }: SignaturePadProps) => {
   return (
     <div className="grid gap-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="font-bold text-[#173f6e]">Firma digital <span className="font-medium text-[#607a98]">(opcional)</span></span>
+        <span className="font-bold text-[#173f6e]">
+          {label}{' '}
+          {optional ? (
+            <span className="font-medium text-[#607a98]">(opcional)</span>
+          ) : (
+            <span className="sr-only">obligatorio</span>
+          )}
+        </span>
         <button className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-sky-200 bg-white px-3 text-sm font-bold text-[#0b65b5] disabled:cursor-not-allowed disabled:text-slate-400" type="button" disabled={!hasSignature} onClick={clear}>
           <IconEraser size={17} aria-hidden="true" /> Limpiar firma
         </button>

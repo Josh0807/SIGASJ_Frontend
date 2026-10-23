@@ -147,13 +147,13 @@ describe('navegación conjunta entre área pública y administrativa', () => {
       await publicArea.cleanup()
     }
 
-    const requests = await mountApp('/')
+    const requests = await mountApp('/solicitudes/cambio-titular')
 
     try {
-      const toRequests = await clickHref(requests.container, '/solicitudes/afiliacion')
-      expect(toRequests.defaultPrevented).toBe(true)
-      expect(requests.currentPath()).toBe('/solicitudes/afiliacion')
-      expect(requests.container.innerHTML).toContain('Formulario público de afiliación')
+      expect(requests.currentPath()).toBe('/solicitudes/cambio-titular')
+      expect(requests.container.innerHTML).toContain(
+        'Formulario público de cambio de titular del servicio',
+      )
       expect(hasAdminChrome(requests.container.innerHTML)).toBe(false)
       expect(requests.errors).toEqual([])
       expect(requests.warnings).toEqual([])

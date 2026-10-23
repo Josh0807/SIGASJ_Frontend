@@ -147,14 +147,17 @@ describe('Proyectos admin — 403 Acceso denegado y 404 de recurso', () => {
     loginAsRole('Administradora')
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce({
+      vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+        const method = (init?.method ?? 'GET').toUpperCase()
+        if (method === 'PATCH' || method === 'PUT' || method === 'POST') {
+          return forbiddenResponse
+        }
+        return {
           ok: true,
           status: 200,
           json: async () => detalle,
-        })
-        .mockResolvedValue(forbiddenResponse),
+        }
+      }),
     )
 
     const app = await mountAppRoutes('/admin/proyectos/7/editar')
@@ -211,14 +214,17 @@ describe('Proyectos admin — 403 Acceso denegado y 404 de recurso', () => {
     loginAsRole('Administradora')
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce({
+      vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+        const method = (init?.method ?? 'GET').toUpperCase()
+        if (method === 'PATCH' || method === 'PUT' || method === 'POST') {
+          return notFoundResponse
+        }
+        return {
           ok: true,
           status: 200,
           json: async () => detalle,
-        })
-        .mockResolvedValue(notFoundResponse),
+        }
+      }),
     )
 
     const app = await mountAppRoutes('/admin/proyectos/7/editar')
@@ -240,4 +246,5 @@ describe('Proyectos admin — 403 Acceso denegado y 404 de recurso', () => {
       await app.cleanup()
     }
   })
-})
+}
+)

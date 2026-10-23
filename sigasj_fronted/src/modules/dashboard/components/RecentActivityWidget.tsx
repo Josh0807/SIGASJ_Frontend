@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -18,46 +19,49 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
   const [isLoading, setIsLoading] = useState(activitiesProp === undefined)
 
   useEffect(() => {
-    if (activitiesProp !== undefined) {
-      setActivities(activitiesProp)
-      setIsLoading(false)
-      return
-    }
-
     let cancelled = false
-    setIsLoading(true)
+    const cancelScheduled = runAfterEffect(() => {
+      if (activitiesProp !== undefined) {
+        setActivities(activitiesProp)
+        setIsLoading(false)
+        return
+      }
 
-    const scope = canOpenAdminActividades
-      ? 'admin'
-      : canOpenFontaneroActividades
-        ? 'fontanero'
-        : null
+      setIsLoading(true)
 
-    if (scope === null) {
-      setActivities([])
-      setIsLoading(false)
-      return
-    }
+      const scope = canOpenAdminActividades
+        ? 'admin'
+        : canOpenFontaneroActividades
+          ? 'fontanero'
+          : null
 
-    void getRecentDashboardActivities(scope)
-      .then((items) => {
-        if (!cancelled) {
-          setActivities(items)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setActivities([])
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false)
-        }
-      })
+      if (scope === null) {
+        setActivities([])
+        setIsLoading(false)
+        return
+      }
+
+      void getRecentDashboardActivities(scope)
+        .then((items) => {
+          if (!cancelled) {
+            setActivities(items)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setActivities([])
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setIsLoading(false)
+          }
+        })
+    })
 
     return () => {
       cancelled = true
+      cancelScheduled()
     }
   }, [activitiesProp, canOpenAdminActividades, canOpenFontaneroActividades])
 

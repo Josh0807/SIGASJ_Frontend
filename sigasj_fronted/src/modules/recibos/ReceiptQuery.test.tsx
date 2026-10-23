@@ -7,8 +7,6 @@ import PublicReceiptNavbar from './components/PublicReceiptNavbar'
 import ReceiptDetails, { formatCurrency, formatDate } from './components/ReceiptDetails'
 import NoPendingReceipts from './components/NoPendingReceipts'
 import * as receiptsApi from './services/receiptsApi'
-import LandingPage from '../landing/pages/LandingPage'
-
 vi.mock('./services/receiptsApi', async () => {
   const actual = await vi.importActual<typeof receiptsApi>('./services/receiptsApi')
   return {
@@ -151,10 +149,13 @@ describe('Consulta Pública de Recibos SIGASJ', () => {
   })
 
   describe('Integración con Landing Page', () => {
-    it('renderiza la sección de recibos conectada al formulario y no incluye el panel de admin', () => {
+    it('renderiza la sección de recibos conectada al formulario y no incluye el panel de admin', async () => {
+      const { default: ReceiptPaymentSection } = await import(
+        '../landing/components/ReceiptPaymentSection'
+      )
       const markup = renderToStaticMarkup(
         <MemoryRouter initialEntries={['/']}>
-          <LandingPage />
+          <ReceiptPaymentSection />
         </MemoryRouter>,
       )
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { runAfterEffect } from '../../shared/utils/yieldToEffect'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
 import {
@@ -87,8 +88,7 @@ export default function InventarioModuleMenu({ inline = false }: InventarioModul
 
   useEffect(() => {
     if (inline) {
-      setHeaderTarget(null)
-      return
+      return runAfterEffect(() => setHeaderTarget(null))
     }
     const frame = window.requestAnimationFrame(() => {
       setHeaderTarget(document.querySelector<HTMLElement>('.inventory-module-menu-slot, .materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header'))

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { consultarRecibo, ReceiptNotFoundError, ReceiptServiceError } from '../services/receiptsApi'
 import type { ReciboConsultaData } from '../types/receipt.types'
 
@@ -18,6 +19,8 @@ export function useReceiptQuery(numeroPaja: number | null): UseReceiptQueryResul
   const refetch = () => setReloadTrigger((prev) => prev + 1)
 
   useEffect(() => {
+    let isMounted = true
+    const cancelScheduled = runAfterEffect(() => {
     if (numeroPaja === null || isNaN(numeroPaja) || numeroPaja <= 0) {
       setData(null)
       setLoading(false)
@@ -25,7 +28,6 @@ export function useReceiptQuery(numeroPaja: number | null): UseReceiptQueryResul
       return
     }
 
-    let isMounted = true
     setLoading(true)
     setError(null)
 
@@ -47,9 +49,11 @@ export function useReceiptQuery(numeroPaja: number | null): UseReceiptQueryResul
           }
         }
       })
+    })
 
     return () => {
       isMounted = false
+      cancelScheduled()
     }
   }, [numeroPaja, reloadTrigger])
 

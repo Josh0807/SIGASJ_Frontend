@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -27,46 +28,49 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
   const [isLoading, setIsLoading] = useState(alertsProp === undefined)
 
   useEffect(() => {
-    if (alertsProp !== undefined) {
-      setAlerts(alertsProp)
-      setIsLoading(false)
-      return
-    }
-
-    const scope = canOpenAdminAverias
-      ? 'admin'
-      : canOpenFontaneroAverias
-        ? 'fontanero'
-        : null
-
-    if (scope === null) {
-      setAlerts([])
-      setIsLoading(false)
-      return
-    }
-
     let cancelled = false
-    setIsLoading(true)
+    const cancelScheduled = runAfterEffect(() => {
+      if (alertsProp !== undefined) {
+        setAlerts(alertsProp)
+        setIsLoading(false)
+        return
+      }
 
-    void getRecentDashboardAlerts(scope)
-      .then((items) => {
-        if (!cancelled) {
-          setAlerts(items)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setAlerts([])
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false)
-        }
-      })
+      const scope = canOpenAdminAverias
+        ? 'admin'
+        : canOpenFontaneroAverias
+          ? 'fontanero'
+          : null
+
+      if (scope === null) {
+        setAlerts([])
+        setIsLoading(false)
+        return
+      }
+
+      setIsLoading(true)
+
+      void getRecentDashboardAlerts(scope)
+        .then((items) => {
+          if (!cancelled) {
+            setAlerts(items)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setAlerts([])
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setIsLoading(false)
+          }
+        })
+    })
 
     return () => {
       cancelled = true
+      cancelScheduled()
     }
   }, [alertsProp, canOpenAdminAverias, canOpenFontaneroAverias])
 

@@ -32,7 +32,10 @@ export type MaterialesQuery = {
   idProveedor?: number
 }
 
-export type UpdateMaterialPayload = Pick<Material, 'nombre' | 'unidadMedida' | 'descripcion' | 'ubicacion' | 'stockMinimo' | 'activo'> & { idCategoria: number | null; idProveedor: number | null }
+export type UpdateMaterialPayload = Pick<
+  Material,
+  'nombre' | 'unidadMedida' | 'descripcion' | 'ubicacion' | 'stockMinimo' | 'activo'
+> & { idCategoria: number; idProveedor: number }
 
 export type CreateMaterialPayload = Omit<UpdateMaterialPayload, 'activo'>
 export type MaterialFormValues = {

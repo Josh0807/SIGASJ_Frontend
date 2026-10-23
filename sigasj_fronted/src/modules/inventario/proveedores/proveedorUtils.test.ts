@@ -16,7 +16,8 @@ describe('validación y normalización de proveedores', () => {
   })
   it('controla las longitudes de identificación y teléfono', () => {
     expect(validateProveedor({ ...valid, identificacion: '1'.repeat(51) }).identificacion).toBeTruthy()
-    expect(validateProveedor({ ...valid, telefono: '1'.repeat(31) }).telefono).toBeTruthy()
+    expect(validateProveedor({ ...valid, telefono: '1'.repeat(51) }).telefono).toBeTruthy()
+    expect(validateProveedor({ ...valid, telefono: '1'.repeat(50) }).telefono).toBeUndefined()
     expect(validateProveedor({ ...valid, razonSocial: 'a'.repeat(201) }).razonSocial).toBeTruthy()
     expect(validateProveedor({ ...valid, direccion: 'a'.repeat(501) }).direccion).toBeTruthy()
     expect(validateProveedor({ ...valid, personaContacto: 'a'.repeat(151) }).personaContacto).toBeTruthy()

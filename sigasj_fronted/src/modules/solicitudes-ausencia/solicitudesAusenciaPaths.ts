@@ -28,3 +28,12 @@ export const misSolicitudAusenciaDetailPath = (id: number) =>
 export const SOLICITUDES_AUSENCIA_ADMIN_PATH = `${RRHH_PATH}/solicitudes-ausencia`
 export const solicitudAusenciaDetailPath = (id: number) =>
   `${SOLICITUDES_AUSENCIA_ADMIN_PATH}/${id}`
+
+/** Cola y detalle administrativo de ausencia (PBI 6.5.4 — solo Administradora). */
+export const isSolicitudesAusenciaAdminPath = (path: string): boolean => {
+  const normalized = path.split('?')[0]?.replace(/\/+$/, '') || path
+  return (
+    normalized === SOLICITUDES_AUSENCIA_ADMIN_PATH ||
+    normalized.startsWith(`${SOLICITUDES_AUSENCIA_ADMIN_PATH}/`)
+  )
+}

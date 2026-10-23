@@ -10,6 +10,7 @@ import {
 import { loginWithAdminSession } from '../../test/authTestHelpers'
 import { canAccessAdminRoute } from '../../modules/auth/utils/adminNavigation'
 import AppRoutes from './AppRoutes'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
 
@@ -48,6 +49,8 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+
+  await waitForAppRoutesReady(container, () => pathname)
 
   return {
     container,

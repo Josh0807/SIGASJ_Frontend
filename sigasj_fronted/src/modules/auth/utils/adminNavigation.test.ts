@@ -61,8 +61,8 @@ describe('adminNavigation helpers', () => {
       false,
     )
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
-    expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
-    expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(true)
+    expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(false)
+    expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(false)
     expect(canAccessAdminRoute(administradora, '/admin/proyectos')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/actividades-fontanero')).toBe(
       true,
@@ -74,10 +74,10 @@ describe('adminNavigation helpers', () => {
     const items = getAdminNavItemsForUser(secretaria)
     expect(items.map((item) => item.path)).not.toContain('/admin/usuarios')
     expect(items.map((item) => item.path)).not.toContain('/admin/reportes')
-    expect(items.map((item) => item.path)).toContain('/admin/lecturas')
+    expect(items.map((item) => item.path)).toContain('/admin/rrhh')
     expect(canAccessAdminRoute(secretaria, '/admin/usuarios')).toBe(false)
     expect(canAccessAdminRoute(secretaria, '/admin/abonados')).toBe(true)
-    expect(canAccessAdminRoute(secretaria, '/admin/lecturas')).toBe(true)
+    expect(canAccessAdminRoute(secretaria, '/admin/rrhh')).toBe(true)
   })
 
   it('Fontanero solo ve dashboard e inventario operativo, no el listado admin de averías', () => {
@@ -89,6 +89,7 @@ describe('adminNavigation helpers', () => {
       '/fontanero/averias',
       '/fontanero/solicitar-ausencia',
       '/fontanero/mis-solicitudes',
+      '/fontanero/mi-saldo-vacaciones',
     ])
     expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(false)
     expect(canAccessAdminRoute(fontanero, '/fontanero/averias')).toBe(true)
@@ -105,11 +106,11 @@ describe('adminNavigation helpers', () => {
       items.find((item) => item.path === '/fontanero/mis-solicitudes')?.title,
     ).toBe('Mis solicitudes')
     expect(canAccessAdminRoute(fontanero, '/fontanero/mi-saldo-vacaciones')).toBe(
-      false,
+      true,
     )
-    expect(items.map((item) => item.path)).not.toContain(
-      '/fontanero/mi-saldo-vacaciones',
-    )
+    expect(
+      items.find((item) => item.path === '/fontanero/mi-saldo-vacaciones')?.title,
+    ).toBe('Mi saldo de vacaciones')
     expect(canAccessAdminRoute(fontanero, '/admin/actividades')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades/nueva')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades-fontanero')).toBe(

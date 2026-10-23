@@ -7,6 +7,7 @@ import {
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import { extractHttpErrorMessage, getHttpErrorStatus } from '../../actividades-fontanero/utils/httpErrorStatus'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
@@ -72,12 +73,13 @@ const AveriasFontaneroResolverDialog = ({
 
   useEffect(() => {
     if (!isOpen) {
-      submittingRef.current = false
-      setObservacionFinal('')
-      setFieldError(null)
-      setSubmitError(null)
-      setSubmitting(false)
-      return undefined
+      return runAfterEffect(() => {
+        submittingRef.current = false
+        setObservacionFinal('')
+        setFieldError(null)
+        setSubmitError(null)
+        setSubmitting(false)
+      })
     }
 
     const previousOverflow = document.body.style.overflow
