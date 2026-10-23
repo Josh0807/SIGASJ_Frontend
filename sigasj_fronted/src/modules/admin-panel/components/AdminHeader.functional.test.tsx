@@ -209,7 +209,13 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
         ok: true,
         json: async () => ({
           accessToken: 'local-administradora-session',
-          user: { id: 'demo-user-id', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+          user: {
+            id: 'demo-user-id',
+            email: 'admin@asadasanjuan.cr',
+            role: 'Administradora',
+            name: 'Usuario',
+            lastName: 'Administradora',
+          },
         }),
       }),
     )
@@ -235,7 +241,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
 
       const user = readHeaderUser(app.container)
 
-      expect(user.name).toBe('Usuario Administradora')
+      expect(user.name).toBe('Usuario')
       expect(user.role).toBe('Administradora')
       expect(app.container.querySelector('.admin-header')?.textContent).toContain(
         'Panel administrativo',
@@ -406,7 +412,7 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
     try {
       await submitLogin(loginApp.container)
 
-      expect(readHeaderUser(loginApp.container).name).toBe('Usuario Administradora')
+      expect(readHeaderUser(loginApp.container).name).toBe('Usuario')
       expect(readHeaderUser(loginApp.container).role).toBe('Administradora')
 
       await logoutFromHeader(loginApp.container)

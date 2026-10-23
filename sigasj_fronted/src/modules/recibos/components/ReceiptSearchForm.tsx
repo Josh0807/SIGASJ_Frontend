@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 
 export type ReceiptSearchFormProps = {
@@ -18,12 +18,13 @@ export const ReceiptSearchForm = ({
     initialValue ? String(initialValue) : '',
   )
   const [validationError, setValidationError] = useState<string | null>(null)
+  const [initialValueSource, setInitialValueSource] = useState(initialValue)
 
-  useEffect(() => {
+  if (initialValue !== initialValueSource) {
+    setInitialValueSource(initialValue)
     setNumeroPajaInput(initialValue ? String(initialValue) : '')
     setValidationError(null)
-  }, [initialValue])
-
+  }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

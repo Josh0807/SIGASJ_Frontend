@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import TransparenciaAdminForm from './TransparenciaAdminForm'
 import {
@@ -47,9 +48,9 @@ const TransparenciaAdminPage = () => {
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void loadPublications()
-  }, [loadPublications])
+  }), [loadPublications])
 
   const showSuccess = (message: string) => {
     setError(null)

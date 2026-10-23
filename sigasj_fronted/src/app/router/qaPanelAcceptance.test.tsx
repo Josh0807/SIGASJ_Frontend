@@ -93,14 +93,18 @@ describe('QA — Tarea 2: rutas privadas sin sesión', () => {
   })
 
   it('bloquea acceso directo a rutas administrativas y redirige al login', async () => {
-    for (const path of [ADMIN_HOME_PATH, '/admin/abonados', '/admin/usuarios'] as const) {
+    for (const path of [
+      ADMIN_HOME_PATH,
+      '/admin/abonados',
+      '/admin/actividades-fontanero',
+    ] as const) {
       const app = await mountAppRoutes(path)
 
       try {
         expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)
         assertBlockedAdminAccess(app.container)
         expect(app.container.innerHTML).not.toContain('Gestión de asociados')
-        expect(app.container.innerHTML).not.toContain('Gestión de usuarios')
+        expect(app.container.innerHTML).not.toContain('Actividades del Fontanero')
       } finally {
         await app.cleanup()
       }

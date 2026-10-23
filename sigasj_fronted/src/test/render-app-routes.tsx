@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { AuthProvider } from '../modules/auth/components/AuthContext'
 import AppRoutes from '../app/router/AppRoutes'
 import { LocationProbe, type RouteLocation } from './location-probe'
+import { waitForAppRoutesReady } from './waitForAppRoutesReady'
 
 export type { RouteLocation }
 
@@ -27,6 +28,8 @@ export const mountAppRoutes = async (path: string) => {
       </MemoryRouter>,
     )
   })
+
+  await waitForAppRoutesReady(container, () => current.pathname)
 
   return {
     container,

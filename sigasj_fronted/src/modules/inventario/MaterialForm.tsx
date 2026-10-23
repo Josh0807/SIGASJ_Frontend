@@ -13,7 +13,6 @@ import {
   IconToggleRight,
 } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
-import FormSuccessResult from '../../shared/components/FormSuccessResult'
 import { MATERIALES_PATH } from './inventarioPaths'
 import { focusFirstInvalidInventoryField } from './focusFirstInvalidInventoryField'
 import { validateMaterial, type MaterialFormErrors } from './materialFormUtils'
@@ -54,7 +53,6 @@ export default function MaterialForm({
   const [errors, setErrors] = useState<MaterialFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [success, setSuccess] = useState(false)
   const submitting = useRef(false)
   const { result: categorias, loading: loadingCategorias, error: categoriasError, refetch: refetchCategorias } =
     useCategorias({ activo: true, page: 1, limit: 100 })
@@ -69,7 +67,6 @@ export default function MaterialForm({
   const update = (field: keyof MaterialFormValues, value: string | boolean) => {
     setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
-    setSuccess(false)
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -85,10 +82,8 @@ export default function MaterialForm({
     submitting.current = true
     setSaving(true)
     setSubmitError(null)
-    setSuccess(false)
     try {
       await onSubmit(values)
-      setSuccess(true)
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'No fue posible guardar el material.')
     } finally {
@@ -125,23 +120,6 @@ export default function MaterialForm({
           {submitError}
         </div>
       )}
-      {success && (
-        <FormSuccessResult
-          className="materials-admin__success"
-          title={mode === 'create' ? 'Material registrado correctamente.' : 'Cambios guardados correctamente.'}
-          description={
-            mode === 'create'
-              ? 'El material ya está disponible en el catálogo de bodega.'
-              : 'La ficha del material se actualizó con la información enviada.'
-          }
-          actions={
-            <Link className="materials-admin__secondary" to={MATERIALES_PATH}>
-              <IconArrowLeft size={19} aria-hidden="true" />
-              Volver al catálogo
-            </Link>
-          }
-        />
-      )}
       <form className="materials-admin__form provider-admin__form w-full max-w-3xl" noValidate onSubmit={handleSubmit}>
         <div className="provider-admin__form-heading">
           <span>
@@ -149,7 +127,7 @@ export default function MaterialForm({
           </span>
           <div>
             <h2>{mode === 'create' ? 'Información del material' : 'Ficha del material'}</h2>
-            <p>Los campos marcados con * son obligatorios.</p>
+            <p>Los campos marcados con * son obligatorios. Categoría y proveedor son requeridos.</p>
           </div>
         </div>
         {field(
@@ -216,16 +194,22 @@ export default function MaterialForm({
             onChange={(e) => update('stockMinimo', e.target.value)}
           />,
         )}
+        <p className="provider-admin__form-note materials-admin__form-full">
+          {mode === 'create'
+            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega.'
+            : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí.'}
+        </p>
         {field(
           'categoriaId',
-          'Categoría',
+          'Categoría *',
           <IconTag size={20} aria-hidden="true" />,
           <select
             value={values.categoriaId}
             disabled={loadingCategorias}
+            aria-invalid={Boolean(errors.categoriaId)}
             onChange={(e) => update('categoriaId', e.target.value)}
           >
-            <option value="">Sin categoría</option>
+            <option value="">Seleccione una categoría</option>
             {categoryOptions.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.nombre}
@@ -236,7 +220,7 @@ export default function MaterialForm({
         )}
         {field(
           'proveedorId',
-          'Proveedor principal',
+          'Proveedor principal *',
           <IconBuildingStore size={20} aria-hidden="true" />,
           <select
             value={values.proveedorId}
@@ -244,7 +228,7 @@ export default function MaterialForm({
             aria-invalid={Boolean(errors.proveedorId)}
             onChange={(e) => update('proveedorId', e.target.value)}
           >
-            <option value="">Sin proveedor</option>
+            <option value="">Seleccione un proveedor</option>
             {providerOptions.map((item) => (
               <option
                 key={item.id}

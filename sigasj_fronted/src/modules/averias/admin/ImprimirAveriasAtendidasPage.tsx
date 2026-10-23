@@ -1,5 +1,6 @@
 import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link, useSearchParams } from 'react-router-dom'
 import { IconPrinter } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
@@ -45,48 +46,55 @@ export default function ImprimirAveriasAtendidasPage() {
     }
   }, [])
 
-  useEffect(() => {
+  const [fechaDesdeSource, setFechaDesdeSource] = useState(fechaDesde)
+  const [fechaHastaSource, setFechaHastaSource] = useState(fechaHasta)
+  if (fechaDesde !== fechaDesdeSource || fechaHasta !== fechaHastaSource) {
+    setFechaDesdeSource(fechaDesde)
+    setFechaHastaSource(fechaHasta)
     setDraftDesde(fechaDesde)
     setDraftHasta(fechaHasta)
-  }, [fechaDesde, fechaHasta])
+  }
 
   const rangoInvalido = Boolean(fechaDesde && fechaHasta && fechaDesde > fechaHasta)
 
   useEffect(() => {
-    if (rangoInvalido) {
-      setAverias([])
-      setLoading(false)
-      setError('La fecha inicial no puede ser posterior a la fecha final.')
-      return
-    }
-
     let cancelled = false
-    setLoading(true)
-    setError('')
-    getAveriasAtendidasParaImpresion({
-      fechaDesde: fechaDesde || undefined,
-      fechaHasta: fechaHasta || undefined,
-    })
-      .then((data) => {
-        if (cancelled) return
-        setAverias(
-          [...data].sort((izquierda, derecha) => {
-            const porEstado = ordenAtencion(izquierda) - ordenAtencion(derecha)
-            if (porEstado !== 0) return porEstado
-            return derecha.fechaReporte.localeCompare(izquierda.fechaReporte)
-          }),
-        )
-      })
-      .catch(() => {
-        if (cancelled) return
+    const cancelScheduled = runAfterEffect(() => {
+      if (rangoInvalido) {
         setAverias([])
-        setError('No fue posible cargar las averías atendidas. Intente nuevamente.')
+        setLoading(false)
+        setError('La fecha inicial no puede ser posterior a la fecha final.')
+        return
+      }
+
+      setLoading(true)
+      setError('')
+      getAveriasAtendidasParaImpresion({
+        fechaDesde: fechaDesde || undefined,
+        fechaHasta: fechaHasta || undefined,
       })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+        .then((data) => {
+          if (cancelled) return
+          setAverias(
+            [...data].sort((izquierda, derecha) => {
+              const porEstado = ordenAtencion(izquierda) - ordenAtencion(derecha)
+              if (porEstado !== 0) return porEstado
+              return derecha.fechaReporte.localeCompare(izquierda.fechaReporte)
+            }),
+          )
+        })
+        .catch(() => {
+          if (cancelled) return
+          setAverias([])
+          setError('No fue posible cargar las averías atendidas. Intente nuevamente.')
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
+    })
     return () => {
       cancelled = true
+      cancelScheduled()
     }
   }, [fechaDesde, fechaHasta, rangoInvalido])
 

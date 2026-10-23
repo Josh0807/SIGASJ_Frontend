@@ -20,10 +20,9 @@ const AdminSidebar = ({
   const { pathname } = useLocation()
   const requestsActive = pathname.startsWith('/admin/solicitudes')
   const [requestsOpen, setRequestsOpen] = useState(requestsActive)
-
-  useEffect(() => {
-    if (requestsActive) setRequestsOpen(true)
-  }, [requestsActive])
+  if (requestsActive && !requestsOpen) {
+    setRequestsOpen(true)
+  }
 
   useEffect(() => {
     if (isDrawer && isOpen) {

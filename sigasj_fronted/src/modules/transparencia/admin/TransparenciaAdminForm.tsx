@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { TransparenciaFormValues } from './types'
 import {
   describeTransparenciaFile,
@@ -35,25 +36,33 @@ const TransparenciaAdminForm = ({
   const [selectedFileLabel, setSelectedFileLabel] = useState<string | null>(
     null,
   )
+  const [valuesSource, setValuesSource] = useState(initialValues)
+  const [modeSource, setModeSource] = useState(mode)
 
-  useEffect(() => {
+  if (initialValues !== valuesSource || mode !== modeSource) {
+    setValuesSource(initialValues)
+    setModeSource(mode)
     setValues(initialValues)
     setFile(null)
     setFileError(null)
     setFormError(null)
     setSelectedFileLabel(null)
-  }, [initialValues, mode])
+  }
+
+  if ((!file || !file.type.startsWith('image/')) && previewUrl !== null) {
+    setPreviewUrl(null)
+  }
 
   useEffect(() => {
     if (!file || !file.type.startsWith('image/')) {
-      setPreviewUrl(null)
-      return
+      return undefined
     }
 
     const objectUrl = URL.createObjectURL(file)
-    setPreviewUrl(objectUrl)
+    const cancelScheduled = runAfterEffect(() => setPreviewUrl(objectUrl))
 
     return () => {
+      cancelScheduled()
       URL.revokeObjectURL(objectUrl)
     }
   }, [file])

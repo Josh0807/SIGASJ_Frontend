@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { IconAlignLeft, IconArrowLeft, IconBuildingStore, IconCalendar, IconDeviceFloppy, IconFileText, IconRefresh, IconTruckDelivery } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
@@ -106,8 +107,9 @@ export default function ReposicionDetallePage() {
   const siguienteEstado = reposicion ? siguienteEstadoReposicion(String(reposicion.estado)) : null
 
   useEffect(() => {
-    if (!mostrarCompra) return
+    if (!mostrarCompra) return undefined
     let active = true
+    const cancelScheduled = runAfterEffect(() => {
     setProveedoresLoading(true)
     void getProveedores({ activo: true, page: 1, limit: 100 })
       .then((response) => {
@@ -124,7 +126,11 @@ export default function ReposicionDetallePage() {
         setProveedoresError('No fue posible cargar los proveedores.')
       })
       .finally(() => { if (active) setProveedoresLoading(false) })
-    return () => { active = false }
+    })
+    return () => {
+      active = false
+      cancelScheduled()
+    }
   }, [mostrarCompra])
 
   const retry = () => {

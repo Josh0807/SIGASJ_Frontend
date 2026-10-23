@@ -9,6 +9,7 @@ import { loginWithAdminSession } from '../../../test/authTestHelpers'
 import AppRoutes from '../../../app/router/AppRoutes'
 import { ADMIN_HOME_PATH, ADMIN_NAV_ITEMS } from '../../../app/router/privateRoutes'
 import AdminSidebar from './AdminSidebar'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 
 const LocationProbe = ({ onPath }: { onPath: (path: string) => void }) => {
   const location = useLocation()
@@ -99,9 +100,7 @@ const mountApp = async (path: string) => {
     )
   })
 
-  await act(async () => {
-    await Promise.resolve()
-  })
+  await waitForAppRoutesReady(container, () => pathname)
 
   return {
     container,
@@ -156,8 +155,12 @@ describe('navegación del menú administrativo', () => {
         expect(link?.textContent).toContain(title)
 
         const click = await clickElement(link!)
+        await waitForAppRoutesReady(app.container, app.currentPath)
         expect(click.defaultPrevented, path).toBe(true)
-        expect(app.currentPath()).toBe(path)
+        // Inventario (y similares) redirigen el índice a una subruta del módulo.
+        const atModule =
+          app.currentPath() === path || app.currentPath().startsWith(`${path}/`)
+        expect(atModule, `${path} → ${app.currentPath()}`).toBe(true)
         expect(app.container.querySelector('.admin-sidebar')).toBe(sidebar)
         expect(app.container.querySelector('.admin-header')).toBe(header)
         expect(app.container.querySelector('.admin-main__content')).toBe(content)
@@ -190,6 +193,7 @@ describe('navegación del menú administrativo', () => {
       await clickElement(
         app.container.querySelector('.admin-sidebar__link[href="/admin/averias"]')!,
       )
+      await waitForAppRoutesReady(app.container, app.currentPath)
 
       expect(app.currentPath()).toBe('/admin/averias')
       expect(activeNavLink(app.container)?.getAttribute('href')).toBe('/admin/averias')
@@ -212,6 +216,7 @@ describe('navegación del menú administrativo', () => {
       await clickElement(
         app.container.querySelector('.admin-sidebar__link[href="/admin/contacto"]')!,
       )
+      await waitForAppRoutesReady(app.container, app.currentPath)
 
       expect(app.currentPath()).toBe('/admin/contacto')
       expect(document.documentElement.scrollTop).toBe(0)
@@ -272,6 +277,7 @@ describe('navegación del menú administrativo', () => {
       const click = await clickElement(
         app.container.querySelector('.admin-sidebar__link[href="/admin/solicitudes"]')!,
       )
+      await waitForAppRoutesReady(app.container, app.currentPath)
 
       expect(click.defaultPrevented).toBe(true)
       expect(app.currentPath()).toBe('/admin/solicitudes')

@@ -6,6 +6,7 @@ import AppRoutes from '../app/router/AppRoutes'
 import { AuthProvider } from '../modules/auth/components/AuthContext'
 import { ADMIN_PROFILE_PATH } from '../app/router/privateRoutes'
 import { LOGIN_ROUTE_PATH } from '../app/router/routePaths'
+import { waitForAppRoutesReady } from './waitForAppRoutesReady'
 
 export const ACCOUNT_MENU_TRIGGER = '.admin-account-menu__trigger'
 export const ACCOUNT_MENU_LOGOUT = '.admin-account-menu__item--danger'
@@ -41,6 +42,8 @@ export const mountInteractiveApp = async (
   await act(async () => {
     root.render(<RouterProvider router={router} />)
   })
+
+  await waitForAppRoutesReady(container, () => router.state.location.pathname)
 
   return {
     container,

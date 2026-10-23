@@ -8,7 +8,16 @@ describe('rutaNotificacionCampana', () => {
         { role: 'Administradora', id: '1' },
         { idAveria: null, idSolicitudAusencia: 12 },
       ),
-    ).toBe('/admin/lecturas/solicitudes-ausencia/12')
+    ).toBe('/admin/rrhh/solicitudes-ausencia/12')
+  })
+
+  it('no inventa enlace administrativo para Secretaria', () => {
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Secretaria', id: '2' },
+        { idAveria: null, idSolicitudAusencia: 12 },
+      ),
+    ).toBeNull()
   })
 
   it('no inventa ruta de solicitud para Fontanero', () => {
@@ -26,7 +35,7 @@ describe('rutaNotificacionCampana', () => {
         { role: 'Administradora', id: '1' },
         { idAveria: 25, idSolicitudAusencia: 12 },
       ),
-    ).toBe('/admin/lecturas/solicitudes-ausencia/12')
+    ).toBe('/admin/rrhh/solicitudes-ausencia/12')
 
     expect(
       rutaNotificacionCampana(

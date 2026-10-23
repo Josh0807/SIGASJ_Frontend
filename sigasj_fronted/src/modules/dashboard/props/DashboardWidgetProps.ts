@@ -1,11 +1,5 @@
 import type { AdminNavIconName } from '../../admin-panel/components/AdminNavIcon'
 
-export type ReadingProgressWidgetProps = {
-  completedLecturas?: number
-  totalLecturas?: number
-  currentMonth?: string
-}
-
 export type AlertItem = {
   id: string
   code?: string
@@ -25,7 +19,7 @@ export type ActivityItem = {
   action: string
   target: string
   timeAgo: string
-  icon: 'lecturas' | 'abonados' | 'averias' | 'usuarios' | 'reportes'
+  icon: 'rrhh' | 'abonados' | 'averias' | 'usuarios' | 'reportes'
 }
 
 export type RecentActivityWidgetProps = {

@@ -63,9 +63,9 @@ const GallerySection = ({
     return () => document.removeEventListener('visibilitychange', sync)
   }, [])
 
-  useEffect(() => {
-    setCarouselIndex((index) => Math.min(index, maxCarouselIndex))
-  }, [maxCarouselIndex])
+  if (carouselIndex > maxCarouselIndex) {
+    setCarouselIndex(maxCarouselIndex)
+  }
 
   const goToCarouselIndex = useCallback((index: number, fromUser = false) => {
     if (maxCarouselIndex === 0) {

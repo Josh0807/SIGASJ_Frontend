@@ -1,8 +1,27 @@
 import { ADMIN_BASE_PATH } from '../../app/router/adminPaths'
 
-/** El módulo usa el segmento `lecturas` que ya reserva el menú para Recursos Humanos. */
-export const RRHH_PATH = `${ADMIN_BASE_PATH}/lecturas`
+/** Segmento canónico de Recursos Humanos. */
+export const RRHH_SEGMENT = 'rrhh'
+/** Alias legacy (bookmarks, notificaciones antiguas). */
+export const RRHH_LEGACY_SEGMENT = 'lecturas'
+
+export const RRHH_PATH = `${ADMIN_BASE_PATH}/${RRHH_SEGMENT}`
+export const RRHH_LEGACY_PATH = `${ADMIN_BASE_PATH}/${RRHH_LEGACY_SEGMENT}`
 export const RRHH_TITLE = 'Recursos Humanos'
+
+/** Reescribe `/admin/lecturas…` → `/admin/rrhh…` para auth y redirects. */
+export const normalizeRrhhAdminPath = (path: string): string => {
+  const [pathname, query = ''] = path.split('?')
+  const normalized = pathname?.replace(/\/+$/, '') || pathname || path
+  if (
+    normalized === RRHH_LEGACY_PATH ||
+    normalized.startsWith(`${RRHH_LEGACY_PATH}/`)
+  ) {
+    const suffix = normalized.slice(RRHH_LEGACY_PATH.length)
+    return `${RRHH_PATH}${suffix}${query ? `?${query}` : ''}`
+  }
+  return path
+}
 export const COLABORADOR_NEW_PATH = `${RRHH_PATH}/nuevo`
 export const colaboradorDetailPath = (id: number) => `${RRHH_PATH}/${id}`
 export const colaboradorEditPath = (id: number) => `${RRHH_PATH}/${id}/editar`

@@ -139,11 +139,13 @@ describe('separación entre interfaz pública y administrativa', () => {
   })
 
   it('Prueba 4 — Solicitudes públicas por URL directa', async () => {
-    const app = await mountApp('/solicitudes/afiliacion')
+    const app = await mountApp('/solicitudes/cambio-titular')
 
     try {
-      expect(app.currentPath()).toBe('/solicitudes/afiliacion')
-      expect(app.container.innerHTML).toContain('Formulario público de afiliación')
+      expect(app.currentPath()).toBe('/solicitudes/cambio-titular')
+      expect(app.container.innerHTML).toContain(
+        'Formulario público de cambio de titular del servicio',
+      )
       expect(hasAdminChrome(app.container.innerHTML)).toBe(false)
       expect(app.errors).toEqual([])
     } finally {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { IconArrowLeft, IconBox, IconFilter, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { InventoryFormField } from '../InventoryFormField'
@@ -49,6 +50,7 @@ export default function ReposicionesPage() {
 
   useEffect(() => {
     let active = true
+    const cancelScheduled = runAfterEffect(() => {
     setLoading(true)
     void getReposicionesAdmin({
       ...(estado ? { estado } : {}),
@@ -75,8 +77,10 @@ export default function ReposicionesPage() {
       .finally(() => {
         if (active) setLoading(false)
       })
+    })
     return () => {
       active = false
+      cancelScheduled()
     }
   }, [estado, origen, navigate, page, reloadKey])
 

@@ -362,14 +362,13 @@ describe('AdminHeader', () => {
     const profileLink = container.querySelector(
       `.admin-account-menu__item--link[href="${ADMIN_PROFILE_PATH}"]`,
     ) as HTMLAnchorElement
-    const configItem = container.querySelector(
-      '.admin-account-menu__item--disabled',
-    ) as HTMLButtonElement
 
     expect(profileLink).not.toBeNull()
-    expect(configItem?.textContent).toContain('Configuración')
-    expect(configItem?.textContent).toContain('Próximamente')
-    expect(configItem?.disabled).toBe(true)
+    // Configuración no implementada: no se muestra acción falsa ni disabled.
+    expect(
+      container.querySelector('.admin-account-menu__item--disabled'),
+    ).toBeNull()
+    expect(container.textContent).not.toContain('Configuración')
 
     await act(async () => {
       profileLink.click()

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import {
   DEFAULT_CONTACTO_UBICACION,
   getPublicContacto,
@@ -18,9 +19,9 @@ export function usePublicContacto() {
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void load()
-  }, [load])
+  }), [load])
 
   return { contacto, retry: load }
 }

@@ -1,4 +1,5 @@
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import {
   ESTADO_PROYECTO_OPTIONS,
@@ -80,16 +81,18 @@ const ProyectosAdminForm = ({
     setFieldErrors({})
   }
 
+  if (!selectedFile && previewUrl !== null) {
+    setPreviewUrl(null)
+  }
+
   useEffect(() => {
-    if (!selectedFile) {
-      setPreviewUrl(null)
-      return
-    }
+    if (!selectedFile) return undefined
 
     const objectUrl = URL.createObjectURL(selectedFile)
-    setPreviewUrl(objectUrl)
+    const cancelScheduled = runAfterEffect(() => setPreviewUrl(objectUrl))
 
     return () => {
+      cancelScheduled()
       URL.revokeObjectURL(objectUrl)
     }
   }, [selectedFile])

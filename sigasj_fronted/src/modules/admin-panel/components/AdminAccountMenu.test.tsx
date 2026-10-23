@@ -82,7 +82,7 @@ describe('AdminAccountMenu', () => {
     vi.restoreAllMocks()
   })
 
-  it('renderiza Mi perfil y opciones futuras en el menú de cuenta', () => {
+  it('renderiza Mi perfil sin acciones de cuenta no implementadas', () => {
     const markup = renderToStaticMarkup(
       <MemoryRouter>
         <AdminAccountMenu />
@@ -93,8 +93,10 @@ describe('AdminAccountMenu', () => {
     expect(markup).toContain('Opciones de cuenta')
     expect(markup).toContain(ADMIN_PROFILE_TITLE)
     expect(markup).toContain(`href="${ADMIN_PROFILE_PATH}"`)
-    expect(markup).toContain('Configuración')
-    expect(markup).toContain('Próximamente')
+    // Configuración no existe: no mostrar disabled ni "Próximamente".
+    expect(markup).not.toContain('Configuración')
+    expect(markup).not.toContain('Próximamente')
+    expect(markup).not.toContain('admin-account-menu__item--disabled')
     expect(markup).not.toContain('Ver perfil')
     expect(markup).toContain('Cerrar sesión')
     expect(markup).toContain('type="button"')
@@ -187,15 +189,14 @@ describe('AdminAccountMenu', () => {
     const profileLink = container.querySelector(
       `.admin-account-menu__item--link[href="${ADMIN_PROFILE_PATH}"]`,
     ) as HTMLAnchorElement
-    const disabledItem = container.querySelector(
-      '.admin-account-menu__item--disabled',
-    ) as HTMLButtonElement
     const logoutItem = container.querySelector(
       '.admin-account-menu__item--danger',
     ) as HTMLButtonElement
 
     expect(profileLink.tabIndex).not.toBe(-1)
-    expect(disabledItem.tabIndex).toBe(-1)
+    expect(
+      container.querySelector('.admin-account-menu__item--disabled'),
+    ).toBeNull()
 
     profileLink.focus()
     expect(document.activeElement).toBe(profileLink)

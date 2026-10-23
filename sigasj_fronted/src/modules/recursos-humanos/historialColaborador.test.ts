@@ -65,7 +65,7 @@ describe('presentación del historial administrativo', () => {
           cantidadDias: 2,
         }),
       ),
-    ).toBe('+2 día(s)')
+    ).toBe('+2 días adquiridos')
   })
 
   it('traduce errores HTTP sin exponer detalle técnico', () => {

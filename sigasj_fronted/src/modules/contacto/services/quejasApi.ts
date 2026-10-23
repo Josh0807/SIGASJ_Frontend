@@ -43,6 +43,8 @@ export async function submitPublicQueja(
     if (error instanceof Error && error.message.startsWith('HTTP ')) {
       throw error
     }
-    throw new Error('No fue posible enviar el formulario. Intente nuevamente.')
+    throw new Error('No fue posible enviar el formulario. Intente nuevamente.', {
+      cause: error,
+    })
   }
 }

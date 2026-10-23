@@ -10,7 +10,14 @@ export function validateMaterial(values: MaterialFormValues): MaterialFormErrors
   else if (values.unidadMedida.trim().length > 50) errors.unidadMedida = 'La unidad no puede superar 50 caracteres.'
   if (values.descripcion.length > 1000) errors.descripcion = 'La descripción no puede superar 1000 caracteres.'
   if (values.ubicacion.length > 150) errors.ubicacion = 'La ubicación no puede superar 150 caracteres.'
-  if (values.proveedorId && (!Number.isInteger(Number(values.proveedorId)) || Number(values.proveedorId) <= 0)) errors.proveedorId = 'Seleccione un proveedor válido.'
+  if (!values.categoriaId) errors.categoriaId = 'La categoría es obligatoria.'
+  else if (!Number.isInteger(Number(values.categoriaId)) || Number(values.categoriaId) <= 0) {
+    errors.categoriaId = 'Seleccione una categoría válida.'
+  }
+  if (!values.proveedorId) errors.proveedorId = 'El proveedor es obligatorio.'
+  else if (!Number.isInteger(Number(values.proveedorId)) || Number(values.proveedorId) <= 0) {
+    errors.proveedorId = 'Seleccione un proveedor válido.'
+  }
   const stock = Number(values.stockMinimo)
   if (values.stockMinimo === '') errors.stockMinimo = 'El stock mínimo es obligatorio.'
   else if (!Number.isInteger(stock) || stock < 0) errors.stockMinimo = 'Ingrese un número entero mayor o igual a cero.'

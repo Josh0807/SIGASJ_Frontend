@@ -28,7 +28,7 @@ const ICONS = {
   abonados: IconUserCheck,
   inventario: IconPackages,
   solicitudes: IconFileText,
-  lecturas: IconBriefcase2,
+  rrhh: IconBriefcase2,
   averias: IconTool,
   actividades: IconClipboardCheck,
   'actividades-fontanero': IconChecklist,

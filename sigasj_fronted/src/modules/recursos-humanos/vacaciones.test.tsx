@@ -154,7 +154,7 @@ async function mount(path: string) {
       <MemoryRouter initialEntries={[path]}>
         <AuthProvider>
           <Routes>
-            <Route path="/admin/lecturas/*" element={<RecursosHumanosRoutes />} />
+            <Route path="/admin/rrhh/*" element={<RecursosHumanosRoutes />} />
             <Route path="/login" element={<p>Pantalla de login</p>} />
           </Routes>
         </AuthProvider>
@@ -216,15 +216,15 @@ describe('Recursos Humanos: vacaciones', () => {
   it('aparece en el subnav de Recursos Humanos', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
-    const view = await mount('/admin/lecturas')
-    expect(byText(view.container, 'nav a', 'Vacaciones')?.getAttribute('href')).toBe('/admin/lecturas/vacaciones')
+    const view = await mount('/admin/rrhh')
+    expect(byText(view.container, 'nav a', 'Vacaciones')?.getAttribute('href')).toBe('/admin/rrhh/vacaciones')
     await view.cleanup()
   })
 
   it('pide seleccionar un colaborador y no consulta saldo hasta hacerlo', async () => {
     loginAsRole('Administradora')
     const { fetchMock } = stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones')
+    const view = await mount('/admin/rrhh/vacaciones')
     expect(view.container.textContent).toContain('Vacaciones del personal')
     expect(view.container.textContent).toContain('Seleccione un colaborador')
     const rutas = fetchMock.mock.calls.map(([url]) => new URL(String(url), 'http://localhost').pathname)
@@ -240,7 +240,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('muestra adquiridas, disfrutadas y disponibles del colaborador', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     expect(view.container.querySelector('h2')?.textContent).toContain('Juan Pérez')
     expect(tarjeta(view.container, 'Adquiridas')).toBe('Adquiridas 20 días')
     expect(tarjeta(view.container, 'Disfrutadas')).toBe('Disfrutadas 8 días')
@@ -252,7 +252,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('muestra el historial Fecha | Tipo | Días con signo', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     const headers = Array.from(view.container.querySelectorAll('th')).map((th) => th.textContent)
     expect(headers).toEqual(['Fecha', 'Tipo', 'Días', 'Observaciones'])
     const filas = Array.from(view.container.querySelectorAll('tbody tr')).map((tr) =>
@@ -272,7 +272,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('registra una adquisición y refresca saldo e historial desde el servidor', async () => {
     loginAsRole('Administradora')
     const { fetchMock } = stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     await llenarFormulario(view.container, 'ACUMULADO', '5', '2026-09-01')
     await act(async () => setValue(q<HTMLTextAreaElement>(view.container, 'textarea'), 'Periodo 2026'))
     await act(async () => q<HTMLFormElement>(view.container, 'form').requestSubmit())
@@ -300,7 +300,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('registra un disfrute y descuenta del saldo', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     await llenarFormulario(view.container, 'DISFRUTADO', '2', '2026-09-10')
     await act(async () => q<HTMLFormElement>(view.container, 'form').requestSubmit())
     await flush()
@@ -314,7 +314,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('bloquea en el cliente disfrutar más días que los disponibles', async () => {
     loginAsRole('Administradora')
     const { fetchMock } = stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     await llenarFormulario(view.container, 'DISFRUTADO', '13', '2026-09-10')
     await act(async () => q<HTMLFormElement>(view.container, 'form').requestSubmit())
     await flush()
@@ -327,7 +327,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('valida campos obligatorios sin llamar al backend', async () => {
     loginAsRole('Administradora')
     const { fetchMock } = stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     await act(async () => q<HTMLFormElement>(view.container, 'form').requestSubmit())
     await flush()
     expect(view.container.textContent).toContain('Seleccione el tipo de movimiento.')
@@ -345,7 +345,7 @@ describe('Recursos Humanos: vacaciones', () => {
         message: 'El colaborador no tiene saldo suficiente de vacaciones: dispone de 1 día(s) y se intentan disfrutar 2',
       },
     })
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     await llenarFormulario(view.container, 'DISFRUTADO', '2', '2026-09-10')
     await act(async () => q<HTMLFormElement>(view.container, 'form').requestSubmit())
     await flush()
@@ -375,7 +375,7 @@ describe('Recursos Humanos: vacaciones', () => {
       }
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     expect(view.container.textContent).toContain('Mostrando 1–10 de 12 movimientos')
     expect(view.container.textContent).toContain('Página 1 de 2')
 
@@ -400,7 +400,7 @@ describe('Recursos Humanos: vacaciones', () => {
       if (url.pathname.endsWith('/rrhh/vacaciones/movimientos')) return response(listado(movimientos))
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     expect(view.container.querySelector('[role="alert"]')?.textContent).toContain('No fue posible conectar')
     fallar = false
     await act(async () => byText(view.container, 'button', 'Reintentar')!.click())
@@ -412,7 +412,7 @@ describe('Recursos Humanos: vacaciones', () => {
   it('informa cuando el colaborador no existe', async () => {
     loginAsRole('Administradora')
     stubVacacionesApi()
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=7')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=7')
     expect(view.container.querySelector('[role="alert"]')?.textContent).toContain('no existe')
     expect(byText(view.container, 'button', 'Reintentar')).toBeUndefined()
     await view.cleanup()
@@ -427,7 +427,7 @@ describe('Recursos Humanos: vacaciones', () => {
       if (url.pathname.endsWith('/rrhh/vacaciones/movimientos')) return response(listado(movimientos))
       return response(listado([juan]))
     })
-    const view = await mount('/admin/lecturas/vacaciones?colaboradorId=1')
+    const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     expect(view.container.textContent).toContain('Pantalla de login')
     await view.cleanup()
   })

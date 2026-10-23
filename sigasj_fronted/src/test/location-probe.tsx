@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 export type RouteLocation = {
@@ -13,7 +13,7 @@ type LocationProbeProps = {
 export const LocationProbe = ({ onLocation }: LocationProbeProps) => {
   const location = useLocation()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     onLocation({ pathname: location.pathname, state: location.state })
   }, [location, onLocation])
 

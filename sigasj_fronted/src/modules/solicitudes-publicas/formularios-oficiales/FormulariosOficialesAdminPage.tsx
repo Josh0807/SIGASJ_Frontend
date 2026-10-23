@@ -1,5 +1,6 @@
 import { IconCircleCheckFilled, IconFileDescription, IconRefresh, IconUpload, IconX } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 import FormularioOficialUploadDialog from './FormularioOficialUploadDialog'
 import { getFormulariosOficialesAdmin, uploadFormularioOficial } from './formulariosOficialesApi'
@@ -21,7 +22,7 @@ const FormulariosOficialesAdminPage = () => {
   const [submitting, setSubmitting] = useState(false)
   const submittingRef = useRef(false)
   const load = useCallback(async () => { setLoading(true); setError(null); try { setItems(await getFormulariosOficialesAdmin()) } catch (caught) { setError(toAdminError(caught)) } finally { setLoading(false) } }, [])
-  useEffect(() => { void load() }, [load])
+  useEffect(() => runAfterEffect(() => { void load() }), [load])
 
   const save = async (file: File) => {
     if (!selected || submittingRef.current) return

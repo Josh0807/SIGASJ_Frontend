@@ -16,7 +16,7 @@ const PATH = SOLICITUDES_AUSENCIA_ADMIN_PATH
 const flushAsync = async () => {
   await act(async () => {
     await Promise.resolve()
-    await Promise.resolve()
+    await new Promise((resolve) => setTimeout(resolve, 0))
   })
 }
 
@@ -115,7 +115,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
 
   it('subnav RRHH muestra Solicitudes solo para Administradora', async () => {
     loginAsRole('Administradora')
-    const app = await mountAppRoutes('/admin/lecturas')
+    const app = await mountAppRoutes('/admin/rrhh')
     await flushAsync()
     try {
       const link = Array.from(app.container.querySelectorAll('a')).find(
@@ -127,7 +127,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
     }
 
     loginAsRole('Secretaria')
-    const sec = await mountAppRoutes('/admin/lecturas')
+    const sec = await mountAppRoutes('/admin/rrhh')
     await flushAsync()
     try {
       const labels = Array.from(sec.container.querySelectorAll('a')).map((a) =>

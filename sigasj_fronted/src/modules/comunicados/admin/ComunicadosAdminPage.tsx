@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import ComunicadosAdminForm from './ComunicadosAdminForm'
 import { emptyComunicadoFormValues, type ComunicadoFormValues } from './types'
@@ -43,9 +44,9 @@ const ComunicadosAdminPage = () => {
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void loadItems()
-  }, [loadItems])
+  }), [loadItems])
 
   const visibleItems = useMemo(() => {
     const query = searchTitle.trim().toLowerCase()
