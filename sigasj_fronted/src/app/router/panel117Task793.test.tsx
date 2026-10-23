@@ -48,7 +48,7 @@ describe('Tarea #793 — rutas inexistentes y accesos no autorizados', () => {
 
   it('desde UnauthorizedPage el usuario puede volver a una ruta válida del panel', async () => {
     loginAsRole('Secretaria')
-    const app = await mountInteractiveApp(['/admin/usuarios'])
+    const app = await mountInteractiveApp(['/admin/actividades-fontanero'])
 
     try {
       expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)

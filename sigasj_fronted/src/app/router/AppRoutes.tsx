@@ -14,6 +14,11 @@ import { InternalAdminRoleName } from '../../modules/auth/utils/internalRoles'
 import MiSolicitudAusenciaDetallePage from '../../modules/solicitudes-ausencia/fontanero/MiSolicitudAusenciaDetallePage'
 import MisSolicitudesAusenciaPage from '../../modules/solicitudes-ausencia/fontanero/MisSolicitudesAusenciaPage'
 import SolicitarAusenciaPage from '../../modules/solicitudes-ausencia/fontanero/SolicitarAusenciaPage'
+import MiSaldoVacacionesPage from '../../modules/recursos-humanos/fontanero/MiSaldoVacacionesPage'
+import {
+  FONTANERO_MI_SALDO_PATH,
+  normalizeRrhhAdminPath,
+} from '../../modules/recursos-humanos/recursosHumanosPaths'
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
   FONTANERO_SOLICITAR_AUSENCIA_PATH,
@@ -44,6 +49,12 @@ const FontaneroActividadesBacklogRedirect = () => {
   const { pathname } = useLocation()
   const suffix = pathname.replace(/^\/fontanero\/actividades/, '') || ''
   return <Navigate to={`${ACTIVIDADES_FONTANERO_BASE_PATH}${suffix}`} replace />
+}
+
+/** Compatibilidad: `/admin/rrhh/*` → `/admin/rrhh/*`. */
+const RrhhLegacyRedirect = () => {
+  const { pathname, search } = useLocation()
+  return <Navigate to={normalizeRrhhAdminPath(`${pathname}${search}`)} replace />
 }
 
 const AppRoutes = () => (
@@ -114,6 +125,21 @@ const AppRoutes = () => (
         <Route path=":id" element={<MiSolicitudAusenciaDetallePage />} />
       </Route>
       <Route
+        path="fontanero/mi-saldo-vacaciones"
+        element={
+          <AdminAreaGate>
+            <AuthorizedRoute
+              requiredPath={FONTANERO_MI_SALDO_PATH}
+              allowedRoles={[InternalAdminRoleName.Fontanero]}
+            >
+              <AdminLayout />
+            </AuthorizedRoute>
+          </AdminAreaGate>
+        }
+      >
+        <Route index element={<MiSaldoVacacionesPage />} />
+      </Route>
+      <Route
         path={ADMIN_ROUTE_SEGMENT}
         element={
           <AdminAreaGate>
@@ -122,6 +148,7 @@ const AppRoutes = () => (
         }
       >
         <Route index element={<AdminIndexRedirect />} />
+        <Route path="lecturas/*" element={<RrhhLegacyRedirect />} />
         {ADMIN_CHILD_ROUTES.map(({ segment, element, path, allowedRoles }) => {
           const authorized = (
             <AuthorizedRoute requiredPath={path} allowedRoles={allowedRoles}>

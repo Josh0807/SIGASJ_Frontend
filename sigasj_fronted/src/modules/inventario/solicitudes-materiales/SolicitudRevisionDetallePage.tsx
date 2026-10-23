@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconAlignLeft, IconArrowLeft, IconCheck, IconPackage, IconRefresh, IconX } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconCheck, IconCircleCheck, IconPackage, IconRefresh, IconX } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { SOLICITUDES_REVISION_PATH } from '../inventarioPaths'
@@ -160,7 +160,17 @@ export default function SolicitudRevisionDetallePage() {
           <button type="button" className="material-review__approve group !inline-flex !min-h-14 !items-center !justify-center !gap-2.5 !rounded-2xl !border-0 !bg-linear-to-r !from-emerald-600 !to-teal-500 !px-7 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(5,150,105,0.26)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!shadow-[0_16px_32px_rgba(5,150,105,0.36)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={busy} onClick={() => setDecision('aprobar')}><IconCheck className="!transition-transform !duration-300 group-hover:!scale-125" size={20} aria-hidden="true" />{busy ? 'Procesando…' : 'Aprobar'}</button>
           <button type="button" className="material-review__reject group !inline-flex !min-h-14 !items-center !justify-center !gap-2.5 !rounded-2xl !border !border-rose-200 !bg-white !px-7 !font-extrabold !text-rose-700 !shadow-[0_8px_20px_rgba(225,29,72,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-rose-400 hover:!bg-rose-50 hover:!shadow-[0_14px_28px_rgba(225,29,72,0.2)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={busy} onClick={() => setDecision('rechazar')}><IconX className="!transition-transform !duration-300 group-hover:!rotate-90" size={20} aria-hidden="true" />Rechazar</button>
         </div>
-      </> : <aside className="material-detail__notice"><strong>Solicitud procesada</strong><span>Esta solicitud ya no está pendiente. Aprobar o rechazar no modifica las existencias del inventario.</span></aside>}
+      </> : (
+        <aside className="material-detail__notice !flex !items-center !gap-4 !rounded-2xl !border !border-emerald-200 !bg-linear-to-r !from-emerald-50 !to-teal-50/70 !px-5 !py-4 !text-emerald-950 !shadow-[0_8px_22px_rgba(5,150,105,0.1)]">
+          <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-xl !bg-emerald-600 !text-white !shadow-[0_7px_16px_rgba(5,150,105,0.24)]" aria-hidden="true">
+            <IconCircleCheck size={24} />
+          </span>
+          <span className="!flex !min-w-0 !flex-col !gap-1">
+            <strong className="!text-base !font-black !text-emerald-900">Solicitud procesada</strong>
+            <span className="!text-sm !leading-relaxed !text-emerald-800">Esta solicitud ya fue atendida y su estado se encuentra actualizado.</span>
+          </span>
+        </aside>
+      )}
     </> : null}
     <ConfirmDialog
       isOpen={decision === 'aprobar'}

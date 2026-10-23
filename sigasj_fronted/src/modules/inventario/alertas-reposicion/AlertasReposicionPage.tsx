@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { IconAlertTriangle, IconArrowLeft, IconFilter, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
@@ -54,6 +55,7 @@ export default function AlertasReposicionPage() {
 
   useEffect(() => {
     let active = true
+    const cancelScheduled = runAfterEffect(() => {
     setLoading(true)
     void getAlertasReposicionAdmin({
       ...(estado ? { estado } : {}),
@@ -79,8 +81,10 @@ export default function AlertasReposicionPage() {
       .finally(() => {
         if (active) setLoading(false)
       })
+    })
     return () => {
       active = false
+      cancelScheduled()
     }
   }, [estado, navigate, page, reloadKey])
 

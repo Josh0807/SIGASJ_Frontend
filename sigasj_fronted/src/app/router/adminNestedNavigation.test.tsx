@@ -401,14 +401,13 @@ describe('navegación de rutas administrativas anidadas', () => {
       await app.cleanup()
     }
 
-    const requests = await mountApp('/')
+    // Afiliación ya no se publica como trámite online; validar un formulario real.
+    const requests = await mountApp('/solicitudes/cambio-titular')
 
     try {
-      const requestClick = await requests.clickLink('/solicitudes/afiliacion')
-      expect(requestClick.defaultPrevented).toBe(true)
-      expect(requests.currentPath()).toBe('/solicitudes/afiliacion')
+      expect(requests.currentPath()).toBe('/solicitudes/cambio-titular')
       expect(requests.container.innerHTML).toContain(
-        'Formulario público de afiliación',
+        'Formulario público de cambio de titular del servicio',
       )
       expect(hasAdminChrome(requests.container)).toBe(false)
       expect(requests.container.innerHTML).not.toContain('admin-sidebar')

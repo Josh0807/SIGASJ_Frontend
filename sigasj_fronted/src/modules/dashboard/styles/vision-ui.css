@@ -330,6 +330,7 @@
   background: linear-gradient(180deg, #1e5a9c, #3e8fd6);
 }
 
+.admin-dashboard .indicator-card--rrhh::before,
 .admin-dashboard .indicator-card--lecturas::before {
   background: linear-gradient(180deg, #b45309, #f0b429);
 }
@@ -382,6 +383,7 @@
   box-shadow: 0 8px 16px rgba(62, 143, 214, 0.22);
 }
 
+.admin-dashboard .indicator-card--rrhh .indicator-card__icon,
 .admin-dashboard .indicator-card--lecturas .indicator-card__icon {
   background: linear-gradient(135deg, #b45309, #f0b429);
   box-shadow: 0 8px 16px rgba(180, 83, 9, 0.2);

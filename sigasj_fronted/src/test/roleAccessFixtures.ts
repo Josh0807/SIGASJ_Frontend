@@ -2,11 +2,11 @@ import type { InternalAdminRole } from '../modules/auth/utils/internalRoles'
 import { ADMIN_MODULE_ACCESS } from '../modules/auth/config/adminNavigation.config'
 import { ADMIN_BASE_PATH } from '../app/router/privateRoutes'
 import { FONTANERO_AVERIAS_PATH } from '../modules/averias/fontanero/averiasFontaneroPaths'
+import { FONTANERO_MI_SALDO_PATH } from '../modules/recursos-humanos/recursosHumanosPaths'
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
   FONTANERO_SOLICITAR_AUSENCIA_PATH,
 } from '../modules/solicitudes-ausencia/solicitudesAusenciaPaths'
-
 /** En SIGASJ el rol técnico es `Secretaria` (equivalente a “Secretaria Ejecutiva” en la tarea). */
 export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
   Administradora: 'Administradora',
@@ -33,6 +33,7 @@ export const EXPECTED_NAV_PATHS: Record<InternalAdminRole, readonly string[]> = 
     FONTANERO_AVERIAS_PATH,
     FONTANERO_SOLICITAR_AUSENCIA_PATH,
     FONTANERO_MIS_SOLICITUDES_PATH,
+    FONTANERO_MI_SALDO_PATH,
   ],
 }
 
@@ -63,7 +64,7 @@ export const SAMPLE_ALLOWED_CONTENT: Record<string, string> = {
   '/admin/abonados': 'Gestión de asociados',
   '/admin/inventario': 'Gestión de inventario',
   '/admin/solicitudes': 'Gestión de solicitudes',
-  '/admin/lecturas': 'Recursos Humanos',
+  '/admin/rrhh': 'Recursos Humanos',
   '/admin/averias': 'Gestión de averías',
   '/admin/actividades': 'Registro de Actividades',
   '/admin/actividades-fontanero': 'Actividades del Fontanero',

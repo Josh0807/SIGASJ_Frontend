@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { MOVIMIENTOS_PATH } from '../inventarioPaths'
@@ -26,16 +27,11 @@ export default function MovimientoDetallePage() {
 
   useEffect(() => {
     let active = true
+    const cancelScheduled = runAfterEffect(() => {
     if (!Number.isInteger(movimientoId) || movimientoId <= 0) {
-      queueMicrotask(() => {
-        if (active) {
-          setError('El movimiento indicado no es válido.')
-          setLoading(false)
-        }
-      })
-      return () => {
-        active = false
-      }
+      setError('El movimiento indicado no es válido.')
+      setLoading(false)
+      return
     }
 
     setLoading(true)
@@ -56,9 +52,11 @@ export default function MovimientoDetallePage() {
       .finally(() => {
         if (active) setLoading(false)
       })
+    })
 
     return () => {
       active = false
+      cancelScheduled()
     }
   }, [movimientoId, navigate, reloadKey])
 

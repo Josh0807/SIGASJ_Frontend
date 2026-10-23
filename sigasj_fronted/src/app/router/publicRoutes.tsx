@@ -3,11 +3,20 @@ import LoginPage from '../../modules/auth/pages/LoginPage'
 import UnauthorizedPage from '../../modules/auth/components/UnauthorizedPage'
 import LandingPage from '../../modules/landing/pages/LandingPage'
 import ReceiptQueryPage from '../../modules/recibos/pages/ReceiptQueryPage'
-import { PUBLIC_SERVICE_REQUEST_ROUTES } from '../../modules/landing/config/serviceRequestRoutes'
-import PublicFormPlaceholder from '../../shared/components/PublicFormPlaceholder'
+import {
+  PUBLIC_ONLINE_SERVICE_REQUEST_ROUTES,
+  SERVICE_REQUEST_ROUTES,
+} from '../../modules/landing/config/serviceRequestRoutes'
 import ComplaintFormPage from '../../modules/landing/pages/ComplaintFormPage'
 import ReportarAveriaPage from '../../modules/averias/pages/ReportarAveriaPage'
 import ProyectoPublicDetailPage from '../../modules/proyectos/public/ProyectoPublicDetailPage'
+import OtherFormsPage from '../../modules/landing/pages/OtherFormsPage'
+import RequestTrackingPage from '../../modules/landing/pages/RequestTrackingPage'
+import AfiliacionPage from '../../modules/solicitudes-publicas/afiliacion/AfiliacionPage'
+import ArregloPagoPage from '../../modules/solicitudes-publicas/arreglo-pago/ArregloPagoPage'
+import CambioTitularPage from '../../modules/solicitudes-publicas/cambio-titular/CambioTitularPage'
+import DisponibilidadPage from '../../modules/solicitudes-publicas/disponibilidad-servicios/DisponibilidadPage'
+import InfraestructuraLinderosPage from '../../modules/solicitudes-publicas/infraestructura-linderos/InfraestructuraLinderosPage'
 
 import {
   LANDING_ROUTE_PATH,
@@ -16,6 +25,8 @@ import {
   RECEIPT_QUERY_ROUTE_PATH,
   REPORTAR_AVERIA_ROUTE_PATH,
   PROYECTO_DETAIL_PUBLIC_ROUTE_PATH,
+  OTHER_FORMS_ROUTE_PATH,
+  REQUEST_TRACKING_ROUTE_PATH,
 } from './routePaths'
 
 export type PublicRouteDefinition = {
@@ -31,6 +42,8 @@ export {
   RECEIPT_QUERY_ROUTE_PATH,
   REPORTAR_AVERIA_ROUTE_PATH,
   PROYECTO_DETAIL_PUBLIC_ROUTE_PATH,
+  OTHER_FORMS_ROUTE_PATH,
+  REQUEST_TRACKING_ROUTE_PATH,
 }
 
 export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
@@ -60,9 +73,30 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
     element: <ReportarAveriaPage />,
     label: 'Formulario público de reporte de averías',
   },
-  ...PUBLIC_SERVICE_REQUEST_ROUTES.map(({ path, label }) => ({
+  {
+    path: OTHER_FORMS_ROUTE_PATH,
+    element: <OtherFormsPage />,
+    label: 'Otros formularios descargables',
+  },
+  {
+    path: REQUEST_TRACKING_ROUTE_PATH,
+    element: <RequestTrackingPage />,
+    label: 'Seguimiento público de solicitudes',
+  },
+  ...PUBLIC_ONLINE_SERVICE_REQUEST_ROUTES.map(({ path, label }) => ({
     path,
-    element: <PublicFormPlaceholder label={label} />,
+    element:
+      path === SERVICE_REQUEST_ROUTES.paymentPlan ? (
+        <ArregloPagoPage />
+      ) : path === SERVICE_REQUEST_ROUTES.accountChange ? (
+        <CambioTitularPage />
+      ) : path === SERVICE_REQUEST_ROUTES.boundaryInfrastructure ? (
+        <InfraestructuraLinderosPage />
+      ) : path === SERVICE_REQUEST_ROUTES.serviceAvailability ? (
+        <DisponibilidadPage />
+      ) : (
+        <AfiliacionPage />
+      ),
     label,
   })),
   {

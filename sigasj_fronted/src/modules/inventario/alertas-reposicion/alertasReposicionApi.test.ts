@@ -26,7 +26,7 @@ describe('alertasReposicionApi', () => {
     await getAlertasReposicionAdmin({ estado: 'PENDIENTE', page: 1, limit: 10 })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/alertas-reposicion?estado=PENDIENTE&page=1&limit=10',
+      '/api/v1/admin/inventario/alertas-reposicion?estado=PENDIENTE&page=1&limit=10',
     )
     expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({
       Authorization: 'Bearer jwt-admin',
@@ -43,7 +43,7 @@ describe('alertasReposicionApi', () => {
     await getAlertasReposicionAdmin({ page: 2, limit: 10 })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/alertas-reposicion?page=2&limit=10',
+      '/api/v1/admin/inventario/alertas-reposicion?page=2&limit=10',
     )
   })
 
@@ -58,7 +58,7 @@ describe('alertasReposicionApi', () => {
     await patchAlertaReposicionEstado(3, 'EN_GESTION')
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/alertas-reposicion/3/estado',
+      '/api/v1/admin/inventario/alertas-reposicion/3/estado',
     )
     expect(fetchMock.mock.calls[0][1]).toMatchObject({
       method: 'PATCH',
@@ -75,7 +75,7 @@ describe('alertasReposicionApi', () => {
     await generarReposicionDesdeAlertaAdmin(3, { cantidad: 20 })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/alertas-reposicion/3/reposicion',
+      '/api/v1/admin/inventario/alertas-reposicion/3/reposicion',
     )
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST' })
   })

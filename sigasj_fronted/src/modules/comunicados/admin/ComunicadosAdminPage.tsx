@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import ComunicadosAdminForm from './ComunicadosAdminForm'
 import { emptyComunicadoFormValues, type ComunicadoFormValues } from './types'
@@ -43,9 +44,9 @@ const ComunicadosAdminPage = () => {
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void loadItems()
-  }, [loadItems])
+  }), [loadItems])
 
   const visibleItems = useMemo(() => {
     const query = searchTitle.trim().toLowerCase()
@@ -65,6 +66,19 @@ const ComunicadosAdminPage = () => {
   const closeForm = () => {
     setFormMode('hidden')
     setEditingItem(null)
+    setActionError(null)
+  }
+
+  const openCreateForm = () => {
+    setActionError(null)
+    setEditingItem(null)
+    setFormMode('create')
+  }
+
+  const openEditForm = (item: AdminComunicado) => {
+    setActionError(null)
+    setEditingItem(item)
+    setFormMode('edit')
   }
 
   const handleSave = async (values: ComunicadoFormValues, file: File | null) => {
@@ -145,122 +159,154 @@ const ComunicadosAdminPage = () => {
         }
       : emptyComunicadoFormValues()
 
+  const isFormView = formMode !== 'hidden'
+
   return (
     <main className="gallery-admin admin-content-modern">
       <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div>
-            <p className="gallery-admin__eyebrow">Panel administrativo</p>
-            <h1>Gestión de Comunicados</h1>
-            <p>Cree, edite y active los avisos visibles en la landing pública.</p>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
-              Volver inicio
-            </Link>
-            <button
-              type="button"
-              className="gallery-admin__button gallery-admin__button--primary"
-              onClick={() => {
-                setEditingItem(null)
-                setFormMode('create')
-              }}
-            >
-              Nuevo comunicado
-            </button>
-          </div>
-        </header>
+        {isFormView ? (
+          <>
+            <header className="gallery-admin__header">
+              <div>
+                <p className="gallery-admin__eyebrow">Panel administrativo</p>
+                <h1>
+                  {formMode === 'create' ? 'Nuevo comunicado' : 'Editar comunicado'}
+                </h1>
+                <p>
+                  {formMode === 'create'
+                    ? 'Complete el formulario y guarde para publicarlo en el listado.'
+                    : 'Actualice los datos del aviso y guarde para volver al listado.'}
+                </p>
+              </div>
+              <div className="gallery-admin__header-actions">
+                <button
+                  type="button"
+                  className="gallery-admin__button"
+                  onClick={closeForm}
+                >
+                  Volver al listado
+                </button>
+              </div>
+            </header>
 
-        <section className="gallery-admin__filters w-full" aria-label="Filtros">
-          <label className="gallery-admin__field">
-            <span>Buscar por título</span>
-            <input
-              type="search"
-              value={searchTitle}
-              onChange={(event) => setSearchTitle(event.target.value)}
+            <ComunicadosAdminForm
+              mode={formMode}
+              initialValues={formInitialValues}
+              currentImageUrl={editingItem?.imagenUrl}
+              submitting={submitting}
+              onSubmit={handleSave}
+              onCancel={closeForm}
             />
-          </label>
-          <label className="gallery-admin__field">
-            <span>Estado</span>
-            <select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
-              }
-            >
-              <option value="all">Todos</option>
-              <option value="active">Activos</option>
-              <option value="inactive">Inactivos</option>
-            </select>
-          </label>
-        </section>
-
-        {actionError ? (
-          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
-            {actionError}
-          </p>
-        ) : null}
-
-        {formMode !== 'hidden' ? (
-          <ComunicadosAdminForm
-            mode={formMode}
-            initialValues={formInitialValues}
-            currentImageUrl={editingItem?.imagenUrl}
-            submitting={submitting}
-            onSubmit={handleSave}
-            onCancel={closeForm}
-          />
-        ) : null}
-
-        {loading ? (
-          <p className="gallery-admin__empty" role="status">
-            Cargando comunicados…
-          </p>
-        ) : error ? (
-          <p className="gallery-admin__empty" role="alert">
-            {error}
-          </p>
-        ) : visibleItems.length === 0 ? (
-          <p className="gallery-admin__empty" role="status">
-            No hay comunicados registrados con los filtros actuales.
-          </p>
+          </>
         ) : (
-          <div className="gallery-admin__list">
-            {visibleItems.map((item) => (
-              <article className="gallery-admin__item" key={item.id}>
-                <div className="gallery-admin__meta">
-                  <h2>{item.titulo}</h2>
-                  <p>{item.descripcion || 'Sin descripción'}</p>
-                  <ul className="gallery-admin__badges">
-                    <li>{item.estado}</li>
-                    <li>{item.tipo}</li>
-                    <li>{item.esPublico ? 'Público' : 'No público'}</li>
-                  </ul>
-                </div>
-                <div className="gallery-admin__actions">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingItem(item)
-                      setFormMode('edit')
-                    }}
-                  >
-                    Editar
-                  </button>
-                  <button type="button" onClick={() => void handleToggleEstado(item)}>
-                    {item.estado === 'Activo' ? 'Desactivar' : 'Activar'}
-                  </button>
-                  <button
-                    type="button"
-                    className="gallery-admin__danger"
-                    onClick={() => void handleDelete(item)}
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+          <>
+            <header className="gallery-admin__header">
+              <div>
+                <p className="gallery-admin__eyebrow">Panel administrativo</p>
+                <h1>Gestión de Comunicados</h1>
+                <p>Cree, edite y active los avisos visibles en la landing pública.</p>
+              </div>
+              <div className="gallery-admin__header-actions">
+                <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
+                  Volver inicio
+                </Link>
+                <button
+                  type="button"
+                  className="gallery-admin__button gallery-admin__button--primary"
+                  onClick={openCreateForm}
+                >
+                  Nuevo comunicado
+                </button>
+              </div>
+            </header>
+
+            <section className="gallery-admin__filters w-full" aria-label="Filtros">
+              <label className="gallery-admin__field">
+                <span>Buscar por título</span>
+                <input
+                  type="search"
+                  value={searchTitle}
+                  onChange={(event) => setSearchTitle(event.target.value)}
+                />
+              </label>
+              <label className="gallery-admin__field">
+                <span>Estado</span>
+                <select
+                  value={statusFilter}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
+                  }
+                >
+                  <option value="all">Todos</option>
+                  <option value="active">Activos</option>
+                  <option value="inactive">Inactivos</option>
+                </select>
+              </label>
+            </section>
+
+            {actionError ? (
+              <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
+                {actionError}
+              </p>
+            ) : null}
+
+            {loading ? (
+              <p className="gallery-admin__empty" role="status">
+                Cargando comunicados…
+              </p>
+            ) : error ? (
+              <p className="gallery-admin__empty" role="alert">
+                {error}
+              </p>
+            ) : visibleItems.length === 0 ? (
+              <p className="gallery-admin__empty" role="status">
+                No hay comunicados registrados con los filtros actuales.
+              </p>
+            ) : (
+              <div className="gallery-admin__list">
+                {visibleItems.map((item) => (
+                  <article className="gallery-admin__item gallery-admin__item--text" key={item.id}>
+                    <div className="gallery-admin__meta">
+                      <h2>{item.titulo}</h2>
+                      <p>{item.descripcion || 'Sin descripción'}</p>
+                      <ul className="gallery-admin__badges">
+                        <li className={item.estado === 'Activo' ? 'is-active' : 'is-inactive'}>
+                          {item.estado}
+                        </li>
+                        <li className="is-type">{item.tipo}</li>
+                        <li className={item.esPublico ? 'is-public' : 'is-private'}>
+                          {item.esPublico ? 'Público' : 'No público'}
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="gallery-admin__actions">
+                      <button
+                        type="button"
+                        className="gallery-admin__button gallery-admin__button--primary"
+                        onClick={() => openEditForm(item)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="gallery-admin__button"
+                        onClick={() => void handleToggleEstado(item)}
+                      >
+                        {item.estado === 'Activo' ? 'Desactivar' : 'Activar'}
+                      </button>
+                      <button
+                        type="button"
+                        className="gallery-admin__button gallery-admin__danger"
+                        onClick={() => void handleDelete(item)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

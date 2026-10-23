@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { GalleryPhoto } from './GallerySectionProps'
 import { getPublicGaleria } from '../services/galeriaApi'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 
 export type PublicGalleryQueryStatus = 'loading' | 'success' | 'error'
 
@@ -40,12 +41,12 @@ export function usePublicGallery(enabled: boolean): UsePublicGalleryResult {
     }
   }, [enabled])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void load()
-  }, [load])
+  }), [load])
 
   return {
-    status: status === 'error' ? 'success' : status,
+    status,
     photos,
     total: photos.length,
     retry: () => {

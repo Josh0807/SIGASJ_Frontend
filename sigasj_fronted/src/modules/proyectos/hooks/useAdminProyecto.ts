@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import {
   parseProyectoSubmitError,
   type ProyectoSubmitError,
@@ -45,8 +46,11 @@ export function useAdminProyecto(
   }
 
   const hasVisibleProyectoRef = useRef(false)
-  hasVisibleProyectoRef.current =
-    proyecto !== null && proyecto.id === proyectoId
+
+  useEffect(() => {
+    hasVisibleProyectoRef.current =
+      proyecto !== null && proyecto.id === proyectoId
+  }, [proyecto, proyectoId])
 
   const refetch = useCallback(() => {
     setReloadTrigger((current) => current + 1)
@@ -65,12 +69,7 @@ export function useAdminProyecto(
 
   useEffect(() => {
     if (proyectoId === null) {
-      setProyecto(null)
-      setLoading(false)
-      setError(null)
-      setMissing(true)
-      setStatusKind('not-found')
-      return
+      return undefined
     }
 
     let cancelled = false
@@ -118,10 +117,13 @@ export function useAdminProyecto(
       }
     }
 
-    void load()
+    const cancelScheduled = runAfterEffect(() => {
+      void load()
+    })
 
     return () => {
       cancelled = true
+      cancelScheduled()
     }
   }, [proyectoId, reloadTrigger])
 

@@ -159,13 +159,13 @@ export default function AsociadosPage() {
   const hasta = Math.min(page * ASOCIADOS_PAGE_SIZE, total)
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
+    <main className="gallery-admin admin-content-modern grid w-full min-w-0 gap-5 sm:gap-6">
       {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
       {accionError ? <AsociadoFeedback variant="error">{accionError}</AsociadoFeedback> : null}
 
-      <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <header className="gallery-admin__header flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          <p className="gallery-admin__eyebrow mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
             Administración · Asociados
           </p>
           <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
@@ -175,11 +175,11 @@ export default function AsociadosPage() {
             Registre, consulte y busque la información de las personas asociadas.
           </p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Link to={ASOCIADOS_HISTORIAL_PATH} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-6 py-3.5 font-extrabold text-blue-800 no-underline shadow-[0_8px_20px_rgba(37,99,235,0.12)] transition hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50 hover:no-underline"><IconHistory size={20} aria-hidden="true" />Ver historial</Link>
+        <div className="gallery-admin__header-actions flex flex-col gap-3 sm:flex-row">
+          <Link to={ASOCIADOS_HISTORIAL_PATH} className="gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"><IconHistory size={20} aria-hidden="true" />Ver historial</Link>
           <Link
             to={ASOCIADO_NEW_PATH}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none"
+            className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"
           >
             <IconUserPlus size={20} aria-hidden="true" />
             Registrar asociado

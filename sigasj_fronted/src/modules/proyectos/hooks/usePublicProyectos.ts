@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { getPublicProyectos, type PublicProyecto } from '../services/proyectosApi'
 
 export function usePublicProyectos() {
@@ -21,9 +22,9 @@ export function usePublicProyectos() {
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void fetchProyectos()
-  }, [fetchProyectos])
+  }), [fetchProyectos])
 
   return {
     status,

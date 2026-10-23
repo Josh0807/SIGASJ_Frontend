@@ -15,7 +15,7 @@ const ProyectosAdminRowActions = ({
   <div className="gallery-admin__actions !flex !items-center !gap-2.5">
     <Link
       to={editTo}
-      className="!inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-xl !border !border-blue-600 !bg-gradient-to-r !from-blue-700 !to-sky-500 !px-5 !font-extrabold !text-white !no-underline !shadow-md !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-lg active:!translate-y-0 active:!scale-[0.98]"
+      className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-5"
       aria-label={`Editar ${proyecto.nombre}`}
     >
       <svg aria-hidden="true" viewBox="0 0 24 24" className="!h-5 !w-5 !fill-none !stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -26,7 +26,7 @@ const ProyectosAdminRowActions = ({
     </Link>
     <button
       type="button"
-      className={`!inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-xl !border !px-5 !font-extrabold !shadow-sm !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-md active:!translate-y-0 active:!scale-[0.98] ${
+      className={`gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-5 ${
         proyecto.activo
           ? '!border-amber-300 !bg-amber-50 !text-amber-800 hover:!bg-amber-100'
           : '!border-emerald-300 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100'
@@ -39,6 +39,5 @@ const ProyectosAdminRowActions = ({
     </button>
   </div>
 )
-
 
 export default ProyectosAdminRowActions

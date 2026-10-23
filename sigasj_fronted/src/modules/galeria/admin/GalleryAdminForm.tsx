@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { GalleryFormValues } from './types'
 import {
   formatGalleryMaxSizeLabel,
@@ -28,25 +29,31 @@ const GalleryAdminForm = ({
   const [fileError, setFileError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [altError, setAltError] = useState<string | null>(null)
+  const [valuesSource, setValuesSource] = useState(initialValues)
+  const [modeSource, setModeSource] = useState(mode)
 
-  useEffect(() => {
+  if (initialValues !== valuesSource || mode !== modeSource) {
+    setValuesSource(initialValues)
+    setModeSource(mode)
     setValues(initialValues)
     setFile(null)
     setFileError(null)
     setFormError(null)
     setAltError(null)
-  }, [initialValues, mode])
+  }
+
+  if (!file && previewUrl !== null) {
+    setPreviewUrl(null)
+  }
 
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
-    }
+    if (!file) return undefined
 
     const objectUrl = URL.createObjectURL(file)
-    setPreviewUrl(objectUrl)
+    const cancelScheduled = runAfterEffect(() => setPreviewUrl(objectUrl))
 
     return () => {
+      cancelScheduled()
       URL.revokeObjectURL(objectUrl)
     }
   }, [file])

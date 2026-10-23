@@ -19,6 +19,7 @@ import {
   PUBLIC_VISITOR_FORM_ROUTES,
   UNAUTHORIZED_ROUTE_PATH,
 } from './publicRoutes'
+import { SERVICE_REQUEST_ROUTES } from '../../modules/landing/config/serviceRequestRoutes'
 
 type RouteLocation = {
   pathname: string
@@ -99,15 +100,19 @@ describe('AppRoutes y AdminLayout', () => {
     expect(renderPath('/login')).not.toContain('admin-layout')
     expect(renderPath('/login')).not.toContain('admin-sidebar')
     expect(renderPath('/reportar-averia')).not.toContain('admin-layout')
-    expect(renderPath('/solicitudes/afiliacion')).not.toContain('admin-layout')
-    expect(renderPath('/solicitudes/afiliacion')).not.toContain('admin-sidebar')
-    expect(renderPath('/solicitudes/afiliacion')).not.toContain('admin-header')
+    expect(renderPath('/solicitudes/cambio-titular')).not.toContain('admin-layout')
+    expect(renderPath('/solicitudes/cambio-titular')).not.toContain('admin-sidebar')
+    expect(renderPath('/solicitudes/cambio-titular')).not.toContain('admin-header')
   })
 
   it('mantiene los formularios públicos existentes fuera de AdminLayout', () => {
     const landing = renderPath('/')
     expect(landing).toContain('href="/reportar-averia"')
-    expect(landing).toContain('href="/solicitudes/afiliacion"')
+    // RequestsSection es lazy en la landing: los CTAs online se validan en sus rutas.
+    expect(renderPath(SERVICE_REQUEST_ROUTES.paymentPlan)).not.toContain('admin-layout')
+    expect(renderPath(SERVICE_REQUEST_ROUTES.accountChange)).not.toContain('admin-layout')
+    expect(renderPath(SERVICE_REQUEST_ROUTES.paymentPlan)).not.toContain('Próximamente')
+    expect(renderPath(SERVICE_REQUEST_ROUTES.accountChange)).not.toContain('Próximamente')
 
     for (const { path, label } of PUBLIC_VISITOR_FORM_ROUTES) {
       const markup = renderPath(path)
@@ -116,13 +121,54 @@ describe('AppRoutes y AdminLayout', () => {
       expect(markup).not.toContain('admin-header')
       expect(markup).not.toContain('admin-main')
       expect(markup).not.toContain('Panel administrativo')
-      expect(markup).toContain(`aria-label="${label}"`)
+      // Formularios reales usan aria-label; placeholders usan el label en el H1.
+      expect(markup).toContain(label)
     }
 
     loginWithAdminSession()
     for (const { path } of PUBLIC_VISITOR_FORM_ROUTES) {
       expect(renderPath(path)).not.toContain('admin-layout')
     }
+  })
+
+  it('no publica trámites solo-presenciales ni stubs admin como rutas funcionales', () => {
+    expect(PUBLIC_ROUTE_PATHS).toContain(
+      SERVICE_REQUEST_ROUTES.boundaryInfrastructure,
+    )
+    expect(
+      renderPath(SERVICE_REQUEST_ROUTES.boundaryInfrastructure),
+    ).toContain('Constancia de Infraestructura Frente a Linderos')
+    expect(PUBLIC_ROUTE_PATHS).toContain(SERVICE_REQUEST_ROUTES.affiliation)
+    expect(renderPath(SERVICE_REQUEST_ROUTES.affiliation)).toContain(
+      'Solicitud de Afiliación',
+    )
+    expect(renderPath(SERVICE_REQUEST_ROUTES.affiliation)).not.toContain(
+      'Próximamente',
+    )
+    expect(PUBLIC_ROUTE_PATHS).toContain(
+      SERVICE_REQUEST_ROUTES.serviceAvailability,
+    )
+    expect(renderPath(SERVICE_REQUEST_ROUTES.serviceAvailability)).toContain(
+      'Constancia de Disponibilidad de Servicios',
+    )
+    expect(
+      renderPath(SERVICE_REQUEST_ROUTES.serviceAvailability),
+    ).not.toContain('Próximamente')
+
+    const unpublishedPublic = [SERVICE_REQUEST_ROUTES.existingService]
+
+    for (const path of unpublishedPublic) {
+      expect(PUBLIC_ROUTE_PATHS).not.toContain(path)
+      // Sin ruta registrada: no hay placeholder "Próximamente" de PublicFormPlaceholder.
+      expect(renderPath(path)).not.toContain('Próximamente')
+    }
+
+    expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/usuarios')
+    expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/reportes')
+
+    loginWithAdminSession()
+    expect(renderPath('/admin/usuarios')).not.toContain('Gestión de usuarios')
+    expect(renderPath('/admin/reportes')).not.toContain('Gestión de reportes')
   })
 
   it('renderiza LandingPage en / sin AdminLayout', () => {
@@ -265,6 +311,34 @@ describe('AppRoutes y AdminLayout', () => {
     expect(averias).toContain('Gestión de averías')
     expect(renderPath('/')).not.toContain('admin-layout')
     expect(renderPath('/login')).not.toContain('admin-layout')
+  })
+
+  it('Mi saldo de vacaciones es solo Fontanero; Administradora queda denegada', async () => {
+    loginAsRole('Fontanero', '3')
+    const fontaneroApp = await mountApp('/fontanero/mi-saldo-vacaciones')
+    try {
+      expect(fontaneroApp.location().pathname).toBe('/fontanero/mi-saldo-vacaciones')
+      expect(fontaneroApp.container.innerHTML).toContain('admin-layout')
+      expect(fontaneroApp.container.innerHTML).toContain('Mi saldo de vacaciones')
+      expect(fontaneroApp.container.innerHTML).toContain(
+        'href="/fontanero/mi-saldo-vacaciones"',
+      )
+    } finally {
+      await fontaneroApp.cleanup()
+    }
+
+    clearAccessToken()
+    loginWithAdminSession()
+    const adminApp = await mountApp('/fontanero/mi-saldo-vacaciones')
+    try {
+      expect(adminApp.location().pathname).toBe(UNAUTHORIZED_ROUTE_PATH)
+      expect(adminApp.container.innerHTML).not.toContain('Mi saldo de vacaciones')
+      expect(adminApp.container.innerHTML).not.toContain(
+        'href="/fontanero/mi-saldo-vacaciones"',
+      )
+    } finally {
+      await adminApp.cleanup()
+    }
   })
 
   it('enlaza las rutas administrativas reales desde AdminSidebar', () => {

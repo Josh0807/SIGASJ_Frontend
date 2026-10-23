@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
 import { useAuth } from '../../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../../auth/utils/adminNavigation'
 import { ACTIVIDADES_FONTANERO_BASE_PATH } from '../../actividades-fontanero/actividadesFontaneroPaths'
+import { ACTIVIDADES_ADMIN_BASE_PATH } from '../../actividades-fontanero/admin/actividadesAdminPaths'
 import type { ActivityItem, RecentActivityWidgetProps } from '../props'
 import { getRecentDashboardActivities } from '../services/dashboardService'
 
@@ -11,59 +13,60 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
   activities: activitiesProp,
 }) => {
   const { user } = useAuth()
-  const canOpenAdminReportes = canAccessAdminRoute(user, '/admin/reportes')
   const canOpenAdminActividades = canAccessAdminRoute(user, '/admin/actividades-fontanero')
   const canOpenFontaneroActividades = canAccessAdminRoute(user, '/admin/actividades')
   const [activities, setActivities] = useState<ActivityItem[]>(activitiesProp ?? [])
   const [isLoading, setIsLoading] = useState(activitiesProp === undefined)
 
   useEffect(() => {
-    if (activitiesProp !== undefined) {
-      setActivities(activitiesProp)
-      setIsLoading(false)
-      return
-    }
-
     let cancelled = false
-    setIsLoading(true)
+    const cancelScheduled = runAfterEffect(() => {
+      if (activitiesProp !== undefined) {
+        setActivities(activitiesProp)
+        setIsLoading(false)
+        return
+      }
 
-    const scope =
-      canOpenAdminActividades || canOpenAdminReportes
+      setIsLoading(true)
+
+      const scope = canOpenAdminActividades
         ? 'admin'
         : canOpenFontaneroActividades
           ? 'fontanero'
           : null
 
-    if (scope === null) {
-      setActivities([])
-      setIsLoading(false)
-      return
-    }
+      if (scope === null) {
+        setActivities([])
+        setIsLoading(false)
+        return
+      }
 
-    void getRecentDashboardActivities(scope)
-      .then((items) => {
-        if (!cancelled) {
-          setActivities(items)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setActivities([])
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false)
-        }
-      })
+      void getRecentDashboardActivities(scope)
+        .then((items) => {
+          if (!cancelled) {
+            setActivities(items)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setActivities([])
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setIsLoading(false)
+          }
+        })
+    })
 
     return () => {
       cancelled = true
+      cancelScheduled()
     }
-  }, [activitiesProp, canOpenAdminActividades, canOpenAdminReportes, canOpenFontaneroActividades])
+  }, [activitiesProp, canOpenAdminActividades, canOpenFontaneroActividades])
 
-  const footerPath = canOpenAdminReportes
-    ? '/admin/reportes'
+  const footerPath = canOpenAdminActividades
+    ? ACTIVIDADES_ADMIN_BASE_PATH
     : canOpenFontaneroActividades
       ? ACTIVIDADES_FONTANERO_BASE_PATH
       : null

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useAdminAveriaEventosHistorial } from '../hooks/useAdminAveriaEventosHistorial'
 import {
   etiquetaTipoEvento,
@@ -46,9 +47,8 @@ const AveriasAdminEventosHistorial = ({
   }, [historial.forbidden, onForbidden])
 
   useEffect(() => {
-    if (historial.error) {
-      setAbierto(true)
-    }
+    if (!historial.error) return undefined
+    return runAfterEffect(() => setAbierto(true))
   }, [historial.error])
 
   return (

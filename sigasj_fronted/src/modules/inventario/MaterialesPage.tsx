@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/components/AuthContext";
 import {
   InternalAdminRoleName,
@@ -26,6 +26,8 @@ import { InventoryFormField } from "./InventoryFormField";
 const PAGE_SIZE = 10;
 
 export default function MaterialesPage() {
+  const location = useLocation();
+  const routeSuccess = (location.state as { success?: string } | null)?.success;
   const [searchInput, setSearchInput] = useState("");
   const [nombre, setNombre] = useState("");
   const [activo, setActivo] = useState("");
@@ -36,7 +38,9 @@ export default function MaterialesPage() {
   const [actionMessage, setActionMessage] = useState<{
     kind: "success" | "error";
     text: string;
-  } | null>(null);
+  } | null>(() =>
+    routeSuccess ? { kind: "success", text: routeSuccess } : null,
+  );
   const latestSearch = useRef("");
   const { user, logout } = useAuth();
   const currentRole = normalizeInternalRole(user?.role);
@@ -110,7 +114,7 @@ export default function MaterialesPage() {
   };
 
   return (
-    <main className="materials-admin sigasj-stack !gap-6">
+    <main className="materials-admin admin-content-modern gallery-admin sigasj-stack !gap-6">
       <header className="materials-admin__header !flex !min-h-[220px] !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8">
         <div>
           <p className="materials-admin__eyebrow inventory-page-eyebrow">

@@ -90,4 +90,41 @@ describe('notificacionesApi', () => {
     expect(listado.data[0]?.idSolicitudAusencia).toBe(12)
     expect(listado.data[0]?.idAveria).toBeNull()
   })
+
+  it('acepta notificaciones de inventario con una referencia válida', () => {
+    const listado = parseNotificacionesListado({
+      data: [
+        {
+          id: 20,
+          idSolicitudMateriales: 15,
+          tipo: 'SOLICITUD_MATERIALES_PENDIENTE_ADMINISTRADORA',
+          titulo: 'Nueva solicitud de materiales',
+          mensaje: 'Un fontanero registró una solicitud.',
+          leida: false,
+        },
+        {
+          id: 21,
+          idSalidaInventario: 8,
+          tipo: 'SALIDA_INVENTARIO_REGISTRADA_ADMINISTRADORA',
+          titulo: 'Salida de inventario registrada',
+          mensaje: 'Se registró una nueva salida.',
+          leida: false,
+        },
+        {
+          id: 22,
+          idReposicion: 5,
+          tipo: 'ALERTA_REPOSICION_ADMINISTRADORA',
+          titulo: 'Material con existencias bajas',
+          mensaje: 'Se generó una alerta de reposición.',
+          leida: false,
+        },
+      ],
+      noLeidas: 3,
+    })
+
+    expect(listado.data).toHaveLength(3)
+    expect(listado.data[0]?.idSolicitudMateriales).toBe(15)
+    expect(listado.data[1]?.idSalidaInventario).toBe(8)
+    expect(listado.data[2]?.idReposicion).toBe(5)
+  })
 })

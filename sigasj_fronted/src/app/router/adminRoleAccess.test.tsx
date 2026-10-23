@@ -103,7 +103,8 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
 
   it('pantalla de acceso no autorizado permite volver al panel del rol', async () => {
     loginAs('Secretaria')
-    const app = await mountAppRoutes('/admin/usuarios')
+    // Ruta registrada y denegada a Secretaria (usuarios/reportes ya no se publican).
+    const app = await mountAppRoutes('/admin/actividades-fontanero')
 
     try {
       expect(app.currentPath()).toBe(UNAUTHORIZED_ROUTE_PATH)
@@ -212,7 +213,7 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
   })
 
   it('sin sesión redirige al login desde URL administrativa', async () => {
-    const app = await mountAppRoutes('/admin/reportes')
+    const app = await mountAppRoutes('/admin/actividades-fontanero')
 
     try {
       expect(app.currentPath()).toBe(LOGIN_ROUTE_PATH)

@@ -55,7 +55,14 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
     type: 'touchstart' | 'touchmove' | 'touchend',
     touches?: { clientX: number; clientY: number }[],
   ) => {
-    const event = new Event(type, { bubbles: true, cancelable: true }) as any
+    const event = new Event(type, {
+      bubbles: true,
+      cancelable: true,
+    }) as Event & {
+      targetTouches: { clientX: number; clientY: number }[]
+      touches: { clientX: number; clientY: number }[]
+      changedTouches: { clientX: number; clientY: number }[]
+    }
     event.targetTouches = touches || []
     event.touches = touches || []
     event.changedTouches = touches || []

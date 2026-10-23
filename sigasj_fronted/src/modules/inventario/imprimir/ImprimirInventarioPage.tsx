@@ -1,5 +1,6 @@
 import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import {
   IconAlertTriangle,
   IconCalendar,
@@ -75,6 +76,7 @@ export default function ImprimirInventarioPage() {
 
   useEffect(() => {
     let cancelled = false
+    const cancelScheduled = runAfterEffect(() => {
     setLoading(true)
     setError('')
     getMaterialesParaImpresion(query)
@@ -92,8 +94,10 @@ export default function ImprimirInventarioPage() {
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
+    })
     return () => {
       cancelled = true
+      cancelScheduled()
     }
   }, [query])
 

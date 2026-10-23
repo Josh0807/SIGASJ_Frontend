@@ -53,10 +53,16 @@ describe('adminNavigation helpers', () => {
     expect(paths).toContain('/admin/abonados')
     expect(paths).toContain('/admin/proyectos')
     expect(paths).toContain('/admin/actividades-fontanero')
+    expect(paths).not.toContain('/fontanero/mi-saldo-vacaciones')
     expect(paths).not.toContain('/admin/actividades')
+    expect(paths).not.toContain('/admin/usuarios')
+    expect(paths).not.toContain('/admin/reportes')
+    expect(canAccessAdminRoute(administradora, '/fontanero/mi-saldo-vacaciones')).toBe(
+      false,
+    )
     expect(canAccessAdminRoute(administradora, '/admin/abonados')).toBe(true)
-    expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(true)
-    expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(true)
+    expect(canAccessAdminRoute(administradora, '/admin/usuarios')).toBe(false)
+    expect(canAccessAdminRoute(administradora, '/admin/reportes')).toBe(false)
     expect(canAccessAdminRoute(administradora, '/admin/proyectos')).toBe(true)
     expect(canAccessAdminRoute(administradora, '/admin/actividades-fontanero')).toBe(
       true,
@@ -68,10 +74,10 @@ describe('adminNavigation helpers', () => {
     const items = getAdminNavItemsForUser(secretaria)
     expect(items.map((item) => item.path)).not.toContain('/admin/usuarios')
     expect(items.map((item) => item.path)).not.toContain('/admin/reportes')
-    expect(items.map((item) => item.path)).toContain('/admin/lecturas')
+    expect(items.map((item) => item.path)).toContain('/admin/rrhh')
     expect(canAccessAdminRoute(secretaria, '/admin/usuarios')).toBe(false)
     expect(canAccessAdminRoute(secretaria, '/admin/abonados')).toBe(true)
-    expect(canAccessAdminRoute(secretaria, '/admin/lecturas')).toBe(true)
+    expect(canAccessAdminRoute(secretaria, '/admin/rrhh')).toBe(true)
   })
 
   it('Fontanero solo ve dashboard e inventario operativo, no el listado admin de averías', () => {
@@ -83,6 +89,7 @@ describe('adminNavigation helpers', () => {
       '/fontanero/averias',
       '/fontanero/solicitar-ausencia',
       '/fontanero/mis-solicitudes',
+      '/fontanero/mi-saldo-vacaciones',
     ])
     expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(false)
     expect(canAccessAdminRoute(fontanero, '/fontanero/averias')).toBe(true)
@@ -99,17 +106,35 @@ describe('adminNavigation helpers', () => {
       items.find((item) => item.path === '/fontanero/mis-solicitudes')?.title,
     ).toBe('Mis solicitudes')
     expect(canAccessAdminRoute(fontanero, '/fontanero/mi-saldo-vacaciones')).toBe(
-      false,
+      true,
     )
     expect(
-      items.map((item) => item.path),
-    ).not.toContain('/fontanero/mi-saldo-vacaciones')
+      items.find((item) => item.path === '/fontanero/mi-saldo-vacaciones')?.title,
+    ).toBe('Mi saldo de vacaciones')
     expect(canAccessAdminRoute(fontanero, '/admin/actividades')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades/nueva')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/admin/actividades-fontanero')).toBe(
       false,
     )
     expect(canAccessAdminRoute(fontanero, '/admin/abonados')).toBe(false)
+    expect(
+      canAccessAdminRoute(fontanero, '/admin/inventario/alertas-reposicion'),
+    ).toBe(false)
+    expect(canAccessAdminRoute(fontanero, '/admin/inventario/salidas')).toBe(
+      true,
+    )
+    expect(
+      canAccessAdminRoute(fontanero, '/admin/inventario/solicitudes-materiales'),
+    ).toBe(true)
+  })
+
+  it('Secretaria no accede a alertas de reposición admin del inventario', () => {
+    expect(
+      canAccessAdminRoute(secretaria, '/admin/inventario/alertas-reposicion'),
+    ).toBe(false)
+    expect(canAccessAdminRoute(secretaria, '/admin/inventario/materiales')).toBe(
+      true,
+    )
   })
 
   it('rol invalido no obtiene acceso administrativo', () => {

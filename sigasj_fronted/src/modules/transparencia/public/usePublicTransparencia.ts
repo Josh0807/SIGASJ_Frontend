@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { TransparencyPublication } from './TransparencySectionProps'
 import { getPublicTransparencia } from '../services/transparenciaApi'
 
@@ -38,12 +39,12 @@ export function usePublicTransparencia(
     }
   }, [enabled])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void load()
-  }, [load])
+  }), [load])
 
   return {
-    status: status === 'error' ? 'success' : status,
+    status,
     publications,
     total: publications.length,
     retry: () => {

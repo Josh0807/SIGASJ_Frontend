@@ -3,12 +3,20 @@ export type RequestServiceIcon =
   | 'affiliation'
   | 'payment-plan'
   | 'account-change'
+  | 'boundary-infrastructure'
+  | 'service-availability'
+  | 'downloadable-forms'
+  | 'request-tracking'
 
 export interface RequestService {
   id: string
   name: string
   description: string
-  formHref: string
+  /** Ruta pública del trámite (misma fuente que `SERVICE_REQUEST_ROUTES`). */
+  formHref?: string
+  downloadSlug?: string
+  viewHref?: string
+  badge?: string
   icon: RequestServiceIcon
 }
 

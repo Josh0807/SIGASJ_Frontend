@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import GalleryAdminForm from './GalleryAdminForm'
 import {
@@ -39,9 +40,9 @@ const GalleryAdminPage = () => {
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(() => runAfterEffect(() => {
     void loadPhotos()
-  }, [loadPhotos])
+  }), [loadPhotos])
 
   const visiblePhotos = useMemo(() => {
     const query = searchTitle.trim().toLowerCase()

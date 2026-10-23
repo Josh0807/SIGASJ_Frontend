@@ -57,7 +57,7 @@ describe('QuickAccessCard', () => {
       <MemoryRouter>
         <QuickAccessCard
           title="Lecturas"
-          path="/admin/lecturas"
+          path="/admin/rrhh"
           badgeText="Nuevo"
         />
       </MemoryRouter>,

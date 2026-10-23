@@ -26,7 +26,7 @@ describe('recepcionesApi', () => {
     })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/recepciones',
+      '/api/v1/admin/inventario/recepciones',
     )
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST' })
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({

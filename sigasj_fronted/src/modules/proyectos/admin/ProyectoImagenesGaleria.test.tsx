@@ -216,40 +216,26 @@ describe('ProyectoImagenesGaleria', () => {
     expect(onProyectoUpdated).toHaveBeenCalledWith(updated)
   })
 
-  it('permite reordenar fotografías de la galería', async () => {
-    const updated = proyectoMock({
-      imagenes: [
-        { ...proyectoMock().imagenes[1], orden: 1 },
-        { ...proyectoMock().imagenes[0], orden: 2 },
-      ],
-    })
-    const spy = vi
-      .spyOn(proyectosApi, 'reorderProyectoImagenes')
-      .mockResolvedValue(updated)
-    const onProyectoUpdated = vi.fn()
+  it('muestra el orden de galería sin controles de reordenamiento en la UI actual', async () => {
+    const spy = vi.spyOn(proyectosApi, 'reorderProyectoImagenes')
 
     await act(async () => {
       root.render(
         <ProyectoImagenesGaleria
           proyecto={proyectoMock()}
-          onProyectoUpdated={onProyectoUpdated}
+          onProyectoUpdated={() => {}}
         />,
       )
     })
 
-    const bajarBtn = Array.from(container.querySelectorAll('button')).find(
-      (btn) => btn.textContent === 'Bajar',
-    )
-
-    await act(async () => {
-      bajarBtn?.click()
-    })
-
-    expect(spy).toHaveBeenCalledWith(10, [
-      { id: 102, orden: 1 },
-      { id: 101, orden: 2 },
-    ])
-    expect(onProyectoUpdated).toHaveBeenCalledWith(updated)
+    expect(container.textContent).toContain('Orden #1')
+    expect(container.textContent).toContain('Orden #2')
+    expect(
+      Array.from(container.querySelectorAll('button')).some(
+        (btn) => btn.textContent === 'Bajar' || btn.textContent === 'Subir',
+      ),
+    ).toBe(false)
+    expect(spy).not.toHaveBeenCalled()
   })
 
   it('muestra error cuando un archivo seleccionado no cumple con las validaciones', async () => {

@@ -14,13 +14,6 @@ export type QuickAccessConfigItem = {
  */
 export const ALL_QUICK_ACCESS_ITEMS: QuickAccessConfigItem[] = [
   {
-    id: 'usuarios',
-    title: 'Usuarios y roles',
-    description: 'Administrar accesos, roles y personal del sistema.',
-    path: '/admin/usuarios',
-    icon: 'usuarios',
-  },
-  {
     id: 'abonados',
     title: 'Padrón de asociados',
     description: 'Consultar padrón, contratos e historial de asociados.',
@@ -28,11 +21,11 @@ export const ALL_QUICK_ACCESS_ITEMS: QuickAccessConfigItem[] = [
     icon: 'abonados',
   },
   {
-    id: 'lecturas',
+    id: 'rrhh',
     title: 'Recursos Humanos',
     description: 'Registrar, consultar y administrar a los colaboradores.',
-    path: '/admin/lecturas',
-    icon: 'lecturas',
+    path: '/admin/rrhh',
+    icon: 'rrhh',
   },
   {
     id: 'averias',
@@ -68,13 +61,6 @@ export const ALL_QUICK_ACCESS_ITEMS: QuickAccessConfigItem[] = [
     description: 'Publicar informes de calidad del agua y rendición.',
     path: '/admin/transparencia',
     icon: 'transparencia',
-  },
-  {
-    id: 'reportes',
-    title: 'Estadísticas y reportes',
-    description: 'Generar estadísticas globales y estados financieros.',
-    path: '/admin/reportes',
-    icon: 'reportes',
   },
 ]
 

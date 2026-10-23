@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { validateGalleryImageFile } from '../../galeria/admin/validateGalleryImageFile'
 import type { ComunicadoFormValues } from './types'
 
@@ -24,24 +25,30 @@ const ComunicadosAdminForm = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [tituloError, setTituloError] = useState<string | null>(null)
+  const [valuesSource, setValuesSource] = useState(initialValues)
+  const [modeSource, setModeSource] = useState(mode)
 
-  useEffect(() => {
+  if (initialValues !== valuesSource || mode !== modeSource) {
+    setValuesSource(initialValues)
+    setModeSource(mode)
     setValues(initialValues)
     setFile(null)
     setFormError(null)
     setTituloError(null)
-  }, [initialValues, mode])
+  }
+
+  if (!file && previewUrl !== null) {
+    setPreviewUrl(null)
+  }
 
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
-    }
+    if (!file) return undefined
 
     const objectUrl = URL.createObjectURL(file)
-    setPreviewUrl(objectUrl)
+    const cancelScheduled = runAfterEffect(() => setPreviewUrl(objectUrl))
 
     return () => {
+      cancelScheduled()
       URL.revokeObjectURL(objectUrl)
     }
   }, [file])

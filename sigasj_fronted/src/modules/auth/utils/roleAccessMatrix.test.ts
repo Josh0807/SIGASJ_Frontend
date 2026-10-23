@@ -40,14 +40,14 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
   })
 
   it('cubre los módulos administrativos configurados en el menú', () => {
-    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(15)
+    expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(13)
   })
 
   it('Secretaria Ejecutiva no incluye usuarios ni reportes', () => {
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/usuarios')
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/reportes')
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/proyectos')
-    expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/lecturas')
+    expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/rrhh')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/galeria')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/comunicados')
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/contacto')
@@ -62,7 +62,20 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/fontanero/averias',
       '/fontanero/solicitar-ausencia',
       '/fontanero/mis-solicitudes',
+      '/fontanero/mi-saldo-vacaciones',
     ])
+    expect(EXPECTED_NAV_PATHS.Administradora).not.toContain(
+      '/fontanero/mi-saldo-vacaciones',
+    )
+    expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain(
+      '/fontanero/mi-saldo-vacaciones',
+    )
+    expect(canAccessAdminRoute(userFor('Fontanero'), '/fontanero/mi-saldo-vacaciones')).toBe(
+      true,
+    )
+    expect(
+      canAccessAdminRoute(userFor('Administradora'), '/fontanero/mi-saldo-vacaciones'),
+    ).toBe(false)
   })
 
   it('Gestión de asociados aparece en el menú solo con permiso definido', () => {

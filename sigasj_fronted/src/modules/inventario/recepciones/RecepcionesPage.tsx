@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { IconArrowLeft, IconRefresh, IconTruckDelivery } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MATERIALES_PATH, recepcionDetailPath } from '../inventarioPaths'
@@ -27,6 +28,7 @@ export default function RecepcionesPage() {
 
   useEffect(() => {
     let active = true
+    const cancelScheduled = runAfterEffect(() => {
     setLoading(true)
     void getReposicionesAdmin({
       estado: 'PENDIENTE_RECEPCION',
@@ -52,8 +54,10 @@ export default function RecepcionesPage() {
       .finally(() => {
         if (active) setLoading(false)
       })
+    })
     return () => {
       active = false
+      cancelScheduled()
     }
   }, [navigate, page, reloadKey])
 

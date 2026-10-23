@@ -343,7 +343,13 @@ describe('Cerrar sesión — pruebas funcionales', () => {
         ok: true,
         json: async () => ({
           accessToken: 'local-administradora-session',
-          user: { id: 'demo-user-id', email: 'admin@asadasanjuan.cr', role: 'Administradora' },
+          user: {
+            id: 'demo-user-id',
+            email: 'admin@asadasanjuan.cr',
+            role: 'Administradora',
+            name: 'Usuario',
+            lastName: 'Administradora',
+          },
         }),
       }),
     )
@@ -621,7 +627,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
       const user = readHeaderUser(app.container)
 
-      expect(user.name).toBe('Usuario Administradora')
+      expect(user.name).toBe('Usuario')
       expect(user.role).toBe('Administradora')
       expect(user.name).not.toBe('María Solís')
       expect(app.container.innerHTML).not.toContain('María Solís')
@@ -726,13 +732,13 @@ describe('Cerrar sesión — pruebas funcionales', () => {
       const authUserBefore = getAuthUser()
       const pathBefore = app.currentPath()
 
-      expect(userBefore.name).toBe('Usuario Administradora')
+      expect(userBefore.name).toBe('Usuario')
       expect(userBefore.role).toBe('Administradora')
       expect(tokenBefore).toBe('local-administradora-session')
       expect(authUserBefore).toEqual({
         id: 'demo-user-id',
         name: 'Usuario',
-        lastName: 'Administradora',
+        email: 'admin@asadasanjuan.cr',
         role: 'Administradora',
       })
 

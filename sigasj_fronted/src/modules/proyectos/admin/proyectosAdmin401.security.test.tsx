@@ -174,14 +174,17 @@ describe('Proyectos admin — 401 reutiliza la sesión global', () => {
     loginAsRole('Administradora')
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce({
+      vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+        const method = (init?.method ?? 'GET').toUpperCase()
+        if (method === 'PATCH' || method === 'PUT' || method === 'POST') {
+          return unauthorizedResponse
+        }
+        return {
           ok: true,
           status: 200,
           json: async () => detalle,
-        })
-        .mockResolvedValue(unauthorizedResponse),
+        }
+      }),
     )
 
     const app = await mountAppRoutes('/admin/proyectos/7/editar')

@@ -19,4 +19,27 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Helpers de prueba y archivos de test no participan en Fast Refresh de Vite.
+    files: [
+      '**/test/**/*.{ts,tsx}',
+      '**/*.{test,spec}.{ts,tsx}',
+      '**/adminPanelTestHelpers.tsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    // Rutas, contexto de auth y configs de landing exportan helpers además de componentes.
+    files: [
+      'src/app/router/**/*.{ts,tsx}',
+      'src/modules/auth/components/AuthContext.tsx',
+      'src/modules/landing/config/**/*.{ts,tsx}',
+      'src/modules/recibos/components/ReceiptDetails.tsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

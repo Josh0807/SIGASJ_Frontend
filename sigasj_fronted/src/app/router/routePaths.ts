@@ -5,4 +5,6 @@ export const UNAUTHORIZED_ROUTE_PATH = '/unauthorized'
 export const RECEIPT_QUERY_ROUTE_PATH = '/consulta-recibo'
 export const REPORTAR_AVERIA_ROUTE_PATH = '/reportar-averia'
 export const PROYECTO_DETAIL_PUBLIC_ROUTE_PATH = '/proyectos/:id'
+export const OTHER_FORMS_ROUTE_PATH = '/solicitudes/otros-formularios'
+export const REQUEST_TRACKING_ROUTE_PATH = '/solicitudes/seguimiento'
 

@@ -27,7 +27,7 @@ describe('reposicionesApi', () => {
     await getReposicionesAdmin({ estado: 'PENDIENTE', origen: 'ALERTA_STOCK_MINIMO', page: 1, limit: 10 })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/reposiciones?estado=PENDIENTE&origen=ALERTA_STOCK_MINIMO&page=1&limit=10',
+      '/api/v1/admin/inventario/reposiciones?estado=PENDIENTE&origen=ALERTA_STOCK_MINIMO&page=1&limit=10',
     )
     expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({
       Authorization: 'Bearer jwt-admin',
@@ -44,7 +44,7 @@ describe('reposicionesApi', () => {
     await getReposicionAdmin(5)
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/reposiciones/5',
+      '/api/v1/admin/inventario/reposiciones/5',
     )
   })
 
@@ -63,7 +63,7 @@ describe('reposicionesApi', () => {
     })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/reposiciones/5/compra',
+      '/api/v1/admin/inventario/reposiciones/5/compra',
     )
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST' })
   })
@@ -76,7 +76,7 @@ describe('reposicionesApi', () => {
     await patchReposicionEstadoAdmin(5, 'EN_GESTION')
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://localhost:3000/api/v1/admin/inventario/reposiciones/5/estado',
+      '/api/v1/admin/inventario/reposiciones/5/estado',
     )
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ estado: 'EN_GESTION' })
   })

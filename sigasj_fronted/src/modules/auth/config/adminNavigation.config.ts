@@ -62,6 +62,8 @@ export type AdminModuleAccessDefinition = {
   /** Permisos mínimos exigidos; deben estar incluidos en ROLE_PERMISSIONS del rol. */
   requiredPermissions: readonly string[]
   availableInNav: boolean
+  /** Si es false, la ruta no se registra ni se puede abrir (stubs). Default: true. */
+  availableAsRoute?: boolean
 }
 
 /**
@@ -85,7 +87,9 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     title: 'Gestión de usuarios',
     allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['users.manage'],
-    availableInNav: true,
+    // Stub sin UI: no se publica en menú ni como ruta funcional.
+    availableInNav: false,
+    availableAsRoute: false,
   },
   {
     segment: 'abonados',
@@ -120,9 +124,8 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     availableInNav: true,
   },
   {
-    segment: 'lecturas',
+    segment: 'rrhh',
     title: 'Recursos Humanos',
-    // Paridad ADMINISTRADORA / SECRETARIA en /rrhh/*.
     allowedRoles: [
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
@@ -159,7 +162,9 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     title: 'Gestión de reportes',
     allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: ['audit.read'],
-    availableInNav: true,
+    // Stub sin UI: no se publica en menú ni como ruta funcional.
+    availableInNav: false,
+    availableAsRoute: false,
   },
   {
     segment: 'proyectos',

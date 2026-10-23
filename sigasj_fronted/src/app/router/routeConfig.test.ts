@@ -19,13 +19,17 @@ describe('route configuration', () => {
       '/consulta-recibo',
       '/formulario-quejas',
       '/reportar-averia',
-      '/solicitudes/constancia-servicio',
-      '/solicitudes/afiliacion',
+      '/solicitudes/otros-formularios',
+      '/solicitudes/seguimiento',
       '/solicitudes/arreglo-pago',
       '/solicitudes/cambio-titular',
+      '/solicitudes/infraestructura-linderos',
+      '/solicitudes/afiliacion',
       '/login',
       '/unauthorized',
     ])
+    expect(PUBLIC_ROUTE_PATHS).toContain('/solicitudes/afiliacion')
+    expect(PUBLIC_ROUTE_PATHS).toContain('/solicitudes/infraestructura-linderos')
 
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/comunicados')
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/dashboard')
@@ -54,27 +58,30 @@ describe('route configuration', () => {
       '/consulta-recibo',
       '/formulario-quejas',
       '/reportar-averia',
-      '/solicitudes/constancia-servicio',
-      '/solicitudes/afiliacion',
+      '/solicitudes/otros-formularios',
+      '/solicitudes/seguimiento',
       '/solicitudes/arreglo-pago',
       '/solicitudes/cambio-titular',
+      '/solicitudes/infraestructura-linderos',
+      '/solicitudes/afiliacion',
     ])
     expect(
       PUBLIC_VISITOR_FORM_PATHS.every((path) => !path.startsWith(`${ADMIN_BASE_PATH}/`)),
     ).toBe(true)
   })
 
+
   it('protege los módulos administrativos principales', () => {
     expect(PRIVATE_ROUTE_PATHS).toEqual(
       expect.arrayContaining([
         '/admin/dashboard',
-        '/admin/usuarios',
         '/admin/abonados',
         '/admin/inventario',
         '/admin/solicitudes',
-        '/admin/lecturas',
+        '/admin/rrhh',
         '/admin/averias',
-        '/admin/reportes',
+        '/admin/actividades',
+        '/admin/actividades-fontanero',
         '/admin/proyectos',
         '/admin/galeria',
         '/admin/comunicados',
@@ -82,6 +89,15 @@ describe('route configuration', () => {
         '/admin/transparencia',
         ADMIN_PROFILE_PATH,
       ]),
+    )
+    // Usuarios/Reportes globales: sin UI real — no se publican como rutas funcionales.
+    expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/usuarios')
+    expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/reportes')
+    expect(ADMIN_NAV_ITEMS.some((item) => item.path === '/admin/usuarios')).toBe(
+      false,
+    )
+    expect(ADMIN_NAV_ITEMS.some((item) => item.path === '/admin/reportes')).toBe(
+      false,
     )
   })
 

@@ -38,9 +38,9 @@ describe('adminAccess', () => {
 
   it('permite el área admin a roles internos válidos', () => {
     expect(evaluateAdminAreaAccess(true, administradora)).toBe('allow')
-    expect(evaluateAdminRouteAccess(true, administradora, '/admin/usuarios')).toBe(
-      'allow',
-    )
+    expect(evaluateAdminRouteAccess(true, administradora, '/admin/usuarios')).toEqual({
+      to: UNAUTHORIZED_ROUTE_PATH,
+    })
     expect(evaluateAdminRouteAccess(true, administradora, '/admin/abonados')).toBe(
       'allow',
     )
