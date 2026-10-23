@@ -2,7 +2,7 @@ import { IconArrowRight, IconCheck, IconChevronLeft } from '@tabler/icons-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import type { FormWizardProps } from '../props/FormWizardProps'
 import { zodIssuesToFieldErrors, type FormValidationErrors } from '../utils/formValidationSchemas'
-import { FormWizardValidationContext } from './FormWizardFieldError'
+import { FormWizardValidationContext } from './formWizardValidation'
 import { FormWizardNavigationContext } from './FormWizardNavigation'
 import ConfirmDialog from './ConfirmDialog'
 
@@ -35,28 +35,28 @@ const FormWizard = ({
   const submittingRef = useRef(false)
   const hasNavigated = useRef(false)
 
-  useEffect(() => {
-    if (currentStepIndex < steps.length) return
-    setCurrentStepIndex(clampStep(currentStepIndex, steps.length))
-  }, [currentStepIndex, steps.length])
+  const safeStepIndex = clampStep(currentStepIndex, steps.length)
+  if (safeStepIndex !== currentStepIndex) {
+    setCurrentStepIndex(safeStepIndex)
+  }
 
   useEffect(() => {
     if (!hasNavigated.current) return
-    titleRefs.current[currentStepIndex]?.focus()
-  }, [currentStepIndex])
+    titleRefs.current[safeStepIndex]?.focus()
+  }, [safeStepIndex])
 
   if (steps.length === 0) return null
 
-  const currentStep = steps[currentStepIndex]
-  const isFirstStep = currentStepIndex === 0
-  const isLastStep = currentStepIndex === steps.length - 1
+  const currentStep = steps[safeStepIndex]
+  const isFirstStep = safeStepIndex === 0
+  const isLastStep = safeStepIndex === steps.length - 1
   const busy = isCompleting || isSubmitting
   const canAdvance = currentStep.canAdvance !== false && !busy
-  const progress = Math.round(((currentStepIndex + 1) / steps.length) * 100)
+  const progress = Math.round(((safeStepIndex + 1) / steps.length) * 100)
 
   const moveTo = (nextIndex: number) => {
     const safeIndex = clampStep(nextIndex, steps.length)
-    if (safeIndex === currentStepIndex) return
+    if (safeIndex === safeStepIndex) return
     hasNavigated.current = true
     setValidationErrors({})
     setCurrentStepIndex(safeIndex)
@@ -91,7 +91,7 @@ const FormWizard = ({
   }
 
   const handleNext = () => {
-    if (validateCurrentStep()) moveTo(currentStepIndex + 1)
+    if (validateCurrentStep()) moveTo(safeStepIndex + 1)
   }
 
   const handleComplete = () => {
@@ -127,7 +127,7 @@ const FormWizard = ({
     >
       <header className="border-b border-sky-100 bg-[linear-gradient(135deg,#f7fcff_0%,#eaf6ff_100%)] px-7 py-6 max-[640px]:px-5">
         <div className="flex items-center justify-between gap-4 text-sm font-bold text-[#315d87]">
-          <span aria-live="polite">Paso {currentStepIndex + 1} de {steps.length}</span>
+          <span aria-live="polite">Paso {safeStepIndex + 1} de {steps.length}</span>
           <span aria-hidden="true">{progress}%</span>
         </div>
         <div
@@ -137,15 +137,15 @@ const FormWizard = ({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={progress}
-          aria-valuetext={`Paso ${currentStepIndex + 1} de ${steps.length}`}
+          aria-valuetext={`Paso ${safeStepIndex + 1} de ${steps.length}`}
         >
           <span className="block h-full rounded-full bg-gradient-to-r from-[#0872d3] to-[#42a5e8] transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${progress}%` }} />
         </div>
 
         <ol className="mt-5 grid list-none gap-2 p-0 max-[700px]:grid-cols-1" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }} aria-label="Pasos del formulario">
           {steps.map((step, index) => {
-            const isCurrent = index === currentStepIndex
-            const isComplete = index < currentStepIndex
+            const isCurrent = index === safeStepIndex
+            const isComplete = index < safeStepIndex
             return (
               <li
                 className={`flex min-w-0 items-center gap-2 rounded-xl px-2 py-2 text-sm font-bold ${isCurrent ? 'bg-white text-[#075fae] shadow-sm' : isComplete ? 'text-emerald-700' : 'text-slate-500'}`}
@@ -162,7 +162,7 @@ const FormWizard = ({
         </ol>
       </header>
 
-      <FormWizardNavigationContext.Provider value={{ currentStepIndex, goToStep: moveTo }}>
+      <FormWizardNavigationContext.Provider value={{ currentStepIndex: safeStepIndex, goToStep: moveTo }}>
       <FormWizardValidationContext.Provider value={{ errors: validationErrors }}>
       <div className="px-7 py-8 max-[640px]:px-5 max-[640px]:py-6">
         {steps.map((step, index) => {
@@ -171,7 +171,7 @@ const FormWizard = ({
           return (
             <section
               key={step.id}
-              hidden={index !== currentStepIndex}
+              hidden={index !== safeStepIndex}
               aria-labelledby={titleId}
               aria-describedby={descriptionId}
               data-wizard-step={step.id}
@@ -201,7 +201,7 @@ const FormWizard = ({
             className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] bg-white px-6 font-bold text-[#0b65b5] transition hover:-translate-y-0.5 hover:bg-sky-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400 disabled:hover:translate-y-0 disabled:hover:bg-white"
             type="button"
             disabled={isFirstStep || busy}
-            onClick={() => moveTo(currentStepIndex - 1)}
+            onClick={() => moveTo(safeStepIndex - 1)}
           >
             <IconChevronLeft size={20} aria-hidden="true" /> {previousLabel}
           </button>

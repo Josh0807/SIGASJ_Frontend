@@ -1,10 +1,16 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { SERVICE_REQUEST_ROUTES } from '../config/serviceRequestRoutes'
+import {
+  ONLINE_SERVICE_REQUEST_PATHS,
+  SERVICE_REQUEST_ROUTES,
+} from '../config/serviceRequestRoutes'
 import RequestsSection from './RequestsSection'
 
-const ONLINE_REQUEST_HREFS = Object.values(SERVICE_REQUEST_ROUTES)
+const ONLINE_REQUEST_HREFS = [...ONLINE_SERVICE_REQUEST_PATHS]
+const PENDING_REQUEST_HREFS = Object.values(SERVICE_REQUEST_ROUTES).filter(
+  (href) => !ONLINE_SERVICE_REQUEST_PATHS.has(href),
+)
 
 const renderSection = () => renderToStaticMarkup(
   <MemoryRouter>
@@ -23,16 +29,23 @@ describe('RequestsSection', () => {
     expect(markup).toContain('Seguimiento de Solicitudes')
   })
 
-  it('enlaza todos los trámites a SERVICE_REQUEST_ROUTES (fuente única)', () => {
+  it('enlaza solo trámites con formulario digital real (fuente única)', () => {
     const markup = renderSection()
 
     for (const href of ONLINE_REQUEST_HREFS) {
       expect(markup).toContain(`href="${href}"`)
     }
-    expect((markup.match(/Realizar solicitud/g) ?? [])).toHaveLength(ONLINE_REQUEST_HREFS.length)
-    expect((markup.match(/Forma Presencial/g) ?? [])).toHaveLength(ONLINE_REQUEST_HREFS.length)
+    for (const href of PENDING_REQUEST_HREFS) {
+      expect(markup).not.toContain(`href="${href}"`)
+    }
+    expect((markup.match(/Realizar solicitud/g) ?? [])).toHaveLength(
+      ONLINE_REQUEST_HREFS.length,
+    )
     expect(markup).toContain('Trámite en línea')
-    expect(markup).not.toContain('El formulario en línea estará disponible próximamente.')
+    expect(markup).toContain('Forma presencial')
+    expect(markup).toContain(
+      'El formulario en línea estará disponible próximamente.',
+    )
     expect(markup).not.toContain('Descarga disponible')
     expect(markup).not.toContain('/formularios/')
     expect(markup).not.toContain('download=""')
