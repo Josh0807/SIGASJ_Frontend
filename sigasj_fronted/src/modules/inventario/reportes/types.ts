@@ -6,6 +6,16 @@ export type ReporteInventarioIndicadores = {
   materialesStockBajo: number
   entradasRegistradas: number
   salidasRegistradas: number
+  valorTotalInventario?: number | null
+  materialesPorVencer?: number
+}
+
+export type ProximoVencer = {
+  id: number
+  nombre: string
+  fechaVencimiento: string
+  stockActual: number
+  unidadMedida: string
 }
 
 export type ReporteInventarioPorCategoria = {
@@ -30,6 +40,7 @@ export type ReporteInventarioResponse = {
   porCategoria: ReporteInventarioPorCategoria[]
   materiales: ReporteInventarioMaterial[]
   movimientos: MovimientoInventario[]
+  proximosVencer?: ProximoVencer[]
 }
 
 export type ReporteInventarioFilters = {

@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { IconArrowsExchange, IconCalendar, IconCategory, IconEraser, IconPackage, IconSearch } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowsExchange, IconCalendar, IconCalendarX, IconCategory, IconCurrencyDollar, IconEraser, IconPackage, IconSearch } from '@tabler/icons-react'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
 import { InventoryFormField } from '../InventoryFormField'
 import {
@@ -49,7 +49,7 @@ export default function ReportesInventarioPage() {
   const { reporte, loading, error, refetch } = useReporteInventario(applied)
   const { result: materialesResult, loading: materialesLoading } = useMateriales({
     page: 1,
-    limit: 100,
+    limit: 500,
   })
   const { result: categoriasResult, loading: categoriasLoading } = useCategorias({
     page: 1,
@@ -191,6 +191,7 @@ export default function ReportesInventarioPage() {
               }
             >
               <option value="">Todos los tipos</option>
+              <option value="ENTRADA">Entradas</option>
               <option value="SALIDA">Salidas</option>
             </select>
           </InventoryFormField>
@@ -266,6 +267,23 @@ export default function ReportesInventarioPage() {
               badgeText="Salidas"
               badgeType="alert"
             />
+            <IndicatorCard
+              title="Valor total estimado"
+              value={loading ? null : reporte.indicadores.valorTotalInventario != null ? `₡${Number(reporte.indicadores.valorTotalInventario).toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : null}
+              isLoading={loading}
+              description="Suma de stock × precio unitario (materiales con precio registrado)"
+              fallbackText="Sin precios"
+              badgeText="Valor"
+              badgeType="info"
+            />
+            <IndicatorCard
+              title="Próximos a vencer"
+              value={loading ? null : reporte.indicadores.materialesPorVencer ?? 0}
+              isLoading={loading}
+              description="Materiales con vencimiento en los próximos 90 días"
+              badgeText="Vencimiento"
+              badgeType={reporte.indicadores.materialesPorVencer ? 'warning' : 'success'}
+            />
           </div>
         </section>
 
@@ -307,6 +325,53 @@ export default function ReportesInventarioPage() {
                 ))}
               </tbody>
             </table>
+            </div>
+          </section>
+        ) : null}
+
+        {!loading && reporte.proximosVencer && reporte.proximosVencer.length > 0 ? (
+          <section className="material-tracking__table-wrap inventario-reportes__category-summary" aria-labelledby="reporte-vencimiento-title">
+            <header className="inventario-reportes__category-heading">
+              <span className="inventario-reportes__category-icon" aria-hidden="true" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff' }}>
+                <IconCalendarX size={26} />
+              </span>
+              <div>
+                <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#062e63]" id="reporte-vencimiento-title">Materiales próximos a vencer</h2>
+                <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Materiales con fecha de vencimiento en los próximos 90 días — revise existencias de químicos.</p>
+              </div>
+            </header>
+            <div className="inventario-reportes__category-table">
+              <table>
+                <caption className="visually-hidden">Materiales próximos a vencer</caption>
+                <thead>
+                  <tr>
+                    <th>Material</th>
+                    <th>Existencia</th>
+                    <th>Unidad</th>
+                    <th>Vence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reporte.proximosVencer.map((item) => {
+                    const dias = Math.ceil((new Date(item.fechaVencimiento).getTime() - Date.now()) / 86_400_000)
+                    const urgente = dias <= 30
+                    return (
+                      <tr key={item.id}>
+                        <td data-label="Material"><strong>{item.nombre}</strong></td>
+                        <td data-label="Existencia"><span className="inventario-reportes__metric-badge is-total">{item.stockActual} {item.unidadMedida}</span></td>
+                        <td data-label="Unidad">{item.unidadMedida}</td>
+                        <td data-label="Vence">
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${urgente ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
+                            {urgente && <IconAlertTriangle size={13} aria-hidden="true" />}
+                            {new Date(item.fechaVencimiento).toLocaleDateString('es-CR', { timeZone: 'UTC' })}
+                            {' '}({dias} día{dias === 1 ? '' : 's'})
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           </section>
         ) : null}
