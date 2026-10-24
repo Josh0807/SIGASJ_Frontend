@@ -70,11 +70,9 @@ export function evaluateRoleAccess(
     return 'allow'
   }
 
-  if (isInternalAdminRole(user.role) || isAbonadoRole(user.role)) {
-    return unauthorizedRedirect()
-  }
-
-  return loginRedirect(fromPath)
+  // Existe una sesión válida, pero el rol no pertenece a los permitidos.
+  // No se trata como sesión ausente: debe terminar explícitamente en 403.
+  return unauthorizedRedirect()
 }
 
 /**

@@ -1,5 +1,6 @@
-import { IconAlertCircle, IconCheck, IconFile, IconFileUpload, IconInfoCircle, IconTrash } from '@tabler/icons-react'
+import { IconAlertCircle, IconFile, IconFileUpload, IconInfoCircle } from '@tabler/icons-react'
 import type { InputHTMLAttributes, ReactNode } from 'react'
+import DocumentFileSelector from '../../shared/components/DocumentFileSelector'
 import { DOCUMENT_REQUIREMENTS, type DocumentRequirementKind, type SolicitudPublicaSlug } from './documentRequirementsConfig'
 
 const badges: Record<DocumentRequirementKind, { label: string; className: string }> = {
@@ -8,8 +9,6 @@ const badges: Record<DocumentRequirementKind, { label: string; className: string
   special: { label: 'Requisito especial', className: 'bg-violet-100 text-violet-800' },
 }
 
-const fileType = (file: File) => file.type === 'application/pdf' ? 'PDF' : file.type.split('/')[1]?.toUpperCase() || 'Archivo'
-
 type Props = {
   slug: SolicitudPublicaSlug
   files: File[]
@@ -17,6 +16,8 @@ type Props = {
   inputProps?: InputHTMLAttributes<HTMLInputElement>
   error?: ReactNode
 }
+
+const fileId = (file: File, index: number) => `${file.name}-${file.size}-${index}`
 
 const DocumentRequirements = ({ slug, files, onFilesChange, inputProps, error }: Props) => {
   const config = DOCUMENT_REQUIREMENTS[slug]
@@ -37,9 +38,18 @@ const DocumentRequirements = ({ slug, files, onFilesChange, inputProps, error }:
         {config.note ? <aside className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><IconAlertCircle className="mt-0.5 shrink-0 text-amber-700" size={21} aria-hidden="true" /><div><strong className="text-sm text-amber-950">{config.note.title}</strong><p className="mb-0 mt-1 text-sm leading-6 text-amber-900">{config.note.description}</p></div></aside> : null}
         {config.secondaryNote ? <p className="m-0 flex gap-3 rounded-xl bg-blue-50 p-4 text-sm leading-6 text-blue-900"><IconInfoCircle className="mt-0.5 shrink-0" size={20} aria-hidden="true" />{config.secondaryNote}</p> : null}
 
-        {config.allowAttachments ? <div className="mt-1 border-t border-sky-100 pt-5"><label className="grid cursor-pointer gap-2 font-bold text-[#173f6e]">Elegir archivos<input {...inputProps} className="block w-full cursor-pointer rounded-xl border border-sky-200 bg-white p-3 text-sm font-medium file:mr-4 file:rounded-lg file:border-0 file:bg-sky-100 file:px-4 file:py-2 file:font-bold file:text-[#0b65b5]" name="documentos" type="file" multiple onChange={(event) => onFilesChange(Array.from(event.target.files ?? []))} /></label>{error}</div> : null}
-
-        {files.length > 0 ? <ul className="m-0 grid list-none gap-3 p-0" aria-label="Archivos seleccionados">{files.map((file, index) => <li className="flex min-w-0 items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3" key={`${file.name}-${file.size}-${index}`}><span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white text-emerald-600"><IconCheck size={19} aria-hidden="true" /></span><span className="min-w-0 flex-1"><strong className="block truncate text-sm text-emerald-950">{file.name}</strong><small className="text-emerald-800">Tipo: {fileType(file)} · Estado: Listo para adjuntar</small></span><button className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-red-600 transition hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-500" type="button" aria-label={`Quitar ${file.name}`} onClick={() => onFilesChange(files.filter((_, fileIndex) => fileIndex !== index))}><IconTrash size={18} aria-hidden="true" /></button></li>)}</ul> : null}
+        {config.allowAttachments ? (
+          <div className="mt-1 border-t border-sky-100 pt-5">
+            <DocumentFileSelector
+              multiple
+              items={files.map((file, index) => ({ id: fileId(file, index), name: file.name, size: file.size, mimeType: file.type, status: 'ready' }))}
+              inputProps={inputProps}
+              error={error}
+              onFilesSelected={(selected) => onFilesChange([...files, ...selected])}
+              onRemove={(id) => onFilesChange(files.filter((file, index) => fileId(file, index) !== id))}
+            />
+          </div>
+        ) : null}
       </div>
     </section>
   )

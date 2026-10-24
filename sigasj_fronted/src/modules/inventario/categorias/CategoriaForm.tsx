@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react'
-import { IconAlignLeft, IconArrowLeft, IconDeviceFloppy, IconTag } from '@tabler/icons-react'
+import { IconAlignLeft, IconArrowLeft, IconCircleCheckFilled, IconDeviceFloppy, IconTag } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 import { CATEGORIAS_PATH } from '../inventarioPaths'
@@ -54,12 +54,13 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
           <div className="materials-admin__error" role="alert">{message.text}</div>
         ) : (
           <FormSuccessResult
-            className="materials-admin__success"
+            className="category-admin__success !max-w-3xl !gap-3 !overflow-hidden !rounded-[24px] !border-emerald-200 !bg-[linear-gradient(135deg,#ecfdf5_0%,#ffffff_58%,#f0fdfa_100%)] !p-6 !shadow-[0_16px_40px_rgba(5,150,105,0.13)]"
+            icon={<IconCircleCheckFilled size={30} />}
             title={message.text}
-            description="Puede volver al listado o seguir editando esta ficha."
+            description="La categoría ya está disponible para clasificar los materiales del inventario."
             actions={
-              <Link className="materials-admin__secondary" to={CATEGORIAS_PATH}>
-                <IconArrowLeft size={19} aria-hidden="true" />
+              <Link className="materials-admin__secondary group !inline-flex !min-h-11 !items-center !justify-center !gap-2 !rounded-xl !border-emerald-200 !bg-white !px-4 !font-extrabold !text-emerald-700 !no-underline !shadow-[0_7px_18px_rgba(5,150,105,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-emerald-400 hover:!bg-emerald-50 hover:!shadow-[0_11px_23px_rgba(5,150,105,0.18)] active:!translate-y-0 active:!scale-[0.98] motion-reduce:!transform-none motion-reduce:!transition-none" to={CATEGORIAS_PATH}>
+                <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />
                 Volver al listado
               </Link>
             }

@@ -54,10 +54,11 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/transparencia')
   })
 
-  it('Fontanero accede a operaciones propias y lectura de inventario', () => {
+  it('Fontanero accede a operaciones propias, inventario y solicitudes', () => {
     expect(EXPECTED_NAV_PATHS.Fontanero).toEqual([
       '/admin/dashboard',
       '/admin/inventario',
+      '/admin/solicitudes',
       '/admin/actividades',
       '/fontanero/averias',
       '/fontanero/solicitar-ausencia',

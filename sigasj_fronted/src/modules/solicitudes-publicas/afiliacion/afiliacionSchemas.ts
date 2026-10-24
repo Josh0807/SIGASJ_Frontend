@@ -71,7 +71,6 @@ export const afiliacionRecomendacion2Schema = z.object({
   recomendacion2Firma: z.string(),
 })
 
-/** Firma del solicitante: opcional (Backend 4.7.2). */
 export const afiliacionFirmaSchema = z.object({
-  firmaSolicitante: z.string(),
+  firmaSolicitante: z.string().trim().min(1, 'Registra la firma del solicitante.'),
 })

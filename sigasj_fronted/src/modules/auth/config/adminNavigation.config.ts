@@ -119,8 +119,9 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     allowedRoles: [
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
+      InternalAdminRoleName.Fontanero,
     ],
-    requiredPermissions: ['subscribers.read'],
+    requiredPermissions: [],
     availableInNav: true,
   },
   {

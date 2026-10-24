@@ -1,24 +1,37 @@
-import { IconEraser } from '@tabler/icons-react'
-import { useEffect, useRef, useState } from 'react'
+import { IconEraser, IconPhotoUp } from '@tabler/icons-react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 type SignaturePadProps = {
   value: string
   onChange: (value: string) => void
-  /** Etiqueta visible; por defecto «Firma digital». */
   label?: string
-  /** Si es false, no muestra el marcador «(opcional)». Por defecto true. */
+  /** Las firmas principales son obligatorias; úselo solo para recomendantes opcionales. */
   optional?: boolean
 }
 
-const SignaturePad = ({
-  value,
-  onChange,
-  label = 'Firma digital',
-  optional = true,
-}: SignaturePadProps) => {
+const SIGNATURE_MAX_BYTES = 5 * 1024 * 1024
+
+const readFile = (file: File, method: 'arrayBuffer' | 'dataUrl') =>
+  new Promise<ArrayBuffer | string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('No fue posible leer la imagen.'))
+    reader.onload = () => resolve(reader.result as ArrayBuffer | string)
+    if (method === 'arrayBuffer') reader.readAsArrayBuffer(file.slice(0, 8))
+    else reader.readAsDataURL(file)
+  })
+
+const isSignatureImage = (bytes: Uint8Array) => {
+  const png = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  return png.every((value, index) => bytes[index] === value) ||
+    (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)
+}
+
+const SignaturePad = ({ value, onChange, label = 'Firma digital del solicitante', optional = false }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawingRef = useRef(false)
-  const [hasSignature, setHasSignature] = useState(Boolean(value))
+  const fileInputId = useId()
+  const [fileError, setFileError] = useState<string | null>(null)
+  const hasSignature = Boolean(value)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -52,6 +65,7 @@ const SignaturePad = ({
     const context = event.currentTarget.getContext('2d')
     if (!context) return
     drawingRef.current = true
+    setFileError(null)
     event.currentTarget.setPointerCapture(event.pointerId)
     const point = pointFromEvent(event)
     context.beginPath()
@@ -71,7 +85,6 @@ const SignaturePad = ({
     if (!drawingRef.current) return
     drawingRef.current = false
     const signature = event.currentTarget.toDataURL('image/png')
-    setHasSignature(true)
     onChange(signature)
   }
 
@@ -79,20 +92,43 @@ const SignaturePad = ({
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d')
     if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height)
-    setHasSignature(false)
+    setFileError(null)
     onChange('')
   }
 
+  const uploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const extension = file.name.toLowerCase().split('.').at(-1)
+    if (!['png', 'jpg', 'jpeg'].includes(extension ?? '') || !['image/png', 'image/jpeg'].includes(file.type)) {
+      setFileError('Selecciona una imagen de firma en formato PNG, JPG o JPEG.')
+      return
+    }
+    if (!file.size || file.size > SIGNATURE_MAX_BYTES) {
+      setFileError(file.size ? 'La imagen de firma no puede superar 5 MB.' : 'La imagen de firma está vacía.')
+      return
+    }
+    try {
+      const header = new Uint8Array(await readFile(file, 'arrayBuffer') as ArrayBuffer)
+      if (!isSignatureImage(header)) {
+        setFileError('El contenido del archivo no corresponde a una imagen PNG o JPG válida.')
+        return
+      }
+      const dataUrl = await readFile(file, 'dataUrl') as string
+      setFileError(null)
+      onChange(dataUrl)
+    } catch {
+      setFileError('No fue posible leer la imagen de firma. Intenta seleccionarla nuevamente.')
+    }
+  }
+
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="font-bold text-[#173f6e]">
           {label}{' '}
-          {optional ? (
-            <span className="font-medium text-[#607a98]">(opcional)</span>
-          ) : (
-            <span className="sr-only">obligatorio</span>
-          )}
+          {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <span className="text-red-700" aria-hidden="true">*</span>}
         </span>
         <button className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-sky-200 bg-white px-3 text-sm font-bold text-[#0b65b5] disabled:cursor-not-allowed disabled:text-slate-400" type="button" disabled={!hasSignature} onClick={clear}>
           <IconEraser size={17} aria-hidden="true" /> Limpiar firma
@@ -101,7 +137,7 @@ const SignaturePad = ({
       <canvas
         ref={canvasRef}
         className="h-44 w-full touch-none rounded-xl border-2 border-dashed border-sky-200 bg-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-        aria-label="Área para dibujar la firma digital"
+        aria-label={`Área para dibujar: ${label}`}
         role="img"
         tabIndex={0}
         onPointerDown={startDrawing}
@@ -109,7 +145,16 @@ const SignaturePad = ({
         onPointerUp={stopDrawing}
         onPointerCancel={stopDrawing}
       />
-      <p className="m-0 text-sm text-[#607a98]">Dibuja tu firma con el dedo, lápiz digital o puntero.</p>
+      <div className="flex flex-wrap items-center gap-3 max-[480px]:items-stretch">
+        <p className="m-0 flex-1 text-sm text-[#607a98]">Dibuja con el dedo, lápiz digital o puntero.</p>
+        <label className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 text-sm font-bold text-[#0b65b5] hover:bg-sky-100" htmlFor={fileInputId}>
+          <IconPhotoUp size={18} aria-hidden="true" /> Subir PNG o JPG
+          <input className="sr-only" id={fileInputId} type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" onChange={(event) => void uploadImage(event)} />
+        </label>
+      </div>
+      {hasSignature && value ? <img className="max-h-28 max-w-full rounded-lg border border-emerald-200 bg-white object-contain p-2" src={value} alt={`Vista previa: ${label}`} /> : null}
+      {fileError ? <p className="m-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-800" role="alert">{fileError}</p> : null}
+      {!optional && !hasSignature ? <p className="m-0 text-sm font-semibold text-red-700">La firma es requerida para enviar la solicitud.</p> : null}
     </div>
   )
 }

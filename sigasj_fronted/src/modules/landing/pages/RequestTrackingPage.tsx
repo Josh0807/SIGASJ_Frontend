@@ -1,5 +1,6 @@
 import { IconArrowRight, IconStatusChange } from '@tabler/icons-react'
 import { type FormEvent, useLayoutEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import { getSolicitudSeguimiento } from '../../solicitudes-publicas/solicitudesPublicasApi'
@@ -7,7 +8,8 @@ import { SOLICITUD_ESTADO_LABELS, type SolicitudSeguimiento } from '../../solici
 import Footer from '../components/Footer'
 
 const RequestTrackingPage = () => {
-  const [code, setCode] = useState('')
+  const [searchParams] = useSearchParams()
+  const [code, setCode] = useState(() => searchParams.get('codigo')?.trim().toUpperCase() ?? '')
   const [result, setResult] = useState<SolicitudSeguimiento | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -23,6 +25,11 @@ const RequestTrackingPage = () => {
     if (!normalized) {
       setResult(null)
       setError('Ingresa el código de seguimiento recibido al enviar la solicitud.')
+      return
+    }
+    if (!/^SOL-\d{4}-[A-Z0-9]{5,10}$/i.test(normalized)) {
+      setResult(null)
+      setError('Usa el formato SOL-AÑO-CÓDIGO, por ejemplo SOL-2026-A82K91.')
       return
     }
 

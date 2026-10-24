@@ -349,5 +349,5 @@ export const disponibilidadDocumentosSchema = z
   })
 
 export const disponibilidadFirmaSchema = z.object({
-  firma: z.string(),
+  firma: z.string().trim().min(1, 'Registre la firma del solicitante o propietario.'),
 })

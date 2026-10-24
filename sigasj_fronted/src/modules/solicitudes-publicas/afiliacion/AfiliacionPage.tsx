@@ -10,6 +10,7 @@ import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsad
 import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import {
   getAfiliacionErrorMessage,
   registrarAfiliacion,
@@ -21,7 +22,7 @@ import {
   afiliacionRecomendacion1Schema,
   afiliacionRecomendacion2Schema,
 } from './afiliacionSchemas'
-import type { AfiliacionFormValues, AfiliacionResponse } from './types'
+import type { AfiliacionFormValues } from './types'
 
 const initialValues = (): AfiliacionFormValues => ({
   fechaSolicitud: hoyEnAsada(),
@@ -100,7 +101,7 @@ const TextField = ({
 
 const AfiliacionPage = () => {
   const [values, setValues] = useState<AfiliacionFormValues>(initialValues)
-  const [result, setResult] = useState<AfiliacionResponse | null>(null)
+  const [result, setResult] = usePersistedSolicitudResult('afiliacion')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDateLabel = useMemo(() => hoyEnAsada(), [])
 
@@ -247,6 +248,7 @@ const AfiliacionPage = () => {
       </div>
       <SignaturePad
         label="Firma del recomendante 1"
+        optional
         value={values.recomendacion1Firma}
         onChange={(value) => update('recomendacion1Firma', value)}
       />
@@ -285,6 +287,7 @@ const AfiliacionPage = () => {
       </div>
       <SignaturePad
         label="Firma del recomendante 2"
+        optional
         value={values.recomendacion2Firma}
         onChange={(value) => update('recomendacion2Firma', value)}
       />
@@ -294,8 +297,8 @@ const AfiliacionPage = () => {
   const firmaStep = (
     <div className="grid gap-5">
       <p className="m-0 text-sm font-medium leading-6 text-[#526d8c]">
-        La firma del solicitante es opcional según el contrato actual del
-        Backend. Puede dibujarla aquí o continuar sin ella.
+        La firma identifica a la persona solicitante. Puede dibujarla en
+        pantalla o cargar una imagen PNG/JPG de su firma.
       </p>
       <SignaturePad
         label="Firma del solicitante"
@@ -389,7 +392,7 @@ const AfiliacionPage = () => {
               label: 'Firma',
               value: values.firmaSolicitante
                 ? 'Firma incorporada'
-                : 'No incorporada (opcional)',
+                : 'Firma pendiente',
             },
           ],
         },
@@ -444,7 +447,7 @@ const AfiliacionPage = () => {
     {
       id: 'firma',
       title: 'Firma',
-      description: 'Firma digital del solicitante (opcional).',
+      description: 'Firma digital obligatoria del solicitante.',
       content: firmaStep,
       validation: {
         schema: afiliacionFirmaSchema,
@@ -502,7 +505,7 @@ const AfiliacionPage = () => {
                 <>
                   <Link
                     className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
-                    to="/solicitudes/seguimiento"
+                    to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}
                   >
                     Consultar seguimiento{' '}
                     <IconArrowRight

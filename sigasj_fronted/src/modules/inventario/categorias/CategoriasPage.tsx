@@ -6,7 +6,7 @@ import {
   InternalAdminRoleName,
   normalizeInternalRole,
 } from "../../auth/utils/internalRoles";
-import { IconFilter, IconSearch } from "@tabler/icons-react";
+import { IconEdit, IconFilter, IconSearch } from "@tabler/icons-react";
 import { InventoryFormField } from "../InventoryFormField";
 import {
   CATEGORIA_NEW_PATH,
@@ -181,7 +181,7 @@ export default function CategoriasPage() {
         </div>
       )}
       {!loading && !error && result.data.length > 0 && (
-        <div className="materials-admin__table-wrap overflow-x-auto">
+        <div className="materials-admin__table-wrap category-admin__table overflow-x-auto">
           <table>
             <thead>
               <tr>
@@ -214,9 +214,10 @@ export default function CategoriasPage() {
                       {canManage ? (
                         <>
                           <Link
-                            className="materials-admin__action"
+                            className="materials-admin__action group"
                             to={categoriaEditPath(item.id)}
                           >
+                            <IconEdit className="category-admin__edit-icon" size={18} aria-hidden="true" />
                             Editar
                           </Link>
                           <CategoriaStateAction

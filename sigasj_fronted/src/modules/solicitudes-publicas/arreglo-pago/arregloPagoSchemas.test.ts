@@ -17,8 +17,9 @@ describe('validación de arreglo de pago', () => {
     expect(arregloPagoApplicantSchema.safeParse({ nombre: 'Ana Rodríguez', cedula: '1-1234-0567', vecinoDe: 'San Juan', telefono: '8888-1234' }).success).toBe(true)
   })
 
-  it('requiere al menos un documento y mantiene la firma opcional', () => {
+  it('requiere al menos un documento y la firma del solicitante', () => {
     expect(arregloPagoDocumentsSchema.safeParse({ documentos: [], firma: '' }).success).toBe(false)
-    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [new File(['x'], 'documento.pdf')], firma: '' }).success).toBe(true)
+    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [new File(['x'], 'documento.pdf')], firma: '' }).success).toBe(false)
+    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [new File(['x'], 'documento.pdf')], firma: 'data:image/png;base64,abc' }).success).toBe(true)
   })
 })

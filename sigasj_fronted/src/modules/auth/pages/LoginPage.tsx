@@ -29,8 +29,8 @@ const LoginPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
-  const redirectTo =
-    (location.state as { from?: string } | null)?.from ?? undefined
+  const loginState = location.state as { from?: string; message?: string } | null
+  const redirectTo = loginState?.from ?? undefined
 
   const [selectedRole, setSelectedRole] = useState<InternalAdminRole>(
     InternalAdminRoleName.Administradora,
@@ -112,6 +112,7 @@ const LoginPage = () => {
           backend emite un token JWT de ese rol para consultar y guardar el
           contenido de la landing.
         </p>
+        {loginState?.message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 font-semibold text-amber-900" role="status">{loginState.message}</p> : null}
 
         <form className="auth-page__form" onSubmit={onSubmit}>
           <label className="auth-page__field" htmlFor="login-role">

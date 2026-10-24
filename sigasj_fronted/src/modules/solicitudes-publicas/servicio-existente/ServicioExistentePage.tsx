@@ -10,6 +10,7 @@ import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsad
 import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import ServicioExistenteDocumentUpload from './ServicioExistenteDocumentUpload'
 import { getServicioExistenteErrorMessage, registrarServicioExistente } from './servicioExistenteApi'
 import {
@@ -28,7 +29,6 @@ import {
   TIPOS_SERVICIO,
   type DocumentoAdjunto,
   type ServicioExistenteFormValues,
-  type ServicioExistenteResponse,
 } from './types'
 
 const initialValues: ServicioExistenteFormValues = {
@@ -60,7 +60,7 @@ const Select = ({ name, label, value, options, update, optional = false }: {
 
 const ServicioExistentePage = () => {
   const [values, setValues] = useState(initialValues)
-  const [result, setResult] = useState<ServicioExistenteResponse | null>(null)
+  const [result, setResult] = usePersistedSolicitudResult('servicio-existente')
   const [submitError, setSubmitError] = useState('')
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -115,7 +115,7 @@ const ServicioExistentePage = () => {
     { id: 'revision', title: 'Revisión', description: 'Verifica toda la información antes de enviar.', content: review },
   ]
 
-  return <><PublicReceiptNavbar returnTo="/#solicitudes-servicio" /><main className="min-h-[65vh] bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-12 max-[640px]:px-4 max-[640px]:py-8" aria-label="Formulario público de constancia de servicio existente"><div className="mx-auto w-full max-w-[1050px]"><header className="mx-auto mb-10 max-w-[850px] text-center"><p className="mb-2 text-xs font-extrabold uppercase tracking-[0.25em] text-[#1476cf]">Trámite digital</p><h1 className="m-0 text-[clamp(2rem,5vw,3.2rem)] font-extrabold leading-tight tracking-[-0.04em] text-[#092e67]">Constancia de Servicio Existente</h1><p className="mb-0 mt-4 leading-7 text-[#526d8c]">Completa los siete pasos para solicitar una constancia que acredite la existencia del servicio.</p></header>{result ? <FormSuccessResult className="mx-auto w-full !max-w-[760px] text-center [&_.form-success-result__actions]:justify-center" icon={<IconCircleCheckFilled size={42} />} title="Solicitud registrada correctamente" description="Guarda este código para consultar el avance del trámite." highlightLabel="Código de seguimiento" highlightValue={result.codigoSeguimiento} meta={[{ label: 'Estado', value: result.estado || 'PENDIENTE' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]} actions={<><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#1476cf] px-6 font-extrabold text-white no-underline" to="/solicitudes/seguimiento">Consultar seguimiento <IconArrowRight size={19} /></Link><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] px-6 font-extrabold text-[#0b65b5] no-underline" to="/"><IconHome size={19} /> Volver al inicio</Link></>} /> : <>{submitError ? <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{submitError}</p> : null}<FormWizard steps={steps} completeLabel="Enviar solicitud" onComplete={handleSubmit} confirmation={{ title: 'Confirmar solicitud', message: 'Confirma que los datos, documentos y firma son correctos antes de registrar la solicitud.' }} /></>}</div></main><Footer /></>
+  return <><PublicReceiptNavbar returnTo="/#solicitudes-servicio" /><main className="min-h-[65vh] bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-12 max-[640px]:px-4 max-[640px]:py-8" aria-label="Formulario público de constancia de servicio existente"><div className="mx-auto w-full max-w-[1050px]"><header className="mx-auto mb-10 max-w-[850px] text-center"><p className="mb-2 text-xs font-extrabold uppercase tracking-[0.25em] text-[#1476cf]">Trámite digital</p><h1 className="m-0 text-[clamp(2rem,5vw,3.2rem)] font-extrabold leading-tight tracking-[-0.04em] text-[#092e67]">Constancia de Servicio Existente</h1><p className="mb-0 mt-4 leading-7 text-[#526d8c]">Completa los siete pasos para solicitar una constancia que acredite la existencia del servicio.</p></header>{result ? <FormSuccessResult className="mx-auto w-full !max-w-[760px] text-center [&_.form-success-result__actions]:justify-center" icon={<IconCircleCheckFilled size={42} />} title="Solicitud registrada correctamente" description="Guarda este código para consultar el avance del trámite." highlightLabel="Código de seguimiento" highlightValue={result.codigoSeguimiento} meta={[{ label: 'Estado', value: result.estado || 'PENDIENTE' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]} actions={<><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#1476cf] px-6 font-extrabold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight size={19} /></Link><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] px-6 font-extrabold text-[#0b65b5] no-underline" to="/"><IconHome size={19} /> Volver al inicio</Link></>} /> : <>{submitError ? <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{submitError}</p> : null}<FormWizard steps={steps} completeLabel="Enviar solicitud" onComplete={handleSubmit} confirmation={{ title: 'Confirmar solicitud', message: 'Confirma que los datos, documentos y firma son correctos antes de registrar la solicitud.' }} /></>}</div></main><Footer /></>
 }
 
 const DocumentError = () => {

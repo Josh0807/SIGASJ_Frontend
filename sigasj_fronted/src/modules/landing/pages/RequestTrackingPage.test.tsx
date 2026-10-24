@@ -17,4 +17,13 @@ describe('RequestTrackingPage', () => {
     expect(markup).toContain('max-[640px]:grid-cols-1')
     expect(markup).toContain('href="/#solicitudes-servicio"')
   })
+
+  it('precarga el código recibido desde la confirmación', () => {
+    const markup = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/solicitudes/seguimiento?codigo=SOL-2026-A82K91']}>
+        <RequestTrackingPage />
+      </MemoryRouter>,
+    )
+    expect(markup).toContain('value="SOL-2026-A82K91"')
+  })
 })
