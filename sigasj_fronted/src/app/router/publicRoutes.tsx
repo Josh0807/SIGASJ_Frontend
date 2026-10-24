@@ -17,6 +17,7 @@ import ArregloPagoPage from '../../modules/solicitudes-publicas/arreglo-pago/Arr
 import CambioTitularPage from '../../modules/solicitudes-publicas/cambio-titular/CambioTitularPage'
 import DisponibilidadPage from '../../modules/solicitudes-publicas/disponibilidad-servicios/DisponibilidadPage'
 import InfraestructuraLinderosPage from '../../modules/solicitudes-publicas/infraestructura-linderos/InfraestructuraLinderosPage'
+import ServicioExistentePage from '../../modules/solicitudes-publicas/servicio-existente/ServicioExistentePage'
 
 import {
   LANDING_ROUTE_PATH,
@@ -94,6 +95,8 @@ export const PUBLIC_ROUTES: PublicRouteDefinition[] = [
         <InfraestructuraLinderosPage />
       ) : path === SERVICE_REQUEST_ROUTES.serviceAvailability ? (
         <DisponibilidadPage />
+      ) : path === SERVICE_REQUEST_ROUTES.existingService ? (
+        <ServicioExistentePage />
       ) : (
         <AfiliacionPage />
       ),

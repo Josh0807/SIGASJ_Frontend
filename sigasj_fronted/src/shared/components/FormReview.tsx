@@ -46,11 +46,12 @@ const FormReview = ({
       ))}
 
       <section className="rounded-2xl border border-sky-100 bg-white p-5" aria-labelledby="review-documents-title">
-        <header className="flex flex-wrap items-center justify-between gap-3">
+        <header className="flex items-center justify-between gap-4 max-[560px]:flex-col max-[560px]:items-stretch">
           <h3 className="m-0 flex items-center gap-2 text-lg font-extrabold text-[#073b79]" id="review-documents-title"><IconPaperclip size={21} aria-hidden="true" /> Documentos seleccionados</h3>
           {documentsStepIndex !== undefined ? (
-            <button className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#1476cf] bg-white px-4 text-sm font-bold text-[#0b65b5] transition hover:bg-sky-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400" type="button" onClick={() => goToStep(documentsStepIndex)}>
-              <IconEdit size={18} aria-hidden="true" /> Corregir documentos
+            <button className="inline-flex h-11 min-w-[190px] shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl border-2 border-[#1476cf] bg-white px-4 text-sm font-extrabold leading-none text-[#0b65b5] transition hover:-translate-y-0.5 hover:bg-sky-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 max-[560px]:w-full motion-reduce:transform-none" type="button" onClick={() => goToStep(documentsStepIndex)}>
+              <IconEdit className="shrink-0" size={18} stroke={2.2} aria-hidden="true" />
+              <span>Corregir documentos</span>
             </button>
           ) : null}
         </header>

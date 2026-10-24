@@ -155,13 +155,13 @@ describe('AppRoutes y AdminLayout', () => {
       renderPath(SERVICE_REQUEST_ROUTES.serviceAvailability),
     ).not.toContain('Próximamente')
 
-    const unpublishedPublic = [SERVICE_REQUEST_ROUTES.existingService]
-
-    for (const path of unpublishedPublic) {
-      expect(PUBLIC_ROUTE_PATHS).not.toContain(path)
-      // Sin ruta registrada: no hay placeholder "Próximamente" de PublicFormPlaceholder.
-      expect(renderPath(path)).not.toContain('Próximamente')
-    }
+    expect(PUBLIC_ROUTE_PATHS).toContain(SERVICE_REQUEST_ROUTES.existingService)
+    expect(renderPath(SERVICE_REQUEST_ROUTES.existingService)).toContain(
+      'Constancia de Servicio Existente',
+    )
+    expect(renderPath(SERVICE_REQUEST_ROUTES.existingService)).not.toContain(
+      'Próximamente',
+    )
 
     expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/usuarios')
     expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/reportes')
