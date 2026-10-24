@@ -309,13 +309,39 @@ export async function corregirActividad(
   actividadId: number,
   tipo: TipoActividadFontaneroCatalogo,
   values: ActividadRegistroFormValues,
+  documentosEliminarIds: number[] = [],
 ): Promise<ActividadFontaneroRegistrada> {
-  const body = toCorregirActividadPayload(values, tipo.codigo)
+  const body = toCorregirActividadPayload(
+    values,
+    tipo.codigo,
+    documentosEliminarIds,
+  )
+  const requestBody =
+    values.documentos.length > 0
+      ? (() => {
+          const formData = new FormData()
+          Object.entries(body).forEach(([key, value]) => {
+            if (key === 'documentosEliminarIds' && Array.isArray(value)) {
+              value.forEach((id) =>
+                formData.append('documentosEliminarIds', String(id)),
+              )
+              return
+            }
+            if (value !== undefined && value !== null) {
+              formData.append(key, String(value))
+            }
+          })
+          values.documentos.forEach((documento) =>
+            formData.append('documentos', documento),
+          )
+          return formData
+        })()
+      : JSON.stringify(body)
 
   try {
     const result = await fetchWithAuth<unknown>(corregirActividadPath(actividadId), {
       method: 'PATCH',
-      body: JSON.stringify(body),
+      body: requestBody,
     })
     const actividad = normalizeActividadFontanero(result)
     if (!actividad) {
@@ -516,7 +542,7 @@ export async function registrarActividad(
   values: ActividadRegistroFormValues,
 ): Promise<ActividadFontaneroRegistrada> {
   const body = toRegistrarActividadPayloadFromTipo(tipo, values)
-  const requestBody = tipo.codigo === 'INCAPACIDAD_VACACIONES'
+  const requestBody = values.documentos.length > 0
     ? (() => {
         const formData = new FormData()
         Object.entries(body).forEach(([key, value]) => {

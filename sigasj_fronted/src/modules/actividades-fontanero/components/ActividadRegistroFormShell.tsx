@@ -6,7 +6,10 @@ import {
   type ActividadRegistroFormField,
   type ActividadRegistroFormValues,
 } from '../types/actividadRegistroForm'
-import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
+import type {
+  ActividadFontaneroRegistrada,
+  DocumentoActividadRegistrado,
+} from '../types/actividadFontaneroApi'
 import {
   hasActividadRegistroFormErrors,
   validateActividadRegistroForm,
@@ -23,7 +26,14 @@ import { registrarActividad } from '../services/actividadesFontaneroApi'
 import ActivityFeedback from './ActivityFeedback'
 import ActividadRegistroFieldError from './ActividadRegistroFieldError'
 import ActividadRegistroValidationSummary from './ActividadRegistroValidationSummary'
+import DocumentoActividadUploader from './DocumentoActividadUploader'
+import EvidenciaFotoGaleria from './EvidenciaFotoGaleria'
 import { FORMULARIOS_ACTIVIDAD } from './formularios/formulariosActividadRegistry'
+import {
+  FOTO_EVIDENCIA_ACCEPT,
+  FOTO_EVIDENCIA_MAX_FILES,
+  validateFotoEvidencia,
+} from '../utils/validateDocumentoActividad'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -35,8 +45,13 @@ type ActividadRegistroFormShellProps = {
   mode?: ActividadRegistroFormShellMode
   tipo: TipoActividadFontaneroCatalogo
   initialValues?: ActividadRegistroFormValues
+  existingDocumentos?: DocumentoActividadRegistrado[]
+  actividadId?: number
   observacionCorreccion?: string | null
-  onSubmit?: (values: ActividadRegistroFormValues) => Promise<ActividadFontaneroRegistrada | void>
+  onSubmit?: (
+    values: ActividadRegistroFormValues,
+    extras?: { documentosEliminarIds: number[] },
+  ) => Promise<ActividadFontaneroRegistrada | void>
   onCatalogStale?: () => void
 }
 
@@ -44,6 +59,8 @@ const ActividadRegistroFormShell = ({
   mode = 'registrar',
   tipo,
   initialValues,
+  existingDocumentos = [],
+  actividadId = 0,
   observacionCorreccion,
   onSubmit,
   onCatalogStale,
@@ -55,6 +72,9 @@ const ActividadRegistroFormShell = ({
   const [values, setValues] = useState<ActividadRegistroFormValues>(
     () => initialValues ?? createActividadRegistroFormInitial(),
   )
+  const [documentosVivos, setDocumentosVivos] = useState<
+    DocumentoActividadRegistrado[]
+  >(existingDocumentos)
   const ocultaUbicacionYObservaciones = tipo.codigo === 'INCAPACIDAD_VACACIONES'
   const [errors, setErrors] = useState<ActividadRegistroFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -68,13 +88,23 @@ const ActividadRegistroFormShell = ({
 
   const updateField = useCallback(
     (field: ActividadRegistroFormField, value: string) => {
-      setValues((current) => ({ ...current, [field]: value }))
+      setValues((current) => {
+        const next = { ...current, [field]: value }
+        if (field === 'fechaActividad' && (!current.fechaFin || current.fechaFin < value)) {
+          next.fechaFin = value
+        }
+        return next
+      })
       setErrors((current) => {
         if (!current[field]) {
           return current
         }
         const next = { ...current }
         delete next[field]
+        if (field === 'fechaActividad') {
+          delete next.fechaFin
+          delete next.horaFin
+        }
         return next
       })
       setSubmitError(null)
@@ -105,6 +135,12 @@ const ActividadRegistroFormShell = ({
       tipo.codigo,
       isCorregirMode ? 'corregir' : 'registrar',
     )
+    if (
+      documentosVivos.length + values.documentos.length >
+      FOTO_EVIDENCIA_MAX_FILES
+    ) {
+      nextErrors.documentos = `Puede conservar y adjuntar un máximo de ${FOTO_EVIDENCIA_MAX_FILES} fotos.`
+    }
     if (hasActividadRegistroFormErrors(nextErrors)) {
       applyValidationErrors(
         nextErrors,
@@ -120,8 +156,15 @@ const ActividadRegistroFormShell = ({
     setSubmitError(null)
 
     try {
+      const documentosEliminarIds = existingDocumentos
+        .filter(
+          (documento) =>
+            !documentosVivos.some((vivo) => vivo.id === documento.id),
+        )
+        .map((documento) => documento.id)
+
       const result = onSubmit
-        ? await onSubmit(values)
+        ? await onSubmit(values, { documentosEliminarIds })
         : await registrarActividad(tipo, values)
 
       if (result && typeof result === 'object' && 'id' in result) {
@@ -273,7 +316,7 @@ const ActividadRegistroFormShell = ({
               }`}
             >
               <label className="actividad-registro-form__label" htmlFor="fechaActividad">
-                Fecha de la actividad{' '}
+                Fecha de inicio{' '}
                 <span className="actividad-registro-form__required" aria-hidden="true">
                   *
                 </span>
@@ -305,6 +348,102 @@ const ActividadRegistroFormShell = ({
 
             <div
               className={`actividad-registro-form__field${
+                errors.horaInicio ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
+              <label className="actividad-registro-form__label" htmlFor="horaInicio">
+                Hora de inicio{' '}
+                <span className="actividad-registro-form__required" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                id="horaInicio"
+                name="horaInicio"
+                type="time"
+                className={`actividad-registro-form__input${
+                  errors.horaInicio ? ' actividad-registro-form__input--error' : ''
+                }`}
+                value={values.horaInicio}
+                onChange={(event) => updateField('horaInicio', event.target.value)}
+                aria-invalid={Boolean(errors.horaInicio)}
+                aria-describedby={errors.horaInicio ? 'horaInicio-error' : undefined}
+                readOnly={isCorregirMode}
+                disabled={isCorregirMode}
+                required
+              />
+              {errors.horaInicio ? (
+                <ActividadRegistroFieldError
+                  id="horaInicio-error"
+                  message={errors.horaInicio}
+                />
+              ) : null}
+            </div>
+
+            <div
+              className={`actividad-registro-form__field${
+                errors.fechaFin ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
+              <label className="actividad-registro-form__label" htmlFor="fechaFin">
+                Fecha de finalización{' '}
+                <span className="actividad-registro-form__required" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                id="fechaFin"
+                name="fechaFin"
+                type="date"
+                className={`actividad-registro-form__input${
+                  errors.fechaFin ? ' actividad-registro-form__input--error' : ''
+                }`}
+                value={values.fechaFin}
+                onChange={(event) => updateField('fechaFin', event.target.value)}
+                aria-invalid={Boolean(errors.fechaFin)}
+                aria-describedby={errors.fechaFin ? 'fechaFin-error' : undefined}
+                readOnly={isCorregirMode}
+                disabled={isCorregirMode}
+                required
+              />
+              {errors.fechaFin ? (
+                <ActividadRegistroFieldError id="fechaFin-error" message={errors.fechaFin} />
+              ) : null}
+            </div>
+
+            <div
+              className={`actividad-registro-form__field${
+                errors.horaFin ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
+              <label className="actividad-registro-form__label" htmlFor="horaFin">
+                Hora de finalización{' '}
+                <span className="actividad-registro-form__required" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                id="horaFin"
+                name="horaFin"
+                type="time"
+                className={`actividad-registro-form__input${
+                  errors.horaFin ? ' actividad-registro-form__input--error' : ''
+                }`}
+                value={values.horaFin}
+                onChange={(event) => updateField('horaFin', event.target.value)}
+                aria-invalid={Boolean(errors.horaFin)}
+                aria-describedby={errors.horaFin ? 'horaFin-error' : undefined}
+                readOnly={isCorregirMode}
+                disabled={isCorregirMode}
+                required
+              />
+              {errors.horaFin ? (
+                <ActividadRegistroFieldError id="horaFin-error" message={errors.horaFin} />
+              ) : null}
+            </div>
+
+            <div
+              className={`actividad-registro-form__field md:!col-span-2${
                 errors.titulo ? ' actividad-registro-form__field--invalid' : ''
               }`}
             >
@@ -429,6 +568,67 @@ const ActividadRegistroFormShell = ({
               setSubmitError(null)
             }}
           />
+
+          <fieldset
+            className="actividad-registro-form__section actividad-formulario-especifico !gap-5 !rounded-3xl !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-5 !shadow-sm md:!p-7"
+            disabled={isSubmitting}
+          >
+            <legend className="actividad-registro-form__legend">Evidencia fotográfica</legend>
+            <p className="actividad-formulario-especifico__hint !mt-0">
+              {isCorregirMode
+                ? 'Toque una foto para verla más grande. Puede borrar las que no correspondan y adjuntar fotos nuevas.'
+                : 'Opcional. Adjunte fotos del trabajo realizado.'}
+            </p>
+            {isCorregirMode ? (
+              <EvidenciaFotoGaleria
+                documentos={documentosVivos}
+                actividadId={actividadId || existingDocumentos[0]?.actividadId || 0}
+                canDelete
+                disabled={isSubmitting}
+                emptyLabel="Esta actividad no tiene fotos adjuntas."
+                onDelete={(documento) => {
+                  setDocumentosVivos((current) =>
+                    current.filter((item) => item.id !== documento.id),
+                  )
+                }}
+              />
+            ) : null}
+            <div
+              className={`actividad-registro-form__field${
+                errors.documentos ? ' actividad-registro-form__field--invalid' : ''
+              }`}
+            >
+              <label className="actividad-registro-form__label" htmlFor="documentos">
+                {isCorregirMode ? 'Fotos nuevas (opcional)' : 'Fotos de evidencia'}
+              </label>
+              <DocumentoActividadUploader
+                files={values.documentos}
+                onChange={(files) => {
+                  setValues((current) => ({ ...current, documentos: files }))
+                  setErrors((current) => {
+                    const next = { ...current }
+                    delete next.documentos
+                    return next
+                  })
+                  setSubmitError(null)
+                }}
+                error={errors.documentos}
+                disabled={isSubmitting}
+                multiple
+                accept={FOTO_EVIDENCIA_ACCEPT}
+                validateFile={validateFotoEvidencia}
+                buttonLabel="Agregar fotos"
+                dropHint="Arrastre las fotos aquí o selecciónelas con el botón."
+                  helpText="Formatos: JPG, JPEG y PNG. Máximo 10 MB por foto. Hasta 5 fotos en total."
+                  listLabel="Fotos seleccionadas"
+                  maxFiles={Math.max(
+                    0,
+                    FOTO_EVIDENCIA_MAX_FILES -
+                      (isCorregirMode ? documentosVivos.length : 0),
+                  )}
+              />
+            </div>
+          </fieldset>
 
           <div className="actividad-registro-form__actions !gap-4 !border-t !border-blue-100 !pt-6">
             <Link

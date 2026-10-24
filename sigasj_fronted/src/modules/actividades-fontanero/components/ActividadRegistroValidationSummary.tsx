@@ -12,7 +12,7 @@ const FIELD_LABELS: Partial<Record<ActividadRegistroFormField, string>> = {
   resultadoVisita: 'Resultado de la visita',
   cantidadCloro: 'Cantidad de cloro',
   caudal: 'Caudal',
-  documentos: 'Documentos',
+  documentos: 'Evidencia fotográfica',
 }
 
 type ActividadRegistroValidationSummaryProps = {

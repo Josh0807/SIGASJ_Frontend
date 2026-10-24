@@ -1,11 +1,11 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { IconEye, IconMessageExclamation } from '@tabler/icons-react'
+import { IconMessageExclamation } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../components/ActivityFeedback'
-import DetalleActividad from '../components/DetalleActividad'
+import ActividadDetalleOverlay from '../components/ActividadDetalleOverlay'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { interpretActividadApiError } from '../utils/interpretActividadApiError'
@@ -19,7 +19,8 @@ import {
   type AdminActividadesFilters,
 } from '../services/actividadesFontaneroApi'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
-import { formatActividadFecha } from '../utils/formatActividadFecha'
+import { mergeActividadFontanero } from '../utils/normalizeActividadFontanero'
+import { formatPeriodoActividadPartes } from '../utils/formatActividadFecha'
 import { ACTIVIDADES_ADMIN_PATHS } from './actividadesAdminPaths'
 
 const PAGE_SIZE = 10
@@ -45,6 +46,24 @@ const EMPTY_FILTERS: DraftFilters = {
 
 const displayFontanero = (actividad: ActividadFontaneroRegistrada) =>
   actividad.fontaneroNombre || actividad.fontaneroId || 'Sin identificar'
+
+const FechaHoraResumen = ({ actividad }: { actividad: ActividadFontaneroRegistrada }) => {
+  const periodo = formatPeriodoActividadPartes(actividad)
+  return (
+    <div className="actividad-historial-card__fecha-hora">
+      <div className="actividad-historial-card__fecha-hora-col">
+        <span className="actividad-historial-card__fecha-hora-label">Fecha</span>
+        <span className="actividad-historial-card__fecha-hora-valor">{periodo.fecha}</span>
+      </div>
+      <div className="actividad-historial-card__fecha-hora-col actividad-historial-card__fecha-hora-col--hora">
+        <span className="actividad-historial-card__fecha-hora-label">Hora</span>
+        <span className="actividad-historial-card__fecha-hora-valor actividad-historial-card__fecha-hora-valor--hora">
+          {periodo.hora}
+        </span>
+      </div>
+    </div>
+  )
+}
 
 const displayEstado = (estado: string) => {
   const labels: Record<string, string> = {
@@ -171,9 +190,11 @@ const ActividadesAdminRevisionPage = () => {
     try {
       const updated = await revisarActividadAdmin(selected.id)
       setActividades((current) =>
-        current.map((item) => item.id === updated.id ? { ...item, ...updated } : item),
+        current.map((item) =>
+          item.id === updated.id ? mergeActividadFontanero(item, updated) : item,
+        ),
       )
-      setSelected((current) => current?.id === updated.id ? { ...current, ...updated } : current)
+      setSelected((current) => mergeActividadFontanero(current, updated))
       setNotice(ACTIVITY_FEEDBACK_MESSAGES.successReview)
     } catch (caught) {
       const interpreted = interpretActividadApiError(caught)
@@ -211,12 +232,10 @@ const ActividadesAdminRevisionPage = () => {
       const updated = await solicitarCorreccionAdmin(selected.id, observacion)
       setActividades((current) =>
         current.map((item) =>
-          item.id === updated.id ? { ...item, ...updated } : item,
+          item.id === updated.id ? mergeActividadFontanero(item, updated) : item,
         ),
       )
-      setSelected((current) =>
-        current?.id === updated.id ? { ...current, ...updated } : current,
-      )
+      setSelected((current) => mergeActividadFontanero(current, updated))
       setCorrectionNote('')
       setNotice(ACTIVITY_FEEDBACK_MESSAGES.successCorrectionRequest)
     } catch (caught) {
@@ -379,10 +398,9 @@ const ActividadesAdminRevisionPage = () => {
                         {displayEstado(actividad.estado)}
                       </span>
                     </header>
-                    <dl className="actividad-historial-card__meta">
+                    <dl className="actividad-historial-card__meta actividad-historial-card__meta--compact">
                       <div className="actividad-historial-card__meta-item">
-                        <dt>Fecha de actividad</dt>
-                        <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
+                        <FechaHoraResumen actividad={actividad} />
                       </div>
                       <div className="actividad-historial-card__meta-item">
                         <dt>Fontanero</dt>
@@ -392,10 +410,9 @@ const ActividadesAdminRevisionPage = () => {
                     <footer className="actividad-historial-card__footer">
                       <button
                         type="button"
-                        className={PRIMARY_ACTION_CLASS}
+                        className="actividad-historial-card__action"
                         onClick={() => void openDetail(actividad)}
                       >
-                        <IconEye size={19} aria-hidden="true" />
                         Ver detalle
                       </button>
                     </footer>
@@ -438,58 +455,38 @@ const ActividadesAdminRevisionPage = () => {
       </div>
 
       {selected ? (
-        <div
-          className="actividades-admin-revision__overlay"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && !busy) setSelected(null)
-          }}
-        >
-          <div className="actividades-admin-revision__detail" role="dialog" aria-modal="true">
-            <DetalleActividad
-              actividad={selected}
-              loading={detailLoading}
-              error={detailError}
-              showFontanero
-              onBack={
-                detailLoading || detailError
-                  ? () => setSelected(null)
-                  : undefined
-              }
-              backLabel="Cerrar"
-              actions={
-                <div className="actividades-admin-revision__detail-actions">
-                  {!canReview ? (
-                    <ActivityFeedback
-                      variant="info"
-                      message="Esta actividad ya fue revisada; no es necesario procesarla nuevamente."
-                      className="actividades-admin-revision__already-reviewed"
-                    />
-                  ) : null}
-                  <div className="actividades-admin-revision__detail-toolbar">
-                    <button
-                      type="button"
-                      className="gallery-admin__button"
-                      disabled={busy}
-                      onClick={() => setSelected(null)}
-                    >
-                      Cerrar
-                    </button>
-                    <button
-                      type="button"
-                      className="gallery-admin__button gallery-admin__button--primary"
-                      disabled={busy || !canReview}
-                      onClick={() => {
-                        if (canReview) setConfirmReview(true)
-                      }}
-                    >
-                      {!canReview
-                        ? 'Actividad revisada'
-                        : reviewing
-                          ? 'Marcando…'
-                          : 'Marcar como revisada'}
-                    </button>
-                  </div>
+        <ActividadDetalleOverlay
+          actividad={selected}
+          loading={detailLoading}
+          error={detailError}
+          showFontanero
+          closeDisabled={busy}
+          onClose={() => setSelected(null)}
+          actions={
+            <div className="actividades-admin-revision__detail-actions">
+              {!canReview ? (
+                <ActivityFeedback
+                  variant="info"
+                  message="Esta actividad ya fue revisada; no es necesario procesarla nuevamente."
+                  className="actividades-admin-revision__already-reviewed"
+                />
+              ) : null}
+              <div className="actividades-admin-revision__detail-toolbar">
+                <button
+                  type="button"
+                  className="gallery-admin__button gallery-admin__button--primary"
+                  disabled={busy || !canReview}
+                  onClick={() => {
+                    if (canReview) setConfirmReview(true)
+                  }}
+                >
+                  {!canReview
+                    ? 'Actividad revisada'
+                    : reviewing
+                      ? 'Marcando…'
+                      : 'Marcar como revisada'}
+                </button>
+              </div>
                   {canRequestCorrection ? (
                     <div className="actividades-admin-revision__correction">
                       <label className="gallery-admin__field" htmlFor="admin-correction-note">
@@ -527,11 +524,9 @@ const ActividadesAdminRevisionPage = () => {
                       </button>
                     </div>
                   ) : null}
-                </div>
-              }
-            />
-          </div>
-        </div>
+            </div>
+          }
+        />
       ) : null}
       <ConfirmDialog
         isOpen={confirmReview}

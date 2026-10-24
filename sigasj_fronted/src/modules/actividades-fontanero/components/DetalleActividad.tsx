@@ -2,9 +2,13 @@ import type { ReactNode } from 'react'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
 import { listDatosEspecificosDetalle } from '../utils/formatDatosEspecificosDetalle'
 import { formatActividadEstado } from '../utils/formatActividadEstado'
-import { formatActividadFecha } from '../utils/formatActividadFecha'
+import {
+  formatActividadFecha,
+  formatHoraActividad,
+} from '../utils/formatActividadFecha'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import ActivityFeedback from './ActivityFeedback'
+import EvidenciaFotoGaleria from './EvidenciaFotoGaleria'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 
 type DetalleActividadProps = {
@@ -15,16 +19,6 @@ type DetalleActividadProps = {
   onBack?: () => void
   backLabel?: string
   actions?: ReactNode
-}
-
-const documentoUrl = (path: string) => {
-  if (/^https?:\/\//i.test(path)) return path
-  const apiBase = import.meta.env?.VITE_API_URL ?? 'http://localhost:3000/api/v1'
-  try {
-    return new URL(path.replace(/^\/+/, ''), `${new URL(apiBase).origin}/`).toString()
-  } catch {
-    return path
-  }
 }
 
 const revisionLabel = (actividad: ActividadFontaneroRegistrada) =>
@@ -101,8 +95,24 @@ const DetalleActividad = ({
             <dd>{actividad.tipoActividadNombre || '—'}</dd>
           </div>
           <div>
-            <dt>Fecha</dt>
+            <dt>Fecha de inicio</dt>
             <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
+          </div>
+          <div>
+            <dt>Hora de inicio</dt>
+            <dd>{formatHoraActividad(actividad.horaInicio)}</dd>
+          </div>
+          <div>
+            <dt>Fecha de finalización</dt>
+            <dd>
+              {actividad.fechaFin
+                ? formatActividadFecha(actividad.fechaFin)
+                : '—'}
+            </dd>
+          </div>
+          <div>
+            <dt>Hora de finalización</dt>
+            <dd>{formatHoraActividad(actividad.horaFin)}</dd>
           </div>
           {showFontanero ? (
             <div>
@@ -195,30 +205,11 @@ const DetalleActividad = ({
       ) : null}
 
       <section className="detalle-actividad__section">
-        <h3>Documentos adjuntos</h3>
-        {actividad.documentos?.length ? (
-          <ul className="detalle-actividad__documents">
-            {actividad.documentos.map((documento) => (
-              <li key={documento.id}>
-                <div>
-                  <strong>{documento.nombreOriginal}</strong>
-                  <small>
-                    {Math.max(1, Math.ceil(documento.tamanio / 1024))} KB
-                  </small>
-                </div>
-                <a
-                  href={documentoUrl(documento.rutaReferenciaArchivo)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Ver documento
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Sin documentos adjuntos.</p>
-        )}
+        <h3>Evidencia fotográfica</h3>
+        <EvidenciaFotoGaleria
+          documentos={actividad.documentos ?? []}
+          actividadId={actividad.id}
+        />
       </section>
 
       {onBack || actions ? (

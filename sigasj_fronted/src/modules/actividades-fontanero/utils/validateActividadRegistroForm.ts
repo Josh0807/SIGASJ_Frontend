@@ -3,7 +3,11 @@ import type {
   ActividadRegistroFormValues,
 } from '../types/actividadRegistroForm'
 import type { TipoActividadFontaneroCodigo } from '../types/tipoActividadFontanero'
-import { validateDocumentoActividad } from './validateDocumentoActividad'
+import {
+  FOTO_EVIDENCIA_MAX_FILES,
+  validateDocumentoActividad,
+  validateFotoEvidencia,
+} from './validateDocumentoActividad'
 
 export type ActividadRegistroFormMode = 'registrar' | 'corregir'
 
@@ -12,9 +16,13 @@ export type ActividadRegistroFormErrors = Partial<
 >
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/
 
 const CORREGIR_SKIP_FIELDS = new Set<ActividadRegistroFormField>([
   'fechaActividad',
+  'horaInicio',
+  'fechaFin',
+  'horaFin',
   'observaciones',
   'documentos',
 ])
@@ -29,6 +37,9 @@ export const validateActividadRegistroForm = (
     mode === 'corregir' && CORREGIR_SKIP_FIELDS.has(field)
 
   const fecha = values.fechaActividad.trim()
+  const horaInicio = (values.horaInicio ?? '').trim()
+  const fechaFin = (values.fechaFin ?? '').trim()
+  const horaFin = (values.horaFin ?? '').trim()
   const titulo = values.titulo.trim()
 
   if (!skipField('fechaActividad')) {
@@ -36,6 +47,40 @@ export const validateActividadRegistroForm = (
       errors.fechaActividad = 'Este campo es obligatorio.'
     } else if (!DATE_PATTERN.test(fecha)) {
       errors.fechaActividad = 'Use el formato YYYY-MM-DD.'
+    }
+  }
+
+  if (!skipField('horaInicio')) {
+    if (!horaInicio) {
+      errors.horaInicio = 'Este campo es obligatorio.'
+    } else if (!TIME_PATTERN.test(horaInicio)) {
+      errors.horaInicio = 'Use el formato HH:mm.'
+    }
+  }
+
+  if (!skipField('fechaFin')) {
+    if (!fechaFin) {
+      errors.fechaFin = 'Este campo es obligatorio.'
+    } else if (!DATE_PATTERN.test(fechaFin)) {
+      errors.fechaFin = 'Use el formato YYYY-MM-DD.'
+    } else if (fecha && DATE_PATTERN.test(fecha) && fechaFin < fecha) {
+      errors.fechaFin = 'No puede ser anterior a la fecha de inicio.'
+    }
+  }
+
+  if (!skipField('horaFin')) {
+    if (!horaFin) {
+      errors.horaFin = 'Este campo es obligatorio.'
+    } else if (!TIME_PATTERN.test(horaFin)) {
+      errors.horaFin = 'Use el formato HH:mm.'
+    } else if (
+      fecha &&
+      fechaFin &&
+      fecha === fechaFin &&
+      TIME_PATTERN.test(horaInicio) &&
+      horaFin <= horaInicio
+    ) {
+      errors.horaFin = 'Debe ser posterior a la hora de inicio.'
     }
   }
 
@@ -84,7 +129,7 @@ export const validateActividadRegistroForm = (
       if (!skipField('documentos')) {
         if (values.documentos.length === 0) {
           errors.documentos = 'Debe adjuntar al menos un documento.'
-        } else if (values.documentos.length > 5) {
+        } else if (values.documentos.length > FOTO_EVIDENCIA_MAX_FILES) {
           errors.documentos = 'Puede adjuntar un máximo de 5 documentos.'
         } else {
           const invalidDocument = values.documentos.map(validateDocumentoActividad).find(Boolean)
@@ -94,6 +139,17 @@ export const validateActividadRegistroForm = (
         }
       }
       break
+  }
+
+  if (tipoCodigo !== 'INCAPACIDAD_VACACIONES' && values.documentos.length > 0) {
+    if (values.documentos.length > FOTO_EVIDENCIA_MAX_FILES) {
+      errors.documentos = 'Puede adjuntar un máximo de 5 fotos.'
+    } else {
+      const invalidPhoto = values.documentos.map(validateFotoEvidencia).find(Boolean)
+      if (invalidPhoto) {
+        errors.documentos = invalidPhoto
+      }
+    }
   }
 
   return errors

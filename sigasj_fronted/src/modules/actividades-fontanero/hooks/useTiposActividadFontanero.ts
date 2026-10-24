@@ -3,6 +3,7 @@ import {
   getTiposActividadFontanero,
   type TipoActividadFontanero,
 } from '../services/actividadesFontaneroApi'
+import { isTipoActividadRegistrable } from '../types/tipoActividadFontanero'
 import { getHttpErrorStatus, sortTiposActividad } from '../utils/httpErrorStatus'
 
 export type TiposActividadFontaneroState = {

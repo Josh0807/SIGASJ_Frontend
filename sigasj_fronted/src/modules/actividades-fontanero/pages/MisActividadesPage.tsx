@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useAuth } from '../../auth/components/AuthContext'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import ActividadDetalleOverlay from '../components/ActividadDetalleOverlay'
 import ActivityFeedback from '../components/ActivityFeedback'
-import { getMisActividades } from '../services/actividadesFontaneroApi'
+import HistorialActividadCard from '../components/HistorialActividadCard'
+import { getActividadDetalle, getMisActividades } from '../services/actividadesFontaneroApi'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
 import { formatActividadEstado } from '../utils/formatActividadEstado'
-import { formatActividadFecha } from '../utils/formatActividadFecha'
+import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { getHttpErrorStatus } from '../utils/httpErrorStatus'
 
 export const MIS_ACTIVIDADES_PAGE_SIZE = 10
@@ -30,6 +32,9 @@ const MisActividadesPage = () => {
   const [estado, setEstado] = useState('')
   const [page, setPage] = useState(1)
   const [reloadKey, setReloadKey] = useState(0)
+  const [selected, setSelected] = useState<ActividadFontaneroRegistrada | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -75,6 +80,32 @@ const MisActividadesPage = () => {
     (currentPage - 1) * MIS_ACTIVIDADES_PAGE_SIZE,
     currentPage * MIS_ACTIVIDADES_PAGE_SIZE,
   )
+
+  const openDetail = async (actividad: ActividadFontaneroRegistrada) => {
+    setSelected(actividad)
+    setDetailLoading(true)
+    setDetailError(null)
+    try {
+      const detalle = await getActividadDetalle(actividad.id)
+      setSelected(detalle)
+    } catch (err: unknown) {
+      const status = getHttpErrorStatus(err)
+      if (status === 401) {
+        logout()
+        navigate('/login', { replace: true })
+        return
+      }
+      setDetailError(
+        status === 403
+          ? ACTIVITY_FEEDBACK_MESSAGES.forbidden
+          : status === 404
+            ? ACTIVITY_FEEDBACK_MESSAGES.notFound
+            : ACTIVITY_FEEDBACK_MESSAGES.loadGeneric,
+      )
+    } finally {
+      setDetailLoading(false)
+    }
+  }
 
   return (
     <section
@@ -175,79 +206,22 @@ const MisActividadesPage = () => {
         >
           {visibles.map((actividad) => (
             <li key={actividad.id}>
-              <article
-                className="actividad-historial-card"
-                aria-labelledby={`mis-actividad-${actividad.id}`}
-              >
-                <header className="actividad-historial-card__header">
-                  <div className="actividad-historial-card__heading">
-                    <p className="actividad-historial-card__tipo">
-                      {actividad.tipoActividadNombre}
-                    </p>
-                    <h2
-                      id={`mis-actividad-${actividad.id}`}
-                      className="actividad-historial-card__titulo"
+              <HistorialActividadCard
+                actividad={actividad}
+                onVerDetalle={() => {
+                  void openDetail(actividad)
+                }}
+                extraFooter={
+                  actividad.estado === 'REQUIERE_CORRECCION' ? (
+                    <Link
+                      to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}
+                      className="actividad-historial-card__action"
                     >
-                      {actividad.titulo}
-                    </h2>
-                  </div>
-                  <span
-                    className="actividad-historial-card__estado"
-                    data-estado={actividad.estado}
-                  >
-                    {formatActividadEstado(actividad.estado)}
-                  </span>
-                </header>
-                <dl className="actividad-historial-card__meta">
-                  <div className="actividad-historial-card__meta-item">
-                    <dt>Fecha de actividad</dt>
-                    <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
-                  </div>
-                </dl>
-                <details className="actividad-historial-card__details">
-                  <summary className="actividad-historial-card__details-toggle">
-                    Ver detalle
-                  </summary>
-                  <div className="actividad-historial-card__details-body">
-                    <dl className="actividad-historial-card__meta">
-                      {actividad.ubicacion ? (
-                        <div className="actividad-historial-card__meta-item">
-                          <dt>Ubicación</dt>
-                          <dd>{actividad.ubicacion}</dd>
-                        </div>
-                      ) : null}
-                      {actividad.descripcion ? (
-                        <div className="actividad-historial-card__meta-item">
-                          <dt>Descripción</dt>
-                          <dd>{actividad.descripcion}</dd>
-                        </div>
-                      ) : null}
-                      {actividad.observaciones ? (
-                        <div className="actividad-historial-card__meta-item">
-                          <dt>Observaciones</dt>
-                          <dd>{actividad.observaciones}</dd>
-                        </div>
-                      ) : null}
-                      {actividad.observacionCorreccion ? (
-                        <div className="actividad-historial-card__meta-item">
-                          <dt>Corrección solicitada</dt>
-                          <dd>{actividad.observacionCorreccion}</dd>
-                        </div>
-                      ) : null}
-                    </dl>
-                    {actividad.estado === 'REQUIERE_CORRECCION' ? (
-                      <div className="actividad-historial-card__footer">
-                        <Link
-                          to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}
-                          className="actividad-historial-card__action"
-                        >
-                          Corregir actividad
-                        </Link>
-                      </div>
-                    ) : null}
-                  </div>
-                </details>
-              </article>
+                      Corregir actividad
+                    </Link>
+                  ) : null
+                }
+              />
             </li>
           ))}
         </ul>
@@ -276,6 +250,18 @@ const MisActividadesPage = () => {
             Siguiente
           </button>
         </nav>
+      ) : null}
+
+      {selected || detailLoading || detailError ? (
+        <ActividadDetalleOverlay
+          actividad={selected}
+          loading={detailLoading}
+          error={detailError}
+          onClose={() => {
+            setSelected(null)
+            setDetailError(null)
+          }}
+        />
       ) : null}
     </section>
   )
