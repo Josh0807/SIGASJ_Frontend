@@ -21,6 +21,18 @@ export function validateMaterial(values: MaterialFormValues): MaterialFormErrors
   const stock = Number(values.stockMinimo)
   if (values.stockMinimo === '') errors.stockMinimo = 'El stock mínimo es obligatorio.'
   else if (!Number.isInteger(stock) || stock < 0) errors.stockMinimo = 'Ingrese un número entero mayor o igual a cero.'
+  if (values.precioUnitario) {
+    const precio = Number(values.precioUnitario)
+    if (isNaN(precio) || precio <= 0) errors.precioUnitario = 'Ingrese un precio mayor a cero.'
+  }
+  if (values.fechaVencimiento) {
+    const d = new Date(values.fechaVencimiento)
+    if (isNaN(d.getTime())) errors.fechaVencimiento = 'Ingrese una fecha válida.'
+  }
+  if (values.cantidadInicial) {
+    const cant = Number(values.cantidadInicial)
+    if (!Number.isInteger(cant) || cant <= 0) errors.cantidadInicial = 'Ingrese un número entero mayor a cero.'
+  }
   return errors
 }
 

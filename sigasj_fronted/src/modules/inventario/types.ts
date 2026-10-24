@@ -7,6 +7,8 @@ export type Material = {
   stockMinimo: number
   stockActual: number
   activo: boolean
+  precioUnitario?: number | null
+  fechaVencimiento?: string | null
   idCategoria: number | null
   categoria: { id: number; nombre: string; descripcion: string | null; activo: boolean } | null
   idProveedor: number | null
@@ -35,7 +37,7 @@ export type MaterialesQuery = {
 export type UpdateMaterialPayload = Pick<
   Material,
   'nombre' | 'unidadMedida' | 'descripcion' | 'ubicacion' | 'stockMinimo' | 'activo'
-> & { idCategoria: number; idProveedor: number }
+> & { idCategoria: number; idProveedor: number; precioUnitario?: number | null; fechaVencimiento?: string | null }
 
 export type CreateMaterialPayload = Omit<UpdateMaterialPayload, 'activo'>
 export type MaterialFormValues = {
@@ -47,4 +49,7 @@ export type MaterialFormValues = {
   activo: boolean
   categoriaId: string
   proveedorId: string
+  precioUnitario: string
+  fechaVencimiento: string
+  cantidadInicial: string
 }
