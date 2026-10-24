@@ -11,22 +11,23 @@ const PRINT_PAGE_CAP = 50
 
 export async function getMaterialesParaImpresion(
   query: Omit<MaterialesQuery, 'page' | 'limit'> = {},
-): Promise<{ data: Material[]; total: number }> {
-  const data: Material[] = []
-  let page = 1
-  let total = 0
+): Promise<{ data: Material[]; total: number; truncated: boolean }> {
+  const first = await getMateriales({ ...query, page: 1, limit: PRINT_PAGE_SIZE })
+  const { total, totalPages } = first
+  const remainingPages = Math.min(totalPages, PRINT_PAGE_CAP) - 1
 
-  while (page <= PRINT_PAGE_CAP) {
-    const result = await getMateriales({ ...query, page, limit: PRINT_PAGE_SIZE })
-    total = result.total
-    data.push(...result.data)
-    if (result.totalPages <= page || result.data.length === 0) {
-      break
-    }
-    page += 1
+  if (remainingPages <= 0) {
+    return { data: first.data, total, truncated: first.data.length < total }
   }
 
-  return { data, total }
+  const rest = await Promise.all(
+    Array.from({ length: remainingPages }, (_, i) =>
+      getMateriales({ ...query, page: i + 2, limit: PRINT_PAGE_SIZE }),
+    ),
+  )
+
+  const data = [first, ...rest].flatMap((r) => r.data)
+  return { data, total, truncated: data.length < total }
 }
 
 export const getMaterial = (id: number) =>

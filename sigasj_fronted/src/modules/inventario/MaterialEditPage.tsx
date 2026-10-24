@@ -55,6 +55,9 @@ export default function MaterialEditPage() {
     activo: material.activo,
     categoriaId: material.idCategoria ? String(material.idCategoria) : '',
     proveedorId: material.idProveedor ? String(material.idProveedor) : '',
+    precioUnitario: material.precioUnitario != null ? String(material.precioUnitario) : '',
+    fechaVencimiento: material.fechaVencimiento ? material.fechaVencimiento.slice(0, 10) : '',
+    cantidadInicial: '',
   }
 
   const submit = async (values: MaterialFormValues) => {
@@ -68,6 +71,8 @@ export default function MaterialEditPage() {
         activo: values.activo,
         idCategoria: Number(values.categoriaId),
         idProveedor: Number(values.proveedorId),
+        precioUnitario: values.precioUnitario ? Number(values.precioUnitario) : null,
+        fechaVencimiento: values.fechaVencimiento || null,
       })
       navigate(MATERIALES_PATH, {
         replace: true,

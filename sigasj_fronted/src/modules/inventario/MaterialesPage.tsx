@@ -27,7 +27,9 @@ const PAGE_SIZE = 10;
 
 export default function MaterialesPage() {
   const location = useLocation();
-  const routeSuccess = (location.state as { success?: string } | null)?.success;
+  const routeState = location.state as { success?: string; warning?: string } | null;
+  const routeSuccess = routeState?.success;
+  const routeWarning = routeState?.warning;
   const [searchInput, setSearchInput] = useState("");
   const [nombre, setNombre] = useState("");
   const [activo, setActivo] = useState("");
@@ -36,11 +38,13 @@ export default function MaterialesPage() {
   const [page, setPage] = useState(1);
   const [changingId, setChangingId] = useState<number | null>(null);
   const [actionMessage, setActionMessage] = useState<{
-    kind: "success" | "error";
+    kind: "success" | "error" | "warning";
     text: string;
-  } | null>(() =>
-    routeSuccess ? { kind: "success", text: routeSuccess } : null,
-  );
+  } | null>(() => {
+    if (routeSuccess) return { kind: "success", text: routeSuccess };
+    if (routeWarning) return { kind: "warning", text: routeWarning };
+    return null;
+  });
   const latestSearch = useRef("");
   const { user, logout } = useAuth();
   const currentRole = normalizeInternalRole(user?.role);
@@ -239,7 +243,9 @@ export default function MaterialesPage() {
           className={
             actionMessage.kind === "success"
               ? "materials-admin__success"
-              : "materials-admin__error"
+              : actionMessage.kind === "warning"
+                ? "materials-admin__warning"
+                : "materials-admin__error"
           }
           role={actionMessage.kind === "error" ? "alert" : "status"}
         >

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { IconArrowLeft, IconInfoCircle, IconPackage, IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconInfoCircle, IconPackage, IconRefresh, IconX } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { SOLICITUDES_MATERIALES_PATH } from '../inventarioPaths'
-import { getMiSolicitudMateriales } from './solicitudesMaterialesApi'
+import { cancelarMiSolicitudMateriales, getMiSolicitudMateriales } from './solicitudesMaterialesApi'
 import { formatSolicitudDate, formatSolicitudStatus, getHttpErrorStatus } from './solicitudMaterialesUtils'
 import type { SolicitudMateriales } from './types'
 
@@ -13,6 +14,9 @@ export default function SolicitudMaterialesDetallePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  const [cancelBusy, setCancelBusy] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
+  const [cancelError, setCancelError] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -40,10 +44,32 @@ export default function SolicitudMaterialesDetallePage() {
 
   const retry = () => { setError(''); setLoading(true); setReloadKey((value) => value + 1) }
 
+  const handleCancelar = async () => {
+    if (cancelBusy || !request) return
+    let active = true
+    setCancelBusy(true)
+    setCancelError('')
+    try {
+      await cancelarMiSolicitudMateriales(request.id)
+      if (active) setReloadKey((value) => value + 1)
+    } catch (requestError) {
+      if (!active) return
+      if (getHttpErrorStatus(requestError) === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
+      setCancelError('No fue posible cancelar la solicitud. Intente nuevamente.')
+    } finally {
+      if (active) setCancelBusy(false)
+      active = false
+    }
+  }
+
   const requestStatus = request?.estado?.toUpperCase()
   const pending = requestStatus === 'PENDIENTE'
   const approved = requestStatus === 'APROBADA' || requestStatus === 'APROBADO'
   const rejected = requestStatus === 'RECHAZADA' || requestStatus === 'RECHAZADO'
+  const cancelled = requestStatus === 'CANCELADA' || requestStatus === 'CANCELADO'
 
   return <section className="material-detail !mx-0 !w-full !max-w-none !gap-6" aria-labelledby="material-detail-title">
     {loading ? <div className="material-tracking__state" role="status"><span className="material-request__spinner" />Cargando detalle…</div> : null}
@@ -52,7 +78,7 @@ export default function SolicitudMaterialesDetallePage() {
       <header className="material-detail__header !w-full !rounded-3xl !border-sky-100 !bg-white !p-8 !shadow-[0_12px_34px_rgba(30,90,156,0.08)]">
         <div><p className="material-request__eyebrow">Solicitud de materiales</p><h1 id="material-detail-title">{request.codigo || `Solicitud #${request.id}`}</h1><p>Registrada el {formatSolicitudDate(request.fechaSolicitud)}</p></div>
         <div className="!flex !shrink-0 !flex-col !items-end !gap-4 max-[700px]:!w-full max-[700px]:!items-stretch">
-          <span className={`material-tracking__badge !inline-flex !items-center !gap-2 !self-end !rounded-full !px-4 !py-2.5 !font-extrabold ${pending ? '!border-amber-200 !bg-linear-to-r !from-amber-50 !to-orange-50 !text-amber-700 !shadow-[0_7px_18px_rgba(217,119,6,0.14)]' : approved ? '!border-emerald-200 !bg-linear-to-r !from-emerald-50 !to-teal-50 !text-emerald-700 !shadow-[0_7px_18px_rgba(5,150,105,0.14)]' : rejected ? '!border-rose-200 !bg-linear-to-r !from-rose-50 !to-red-50 !text-rose-700 !shadow-[0_7px_18px_rgba(225,29,72,0.14)]' : ''}`} data-status={request.estado.toUpperCase()}>{pending || approved || rejected ? <span className={`!size-2 !rounded-full ${pending ? '!bg-amber-500 !shadow-[0_0_0_5px_rgba(245,158,11,0.12)]' : approved ? '!bg-emerald-500 !shadow-[0_0_0_5px_rgba(16,185,129,0.12)]' : '!bg-rose-500 !shadow-[0_0_0_5px_rgba(244,63,94,0.12)]'}`} aria-hidden="true" /> : null}{formatSolicitudStatus(request.estado)}</span>
+          <span className={`material-tracking__badge !inline-flex !items-center !gap-2 !self-end !rounded-full !px-4 !py-2.5 !font-extrabold ${pending ? '!border-amber-200 !bg-linear-to-r !from-amber-50 !to-orange-50 !text-amber-700 !shadow-[0_7px_18px_rgba(217,119,6,0.14)]' : approved ? '!border-emerald-200 !bg-linear-to-r !from-emerald-50 !to-teal-50 !text-emerald-700 !shadow-[0_7px_18px_rgba(5,150,105,0.14)]' : rejected ? '!border-rose-200 !bg-linear-to-r !from-rose-50 !to-red-50 !text-rose-700 !shadow-[0_7px_18px_rgba(225,29,72,0.14)]' : cancelled ? '!border-slate-200 !bg-slate-50 !text-slate-600 !shadow-[0_7px_18px_rgba(100,116,139,0.12)]' : ''}`} data-status={request.estado.toUpperCase()}>{pending || approved || rejected || cancelled ? <span className={`!size-2 !rounded-full ${pending ? '!bg-amber-500 !shadow-[0_0_0_5px_rgba(245,158,11,0.12)]' : approved ? '!bg-emerald-500 !shadow-[0_0_0_5px_rgba(16,185,129,0.12)]' : cancelled ? '!bg-slate-400 !shadow-[0_0_0_5px_rgba(100,116,139,0.12)]' : '!bg-rose-500 !shadow-[0_0_0_5px_rgba(244,63,94,0.12)]'}`} aria-hidden="true" /> : null}{formatSolicitudStatus(request.estado)}</span>
           <Link className="material-detail__back group !inline-flex !w-fit !min-h-12 !items-center !gap-2.5 !self-end !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none max-[700px]:!w-full max-[700px]:!self-stretch" to={SOLICITUDES_MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" /> Volver a mis solicitudes</Link>
         </div>
       </header>
@@ -70,6 +96,29 @@ export default function SolicitudMaterialesDetallePage() {
         {!request.detalles?.length ? <p className="material-detail__no-materials">No se recibió información de materiales para esta solicitud.</p> : null}
       </div>
       <aside className="material-detail__notice !flex !w-full !flex-row !items-center !gap-4 !rounded-2xl !border-blue-200 !bg-linear-to-r !from-blue-50 !to-cyan-50 !p-5 !shadow-[0_8px_22px_rgba(37,99,235,0.08)]"><span className="!grid !size-10 !shrink-0 !place-items-center !rounded-xl !bg-blue-600 !text-white !shadow-md"><IconInfoCircle size={21} aria-hidden="true" /></span><span className="!grid !gap-1"><strong className="!text-[#073b73]">Consulta de seguimiento</strong><span className="!text-slate-600">Desde esta pantalla no se aprueban, rechazan ni despachan solicitudes.</span></span></aside>
+      {cancelError ? <div className="material-tracking__state material-tracking__state--error" role="alert">{cancelError}</div> : null}
+      {pending ? (
+        <div className="!flex !justify-end">
+          <button
+            type="button"
+            className="material-review__reject group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-rose-200 !bg-white !px-6 !font-extrabold !text-rose-700 !shadow-[0_8px_20px_rgba(225,29,72,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-rose-400 hover:!bg-rose-50 disabled:!opacity-60"
+            disabled={cancelBusy}
+            onClick={() => setConfirmCancel(true)}
+          >
+            <IconX size={18} aria-hidden="true" />
+            {cancelBusy ? 'Cancelando…' : 'Cancelar solicitud'}
+          </button>
+        </div>
+      ) : null}
     </> : null}
+    <ConfirmDialog
+      isOpen={confirmCancel}
+      title="Cancelar solicitud"
+      message="¿Está seguro de cancelar esta solicitud? Esta acción no puede deshacerse y la solicitud quedará como cancelada."
+      confirmLabel="Sí, cancelar"
+      confirmDanger
+      onCancel={() => setConfirmCancel(false)}
+      onConfirm={() => { setConfirmCancel(false); void handleCancelar() }}
+    />
   </section>
 }

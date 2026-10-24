@@ -157,7 +157,13 @@ export default function ReposicionDetallePage() {
     return compraItems.every((item) => Number.isInteger(item.cantidad) && item.cantidad > 0)
   }, [compraItems, fechaCompra, proveedorId])
 
-  const recepcionValida = useMemo(() => recepcionItemsValidos(recepcionItems), [recepcionItems])
+  const recepcionValida = useMemo(() => {
+    if (!recepcionItemsValidos(recepcionItems)) return false
+    return recepcionItems.every((item) => {
+      const detalle = reposicion?.detalles?.find((d) => d.idMaterial === item.idMaterial)
+      return detalle ? item.cantidad === detalle.cantidad : true
+    })
+  }, [recepcionItems, reposicion])
 
   const confirmarCompra = async () => {
     if (!reposicion || busy || !compraValida) return
@@ -515,8 +521,14 @@ export default function ReposicionDetallePage() {
                               min={1}
                               value={item.cantidad}
                               disabled={busy}
+                              aria-invalid={item.cantidad !== detalle?.cantidad}
                               onChange={(event) => updateCantidadRecepcion(item.idMaterial, Number(event.target.value))}
                             />
+                            {item.cantidad !== detalle?.cantidad && (
+                              <small style={{ color: '#b45309', display: 'block', marginTop: 4 }}>
+                                Debe coincidir con la cantidad comprada ({detalle?.cantidad}).
+                              </small>
+                            )}
                           </td>
                         </tr>
                       )

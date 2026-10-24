@@ -91,7 +91,7 @@ export const getReposicionProveedorNombre = (reposicion: ReposicionMaterial) =>
   reposicion.proveedor?.nombre?.trim() || 'Sin definir'
 
 export const toIsoFechaCompra = (fecha: string) => {
-  const parsed = new Date(`${fecha}T12:00:00`)
+  const parsed = new Date(`${fecha}T12:00:00-06:00`)
   if (Number.isNaN(parsed.getTime())) {
     throw new Error('Fecha de compra inválida')
   }

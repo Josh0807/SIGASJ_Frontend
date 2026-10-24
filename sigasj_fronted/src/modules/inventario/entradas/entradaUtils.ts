@@ -12,10 +12,20 @@ export function validateEntrada(values: EntradaFormValues): EntradaFormErrors {
   else if (!Number.isInteger(cantidad) || cantidad <= 0) errors.cantidad = 'Ingrese un número entero mayor a cero.'
   if (values.proveedorId && (!Number.isInteger(Number(values.proveedorId)) || Number(values.proveedorId) <= 0)) errors.proveedorId = 'Seleccione un proveedor válido.'
   if (values.observacion.trim().length > 1000) errors.observacion = 'La observación no puede superar 1000 caracteres.'
+  if (values.precioUnitario) {
+    const precio = Number(values.precioUnitario)
+    if (isNaN(precio) || precio <= 0) errors.precioUnitario = 'Ingrese un precio mayor a cero.'
+  }
   return errors
 }
 
-export const toEntradaPayload = (values: EntradaFormValues): RegistrarEntradaPayload => ({ idMaterial: Number(values.materialId), cantidad: Number(values.cantidad), idProveedor: values.proveedorId ? Number(values.proveedorId) : null, observacion: values.observacion.trim() || null })
+export const toEntradaPayload = (values: EntradaFormValues): RegistrarEntradaPayload => ({
+  idMaterial: Number(values.materialId),
+  cantidad: Number(values.cantidad),
+  idProveedor: values.proveedorId ? Number(values.proveedorId) : null,
+  observacion: values.observacion.trim() || null,
+  precioUnitario: values.precioUnitario ? Number(values.precioUnitario) : null,
+})
 
 export function entradaError(error: unknown) {
   if (!(error instanceof Error)) return 'No fue posible registrar la entrada. Intente nuevamente.'

@@ -52,6 +52,7 @@ export default function ImprimirInventarioPage() {
   const [applied, setApplied] = useState<DraftFilters>(EMPTY_DRAFT)
   const [materials, setMaterials] = useState<Material[]>([])
   const [total, setTotal] = useState(0)
+  const [truncated, setTruncated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [printedAt, setPrintedAt] = useState(() => new Date())
@@ -84,6 +85,7 @@ export default function ImprimirInventarioPage() {
         if (cancelled) return
         setMaterials(result.data)
         setTotal(result.total)
+        setTruncated(result.truncated)
       })
       .catch(() => {
         if (cancelled) return
@@ -258,6 +260,13 @@ export default function ImprimirInventarioPage() {
           </div>
         ) : null}
 
+        {!loading && !error && truncated ? (
+          <div className="materials-admin__category-error" role="alert">
+            <IconAlertTriangle size={20} aria-hidden="true" />
+            Se muestran {materials.length} de {total} materiales. El listado está limitado a 5000 registros. Aplique filtros para acotar los resultados antes de imprimir.
+          </div>
+        ) : null}
+
         {loading ? (
           <div className="materials-admin__state inventario-print__controls" role="status">
             <span className="materials-admin__spinner" />
@@ -299,7 +308,11 @@ export default function ImprimirInventarioPage() {
               </div>
               <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${lowStock > 0 ? 'border-amber-200 bg-amber-50/90' : 'border-emerald-200 bg-emerald-50/80'}`}>
                 <IconAlertTriangle className={`shrink-0 ${lowStock > 0 ? 'text-amber-600' : 'text-emerald-600'}`} size={22} aria-hidden="true" />
-                <div><small className="block font-bold uppercase tracking-wide text-slate-500">Stock bajo</small><strong className={lowStock > 0 ? 'text-amber-800' : 'text-emerald-800'}>{lowStock} con stock bajo</strong></div>
+                <div>
+                  <small className="block font-bold uppercase tracking-wide text-slate-500">Stock bajo</small>
+                  <strong className={lowStock > 0 ? 'text-amber-800' : 'text-emerald-800'}>{lowStock} con stock bajo</strong>
+                  {truncated && <small className="block text-slate-400" style={{ fontSize: '0.7em' }}>Solo en los {materials.length} mostrados</small>}
+                </div>
               </div>
               {filterSummary.length > 0 ? <p className="!m-0 text-sm text-slate-500 sm:col-span-3"><strong>Filtros:</strong> {filterSummary.join(' · ')}</p> : null}
             </div>
@@ -315,6 +328,8 @@ export default function ImprimirInventarioPage() {
                     <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Ubicación</th>
                     <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Existencia</th>
                     <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Stock mínimo</th>
+                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Precio unit.</th>
+                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Vencimiento</th>
                     <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Estado</th>
                   </tr>
                 </thead>
@@ -336,6 +351,8 @@ export default function ImprimirInventarioPage() {
                         <span className={`inline-grid min-w-10 place-items-center rounded-full px-3 py-1 font-extrabold ${material.stockActual <= material.stockMinimo ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>{material.stockActual}</span>
                       </td>
                       <td data-label="Stock mínimo">{material.stockMinimo}</td>
+                      <td data-label="Precio unit.">{material.precioUnitario != null ? `₡${Number(material.precioUnitario).toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</td>
+                      <td data-label="Vencimiento">{material.fechaVencimiento ? new Date(material.fechaVencimiento).toLocaleDateString('es-CR', { timeZone: 'UTC' }) : '—'}</td>
                       <td data-label="Estado"><span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${material.activo ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'bg-slate-100 text-slate-600 ring-1 ring-slate-200'}`}><span className={`size-2 rounded-full ${material.activo ? 'bg-emerald-500' : 'bg-slate-400'}`} aria-hidden="true" />{material.activo ? 'Activo' : 'Inactivo'}</span></td>
                     </tr>
                   ))}

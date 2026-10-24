@@ -4,6 +4,8 @@ import {
   IconAlignLeft,
   IconArrowLeft,
   IconBuildingStore,
+  IconCalendarTime,
+  IconCurrencyDollar,
   IconDeviceFloppy,
   IconMapPin,
   IconPackage,
@@ -11,6 +13,7 @@ import {
   IconStack2,
   IconTag,
   IconToggleRight,
+  IconTruckDelivery,
 } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { MATERIALES_PATH } from './inventarioPaths'
@@ -39,6 +42,9 @@ const EMPTY_VALUES: MaterialFormValues = {
   activo: true,
   categoriaId: '',
   proveedorId: '',
+  precioUnitario: '',
+  fechaVencimiento: '',
+  cantidadInicial: '',
 }
 
 export default function MaterialForm({
@@ -182,7 +188,7 @@ export default function MaterialForm({
         )}
         {field(
           'stockMinimo',
-          'Stock mínimo *',
+          'Stock mínimo de alerta *',
           <IconAlertTriangle size={20} aria-hidden="true" />,
           <input
             value={values.stockMinimo}
@@ -192,6 +198,31 @@ export default function MaterialForm({
             placeholder="0"
             aria-invalid={Boolean(errors.stockMinimo)}
             onChange={(e) => update('stockMinimo', e.target.value)}
+          />,
+        )}
+        {field(
+          'precioUnitario',
+          'Precio unitario',
+          <IconCurrencyDollar size={20} aria-hidden="true" />,
+          <input
+            value={values.precioUnitario}
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Ej. 1250.00"
+            aria-invalid={Boolean(errors.precioUnitario)}
+            onChange={(e) => update('precioUnitario', e.target.value)}
+          />,
+        )}
+        {field(
+          'fechaVencimiento',
+          'Fecha de vencimiento',
+          <IconCalendarTime size={20} aria-hidden="true" />,
+          <input
+            value={values.fechaVencimiento}
+            type="date"
+            aria-invalid={Boolean(errors.fechaVencimiento)}
+            onChange={(e) => update('fechaVencimiento', e.target.value)}
           />,
         )}
         <p className="provider-admin__form-note materials-admin__form-full">
@@ -289,6 +320,32 @@ export default function MaterialForm({
             </span>
             <small>Solo cambia mediante entradas y salidas de inventario.</small>
           </label>
+        )}
+        {mode === 'create' && (
+          <div className="materials-admin__form-full" style={{ borderTop: '1px solid var(--color-border, #e2e8f0)', paddingTop: '1.25rem', display: 'grid', gap: '0.5rem' }}>
+            <div className="provider-admin__form-heading" style={{ marginBottom: 0 }}>
+              <span><IconTruckDelivery size={25} aria-hidden="true" /></span>
+              <div>
+                <h2 style={{ margin: 0 }}>Existencia inicial <span style={{ fontWeight: 400, fontSize: '0.85em', opacity: 0.65 }}>(opcional)</span></h2>
+                <p style={{ margin: 0 }}>Si ya tiene unidades en bodega, ingréselas aquí para no tener que ir a "Registrar entrada" por separado.</p>
+              </div>
+            </div>
+            {field(
+              'cantidadInicial',
+              'Cantidad inicial en bodega',
+              <IconStack2 size={20} aria-hidden="true" />,
+              <input
+                type="number"
+                inputMode="numeric"
+                min="1"
+                step="1"
+                value={values.cantidadInicial}
+                placeholder="Ej. 10 — déjelo vacío si es 0"
+                aria-invalid={Boolean(errors.cantidadInicial)}
+                onChange={(e) => update('cantidadInicial', e.target.value)}
+              />,
+            )}
+          </div>
         )}
         <div className="materials-admin__form-actions">
           <button type="submit" className="materials-admin__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_11px_26px_rgba(37,99,235,0.3)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-800 hover:!to-cyan-500 hover:!shadow-[0_17px_34px_rgba(37,99,235,0.4)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={saving}>
