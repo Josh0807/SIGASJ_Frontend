@@ -10,6 +10,7 @@ import {
   FONTANERO_SOLICITAR_AUSENCIA_PATH,
   FONTANERO_SOLICITAR_AUSENCIA_TITLE,
 } from '../solicitudesAusenciaPaths'
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 
 const PATH = FONTANERO_SOLICITAR_AUSENCIA_PATH
 
@@ -77,6 +78,9 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
         'input[type="email"]',
       ) as HTMLInputElement
       expect(correoInput?.value).toBe('fontanero@asadasanjuan.cr')
+      const fechas = app.container.querySelectorAll('input[type="date"]')
+      expect((fechas[0] as HTMLInputElement).value).toBe(hoyEnAsada())
+      expect((fechas[1] as HTMLInputElement).value).toBe(hoyEnAsada())
       expect(html).toContain('Seleccione el tipo')
       expect(html).toContain('Permiso')
       expect(html).toContain('Vacaciones')

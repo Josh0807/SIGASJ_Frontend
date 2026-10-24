@@ -19,6 +19,9 @@ export const actividadToFormValues = (
 
   return {
     fechaActividad: actividad.fechaActividad?.slice(0, 10) ?? '',
+    horaInicio: (actividad.horaInicio ?? readString(datos.horaInicio)).slice(0, 5),
+    fechaFin: (actividad.fechaFin ?? readString(datos.fechaFin)).slice(0, 10),
+    horaFin: (actividad.horaFin ?? readString(datos.horaFin)).slice(0, 5),
     titulo: actividad.titulo ?? '',
     descripcion: actividad.descripcion ?? '',
     ubicacion: actividad.ubicacion ?? '',
@@ -41,14 +44,20 @@ export type CorregirActividadRequest = {
   cantidadCloro?: number
   ubicacionFuga?: string
   resultadoVisita?: string
+  documentosEliminarIds?: number[]
 }
 
 export const toCorregirActividadPayload = (
   values: ActividadRegistroFormValues,
   tipoCodigo: TipoActividadFontaneroCodigo,
+  documentosEliminarIds: number[] = [],
 ): CorregirActividadRequest => {
   const payload: CorregirActividadRequest = {
     titulo: values.titulo.trim(),
+  }
+
+  if (documentosEliminarIds.length > 0) {
+    payload.documentosEliminarIds = documentosEliminarIds
   }
 
   const descripcion = values.descripcion.trim()

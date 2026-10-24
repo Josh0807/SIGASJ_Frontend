@@ -4,6 +4,9 @@ import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFonta
 export type RegistrarActividadRequest = {
   tipoActividadId: number
   fechaActividad: string
+  horaInicio: string
+  fechaFin: string
+  horaFin: string
   titulo: string
   descripcion?: string
   ubicacion?: string
@@ -21,6 +24,9 @@ export type ActividadFontaneroRegistrada = {
   tipoActividadNombre: string
   tipoActividadCodigo?: string
   fechaActividad: string
+  horaInicio?: string | null
+  fechaFin?: string | null
+  horaFin?: string | null
   titulo: string
   descripcion: string | null
   ubicacion: string | null
@@ -57,6 +63,9 @@ export const toRegistrarActividadPayload = (
   const payload: RegistrarActividadRequest = {
     tipoActividadId,
     fechaActividad: values.fechaActividad.trim(),
+    horaInicio: (values.horaInicio ?? '').trim().slice(0, 5),
+    fechaFin: values.fechaFin?.trim() ?? '',
+    horaFin: (values.horaFin ?? '').trim().slice(0, 5),
     titulo: values.titulo.trim(),
   }
 
@@ -67,11 +76,13 @@ export const toRegistrarActividadPayload = (
   if (descripcion) {
     payload.descripcion = descripcion
   }
-  if (ubicacion) {
-    payload.ubicacion = ubicacion
-  }
-  if (observaciones) {
-    payload.observaciones = observaciones
+  if (tipoCodigo !== 'INCAPACIDAD_VACACIONES') {
+    if (ubicacion) {
+      payload.ubicacion = ubicacion
+    }
+    if (observaciones) {
+      payload.observaciones = observaciones
+    }
   }
 
   switch (tipoCodigo) {

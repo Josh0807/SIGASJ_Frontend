@@ -40,6 +40,12 @@ export const hoyEnAsada = (ahora: Date = new Date()): string => {
   return `${p.year}-${p.month}-${p.day}`
 }
 
+/** Hora actual en Costa Rica como HH:mm (para valores por defecto de formularios). */
+export const horaEnAsada = (ahora: Date = new Date()): string => {
+  const p = partesEnAsada(ahora, { hour: '2-digit', minute: '2-digit' })
+  return `${p.hour}:${p.minute}`
+}
+
 /** Año actual en Costa Rica. */
 export const anioEnAsada = (ahora: Date = new Date()): number =>
   Number(hoyEnAsada(ahora).slice(0, 4))

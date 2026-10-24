@@ -162,8 +162,17 @@ const CorregirActividadPage = () => {
       mode="corregir"
       tipo={tipo}
       initialValues={actividadToFormValues(actividad)}
+      existingDocumentos={actividad.documentos}
+      actividadId={actividad.id}
       observacionCorreccion={actividad.observacionCorreccion}
-      onSubmit={(values) => corregirActividad(actividad.id, tipo, values)}
+      onSubmit={(values, extras) =>
+        corregirActividad(
+          actividad.id,
+          tipo,
+          values,
+          extras?.documentosEliminarIds,
+        )
+      }
       onCatalogStale={catalogo.refetch}
     />
   )

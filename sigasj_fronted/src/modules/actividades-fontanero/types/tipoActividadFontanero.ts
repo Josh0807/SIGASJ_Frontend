@@ -24,3 +24,8 @@ export const isTipoActividadFontaneroCodigo = (
   value: string | undefined,
 ): value is TipoActividadFontaneroCodigo =>
   typeof value === 'string' && CODIGOS_TIPO_ACTIVIDAD.has(value)
+
+/** Permisos y vacaciones se gestionan en su propio módulo, no como actividad. */
+export const isTipoActividadRegistrable = (
+  tipo: { codigo: string },
+): boolean => tipo.codigo !== 'INCAPACIDAD_VACACIONES'

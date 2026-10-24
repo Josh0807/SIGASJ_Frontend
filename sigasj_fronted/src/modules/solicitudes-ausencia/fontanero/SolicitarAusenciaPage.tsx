@@ -24,6 +24,7 @@ import {
   misSolicitudAusenciaDetailPath,
 } from '../solicitudesAusenciaPaths'
 import type { TipoSolicitudAusencia } from '../types'
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 
 type FormValues = {
   correo: string
@@ -116,13 +117,16 @@ const mensajeErrorEnvio = (error: unknown): string => {
 export default function SolicitarAusenciaPage() {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
-  const [values, setValues] = useState<FormValues>(() => ({
-    correo: user?.email?.trim() || '',
-    tipo: '',
-    fechaInicio: '',
-    fechaFin: '',
-    motivo: '',
-  }))
+  const [values, setValues] = useState<FormValues>(() => {
+    const hoy = hoyEnAsada()
+    return {
+      correo: user?.email?.trim() || '',
+      tipo: '',
+      fechaInicio: hoy,
+      fechaFin: hoy,
+      motivo: '',
+    }
+  })
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)

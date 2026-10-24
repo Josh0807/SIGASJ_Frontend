@@ -3,6 +3,9 @@ import type { ActividadRegistroFormErrors } from './validateActividadRegistroFor
 
 const FIELD_FOCUS_ORDER: ActividadRegistroFormField[] = [
   'fechaActividad',
+  'horaInicio',
+  'fechaFin',
+  'horaFin',
   'titulo',
   'descripcion',
   'ubicacion',

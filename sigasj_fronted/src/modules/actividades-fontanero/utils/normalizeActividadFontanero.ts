@@ -24,6 +24,14 @@ export const normalizeActividadFontanero = (
         )
         .join(' ')
     : ''
+  const readText = (value: unknown): string | null =>
+    typeof value === 'string' && value.trim() ? value.trim() : null
+
+  const datosEspecificos =
+    record.datosEspecificos && typeof record.datosEspecificos === 'object'
+      ? (record.datosEspecificos as Record<string, unknown>)
+      : null
+
   const documentos = Array.isArray(record.documentos)
     ? record.documentos.filter((documento): documento is DocumentoActividadRegistrado => {
         if (!documento || typeof documento !== 'object') return false
@@ -46,6 +54,10 @@ export const normalizeActividadFontanero = (
         : undefined,
     fechaActividad:
       typeof record.fechaActividad === 'string' ? record.fechaActividad : '',
+    horaInicio:
+      readText(record.horaInicio) ?? readText(datosEspecificos?.horaInicio),
+    fechaFin: readText(record.fechaFin) ?? readText(datosEspecificos?.fechaFin),
+    horaFin: readText(record.horaFin) ?? readText(datosEspecificos?.horaFin),
     titulo: record.titulo,
     descripcion:
       typeof record.descripcion === 'string' ? record.descripcion : null,
@@ -75,12 +87,27 @@ export const normalizeActividadFontanero = (
         : null,
     fechaRegistro:
       typeof record.fechaRegistro === 'string' ? record.fechaRegistro : undefined,
-    datosEspecificos:
-      record.datosEspecificos && typeof record.datosEspecificos === 'object'
-        ? (record.datosEspecificos as Record<string, unknown>)
-        : null,
+    datosEspecificos,
     documentos,
     createdAt: typeof record.createdAt === 'string' ? record.createdAt : '',
     updatedAt: typeof record.updatedAt === 'string' ? record.updatedAt : '',
+  }
+}
+
+export const mergeActividadFontanero = (
+  current: ActividadFontaneroRegistrada | null,
+  updated: ActividadFontaneroRegistrada,
+): ActividadFontaneroRegistrada => {
+  if (!current || current.id !== updated.id) {
+    return updated
+  }
+
+  const incoming = updated.documentos ?? []
+  const previous = current.documentos ?? []
+
+  return {
+    ...current,
+    ...updated,
+    documentos: incoming.length > 0 ? incoming : previous,
   }
 }

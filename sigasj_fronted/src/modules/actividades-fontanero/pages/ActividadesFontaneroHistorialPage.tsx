@@ -2,8 +2,12 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/components/AuthContext'
 import ActivityFeedback from '../components/ActivityFeedback'
+import ActividadDetalleOverlay from '../components/ActividadDetalleOverlay'
 import HistorialActividadCard from '../components/HistorialActividadCard'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
+import { getActividadDetalle } from '../services/actividadesFontaneroApi'
+import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
+import { getHttpErrorStatus } from '../utils/httpErrorStatus'
 import { useHistorialActividades } from '../hooks/useHistorialActividades'
 import {
   HISTORIAL_PAGE_SIZE,
@@ -42,6 +46,9 @@ const ActividadesFontaneroHistorialPage = () => {
     limit: HISTORIAL_PAGE_SIZE,
   })
   const [clientError, setClientError] = useState<string | null>(null)
+  const [selected, setSelected] = useState<ActividadFontaneroRegistrada | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState<string | null>(null)
 
   const {
     actividades,
@@ -98,6 +105,32 @@ const ActividadesFontaneroHistorialPage = () => {
     setApplied((current) => ({ ...current, page: nextPage }))
   }
 
+  const openDetail = async (actividad: ActividadFontaneroRegistrada) => {
+    setSelected(actividad)
+    setDetailLoading(true)
+    setDetailError(null)
+    try {
+      const detalle = await getActividadDetalle(actividad.id)
+      setSelected(detalle)
+    } catch (error) {
+      const status = getHttpErrorStatus(error)
+      if (status === 401) {
+        logout()
+        navigate('/login', { replace: true })
+        return
+      }
+      setDetailError(
+        status === 403
+          ? ACTIVITY_FEEDBACK_MESSAGES.forbidden
+          : status === 404
+            ? ACTIVITY_FEEDBACK_MESSAGES.notFound
+            : ACTIVITY_FEEDBACK_MESSAGES.loadGeneric,
+      )
+    } finally {
+      setDetailLoading(false)
+    }
+  }
+
   return (
     <section
       className="actividades-fontanero-historial !mx-0 !max-w-none !gap-7"
@@ -108,26 +141,31 @@ const ActividadesFontaneroHistorialPage = () => {
           <p className="actividades-fontanero-historial__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-blue-600">
             Registro de Actividades
           </p>
-          <h1 id="historial-actividades-title" className="!m-0 !text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">Historial de actividades</h1>
+          <h1 id="historial-actividades-title" className="!m-0 !text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">
+            Historial de actividades
+          </h1>
           <p className="actividades-fontanero-historial__intro !m-0 !text-lg !leading-relaxed !text-slate-500">
             Consulte las actividades finalizadas o revisadas durante la jornada o
             en un periodo específico.
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-stretch gap-3 lg:items-end">
-          <Link to={ACTIVIDADES_FONTANERO_PATHS.home} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline">
+          <Link
+            to={ACTIVIDADES_FONTANERO_PATHS.home}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline"
+          >
             <IconArrowLeft size={20} aria-hidden="true" />
             Volver al menú de actividades
           </Link>
-        {!isLoading && !isError && total > 0 ? (
-          <p
-            className="actividades-fontanero-historial__count"
-            role="status"
-            data-testid="historial-total"
-          >
-            {total} {total === 1 ? 'actividad' : 'actividades'}
-          </p>
-        ) : null}
+          {!isLoading && !isError && total > 0 ? (
+            <p
+              className="actividades-fontanero-historial__count"
+              role="status"
+              data-testid="historial-total"
+            >
+              {total} {total === 1 ? 'actividad' : 'actividades'}
+            </p>
+          ) : null}
         </div>
       </header>
 
@@ -237,7 +275,9 @@ const ActividadesFontaneroHistorialPage = () => {
           role="status"
           data-testid="historial-lista-vacia"
         >
-          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconCalendarSearch size={28} aria-hidden="true" /></span>
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <IconCalendarSearch size={28} aria-hidden="true" />
+          </span>
           <p className="actividades-fontanero-historial__empty-title !text-xl !font-black !text-[#07376f]">
             {hasPeriodFilter
               ? 'No hay actividades en el periodo seleccionado'
@@ -260,7 +300,12 @@ const ActividadesFontaneroHistorialPage = () => {
           >
             {actividades.map((actividad) => (
               <div key={actividad.id} role="listitem">
-                <HistorialActividadCard actividad={actividad} />
+                <HistorialActividadCard
+                  actividad={actividad}
+                  onVerDetalle={() => {
+                    void openDetail(actividad)
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -304,6 +349,18 @@ const ActividadesFontaneroHistorialPage = () => {
       >
         Volver al menú de actividades
       </Link>
+
+      {selected || detailLoading || detailError ? (
+        <ActividadDetalleOverlay
+          actividad={selected}
+          loading={detailLoading}
+          error={detailError}
+          onClose={() => {
+            setSelected(null)
+            setDetailError(null)
+          }}
+        />
+      ) : null}
     </section>
   )
 }

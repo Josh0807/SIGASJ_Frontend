@@ -19,8 +19,10 @@ export const listDatosEspecificosDetalle = (
     return []
   }
 
+  const ocultos = new Set(['horaInicio', 'fechaFin', 'horaFin', 'documentos'])
+
   return Object.entries(datos)
-    .filter(([, value]) => value !== null && value !== undefined && value !== '')
+    .filter(([key, value]) => !ocultos.has(key) && value !== null && value !== undefined && value !== '')
     .map(([key, value]) => ({
       label: DATOS_ESPECIFICOS_LABELS[key] ?? key,
       value: Array.isArray(value) ? value.map(String).join(', ') : String(value),
