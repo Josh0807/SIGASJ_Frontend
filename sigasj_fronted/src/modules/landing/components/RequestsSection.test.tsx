@@ -25,6 +25,7 @@ describe('RequestsSection', () => {
     expect((markup.match(/<article/g) ?? [])).toHaveLength(8)
     expect(markup).toContain('Solicitud de Arreglo de Pago Domiciliar')
     expect(markup).toContain('Cambio de Nombre del Titular del Servicio')
+    expect(markup).toContain('Constancia de Servicio Existente')
     expect(markup).toContain('Otros Formularios')
     expect(markup).toContain('Seguimiento de Solicitudes')
   })
@@ -42,9 +43,9 @@ describe('RequestsSection', () => {
       ONLINE_REQUEST_HREFS.length,
     )
     expect(markup).toContain('Trámite en línea')
-    expect(markup).toContain('Forma presencial')
+    expect(markup).toContain('Forma Presencial')
     expect(markup).toContain(
-      'El formulario en línea estará disponible próximamente.',
+      `href="${SERVICE_REQUEST_ROUTES.existingService}"`,
     )
     expect(markup).not.toContain('Descarga disponible')
     expect(markup).not.toContain('/formularios/')

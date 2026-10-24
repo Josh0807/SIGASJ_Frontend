@@ -32,6 +32,7 @@ const FormWizard = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const titleRefs = useRef<Array<HTMLHeadingElement | null>>([])
   const completeButtonRef = useRef<HTMLButtonElement>(null)
+  const wizardRef = useRef<HTMLElement>(null)
   const submittingRef = useRef(false)
   const hasNavigated = useRef(false)
 
@@ -42,7 +43,20 @@ const FormWizard = ({
 
   useEffect(() => {
     if (!hasNavigated.current) return
-    titleRefs.current[safeStepIndex]?.focus()
+    titleRefs.current[safeStepIndex]?.focus({ preventScroll: true })
+
+    const wizard = wizardRef.current
+    if (!wizard) return
+    const currentScroll =
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop
+    const top = Math.max(
+      0,
+      Math.round(wizard.getBoundingClientRect().top + currentScroll - 16),
+    )
+    document.documentElement.scrollTop = top
+    document.body.scrollTop = top
   }, [safeStepIndex])
 
   if (steps.length === 0) return null
@@ -119,6 +133,7 @@ const FormWizard = ({
   return (
     <>
     <section
+      ref={wizardRef}
       className={[
         'form-wizard overflow-hidden rounded-[24px] border border-sky-100 bg-white shadow-[0_16px_42px_rgba(31,105,165,0.13)]',
         className,

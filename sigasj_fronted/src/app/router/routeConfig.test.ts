@@ -25,6 +25,8 @@ describe('route configuration', () => {
       '/solicitudes/cambio-titular',
       '/solicitudes/infraestructura-linderos',
       '/solicitudes/afiliacion',
+      '/solicitudes/disponibilidad-servicios',
+      '/solicitudes/servicio-existente',
       '/login',
       '/unauthorized',
     ])
@@ -64,6 +66,8 @@ describe('route configuration', () => {
       '/solicitudes/cambio-titular',
       '/solicitudes/infraestructura-linderos',
       '/solicitudes/afiliacion',
+      '/solicitudes/disponibilidad-servicios',
+      '/solicitudes/servicio-existente',
     ])
     expect(
       PUBLIC_VISITOR_FORM_PATHS.every((path) => !path.startsWith(`${ADMIN_BASE_PATH}/`)),

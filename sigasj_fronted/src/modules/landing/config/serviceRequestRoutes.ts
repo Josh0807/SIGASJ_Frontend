@@ -19,6 +19,7 @@ export const ONLINE_SERVICE_REQUEST_KEYS = [
   'boundaryInfrastructure',
   'affiliation',
   'serviceAvailability',
+  'existingService',
 ] as const satisfies readonly ServiceRequestRouteKey[]
 
 export const ONLINE_SERVICE_REQUEST_PATHS = new Set<string>(
