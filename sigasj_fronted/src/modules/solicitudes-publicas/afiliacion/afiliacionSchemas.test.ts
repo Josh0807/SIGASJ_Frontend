@@ -95,9 +95,12 @@ describe('afiliacionSchemas', () => {
     ).toBe(false)
   })
 
-  it('permite firma del solicitante vacía', () => {
+  it('exige la firma del solicitante', () => {
     expect(
       afiliacionFirmaSchema.safeParse({ firmaSolicitante: '' }).success,
+    ).toBe(false)
+    expect(
+      afiliacionFirmaSchema.safeParse({ firmaSolicitante: 'data:image/png;base64,abc' }).success,
     ).toBe(true)
   })
 })

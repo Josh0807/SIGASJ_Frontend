@@ -14,12 +14,15 @@ import { useMateriales } from "./useMateriales";
 import { useCategorias } from "./categorias/useCategorias";
 import { useProveedores } from "./proveedores/useProveedores";
 import {
+  IconAlertTriangle,
   IconCategory,
+  IconCheck,
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconFilter,
   IconSearch,
   IconTruck,
+  IconX,
 } from "@tabler/icons-react";
 import { InventoryFormField } from "./InventoryFormField";
 
@@ -240,16 +243,30 @@ export default function MaterialesPage() {
       </section>
       {actionMessage && (
         <div
-          className={
+          className={`flex items-start gap-4 rounded-3xl border p-5 shadow-[0_14px_36px_rgba(15,23,42,0.10)] ${
             actionMessage.kind === "success"
-              ? "materials-admin__success"
+              ? "!border-emerald-200 !bg-[linear-gradient(135deg,#ecfdf5_0%,#ffffff_60%,#f0fdfa_100%)] !text-emerald-950"
               : actionMessage.kind === "warning"
-                ? "materials-admin__warning"
-                : "materials-admin__error"
-          }
+                ? "!border-amber-200 !bg-[linear-gradient(135deg,#fffbeb_0%,#ffffff_62%,#fff7ed_100%)] !text-amber-950"
+                : "!border-rose-200 !bg-[linear-gradient(135deg,#fff1f2_0%,#ffffff_62%,#fff7ed_100%)] !text-rose-950"
+          }`}
           role={actionMessage.kind === "error" ? "alert" : "status"}
         >
-          {actionMessage.text}
+          <span className={`flex size-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg ${
+            actionMessage.kind === "success"
+              ? "bg-linear-to-br from-emerald-500 to-teal-600 shadow-emerald-200"
+              : actionMessage.kind === "warning"
+                ? "bg-linear-to-br from-amber-500 to-orange-600 shadow-amber-200"
+                : "bg-linear-to-br from-rose-500 to-red-600 shadow-rose-200"
+          }`}>
+            {actionMessage.kind === "success" ? <IconCheck size={26} stroke={3} aria-hidden="true" /> : actionMessage.kind === "warning" ? <IconAlertTriangle size={25} aria-hidden="true" /> : <IconX size={25} stroke={2.6} aria-hidden="true" />}
+          </span>
+          <div className="grid min-w-0 flex-1 gap-1.5">
+            <strong className="text-base font-extrabold tracking-tight">
+              {actionMessage.kind === "success" ? "Operación completada" : actionMessage.kind === "warning" ? "Atención" : "No se pudo completar"}
+            </strong>
+            <span className="leading-6 opacity-90">{actionMessage.text}</span>
+          </div>
         </div>
       )}
       {loading && (

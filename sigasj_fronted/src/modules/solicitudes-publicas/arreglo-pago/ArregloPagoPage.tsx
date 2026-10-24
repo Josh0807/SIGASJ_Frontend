@@ -10,10 +10,11 @@ import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsad
 import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import DocumentRequirements from '../DocumentRequirements'
+import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import { getArregloPagoErrorMessage, registrarArregloPago } from './arregloPagoApi'
 import { arregloPagoApplicantSchema, arregloPagoDocumentsSchema, arregloPagoServiceSchema } from './arregloPagoSchemas'
 import SignaturePad from './SignaturePad'
-import { PLAZOS_ARREGLO_PAGO, type ArregloPagoFormValues, type ArregloPagoResponse } from './types'
+import { PLAZOS_ARREGLO_PAGO, type ArregloPagoFormValues } from './types'
 
 const initialValues: ArregloPagoFormValues = {
   nombre: '',
@@ -85,7 +86,7 @@ const DocumentsAndSignatureFields = ({ values, update }: { values: ArregloPagoFo
 
 const ArregloPagoPage = () => {
   const [values, setValues] = useState<ArregloPagoFormValues>(initialValues)
-  const [result, setResult] = useState<ArregloPagoResponse | null>(null)
+  const [result, setResult] = usePersistedSolicitudResult('arreglo-pago')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -155,7 +156,7 @@ const ArregloPagoPage = () => {
           id: 'firma',
           title: 'Firma',
           stepIndex: 2,
-          items: [{ label: 'Firma digital', value: values.firma ? 'Firma incorporada' : 'No incorporada (opcional)' }],
+          items: [{ label: 'Firma digital', value: values.firma ? 'Firma incorporada' : 'Firma pendiente' }],
         },
       ]}
       documentsStepIndex={2}
@@ -191,7 +192,7 @@ const ArregloPagoPage = () => {
               highlightLabel="Código de seguimiento"
               highlightValue={result.codigoSeguimiento}
               meta={[{ label: 'Estado', value: 'Pendiente' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]}
-              actions={<><Link className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none" to="/solicitudes/seguimiento">Consultar seguimiento <IconArrowRight className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" /></Link><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] bg-white px-6 font-extrabold text-[#0b65b5] no-underline transition hover:-translate-y-0.5 hover:bg-blue-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none sm:ml-2" to="/"><IconHome size={19} aria-hidden="true" /> Volver al inicio</Link></>}
+              actions={<><Link className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" /></Link><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] bg-white px-6 font-extrabold text-[#0b65b5] no-underline transition hover:-translate-y-0.5 hover:bg-blue-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none sm:ml-2" to="/"><IconHome size={19} aria-hidden="true" /> Volver al inicio</Link></>}
             />
           ) : (
             <>

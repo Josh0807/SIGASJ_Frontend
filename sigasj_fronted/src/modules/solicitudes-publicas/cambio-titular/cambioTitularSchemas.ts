@@ -75,5 +75,5 @@ export const cambioTitularDocumentosSchema = z.object({
   documentos: z
     .array(z.instanceof(File))
     .min(1, 'Adjunta al menos un documento requerido.'),
-  firma: z.string(),
+  firma: z.string().trim().min(1, 'Registra la firma del nuevo titular solicitante.'),
 })

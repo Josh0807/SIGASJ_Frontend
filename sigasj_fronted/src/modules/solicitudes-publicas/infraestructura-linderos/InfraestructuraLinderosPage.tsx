@@ -12,6 +12,7 @@ import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import InfraestructuraDocumentUpload from './InfraestructuraDocumentUpload'
 import type { DocumentoAdjunto } from './documentoAdjunto'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import {
   getInfraestructuraLinderosErrorMessage,
   registrarInfraestructuraLinderos,
@@ -30,7 +31,6 @@ import {
   TIPOS_PERSONA,
   type CalidadTitular,
   type InfraestructuraLinderosFormValues,
-  type InfraestructuraLinderosResponse,
   type MedioNotificacion,
   type Proposito,
   type TipoPersona,
@@ -264,9 +264,7 @@ const DocumentsAndSignatureFields = ({
 const InfraestructuraLinderosPage = () => {
   const [values, setValues] =
     useState<InfraestructuraLinderosFormValues>(initialValues)
-  const [result, setResult] = useState<InfraestructuraLinderosResponse | null>(
-    null,
-  )
+  const [result, setResult] = usePersistedSolicitudResult('infraestructura-linderos')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -760,7 +758,7 @@ const InfraestructuraLinderosPage = () => {
               label: 'Firma digital',
               value: values.firma
                 ? 'Firma incorporada'
-                : 'No incorporada (opcional)',
+                : 'Firma pendiente',
             },
           ],
         },
@@ -882,7 +880,7 @@ const InfraestructuraLinderosPage = () => {
                 <>
                   <Link
                     className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
-                    to="/solicitudes/seguimiento"
+                    to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}
                   >
                     Consultar seguimiento{' '}
                     <IconArrowRight

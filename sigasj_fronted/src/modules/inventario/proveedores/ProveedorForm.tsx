@@ -3,7 +3,7 @@ import { IconArrowLeft, IconBuilding, IconBuildingStore, IconDeviceFloppy, IconI
 import { Link } from 'react-router-dom'
 import { PROVEEDORES_PATH } from '../inventarioPaths'
 import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
-import { toProveedorPayload, validateProveedor, type ProveedorFormErrors } from './proveedorUtils'
+import { PROVEEDOR_IDENTIFICACION_MAX_LENGTH, PROVEEDOR_TELEFONO_MAX_LENGTH, toProveedorPayload, validateProveedor, type ProveedorFormErrors } from './proveedorUtils'
 import type { ProveedorFormValues, ProveedorPayload } from './types'
 
 const EMPTY_PROVEEDOR_VALUES: ProveedorFormValues = { nombre: '', razonSocial: '', identificacion: '', telefono: '', correo: '', direccion: '', personaContacto: '' }
@@ -27,8 +27,8 @@ export default function ProveedorForm({ mode, initialValues = EMPTY_PROVEEDOR_VA
     <div className="provider-admin__form-heading"><span><IconBuildingStore size={25} aria-hidden="true" /></span><div><h2>Información del proveedor</h2><p>Los campos marcados con * son obligatorios.</p></div></div>
     {field('nombre', 'Nombre *', <IconBuildingStore size={20} aria-hidden="true" />, <input autoFocus autoComplete="organization" value={values.nombre} maxLength={150} placeholder="Ej. Ferretería Central" aria-invalid={Boolean(errors.nombre)} onChange={(e) => update('nombre', e.target.value)} />)}
     {field('razonSocial', 'Razón social', <IconBuilding size={20} aria-hidden="true" />, <input autoComplete="organization" value={values.razonSocial} maxLength={200} placeholder="Nombre legal de la empresa" aria-invalid={Boolean(errors.razonSocial)} onChange={(e) => update('razonSocial', e.target.value)} />)}
-    {field('identificacion', 'Identificación', <IconId size={20} aria-hidden="true" />, <input value={values.identificacion} maxLength={50} placeholder="Cédula física o jurídica" aria-invalid={Boolean(errors.identificacion)} onChange={(e) => update('identificacion', e.target.value)} />)}
-    {field('telefono', 'Teléfono', <IconPhone size={20} aria-hidden="true" />, <input type="tel" autoComplete="tel" value={values.telefono} maxLength={50} placeholder="Ej. 2222-2222" aria-invalid={Boolean(errors.telefono)} onChange={(e) => update('telefono', e.target.value)} />)}
+    {field('identificacion', 'Identificación', <IconId size={20} aria-hidden="true" />, <input inputMode="numeric" value={values.identificacion} maxLength={PROVEEDOR_IDENTIFICACION_MAX_LENGTH} placeholder="Cédula física o jurídica" aria-invalid={Boolean(errors.identificacion)} onChange={(e) => update('identificacion', e.target.value)} />)}
+    {field('telefono', 'Teléfono', <IconPhone size={20} aria-hidden="true" />, <input type="tel" inputMode="tel" autoComplete="tel" value={values.telefono} maxLength={PROVEEDOR_TELEFONO_MAX_LENGTH} placeholder="Ej. 2222-2222" aria-invalid={Boolean(errors.telefono)} onChange={(e) => update('telefono', e.target.value)} />)}
     {field('correo', 'Correo electrónico', <IconMail size={20} aria-hidden="true" />, <input type="email" autoComplete="email" value={values.correo} maxLength={150} placeholder="correo@empresa.com" aria-invalid={Boolean(errors.correo)} onChange={(e) => update('correo', e.target.value)} />)}
     {field('personaContacto', 'Persona de contacto', <IconUser size={20} aria-hidden="true" />, <input autoComplete="name" value={values.personaContacto} maxLength={150} placeholder="Nombre del contacto principal" aria-invalid={Boolean(errors.personaContacto)} onChange={(e) => update('personaContacto', e.target.value)} />)}
     {field('direccion', 'Dirección', <IconMapPin size={20} aria-hidden="true" />, <textarea autoComplete="street-address" value={values.direccion} maxLength={500} placeholder="Dirección física del proveedor" aria-invalid={Boolean(errors.direccion)} onChange={(e) => update('direccion', e.target.value)} />, true)}

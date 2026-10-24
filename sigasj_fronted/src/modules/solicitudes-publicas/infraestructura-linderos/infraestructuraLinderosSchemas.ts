@@ -207,7 +207,7 @@ export const infraestructuraDocumentosSchema = z
   .object({
     proposito: z.string(),
     documentos: z.array(documentoAdjuntoSchema),
-    firma: z.string(),
+    firma: z.string().trim().min(1, 'Registre la firma del solicitante o representante legal.'),
   })
   .superRefine((data, ctx) => {
     if (data.documentos.some((doc) => doc.estado === 'subiendo')) {

@@ -96,7 +96,7 @@ describe('cambioTitularSchemas', () => {
     ).toBe(false)
   })
 
-  it('exige al menos un documento y acepta firma vacía', () => {
+  it('exige al menos un documento y la firma del nuevo titular', () => {
     expect(
       cambioTitularDocumentosSchema.safeParse({
         documentos: [],
@@ -108,7 +108,7 @@ describe('cambioTitularSchemas', () => {
         documentos: [
           new File(['x'], 'cedula.pdf', { type: 'application/pdf' }),
         ],
-        firma: '',
+        firma: 'data:image/png;base64,abc',
       }).success,
     ).toBe(true)
   })

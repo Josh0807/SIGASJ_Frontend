@@ -10,6 +10,7 @@ import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsad
 import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import DisponibilidadDocumentUpload from './DisponibilidadDocumentUpload'
 import type { DocumentoAdjunto } from './documentoAdjunto'
 import {
@@ -35,7 +36,6 @@ import {
   TIPOS_PERSONA,
   type CalidadTitular,
   type DisponibilidadFormValues,
-  type DisponibilidadResponse,
   type MedioNotificacion,
   type NaturalezaInmueble,
   type Proposito,
@@ -319,8 +319,8 @@ const FirmaFields = ({
 }) => (
   <div className="grid gap-5">
     <p className="m-0 rounded-xl border border-sky-100 bg-sky-50/80 p-4 text-sm font-medium leading-6 text-[#3d5f82]">
-      Firma del solicitante (opcional según Backend). Queda asociada a esta
-      solicitud; no se muestra la data URL cruda en la revisión.
+      La firma del solicitante o propietario queda asociada a esta solicitud;
+      la cadena Data URL nunca se muestra de forma directa en la revisión.
     </p>
     <SignaturePad
       value={values.firma}
@@ -335,7 +335,7 @@ const FirmaFields = ({
 const DisponibilidadPage = () => {
   const [values, setValues] =
     useState<DisponibilidadFormValues>(initialValues)
-  const [result, setResult] = useState<DisponibilidadResponse | null>(null)
+  const [result, setResult] = usePersistedSolicitudResult('disponibilidad-servicios')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -1010,7 +1010,7 @@ const DisponibilidadPage = () => {
               label: 'Firma del solicitante',
               value: values.firma
                 ? 'Firma registrada'
-                : 'Sin firma (opcional)',
+                : 'Firma pendiente',
             },
           ],
         },
@@ -1170,7 +1170,7 @@ const DisponibilidadPage = () => {
                 <>
                   <Link
                     className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
-                    to="/solicitudes/seguimiento"
+                    to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}
                   >
                     Consultar seguimiento{' '}
                     <IconArrowRight
