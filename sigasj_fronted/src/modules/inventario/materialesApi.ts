@@ -11,7 +11,7 @@ const PRINT_PAGE_CAP = 50
 
 export async function getMaterialesParaImpresion(
   query: Omit<MaterialesQuery, 'page' | 'limit'> = {},
-): Promise<{ data: Material[]; total: number }> {
+): Promise<{ data: Material[]; total: number; truncated: boolean }> {
   const data: Material[] = []
   let page = 1
   let total = 0
@@ -26,7 +26,7 @@ export async function getMaterialesParaImpresion(
     page += 1
   }
 
-  return { data, total }
+  return { data, total, truncated: data.length < total }
 }
 
 export const getMaterial = (id: number) =>
