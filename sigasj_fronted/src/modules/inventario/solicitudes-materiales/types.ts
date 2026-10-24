@@ -67,7 +67,7 @@ export type SolicitudesMaterialesListResponse =
     }
 
 export type SolicitudesMaterialesQuery = {
-  estado?: 'PENDIENTE' | 'APROBADA' | 'RECHAZADA'
+  estado?: 'PENDIENTE' | 'APROBADA' | 'RECHAZADA' | 'DESPACHADA' | 'CANCELADA'
   idAveria?: number
   page?: number
   limit?: number

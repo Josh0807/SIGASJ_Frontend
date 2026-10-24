@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { IconAlignLeft, IconArrowLeft, IconCheck, IconCircleCheck, IconPackage, IconRefresh, IconX } from '@tabler/icons-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
-import { SOLICITUDES_REVISION_PATH } from '../inventarioPaths'
+import { SALIDAS_PATH, SOLICITUDES_REVISION_PATH } from '../inventarioPaths'
 import {
   aprobarSolicitudMaterialesAdmin,
   getSolicitudMaterialesAdmin,
@@ -31,6 +31,7 @@ export default function SolicitudRevisionDetallePage() {
   const [busy, setBusy] = useState(false)
   const [motivoRechazo, setMotivoRechazo] = useState('')
   const [success, setSuccess] = useState('')
+  const [showSalidaLink, setShowSalidaLink] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -60,6 +61,7 @@ export default function SolicitudRevisionDetallePage() {
   const retry = () => {
     setError('')
     setSuccess('')
+    setShowSalidaLink(false)
     setLoading(true)
     setReloadKey((value) => value + 1)
   }
@@ -80,9 +82,13 @@ export default function SolicitudRevisionDetallePage() {
         ? await aprobarSolicitudMaterialesAdmin(request.id)
         : await rechazarSolicitudMaterialesAdmin(request.id, motivoRechazo)
       setRequest(updated)
-      setSuccess(decision === 'aprobar'
-        ? 'La solicitud fue aprobada. Las existencias no se modificaron.'
-        : 'La solicitud fue rechazada. Las existencias no se modificaron.')
+      if (decision === 'aprobar') {
+        setSuccess('La solicitud fue aprobada. Las existencias no se modificaron.')
+        setShowSalidaLink(true)
+      } else {
+        setSuccess('La solicitud fue rechazada. Las existencias no se modificaron.')
+        setShowSalidaLink(false)
+      }
     } catch (requestError) {
       if (getHttpErrorStatus(requestError) === 401) {
         navigate('/login', { replace: true })
@@ -101,7 +107,12 @@ export default function SolicitudRevisionDetallePage() {
   return <section className="material-detail !mx-0 !w-full !max-w-none !gap-6" aria-labelledby="solicitud-revision-detail-title">
     {loading ? <div className="material-tracking__state" role="status"><span className="material-request__spinner" />Cargando solicitud…</div> : null}
     {error ? <div className="material-tracking__state material-tracking__state--error" role="alert"><p>{error}</p><button type="button" onClick={retry}><IconRefresh size={18} aria-hidden="true" /> Reintentar</button></div> : null}
-    {success ? <div className="material-tracking__state" role="status">{success}</div> : null}
+    {success ? <div className="material-tracking__state" role="status">
+      {success}
+      {showSalidaLink ? (
+        <Link className="material-tracking__detail-link !ml-4" to={SALIDAS_PATH}>Registrar salida de bodega →</Link>
+      ) : null}
+    </div> : null}
     {!loading && request ? <>
       <header className="material-detail__header">
         <div>

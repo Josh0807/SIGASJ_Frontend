@@ -22,6 +22,12 @@ export const getMisSolicitudesMateriales = (query: SolicitudesMaterialesQuery = 
 export const getMiSolicitudMateriales = (id: number) =>
   fetchWithAuth<SolicitudMateriales>(`${SOLICITUDES_MATERIALES_PATH}/${id}`)
 
+export const cancelarMiSolicitudMateriales = (id: number) =>
+  fetchWithAuth<{ id: number; codigo: string | null; estado: string; mensaje: string }>(
+    `${SOLICITUDES_MATERIALES_PATH}/${id}/cancelar`,
+    { method: 'PATCH' },
+  )
+
 const SOLICITUDES_ADMIN_PATH = '/admin/solicitudes-materiales'
 
 export const getSolicitudesMaterialesAdmin = (
