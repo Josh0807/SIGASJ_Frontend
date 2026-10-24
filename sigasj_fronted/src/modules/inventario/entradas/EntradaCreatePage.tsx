@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react'
-import { IconAlertTriangle, IconAlignLeft, IconArrowLeft, IconBuildingStore, IconCheck, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconTrendingUp, IconTruckDelivery } from '@tabler/icons-react'
+import { IconAlertTriangle, IconAlignLeft, IconArrowLeft, IconBuildingStore, IconCheck, IconCurrencyDollar, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconTrendingUp, IconTruckDelivery } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
 import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
@@ -14,7 +14,7 @@ import DocumentosEntradaField from './DocumentosEntradaField'
 import { abrirDocumentoEntrada, adjuntarDocumentoEntrada } from './documentosApi'
 import type { DocumentoMovimiento, SelectedDocument } from './documentosTypes'
 
-const EMPTY_VALUES: EntradaFormValues = { materialId: '', cantidad: '', proveedorId: '', observacion: '' }
+const EMPTY_VALUES: EntradaFormValues = { materialId: '', cantidad: '', proveedorId: '', observacion: '', precioUnitario: '' }
 
 export default function EntradaCreatePage() {
   const { logout } = useAuth()
@@ -127,6 +127,9 @@ export default function EntradaCreatePage() {
       </InventoryFormField>
       {loadingProveedores && <p className="provider-admin__form-note" role="status">Cargando proveedores disponibles…</p>}
       {proveedoresError && <div className="materials-admin__category-error materials-admin__form-full" role="alert">No fue posible cargar proveedores. Puede registrar la entrada sin proveedor. <button type="button" onClick={refetchProveedores}>Reintentar</button></div>}
+      <InventoryFormField label="Precio unitario" icon={<IconCurrencyDollar size={20} aria-hidden="true" />} error={errors.precioUnitario} hint={<small>Opcional — precio pagado por unidad en esta compra.</small>}>
+        <input type="number" inputMode="decimal" min="0" step="0.01" value={values.precioUnitario} aria-invalid={Boolean(errors.precioUnitario)} placeholder="Ej. 1250.00" onChange={(event) => update('precioUnitario', event.target.value)} />
+      </InventoryFormField>
       <InventoryFormField label="Observaciones" icon={<IconAlignLeft size={20} aria-hidden="true" />} error={errors.observacion} full hint={<small>{values.observacion.length}/1000 caracteres</small>}>
         <textarea value={values.observacion} maxLength={1000} aria-invalid={Boolean(errors.observacion)} placeholder="Ej. Entrega parcial según orden de compra" onChange={(event) => update('observacion', event.target.value)} />
       </InventoryFormField>

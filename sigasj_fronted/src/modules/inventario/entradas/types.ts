@@ -3,6 +3,7 @@ export type RegistrarEntradaPayload = {
   cantidad: number
   idProveedor: number | null
   observacion: string | null
+  precioUnitario?: number | null
 }
 
 export type EntradaResponse = {
@@ -30,4 +31,4 @@ export type EntradaResponse = {
   mensaje: string
 }
 
-export type EntradaFormValues = { materialId: string; cantidad: string; proveedorId: string; observacion: string }
+export type EntradaFormValues = { materialId: string; cantidad: string; proveedorId: string; observacion: string; precioUnitario: string }

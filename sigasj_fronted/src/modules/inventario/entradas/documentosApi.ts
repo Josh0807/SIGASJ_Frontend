@@ -29,5 +29,5 @@ export async function abrirDocumentoEntrada(rutaReferenciaArchivo: string) {
 
   const blobUrl = URL.createObjectURL(await response.blob())
   window.open(blobUrl, '_blank', 'noopener,noreferrer')
-  window.setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+  window.setTimeout(() => URL.revokeObjectURL(blobUrl), 300_000)
 }

@@ -57,9 +57,9 @@ export const alertaReposicionErrorMessage = (
 ) => {
   const status = getHttpErrorStatus(error)
   if (status === 403) {
-    return accion === 'actualizar'
-      ? 'No tiene permiso para gestionar las alertas de reposición.'
-      : 'No tiene permiso para consultar las alertas de reposición.'
+    if (accion === 'actualizar') return 'No tiene permiso para gestionar las alertas de reposición.'
+    if (accion === 'generar') return 'No tiene permiso para generar reposiciones desde alertas.'
+    return 'No tiene permiso para consultar las alertas de reposición.'
   }
   if (status === 401) return 'Su sesión expiró. Inicie sesión de nuevo.'
   if (status === 404) return 'La alerta de reposición ya no está disponible.'

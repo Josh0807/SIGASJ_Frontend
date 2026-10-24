@@ -13177,6 +13177,9 @@ button.actividad-historial-card__action:focus-visible {
 .materials-admin__error { background: #fff5f5; border-color: #efcaca; color: #912f2f; }
 .materials-admin__error p { margin: 0 0 10px; }
 .materials-admin__success { background: #effaf3; border-color: #bce2c9; color: #1d6338; }
+@media (prefers-color-scheme: dark) { .materials-admin__success { background: #0d2b1a; border-color: #1a5c32; color: #6ee7a0; } }
+.materials-admin__warning { background: #fffbeb; border-color: #f6d860; color: #7a4f00; }
+@media (prefers-color-scheme: dark) { .materials-admin__warning { background: #2b1f00; border-color: #7a5a00; color: #fcd34d; } }
 .materials-admin__empty { text-align: center; }
 .materials-admin__empty h1, .materials-admin__empty h2 { margin: 0 0 8px; color: #123f70; }
 .materials-admin__table-wrap { overflow-x: auto; border: 1px solid #d7e5f1; border-radius: 14px; background: #fff; }
@@ -13703,6 +13706,9 @@ button.actividad-historial-card__action:focus-visible {
   width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+.inventario-reportes .gallery-admin__filters .provider-admin__control > :is(input, select) {
+  padding-left: 50px !important;
 }
 .inventario-reportes .gallery-admin__filters input[type="date"] {
   padding-right: 20px !important;

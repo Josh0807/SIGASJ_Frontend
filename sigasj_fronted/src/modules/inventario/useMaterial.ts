@@ -8,7 +8,8 @@ export function useMaterial(id: number | null, initialMaterial?: Material) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (id === null || initialMaterial) return
+    if (id === null) return
+    if (initialMaterial && initialMaterial.id === id) return
     let cancelled = false
     getMaterial(id)
       .then((result) => { if (!cancelled) setMaterial(result) })

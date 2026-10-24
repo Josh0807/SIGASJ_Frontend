@@ -28,13 +28,12 @@ export default function SalidaCreatePage() {
   const [feedback, setFeedback] = useState<{ kind: 'success' | 'error'; text: string; stock?: { previous: number; current: number }; movementId?: number } | null>(null)
   const submitting = useRef(false)
   const feedbackRef = useRef<HTMLDivElement>(null)
-  const { result: materiales, loading, error, refetch } = useMateriales({ activo: true, page: 1, limit: 100 })
+  const { result: materiales, loading, error, refetch } = useMateriales({ activo: true, page: 1, limit: 500 })
+  const materialListTruncated = materiales.total > materiales.data.length
   const availableMaterials = materiales.data.filter((item) => item.activo && item.stockActual > 0)
   const selectedMaterial = availableMaterials.find((item) => String(item.id) === values.materialId)
   const numericQuantity = Number(values.cantidad)
-  const maximumWithdrawal = selectedMaterial ? Math.max(0, selectedMaterial.stockActual - selectedMaterial.stockMinimo) : null
   const exceedsKnownStock = Boolean(selectedMaterial && Number.isFinite(numericQuantity) && numericQuantity > selectedMaterial.stockActual)
-  const violatesMinimumStock = Boolean(selectedMaterial && Number.isFinite(numericQuantity) && maximumWithdrawal !== null && numericQuantity > maximumWithdrawal)
   const displayedStock = availability?.kind === 'valid' && availability.data.idMaterial === selectedMaterial?.id
     ? availability.data.stockActual
     : selectedMaterial?.stockActual
@@ -50,11 +49,10 @@ export default function SalidaCreatePage() {
       setAvailability({ kind: 'checking' })
       consultarDisponibilidad(materialId, cantidad, controller.signal)
         .then((data) => {
-          const resultingStock = Number(data.stockResultante)
-          const respectsMinimumStock = Number.isFinite(resultingStock) && resultingStock >= Number(data.stockMinimo)
-          setAvailability(respectsMinimumStock
+          const serverApproves = data.disponible !== false
+          setAvailability(serverApproves
             ? { kind: 'valid', data }
-            : { kind: 'invalid', message: `La salida dejaría el inventario por debajo del stock mínimo (${data.stockMinimo}). Puede retirar como máximo ${Math.max(0, Number(data.stockActual) - Number(data.stockMinimo))}.` })
+            : { kind: 'invalid', message: data.mensaje || `No hay stock suficiente. Existencia disponible: ${data.stockActual}.` })
         })
         .catch((caught) => {
           if (controller.signal.aborted) return
@@ -87,14 +85,12 @@ export default function SalidaCreatePage() {
     const nextErrors = validateSalida(values)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) { setFeedback({ kind: 'error', text: 'Revise los campos señalados.' }); focusFirstInvalidInventoryField(event.currentTarget); return }
-    if (exceedsKnownStock || violatesMinimumStock || availability?.kind === 'invalid') {
+    if (exceedsKnownStock || availability?.kind === 'invalid') {
       setFeedback({
         kind: 'error',
         text: availability?.kind === 'invalid'
           ? availability.message
-          : violatesMinimumStock
-            ? `Debe conservar el stock mínimo de ${selectedMaterial?.stockMinimo}. Puede retirar como máximo ${maximumWithdrawal}.`
-            : 'La cantidad supera la existencia disponible conocida.',
+          : 'La cantidad supera la existencia disponible conocida.',
       })
       return
     }
@@ -153,6 +149,7 @@ export default function SalidaCreatePage() {
       {loading && <p className="provider-admin__form-note" role="status">Cargando materiales disponibles…</p>}
       {error && <div className="materials-admin__category-error materials-admin__form-full" role="alert">{error} <button type="button" onClick={refetch}>Reintentar</button></div>}
       {!loading && !error && availableMaterials.length === 0 && <div className="materials-admin__category-error materials-admin__form-full" role="alert">No hay materiales activos con existencias disponibles para retirar.</div>}
+      {materialListTruncated && <p className="provider-admin__form-note materials-admin__form-full" role="note">Se muestran los primeros {materiales.data.length} materiales. Si no encuentra el material, use el buscador del catálogo.</p>}
       <InventoryFormField label="Unidad de medida" icon={<IconRulerMeasure size={20} aria-hidden="true" />}>
         <input value={selectedMaterial?.unidadMedida ?? 'Seleccione un material'} readOnly aria-label="Unidad de medida del material" />
       </InventoryFormField>
@@ -164,9 +161,8 @@ export default function SalidaCreatePage() {
         icon={<IconNumbers size={20} aria-hidden="true" />}
         error={errors.cantidad}
         full
-        hint={violatesMinimumStock ? <small className="inventory-exit__warning" role="alert">Debe conservar {selectedMaterial?.stockMinimo} como stock mínimo. Retiro máximo permitido: {maximumWithdrawal}.</small> : null}
       >
-        <input type="number" inputMode="numeric" min="1" max={maximumWithdrawal ?? undefined} step="1" value={values.cantidad} aria-invalid={Boolean(errors.cantidad) || exceedsKnownStock || violatesMinimumStock} onChange={(event) => update('cantidad', event.target.value)} />
+        <input type="number" inputMode="numeric" min="1" step="1" value={values.cantidad} aria-invalid={Boolean(errors.cantidad) || exceedsKnownStock} onChange={(event) => update('cantidad', event.target.value)} />
       </InventoryFormField>
       {availability?.kind === 'checking' && <div className="materials-admin__form-full flex items-center gap-3 rounded-2xl border border-sky-200 bg-sky-50 px-5 py-4 font-semibold text-sky-800 shadow-sm" role="status"><span className="materials-admin__spinner" /> Verificando disponibilidad…</div>}
       {availability?.kind === 'invalid' && <div className="materials-admin__form-full flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-800 shadow-sm" role="alert"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-rose-100"><IconAlertTriangle size={20} aria-hidden="true" /></span><span>{availability.message}</span></div>}
