@@ -1,6 +1,7 @@
-import { fetchWithAuth } from '../../services/http/httpClient'
+import { fetchRawWithAuth, fetchWithAuth } from '../../services/http/httpClient'
 import type {
   CorrelacionAusencia,
+  DocumentoSolicitudAusencia,
   EstadoSolicitudAusencia,
   SolicitudAusencia,
   SolicitudAusenciaFontanero,
@@ -11,6 +12,11 @@ import type {
 const ENDPOINT = '/rrhh/solicitudes-ausencia'
 /** PBI 6.5.3 — consulta propia; el Backend resuelve Colaborador vía JWT. */
 const FONTANERO_ENDPOINT = '/fontanero/solicitudes-ausencia'
+
+const RUTA_DOC_FONTANERO =
+  /^\/api\/v1\/fontanero\/solicitudes-ausencia\/\d+\/documentos\/[A-Za-z0-9._-]+$/
+const RUTA_DOC_ADMIN =
+  /^\/api\/v1\/rrhh\/solicitudes-ausencia\/\d+\/documentos\/[A-Za-z0-9._-]+$/
 
 export const emitirCorrelacionAusencia = () =>
   fetchWithAuth<CorrelacionAusencia>(`${ENDPOINT}/correlacion`, {
@@ -45,6 +51,52 @@ export const crearMiSolicitudAusencia = (payload: {
       motivo: payload.motivo?.trim() || null,
     }),
   })
+
+/** Adjunta evidencia (PDF/JPG/PNG) a una solicitud propia pendiente. */
+export const adjuntarEvidenciaMiSolicitudAusencia = (
+  solicitudId: number,
+  file: File,
+) => {
+  const body = new FormData()
+  body.append('archivo', file)
+  return fetchWithAuth<DocumentoSolicitudAusencia>(
+    `${FONTANERO_ENDPOINT}/${solicitudId}/documentos`,
+    { method: 'POST', body },
+  )
+}
+
+/**
+ * Abre evidencia con JWT. Las rutas guardadas apuntan a Fontanero;
+ * en vista admin se reescriben a `/rrhh/...`.
+ */
+export async function abrirEvidenciaSolicitudAusencia(
+  rutaReferenciaArchivo: string,
+  vista: 'fontanero' | 'admin' = 'fontanero',
+) {
+  let ruta = rutaReferenciaArchivo
+  if (vista === 'admin' && RUTA_DOC_FONTANERO.test(ruta)) {
+    ruta = ruta.replace(
+      '/api/v1/fontanero/solicitudes-ausencia/',
+      '/api/v1/rrhh/solicitudes-ausencia/',
+    )
+  }
+  if (
+    (!RUTA_DOC_FONTANERO.test(ruta) && !RUTA_DOC_ADMIN.test(ruta)) ||
+    ruta.includes('..')
+  ) {
+    throw new Error('La referencia del documento no es válida.')
+  }
+  const endpoint = ruta.replace(/^\/api\/v1/, '')
+  const response = await fetchRawWithAuth(endpoint)
+  if (!response.ok) {
+    throw new Error(
+      `HTTP ${response.status}: No fue posible abrir la evidencia.`,
+    )
+  }
+  const blobUrl = URL.createObjectURL(await response.blob())
+  window.open(blobUrl, '_blank', 'noopener,noreferrer')
+  window.setTimeout(() => URL.revokeObjectURL(blobUrl), 300_000)
+}
 
 export const getSolicitudesAusencia = (filtros: {
   estado?: EstadoSolicitudAusencia | ''

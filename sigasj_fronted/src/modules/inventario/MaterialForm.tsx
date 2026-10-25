@@ -28,7 +28,12 @@ type Props = {
   mode: 'create' | 'edit'
   initialValues?: MaterialFormValues
   stockActual?: number
-  currentCategoria?: { id: number; nombre: string; activo: boolean } | null
+  currentCategoria?: {
+    id: number
+    nombre: string
+    activo: boolean
+    requiereFechaVencimiento?: boolean
+  } | null
   currentProveedor?: { id: number; nombre: string; activo: boolean } | null
   onSubmit: (values: MaterialFormValues) => Promise<void>
 }
@@ -70,9 +75,29 @@ export default function MaterialForm({
       ? [currentProveedor, ...proveedores.data]
       : proveedores.data
 
+  const categoriaSeleccionada = categoryOptions.find(
+    (item) => String(item.id) === values.categoriaId,
+  )
+  const muestraVencimiento = Boolean(
+    categoriaSeleccionada?.requiereFechaVencimiento,
+  )
+
   const update = (field: keyof MaterialFormValues, value: string | boolean) => {
-    setValues((current) => ({ ...current, [field]: value }))
-    setErrors((current) => ({ ...current, [field]: undefined }))
+    setValues((current) => {
+      const next = { ...current, [field]: value }
+      if (field === 'categoriaId') {
+        const cat = categoryOptions.find((item) => String(item.id) === value)
+        if (!cat?.requiereFechaVencimiento) {
+          next.fechaVencimiento = ''
+        }
+      }
+      return next
+    })
+    setErrors((current) => ({
+      ...current,
+      [field]: undefined,
+      ...(field === 'categoriaId' ? { fechaVencimiento: undefined } : {}),
+    }))
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -215,22 +240,6 @@ export default function MaterialForm({
           />,
         )}
         {field(
-          'fechaVencimiento',
-          'Fecha de vencimiento',
-          <IconCalendarTime size={20} aria-hidden="true" />,
-          <input
-            value={values.fechaVencimiento}
-            type="date"
-            aria-invalid={Boolean(errors.fechaVencimiento)}
-            onChange={(e) => update('fechaVencimiento', e.target.value)}
-          />,
-        )}
-        <p className="provider-admin__form-note materials-admin__form-full">
-          {mode === 'create'
-            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega.'
-            : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí.'}
-        </p>
-        {field(
           'categoriaId',
           'Categoría *',
           <IconTag size={20} aria-hidden="true" />,
@@ -249,6 +258,29 @@ export default function MaterialForm({
             ))}
           </select>,
         )}
+        {muestraVencimiento
+          ? field(
+              'fechaVencimiento',
+              'Fecha de vencimiento',
+              <IconCalendarTime size={20} aria-hidden="true" />,
+              <input
+                value={values.fechaVencimiento}
+                type="date"
+                aria-invalid={Boolean(errors.fechaVencimiento)}
+                onChange={(e) => update('fechaVencimiento', e.target.value)}
+              />,
+            )
+          : values.categoriaId ? (
+              <p className="provider-admin__form-note materials-admin__form-full">
+                Esta categoría no usa fecha de vencimiento (p. ej. tubería PVC,
+                válvulas o herramientas).
+              </p>
+            ) : null}
+        <p className="provider-admin__form-note materials-admin__form-full">
+          {mode === 'create'
+            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega.'
+            : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí.'}
+        </p>
         {field(
           'proveedorId',
           'Proveedor principal *',

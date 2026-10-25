@@ -21,6 +21,7 @@ import {
   tipoSolicitudAusenciaLabel,
 } from '../solicitudAusenciaLabels'
 import {
+  abrirEvidenciaSolicitudAusencia,
   aprobarSolicitudAusencia,
   getSolicitudAusencia,
   rechazarSolicitudAusencia,
@@ -103,9 +104,10 @@ export default function SolicitudAusenciaDetallePage() {
 
   const aprobar = async () => {
     if (!solicitud || busy) return
+    const diasNetos = solicitud.resumenVacaciones?.diasNetos
     const mensaje =
       solicitud.tipo === 'VACACIONES'
-        ? '¿Desea aprobar esta solicitud de vacaciones? Se registrará el disfrute correspondiente y se actualizará el saldo.'
+        ? `¿Desea aprobar esta solicitud de vacaciones? Se descontarán ${diasNetos ?? 'los'} día(s) netos (sin feriados) del saldo.`
         : '¿Desea aprobar esta solicitud de permiso? Se creará el registro oficial en Permisos.'
     if (!window.confirm(mensaje)) return
     setBusy('aprobar')
@@ -285,6 +287,27 @@ export default function SolicitudAusenciaDetallePage() {
                   {formatearFechaPermiso(solicitud.createdAt.slice(0, 10))}
                 </dd>
               </div>
+              {solicitud.tipo === 'VACACIONES' && solicitud.resumenVacaciones ? (
+                <div className="rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3 sm:col-span-2">
+                  <dt className="text-xs font-extrabold uppercase text-sky-800">
+                    Días a descontar (sin feriados)
+                  </dt>
+                  <dd className="m-0 mt-1 font-semibold text-slate-800">
+                    Calendario: {solicitud.resumenVacaciones.diasCalendario} · Feriados:{' '}
+                    {solicitud.resumenVacaciones.feriados.length} · Netos:{' '}
+                    {solicitud.resumenVacaciones.diasNetos}
+                  </dd>
+                  {solicitud.resumenVacaciones.feriados.length > 0 ? (
+                    <ul className="m-0 mt-2 list-disc space-y-1 pl-5 text-sm font-medium text-slate-600">
+                      {solicitud.resumenVacaciones.feriados.map((f) => (
+                        <li key={f.fecha}>
+                          {formatearFechaPermiso(f.fecha)} — {f.nombre}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
               {solicitud.tipo === 'VACACIONES' && solicitud.saldoVacaciones ? (
                 <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 sm:col-span-2">
                   <dt className="text-xs font-extrabold uppercase text-emerald-800">
@@ -318,6 +341,42 @@ export default function SolicitudAusenciaDetallePage() {
                 </div>
               ) : null}
             </dl>
+
+              <section className="mt-2 grid gap-2 border-t border-slate-100 pt-5">
+                <h2 className="m-0 text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                  Evidencia
+                </h2>
+                {solicitud.documentos?.length ? (
+                  <ul className="m-0 grid list-none gap-2 p-0">
+                    {solicitud.documentos.map((doc) => (
+                      <li
+                        key={doc.id}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                      >
+                        <span className="font-semibold text-slate-800">
+                          {doc.nombreOriginal}
+                        </span>
+                        <button
+                          type="button"
+                          className="inline-flex min-h-10 items-center rounded-xl border border-blue-200 bg-white px-3 text-sm font-bold text-blue-800"
+                          onClick={() =>
+                            void abrirEvidenciaSolicitudAusencia(
+                              doc.rutaReferenciaArchivo,
+                              'admin',
+                            )
+                          }
+                        >
+                          Ver documento
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="m-0 text-sm font-semibold text-slate-500">
+                    Sin evidencia adjunta.
+                  </p>
+                )}
+              </section>
 
               {solicitud.estado === 'PENDIENTE' ? (
                 <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4">

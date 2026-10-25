@@ -25,6 +25,40 @@ export default function CategoriaEditPage() {
   if (id === null) return <Navigate to="/admin/inventario/categorias" replace />
   if (error) return <main className="materials-admin"><div className="materials-admin__error" role="alert">{error}</div></main>
   if (!categoria) return <main className="materials-admin"><div className="materials-admin__state" role="status"><span className="materials-admin__spinner" />Cargando categoría…</div></main>
-  const submit = async (values: CategoriaFormValues) => { try { await updateCategoria(id, { nombre: values.nombre.trim(), descripcion: values.descripcion.trim() || null }) } catch (caught) { const parsed = categoriaError(caught); const next = new Error(parsed.message, { cause: caught }) as Error & { fieldError?: string }; next.fieldError = parsed.nombre; throw next } }
-  return <main className="materials-admin materials-admin--form sigasj-stack"><header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Categorías</p><h1>Editar categoría</h1><p>Actualice la información descriptiva de la categoría.</p></div></header><CategoriaForm mode="edit" initialValues={{ nombre: categoria.nombre, descripcion: categoria.descripcion ?? '' }} onSubmit={submit} /></main>
+  const submit = async (values: CategoriaFormValues) => {
+    try {
+      await updateCategoria(id, {
+        nombre: values.nombre.trim(),
+        descripcion: values.descripcion.trim() || null,
+        requiereFechaVencimiento: values.requiereFechaVencimiento,
+      })
+    } catch (caught) {
+      const parsed = categoriaError(caught)
+      const next = new Error(parsed.message, { cause: caught }) as Error & {
+        fieldError?: string
+      }
+      next.fieldError = parsed.nombre
+      throw next
+    }
+  }
+  return (
+    <main className="materials-admin materials-admin--form sigasj-stack">
+      <header className="materials-admin__header">
+        <div>
+          <p className="materials-admin__eyebrow">Inventario · Categorías</p>
+          <h1>Editar categoría</h1>
+          <p>Actualice la información descriptiva de la categoría.</p>
+        </div>
+      </header>
+      <CategoriaForm
+        mode="edit"
+        initialValues={{
+          nombre: categoria.nombre,
+          descripcion: categoria.descripcion ?? '',
+          requiereFechaVencimiento: Boolean(categoria.requiereFechaVencimiento),
+        }}
+        onSubmit={submit}
+      />
+    </main>
+  )
 }

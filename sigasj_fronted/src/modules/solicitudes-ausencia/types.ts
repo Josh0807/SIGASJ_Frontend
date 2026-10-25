@@ -1,3 +1,5 @@
+import type { ResumenDiasVacaciones } from './feriadosCostaRica'
+
 export type TipoSolicitudAusencia = 'PERMISO' | 'VACACIONES'
 export type EstadoSolicitudAusencia = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA'
 
@@ -9,6 +11,15 @@ export type ColaboradorResumenAusencia = {
   cargo: string
   correoElectronico?: string
   activo?: boolean
+}
+
+export type DocumentoSolicitudAusencia = {
+  id: number
+  nombreOriginal: string
+  tipoArchivo: string
+  rutaReferenciaArchivo: string
+  tamanio: number
+  fechaCarga: string
 }
 
 /** Vista Fontanero (API 6.5.3). Sin jotformSubmissionId ni datos de revisor internos. */
@@ -23,6 +34,8 @@ export type SolicitudAusenciaFontanero = {
   estado: EstadoSolicitudAusencia
   motivoRechazo: string | null
   reviewedAt: string | null
+  documentos?: DocumentoSolicitudAusencia[]
+  resumenVacaciones?: ResumenDiasVacaciones | null
   createdAt: string
   updatedAt: string
 }
@@ -45,6 +58,8 @@ export type SolicitudAusencia = {
   registroGeneradoTipo: 'PERMISO' | 'MOVIMIENTO_VACACIONES' | null
   createdAt: string
   updatedAt: string
+  documentos?: DocumentoSolicitudAusencia[]
+  resumenVacaciones?: ResumenDiasVacaciones | null
   saldoVacaciones?: {
     diasAcumulados: number
     diasDisfrutados: number

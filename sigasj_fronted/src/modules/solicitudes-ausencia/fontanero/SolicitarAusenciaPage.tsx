@@ -1,14 +1,14 @@
 import {
   IconArrowLeft,
-  IconCalendarEvent,
   IconClipboardList,
   IconDeviceFloppy,
   IconMail,
   IconMessage2,
+  IconPaperclip,
   IconTag,
   IconUser,
 } from '@tabler/icons-react'
-import { useRef, useState, type FormEvent } from 'react'
+import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -17,14 +17,19 @@ import {
   esNoAutenticado,
   getHttpStatus,
 } from '../../recursos-humanos/colaboradorForm'
-import { crearMiSolicitudAusencia } from '../solicitudesAusenciaApi'
+import { formatearFechaPermiso } from '../../recursos-humanos/permisoForm'
+import FechaFeriadoPicker from '../FechaFeriadoPicker'
+import { resumenDiasVacaciones } from '../feriadosCostaRica'
+import {
+  adjuntarEvidenciaMiSolicitudAusencia,
+  crearMiSolicitudAusencia,
+} from '../solicitudesAusenciaApi'
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
   FONTANERO_SOLICITAR_AUSENCIA_TITLE,
   misSolicitudAusenciaDetailPath,
 } from '../solicitudesAusenciaPaths'
 import type { TipoSolicitudAusencia } from '../types'
-import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 
 type FormValues = {
   correo: string
@@ -34,12 +39,19 @@ type FormValues = {
   motivo: string
 }
 
-type FormErrors = Partial<Record<keyof FormValues, string>>
+type FormErrors = Partial<Record<keyof FormValues | 'evidencia', string>>
+
+const MAX_EVIDENCIA_BYTES = 10 * 1024 * 1024
+const EVIDENCIA_TIPOS = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+])
 
 const correoValido = (value: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 
-const validate = (values: FormValues): FormErrors => {
+const validate = (values: FormValues, evidencia: File | null): FormErrors => {
   const errors: FormErrors = {}
   if (!values.correo.trim()) {
     errors.correo = 'Indique el correo donde desea recibir el aviso.'
@@ -62,10 +74,32 @@ const validate = (values: FormValues): FormErrors => {
   ) {
     errors.fechaFin = 'La fecha de fin no puede ser anterior al inicio.'
   }
+  if (
+    values.tipo === 'VACACIONES' &&
+    values.fechaInicio &&
+    values.fechaFin &&
+    values.fechaFin >= values.fechaInicio
+  ) {
+    const resumen = resumenDiasVacaciones(values.fechaInicio, values.fechaFin)
+    if (resumen.diasNetos < 1) {
+      errors.fechaFin =
+        'Tras descontar feriados, el periodo no deja días de vacaciones.'
+    }
+  }
   if (!values.motivo.trim()) {
     errors.motivo = 'Indique el motivo de la solicitud.'
   } else if (values.motivo.trim().length > 500) {
     errors.motivo = 'El motivo no puede superar 500 caracteres.'
+  }
+  // Evidencia solo para permiso; vacaciones no la exige.
+  if (values.tipo === 'PERMISO') {
+    if (!evidencia) {
+      errors.evidencia = 'Adjunte la evidencia de respaldo (PDF, JPG o PNG).'
+    } else if (!EVIDENCIA_TIPOS.has(evidencia.type)) {
+      errors.evidencia = 'Solo se permiten archivos PDF, JPG o PNG.'
+    } else if (evidencia.size > MAX_EVIDENCIA_BYTES) {
+      errors.evidencia = 'El archivo no puede superar 10 MB.'
+    }
   }
   return errors
 }
@@ -117,32 +151,49 @@ const mensajeErrorEnvio = (error: unknown): string => {
 export default function SolicitarAusenciaPage() {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
-  const [values, setValues] = useState<FormValues>(() => {
-    const hoy = hoyEnAsada()
-    return {
-      correo: user?.email?.trim() || '',
-      tipo: '',
-      fechaInicio: hoy,
-      fechaFin: hoy,
-      motivo: '',
-    }
-  })
+  const [values, setValues] = useState<FormValues>(() => ({
+    correo: user?.email?.trim() || '',
+    tipo: '',
+    fechaInicio: '',
+    fechaFin: '',
+    motivo: '',
+  }))
+  const [evidencia, setEvidencia] = useState<File | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const submitting = useRef(false)
   const nombre = resolveAuthUserDisplayName(user)
 
+  const resumenVacaciones = useMemo(() => {
+    if (
+      values.tipo !== 'VACACIONES' ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(values.fechaInicio) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(values.fechaFin) ||
+      values.fechaFin < values.fechaInicio
+    ) {
+      return null
+    }
+    return resumenDiasVacaciones(values.fechaInicio, values.fechaFin)
+  }, [values.tipo, values.fechaInicio, values.fechaFin])
+
   const update = (name: keyof FormValues, value: string) => {
     setValues((current) => ({ ...current, [name]: value }))
-    setErrors((current) => ({ ...current, [name]: undefined }))
+    setErrors((current) => ({
+      ...current,
+      [name]: undefined,
+      ...(name === 'tipo' && value !== 'PERMISO' ? { evidencia: undefined } : {}),
+    }))
+    if (name === 'tipo' && value !== 'PERMISO') {
+      setEvidencia(null)
+    }
     setSubmitError(null)
   }
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (submitting.current) return
-    const nextErrors = validate(values)
+    const nextErrors = validate(values, evidencia)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) {
       setSubmitError('Revise los campos señalados.')
@@ -162,6 +213,22 @@ export default function SolicitarAusenciaPage() {
         correo: values.correo.trim().toLowerCase(),
         motivo: values.motivo.trim(),
       })
+      if (values.tipo === 'PERMISO' && evidencia) {
+        try {
+          await adjuntarEvidenciaMiSolicitudAusencia(creada.id, evidencia)
+        } catch (uploadError: unknown) {
+          if (esNoAutenticado(uploadError)) {
+            logout()
+            navigate(LOGIN_ROUTE_PATH, { replace: true })
+            return
+          }
+          setSubmitError(
+            `La solicitud #${creada.id} quedó creada, pero no se pudo adjuntar la evidencia. Ábrala desde Mis solicitudes e intente de nuevo o contacte a Administración.`,
+          )
+          navigate(misSolicitudAusenciaDetailPath(creada.id), { replace: true })
+          return
+        }
+      }
       navigate(misSolicitudAusenciaDetailPath(creada.id), { replace: true })
     } catch (error: unknown) {
       if (esNoAutenticado(error)) {
@@ -177,7 +244,7 @@ export default function SolicitarAusenciaPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-5xl gap-5 overflow-x-hidden px-4 py-6 sm:px-6">
+    <div className="mx-auto grid w-full max-w-5xl gap-5 px-4 py-6 sm:px-6">
       <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
           Fontanero
@@ -307,69 +374,99 @@ export default function SolicitarAusenciaPage() {
             ) : null}
           </label>
 
-          <label className="grid min-w-0 gap-2.5">
-            <span className="text-sm font-bold text-[#163f6b]">
-              Fecha de inicio <span className="text-red-600">*</span>
-            </span>
-            <span
-              className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${
-                errors.fechaInicio
-                  ? 'border-red-400'
-                  : 'border-slate-200 focus-within:border-blue-500'
-              }`}
-            >
-              <IconCalendarEvent
-                className={errors.fechaInicio ? 'text-red-500' : 'text-slate-400'}
-                size={20}
-                aria-hidden="true"
-              />
-              <input
-                type="date"
-                className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none"
-                value={values.fechaInicio}
-                required
-                aria-invalid={Boolean(errors.fechaInicio)}
-                onChange={(event) => update('fechaInicio', event.target.value)}
-              />
-            </span>
-            {errors.fechaInicio ? (
-              <small className="font-semibold text-red-600" role="alert">
-                {errors.fechaInicio}
-              </small>
-            ) : null}
-          </label>
+          <FechaFeriadoPicker
+            label="Fecha de inicio"
+            value={values.fechaInicio}
+            required
+            error={errors.fechaInicio}
+            max={values.fechaFin || undefined}
+            onChange={(iso) => update('fechaInicio', iso)}
+          />
 
-          <label className="grid min-w-0 gap-2.5">
-            <span className="text-sm font-bold text-[#163f6b]">
-              Fecha de fin <span className="text-red-600">*</span>
-            </span>
-            <span
-              className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${
-                errors.fechaFin
-                  ? 'border-red-400'
-                  : 'border-slate-200 focus-within:border-blue-500'
-              }`}
+          <FechaFeriadoPicker
+            label="Fecha de fin"
+            value={values.fechaFin}
+            required
+            error={errors.fechaFin}
+            min={values.fechaInicio || undefined}
+            onChange={(iso) => update('fechaFin', iso)}
+          />
+
+          {resumenVacaciones ? (
+            <div
+              className="grid gap-4 overflow-hidden rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-amber-50/40 p-4 shadow-[0_10px_28px_rgba(30,90,156,0.06)] lg:col-span-2 sm:p-5"
+              role="status"
+              aria-live="polite"
             >
-              <IconCalendarEvent
-                className={errors.fechaFin ? 'text-red-500' : 'text-slate-400'}
-                size={20}
-                aria-hidden="true"
-              />
-              <input
-                type="date"
-                className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none"
-                value={values.fechaFin}
-                required
-                aria-invalid={Boolean(errors.fechaFin)}
-                onChange={(event) => update('fechaFin', event.target.value)}
-              />
-            </span>
-            {errors.fechaFin ? (
-              <small className="font-semibold text-red-600" role="alert">
-                {errors.fechaFin}
-              </small>
-            ) : null}
-          </label>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="m-0 text-xs font-extrabold uppercase tracking-[0.14em] text-blue-600">
+                    Vacaciones
+                  </p>
+                  <p className="m-0 mt-1 text-base font-black text-[#062e63]">
+                    Días a descontar del saldo
+                  </p>
+                </div>
+                <p className="m-0 inline-flex min-w-[4.5rem] flex-col items-center rounded-2xl bg-gradient-to-br from-blue-700 to-sky-500 px-4 py-2 text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)]">
+                  <span className="text-2xl font-black leading-none">
+                    {resumenVacaciones.diasNetos}
+                  </span>
+                  <span className="mt-1 text-[0.65rem] font-bold uppercase tracking-wide text-sky-100">
+                    netos
+                  </span>
+                </p>
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-3">
+                <div className="rounded-xl border border-slate-100 bg-white/80 px-3 py-2.5">
+                  <p className="m-0 text-[0.65rem] font-extrabold uppercase tracking-wide text-slate-400">
+                    Calendario
+                  </p>
+                  <p className="m-0 mt-0.5 text-lg font-black text-slate-800">
+                    {resumenVacaciones.diasCalendario}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-amber-100 bg-amber-50/70 px-3 py-2.5">
+                  <p className="m-0 text-[0.65rem] font-extrabold uppercase tracking-wide text-amber-700/80">
+                    Feriados
+                  </p>
+                  <p className="m-0 mt-0.5 text-lg font-black text-amber-950">
+                    {resumenVacaciones.feriados.length}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 px-3 py-2.5">
+                  <p className="m-0 text-[0.65rem] font-extrabold uppercase tracking-wide text-emerald-700/80">
+                    A descontar
+                  </p>
+                  <p className="m-0 mt-0.5 text-lg font-black text-emerald-950">
+                    {resumenVacaciones.diasNetos}
+                  </p>
+                </div>
+              </div>
+
+              {resumenVacaciones.feriados.length > 0 ? (
+                <ul className="m-0 grid list-none gap-2 p-0">
+                  {resumenVacaciones.feriados.map((feriado) => (
+                    <li
+                      key={feriado.fecha}
+                      className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-100/80 bg-white/70 px-3 py-2 text-sm"
+                    >
+                      <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wide text-amber-900">
+                        {formatearFechaPermiso(feriado.fecha)}
+                      </span>
+                      <span className="font-semibold text-slate-700">
+                        {feriado.nombre}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="m-0 text-sm font-medium text-slate-500">
+                  No hay feriados nacionales en este periodo.
+                </p>
+              )}
+            </div>
+          ) : null}
 
           <label className="grid min-w-0 gap-2.5 lg:col-span-2">
             <span className="text-sm font-bold text-[#163f6b]">
@@ -403,6 +500,56 @@ export default function SolicitarAusenciaPage() {
               </small>
             ) : null}
           </label>
+
+          {values.tipo === 'PERMISO' ? (
+            <label className="grid min-w-0 gap-2.5 lg:col-span-2">
+              <span className="text-sm font-bold text-[#163f6b]">
+                Evidencia <span className="text-red-600">*</span>
+              </span>
+              <span
+                className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${
+                  errors.evidencia
+                    ? 'border-red-400'
+                    : 'border-slate-200 focus-within:border-blue-500'
+                }`}
+              >
+                <IconPaperclip
+                  className={
+                    errors.evidencia ? 'text-red-500' : 'text-slate-400'
+                  }
+                  size={20}
+                  aria-hidden="true"
+                />
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-sm file:font-bold file:text-blue-800"
+                  required
+                  aria-invalid={Boolean(errors.evidencia)}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null
+                    setEvidencia(file)
+                    setErrors((current) => ({
+                      ...current,
+                      evidencia: undefined,
+                    }))
+                    setSubmitError(null)
+                  }}
+                />
+              </span>
+              {errors.evidencia ? (
+                <small className="font-semibold text-red-600" role="alert">
+                  {errors.evidencia}
+                </small>
+              ) : (
+                <small className="text-slate-500">
+                  Adjunte un comprobante o constancia (PDF, JPG o PNG, máx. 10
+                  MB).
+                  {evidencia ? ` Archivo: ${evidencia.name}` : ''}
+                </small>
+              )}
+            </label>
+          ) : null}
         </div>
 
         <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
