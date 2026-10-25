@@ -112,11 +112,12 @@ export default function SolicitudesAusenciaPage() {
           Administración · {RRHH_TITLE}
         </p>
         <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
-          Solicitudes
+          Solicitudes a revisar
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-          Revise las solicitudes de permiso o vacaciones. Solo al aprobar se crea el registro
-          oficial en RRHH.
+          Cola de permiso y vacaciones que envía el Fontanero. Al aprobar un
+          permiso se registra en Permisos otorgados; al aprobar vacaciones se
+          descuenta el saldo.
         </p>
       </header>
 

@@ -20,12 +20,18 @@ export default function RrhhSubnav() {
 
   const items = [
     { to: RRHH_PATH, label: 'Colaboradores', end: true },
-    { to: PERMISOS_PATH, label: 'Permisos', end: false },
+    ...(verSolicitudes
+      ? [
+          {
+            to: SOLICITUDES_AUSENCIA_ADMIN_PATH,
+            label: 'Solicitudes a revisar',
+            end: false,
+          },
+        ]
+      : []),
+    { to: PERMISOS_PATH, label: 'Permisos otorgados', end: false },
     { to: INCAPACIDADES_PATH, label: 'Incapacidades', end: false },
     { to: VACACIONES_PATH, label: 'Vacaciones', end: false },
-    ...(verSolicitudes
-      ? [{ to: SOLICITUDES_AUSENCIA_ADMIN_PATH, label: 'Solicitudes', end: false }]
-      : []),
   ]
 
   return (

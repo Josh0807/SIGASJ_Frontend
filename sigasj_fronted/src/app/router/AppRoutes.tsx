@@ -14,6 +14,8 @@ import { InternalAdminRoleName } from '../../modules/auth/utils/internalRoles'
 import MiSolicitudAusenciaDetallePage from '../../modules/solicitudes-ausencia/fontanero/MiSolicitudAusenciaDetallePage'
 import MisSolicitudesAusenciaPage from '../../modules/solicitudes-ausencia/fontanero/MisSolicitudesAusenciaPage'
 import SolicitarAusenciaPage from '../../modules/solicitudes-ausencia/fontanero/SolicitarAusenciaPage'
+import SolicitarPermisoPage from '../../modules/solicitudes-ausencia/fontanero/SolicitarPermisoPage'
+import SolicitarVacacionesPage from '../../modules/solicitudes-ausencia/fontanero/SolicitarVacacionesPage'
 import MiSaldoVacacionesPage from '../../modules/recursos-humanos/fontanero/MiSaldoVacacionesPage'
 import {
   FONTANERO_MI_SALDO_PATH,
@@ -22,6 +24,8 @@ import {
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
   FONTANERO_SOLICITAR_AUSENCIA_PATH,
+  FONTANERO_SOLICITAR_PERMISO_PATH,
+  FONTANERO_SOLICITAR_VACACIONES_PATH,
 } from '../../modules/solicitudes-ausencia/solicitudesAusenciaPaths'
 import {
   ADMIN_CHILD_ROUTES,
@@ -107,6 +111,36 @@ const AppRoutes = () => (
         }
       >
         <Route index element={<SolicitarAusenciaPage />} />
+      </Route>
+      <Route
+        path="fontanero/solicitar-permiso"
+        element={
+          <AdminAreaGate>
+            <AuthorizedRoute
+              requiredPath={FONTANERO_SOLICITAR_PERMISO_PATH}
+              allowedRoles={[InternalAdminRoleName.Fontanero]}
+            >
+              <AdminLayout />
+            </AuthorizedRoute>
+          </AdminAreaGate>
+        }
+      >
+        <Route index element={<SolicitarPermisoPage />} />
+      </Route>
+      <Route
+        path="fontanero/solicitar-vacaciones"
+        element={
+          <AdminAreaGate>
+            <AuthorizedRoute
+              requiredPath={FONTANERO_SOLICITAR_VACACIONES_PATH}
+              allowedRoles={[InternalAdminRoleName.Fontanero]}
+            >
+              <AdminLayout />
+            </AuthorizedRoute>
+          </AdminAreaGate>
+        }
+      >
+        <Route index element={<SolicitarVacacionesPage />} />
       </Route>
       <Route
         path="fontanero/mis-solicitudes"

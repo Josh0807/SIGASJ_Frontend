@@ -34,17 +34,37 @@ export const crearMiSolicitudAusencia = (payload: {
   fechaFin: string
   correo: string
   motivo?: string | null
-}) =>
-  fetchWithAuth<SolicitudAusenciaFontanero>(FONTANERO_ENDPOINT, {
+  documentos?: File[]
+}) => {
+  const documentos = payload.documentos ?? []
+  if (documentos.length > 0) {
+    const body = new FormData()
+    body.append('tipo', payload.tipo)
+    body.append('fechaInicio', payload.fechaInicio)
+    body.append('fechaFin', payload.fechaFin)
+    body.append('correo', payload.correo.trim().toLowerCase())
+    if (payload.motivo?.trim()) {
+      body.append('motivo', payload.motivo.trim())
+    }
+    for (const file of documentos) {
+      body.append('documentos', file)
+    }
+    return fetchWithAuth<SolicitudAusenciaFontanero>(FONTANERO_ENDPOINT, {
+      method: 'POST',
+      body,
+    })
+  }
+  return fetchWithAuth<SolicitudAusenciaFontanero>(FONTANERO_ENDPOINT, {
     method: 'POST',
     body: JSON.stringify({
       tipo: payload.tipo,
       fechaInicio: payload.fechaInicio,
       fechaFin: payload.fechaFin,
       correo: payload.correo.trim().toLowerCase(),
-      motivo: payload.motivo?.trim() || null,
+      motivo: payload.tipo === 'VACACIONES' ? null : payload.motivo?.trim() || null,
     }),
   })
+}
 
 export const getSolicitudesAusencia = (filtros: {
   estado?: EstadoSolicitudAusencia | ''

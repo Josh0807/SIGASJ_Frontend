@@ -61,7 +61,8 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/admin/solicitudes',
       '/admin/actividades',
       '/fontanero/averias',
-      '/fontanero/solicitar-ausencia',
+      '/fontanero/solicitar-permiso',
+      '/fontanero/solicitar-vacaciones',
       '/fontanero/mis-solicitudes',
       '/fontanero/mi-saldo-vacaciones',
     ])

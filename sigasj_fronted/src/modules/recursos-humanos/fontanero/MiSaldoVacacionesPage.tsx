@@ -1,7 +1,8 @@
 import { IconBeach, IconRefresh } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { FONTANERO_SOLICITAR_VACACIONES_PATH } from '../../solicitudes-ausencia/solicitudesAusenciaPaths'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../../auth/components/AuthContext'
 import { esNoAutenticado, esReintentable, nombreCompleto } from '../colaboradorForm'
@@ -68,7 +69,10 @@ export default function MiSaldoVacacionesPage() {
           {FONTANERO_MI_SALDO_TITLE}
         </h1>
         <p className="m-0 text-slate-500">
-          Consulta de solo lectura. Para solicitar vacaciones use el formulario de ausencia.
+          Consulta de solo lectura.{' '}
+          <Link to={FONTANERO_SOLICITAR_VACACIONES_PATH} className="font-bold text-blue-800">
+            Solicitar vacaciones
+          </Link>
         </p>
       </header>
 

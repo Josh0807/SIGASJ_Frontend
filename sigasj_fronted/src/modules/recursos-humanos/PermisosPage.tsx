@@ -21,6 +21,11 @@ import {
 } from './permisoForm'
 import { PERMISOS_PAGE_SIZE, getPermisos } from './permisosApi'
 import {
+  InternalAdminRoleName,
+  userHasAllowedRole,
+} from '../auth/utils/adminNavigation'
+import { SOLICITUDES_AUSENCIA_ADMIN_PATH } from '../solicitudes-ausencia/solicitudesAusenciaPaths'
+import {
   PERMISO_NEW_PATH,
   permisoDetailPath,
   permisoEditPath,
@@ -44,7 +49,10 @@ const inputClass =
 export default function PermisosPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
+  const verColaSolicitudes = userHasAllowedRole(user, [
+    InternalAdminRoleName.Administradora,
+  ])
   const [searchParams, setSearchParams] = useSearchParams()
   const filtros = leerFiltros(searchParams)
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([])
@@ -152,7 +160,9 @@ export default function PermisosPage() {
             Permisos del personal
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-            Registre, consulte y actualice los permisos otorgados a los colaboradores.
+            Aquí solo aparecen los permisos ya otorgados. Las solicitudes que envía
+            el Fontanero se revisan en Solicitudes a revisar; al aprobarlas se
+            agregan a esta lista.
           </p>
         </div>
         <Link
@@ -163,6 +173,18 @@ export default function PermisosPage() {
           Registrar permiso
         </Link>
       </header>
+
+      {verColaSolicitudes ? (
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 font-semibold text-amber-950">
+          Las solicitudes pendientes del Fontanero no salen aquí.{' '}
+          <Link
+            className="font-extrabold text-blue-800 underline"
+            to={`${SOLICITUDES_AUSENCIA_ADMIN_PATH}?estado=PENDIENTE`}
+          >
+            Ir a solicitudes a revisar
+          </Link>
+        </p>
+      ) : null}
 
       {aviso ? (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-800" role="status">

@@ -12217,6 +12217,17 @@ body,
   background: #174a82;
 }
 
+.actividad-registro-form__button--adjuntar {
+  border: 0;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+}
+
+.actividad-registro-form__button--adjuntar:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
 .actividad-registro-form__button--primary:disabled {
   opacity: 0.65;
   cursor: not-allowed;

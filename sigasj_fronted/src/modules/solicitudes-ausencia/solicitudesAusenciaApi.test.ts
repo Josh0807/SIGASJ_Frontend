@@ -69,7 +69,7 @@ describe('solicitudesAusenciaApi — Fontanero 6.5.3', () => {
       fechaInicio: '2026-12-01',
       fechaFin: '2026-12-05',
       correo: 'aviso@asadasanjuan.cr',
-      motivo: 'Descanso',
+      motivo: null,
     })
   })
 })

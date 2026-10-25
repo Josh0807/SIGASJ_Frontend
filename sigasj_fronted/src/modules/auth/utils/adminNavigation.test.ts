@@ -85,9 +85,11 @@ describe('adminNavigation helpers', () => {
     expect(items.map((item) => item.path)).toEqual([
       '/admin/dashboard',
       '/admin/inventario',
+      '/admin/solicitudes',
       '/admin/actividades',
       '/fontanero/averias',
-      '/fontanero/solicitar-ausencia',
+      '/fontanero/solicitar-permiso',
+      '/fontanero/solicitar-vacaciones',
       '/fontanero/mis-solicitudes',
       '/fontanero/mi-saldo-vacaciones',
     ])
@@ -95,9 +97,16 @@ describe('adminNavigation helpers', () => {
     expect(canAccessAdminRoute(fontanero, '/fontanero/averias')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/fontanero/averias/25')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/fontanero/solicitar-ausencia')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/fontanero/solicitar-permiso')).toBe(true)
+    expect(canAccessAdminRoute(fontanero, '/fontanero/solicitar-vacaciones')).toBe(
+      true,
+    )
     expect(
-      items.find((item) => item.path === '/fontanero/solicitar-ausencia')?.title,
-    ).toBe('Solicitar permiso o vacaciones')
+      items.find((item) => item.path === '/fontanero/solicitar-permiso')?.title,
+    ).toBe('Solicitar permiso')
+    expect(
+      items.find((item) => item.path === '/fontanero/solicitar-vacaciones')?.title,
+    ).toBe('Solicitar vacaciones')
     expect(canAccessAdminRoute(fontanero, '/fontanero/mis-solicitudes')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/fontanero/mis-solicitudes/12')).toBe(
       true,

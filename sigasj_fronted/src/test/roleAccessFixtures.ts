@@ -5,7 +5,8 @@ import { FONTANERO_AVERIAS_PATH } from '../modules/averias/fontanero/averiasFont
 import { FONTANERO_MI_SALDO_PATH } from '../modules/recursos-humanos/recursosHumanosPaths'
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
-  FONTANERO_SOLICITAR_AUSENCIA_PATH,
+  FONTANERO_SOLICITAR_PERMISO_PATH,
+  FONTANERO_SOLICITAR_VACACIONES_PATH,
 } from '../modules/solicitudes-ausencia/solicitudesAusenciaPaths'
 /** En SIGASJ el rol técnico es `Secretaria` (equivalente a “Secretaria Ejecutiva” en la tarea). */
 export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
@@ -31,7 +32,8 @@ export const EXPECTED_NAV_PATHS: Record<InternalAdminRole, readonly string[]> = 
   Fontanero: [
     ...pathsForRoles('Fontanero'),
     FONTANERO_AVERIAS_PATH,
-    FONTANERO_SOLICITAR_AUSENCIA_PATH,
+    FONTANERO_SOLICITAR_PERMISO_PATH,
+    FONTANERO_SOLICITAR_VACACIONES_PATH,
     FONTANERO_MIS_SOLICITUDES_PATH,
     FONTANERO_MI_SALDO_PATH,
   ],

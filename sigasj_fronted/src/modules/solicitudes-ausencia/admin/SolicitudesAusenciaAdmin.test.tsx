@@ -119,7 +119,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
     await flushAsync()
     try {
       const link = Array.from(app.container.querySelectorAll('a')).find(
-        (a) => a.textContent?.trim() === 'Solicitudes',
+        (a) => a.textContent?.trim() === 'Solicitudes a revisar',
       )
       expect(link?.getAttribute('href')).toBe(PATH)
     } finally {
@@ -133,7 +133,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
       const labels = Array.from(sec.container.querySelectorAll('a')).map((a) =>
         a.textContent?.trim(),
       )
-      expect(labels).not.toContain('Solicitudes')
+      expect(labels).not.toContain('Solicitudes a revisar')
     } finally {
       await sec.cleanup()
     }

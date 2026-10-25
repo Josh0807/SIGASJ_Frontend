@@ -12,8 +12,10 @@ import {
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
   FONTANERO_MIS_SOLICITUDES_TITLE,
-  FONTANERO_SOLICITAR_AUSENCIA_PATH,
-  FONTANERO_SOLICITAR_AUSENCIA_TITLE,
+  FONTANERO_SOLICITAR_PERMISO_PATH,
+  FONTANERO_SOLICITAR_PERMISO_TITLE,
+  FONTANERO_SOLICITAR_VACACIONES_PATH,
+  FONTANERO_SOLICITAR_VACACIONES_TITLE,
   isFontaneroMisSolicitudesPath,
   isFontaneroSolicitarAusenciaPath,
   isSolicitudesAusenciaAdminPath,
@@ -273,8 +275,13 @@ export function getAdminNavItemsForUser(user: AuthUser | null): AdminNavItem[] {
       icon: 'averias',
     })
     items.push({
-      path: FONTANERO_SOLICITAR_AUSENCIA_PATH,
-      title: FONTANERO_SOLICITAR_AUSENCIA_TITLE,
+      path: FONTANERO_SOLICITAR_PERMISO_PATH,
+      title: FONTANERO_SOLICITAR_PERMISO_TITLE,
+      icon: 'rrhh',
+    })
+    items.push({
+      path: FONTANERO_SOLICITAR_VACACIONES_PATH,
+      title: FONTANERO_SOLICITAR_VACACIONES_TITLE,
       icon: 'rrhh',
     })
     items.push({
