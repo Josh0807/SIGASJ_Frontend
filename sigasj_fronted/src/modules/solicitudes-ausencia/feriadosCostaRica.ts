@@ -1,12 +1,35 @@
-const pad = (value: number) => String(value).padStart(2, '0')
+/**
+ * Feriados nacionales de Costa Rica (Código de Trabajo, art. 148).
+ * Debe coincidir con Backend `feriados-costa-rica.ts`.
+ */
 
-const isoUtc = (year: number, month: number, day: number): string =>
-  `${year}-${pad(month)}-${pad(day)}`
+export type FeriadoCostaRica = {
+  fecha: string
+  nombre: string
+}
 
-export const domingoPascua = (year: number): string => {
-  const a = year % 19
-  const b = Math.floor(year / 100)
-  const c = year % 100
+const FIXED: ReadonlyArray<{ mes: number; dia: number; nombre: string }> = [
+  { mes: 1, dia: 1, nombre: 'Año Nuevo' },
+  { mes: 4, dia: 11, nombre: 'Batalla de Rivas / Juan Santamaría' },
+  { mes: 5, dia: 1, nombre: 'Día del Trabajador' },
+  { mes: 7, dia: 25, nombre: 'Anexión del Partido de Nicoya' },
+  { mes: 8, dia: 2, nombre: 'Virgen de los Ángeles' },
+  { mes: 8, dia: 15, nombre: 'Día de la Madre' },
+  {
+    mes: 8,
+    dia: 31,
+    nombre: 'Día de la Persona Negra y la Cultura Afrocostarricense',
+  },
+  { mes: 9, dia: 15, nombre: 'Día de la Independencia' },
+  { mes: 12, dia: 1, nombre: 'Abolición del Ejército' },
+  { mes: 12, dia: 25, nombre: 'Navidad' },
+]
+
+/** Domingo de Pascua (algoritmo gregoriano Meeus/Jones/Butcher). */
+export const domingoPascua = (anio: number): { mes: number; dia: number } => {
+  const a = anio % 19
+  const b = Math.floor(anio / 100)
+  const c = anio % 100
   const d = Math.floor(b / 4)
   const e = b % 4
   const f = Math.floor((b + 8) / 25)
@@ -16,90 +39,107 @@ export const domingoPascua = (year: number): string => {
   const k = c % 4
   const l = (32 + 2 * e + 2 * i - h - k) % 7
   const m = Math.floor((a + 11 * h + 22 * l) / 451)
-  const month = Math.floor((h + l - 7 * m + 114) / 31)
-  const day = ((h + l - 7 * m + 114) % 31) + 1
-  return isoUtc(year, month, day)
+  const mes = Math.floor((h + l - 7 * m + 114) / 31)
+  const dia = ((h + l - 7 * m + 114) % 31) + 1
+  return { mes, dia }
 }
 
-const addDaysIso = (iso: string, days: number): string => {
-  const [y, m, d] = iso.split('-').map(Number)
-  const date = new Date(Date.UTC(y, m - 1, d + days))
-  return isoUtc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
+const iso = (anio: number, mes: number, dia: number): string =>
+  `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
+
+const sumarDiasUtc = (fechaIso: string, delta: number): string => {
+  const [y, m, d] = fechaIso.split('-').map(Number)
+  const ms = Date.UTC(y, m - 1, d) + delta * 86_400_000
+  const date = new Date(ms)
+  return iso(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
 }
 
-export const feriadosCostaRicaDelAnio = (year: number): string[] => {
-  const pascua = domingoPascua(year)
-  return [
-    isoUtc(year, 1, 1),
-    addDaysIso(pascua, -3),
-    addDaysIso(pascua, -2),
-    isoUtc(year, 4, 11),
-    isoUtc(year, 5, 1),
-    isoUtc(year, 7, 25),
-    isoUtc(year, 8, 2),
-    isoUtc(year, 8, 15),
-    isoUtc(year, 9, 15),
-    isoUtc(year, 12, 1),
-    isoUtc(year, 12, 25),
+export const feriadosDelAnio = (anio: number): FeriadoCostaRica[] => {
+  if (!Number.isInteger(anio) || anio < 1900 || anio > 2200) return []
+  const pascua = domingoPascua(anio)
+  const domingo = iso(anio, pascua.mes, pascua.dia)
+  const moviles: FeriadoCostaRica[] = [
+    { fecha: sumarDiasUtc(domingo, -3), nombre: 'Jueves Santo' },
+    { fecha: sumarDiasUtc(domingo, -2), nombre: 'Viernes Santo' },
   ]
+  const fijos = FIXED.map((f) => ({
+    fecha: iso(anio, f.mes, f.dia),
+    nombre: f.nombre,
+  }))
+  return [...fijos, ...moviles].sort((a, b) => a.fecha.localeCompare(b.fecha))
 }
 
-const cache = new Map<number, Set<string>>()
+export const feriadosEnPeriodo = (
+  fechaInicio: string,
+  fechaFin: string,
+): FeriadoCostaRica[] => {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(fechaInicio) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(fechaFin)
+  ) {
+    return []
+  }
+  if (fechaFin < fechaInicio) return []
 
-const feriadosDelAnio = (year: number): Set<string> => {
-  const cached = cache.get(year)
-  if (cached) return cached
-  const set = new Set(feriadosCostaRicaDelAnio(year))
-  cache.set(year, set)
-  return set
+  const anioInicio = Number(fechaInicio.slice(0, 4))
+  const anioFin = Number(fechaFin.slice(0, 4))
+  const out: FeriadoCostaRica[] = []
+  for (let anio = anioInicio; anio <= anioFin; anio += 1) {
+    for (const feriado of feriadosDelAnio(anio)) {
+      if (feriado.fecha >= fechaInicio && feriado.fecha <= fechaFin) {
+        out.push(feriado)
+      }
+    }
+  }
+  return out
 }
 
-export const esFeriadoCostaRica = (isoDate: string): boolean => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return false
-  return feriadosDelAnio(Number(isoDate.slice(0, 4))).has(isoDate)
+export type ResumenDiasVacaciones = {
+  diasCalendario: number
+  feriados: FeriadoCostaRica[]
+  diasNetos: number
 }
+
+export const resumenDiasVacaciones = (
+  fechaInicio: string,
+  fechaFin: string,
+): ResumenDiasVacaciones => {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(fechaInicio) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(fechaFin) ||
+    fechaFin < fechaInicio
+  ) {
+    return { diasCalendario: 0, feriados: [], diasNetos: 0 }
+  }
+  const [y1, m1, d1] = fechaInicio.split('-').map(Number)
+  const [y2, m2, d2] = fechaFin.split('-').map(Number)
+  const diasCalendario =
+    Math.floor(
+      (Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86_400_000,
+    ) + 1
+  const feriados = feriadosEnPeriodo(fechaInicio, fechaFin)
+  return {
+    diasCalendario,
+    feriados,
+    diasNetos: Math.max(0, diasCalendario - feriados.length),
+  }
+}
+
+export const esFeriadoCostaRica = (isoDate: string): boolean =>
+  feriadosEnPeriodo(isoDate, isoDate).length > 0
 
 export const listarFeriadosEnRango = (
   fechaInicio: string,
   fechaFin: string,
-): string[] => {
-  if (!fechaInicio || !fechaFin || fechaFin < fechaInicio) return []
-  const [y1, m1, d1] = fechaInicio.split('-').map(Number)
-  const [y2, m2, d2] = fechaFin.split('-').map(Number)
-  const start = Date.UTC(y1, m1 - 1, d1)
-  const end = Date.UTC(y2, m2 - 1, d2)
-  const feriados: string[] = []
-  for (let t = start; t <= end; t += 86_400_000) {
-    const date = new Date(t)
-    const iso = isoUtc(
-      date.getUTCFullYear(),
-      date.getUTCMonth() + 1,
-      date.getUTCDate(),
-    )
-    if (esFeriadoCostaRica(iso)) feriados.push(iso)
-  }
-  return feriados
-}
+): string[] => feriadosEnPeriodo(fechaInicio, fechaFin).map((f) => f.fecha)
 
 export const diasAusenciaSinFeriados = (
   fechaInicio: string,
   fechaFin: string,
-): number => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaInicio) || !/^\d{4}-\d{2}-\d{2}$/.test(fechaFin)) {
-    return 0
-  }
-  if (fechaFin < fechaInicio) return 0
-  const [y1, m1, d1] = fechaInicio.split('-').map(Number)
-  const [y2, m2, d2] = fechaFin.split('-').map(Number)
-  const inclusivos =
-    Math.floor(
-      (Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86_400_000,
-    ) + 1
-  return Math.max(0, inclusivos - listarFeriadosEnRango(fechaInicio, fechaFin).length)
-}
+): number => resumenDiasVacaciones(fechaInicio, fechaFin).diasNetos
 
-export const formatearFeriado = (iso: string): string => {
-  const [y, m, d] = iso.split('-').map(Number)
+export const formatearFeriado = (isoFecha: string): string => {
+  const [y, m, d] = isoFecha.split('-').map(Number)
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('es-CR', {
     day: 'numeric',
     month: 'short',

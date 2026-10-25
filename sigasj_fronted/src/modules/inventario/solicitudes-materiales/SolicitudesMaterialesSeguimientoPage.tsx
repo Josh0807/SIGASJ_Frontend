@@ -14,7 +14,7 @@ import {
 } from './solicitudMaterialesUtils'
 import type { SolicitudMaterialesListItem } from './types'
 
-const STATUS_OPTIONS = ['TODAS', 'PENDIENTE', 'APROBADA', 'RECHAZADA'] as const
+const STATUS_OPTIONS = ['TODAS', 'PENDIENTE', 'APROBADA', 'RECHAZADA', 'CANCELADA', 'DESPACHADA'] as const
 const requestButtonClasses = 'group relative isolate overflow-hidden !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !via-blue-600 !to-sky-500 !px-6 !py-3 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.28)] transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_16px_32px_rgba(37,99,235,0.36)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none motion-reduce:transition-none'
 
 export default function SolicitudesMaterialesSeguimientoPage() {

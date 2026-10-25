@@ -1,9 +1,15 @@
 import type { Categoria } from './categorias/types'
 
-type CategoryOption = Pick<Categoria, 'id' | 'nombre' | 'activo'>
+type CategoryOption = Pick<
+  Categoria,
+  'id' | 'nombre' | 'activo' | 'requiereFechaVencimiento'
+>
 
 /** Conserva la categoría histórica inactiva, sin ofrecer otras inactivas. */
-export function materialCategoryOptions(active: Categoria[], current?: CategoryOption | null): CategoryOption[] {
+export function materialCategoryOptions(
+  active: Categoria[],
+  current?: CategoryOption | null,
+): CategoryOption[] {
   const options: CategoryOption[] = []
   if (current && !current.activo) options.push(current)
   for (const category of active) {

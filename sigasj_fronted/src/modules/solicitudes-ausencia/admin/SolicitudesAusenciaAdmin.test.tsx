@@ -377,7 +377,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
       await flushAsync()
       expect(window.confirm).toHaveBeenCalled()
       const confirmMsg = String(vi.mocked(window.confirm).mock.calls[0][0])
-      expect(confirmMsg).toMatch(/disfrute/i)
+      expect(confirmMsg).toMatch(/feriados|saldo/i)
       expect(ausenciaApi.aprobarSolicitudAusencia).toHaveBeenCalledWith(20)
       expect(app.container.innerHTML).toContain('movimiento de vacaciones')
       expect(app.container.innerHTML).toContain('Aprobada')

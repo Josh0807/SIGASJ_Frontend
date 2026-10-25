@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { IconAlertTriangle, IconArrowsExchange, IconCalendar, IconCalendarX, IconCategory, IconCurrencyDollar, IconEraser, IconPackage, IconSearch } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowsExchange, IconCalendar, IconCalendarX, IconCategory, IconEraser, IconPackage, IconSearch } from '@tabler/icons-react'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
 import { InventoryFormField } from '../InventoryFormField'
 import {

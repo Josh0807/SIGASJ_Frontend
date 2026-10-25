@@ -187,6 +187,7 @@ export default function CategoriasPage() {
               <tr>
                 <th>Nombre</th>
                 <th>Descripción</th>
+                <th>Vencimiento</th>
                 <th>Estado</th>
                 <th>Creación</th>
                 <th>Acciones</th>
@@ -200,6 +201,15 @@ export default function CategoriasPage() {
                   </td>
                   <td data-label="Descripción">
                     {item.descripcion || "Sin descripción"}
+                  </td>
+                  <td data-label="Vencimiento">
+                    {item.requiereFechaVencimiento ? (
+                      <span className="materials-admin__badge is-active">
+                        Sí
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">No</span>
+                    )}
                   </td>
                   <td data-label="Estado">
                     <span

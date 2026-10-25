@@ -1,5 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getSolicitudAdminDetail, getSolicitudDocumentoAdmin, getSolicitudesAdmin, normalizeSolicitudAdminDetail, normalizeSolicitudesAdminList, solicitudesAdminParams } from './solicitudesAdminApi'
+import {
+  cambiarEstadoSolicitudAdmin,
+  getHistorialSolicitudAdmin,
+  getSolicitudAdmin,
+  getSolicitudAdminDetail,
+  getSolicitudDocumentoAdmin,
+  getSolicitudesAdmin,
+  normalizeSolicitudAdminDetail,
+  normalizeSolicitudesAdminList,
+  solicitudesAdminParams,
+} from './solicitudesAdminApi'
 
 describe('solicitudesAdminApi', () => {
   beforeEach(() => vi.restoreAllMocks())
@@ -37,5 +47,52 @@ describe('solicitudesAdminApi', () => {
     expect(String(fetchMock.mock.calls[0][0])).toContain('/solicitudes?page=1&limit=10')
     expect(String(fetchMock.mock.calls[1][0])).toMatch(/\/solicitudes\/15\/detalle$/)
     expect(String(fetchMock.mock.calls[2][0])).toMatch(/\/solicitudes\/15\/documentos\/40\/descargar$/)
+  })
+
+  it('consulta resumen, historial y cambio de estado', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: 15,
+            tipoSolicitudId: 1,
+            codigoSeguimiento: 'SOL-2026-X8K91B',
+            estado: 'PENDIENTE',
+            fechaIngreso: '2026-10-24',
+            createdAt: '2026-10-24',
+            updatedAt: '2026-10-24',
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            solicitudId: 15,
+            codigoSeguimiento: 'SOL-2026-X8K91B',
+            estadoAnterior: 'PENDIENTE',
+            estadoNuevo: 'EN_REVISION',
+            observacionPublica: 'Público',
+            notaInterna: 'Interno',
+            idUsuario: 1,
+            fecha: '2026-10-25',
+            historialId: 9,
+          }),
+          { status: 200 },
+        ),
+      )
+
+    await getSolicitudAdmin(15)
+    await getHistorialSolicitudAdmin(15)
+    await cambiarEstadoSolicitudAdmin(15, {
+      estadoNuevo: 'EN_REVISION',
+      observacionPublica: 'Público',
+    })
+
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/solicitudes\/15$/)
+    expect(String(fetchMock.mock.calls[1][0])).toMatch(/\/solicitudes\/15\/historial$/)
+    expect(String(fetchMock.mock.calls[2][0])).toMatch(/\/solicitudes\/15\/estado$/)
+    expect(fetchMock.mock.calls[2][1]?.method).toBe('PATCH')
   })
 })
