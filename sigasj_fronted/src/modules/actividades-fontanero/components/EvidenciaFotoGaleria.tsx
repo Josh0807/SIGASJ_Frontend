@@ -6,6 +6,61 @@ import {
   esEvidenciaImagen,
   evidenciaActividadPublicUrl,
 } from '../utils/evidenciaActividadUrl'
+import { crearMiniaturaEvidencia } from '../utils/evidenciaMiniatura'
+
+const FotoMiniatura = ({
+  src,
+  disabled,
+  onOpen,
+}: {
+  src: string
+  disabled?: boolean
+  onOpen: () => void
+}) => {
+  const [thumb, setThumb] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    let created: string | null = null
+
+    crearMiniaturaEvidencia(src)
+      .then((url) => {
+        if (!active) {
+          URL.revokeObjectURL(url)
+          return
+        }
+        created = url
+        setThumb(url)
+      })
+      .catch(() => {
+        if (active) {
+          setThumb(src)
+        }
+      })
+
+    return () => {
+      active = false
+      if (created) {
+        URL.revokeObjectURL(created)
+      }
+    }
+  }, [src])
+
+  return (
+    <button
+      type="button"
+      className="detalle-actividad__photo-trigger"
+      onClick={onOpen}
+      disabled={disabled}
+    >
+      {thumb ? (
+        <img src={thumb} alt="" decoding="async" />
+      ) : (
+        <span className="detalle-actividad__photo-skeleton" aria-hidden="true" />
+      )}
+    </button>
+  )
+}
 
 type EvidenciaFotoGaleriaProps = {
   documentos: DocumentoActividadRegistrado[]
@@ -75,15 +130,11 @@ const EvidenciaFotoGaleria = ({
 
           return (
             <li key={documento.id} className="detalle-actividad__photo">
-              <button
-                type="button"
-                className="detalle-actividad__photo-trigger"
-                onClick={() => setSelected(documento)}
+              <FotoMiniatura
+                src={href}
                 disabled={disabled}
-              >
-                <img src={href} alt={documento.nombreOriginal} />
-              </button>
-              <span>{documento.nombreOriginal}</span>
+                onOpen={() => setSelected(documento)}
+              />
             </li>
           )
         })}
@@ -104,7 +155,7 @@ const EvidenciaFotoGaleria = ({
                 className="evidencia-foto-visor__dialog"
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="evidencia-foto-visor-title"
+                aria-label="Foto de evidencia"
               >
                 <button
                   type="button"
@@ -112,15 +163,13 @@ const EvidenciaFotoGaleria = ({
                   onClick={() => setSelected(null)}
                   aria-label="Cerrar"
                 >
-                  <IconX size={22} aria-hidden="true" />
+                  <IconX size={20} aria-hidden="true" />
                 </button>
-                <h2 id="evidencia-foto-visor-title" className="evidencia-foto-visor__title">
-                  {selected.nombreOriginal}
-                </h2>
                 <img
                   className="evidencia-foto-visor__image"
                   src={selectedUrl}
-                  alt={selected.nombreOriginal}
+                  alt=""
+                  decoding="async"
                 />
                 {canDelete && onDelete ? (
                   <button

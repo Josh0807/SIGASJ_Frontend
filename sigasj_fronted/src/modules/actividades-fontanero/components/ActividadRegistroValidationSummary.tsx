@@ -2,7 +2,10 @@ import type { ActividadRegistroFormField } from '../types/actividadRegistroForm'
 import type { ActividadRegistroFormErrors } from '../utils/validateActividadRegistroForm'
 
 const FIELD_LABELS: Partial<Record<ActividadRegistroFormField, string>> = {
-  fechaActividad: 'Fecha de la actividad',
+  fechaActividad: 'Fecha de inicio',
+  horaInicio: 'Hora de inicio',
+  fechaFin: 'Fecha de finalización',
+  horaFin: 'Hora de finalización',
   titulo: 'Título o resumen',
   descripcion: 'Descripción',
   ubicacion: 'Ubicación',

@@ -15,6 +15,7 @@ import { getHttpErrorStatus } from '../utils/httpErrorStatus'
 export const MIS_ACTIVIDADES_PAGE_SIZE = 10
 
 const ESTADOS_FILTRO = [
+  'BORRADOR',
   'REPORTADA',
   'REQUIERE_CORRECCION',
   'CORREGIDA',
@@ -212,7 +213,14 @@ const MisActividadesPage = () => {
                   void openDetail(actividad)
                 }}
                 extraFooter={
-                  actividad.estado === 'REQUIERE_CORRECCION' ? (
+                  actividad.estado === 'BORRADOR' ? (
+                    <Link
+                      to={ACTIVIDADES_FONTANERO_PATHS.editarBorrador(actividad.id)}
+                      className="actividad-historial-card__action"
+                    >
+                      Editar borrador
+                    </Link>
+                  ) : actividad.estado === 'REQUIERE_CORRECCION' ? (
                     <Link
                       to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}
                       className="actividad-historial-card__action"

@@ -1,4 +1,5 @@
 import { type FormEvent, useCallback, useRef, useState } from 'react'
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 import { Link, useNavigate } from 'react-router-dom'
 import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
 import {
@@ -37,9 +38,12 @@ import {
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { useAuth } from '../../auth/components/AuthContext'
-import { IconArrowLeft, IconCheck, IconDeviceFloppy, IconPlus } from '@tabler/icons-react'
+import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import { IconArrowLeft, IconCheck, IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react'
 
-type ActividadRegistroFormShellMode = 'registrar' | 'corregir'
+type ActividadRegistroFormShellMode = 'registrar' | 'corregir' | 'editar-borrador'
+
+export type ActividadRegistroSubmitIntent = 'registrar' | 'borrador'
 
 type ActividadRegistroFormShellProps = {
   mode?: ActividadRegistroFormShellMode
@@ -50,8 +54,12 @@ type ActividadRegistroFormShellProps = {
   observacionCorreccion?: string | null
   onSubmit?: (
     values: ActividadRegistroFormValues,
-    extras?: { documentosEliminarIds: number[] },
+    extras?: {
+      documentosEliminarIds: number[]
+      intent: ActividadRegistroSubmitIntent
+    },
   ) => Promise<ActividadFontaneroRegistrada | void>
+  onDelete?: () => Promise<void>
   onCatalogStale?: () => void
 }
 
@@ -63,12 +71,19 @@ const ActividadRegistroFormShell = ({
   actividadId = 0,
   observacionCorreccion,
   onSubmit,
+  onDelete,
   onCatalogStale,
 }: ActividadRegistroFormShellProps) => {
   const isCorregirMode = mode === 'corregir'
+  const isEditBorrador = mode === 'editar-borrador'
+  const lockInicio = isCorregirMode || isEditBorrador
   const navigate = useNavigate()
   const { logout } = useAuth()
   const formRef = useRef<HTMLFormElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const intentRef = useRef<ActividadRegistroSubmitIntent>('registrar')
+  const deleteButtonRef = useRef<HTMLButtonElement>(null)
+  const hoyAsada = hoyEnAsada()
   const [values, setValues] = useState<ActividadRegistroFormValues>(
     () => initialValues ?? createActividadRegistroFormInitial(),
   )
@@ -83,18 +98,14 @@ const ActividadRegistroFormShell = ({
   const [registrada, setRegistrada] = useState<ActividadFontaneroRegistrada | null>(
     null,
   )
+  const [savedAsDraft, setSavedAsDraft] = useState(false)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
   const FormularioEspecifico = FORMULARIOS_ACTIVIDAD[tipo.codigo]
 
   const updateField = useCallback(
     (field: ActividadRegistroFormField, value: string) => {
-      setValues((current) => {
-        const next = { ...current, [field]: value }
-        if (field === 'fechaActividad' && (!current.fechaFin || current.fechaFin < value)) {
-          next.fechaFin = value
-        }
-        return next
-      })
+      setValues((current) => ({ ...current, [field]: value }))
       setErrors((current) => {
         if (!current[field]) {
           return current
@@ -113,15 +124,22 @@ const ActividadRegistroFormShell = ({
     [],
   )
 
+  const scrollToFormAlert = useCallback(() => {
+    queueMicrotask(() => {
+      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }, [])
+
   const applyValidationErrors = useCallback(
     (nextErrors: ActividadRegistroFormErrors, message: string) => {
       setErrors(nextErrors)
       setSubmitError(message)
+      scrollToFormAlert()
       queueMicrotask(() => {
         focusFirstActividadRegistroError(nextErrors, formRef.current ?? document)
       })
     },
-    [],
+    [scrollToFormAlert],
   )
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -130,10 +148,22 @@ const ActividadRegistroFormShell = ({
       return
     }
 
+    const submitter = (event.nativeEvent as SubmitEvent).submitter
+    const submitterButton =
+      submitter instanceof HTMLElement ? submitter.closest('button') : null
+    const fromSubmitter = submitterButton?.value
+    const intent: ActividadRegistroSubmitIntent =
+      fromSubmitter === 'borrador' || fromSubmitter === 'registrar'
+        ? fromSubmitter
+        : intentRef.current
+
+    const submitValues: ActividadRegistroFormValues =
+      intent === 'borrador' ? { ...values, fechaFin: '', horaFin: '' } : values
+
     const nextErrors = validateActividadRegistroForm(
-      values,
+      submitValues,
       tipo.codigo,
-      isCorregirMode ? 'corregir' : 'registrar',
+      isCorregirMode ? 'corregir' : intent === 'borrador' ? 'borrador' : 'registrar',
     )
     if (
       documentosVivos.length + values.documentos.length >
@@ -164,17 +194,21 @@ const ActividadRegistroFormShell = ({
         .map((documento) => documento.id)
 
       const result = onSubmit
-        ? await onSubmit(values, { documentosEliminarIds })
-        : await registrarActividad(tipo, values)
+        ? await onSubmit(submitValues, { documentosEliminarIds, intent })
+        : await registrarActividad(tipo, submitValues, {
+            esBorrador: intent === 'borrador',
+          })
 
       if (result && typeof result === 'object' && 'id' in result) {
         setRegistrada(result)
       }
+      setSavedAsDraft(intent === 'borrador')
       setIsSuccess(true)
       if (!isCorregirMode) {
         setValues(createActividadRegistroFormInitial())
       }
       setErrors({})
+      scrollToFormAlert()
       window.dispatchEvent(new CustomEvent('actividades-fontanero:updated'))
     } catch (error) {
       const parsed = parseActividadRegistroSubmitError(error)
@@ -202,13 +236,30 @@ const ActividadRegistroFormShell = ({
           mode: isCorregirMode ? 'corregir' : 'registrar',
         }),
       )
+      scrollToFormAlert()
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  const backLink = isCorregirMode
+    ? {
+        to: ACTIVIDADES_FONTANERO_PATHS.correcciones,
+        label: 'Volver a correcciones',
+      }
+    : isEditBorrador
+      ? {
+          to: ACTIVIDADES_FONTANERO_PATHS.misActividades,
+          label: 'Volver a mis actividades',
+        }
+      : {
+          to: ACTIVIDADES_FONTANERO_PATHS.nueva,
+          label: 'Cambiar tipo de actividad',
+        }
+
   return (
     <section
+      ref={sectionRef}
       className={`actividades-fontanero-registro !mx-0 !max-w-none !gap-7${
         isCorregirMode ? ' actividades-fontanero-registro--corregir' : ''
       }`}
@@ -219,7 +270,11 @@ const ActividadRegistroFormShell = ({
           <div className="min-w-0 space-y-3">
             <p className="actividades-fontanero-registro__eyebrow !text-sm !font-black !tracking-[0.12em] !text-blue-600">Registro de Actividades</p>
             <h1 id="actividad-registro-title" className="!text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">
-          {isCorregirMode ? `Corregir: ${tipo.nombre}` : `Registrar: ${tipo.nombre}`}
+          {isCorregirMode
+            ? `Corregir: ${tipo.nombre}`
+            : isEditBorrador
+              ? `Editar borrador: ${tipo.nombre}`
+              : `Registrar: ${tipo.nombre}`}
         </h1>
         <p className="actividades-fontanero-registro__intro !text-lg !leading-relaxed !text-slate-500">
           {isCorregirMode
@@ -228,11 +283,11 @@ const ActividadRegistroFormShell = ({
             </p>
           </div>
           <Link
-            to={isCorregirMode ? ACTIVIDADES_FONTANERO_PATHS.correcciones : ACTIVIDADES_FONTANERO_PATHS.nueva}
+            to={backLink.to}
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline focus:!no-underline"
           >
             <IconArrowLeft size={20} aria-hidden="true" />
-            {isCorregirMode ? 'Volver a correcciones' : 'Cambiar tipo de actividad'}
+            {backLink.label}
           </Link>
         </div>
       </header>
@@ -263,7 +318,11 @@ const ActividadRegistroFormShell = ({
                 ? `${ACTIVITY_FEEDBACK_MESSAGES.successCorrect}${
                     registrada?.id ? ` (registro #${registrada.id})` : ''
                   }`
-                : `${ACTIVITY_FEEDBACK_MESSAGES.successRegister.replace(
+                : savedAsDraft
+                  ? `Borrador guardado${
+                      registrada?.id ? ` (registro #${registrada.id})` : ''
+                    }. No se envió a administradora.`
+                  : `${ACTIVITY_FEEDBACK_MESSAGES.successRegister.replace(
                     /\.$/,
                     '',
                   )}${tipo.nombre ? `: ${tipo.nombre}` : ''}${
@@ -276,14 +335,22 @@ const ActividadRegistroFormShell = ({
               to={
                 isCorregirMode
                   ? ACTIVIDADES_FONTANERO_PATHS.correcciones
-                  : ACTIVIDADES_FONTANERO_PATHS.nueva
+                  : isEditBorrador
+                    ? ACTIVIDADES_FONTANERO_PATHS.misActividades
+                    : ACTIVIDADES_FONTANERO_PATHS.nueva
               }
               className="actividades-fontanero-registro__link"
             >
-              {isCorregirMode ? <IconArrowLeft size={18} aria-hidden="true" /> : <IconPlus size={19} aria-hidden="true" />}
+              {isCorregirMode || isEditBorrador ? (
+                <IconArrowLeft size={18} aria-hidden="true" />
+              ) : (
+                <IconPlus size={19} aria-hidden="true" />
+              )}
               {isCorregirMode
                 ? 'Volver a correcciones pendientes'
-                : 'Nueva actividad'}
+                : isEditBorrador
+                  ? 'Volver a mis actividades'
+                  : 'Nueva actividad'}
             </Link>
           }
         />
@@ -329,13 +396,14 @@ const ActividadRegistroFormShell = ({
                   errors.fechaActividad ? ' actividad-registro-form__input--error' : ''
                 }`}
                 value={values.fechaActividad}
+                max={hoyAsada}
                 onChange={(event) => updateField('fechaActividad', event.target.value)}
                 aria-invalid={Boolean(errors.fechaActividad)}
                 aria-describedby={
                   errors.fechaActividad ? 'fechaActividad-error' : undefined
                 }
-                readOnly={isCorregirMode}
-                disabled={isCorregirMode}
+                readOnly={lockInicio}
+                disabled={lockInicio}
                 required
               />
               {errors.fechaActividad ? (
@@ -368,8 +436,8 @@ const ActividadRegistroFormShell = ({
                 onChange={(event) => updateField('horaInicio', event.target.value)}
                 aria-invalid={Boolean(errors.horaInicio)}
                 aria-describedby={errors.horaInicio ? 'horaInicio-error' : undefined}
-                readOnly={isCorregirMode}
-                disabled={isCorregirMode}
+                readOnly={lockInicio}
+                disabled={lockInicio}
                 required
               />
               {errors.horaInicio ? (
@@ -390,6 +458,13 @@ const ActividadRegistroFormShell = ({
                 <span className="actividad-registro-form__required" aria-hidden="true">
                   *
                 </span>
+                {isCorregirMode ? null : (
+                  <span className="ml-1 text-xs font-semibold normal-case tracking-normal text-slate-400">
+                    {isEditBorrador
+                      ? '(opcional en borrador)'
+                      : '(al registrar)'}
+                  </span>
+                )}
               </label>
               <input
                 id="fechaFin"
@@ -399,12 +474,12 @@ const ActividadRegistroFormShell = ({
                   errors.fechaFin ? ' actividad-registro-form__input--error' : ''
                 }`}
                 value={values.fechaFin}
+                max={hoyAsada}
                 onChange={(event) => updateField('fechaFin', event.target.value)}
                 aria-invalid={Boolean(errors.fechaFin)}
                 aria-describedby={errors.fechaFin ? 'fechaFin-error' : undefined}
                 readOnly={isCorregirMode}
                 disabled={isCorregirMode}
-                required
               />
               {errors.fechaFin ? (
                 <ActividadRegistroFieldError id="fechaFin-error" message={errors.fechaFin} />
@@ -421,6 +496,13 @@ const ActividadRegistroFormShell = ({
                 <span className="actividad-registro-form__required" aria-hidden="true">
                   *
                 </span>
+                {isCorregirMode ? null : (
+                  <span className="ml-1 text-xs font-semibold normal-case tracking-normal text-slate-400">
+                    {isEditBorrador
+                      ? '(opcional en borrador)'
+                      : '(al registrar)'}
+                  </span>
+                )}
               </label>
               <input
                 id="horaFin"
@@ -435,7 +517,6 @@ const ActividadRegistroFormShell = ({
                 aria-describedby={errors.horaFin ? 'horaFin-error' : undefined}
                 readOnly={isCorregirMode}
                 disabled={isCorregirMode}
-                required
               />
               {errors.horaFin ? (
                 <ActividadRegistroFieldError id="horaFin-error" message={errors.horaFin} />
@@ -575,11 +656,11 @@ const ActividadRegistroFormShell = ({
           >
             <legend className="actividad-registro-form__legend">Evidencia fotográfica</legend>
             <p className="actividad-formulario-especifico__hint !mt-0">
-              {isCorregirMode
+              {isCorregirMode || isEditBorrador
                 ? 'Toque una foto para verla más grande. Puede borrar las que no correspondan y adjuntar fotos nuevas.'
                 : 'Opcional. Adjunte fotos del trabajo realizado.'}
             </p>
-            {isCorregirMode ? (
+            {isCorregirMode || isEditBorrador ? (
               <EvidenciaFotoGaleria
                 documentos={documentosVivos}
                 actividadId={actividadId || existingDocumentos[0]?.actividadId || 0}
@@ -624,58 +705,128 @@ const ActividadRegistroFormShell = ({
                   maxFiles={Math.max(
                     0,
                     FOTO_EVIDENCIA_MAX_FILES -
-                      (isCorregirMode ? documentosVivos.length : 0),
+                      (isCorregirMode || isEditBorrador ? documentosVivos.length : 0),
                   )}
               />
             </div>
           </fieldset>
 
-          <div className="actividad-registro-form__actions !gap-4 !border-t !border-blue-100 !pt-6">
-            <Link
-              to={
-                isCorregirMode
-                  ? ACTIVIDADES_FONTANERO_PATHS.correcciones
-                  : ACTIVIDADES_FONTANERO_PATHS.nueva
-              }
-              className="actividad-registro-form__button actividad-registro-form__button--secondary !order-2 !gap-2 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md transition hover:!-translate-y-0.5 hover:!bg-blue-50"
-            >
-              <IconArrowLeft size={20} aria-hidden="true" />
-              Cancelar
-            </Link>
-            <button
-              type="submit"
-              className="actividad-registro-form__button actividad-registro-form__button--primary !order-1 !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200 transition hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
-              disabled={isSubmitting}
-              aria-disabled={isSubmitting}
-            >
-              {isSubmitting ? null : isCorregirMode ? <IconCheck size={20} aria-hidden="true" /> : <IconDeviceFloppy size={20} aria-hidden="true" />}
-              {isSubmitting
-                ? isCorregirMode
-                  ? 'Reenviando…'
-                  : 'Registrando…'
-                : isCorregirMode
-                  ? 'Reenviar actividad corregida'
-                  : 'Registrar actividad'}
-            </button>
+          <div
+            className={`actividad-registro-form__actions !gap-4 !border-t !border-blue-100 !pt-6${
+              isEditBorrador ? ' actividad-registro-form__actions--split' : ''
+            }`}
+          >
+            <div className="actividad-registro-form__actions-group">
+              {isEditBorrador && onDelete ? (
+                <button
+                  ref={deleteButtonRef}
+                  type="button"
+                  className="actividad-registro-form__button actividad-registro-form__button--danger !gap-2 !rounded-2xl !px-6 !py-3.5 !font-bold !shadow-md"
+                  disabled={isSubmitting}
+                  onClick={() => setConfirmDeleteOpen(true)}
+                >
+                  <IconTrash size={20} aria-hidden="true" />
+                  Eliminar actividad
+                </button>
+              ) : null}
+              <Link
+                to={
+                  isCorregirMode
+                    ? ACTIVIDADES_FONTANERO_PATHS.correcciones
+                    : isEditBorrador
+                      ? ACTIVIDADES_FONTANERO_PATHS.misActividades
+                      : ACTIVIDADES_FONTANERO_PATHS.nueva
+                }
+                className="actividad-registro-form__button actividad-registro-form__button--secondary !gap-2 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md transition hover:!-translate-y-0.5 hover:!bg-blue-50"
+              >
+                <IconArrowLeft size={20} aria-hidden="true" />
+                {isEditBorrador ? 'Cancelar edición' : 'Cancelar'}
+              </Link>
+            </div>
+            <div className="actividad-registro-form__actions-group">
+              {isCorregirMode ? null : (
+                <button
+                  type="submit"
+                  name="intent"
+                  value="borrador"
+                  className="actividad-registro-form__button actividad-registro-form__button--draft !gap-2 !rounded-2xl !px-6 !py-3.5 !font-bold !shadow-md"
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    intentRef.current = 'borrador'
+                  }}
+                >
+                  <IconDeviceFloppy size={20} aria-hidden="true" />
+                  {isSubmitting ? 'Guardando…' : 'Guardar borrador'}
+                </button>
+              )}
+              <button
+                type="submit"
+                name="intent"
+                value="registrar"
+                className="actividad-registro-form__button actividad-registro-form__button--primary !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200 transition hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
+                disabled={isSubmitting}
+                aria-disabled={isSubmitting}
+                onClick={() => {
+                  intentRef.current = 'registrar'
+                }}
+              >
+                {isSubmitting ? null : isCorregirMode ? (
+                  <IconCheck size={20} aria-hidden="true" />
+                ) : (
+                  <IconCheck size={20} aria-hidden="true" />
+                )}
+                {isSubmitting
+                  ? isCorregirMode
+                    ? 'Reenviando…'
+                    : 'Registrando…'
+                  : isCorregirMode
+                    ? 'Reenviar actividad corregida'
+                    : 'Registrar actividad'}
+              </button>
+            </div>
           </div>
         </form>
       )}
 
       {!isSuccess ? (
         <Link
-          to={
-            isCorregirMode
-              ? ACTIVIDADES_FONTANERO_PATHS.correcciones
-              : ACTIVIDADES_FONTANERO_PATHS.nueva
-          }
+          to={backLink.to}
           className="actividades-fontanero-registro__back !hidden"
         >
           <IconArrowLeft size={20} aria-hidden="true" />
-          {isCorregirMode
-            ? 'Volver a correcciones pendientes'
-            : 'Cambiar tipo de actividad'}
+          {backLink.label}
         </Link>
       ) : null}
+
+      <ConfirmDialog
+        isOpen={confirmDeleteOpen}
+        title="Eliminar borrador"
+        message="¿Eliminar este borrador? Esta acción no se puede deshacer."
+        cancelLabel="Cancelar"
+        confirmLabel={isSubmitting ? 'Eliminando…' : 'Eliminar borrador'}
+        confirmDanger
+        returnFocusRef={deleteButtonRef}
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={() => {
+          if (!onDelete || isSubmitting) {
+            return
+          }
+          setConfirmDeleteOpen(false)
+          void (async () => {
+            setIsSubmitting(true)
+            try {
+              await onDelete()
+            } catch (error) {
+              setSubmitError(
+                toActividadRegistroSubmitMessage(error, { mode: 'registrar' }),
+              )
+              scrollToFormAlert()
+            } finally {
+              setIsSubmitting(false)
+            }
+          })()
+        }}
+      />
     </section>
   )
 }

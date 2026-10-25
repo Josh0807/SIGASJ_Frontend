@@ -1,3 +1,4 @@
+import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 import type {
   ActividadRegistroFormField,
   ActividadRegistroFormValues,
@@ -9,7 +10,7 @@ import {
   validateFotoEvidencia,
 } from './validateDocumentoActividad'
 
-export type ActividadRegistroFormMode = 'registrar' | 'corregir'
+export type ActividadRegistroFormMode = 'registrar' | 'corregir' | 'borrador'
 
 export type ActividadRegistroFormErrors = Partial<
   Record<ActividadRegistroFormField, string>
@@ -37,16 +38,19 @@ export const validateActividadRegistroForm = (
     mode === 'corregir' && CORREGIR_SKIP_FIELDS.has(field)
 
   const fecha = values.fechaActividad.trim()
-  const horaInicio = (values.horaInicio ?? '').trim()
+  const horaInicio = (values.horaInicio ?? '').trim().slice(0, 5)
   const fechaFin = (values.fechaFin ?? '').trim()
-  const horaFin = (values.horaFin ?? '').trim()
+  const horaFin = (values.horaFin ?? '').trim().slice(0, 5)
   const titulo = values.titulo.trim()
+  const hoy = hoyEnAsada()
 
   if (!skipField('fechaActividad')) {
     if (!fecha) {
       errors.fechaActividad = 'Este campo es obligatorio.'
     } else if (!DATE_PATTERN.test(fecha)) {
       errors.fechaActividad = 'Use el formato YYYY-MM-DD.'
+    } else if (fecha > hoy) {
+      errors.fechaActividad = 'La fecha de inicio no puede ser futura.'
     }
   }
 
@@ -58,20 +62,25 @@ export const validateActividadRegistroForm = (
     }
   }
 
-  if (!skipField('fechaFin')) {
-    if (!fechaFin) {
-      errors.fechaFin = 'Este campo es obligatorio.'
-    } else if (!DATE_PATTERN.test(fechaFin)) {
+  const requireFin = !(skipField('fechaFin') || mode === 'borrador')
+
+  if (requireFin && !fechaFin) {
+    errors.fechaFin = 'Este campo es obligatorio.'
+  } else if (fechaFin) {
+    if (!DATE_PATTERN.test(fechaFin)) {
       errors.fechaFin = 'Use el formato YYYY-MM-DD.'
     } else if (fecha && DATE_PATTERN.test(fecha) && fechaFin < fecha) {
       errors.fechaFin = 'No puede ser anterior a la fecha de inicio.'
+    } else if (fechaFin > hoy) {
+      errors.fechaFin =
+        'La fecha de finalización no puede ser futura. Si la actividad aún no termina, guarde un borrador y déjela vacía.'
     }
   }
 
-  if (!skipField('horaFin')) {
-    if (!horaFin) {
-      errors.horaFin = 'Este campo es obligatorio.'
-    } else if (!TIME_PATTERN.test(horaFin)) {
+  if (requireFin && !horaFin) {
+    errors.horaFin = 'Este campo es obligatorio.'
+  } else if (horaFin) {
+    if (!TIME_PATTERN.test(horaFin)) {
       errors.horaFin = 'Use el formato HH:mm.'
     } else if (
       fecha &&
@@ -80,7 +89,7 @@ export const validateActividadRegistroForm = (
       TIME_PATTERN.test(horaInicio) &&
       horaFin <= horaInicio
     ) {
-      errors.horaFin = 'Debe ser posterior a la hora de inicio.'
+      errors.horaFin = 'Debe ser posterior a la hora de inicio guardada.'
     }
   }
 

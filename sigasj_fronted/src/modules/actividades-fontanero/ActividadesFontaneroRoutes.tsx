@@ -6,6 +6,7 @@ import ActividadesFontaneroDashboardPage from './pages/ActividadesFontaneroDashb
 import ActividadesFontaneroHomePage from './pages/ActividadesFontaneroHomePage'
 import MisActividadesPage from './pages/MisActividadesPage'
 import CorregirActividadPage from './pages/CorregirActividadPage'
+import EditarBorradorPage from './pages/EditarBorradorPage'
 import HistorialActividadDetallePage from './pages/HistorialActividadDetallePage'
 import RegistrarActividadPage from './pages/RegistrarActividadPage'
 import SeleccionarTipoActividadPage from './pages/SeleccionarTipoActividadPage'
@@ -40,6 +41,7 @@ const ActividadesFontaneroRoutes = () => (
     <Route path="historial/:actividadId" element={<HistorialActividadDetallePage />} />
     <Route path="correcciones" element={<ActividadesFontaneroCorreccionesPage />} />
     <Route path="correcciones/:actividadId/corregir" element={<CorregirActividadPage />} />
+    <Route path="borradores/:actividadId" element={<EditarBorradorPage />} />
     <Route
       path="*"
       element={<Navigate to={ACTIVIDADES_FONTANERO_PATHS.home} replace />}

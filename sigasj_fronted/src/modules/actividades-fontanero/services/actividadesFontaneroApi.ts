@@ -537,21 +537,44 @@ export async function registrarActividadFontanero(
  * Registra una actividad del Fontanero autenticado.
  * La identidad del fontanero proviene del JWT; no se envía desde el cliente.
  */
+const toActividadRequestBody = (
+  tipo: TipoActividadFontaneroCatalogo,
+  values: ActividadRegistroFormValues,
+  extras: { esBorrador?: boolean; documentosEliminarIds?: number[] } = {},
+) => {
+  const payload = toRegistrarActividadPayloadFromTipo(tipo, values)
+  if (extras.esBorrador) {
+    delete payload.fechaFin
+    delete payload.horaFin
+  }
+  const body = {
+    ...payload,
+    ...(extras.esBorrador ? { esBorrador: true } : {}),
+    ...(extras.documentosEliminarIds && extras.documentosEliminarIds.length > 0
+      ? { documentosEliminarIds: extras.documentosEliminarIds }
+      : {}),
+  }
+  const formData = new FormData()
+  Object.entries(body).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') {
+      return
+    }
+    if (key === 'documentosEliminarIds' && Array.isArray(value)) {
+      value.forEach((id) => formData.append('documentosEliminarIds', String(id)))
+      return
+    }
+    formData.append(key, Array.isArray(value) ? value.join(',') : String(value))
+  })
+  values.documentos.forEach((documento) => formData.append('documentos', documento))
+  return formData
+}
+
 export async function registrarActividad(
   tipo: TipoActividadFontaneroCatalogo,
   values: ActividadRegistroFormValues,
+  options: { esBorrador?: boolean } = {},
 ): Promise<ActividadFontaneroRegistrada> {
-  const body = toRegistrarActividadPayloadFromTipo(tipo, values)
-  const requestBody = values.documentos.length > 0
-    ? (() => {
-        const formData = new FormData()
-        Object.entries(body).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) formData.append(key, String(value))
-        })
-        values.documentos.forEach((documento) => formData.append('documentos', documento))
-        return formData
-      })()
-    : JSON.stringify(body)
+  const requestBody = toActividadRequestBody(tipo, values, options)
 
   try {
     return await fetchWithPathFallback<ActividadFontaneroRegistrada>(
@@ -566,4 +589,53 @@ export async function registrarActividad(
       ? error
       : new Error('No se pudo registrar la actividad')
   }
+}
+
+export async function actualizarBorradorActividad(
+  actividadId: number,
+  tipo: TipoActividadFontaneroCatalogo,
+  values: ActividadRegistroFormValues,
+  documentosEliminarIds: number[] = [],
+): Promise<ActividadFontaneroRegistrada> {
+  const result = await fetchWithAuth<unknown>(
+    `/fontanero/actividades/${actividadId}/borrador`,
+    {
+      method: 'POST',
+      body: toActividadRequestBody(tipo, values, {
+        esBorrador: true,
+        documentosEliminarIds,
+      }),
+    },
+  )
+  const actividad = normalizeActividadFontanero(result)
+  if (!actividad) {
+    throw new Error('No se pudo guardar el borrador')
+  }
+  return actividad
+}
+
+export async function registrarBorradorActividad(
+  actividadId: number,
+  tipo: TipoActividadFontaneroCatalogo,
+  values: ActividadRegistroFormValues,
+  documentosEliminarIds: number[] = [],
+): Promise<ActividadFontaneroRegistrada> {
+  const result = await fetchWithAuth<unknown>(
+    `/fontanero/actividades/${actividadId}/registrar`,
+    {
+      method: 'POST',
+      body: toActividadRequestBody(tipo, values, { documentosEliminarIds }),
+    },
+  )
+  const actividad = normalizeActividadFontanero(result)
+  if (!actividad) {
+    throw new Error('No se pudo registrar la actividad')
+  }
+  return actividad
+}
+
+export async function eliminarBorradorActividad(actividadId: number): Promise<void> {
+  await fetchWithAuth(`/fontanero/actividades/${actividadId}/borrador`, {
+    method: 'DELETE',
+  })
 }

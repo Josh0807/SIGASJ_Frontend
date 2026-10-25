@@ -26,7 +26,7 @@ export const createActividadRegistroFormInitial = (
   return {
     fechaActividad: hoy,
     horaInicio: horaEnAsada(ahora),
-    fechaFin: hoy,
+    fechaFin: '',
     horaFin: '',
     titulo: '',
     descripcion: '',

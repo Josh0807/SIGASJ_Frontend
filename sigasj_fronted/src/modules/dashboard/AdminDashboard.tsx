@@ -7,6 +7,10 @@ import { useDashboardMetrics } from './hooks/useDashboardMetrics'
 import type { DashboardSummaryData } from './services/dashboardService'
 import { useAuth } from '../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
+import {
+  InternalAdminRoleName,
+  normalizeInternalRole,
+} from '../auth/utils/internalRoles'
 import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
 import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
@@ -78,7 +82,24 @@ const indicatorMetricKey = (
 const canShowIndicator = (
   user: Parameters<typeof canAccessAdminRoute>[0],
   indicator: DashboardIndicator,
-) => !indicator.link || canAccessAdminRoute(user, indicator.link)
+) => {
+  if (indicator.link && !canAccessAdminRoute(user, indicator.link)) {
+    return false
+  }
+
+  // El conteo de trámites usa GET /solicitudes/aprobadas-pendientes
+  // (solo Administradora y Secretaria). El fontanero ve "Mis solicitudes",
+  // no este indicador administrativo.
+  if (indicator.id === 'solicitudes') {
+    const role = normalizeInternalRole(user?.role)
+    return (
+      role === InternalAdminRoleName.Administradora ||
+      role === InternalAdminRoleName.Secretaria
+    )
+  }
+
+  return true
+}
 
 const AdminDashboard = () => {
   const { user } = useAuth()

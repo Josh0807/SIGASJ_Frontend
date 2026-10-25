@@ -8001,7 +8001,6 @@ body,
   overscroll-behavior: none;
   padding: clamp(0.75rem, 2vw, 1.5rem);
   background: rgb(15 23 42 / 62%);
-  backdrop-filter: blur(8px);
 }
 
 .actividades-admin-revision__detail {
@@ -8307,8 +8306,8 @@ body,
 
 .detalle-actividad__gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 0.6rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -8317,12 +8316,12 @@ body,
 .detalle-actividad__photo {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
   min-width: 0;
-  padding: 0.55rem;
+  padding: 0;
+  overflow: hidden;
   border: 1px solid #dbeafe;
-  border-radius: 16px;
-  background: #f8fbff;
+  border-radius: 10px;
+  background: #e8f1fb;
 }
 
 .detalle-actividad__photo a,
@@ -8332,7 +8331,7 @@ body,
   width: 100%;
   padding: 0;
   border: 0;
-  border-radius: 12px;
+  border-radius: 0;
   background: transparent;
   cursor: pointer;
 }
@@ -8341,7 +8340,8 @@ body,
   cursor: default;
 }
 
-.detalle-actividad__photo img {
+.detalle-actividad__photo img,
+.detalle-actividad__photo-skeleton {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -8399,55 +8399,49 @@ body,
   overscroll-behavior: none;
   padding: clamp(0.75rem, 2vw, 1.5rem);
   background: rgb(15 23 42 / 72%);
-  backdrop-filter: blur(8px);
 }
 
 .evidencia-foto-visor__dialog {
   position: relative;
   display: grid;
-  gap: 0.9rem;
-  width: min(860px, 100%);
+  gap: 0.55rem;
+  width: min(720px, 100%);
   max-height: calc(100vh - 1.5rem);
   overflow: auto;
   overscroll-behavior: contain;
-  padding: 1.15rem 1.15rem 1.25rem;
-  border-radius: 24px;
-  background: #ffffff;
+  padding: 0.4rem;
+  border-radius: 14px;
+  background: #0f172a;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
 }
 
 .evidencia-foto-visor__close {
   position: absolute;
-  top: 0.85rem;
-  right: 0.85rem;
+  top: 0.45rem;
+  right: 0.45rem;
+  z-index: 1;
   display: grid;
   place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  border: 1px solid #dbeafe;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
   border-radius: 999px;
-  color: #1e3a8a;
-  background: #f8fbff;
+  color: #fff;
+  background: rgb(15 23 42 / 62%);
   cursor: pointer;
 }
 
 .evidencia-foto-visor__close:hover {
-  background: #eff6ff;
-}
-
-.evidencia-foto-visor__title {
-  margin: 0 3rem 0 0;
-  color: #0f3f73;
-  font-size: 1.05rem;
-  font-weight: 800;
+  background: rgb(15 23 42 / 82%);
 }
 
 .evidencia-foto-visor__image {
   display: block;
   width: 100%;
-  max-height: min(68vh, 640px);
+  min-height: 12rem;
+  max-height: min(78vh, 720px);
   object-fit: contain;
-  border-radius: 16px;
+  border-radius: 10px;
   background: #0f172a;
 }
 
@@ -12169,6 +12163,37 @@ body,
   justify-content: flex-end;
 }
 
+.actividad-registro-form__actions--split {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actividad-registro-form__actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actividad-registro-form__button--danger {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.actividad-registro-form__button--danger:hover:not(:disabled) {
+  background: #ffe4e6;
+}
+
+.actividad-registro-form__button--draft {
+  border-color: #bfdbfe;
+  background: #fff;
+  color: #1d4ed8;
+}
+
+.actividad-registro-form__button--draft:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
 .actividad-registro-form__button {
   display: inline-flex;
   align-items: center;
@@ -13052,6 +13077,12 @@ body,
   background: currentColor;
   box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 13%, transparent);
   content: '';
+}
+
+.actividad-historial-card__estado[data-estado='BORRADOR'] {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #cbd5e1;
 }
 
 .actividad-historial-card__estado[data-estado='REPORTADA'],

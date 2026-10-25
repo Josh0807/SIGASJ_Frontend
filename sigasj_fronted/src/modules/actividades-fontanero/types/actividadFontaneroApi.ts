@@ -5,8 +5,9 @@ export type RegistrarActividadRequest = {
   tipoActividadId: number
   fechaActividad: string
   horaInicio: string
-  fechaFin: string
-  horaFin: string
+  fechaFin?: string
+  horaFin?: string
+  esBorrador?: boolean
   titulo: string
   descripcion?: string
   ubicacion?: string
@@ -64,9 +65,15 @@ export const toRegistrarActividadPayload = (
     tipoActividadId,
     fechaActividad: values.fechaActividad.trim(),
     horaInicio: (values.horaInicio ?? '').trim().slice(0, 5),
-    fechaFin: values.fechaFin?.trim() ?? '',
-    horaFin: (values.horaFin ?? '').trim().slice(0, 5),
     titulo: values.titulo.trim(),
+  }
+  const fechaFin = values.fechaFin?.trim() ?? ''
+  const horaFin = (values.horaFin ?? '').trim().slice(0, 5)
+  if (fechaFin) {
+    payload.fechaFin = fechaFin
+  }
+  if (horaFin) {
+    payload.horaFin = horaFin
   }
 
   const ubicacion = values.ubicacion.trim()

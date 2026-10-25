@@ -167,6 +167,8 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).not.toContain('Asociados activos')
     expect(markup).not.toContain('Alertas de reposición')
     expect(markup).not.toContain('href="/admin/inventario/alertas-reposicion"')
+    expect(markup).not.toContain('Solicitudes en trámite')
+    expect(markup).not.toContain('href="/admin/solicitudes"')
     expect(markup).not.toContain(
       'No se pudieron actualizar algunos indicadores del servidor.',
     )

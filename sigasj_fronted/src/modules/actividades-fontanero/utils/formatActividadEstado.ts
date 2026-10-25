@@ -1,4 +1,5 @@
 const ESTADO_LABELS: Record<string, string> = {
+  BORRADOR: 'Borrador',
   REPORTADA: 'Reportada',
   EN_REVISION: 'En revisión',
   REQUIERE_CORRECCION: 'Requiere corrección',

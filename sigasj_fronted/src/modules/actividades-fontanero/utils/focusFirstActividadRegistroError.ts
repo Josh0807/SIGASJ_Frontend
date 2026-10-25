@@ -32,10 +32,7 @@ export const focusFirstActividadRegistroError = (
       continue
     }
 
-    element.focus()
-    if (typeof element.scrollIntoView === 'function') {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+    element.focus({ preventScroll: true })
     return field
   }
 

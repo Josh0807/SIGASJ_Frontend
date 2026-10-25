@@ -17,4 +17,6 @@ export const ACTIVIDADES_FONTANERO_PATHS = {
   correcciones: `${ACTIVIDADES_FONTANERO_BASE_PATH}/correcciones`,
   corregirActividad: (actividadId: number | string) =>
     `${ACTIVIDADES_FONTANERO_BASE_PATH}/correcciones/${actividadId}/corregir`,
+  editarBorrador: (actividadId: number | string) =>
+    `${ACTIVIDADES_FONTANERO_BASE_PATH}/borradores/${actividadId}`,
 } as const
