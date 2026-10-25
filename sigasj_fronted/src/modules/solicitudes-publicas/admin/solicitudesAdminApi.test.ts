@@ -69,8 +69,11 @@ describe('solicitudesAdminApi', () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
+            id: 15,
             solicitudId: 15,
             codigoSeguimiento: 'SOL-2026-X8K91B',
+            estado: 'EN_REVISION',
+            fechaResolucion: null,
             estadoAnterior: 'PENDIENTE',
             estadoNuevo: 'EN_REVISION',
             observacionPublica: 'Público',

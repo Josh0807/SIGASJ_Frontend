@@ -130,10 +130,12 @@ export const cambiarEstadoSolicitudAdmin = async (
   id: number,
   payload: CambiarEstadoSolicitudPayload,
   signal?: AbortSignal,
-) =>
-  fetchWithAuth<CambioEstadoSolicitudResponse>(`/solicitudes/${id}/estado`, {
+) => {
+  const response = await fetchWithAuth<CambioEstadoSolicitudResponse>(`/solicitudes/${id}/estado`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
     signal,
   })
+  return response
+}

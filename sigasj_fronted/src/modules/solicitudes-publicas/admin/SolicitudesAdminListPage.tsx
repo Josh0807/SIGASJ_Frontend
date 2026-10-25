@@ -166,10 +166,11 @@ export default function SolicitudesAdminListPage() {
   return (
     <main className="admin-content-modern grid min-w-0 gap-5 sm:gap-6">
       <Link
-        className="inline-flex w-fit min-h-11 items-center gap-2 font-bold text-blue-700 no-underline hover:underline"
+        className="group inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-4 font-extrabold text-[#075fae] no-underline shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:bg-white hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
         to={SOLICITUDES_ADMIN_PATH}
       >
-        <IconArrowLeft size={18} aria-hidden="true" /> Volver al inicio
+        <IconArrowLeft className="transition-transform group-hover:-translate-x-0.5 motion-reduce:transform-none" size={18} aria-hidden="true" />
+        Volver a Gestión de solicitudes
       </Link>
 
       <header className="flex flex-col gap-5 rounded-3xl border border-sky-100 bg-white p-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:p-8 lg:flex-row lg:items-center lg:justify-between">

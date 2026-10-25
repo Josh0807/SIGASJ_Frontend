@@ -4,6 +4,7 @@ import {
   downloadFormularioOficial,
   getDownloadFilename,
   getFormulariosOficialesAdmin,
+  getFormulariosOficialesPublicos,
   uploadFormularioOficial,
 } from './formulariosOficialesApi'
 
@@ -21,7 +22,10 @@ const official = {
   fechaActualizacion: '2026-10-20T12:00:00.000Z',
 }
 
-afterEach(() => vi.restoreAllMocks())
+afterEach(() => {
+  vi.clearAllMocks()
+  vi.restoreAllMocks()
+})
 
 describe('formularios oficiales API', () => {
   it('consulta el catálogo administrativo y carga el PDF en el campo multipart file', async () => {
@@ -36,6 +40,14 @@ describe('formularios oficiales API', () => {
     expect(path).toBe('/solicitudes/admin/formularios-oficiales/1')
     expect(options?.method).toBe('PUT')
     expect((options?.body as FormData).get('file')).toBe(file)
+  })
+
+  it('consulta el catálogo público y filtra slugs ajenos', async () => {
+    const publicOfficial = { ...official, urlDescarga: '/solicitudes/arreglo-pago/formulario-oficial' }
+    vi.mocked(fetchWithAuth).mockResolvedValue([publicOfficial, { ...official, tipoSolicitudId: 99, slug: 'no-oficial' }])
+
+    await expect(getFormulariosOficialesPublicos()).resolves.toEqual([publicOfficial])
+    expect(fetchWithAuth).toHaveBeenCalledWith('/solicitudes/formularios-oficiales')
   })
 
   it('obtiene el nombre desde Content-Disposition', () => {
@@ -84,5 +96,30 @@ describe('formularios oficiales API', () => {
       headers: { 'Content-Type': 'application/json' },
     }))
     await expect(downloadFormularioOficial('arreglo-pago')).rejects.toThrow('PDF no publicado')
+  })
+
+  it('usa la URL publicada solo si pertenece al mismo trámite', async () => {
+    vi.mocked(fetchRawWithAuth)
+      .mockResolvedValueOnce(new Response('%PDF-documento', {
+        status: 200,
+        headers: { 'Content-Type': 'application/pdf' },
+      }))
+      .mockResolvedValueOnce(new Response('%PDF-documento', {
+        status: 200,
+        headers: { 'Content-Type': 'application/pdf' },
+      }))
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:official')
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+
+    await downloadFormularioOficial('arreglo-pago', '/solicitudes/tipos/arreglo-pago/formulario-oficial')
+    await downloadFormularioOficial('arreglo-pago', '/solicitudes/cambio-titular/formulario-oficial')
+
+    expect(fetchRawWithAuth).toHaveBeenNthCalledWith(1, '/solicitudes/tipos/arreglo-pago/formulario-oficial', {
+      headers: { Accept: 'application/pdf' },
+    })
+    expect(fetchRawWithAuth).toHaveBeenNthCalledWith(2, '/solicitudes/arreglo-pago/formulario-oficial', {
+      headers: { Accept: 'application/pdf' },
+    })
   })
 })

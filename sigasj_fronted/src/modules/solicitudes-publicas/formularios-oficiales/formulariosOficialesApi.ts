@@ -2,6 +2,15 @@ import { fetchRawWithAuth, fetchWithAuth } from '../../../services/http/httpClie
 import { FORMULARIOS_OFICIALES_SLUGS, type FormularioOficial } from './types'
 
 const ADMIN_PATH = '/solicitudes/admin/formularios-oficiales'
+const PUBLIC_PATH = '/solicitudes/formularios-oficiales'
+
+export async function getFormulariosOficialesPublicos(): Promise<FormularioOficial[]> {
+  const response = await fetchWithAuth<FormularioOficial[]>(PUBLIC_PATH)
+  if (!Array.isArray(response)) return []
+
+  const officialSlugs = new Set<string>(FORMULARIOS_OFICIALES_SLUGS)
+  return response.filter((item) => officialSlugs.has(item?.slug))
+}
 
 export async function getFormulariosOficialesAdmin(): Promise<FormularioOficial[]> {
   const response = await fetchWithAuth<FormularioOficial[]>(ADMIN_PATH)
@@ -47,8 +56,22 @@ export const getDownloadFilename = (contentDisposition: string | null, slug: str
   return name.toLowerCase().endsWith('.pdf') ? name : `${name || slug}.pdf`
 }
 
-export async function downloadFormularioOficial(slug: string): Promise<string> {
-  const response = await fetchRawWithAuth(`/solicitudes/${encodeURIComponent(slug)}/formulario-oficial`, {
+const getPublicDownloadPath = (slug: string, urlDescarga?: string | null) => {
+  const encodedSlug = encodeURIComponent(slug)
+  const allowedPaths = new Set([
+    `/solicitudes/${encodedSlug}/formulario-oficial`,
+    `/solicitudes/tipos/${encodedSlug}/formulario-oficial`,
+  ])
+  return urlDescarga && allowedPaths.has(urlDescarga)
+    ? urlDescarga
+    : `/solicitudes/${encodedSlug}/formulario-oficial`
+}
+
+export async function downloadFormularioOficial(
+  slug: string,
+  urlDescarga?: string | null,
+): Promise<string> {
+  const response = await fetchRawWithAuth(getPublicDownloadPath(slug, urlDescarga), {
     headers: { Accept: 'application/pdf' },
   })
 
@@ -77,6 +100,8 @@ export async function downloadFormularioOficial(slug: string): Promise<string> {
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0)
+  // Chrome puede seguir escribiendo/abriendo la descarga después del click.
+  // Revocar en el siguiente tick puede dejar un archivo local inaccesible.
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
   return filename
 }
