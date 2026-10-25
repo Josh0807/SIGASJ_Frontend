@@ -11,6 +11,25 @@ const valid: MaterialFormValues = {
   activo: true,
   categoriaId: '2',
   proveedorId: '10',
+  precioUnitario: '',
+  fechaVencimiento: '',
+  cantidadInicial: '',
+  requiereFechaVencimiento: false,
+}
+
+function hoyEnCostaRica(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Costa_Rica',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
+function sumarDias(iso: string, dias: number): string {
+  const [year, month, day] = iso.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day + dias))
+  return date.toISOString().slice(0, 10)
 }
 
 describe('validación del formulario de materiales', () => {
@@ -48,6 +67,29 @@ describe('validación del formulario de materiales', () => {
     expect(validateMaterial({ ...valid, proveedorId: '-2' }).proveedorId).toContain(
       'válido',
     )
+  })
+
+  it('exige una fecha futura cuando el material requiere vencimiento', () => {
+    const hoy = hoyEnCostaRica()
+    expect(
+      validateMaterial({ ...valid, requiereFechaVencimiento: true, fechaVencimiento: '' }).fechaVencimiento,
+    ).toContain('obligatoria')
+    expect(
+      validateMaterial({ ...valid, requiereFechaVencimiento: true, fechaVencimiento: hoy }).fechaVencimiento,
+    ).toContain('futura')
+    expect(
+      validateMaterial({
+        ...valid,
+        requiereFechaVencimiento: true,
+        fechaVencimiento: sumarDias(hoy, 1),
+      }).fechaVencimiento,
+    ).toBeUndefined()
+  })
+
+  it('no exige vencimiento futuro en materiales que no lo requieren', () => {
+    expect(
+      validateMaterial({ ...valid, requiereFechaVencimiento: false, fechaVencimiento: '2020-01-01' }),
+    ).toEqual({})
   })
 
   it('traduce conflictos y permisos a mensajes comprensibles', () => {

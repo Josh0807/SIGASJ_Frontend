@@ -50,6 +50,7 @@ const EMPTY_VALUES: MaterialFormValues = {
   precioUnitario: '',
   fechaVencimiento: '',
   cantidadInicial: '',
+  requiereFechaVencimiento: false,
 }
 
 export default function MaterialForm({
@@ -75,28 +76,23 @@ export default function MaterialForm({
       ? [currentProveedor, ...proveedores.data]
       : proveedores.data
 
-  const categoriaSeleccionada = categoryOptions.find(
-    (item) => String(item.id) === values.categoriaId,
-  )
-  const muestraVencimiento = Boolean(
-    categoriaSeleccionada?.requiereFechaVencimiento,
-  )
-
   const update = (field: keyof MaterialFormValues, value: string | boolean) => {
     setValues((current) => {
       const next = { ...current, [field]: value }
       if (field === 'categoriaId') {
         const cat = categoryOptions.find((item) => String(item.id) === value)
-        if (!cat?.requiereFechaVencimiento) {
-          next.fechaVencimiento = ''
-        }
+        const requiere = Boolean(cat?.requiereFechaVencimiento)
+        next.requiereFechaVencimiento = requiere
+        if (!requiere) next.fechaVencimiento = ''
       }
       return next
     })
     setErrors((current) => ({
       ...current,
       [field]: undefined,
-      ...(field === 'categoriaId' ? { fechaVencimiento: undefined } : {}),
+      ...(field === 'categoriaId'
+        ? { fechaVencimiento: undefined, requiereFechaVencimiento: undefined }
+        : {}),
     }))
   }
 
@@ -254,31 +250,39 @@ export default function MaterialForm({
               <option key={item.id} value={item.id}>
                 {item.nombre}
                 {item.activo ? '' : ' (inactiva · actual)'}
+                {item.requiereFechaVencimiento ? ' · con vencimiento' : ''}
               </option>
             ))}
           </select>,
         )}
-        {muestraVencimiento
-          ? field(
-              'fechaVencimiento',
-              'Fecha de vencimiento',
-              <IconCalendarTime size={20} aria-hidden="true" />,
-              <input
-                value={values.fechaVencimiento}
-                type="date"
-                aria-invalid={Boolean(errors.fechaVencimiento)}
-                onChange={(e) => update('fechaVencimiento', e.target.value)}
-              />,
-            )
-          : values.categoriaId ? (
-              <p className="provider-admin__form-note materials-admin__form-full">
-                Esta categoría no usa fecha de vencimiento (p. ej. tubería PVC,
-                válvulas o herramientas).
-              </p>
-            ) : null}
+        <label className="materials-admin__form-full !flex !cursor-pointer !items-center !gap-3 !rounded-xl !border !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-sm !font-semibold !text-slate-700 hover:!bg-slate-100 dark:!border-slate-700 dark:!bg-slate-800 dark:!text-slate-200">
+          <input
+            type="checkbox"
+            checked={values.requiereFechaVencimiento}
+            onChange={(e) => {
+              const checked = e.target.checked
+              update('requiereFechaVencimiento', checked)
+              if (!checked) update('fechaVencimiento', '')
+            }}
+            className="!size-4 !accent-indigo-600"
+          />
+          Este material requiere fecha de vencimiento (p. ej. insumos químicos)
+        </label>
+        {values.requiereFechaVencimiento &&
+          field(
+            'fechaVencimiento',
+            'Fecha de vencimiento *',
+            <IconCalendarTime size={20} aria-hidden="true" />,
+            <input
+              value={values.fechaVencimiento}
+              type="date"
+              aria-invalid={Boolean(errors.fechaVencimiento)}
+              onChange={(e) => update('fechaVencimiento', e.target.value)}
+            />,
+          )}
         <p className="provider-admin__form-note materials-admin__form-full">
           {mode === 'create'
-            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega.'
+            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega. Si la categoría exige vencimiento, el campo se marca automáticamente.'
             : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí.'}
         </p>
         {field(

@@ -110,7 +110,7 @@ export default function SolicitudRevisionDetallePage() {
     {success ? <div className="material-tracking__state" role="status">
       {success}
       {showSalidaLink ? (
-        <Link className="material-tracking__detail-link !ml-4" to={SALIDAS_PATH}>Registrar salida de bodega →</Link>
+        <Link className="material-tracking__detail-link !ml-4" to={`${SALIDAS_PATH}?idSolicitud=${request.id}`}>Registrar salida de bodega →</Link>
       ) : null}
     </div> : null}
     {!loading && request ? <>
