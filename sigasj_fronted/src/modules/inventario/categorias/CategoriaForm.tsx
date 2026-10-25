@@ -1,5 +1,12 @@
 import { useRef, useState, type FormEvent } from 'react'
-import { IconAlignLeft, IconArrowLeft, IconCircleCheckFilled, IconDeviceFloppy, IconTag } from '@tabler/icons-react'
+import {
+  IconAlignLeft,
+  IconArrowLeft,
+  IconCalendarTime,
+  IconCircleCheckFilled,
+  IconDeviceFloppy,
+  IconTag,
+} from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 import { CATEGORIAS_PATH } from '../inventarioPaths'
@@ -8,15 +15,31 @@ import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { validateCategoria, type CategoriaErrors } from './categoriaUtils'
 import type { CategoriaFormValues } from './types'
 
-type Props = { mode: 'create' | 'edit'; initialValues?: CategoriaFormValues; onSubmit: (values: CategoriaFormValues) => Promise<void> }
+type Props = {
+  mode: 'create' | 'edit'
+  initialValues?: CategoriaFormValues
+  onSubmit: (values: CategoriaFormValues) => Promise<void>
+}
 
-export default function CategoriaForm({ mode, initialValues = { nombre: '', descripcion: '' }, onSubmit }: Props) {
+const EMPTY: CategoriaFormValues = {
+  nombre: '',
+  descripcion: '',
+  requiereFechaVencimiento: false,
+}
+
+export default function CategoriaForm({
+  mode,
+  initialValues = EMPTY,
+  onSubmit,
+}: Props) {
   const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState<CategoriaErrors>({})
-  const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null)
+  const [message, setMessage] = useState<{ error: boolean; text: string } | null>(
+    null,
+  )
   const [saving, setSaving] = useState(false)
   const submitting = useRef(false)
-  const change = (field: keyof CategoriaFormValues, value: string) => {
+  const change = (field: keyof CategoriaFormValues, value: string | boolean) => {
     setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
     setMessage(null)
@@ -36,7 +59,13 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
     setMessage(null)
     try {
       await onSubmit(values)
-      setMessage({ error: false, text: mode === 'create' ? 'Categoría registrada correctamente.' : 'Cambios guardados correctamente.' })
+      setMessage({
+        error: false,
+        text:
+          mode === 'create'
+            ? 'Categoría registrada correctamente.'
+            : 'Cambios guardados correctamente.',
+      })
     } catch (caught) {
       const parsed = caught as Error & { fieldError?: string }
       setMessage({ error: true, text: parsed.message })
@@ -51,7 +80,9 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
     <>
       {message ? (
         message.error ? (
-          <div className="materials-admin__error" role="alert">{message.text}</div>
+          <div className="materials-admin__error" role="alert">
+            {message.text}
+          </div>
         ) : (
           <FormSuccessResult
             className="category-admin__success !max-w-3xl !gap-3 !overflow-hidden !rounded-[24px] !border-emerald-200 !bg-[linear-gradient(135deg,#ecfdf5_0%,#ffffff_58%,#f0fdfa_100%)] !p-6 !shadow-[0_16px_40px_rgba(5,150,105,0.13)]"
@@ -67,10 +98,18 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
           />
         )
       ) : null}
-      <form className="materials-admin__form provider-admin__form category-admin__form w-full max-w-3xl" noValidate onSubmit={submit}>
+      <form
+        className="materials-admin__form provider-admin__form category-admin__form w-full max-w-3xl"
+        noValidate
+        onSubmit={submit}
+      >
         <InventoryFormHeading
           icon={<IconTag size={25} aria-hidden="true" />}
-          title={mode === 'create' ? 'Información de la categoría' : 'Ficha de la categoría'}
+          title={
+            mode === 'create'
+              ? 'Información de la categoría'
+              : 'Ficha de la categoría'
+          }
           description="Los campos marcados con * son obligatorios."
         />
         <InventoryFormField
@@ -102,13 +141,54 @@ export default function CategoriaForm({ mode, initialValues = { nombre: '', desc
             onChange={(event) => change('descripcion', event.target.value)}
           />
         </InventoryFormField>
+
+        <label className="materials-admin__form-full flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3.5">
+          <input
+            type="checkbox"
+            className="mt-1 size-4 accent-blue-600"
+            checked={values.requiereFechaVencimiento}
+            onChange={(event) =>
+              change('requiereFechaVencimiento', event.target.checked)
+            }
+          />
+          <span className="grid gap-1">
+            <span className="inline-flex items-center gap-2 text-sm font-bold text-[#163f6b]">
+              <IconCalendarTime size={18} aria-hidden="true" />
+              Requiere fecha de vencimiento
+            </span>
+            <small className="text-slate-500">
+              Actívelo solo para insumos que caducan (químicos, cloro,
+              reactivos). Tubería PVC, válvulas y herramientas no lo necesitan.
+            </small>
+          </span>
+        </label>
+
         <div className="materials-admin__form-actions">
-          <button type="submit" className="materials-admin__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_11px_26px_rgba(37,99,235,0.3)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-800 hover:!to-cyan-500 hover:!shadow-[0_17px_34px_rgba(37,99,235,0.4)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none" disabled={saving}>
-            <IconDeviceFloppy className="!transition-transform !duration-300 group-hover:!scale-110 group-hover:!-rotate-6 motion-reduce:!transform-none" size={19} aria-hidden="true" />
-            {saving ? 'Guardando…' : mode === 'create' ? 'Registrar categoría' : 'Guardar cambios'}
+          <button
+            type="submit"
+            className="materials-admin__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_11px_26px_rgba(37,99,235,0.3)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-800 hover:!to-cyan-500 hover:!shadow-[0_17px_34px_rgba(37,99,235,0.4)] active:!translate-y-0 active:!scale-[0.97] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none"
+            disabled={saving}
+          >
+            <IconDeviceFloppy
+              className="!transition-transform !duration-300 group-hover:!scale-110 group-hover:!-rotate-6 motion-reduce:!transform-none"
+              size={19}
+              aria-hidden="true"
+            />
+            {saving
+              ? 'Guardando…'
+              : mode === 'create'
+                ? 'Registrar categoría'
+                : 'Guardar cambios'}
           </button>
-          <Link className="materials-admin__secondary group !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-extrabold !text-blue-900 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!text-blue-700 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={CATEGORIAS_PATH}>
-            <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
+          <Link
+            className="materials-admin__secondary group !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-extrabold !text-blue-900 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!text-blue-700 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none"
+            to={CATEGORIAS_PATH}
+          >
+            <IconArrowLeft
+              className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none"
+              size={19}
+              aria-hidden="true"
+            />
             Volver al listado
           </Link>
         </div>

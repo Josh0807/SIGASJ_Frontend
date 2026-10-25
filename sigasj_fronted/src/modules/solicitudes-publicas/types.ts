@@ -9,17 +9,19 @@ export const SOLICITUD_ESTADO_LABELS = {
 
 export type SolicitudEstado = keyof typeof SOLICITUD_ESTADO_LABELS
 
+/** @deprecated Preferir SeguimientoSolicitudPublico (contrato 4.14.1). */
 export type SolicitudSeguimiento = {
-  id: number
-  tipoSolicitudId: number
   codigoSeguimiento: string
   estado: SolicitudEstado
   fechaIngreso: string
-  createdAt: string
-  updatedAt: string
   tipoSolicitud: {
-    id: number
     nombre: string
     slug: string
-  }
+  } | null
+  historial?: Array<{
+    fecha: string
+    estadoAnterior: SolicitudEstado | null
+    estadoNuevo: SolicitudEstado
+    observacionPublica: string | null
+  }>
 }

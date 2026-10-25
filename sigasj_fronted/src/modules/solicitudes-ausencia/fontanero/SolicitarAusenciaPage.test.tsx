@@ -21,6 +21,99 @@ const flushAsync = async () => {
   })
 }
 
+const evidenciaPdf = () =>
+  new File(['%PDF-1.4 evidencia'], 'constancia.pdf', {
+    type: 'application/pdf',
+  })
+
+const adjuntarEvidencia = async (
+  container: HTMLElement,
+  file: File = evidenciaPdf(),
+) => {
+  const input = container.querySelector(
+    'input[type="file"]',
+  ) as HTMLInputElement
+  await act(async () => {
+    const files = {
+      0: file,
+      length: 1,
+      item: (index: number) => (index === 0 ? file : null),
+      [Symbol.iterator]: function* () {
+        yield file
+      },
+    } as unknown as FileList
+    Object.defineProperty(input, 'files', {
+      value: files,
+      configurable: true,
+    })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+  })
+}
+
+/** índice 0 = fecha inicio, 1 = fecha fin. iso = YYYY-MM-DD */
+const elegirFecha = async (
+  container: HTMLElement,
+  indice: 0 | 1,
+  iso: string,
+) => {
+  const [y, m, d] = iso.split('-').map(Number)
+  const visible = `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`
+  const triggers = container.querySelectorAll(
+    'button[aria-haspopup="dialog"]',
+  )
+  const trigger = triggers[indice] as HTMLButtonElement
+  await act(async () => {
+    trigger.click()
+  })
+  const nombresMes = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Setiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
+  ]
+  // El calendario se renderiza en portal (document.body)
+  const dialogRoot = () =>
+    document.querySelector('[role="dialog"]') as HTMLElement | null
+
+  for (let i = 0; i < 36; i += 1) {
+    const dialog = dialogRoot()
+    expect(dialog).toBeTruthy()
+    const titulo = Array.from(dialog!.querySelectorAll('p'))
+      .map((p) => p.textContent || '')
+      .join(' ')
+    const mesNombre = nombresMes[m - 1]
+    if (titulo.includes(mesNombre) && titulo.includes(String(y))) break
+    const next = dialog!.querySelector(
+      'button[aria-label="Mes siguiente"]',
+    ) as HTMLButtonElement | null
+    const prev = dialog!.querySelector(
+      'button[aria-label="Mes anterior"]',
+    ) as HTMLButtonElement | null
+    const anioActual = Number((titulo.match(/\d{4}/) || [])[0] || 0)
+    const mesIdx = nombresMes.findIndex((n) => titulo.includes(n))
+    const irAdelante =
+      anioActual < y || (anioActual === y && mesIdx + 1 < m)
+    await act(async () => {
+      ;(irAdelante ? next : prev)?.click()
+    })
+  }
+  const dia = Array.from(
+    dialogRoot()!.querySelectorAll('button[aria-label]'),
+  ).find((b) => (b.getAttribute('aria-label') || '').startsWith(visible))
+  expect(dia).toBeTruthy()
+  await act(async () => {
+    ;(dia as HTMLButtonElement).click()
+  })
+}
+
 describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
   beforeEach(() => {
     clearAccessToken()
@@ -38,6 +131,15 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
       reviewedAt: null,
       createdAt: '2026-10-19T12:00:00.000Z',
       updatedAt: '2026-10-19T12:00:00.000Z',
+    })
+    vi.spyOn(ausenciaApi, 'adjuntarEvidenciaMiSolicitudAusencia').mockResolvedValue({
+      id: 1,
+      nombreOriginal: 'constancia.pdf',
+      tipoArchivo: 'application/pdf',
+      rutaReferenciaArchivo:
+        '/api/v1/fontanero/solicitudes-ausencia/42/documentos/x.pdf',
+      tamanio: 128,
+      fechaCarga: '2026-10-19T12:00:00.000Z',
     })
   })
 
@@ -85,6 +187,9 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
       expect(html).toContain('Permiso')
       expect(html).toContain('Vacaciones')
       expect(html).toContain('Enviar solicitud')
+      // Evidencia solo aparece al elegir Permiso
+      expect(html).not.toContain('Evidencia')
+      expect(app.container.querySelector('input[type="file"]')).toBeNull()
       expect(html).not.toContain('Vacaciones aprobadas')
       expect(html).not.toContain('Cree su propio Jotform')
       expect(app.container.querySelector('iframe')).toBeNull()
@@ -120,7 +225,6 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
 
     try {
       const tipo = app.container.querySelector('select') as HTMLSelectElement
-      const fechas = app.container.querySelectorAll('input[type="date"]')
       const correo = app.container.querySelector(
         'input[type="email"]',
       ) as HTMLInputElement
@@ -146,10 +250,11 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
         }
         setInput(correo, 'aviso@asadasanjuan.cr')
         setSelect(tipo, 'PERMISO')
-        setInput(fechas[0] as HTMLInputElement, '2026-11-01')
-        setInput(fechas[1] as HTMLInputElement, '2026-11-02')
         setInput(motivo, 'Cita médica')
       })
+      await elegirFecha(app.container, 0, '2026-11-01')
+      await elegirFecha(app.container, 1, '2026-11-02')
+      await adjuntarEvidencia(app.container)
 
       const enviar = Array.from(app.container.querySelectorAll('button')).find(
         (b) => b.textContent?.includes('Enviar solicitud'),
@@ -166,6 +271,7 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
         correo: 'aviso@asadasanjuan.cr',
         motivo: 'Cita médica',
       })
+      expect(ausenciaApi.adjuntarEvidenciaMiSolicitudAusencia).toHaveBeenCalled()
       expect(app.currentPath()).toBe('/fontanero/mis-solicitudes/42')
     } finally {
       await app.cleanup()
@@ -209,7 +315,6 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
     await flushAsync()
     try {
       const tipo = app.container.querySelector('select') as HTMLSelectElement
-      const fechas = app.container.querySelectorAll('input[type="date"]')
       const motivo = app.container.querySelector(
         'input[placeholder*="Cita médica"]',
       ) as HTMLInputElement
@@ -226,10 +331,11 @@ describe('PBI 6.5.5 — Solicitar permiso o vacaciones (Fontanero)', () => {
           )?.set?.call(el, value)
           el.dispatchEvent(new Event('input', { bubbles: true }))
         }
-        setInput(fechas[0] as HTMLInputElement, '2026-11-01')
-        setInput(fechas[1] as HTMLInputElement, '2026-11-02')
         setInput(motivo, 'Trámite')
       })
+      await elegirFecha(app.container, 0, '2026-11-01')
+      await elegirFecha(app.container, 1, '2026-11-02')
+      await adjuntarEvidencia(app.container)
       const enviar = Array.from(app.container.querySelectorAll('button')).find(
         (b) => b.textContent?.includes('Enviar solicitud'),
       )

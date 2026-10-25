@@ -16,7 +16,10 @@ import {
   estadoSolicitudAusenciaLabel,
   tipoSolicitudAusenciaLabel,
 } from '../solicitudAusenciaLabels'
-import { getMiSolicitudAusencia } from '../solicitudesAusenciaApi'
+import {
+  abrirEvidenciaSolicitudAusencia,
+  getMiSolicitudAusencia,
+} from '../solicitudesAusenciaApi'
 import { FONTANERO_MIS_SOLICITUDES_PATH } from '../solicitudesAusenciaPaths'
 import type { SolicitudAusenciaFontanero } from '../types'
 
@@ -193,7 +196,64 @@ export default function MiSolicitudAusenciaDetallePage() {
             {solicitud.estado === 'RECHAZADA' && solicitud.motivoRechazo?.trim() ? (
               <Dato label="Motivo del rechazo">{solicitud.motivoRechazo}</Dato>
             ) : null}
+            {solicitud.tipo === 'VACACIONES' && solicitud.resumenVacaciones ? (
+              <div className="grid min-w-0 gap-1 rounded-2xl border border-sky-100 bg-sky-50/70 px-4 py-3 sm:col-span-2">
+                <dt className="text-xs font-extrabold uppercase tracking-wider text-sky-800">
+                  Días de vacaciones (sin feriados)
+                </dt>
+                <dd className="m-0 text-base font-semibold text-slate-800">
+                  Calendario: {solicitud.resumenVacaciones.diasCalendario} · Feriados:{' '}
+                  {solicitud.resumenVacaciones.feriados.length} · A descontar:{' '}
+                  {solicitud.resumenVacaciones.diasNetos}
+                </dd>
+                {solicitud.resumenVacaciones.feriados.length > 0 ? (
+                  <ul className="m-0 mt-2 list-disc space-y-1 pl-5 text-sm font-medium text-slate-600">
+                    {solicitud.resumenVacaciones.feriados.map((f) => (
+                      <li key={f.fecha}>
+                        {formatearFechaPermiso(f.fecha)} — {f.nombre}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
           </dl>
+
+          <section className="grid gap-2 border-t border-slate-100 pt-5">
+            <h2 className="m-0 text-sm font-extrabold uppercase tracking-wider text-slate-500">
+              Evidencia
+            </h2>
+            {solicitud.documentos?.length ? (
+              <ul className="m-0 grid list-none gap-2 p-0">
+                {solicitud.documentos.map((doc) => (
+                  <li
+                    key={doc.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                  >
+                    <span className="font-semibold text-slate-800">
+                      {doc.nombreOriginal}
+                    </span>
+                    <button
+                      type="button"
+                      className="inline-flex min-h-10 items-center rounded-xl border border-blue-200 bg-white px-3 text-sm font-bold text-blue-800"
+                      onClick={() =>
+                        void abrirEvidenciaSolicitudAusencia(
+                          doc.rutaReferenciaArchivo,
+                          'fontanero',
+                        )
+                      }
+                    >
+                      Ver documento
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="m-0 text-sm font-semibold text-slate-500">
+                Sin evidencia adjunta.
+              </p>
+            )}
+          </section>
         </article>
       )}
     </div>

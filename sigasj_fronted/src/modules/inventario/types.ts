@@ -11,7 +11,13 @@ export type Material = {
   fechaVencimiento?: string | null
   requiereFechaVencimiento?: boolean
   idCategoria: number | null
-  categoria: { id: number; nombre: string; descripcion: string | null; activo: boolean } | null
+  categoria: {
+    id: number
+    nombre: string
+    descripcion: string | null
+    activo: boolean
+    requiereFechaVencimiento?: boolean
+  } | null
   idProveedor: number | null
   proveedor: { id: number; nombre: string; telefono: string | null; correo: string | null; activo: boolean } | null
   createdAt: string

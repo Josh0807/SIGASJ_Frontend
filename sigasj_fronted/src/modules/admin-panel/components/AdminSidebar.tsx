@@ -4,7 +4,11 @@ import { IconChevronDown, IconFiles } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import AdminNavIcon from './AdminNavIcon'
 import type { AdminSidebarItem, AdminSidebarProps } from '../props'
-import { FORMULARIOS_OFICIALES_ADMIN_PATH, SOLICITUDES_ADMIN_PATH } from '../../solicitudes-publicas/admin/solicitudesAdminPaths'
+import {
+  FORMULARIOS_DESCARGABLES_ADMIN_PATH,
+  FORMULARIOS_OFICIALES_ADMIN_PATH,
+  SOLICITUDES_ADMIN_PATH,
+} from '../../solicitudes-publicas/admin/solicitudesAdminPaths'
 
 export type { AdminSidebarItem, AdminSidebarProps }
 
@@ -80,6 +84,14 @@ const AdminSidebar = ({
               >
                 <IconFiles className="shrink-0" size={17} aria-hidden="true" />
                 <span>Formularios oficiales</span>
+              </NavLink>
+              <NavLink
+                to={FORMULARIOS_DESCARGABLES_ADMIN_PATH}
+                className={({ isActive }) => `group flex min-h-10 items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold no-underline transition ${isActive ? 'bg-gradient-to-r from-[#3e8fd6] to-[#1e5a9c] text-white shadow-[0_7px_18px_rgba(62,143,214,0.32)]' : 'text-sky-100/80 hover:bg-white/10 hover:text-white'}`}
+                onClick={onNavigate}
+              >
+                <IconFiles className="shrink-0" size={17} aria-hidden="true" />
+                <span>Formularios descargables</span>
               </NavLink>
           </div> : null}
         </div>

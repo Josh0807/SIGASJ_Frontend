@@ -23,7 +23,7 @@ const defaultServices: RequestService[] = [
   { id: 'disponibilidad-servicios', name: 'Constancia de Disponibilidad de Servicios', description: 'Permite solicitar una constancia sobre la disponibilidad de los servicios brindados por la ASADA. Use el trámite en línea o descargue el formulario para entrega presencial.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.serviceAvailability), downloadSlug: 'disponibilidad-servicios', badge: 'Trámite en línea', icon: 'service-availability' },
   { id: 'servicio-existente', name: 'Constancia de Servicio Existente', description: 'Solicite en línea una constancia que acredite la existencia de un servicio de agua.', formHref: onlineFormHref(SERVICE_REQUEST_ROUTES.existingService), downloadSlug: 'servicio-existente', badge: 'Trámite en línea', icon: 'service-record' },
   { id: 'otros-formularios', name: 'Otros Formularios', description: 'Consulta y descarga otros documentos oficiales publicados por la Administración de la ASADA.', viewHref: OTHER_FORMS_ROUTE, badge: 'Solo descarga', icon: 'downloadable-forms' },
-  { id: 'seguimiento', name: 'Seguimiento de Solicitudes', description: 'Consulta el avance de tu solicitud utilizando el código de seguimiento que recibiste al enviarla.', viewHref: REQUEST_TRACKING_ROUTE, badge: 'Consulta pública', icon: 'request-tracking' },
+  { id: 'seguimiento', name: 'Seguimiento de Solicitudes', description: 'Consulta el avance de tu solicitud con el código de seguimiento y la identificación del solicitante.', viewHref: REQUEST_TRACKING_ROUTE, badge: 'Consulta pública', icon: 'request-tracking' },
 ]
 
 const iconPaths: Record<RequestServiceIcon, ReactNode> = {

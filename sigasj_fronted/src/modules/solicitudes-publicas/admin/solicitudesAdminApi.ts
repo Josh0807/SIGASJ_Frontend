@@ -1,5 +1,16 @@
 import { fetchRawWithAuth, fetchWithAuth } from '../../../services/http/httpClient'
-import type { SolicitudAdminDetail, SolicitudAdminListItem, SolicitudesAdminFilters, SolicitudesAdminList } from './types'
+import type {
+  CambiarEstadoSolicitudPayload,
+  CambioEstadoSolicitudResponse,
+  HistorialSolicitudEvento,
+  SolicitudAdmin,
+} from './solicitudesAdminTypes'
+import type {
+  SolicitudAdminDetail,
+  SolicitudAdminListItem,
+  SolicitudesAdminFilters,
+  SolicitudesAdminList,
+} from './types'
 
 export const SOLICITUDES_ADMIN_PAGE_SIZE = 10
 
@@ -79,3 +90,50 @@ export const solicitudesAdminError = (error: unknown, fallback: string) => {
   if (error.message.includes('HTTP 404')) return 'La solicitud indicada no existe.'
   return error.message.replace(/^HTTP \d+:\s*/, '') || fallback
 }
+
+/** GET /solicitudes/:id — resumen para cambio de estado (4.12 / 4.13). */
+export const getSolicitudAdmin = async (id: number, signal?: AbortSignal) =>
+  fetchWithAuth<SolicitudAdmin>(`/solicitudes/${id}`, { signal })
+
+/** GET /solicitudes/:id/historial — timeline admin con nota interna. */
+export const getHistorialSolicitudAdmin = async (
+  id: number,
+  signal?: AbortSignal,
+) => {
+  const raw = await fetchWithAuth<HistorialSolicitudEvento[]>(
+    `/solicitudes/${id}/historial`,
+    { signal },
+  )
+  return Array.isArray(raw) ? raw : []
+}
+
+const trimOptional = (value: string) => {
+  const trimmed = value.trim()
+  return trimmed.length ? trimmed : null
+}
+
+export const buildCambiarEstadoPayload = ({
+  estadoNuevo,
+  observacionPublica,
+  notaInterna,
+}: CambiarEstadoSolicitudPayload & {
+  observacionPublica: string
+  notaInterna: string
+}): CambiarEstadoSolicitudPayload => ({
+  estadoNuevo,
+  observacionPublica: trimOptional(observacionPublica),
+  notaInterna: trimOptional(notaInterna),
+})
+
+/** PATCH /solicitudes/:id/estado */
+export const cambiarEstadoSolicitudAdmin = async (
+  id: number,
+  payload: CambiarEstadoSolicitudPayload,
+  signal?: AbortSignal,
+) =>
+  fetchWithAuth<CambioEstadoSolicitudResponse>(`/solicitudes/${id}/estado`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal,
+  })

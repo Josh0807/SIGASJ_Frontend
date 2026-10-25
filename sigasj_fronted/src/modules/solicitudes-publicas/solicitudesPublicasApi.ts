@@ -1,11 +1,39 @@
-import { fetchPublicApi } from '../../services/http/publicApi'
-import type { SolicitudSeguimiento } from './types'
+import { fetchWithAuth } from '../../services/http/httpClient'
+import type {
+  ConsultarSeguimientoPayload,
+  SeguimientoSolicitudPublico,
+} from './seguimientoPublicoTypes'
+import { normalizarCodigoSeguimiento } from './seguimientoPublicoValidation'
 
-export const normalizeTrackingCode = (code: string) => code.trim().toUpperCase()
+/** @deprecated Preferir normalizarCodigoSeguimiento (mismo comportamiento). */
+export const normalizeTrackingCode = (code: string) =>
+  normalizarCodigoSeguimiento(code)
 
-export async function getSolicitudSeguimiento(code: string): Promise<SolicitudSeguimiento> {
-  const normalizedCode = normalizeTrackingCode(code)
-  return fetchPublicApi<SolicitudSeguimiento>([
-    `/solicitudes/seguimiento/${encodeURIComponent(normalizedCode)}`,
-  ])
+/**
+ * POST /solicitudes/seguimiento (4.14.1).
+ * Payload exacto: { codigo, identificacion }. Sin campos auxiliares.
+ */
+export async function consultarSeguimientoPublico(
+  payload: ConsultarSeguimientoPayload,
+): Promise<SeguimientoSolicitudPublico> {
+  return fetchWithAuth<SeguimientoSolicitudPublico>('/solicitudes/seguimiento', {
+    method: 'POST',
+    body: JSON.stringify({
+      codigo: payload.codigo,
+      identificacion: payload.identificacion,
+    }),
+  })
+}
+
+/**
+ * @deprecated El seguimiento por código solo fue retirado en Backend.
+ * Usar consultarSeguimientoPublico con código + identificación.
+ */
+export async function getSolicitudSeguimiento(
+  code: string,
+): Promise<SeguimientoSolicitudPublico> {
+  void code
+  throw new Error(
+    'HTTP 404: No fue posible localizar una solicitud con los datos proporcionados.',
+  )
 }
