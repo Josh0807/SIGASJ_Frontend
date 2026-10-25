@@ -73,7 +73,7 @@ export default function MaterialEditPage() {
         idCategoria: Number(values.categoriaId),
         idProveedor: Number(values.proveedorId),
         precioUnitario: values.precioUnitario ? Number(values.precioUnitario) : null,
-        fechaVencimiento: values.fechaVencimiento || null,
+        fechaVencimiento: values.requiereFechaVencimiento ? values.fechaVencimiento || null : null,
         requiereFechaVencimiento: values.requiereFechaVencimiento,
       })
       navigate(MATERIALES_PATH, {

@@ -2,6 +2,27 @@ import type { MaterialFormValues } from './types'
 
 export type MaterialFormErrors = Partial<Record<keyof MaterialFormValues, string>>
 
+const FECHA_CALENDARIO = /^(\d{4})-(\d{2})-(\d{2})$/
+
+function esFechaCalendario(value: string): boolean {
+  const match = FECHA_CALENDARIO.exec(value)
+  if (!match) return false
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+}
+
+function hoyEnCostaRica(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Costa_Rica',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
 export function validateMaterial(values: MaterialFormValues): MaterialFormErrors {
   const errors: MaterialFormErrors = {}
   if (!values.nombre.trim()) errors.nombre = 'El nombre es obligatorio.'
@@ -28,17 +49,13 @@ export function validateMaterial(values: MaterialFormValues): MaterialFormErrors
   if (values.requiereFechaVencimiento) {
     if (!values.fechaVencimiento) {
       errors.fechaVencimiento = 'La fecha de vencimiento es obligatoria para este tipo de material.'
-    } else {
-      const d = new Date(values.fechaVencimiento)
-      if (isNaN(d.getTime())) {
-        errors.fechaVencimiento = 'Ingrese una fecha válida.'
-      } else if (d <= new Date()) {
-        errors.fechaVencimiento = 'La fecha de vencimiento debe ser una fecha futura.'
-      }
+    } else if (!esFechaCalendario(values.fechaVencimiento)) {
+      errors.fechaVencimiento = 'Ingrese una fecha válida.'
+    } else if (values.fechaVencimiento <= hoyEnCostaRica()) {
+      errors.fechaVencimiento = 'La fecha de vencimiento debe ser una fecha futura.'
     }
-  } else if (values.fechaVencimiento) {
-    const d = new Date(values.fechaVencimiento)
-    if (isNaN(d.getTime())) errors.fechaVencimiento = 'Ingrese una fecha válida.'
+  } else if (values.fechaVencimiento && !esFechaCalendario(values.fechaVencimiento)) {
+    errors.fechaVencimiento = 'Ingrese una fecha válida.'
   }
   if (values.cantidadInicial) {
     const cant = Number(values.cantidadInicial)

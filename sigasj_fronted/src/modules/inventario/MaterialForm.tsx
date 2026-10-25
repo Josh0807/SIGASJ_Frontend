@@ -219,7 +219,11 @@ export default function MaterialForm({
           <input
             type="checkbox"
             checked={values.requiereFechaVencimiento}
-            onChange={(e) => update('requiereFechaVencimiento', e.target.checked)}
+            onChange={(e) => {
+              const checked = e.target.checked
+              update('requiereFechaVencimiento', checked)
+              if (!checked) update('fechaVencimiento', '')
+            }}
             className="!size-4 !accent-indigo-600"
           />
           Este material requiere fecha de vencimiento (p. ej. insumos químicos)
