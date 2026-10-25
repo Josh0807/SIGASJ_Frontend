@@ -185,13 +185,13 @@ const RequestTrackingPage = () => {
               </div>
 
               <button
-                className="requests-motion-button flex min-h-[54px] w-full max-w-md cursor-pointer items-center justify-center gap-4 rounded-xl border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-7 text-base font-extrabold text-white shadow-[0_10px_22px_rgba(8,114,211,0.22)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-70 max-[640px]:max-w-none"
+                className="group requests-motion-button flex min-h-[58px] w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border-0 bg-gradient-to-r from-[#086dcc] via-[#1684d8] to-[#3aa0df] px-7 text-base font-extrabold text-white shadow-[0_12px_26px_rgba(8,114,211,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_17px_34px_rgba(8,114,211,0.34)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 motion-reduce:transform-none motion-reduce:transition-none"
                 type="submit"
                 disabled={loading}
               >
                 {loading ? 'Consultando…' : 'Consultar'}{' '}
                 <IconArrowRight
-                  className="shrink-0"
+                  className="shrink-0 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
                   size={21}
                   stroke={2.5}
                   aria-hidden="true"

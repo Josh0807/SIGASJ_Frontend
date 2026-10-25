@@ -1,13 +1,16 @@
 import { labelEstadoSolicitud } from './solicitudEstadoUi'
 import type { HistorialSolicitudEvento } from './solicitudesAdminTypes'
 
+export const fechaEventoHistorial = (evento: HistorialSolicitudEvento): string =>
+  evento.fechaHora ?? evento.fecha ?? ''
+
 /** Orden cronológico estable: fecha ASC, desempate por id ASC. No muta el arreglo original. */
 export const ordenarHistorialCronologico = (
   eventos: readonly HistorialSolicitudEvento[],
 ): HistorialSolicitudEvento[] =>
   [...eventos].sort((a, b) => {
-    const ta = new Date(a.fecha).getTime()
-    const tb = new Date(b.fecha).getTime()
+    const ta = new Date(fechaEventoHistorial(a)).getTime()
+    const tb = new Date(fechaEventoHistorial(b)).getTime()
     if (ta !== tb) return ta - tb
     return a.id - b.id
   })

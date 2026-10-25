@@ -106,7 +106,8 @@ export async function downloadFormularioDescargablePublico(
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0)
+  // Deja tiempo para que el navegador termine de guardar o abrir el Blob.
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
   return filename
 }
 

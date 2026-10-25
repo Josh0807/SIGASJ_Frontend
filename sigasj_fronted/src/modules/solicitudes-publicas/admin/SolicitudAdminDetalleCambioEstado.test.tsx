@@ -67,10 +67,13 @@ describe('Detalle admin — cambio de estado (4.13.2)', () => {
       },
     ])
     vi.spyOn(adminApi, 'cambiarEstadoSolicitudAdmin').mockResolvedValue({
+      id: 15,
       solicitudId: 15,
       codigoSeguimiento: 'SOL-2026-TEST15',
+      estado: 'EN_REVISION',
       estadoAnterior: 'PENDIENTE',
       estadoNuevo: 'EN_REVISION',
+      fechaResolucion: null,
       observacionPublica: 'Mensaje público',
       notaInterna: 'Nota interna',
       idUsuario: 7,
@@ -251,4 +254,5 @@ describe('Detalle admin — cambio de estado (4.13.2)', () => {
     await flushAsync()
     expect(app.container.textContent).toContain('Cambiar estado')
   })
+
 })

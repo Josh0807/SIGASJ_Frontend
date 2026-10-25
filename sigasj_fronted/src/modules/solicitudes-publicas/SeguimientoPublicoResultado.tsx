@@ -1,4 +1,4 @@
-import { IconHome } from '@tabler/icons-react'
+import { IconHome, IconRefresh } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { formatearFechaHoraAsada } from '../../shared/utils/fechaAsada'
 import {
@@ -115,21 +115,21 @@ export default function SeguimientoPublicoResultado({
         />
       </section>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-7 flex flex-wrap gap-3 border-t border-sky-200/80 pt-6 max-[480px]:grid max-[480px]:grid-cols-1">
         {onNuevaConsulta ? (
           <button
             type="button"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-sky-200 bg-white px-4 font-bold text-blue-800"
+            className="group inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-[#1476cf] bg-white px-6 font-extrabold text-[#0b65b5] shadow-[0_7px_18px_rgba(8,114,211,0.12)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-50 hover:shadow-[0_12px_24px_rgba(8,114,211,0.2)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sky-400 motion-reduce:transform-none motion-reduce:transition-none"
             onClick={onNuevaConsulta}
           >
-            Nueva consulta
+            <IconRefresh className="transition-transform duration-300 group-hover:rotate-[-35deg] motion-reduce:transform-none" size={19} aria-hidden="true" /> Nueva consulta
           </button>
         ) : null}
         <Link
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-sky-200 bg-white px-4 font-bold text-blue-800 no-underline"
+          className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_9px_20px_rgba(8,114,211,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sky-400 motion-reduce:transform-none motion-reduce:transition-none"
           to="/"
         >
-          <IconHome size={18} aria-hidden="true" /> Ir al inicio
+          <IconHome className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={19} aria-hidden="true" /> Ir al inicio
         </Link>
       </div>
     </article>
