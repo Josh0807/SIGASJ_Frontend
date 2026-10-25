@@ -14,6 +14,16 @@ import {
 } from './solicitudMaterialesUtils'
 import type { SolicitudMaterialesListItem } from './types'
 
+type EstadoFiltro = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA' | 'CANCELADA' | 'DESPACHADA'
+
+const ESTADO_OPCIONES: { value: EstadoFiltro; label: string }[] = [
+  { value: 'PENDIENTE', label: 'Pendientes' },
+  { value: 'APROBADA', label: 'Aprobadas' },
+  { value: 'RECHAZADA', label: 'Rechazadas' },
+  { value: 'CANCELADA', label: 'Canceladas' },
+  { value: 'DESPACHADA', label: 'Despachadas' },
+]
+
 export default function SolicitudesRevisionPage() {
   const [requests, setRequests] = useState<SolicitudMaterialesListItem[]>([])
   const [page, setPage] = useState(1)
@@ -22,11 +32,12 @@ export default function SolicitudesRevisionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltro>('PENDIENTE')
   const navigate = useNavigate()
 
   useEffect(() => {
     let active = true
-    void getSolicitudesMaterialesAdmin({ estado: 'PENDIENTE', page, limit: 10 })
+    void getSolicitudesMaterialesAdmin({ estado: estadoFiltro, page, limit: 10 })
       .then((response) => {
         if (!active) return
         const items = normalizeSolicitudesMaterialesList(response)
@@ -47,7 +58,7 @@ export default function SolicitudesRevisionPage() {
       })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
-  }, [navigate, page, reloadKey])
+  }, [navigate, page, reloadKey, estadoFiltro])
 
   const retry = () => {
     setError('')
@@ -73,12 +84,23 @@ export default function SolicitudesRevisionPage() {
           <small className="!mt-1 !block !text-sm !text-slate-500">Materiales pendientes de aprobación administrativa.</small>
         </div>
       </div>
-      <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-indigo-200 !bg-white !px-5 !py-3 !font-extrabold !text-indigo-700 !shadow-[0_7px_18px_rgba(79,70,229,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(79,70,229,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none max-[640px]:!w-fit" role="status"><span className="!size-2 !rounded-full !bg-indigo-500 !shadow-[0_0_0_5px_rgba(99,102,241,0.12)]" aria-hidden="true" />{total} {total === 1 ? 'solicitud pendiente' : 'solicitudes pendientes'}</span>
+      <div className="!flex !items-center !gap-3 max-[640px]:!w-full">
+        <label htmlFor="filtro-estado-revision" className="!text-sm !font-bold !text-slate-600 !whitespace-nowrap">Filtrar por:</label>
+        <select
+          id="filtro-estado-revision"
+          value={estadoFiltro}
+          onChange={(event) => { setPage(1); setEstadoFiltro(event.target.value as EstadoFiltro) }}
+          className="!rounded-xl !border !border-indigo-200 !bg-white !px-3 !py-2 !text-sm !font-semibold !text-indigo-700 !shadow-sm !outline-none focus:!border-indigo-400 max-[640px]:!flex-1"
+        >
+          {ESTADO_OPCIONES.map((op) => <option key={op.value} value={op.value}>{op.label}</option>)}
+        </select>
+        <span className="!m-0 !inline-flex !min-h-10 !shrink-0 !items-center !gap-2 !rounded-2xl !border !border-indigo-200 !bg-white !px-4 !py-2 !text-sm !font-extrabold !text-indigo-700 !shadow-[0_7px_18px_rgba(79,70,229,0.12)]" role="status"><span className="!size-2 !rounded-full !bg-indigo-500 !shadow-[0_0_0_5px_rgba(99,102,241,0.12)]" aria-hidden="true" />{total}</span>
+      </div>
     </div> : null}
 
-    {loading ? <div className="material-tracking__state" role="status"><span className="material-request__spinner" />Cargando solicitudes pendientes…</div> : null}
+    {loading ? <div className="material-tracking__state" role="status"><span className="material-request__spinner" />Cargando solicitudes…</div> : null}
     {error ? <div className="material-tracking__state material-tracking__state--error" role="alert"><p>{error}</p><button type="button" onClick={retry}><IconRefresh size={18} aria-hidden="true" /> Reintentar</button></div> : null}
-    {!loading && !error && requests.length === 0 ? <div className="material-tracking__empty"><h2>No hay solicitudes pendientes</h2><p>Cuando un fontanero envíe una solicitud de materiales, aparecerá aquí para su revisión.</p></div> : null}
+    {!loading && !error && requests.length === 0 ? <div className="material-tracking__empty"><h2>No hay solicitudes {ESTADO_OPCIONES.find((o) => o.value === estadoFiltro)?.label.toLowerCase() ?? ''}</h2><p>No se encontraron solicitudes de materiales con el estado seleccionado.</p></div> : null}
 
     {!loading && !error && requests.length > 0 ? <div className="material-tracking__table-wrap">
       <table>

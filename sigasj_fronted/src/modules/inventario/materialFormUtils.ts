@@ -25,7 +25,18 @@ export function validateMaterial(values: MaterialFormValues): MaterialFormErrors
     const precio = Number(values.precioUnitario)
     if (isNaN(precio) || precio <= 0) errors.precioUnitario = 'Ingrese un precio mayor a cero.'
   }
-  if (values.fechaVencimiento) {
+  if (values.requiereFechaVencimiento) {
+    if (!values.fechaVencimiento) {
+      errors.fechaVencimiento = 'La fecha de vencimiento es obligatoria para este tipo de material.'
+    } else {
+      const d = new Date(values.fechaVencimiento)
+      if (isNaN(d.getTime())) {
+        errors.fechaVencimiento = 'Ingrese una fecha válida.'
+      } else if (d <= new Date()) {
+        errors.fechaVencimiento = 'La fecha de vencimiento debe ser una fecha futura.'
+      }
+    }
+  } else if (values.fechaVencimiento) {
     const d = new Date(values.fechaVencimiento)
     if (isNaN(d.getTime())) errors.fechaVencimiento = 'Ingrese una fecha válida.'
   }

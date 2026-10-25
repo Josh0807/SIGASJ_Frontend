@@ -58,6 +58,7 @@ export default function MaterialEditPage() {
     precioUnitario: material.precioUnitario != null ? String(material.precioUnitario) : '',
     fechaVencimiento: material.fechaVencimiento ? material.fechaVencimiento.slice(0, 10) : '',
     cantidadInicial: '',
+    requiereFechaVencimiento: material.requiereFechaVencimiento ?? false,
   }
 
   const submit = async (values: MaterialFormValues) => {
@@ -73,6 +74,7 @@ export default function MaterialEditPage() {
         idProveedor: Number(values.proveedorId),
         precioUnitario: values.precioUnitario ? Number(values.precioUnitario) : null,
         fechaVencimiento: values.fechaVencimiento || null,
+        requiereFechaVencimiento: values.requiereFechaVencimiento,
       })
       navigate(MATERIALES_PATH, {
         replace: true,

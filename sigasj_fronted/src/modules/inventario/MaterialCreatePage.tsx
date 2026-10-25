@@ -29,6 +29,7 @@ export default function MaterialCreatePage() {
         idProveedor: Number(values.proveedorId),
         precioUnitario: values.precioUnitario ? Number(values.precioUnitario) : null,
         fechaVencimiento: values.fechaVencimiento || null,
+        requiereFechaVencimiento: values.requiereFechaVencimiento,
       })
     } catch (error) {
       throw new Error(materialApiError(error), { cause: error })

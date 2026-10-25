@@ -45,6 +45,7 @@ const EMPTY_VALUES: MaterialFormValues = {
   precioUnitario: '',
   fechaVencimiento: '',
   cantidadInicial: '',
+  requiereFechaVencimiento: false,
 }
 
 export default function MaterialForm({
@@ -214,9 +215,18 @@ export default function MaterialForm({
             onChange={(e) => update('precioUnitario', e.target.value)}
           />,
         )}
-        {field(
+        <label className="materials-admin__form-full !flex !cursor-pointer !items-center !gap-3 !rounded-xl !border !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-sm !font-semibold !text-slate-700 hover:!bg-slate-100 dark:!border-slate-700 dark:!bg-slate-800 dark:!text-slate-200">
+          <input
+            type="checkbox"
+            checked={values.requiereFechaVencimiento}
+            onChange={(e) => update('requiereFechaVencimiento', e.target.checked)}
+            className="!size-4 !accent-indigo-600"
+          />
+          Este material requiere fecha de vencimiento (p. ej. insumos químicos)
+        </label>
+        {values.requiereFechaVencimiento && field(
           'fechaVencimiento',
-          'Fecha de vencimiento',
+          'Fecha de vencimiento *',
           <IconCalendarTime size={20} aria-hidden="true" />,
           <input
             value={values.fechaVencimiento}
