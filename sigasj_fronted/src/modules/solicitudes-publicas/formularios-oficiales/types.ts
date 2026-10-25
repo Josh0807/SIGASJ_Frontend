@@ -5,6 +5,7 @@ export type FormularioOficial = {
   tienePdf: boolean
   nombreArchivo: string | null
   fechaActualizacion: string | null
+  urlDescarga?: string | null
 }
 
 export const FORMULARIO_OFICIAL_MAX_BYTES = 10 * 1024 * 1024

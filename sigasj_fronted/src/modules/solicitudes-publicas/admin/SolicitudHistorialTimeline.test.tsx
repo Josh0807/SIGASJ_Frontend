@@ -83,6 +83,26 @@ describe('SolicitudHistorialTimeline', () => {
     root.unmount()
   })
 
+  it('muestra fechaHora del contrato actual del backend', async () => {
+    const host = document.createElement('div')
+    const root = createRoot(host)
+    await act(async () => {
+      root.render(
+        <SolicitudHistorialTimeline
+          eventos={[evento({
+            id: 7,
+            fecha: '',
+            fechaHora: '2026-10-25T15:02:59.000Z',
+            estadoNuevo: 'APROBADA',
+          })]}
+        />,
+      )
+    })
+    expect(host.querySelector('time')?.getAttribute('datetime')).toBe('2026-10-25T15:02:59.000Z')
+    expect(host.textContent).toMatch(/25\/10\/2026/)
+    root.unmount()
+  })
+
   it('muestra usuario, observación pública y nota interna diferenciadas', async () => {
     const host = document.createElement('div')
     const root = createRoot(host)

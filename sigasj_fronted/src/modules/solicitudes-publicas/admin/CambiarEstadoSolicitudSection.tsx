@@ -1,3 +1,4 @@
+import { IconRefresh } from '@tabler/icons-react'
 import { useId, useRef, useState } from 'react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import type { SolicitudEstado } from '../types'
@@ -76,10 +77,12 @@ export default function CambiarEstadoSolicitudSection({
 
     try {
       const response = await cambiarEstadoSolicitudAdmin(solicitudId, payload)
+      const estadoPersistido = response.estado ?? response.estadoNuevo
+      if (!estadoPersistido) throw new Error('La respuesta no incluyó el estado persistido.')
       setObservacionPublica('')
       setNotaInterna('')
       onSuccess(response)
-      const restantes = estadosDisponiblesParaCambio(response.estadoNuevo)
+      const restantes = estadosDisponiblesParaCambio(estadoPersistido)
       setEstadoNuevo(restantes[0] ?? '')
     } catch (err: unknown) {
       const statusMatch = /HTTP\s+(\d{3})/i.exec(
@@ -215,14 +218,15 @@ export default function CambiarEstadoSolicitudSection({
         </p>
       ) : null}
 
-      <div className="mt-5">
+      <div className="mt-6 flex justify-end border-t border-sky-100 pt-5 max-[520px]:block">
         <button
           ref={confirmBtnRef}
           type="button"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0b6bcb] px-5 font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-55"
+          className="group inline-flex min-h-12 items-center justify-center gap-2.5 rounded-2xl border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white shadow-[0_10px_22px_rgba(8,114,211,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_15px_30px_rgba(8,114,211,0.32)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 disabled:hover:shadow-[0_10px_22px_rgba(8,114,211,0.24)] motion-reduce:transform-none motion-reduce:transition-none max-[520px]:w-full"
           disabled={!puedeEnviar}
           onClick={abrirConfirmacion}
         >
+          <IconRefresh className={`transition-transform duration-300 motion-reduce:transform-none ${busy ? 'animate-spin' : 'group-hover:rotate-[-35deg]'}`} size={19} aria-hidden="true" />
           {busy ? 'Actualizando…' : 'Cambiar estado'}
         </button>
       </div>

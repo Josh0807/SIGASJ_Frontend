@@ -67,6 +67,9 @@ describe('RequestTrackingPage', () => {
     expect(host.querySelector('#tracking-id')).toBeTruthy()
     expect(host.textContent).toContain('Consultar')
     expect(host.innerHTML).toContain('max-[640px]')
+    const submit = host.querySelector('button[type="submit"]')
+    expect(submit?.className).toContain('w-full')
+    expect(submit?.className).not.toContain('max-w-md')
     root.unmount()
   })
 

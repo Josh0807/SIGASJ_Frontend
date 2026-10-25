@@ -29,15 +29,19 @@ export type CambiarEstadoSolicitudPayload = {
 }
 
 export type CambioEstadoSolicitudResponse = {
-  solicitudId: number
-  codigoSeguimiento: string
-  estadoAnterior: SolicitudEstado | null
-  estadoNuevo: SolicitudEstado
-  observacionPublica: string | null
-  notaInterna: string | null
-  idUsuario: number
-  fecha: string
-  historialId: number
+  id?: number
+  solicitudId?: number
+  codigoSeguimiento?: string
+  estado?: SolicitudEstado
+  /** Compatibilidad temporal con el contrato anterior. */
+  estadoNuevo?: SolicitudEstado
+  fechaResolucion?: string | null
+  estadoAnterior?: SolicitudEstado | null
+  observacionPublica?: string | null
+  notaInterna?: string | null
+  idUsuario?: number
+  fecha?: string
+  historialId?: number
 }
 
 /** Evento de GET /solicitudes/:id/historial (admin). notaInterna = solo administrativa. */
@@ -56,6 +60,8 @@ export type HistorialSolicitudEvento = {
   notaInterna: string | null
   idUsuario: number | null
   usuario: HistorialSolicitudUsuario | null
-  fecha: string
+  fecha?: string
+  /** Nombre oficial enviado por el Backend actual. */
+  fechaHora?: string
 }
 

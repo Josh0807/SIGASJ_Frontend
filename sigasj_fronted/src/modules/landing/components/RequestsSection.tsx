@@ -1,5 +1,5 @@
 import { IconAlertTriangle, IconArrowRight, IconBuildingCommunity, IconClock, IconDownload, IconFiles, IconMapPin, IconProgressCheck, IconX } from '@tabler/icons-react'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import type { RequestService, RequestServiceIcon, RequestsSectionProps } from '../types/RequestsSectionProps'
@@ -9,7 +9,8 @@ import {
   SERVICE_REQUEST_ROUTES,
   isOnlineServiceRequestPath,
 } from '../config/serviceRequestRoutes'
-import { downloadFormularioOficial } from '../../solicitudes-publicas/formularios-oficiales/formulariosOficialesApi'
+import { downloadFormularioOficial, getFormulariosOficialesPublicos } from '../../solicitudes-publicas/formularios-oficiales/formulariosOficialesApi'
+import type { FormularioOficial } from '../../solicitudes-publicas/formularios-oficiales/types'
 
 const onlineFormHref = (path: string) =>
   isOnlineServiceRequestPath(path) ? path : undefined
@@ -61,13 +62,40 @@ const RequestsSection = ({
   const [downloadingSlug, setDownloadingSlug] = useState<string | null>(null)
   const [downloadError, setDownloadError] = useState<string | null>(null)
   const [presentialDownload, setPresentialDownload] = useState<{ slug: string; name: string } | null>(null)
+  const [officialForms, setOfficialForms] = useState<FormularioOficial[]>([])
+  const [catalogLoading, setCatalogLoading] = useState(true)
+  const [catalogError, setCatalogError] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    void getFormulariosOficialesPublicos()
+      .then((items) => {
+        if (active) setOfficialForms(items)
+      })
+      .catch(() => {
+        if (active) setCatalogError(true)
+      })
+      .finally(() => {
+        if (active) setCatalogLoading(false)
+      })
+    return () => { active = false }
+  }, [])
+
+  const formsBySlug = useMemo(
+    () => new Map(officialForms.map((form) => [form.slug, form])),
+    [officialForms],
+  )
 
   const handleDownload = async (slug: string) => {
     if (downloadingSlug) return
     setDownloadingSlug(slug)
     setDownloadError(null)
     try {
-      await downloadFormularioOficial(slug)
+      const officialForm = formsBySlug.get(slug)
+      if (!catalogError && !officialForm?.tienePdf) {
+        throw new Error('El formulario oficial no está disponible en este momento.')
+      }
+      await downloadFormularioOficial(slug, officialForm?.urlDescarga)
       setPresentialDownload(null)
     } catch (error) {
       setDownloadError(error instanceof Error ? error.message : 'No fue posible descargar el formulario oficial.')
@@ -92,7 +120,18 @@ const RequestsSection = ({
       {downloadError ? <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{downloadError}</p> : null}
 
       <div className="mt-8 grid grid-cols-2 gap-5 max-[760px]:grid-cols-1">
-        {services.map(({ id: serviceId, name, description: serviceDescription, formHref, downloadSlug, viewHref, badge, icon }) => (
+        {services.map(({ id: serviceId, name, description: serviceDescription, formHref, downloadSlug, viewHref, badge, icon }) => {
+          const officialForm = downloadSlug ? formsBySlug.get(downloadSlug) : undefined
+          const downloadAvailable = catalogError
+            ? Boolean(downloadSlug)
+            : Boolean(officialForm?.tienePdf)
+          const downloadDisabled = catalogLoading || !downloadAvailable || Boolean(downloadingSlug)
+          const downloadLabel = catalogLoading
+            ? 'Consultando formulario…'
+            : downloadAvailable
+              ? 'Descargar formulario'
+              : 'Formulario no disponible'
+          return (
           <article className="requests-motion-card relative flex min-h-[255px] flex-col overflow-hidden rounded-[22px] border border-white bg-white/90 px-8 py-6 shadow-[0_12px_28px_rgba(39,112,166,0.12)] backdrop-blur-sm focus-within:ring-3 focus-within:ring-sky-300/50 max-[640px]:min-h-0 max-[640px]:px-5" key={serviceId}>
             <div className="relative z-10 grid size-16 place-items-center rounded-[18px] bg-gradient-to-br from-[#edf8ff] to-[#dceffd] text-[#1476cf]">
               <ServiceIcon type={icon} name={name} />
@@ -110,14 +149,15 @@ const RequestsSection = ({
               <Link className="requests-motion-button flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#0872d3] to-[#2f91da] px-4 text-center text-sm font-bold text-white no-underline shadow-[0_8px_18px_rgba(8,114,211,0.2)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400" to={formHref}>
                 Realizar solicitud <IconArrowRight className="shrink-0" size={19} aria-hidden="true" />
               </Link>
-              <button className="requests-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-65" type="button" disabled={Boolean(downloadingSlug)} onClick={() => { if (downloadSlug) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
-                Forma Presencial <IconDownload className="shrink-0" size={19} aria-hidden="true" />
+              <button className="requests-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-500 disabled:opacity-75" type="button" disabled={downloadDisabled} aria-describedby={!downloadAvailable && !catalogLoading ? `${serviceId}-download-status` : undefined} onClick={() => { if (downloadSlug && downloadAvailable) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
+                {downloadLabel} <IconDownload className="shrink-0" size={19} aria-hidden="true" />
               </button>
+              {!downloadAvailable && !catalogLoading ? <span className="sr-only" id={`${serviceId}-download-status`}>La ASADA aún no ha publicado el PDF de este trámite.</span> : null}
             </div>
             ) : (
             <div className="relative z-10 mt-auto grid gap-3">
-              <button className="requests-motion-button flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-65" type="button" disabled={Boolean(downloadingSlug) || !downloadSlug} onClick={() => { if (downloadSlug) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
-                Forma Presencial <IconDownload className="shrink-0" size={19} aria-hidden="true" />
+              <button className="requests-motion-button flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border-2 border-[#1476cf] bg-white px-4 text-center text-sm font-bold text-[#0b65b5] shadow-[0_6px_14px_rgba(8,114,211,0.12)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:opacity-75" type="button" disabled={downloadDisabled} onClick={() => { if (downloadSlug && downloadAvailable) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
+                {downloadLabel} <IconDownload className="shrink-0" size={19} aria-hidden="true" />
               </button>
               <p className="m-0 text-center text-xs font-semibold text-[#607a98]">El formulario en línea estará disponible próximamente.</p>
             </div>
@@ -127,7 +167,8 @@ const RequestsSection = ({
             <span className="pointer-events-none absolute -right-16 -bottom-20 h-28 w-72 -rotate-6 rounded-[50%] bg-sky-200/35" aria-hidden="true" />
             <span className="pointer-events-none absolute -right-20 -bottom-24 h-28 w-80 rotate-3 rounded-[50%] border-[18px] border-sky-300/15" aria-hidden="true" />
           </article>
-        ))}
+          )
+        })}
       </div>
     </div>
     {presentialDownload && typeof document !== 'undefined' ? createPortal((

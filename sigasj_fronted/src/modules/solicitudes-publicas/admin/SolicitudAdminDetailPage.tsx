@@ -140,9 +140,14 @@ export default function SolicitudAdminDetailPage() {
             setRecargaHistorial((value) => value + 1)
           }}
           onSuccess={(response) => {
+            const estadoPersistido = response.estado ?? response.estadoNuevo
             setDetail((current) =>
-              current
-                ? { ...current, estado: response.estadoNuevo }
+              current && estadoPersistido
+                ? {
+                    ...current,
+                    estado: estadoPersistido,
+                    fechaResolucion: response.fechaResolucion ?? null,
+                  }
                 : current,
             )
             setExitoEstado('Estado de la solicitud actualizado correctamente.')
