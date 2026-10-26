@@ -14,7 +14,6 @@ import RrhhSubnav from '../../recursos-humanos/RrhhSubnav'
 import {
   estadoSolicitudAusenciaClassName,
   estadoSolicitudAusenciaLabel,
-  resumirMotivo,
   tipoSolicitudAusenciaLabel,
 } from '../solicitudAusenciaLabels'
 import { getSolicitudesAusencia } from '../solicitudesAusenciaApi'
@@ -24,6 +23,9 @@ import type {
   SolicitudAusencia,
   TipoSolicitudAusencia,
 } from '../types'
+const accionListadoClassName =
+  'group inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/80 px-3.5 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-none transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 hover:shadow-[0_7px_16px_rgba(37,99,235,0.14)] motion-reduce:transform-none motion-reduce:transition-none'
+
 type Carga = {
   clave: string
   data: SolicitudAusencia[]
@@ -105,7 +107,7 @@ export default function SolicitudesAusenciaPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-5 overflow-x-hidden px-4 py-6 sm:px-6">
+    <div className="mx-auto grid w-full min-w-0 max-w-6xl gap-4 py-2 sm:gap-5 sm:py-4">
       <RrhhSubnav />
       <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
@@ -206,13 +208,16 @@ export default function SolicitudesAusenciaPage() {
                   {formatearFechaPermiso(item.fechaInicio)} —{' '}
                   {formatearFechaPermiso(item.fechaFin)}
                 </p>
-                <p className="m-0 text-sm text-slate-700">{resumirMotivo(item.motivo)}</p>
                 <Link
                   to={solicitudAusenciaDetailPath(item.id)}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 font-bold text-blue-700 no-underline hover:bg-sky-50"
+                  className={`${accionListadoClassName} w-fit self-start`}
                 >
-                  <IconEye size={18} aria-hidden="true" />
-                  {item.estado === 'PENDIENTE' ? 'Revisar / Aprobar o rechazar' : 'Ver detalle'}
+                  <IconEye
+                    className="transition-transform duration-300 group-hover:scale-110"
+                    size={17}
+                    aria-hidden="true"
+                  />
+                  {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver detalle'}
                 </Link>
               </li>
             ))}
@@ -225,7 +230,6 @@ export default function SolicitudesAusenciaPage() {
                   <th className="px-4 py-3">Colaborador</th>
                   <th className="px-4 py-3">Tipo</th>
                   <th className="px-4 py-3">Periodo</th>
-                  <th className="px-4 py-3">Motivo</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Solicitud</th>
                   <th className="px-4 py-3">Acción</th>
@@ -246,9 +250,6 @@ export default function SolicitudesAusenciaPage() {
                       {formatearFechaPermiso(item.fechaInicio)} —{' '}
                       {formatearFechaPermiso(item.fechaFin)}
                     </td>
-                    <td className="max-w-xs px-4 py-3 text-slate-700">
-                      {resumirMotivo(item.motivo)}
-                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
@@ -262,9 +263,13 @@ export default function SolicitudesAusenciaPage() {
                     <td className="px-4 py-3">
                       <Link
                         to={solicitudAusenciaDetailPath(item.id)}
-                        className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 font-bold text-blue-700 no-underline hover:bg-sky-50"
+                        className={accionListadoClassName}
                       >
-                        <IconEye size={18} aria-hidden="true" />
+                        <IconEye
+                          className="transition-transform duration-300 group-hover:scale-110"
+                          size={17}
+                          aria-hidden="true"
+                        />
                         {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver detalle'}
                       </Link>
                     </td>

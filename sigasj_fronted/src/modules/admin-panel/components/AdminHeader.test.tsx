@@ -175,6 +175,38 @@ describe('AdminHeader', () => {
     expect(markup).toContain('src="/avatar.png"')
   })
 
+  it('oculta la barra al scrollear hacia abajo y la muestra al subir', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    await act(async () => {
+      root.render(
+        <MemoryRouter>
+          <AdminHeader />
+        </MemoryRouter>,
+      )
+    })
+
+    const header = () => container.querySelector('.admin-header') as HTMLElement
+    expect(header().getAttribute('data-scroll-hidden')).toBe('false')
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 0 })
+
+    await act(async () => {
+      window.scrollY = 180
+      window.dispatchEvent(new Event('scroll'))
+    })
+    expect(header().className).toContain('admin-header--collapsed')
+    expect(header().getAttribute('data-scroll-hidden')).toBe('true')
+
+    await act(async () => {
+      window.scrollY = 40
+      window.dispatchEvent(new Event('scroll'))
+    })
+    expect(header().className).not.toContain('admin-header--collapsed')
+  })
+
   it('expone el toggle del menú móvil con atributos de accesibilidad', () => {
     const markup = renderHeader({ menuOpen: true })
 

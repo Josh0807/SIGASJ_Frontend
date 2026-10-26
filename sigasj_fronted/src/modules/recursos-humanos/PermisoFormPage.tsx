@@ -285,7 +285,7 @@ export default function PermisoFormPage() {
                   <IconMessage2 className={errors.motivo ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
                   <input
                     className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400"
-                    maxLength={200}
+                    maxLength={500}
                     placeholder="Ej. Cita médica, vacaciones, asunto personal"
                     value={values.motivo}
                     required

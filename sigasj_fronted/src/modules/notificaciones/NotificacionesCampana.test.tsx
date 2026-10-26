@@ -71,7 +71,7 @@ describe('NotificacionesCampana', () => {
       await act(async () => {
         trigger.click()
       })
-      expect(view.container.textContent).toContain('No hay notificaciones.')
+      expect(document.body.textContent).toContain('No hay notificaciones.')
       expect(view.container.querySelector('.notificaciones-campana__badge')).toBeNull()
     } finally {
       await view.cleanup()
@@ -97,11 +97,11 @@ describe('NotificacionesCampana', () => {
       await act(async () => {
         trigger.click()
       })
-      expect(view.container.textContent).toContain('Cargando notificaciones…')
+      expect(document.body.textContent).toContain('Cargando notificaciones…')
       await act(async () => {
         resolveList({ data: [item], noLeidas: 1 })
       })
-      expect(view.container.textContent).toContain('Nueva avería AV-2026-0001')
+      expect(document.body.textContent).toContain('Nueva avería AV-2026-0001')
       expect(view.container.querySelector('.notificaciones-campana__badge')?.textContent).toBe(
         '1',
       )
@@ -122,10 +122,10 @@ describe('NotificacionesCampana', () => {
       await act(async () => {
         trigger.click()
       })
-      expect(view.container.textContent).toContain(
+      expect(document.body.textContent).toContain(
         'No se pudieron cargar las notificaciones.',
       )
-      expect(view.container.textContent).not.toContain('María Rodríguez')
+      expect(document.body.textContent).not.toContain('María Rodríguez')
     } finally {
       await view.cleanup()
     }
@@ -148,7 +148,7 @@ describe('NotificacionesCampana', () => {
       await act(async () => {
         trigger.click()
       })
-      const link = view.container.querySelector(
+      const link = document.body.querySelector(
         '.notificaciones-campana__link',
       ) as HTMLAnchorElement
       expect(link.getAttribute('href')).toBe('/admin/averias/25')

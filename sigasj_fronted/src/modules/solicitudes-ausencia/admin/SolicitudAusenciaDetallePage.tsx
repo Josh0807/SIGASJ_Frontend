@@ -119,8 +119,8 @@ export default function SolicitudAusenciaDetallePage() {
       setCarga({ clave, solicitud: actualizada, error: null })
       setAviso(
         actualizada.tipo === 'VACACIONES'
-          ? 'Solicitud aprobada. El movimiento de vacaciones quedó registrado en RRHH.'
-          : 'Solicitud aprobada. El permiso quedó registrado en RRHH.',
+          ? 'Solicitud aprobada. El movimiento de vacaciones quedó en RRHH. Se intentó avisar al Fontanero por campana y por correo (si SMTP está activo).'
+          : 'Solicitud aprobada. El permiso quedó en RRHH. Se intentó avisar al Fontanero por campana y por correo (si SMTP está activo).',
       )
     } catch (err: unknown) {
       if (esNoAutenticado(err)) {
@@ -147,7 +147,9 @@ export default function SolicitudAusenciaDetallePage() {
         motivoRechazo.trim() || undefined,
       )
       setCarga({ clave, solicitud: actualizada, error: null })
-      setAviso('Solicitud rechazada. No se generó registro en RRHH.')
+      setAviso(
+        'Solicitud rechazada. No se generó registro en RRHH. Se intentó avisar al Fontanero por campana y por correo (si SMTP está activo).',
+      )
       setModalRechazo(false)
       setMotivoRechazo('')
     } catch (err: unknown) {
@@ -166,7 +168,7 @@ export default function SolicitudAusenciaDetallePage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-4xl gap-5 overflow-x-hidden px-4 py-6 sm:px-6">
+    <div className="mx-auto grid w-full min-w-0 max-w-4xl gap-4 py-2 sm:gap-5 sm:py-4">
       <RrhhSubnav />
       <Link
         to={SOLICITUDES_AUSENCIA_ADMIN_PATH}
@@ -229,13 +231,13 @@ export default function SolicitudAusenciaDetallePage() {
             </div>
           ) : null}
 
-          <article className="grid gap-5 rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-            <header className="grid gap-3">
-              <p className="mb-0 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          <article className="grid min-w-0 gap-5 rounded-2xl border border-sky-100 bg-white p-4 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
+            <header className="grid min-w-0 gap-3">
+              <p className="mb-0 text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-blue-600 sm:text-sm">
                 {RRHH_TITLE} · Solicitud de ausencia
               </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="m-0 text-3xl font-black text-[#062e63]">
+              <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="m-0 text-2xl font-black text-[#062e63] sm:text-3xl">
                   {tipoSolicitudAusenciaLabel(solicitud.tipo)}
                 </h1>
                 <span
@@ -246,37 +248,37 @@ export default function SolicitudAusenciaDetallePage() {
               </div>
             </header>
 
-            <dl className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl bg-slate-50 px-4 py-3">
+            <dl className="grid min-w-0 gap-3">
+              <div className="min-w-0 rounded-xl bg-slate-50 px-4 py-3">
                 <dt className="text-xs font-extrabold uppercase text-slate-500">
                   Colaborador
                 </dt>
-                <dd className="m-0 mt-1 font-semibold text-slate-800">
+                <dd className="m-0 mt-1 break-words font-semibold text-slate-800">
                   {solicitud.colaborador
                     ? nombreCompleto(solicitud.colaborador)
                     : `#${solicitud.colaboradorId}`}
                 </dd>
               </div>
-              <div className="rounded-xl bg-slate-50 px-4 py-3">
+              <div className="min-w-0 rounded-xl bg-slate-50 px-4 py-3">
                 <dt className="text-xs font-extrabold uppercase text-slate-500">
                   Correo para aviso
                 </dt>
-                <dd className="m-0 mt-1 font-semibold text-slate-800">
+                <dd className="m-0 mt-1 break-words font-semibold text-slate-800">
                   {solicitud.correoNotificacion?.trim() ||
                     solicitud.colaborador?.correoElectronico?.trim() ||
                     'Sin correo indicado'}
                 </dd>
               </div>
-              <div className="rounded-xl bg-slate-50 px-4 py-3">
+              <div className="min-w-0 rounded-xl bg-slate-50 px-4 py-3">
                 <dt className="text-xs font-extrabold uppercase text-slate-500">Periodo</dt>
                 <dd className="m-0 mt-1 font-semibold text-slate-800">
                   {formatearFechaPermiso(solicitud.fechaInicio)} —{' '}
                   {formatearFechaPermiso(solicitud.fechaFin)}
                 </dd>
               </div>
-              <div className="rounded-xl bg-slate-50 px-4 py-3 sm:col-span-2">
+              <div className="rounded-xl bg-slate-50 px-4 py-3 ">
                 <dt className="text-xs font-extrabold uppercase text-slate-500">Motivo</dt>
-                <dd className="m-0 mt-1 font-semibold text-slate-800">
+                <dd className="m-0 mt-1 break-words font-semibold text-slate-800">
                   {solicitud.motivo?.trim() || 'Sin motivo'}
                 </dd>
               </div>
@@ -289,7 +291,7 @@ export default function SolicitudAusenciaDetallePage() {
                 </dd>
               </div>
               {solicitud.tipo === 'VACACIONES' && solicitud.resumenVacaciones ? (
-                <div className="rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3 sm:col-span-2">
+                <div className="rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3 ">
                   <dt className="text-xs font-extrabold uppercase text-sky-800">
                     Días a descontar (sin feriados)
                   </dt>
@@ -310,7 +312,7 @@ export default function SolicitudAusenciaDetallePage() {
                 </div>
               ) : null}
               {solicitud.tipo === 'VACACIONES' && solicitud.saldoVacaciones ? (
-                <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 sm:col-span-2">
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 ">
                   <dt className="text-xs font-extrabold uppercase text-emerald-800">
                     Saldo de vacaciones (actual)
                   </dt>
@@ -322,7 +324,7 @@ export default function SolicitudAusenciaDetallePage() {
                 </div>
               ) : null}
               {solicitud.registroGeneradoId ? (
-                <div className="rounded-xl bg-slate-50 px-4 py-3 sm:col-span-2">
+                <div className="rounded-xl bg-slate-50 px-4 py-3 ">
                   <dt className="text-xs font-extrabold uppercase text-slate-500">
                     Registro RRHH generado
                   </dt>
@@ -332,7 +334,7 @@ export default function SolicitudAusenciaDetallePage() {
                 </div>
               ) : null}
               {solicitud.motivoRechazo ? (
-                <div className="rounded-xl bg-amber-50 px-4 py-3 sm:col-span-2">
+                <div className="rounded-xl bg-amber-50 px-4 py-3 ">
                   <dt className="text-xs font-extrabold uppercase text-amber-800">
                     Motivo de rechazo
                   </dt>

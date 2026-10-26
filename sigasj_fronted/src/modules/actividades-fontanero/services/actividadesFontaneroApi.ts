@@ -236,7 +236,7 @@ export async function getCorreccionesPendientes(): Promise<ActividadFontaneroLis
 }
 
 /**
- * Historial de actividades del Fontanero (APROBADA, RECHAZADA, CORREGIDA).
+ * Historial de actividades del Fontanero (sin borradores).
  * Acepta filtros de periodo y paginación cuando el Back-end los exponga.
  */
 export async function getHistorialActividades(
@@ -487,8 +487,11 @@ export async function solicitarCorreccionAdmin(
   id: number,
   observacion: string,
 ): Promise<ActividadFontaneroRegistrada> {
-  const raw = await fetchWithAuth<unknown>(
-    `/admin/actividades/${id}/solicitar-correccion`,
+  const raw = await fetchWithPathFallback<unknown>(
+    [
+      `/admin/actividades/${id}/solicitar-correccion`,
+      `/admin/actividades-fontanero/${id}/solicitar-correccion`,
+    ],
     {
       method: 'PATCH',
       body: JSON.stringify({ observacion: observacion.trim() }),

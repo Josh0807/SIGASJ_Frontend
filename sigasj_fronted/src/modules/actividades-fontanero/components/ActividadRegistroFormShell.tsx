@@ -76,7 +76,7 @@ const ActividadRegistroFormShell = ({
 }: ActividadRegistroFormShellProps) => {
   const isCorregirMode = mode === 'corregir'
   const isEditBorrador = mode === 'editar-borrador'
-  const lockInicio = isCorregirMode || isEditBorrador
+  const lockInicio = isEditBorrador
   const navigate = useNavigate()
   const { logout } = useAuth()
   const formRef = useRef<HTMLFormElement>(null)
@@ -380,7 +380,7 @@ const ActividadRegistroFormShell = ({
             <div
               className={`actividad-registro-form__field${
                 errors.fechaActividad ? ' actividad-registro-form__field--invalid' : ''
-              }`}
+              }${lockInicio ? ' actividad-registro-form__field--locked' : ''}`}
             >
               <label className="actividad-registro-form__label" htmlFor="fechaActividad">
                 Fecha de inicio{' '}
@@ -400,7 +400,11 @@ const ActividadRegistroFormShell = ({
                 onChange={(event) => updateField('fechaActividad', event.target.value)}
                 aria-invalid={Boolean(errors.fechaActividad)}
                 aria-describedby={
-                  errors.fechaActividad ? 'fechaActividad-error' : undefined
+                  lockInicio
+                    ? 'inicio-borrador-ayuda'
+                    : errors.fechaActividad
+                      ? 'fechaActividad-error'
+                      : undefined
                 }
                 readOnly={lockInicio}
                 disabled={lockInicio}
@@ -417,7 +421,7 @@ const ActividadRegistroFormShell = ({
             <div
               className={`actividad-registro-form__field${
                 errors.horaInicio ? ' actividad-registro-form__field--invalid' : ''
-              }`}
+              }${lockInicio ? ' actividad-registro-form__field--locked' : ''}`}
             >
               <label className="actividad-registro-form__label" htmlFor="horaInicio">
                 Hora de inicio{' '}
@@ -435,7 +439,13 @@ const ActividadRegistroFormShell = ({
                 value={values.horaInicio}
                 onChange={(event) => updateField('horaInicio', event.target.value)}
                 aria-invalid={Boolean(errors.horaInicio)}
-                aria-describedby={errors.horaInicio ? 'horaInicio-error' : undefined}
+                aria-describedby={
+                  lockInicio
+                    ? 'inicio-borrador-ayuda'
+                    : errors.horaInicio
+                      ? 'horaInicio-error'
+                      : undefined
+                }
                 readOnly={lockInicio}
                 disabled={lockInicio}
                 required
@@ -447,6 +457,14 @@ const ActividadRegistroFormShell = ({
                 />
               ) : null}
             </div>
+            {lockInicio ? (
+              <p
+                id="inicio-borrador-ayuda"
+                className="m-0 md:col-span-2 text-sm font-medium text-slate-500"
+              >
+                La fecha y hora de inicio de este borrador no se pueden modificar.
+              </p>
+            ) : null}
 
             <div
               className={`actividad-registro-form__field${
@@ -631,24 +649,31 @@ const ActividadRegistroFormShell = ({
             )}
           </fieldset>
 
-          <FormularioEspecifico
-            values={values}
-            errors={errors}
-            disabled={isSubmitting}
-            onChange={updateField}
-            onFilesChange={(files) => {
-              if (isCorregirMode) {
-                return
-              }
-              setValues((current) => ({ ...current, documentos: files }))
-              setErrors((current) => {
-                const next = { ...current }
-                delete next.documentos
-                return next
-              })
-              setSubmitError(null)
-            }}
-          />
+          {FormularioEspecifico ? (
+            <FormularioEspecifico
+              values={values}
+              errors={errors}
+              disabled={isSubmitting}
+              onChange={updateField}
+              onFilesChange={(files) => {
+                if (isCorregirMode) {
+                  return
+                }
+                setValues((current) => ({ ...current, documentos: files }))
+                setErrors((current) => {
+                  const next = { ...current }
+                  delete next.documentos
+                  return next
+                })
+                setSubmitError(null)
+              }}
+            />
+          ) : (
+            <p className="actividad-registro-form__hint">
+              Este tipo ya no se registra como actividad. Use Permisos y
+              vacaciones.
+            </p>
+          )}
 
           <fieldset
             className="actividad-registro-form__section actividad-formulario-especifico !gap-5 !rounded-3xl !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-5 !shadow-sm md:!p-7"

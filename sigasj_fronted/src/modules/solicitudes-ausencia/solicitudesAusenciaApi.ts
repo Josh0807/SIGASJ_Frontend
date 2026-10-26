@@ -17,6 +17,8 @@ const RUTA_DOC_FONTANERO =
   /^\/api\/v1\/fontanero\/solicitudes-ausencia\/\d+\/documentos\/[A-Za-z0-9._-]+$/
 const RUTA_DOC_ADMIN =
   /^\/api\/v1\/rrhh\/solicitudes-ausencia\/\d+\/documentos\/[A-Za-z0-9._-]+$/
+const RUTA_DOC_UPLOADS =
+  /^\/uploads\/solicitudes-ausencia\/(\d+)\/([A-Za-z0-9._-]+)$/
 
 export const emitirCorrelacionAusencia = () =>
   fetchWithAuth<CorrelacionAusencia>(`${ENDPOINT}/correlacion`, {
@@ -94,6 +96,14 @@ export async function abrirEvidenciaSolicitudAusencia(
   vista: 'fontanero' | 'admin' = 'fontanero',
 ) {
   let ruta = rutaReferenciaArchivo
+  const uploads = ruta.match(RUTA_DOC_UPLOADS)
+  if (uploads) {
+    const [, solicitudId, filename] = uploads
+    ruta =
+      vista === 'admin'
+        ? `/api/v1/rrhh/solicitudes-ausencia/${solicitudId}/documentos/${filename}`
+        : `/api/v1/fontanero/solicitudes-ausencia/${solicitudId}/documentos/${filename}`
+  }
   if (vista === 'admin' && RUTA_DOC_FONTANERO.test(ruta)) {
     ruta = ruta.replace(
       '/api/v1/fontanero/solicitudes-ausencia/',

@@ -7,7 +7,15 @@ export type HistorialActividadesFilters = {
 
 export const HISTORIAL_PAGE_SIZE = 10
 
-export const HISTORIAL_ESTADOS = ['APROBADA', 'RECHAZADA', 'CORREGIDA'] as const
+export const HISTORIAL_ESTADOS = [
+  'REPORTADA',
+  'EN_REVISION',
+  'REQUIERE_CORRECCION',
+  'CORREGIDA',
+  'REVISADA',
+  'APROBADA',
+  'RECHAZADA',
+] as const
 
 export type HistorialEstado = (typeof HISTORIAL_ESTADOS)[number]
 

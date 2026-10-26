@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { IconBell } from '@tabler/icons-react'
 import { useAuthUser } from '../auth/hooks/useAuthUser'
@@ -8,12 +17,61 @@ import { useNotificacionesAveria } from './useNotificacionesAveria'
 const NotificacionesCampana = () => {
   const panelId = useId()
   const user = useAuthUser()
-  const { listado, loading, error, marcarLeida } = useNotificacionesAveria()
+  const { listado, loading, error, recargar, marcarLeida } =
+    useNotificacionesAveria()
   const [open, setOpen] = useState(false)
+  const [panelStyle, setPanelStyle] = useState<CSSProperties>({})
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   const close = useCallback(() => setOpen(false), [])
+
+  const toggle = useCallback(() => {
+    setOpen((value) => {
+      const next = !value
+      if (next) {
+        void recargar()
+      }
+      return next
+    })
+  }, [recargar])
+
+  const positionPanel = useCallback(() => {
+    const trigger = triggerRef.current
+    if (!trigger) {
+      return
+    }
+    const rect = trigger.getBoundingClientRect()
+    const gutter = 8
+    const viewportWidth = document.documentElement.clientWidth
+    const width = Math.min(352, viewportWidth - gutter * 2)
+    const left = Math.min(
+      Math.max(gutter, rect.right - width),
+      Math.max(gutter, viewportWidth - width - gutter),
+    )
+    setPanelStyle({
+      position: 'fixed',
+      top: rect.bottom + gutter,
+      left,
+      width,
+      right: 'auto',
+      zIndex: 80,
+    })
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!open) {
+      return undefined
+    }
+    positionPanel()
+    window.addEventListener('resize', positionPanel)
+    window.addEventListener('scroll', positionPanel, true)
+    return () => {
+      window.removeEventListener('resize', positionPanel)
+      window.removeEventListener('scroll', positionPanel, true)
+    }
+  }, [open, positionPanel])
 
   useEffect(() => {
     if (!open) {
@@ -22,9 +80,16 @@ const NotificacionesCampana = () => {
 
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target
-      if (!(target instanceof Node) || !containerRef.current?.contains(target)) {
-        close()
+      if (!(target instanceof Node)) {
+        return
       }
+      if (
+        containerRef.current?.contains(target) ||
+        panelRef.current?.contains(target)
+      ) {
+        return
+      }
+      close()
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -44,6 +109,77 @@ const NotificacionesCampana = () => {
 
   const unread = listado.noLeidas
 
+  const panel = (
+    <div
+      ref={panelRef}
+      id={panelId}
+      className="notificaciones-campana__panel"
+      hidden={!open}
+      role="region"
+      aria-label="Notificaciones internas"
+      style={open ? panelStyle : undefined}
+    >
+      {loading ? (
+        <p className="notificaciones-campana__state">Cargando notificaciones…</p>
+      ) : null}
+      {!loading && error ? (
+        <p className="notificaciones-campana__state notificaciones-campana__state--error">
+          No se pudieron cargar las notificaciones.
+        </p>
+      ) : null}
+      {!loading && !error && listado.data.length === 0 ? (
+        <p className="notificaciones-campana__state">No hay notificaciones.</p>
+      ) : null}
+      {!loading && !error && listado.data.length > 0 ? (
+        <ul className="notificaciones-campana__list">
+          {listado.data.map((item) => {
+            const to = rutaNotificacionCampana(user, item)
+            const content = (
+              <>
+                <span className="notificaciones-campana__title">{item.titulo}</span>
+                <span className="notificaciones-campana__message">{item.mensaje}</span>
+              </>
+            )
+            const markAndClose = () => {
+              if (!item.leida) {
+                void marcarLeida(item.id)
+              }
+              close()
+            }
+            return (
+              <li
+                key={item.id}
+                className={
+                  item.leida
+                    ? 'notificaciones-campana__item'
+                    : 'notificaciones-campana__item notificaciones-campana__item--unread'
+                }
+              >
+                {to ? (
+                  <Link
+                    className="notificaciones-campana__link"
+                    to={to}
+                    onClick={markAndClose}
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="notificaciones-campana__link notificaciones-campana__link--static"
+                    onClick={markAndClose}
+                  >
+                    {content}
+                  </button>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      ) : null}
+    </div>
+  )
+
   return (
     <div className="notificaciones-campana" ref={containerRef}>
       <button
@@ -57,7 +193,7 @@ const NotificacionesCampana = () => {
         }
         aria-expanded={open}
         aria-controls={panelId}
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggle}
       >
         <IconBell size={20} stroke={1.8} aria-hidden="true" />
         {unread > 0 ? (
@@ -66,68 +202,9 @@ const NotificacionesCampana = () => {
           </span>
         ) : null}
       </button>
-
-      <div
-        id={panelId}
-        className="notificaciones-campana__panel"
-        hidden={!open}
-        role="region"
-        aria-label="Notificaciones internas"
-      >
-        {loading ? (
-          <p className="notificaciones-campana__state">Cargando notificaciones…</p>
-        ) : null}
-        {!loading && error ? (
-          <p className="notificaciones-campana__state notificaciones-campana__state--error">
-            No se pudieron cargar las notificaciones.
-          </p>
-        ) : null}
-        {!loading && !error && listado.data.length === 0 ? (
-          <p className="notificaciones-campana__state">No hay notificaciones.</p>
-        ) : null}
-        {!loading && !error && listado.data.length > 0 ? (
-          <ul className="notificaciones-campana__list">
-            {listado.data.map((item) => {
-              const to = rutaNotificacionCampana(user, item)
-              const content = (
-                <>
-                  <span className="notificaciones-campana__title">{item.titulo}</span>
-                  <span className="notificaciones-campana__message">{item.mensaje}</span>
-                </>
-              )
-              return (
-                <li
-                  key={item.id}
-                  className={
-                    item.leida
-                      ? 'notificaciones-campana__item'
-                      : 'notificaciones-campana__item notificaciones-campana__item--unread'
-                  }
-                >
-                  {to ? (
-                    <Link
-                      className="notificaciones-campana__link"
-                      to={to}
-                      onClick={() => {
-                        if (!item.leida) {
-                          void marcarLeida(item.id)
-                        }
-                        close()
-                      }}
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <span className="notificaciones-campana__link notificaciones-campana__link--static">
-                      {content}
-                    </span>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        ) : null}
-      </div>
+      {typeof document !== 'undefined'
+        ? createPortal(panel, document.body)
+        : panel}
     </div>
   )
 }

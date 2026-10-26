@@ -22,12 +22,7 @@ export const buildFontaneroResumenMetricas = (
   return {
     total,
     pendientesRevision: countEstados(porEstado, ['REPORTADA', 'EN_REVISION']),
-    revisadas: countEstados(porEstado, [
-      'REVISADA',
-      'APROBADA',
-      'RECHAZADA',
-      'CORREGIDA',
-    ]),
+    revisadas: countEstados(porEstado, ['REVISADA', 'APROBADA', 'RECHAZADA']),
     correccionSolicitada: porEstado.REQUIERE_CORRECCION ?? 0,
     corregidas: porEstado.CORREGIDA ?? 0,
   }

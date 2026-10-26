@@ -20,13 +20,35 @@ describe('rutaNotificacionCampana', () => {
     ).toBeNull()
   })
 
-  it('no inventa ruta de solicitud para Fontanero', () => {
+  it('lleva al Fontanero al detalle de su solicitud de ausencia', () => {
     expect(
       rutaNotificacionCampana(
         { role: 'Fontanero', id: '3' },
         { idAveria: null, idSolicitudAusencia: 12 },
       ),
-    ).toBeNull()
+    ).toBe('/fontanero/mis-solicitudes/12')
+
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Fontanero', id: '3' },
+        {
+          tipo: 'SOLICITUD_AUSENCIA_APROBADA_FONTANERO',
+          idSolicitudAusencia: 12,
+        },
+      ),
+    ).toBe('/fontanero/mis-solicitudes/12')
+  })
+
+  it('lleva al Fontanero a corregir la actividad notificada', () => {
+    expect(
+      rutaNotificacionCampana(
+        { role: 'Fontanero', id: '3' },
+        {
+          tipo: 'ACTIVIDAD_REQUIERE_CORRECCION_FONTANERO',
+          idActividad: 7,
+        },
+      ),
+    ).toBe('/admin/actividades/correcciones/7/corregir')
   })
 
   it('prioriza solicitud sobre avería y conserva rutas de avería', () => {

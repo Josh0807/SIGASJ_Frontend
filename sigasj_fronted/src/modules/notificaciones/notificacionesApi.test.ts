@@ -127,4 +127,22 @@ describe('notificacionesApi', () => {
     expect(listado.data[1]?.idSalidaInventario).toBe(8)
     expect(listado.data[2]?.idReposicion).toBe(5)
   })
+
+  it('acepta notificaciones de corrección de actividad', () => {
+    const listado = parseNotificacionesListado({
+      data: [
+        {
+          id: 30,
+          idActividad: 7,
+          tipo: 'ACTIVIDAD_REQUIERE_CORRECCION_FONTANERO',
+          titulo: 'Debe corregir una actividad',
+          mensaje: 'La administradora pidió correcciones.',
+          leida: false,
+        },
+      ],
+      noLeidas: 1,
+    })
+    expect(listado.data).toHaveLength(1)
+    expect(listado.data[0]?.idActividad).toBe(7)
+  })
 })

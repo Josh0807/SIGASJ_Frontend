@@ -1,6 +1,7 @@
 import { IconArrowLeft, IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
@@ -21,6 +22,7 @@ import {
   formatearFeriado,
   listarFeriadosEnRango,
 } from '../feriadosCostaRica'
+import FechaFeriadoPicker from '../FechaFeriadoPicker'
 import { crearMiSolicitudAusencia } from '../solicitudesAusenciaApi'
 import {
   FONTANERO_MIS_SOLICITUDES_PATH,
@@ -117,7 +119,20 @@ const textoErrorBackend = (detail: string): string | null => {
 const mensajeErrorEnvio = (error: unknown): string => {
   const status = getHttpStatus(error)
   if (status === 403) {
-    return 'No tiene permiso para enviar esta solicitud o no hay un colaborador vinculado a su cuenta.'
+    const message = error instanceof Error ? error.message : ''
+    const detail = message.replace(/^HTTP\s+\d{3}:\s*/i, '')
+    if (/colaborador/i.test(detail)) {
+      return 'No hay un colaborador activo vinculado a su cuenta. Pida a Administración que asocie su usuario.'
+    }
+    return 'No tiene permiso para enviar esta solicitud.'
+  }
+  if (status === 409) {
+    const message = error instanceof Error ? error.message : ''
+    const detail = message.replace(/^HTTP\s+\d{3}:\s*/i, '').trim()
+    return (
+      textoErrorBackend(detail) ||
+      'Ya existe una solicitud o un registro de RRHH en ese periodo.'
+    )
   }
   if (status === 400) {
     const message = error instanceof Error ? error.message : ''
@@ -254,19 +269,27 @@ export default function SolicitarAusenciaForm({
   }
 
   return (
-    <section className="actividades-fontanero-registro mx-auto grid w-full max-w-5xl gap-5 px-4 py-6 sm:px-6">
-      <header className="border-b border-blue-100 pb-5">
-        <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">
-          Fontanero
-        </p>
-        <h1 className="m-0 text-2xl font-black tracking-tight text-[#07376f] sm:text-3xl">
-          {titulo}
-        </h1>
-        <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500">
-          {esVacaciones
-            ? 'Solicite el disfrute de vacaciones. Los feriados no se seleccionan ni se descuentan del saldo. La Administración aprueba antes de afectar el saldo.'
-            : 'Solicite un permiso laboral. Adjunte el respaldo si lo tiene (constancia, cita, etc.). No descuenta vacaciones.'}
-        </p>
+    <section className="actividades-fontanero-home actividades-fontanero-registro mx-auto grid w-full max-w-6xl gap-6 px-4 py-6 sm:px-6">
+      <header className="actividades-fontanero-home__welcome !rounded-[26px] !border-sky-100 !bg-linear-to-br !from-white !via-white !to-blue-50/70 !p-8 !shadow-[0_16px_42px_rgba(15,63,110,0.1)]">
+        <div className="actividades-fontanero-home__welcome-content">
+          <span className="actividades-fontanero-home__eyebrow !text-sm !font-extrabold !tracking-[0.12em] !text-blue-600">
+            Módulo operativo · Fontanero
+          </span>
+          <h1 className="!text-4xl !font-black !tracking-[-0.025em] !text-[#062e63]">
+            {titulo}
+          </h1>
+          <p className="actividades-fontanero-home__welcome-text">
+            {esVacaciones
+              ? 'Solicite el disfrute de vacaciones. Los feriados no se seleccionan ni se descuentan del saldo. La Administración aprueba antes de afectar el saldo.'
+              : 'Solicite un permiso laboral. Adjunte el respaldo si lo tiene (constancia, cita, etc.). No descuenta vacaciones.'}
+          </p>
+        </div>
+        <Link
+          to={`${ADMIN_BASE_PATH}/dashboard`}
+          className="actividades-fontanero-home__back-link !inline-flex !min-h-11 !items-center !rounded-xl !border !border-blue-200 !bg-white !px-4 !font-extrabold !text-blue-700 !shadow-sm !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!bg-blue-50 hover:!no-underline hover:!shadow-md active:!translate-y-0"
+        >
+          Volver al dashboard
+        </Link>
       </header>
 
       {esVacaciones ? (
@@ -375,81 +398,35 @@ export default function SolicitarAusenciaForm({
               <ActividadRegistroFieldError id="correo-error" message={errors.correo} />
             ) : (
               <small className="text-slate-500">
-                Escriba uno o varios correos, separados por coma. Pueden ser
-                distintos al de su cuenta.
+                El aviso se envía cuando la Administradora aprueba, no al
+                registrar. Separe varios correos con coma.
               </small>
             )}
           </div>
 
-          <div
-            className={`actividad-registro-form__field${
-              errors.fechaInicio ? ' actividad-registro-form__field--invalid' : ''
-            }`}
-          >
-            <label className="actividad-registro-form__label" htmlFor="fechaInicio">
-              Fecha de inicio{' '}
-              <span className="actividad-registro-form__required" aria-hidden="true">
-                *
-              </span>
-            </label>
-            <input
-              id="fechaInicio"
-              name="fechaInicio"
-              type="date"
-              className={`actividad-registro-form__input${
-                errors.fechaInicio ? ' actividad-registro-form__input--error' : ''
-              }`}
-              value={values.fechaInicio}
-              required
-              aria-invalid={Boolean(errors.fechaInicio)}
-              onChange={(event) => update('fechaInicio', event.target.value)}
-            />
-            {errors.fechaInicio ? (
-              <ActividadRegistroFieldError
-                id="fechaInicio-error"
-                message={errors.fechaInicio}
-              />
-            ) : (
-              <small className="text-slate-500">
-                No se permiten feriados de Costa Rica.
-              </small>
-            )}
-          </div>
+          <FechaFeriadoPicker
+            label="Fecha de inicio"
+            value={values.fechaInicio}
+            required
+            error={errors.fechaInicio}
+            onChange={(iso) => update('fechaInicio', iso)}
+          />
 
-          <div
-            className={`actividad-registro-form__field${
-              errors.fechaFin ? ' actividad-registro-form__field--invalid' : ''
-            }`}
-          >
-            <label className="actividad-registro-form__label" htmlFor="fechaFin">
-              Fecha de fin{' '}
-              <span className="actividad-registro-form__required" aria-hidden="true">
-                *
-              </span>
-            </label>
-            <input
-              id="fechaFin"
-              name="fechaFin"
-              type="date"
-              className={`actividad-registro-form__input${
-                errors.fechaFin ? ' actividad-registro-form__input--error' : ''
-              }`}
-              value={values.fechaFin}
-              min={values.fechaInicio || undefined}
-              required
-              aria-invalid={Boolean(errors.fechaFin)}
-              onChange={(event) => update('fechaFin', event.target.value)}
-            />
-            {errors.fechaFin ? (
-              <ActividadRegistroFieldError id="fechaFin-error" message={errors.fechaFin} />
-            ) : (
-              <small className="text-slate-500">
-                {esVacaciones
-                  ? 'Sin autollenado. Los feriados del rango no se cuentan.'
-                  : 'Sin autollenado. Puede ser el mismo día de inicio.'}
-              </small>
-            )}
-          </div>
+          <FechaFeriadoPicker
+            label="Fecha de fin"
+            value={values.fechaFin}
+            required
+            min={values.fechaInicio || undefined}
+            error={errors.fechaFin}
+            onChange={(iso) => update('fechaFin', iso)}
+          />
+          {errors.fechaFin ? null : (
+            <small className="text-slate-500 md:col-span-2">
+              {esVacaciones
+                ? 'Los feriados nacionales se marcan en el calendario y no se cuentan.'
+                : 'Puede ser el mismo día de inicio. Los feriados se marcan en el calendario.'}
+            </small>
+          )}
 
           {esVacaciones ? null : (
             <div

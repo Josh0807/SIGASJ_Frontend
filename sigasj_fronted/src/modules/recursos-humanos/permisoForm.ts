@@ -1,3 +1,7 @@
+import {
+  diasAusenciaSinFeriados,
+  esFeriadoCostaRica,
+} from '../solicitudes-ausencia/feriadosCostaRica'
 import type { PermisoColaborador, PermisoFormValues, PermisoPayload } from './types'
 import { getHttpStatus, nombreCompleto } from './colaboradorForm'
 
@@ -66,10 +70,22 @@ export function validatePermiso(values: PermisoFormValues): PermisoFormErrors {
     values.fechaFin < values.fechaInicio
   ) {
     errors.fechaFin = 'La fecha de fin no puede ser anterior al inicio.'
+  } else if (esFeriadoCostaRica(values.fechaFin)) {
+    errors.fechaFin = 'La fecha de fin no puede ser un feriado.'
+  } else if (
+    values.fechaInicio &&
+    values.fechaFin &&
+    diasAusenciaSinFeriados(values.fechaInicio, values.fechaFin) < 1
+  ) {
+    errors.fechaFin =
+      'El periodo no incluye días hábiles: solo hay feriados en ese rango.'
+  }
+  if (values.fechaInicio && esFeriadoCostaRica(values.fechaInicio)) {
+    errors.fechaInicio = 'La fecha de inicio no puede ser un feriado.'
   }
   const motivo = values.motivo.trim()
   if (!motivo) errors.motivo = 'El motivo es obligatorio.'
-  else if (motivo.length > 200) errors.motivo = 'Use un máximo de 200 caracteres.'
+  else if (motivo.length > 500) errors.motivo = 'Use un máximo de 500 caracteres.'
   if (values.observaciones.trim().length > 500) {
     errors.observaciones = 'Use un máximo de 500 caracteres.'
   }
@@ -99,6 +115,14 @@ export function permisoErrorMessage(error: unknown, fallback: string): string {
   const status = getHttpStatus(error)
   if (status === 403) return 'No tiene acceso para administrar los permisos del personal.'
   if (status === 404) return 'El permiso indicado no existe o fue eliminado.'
+  if (status === 409) {
+    const message = error instanceof Error ? error.message : ''
+    const detail = message.replace(/^HTTP\s+\d{3}:\s*/i, '').trim()
+    return (
+      detail ||
+      'Ya hay una ausencia en ese periodo. Revise permisos, vacaciones o solicitudes pendientes.'
+    )
+  }
   if (status === 400) {
     const message = error instanceof Error ? error.message : ''
     const detail = message.replace(/^HTTP\s+\d{3}:\s*/i, '').trim()

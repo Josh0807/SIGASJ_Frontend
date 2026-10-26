@@ -43,7 +43,9 @@ export function useTiposActividadFontanero(): TiposActividadFontaneroState {
           return
         }
         const data = sortTiposActividad(
-          Array.isArray(result.data) ? result.data : [],
+          (Array.isArray(result.data) ? result.data : []).filter(
+            isTipoActividadRegistrable,
+          ),
         )
         setTipos(data)
         hasLoaded.current = true

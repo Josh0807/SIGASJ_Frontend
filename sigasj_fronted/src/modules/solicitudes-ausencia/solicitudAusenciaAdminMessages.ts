@@ -27,7 +27,15 @@ const detalleBackend = (error: unknown): string => {
 export const mensajeErrorAprobarSolicitud = (error: unknown): string => {
   const status = getHttpStatus(error)
   const detail = detalleBackend(error)
-  if (status === 409) return 'Esta solicitud ya fue procesada.'
+  if (status === 409) {
+    if (/periodo|pendiente|disfrute|permiso registrado/i.test(detail)) {
+      return (
+        detail ||
+        'Ya hay una ausencia en ese periodo. Revise permisos, vacaciones o solicitudes pendientes.'
+      )
+    }
+    return 'Esta solicitud ya fue procesada.'
+  }
   if (status === 404) return 'No se encontró la solicitud.'
   if (status === 403) return 'No tiene permiso para aprobar solicitudes.'
   if (

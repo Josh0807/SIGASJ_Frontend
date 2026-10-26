@@ -1,6 +1,9 @@
 import type { AuthUser } from '../auth/types/authUser'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
-import { solicitudAusenciaDetailPath } from '../solicitudes-ausencia/solicitudesAusenciaPaths'
+import {
+  misSolicitudAusenciaDetailPath,
+  solicitudAusenciaDetailPath,
+} from '../solicitudes-ausencia/solicitudesAusenciaPaths'
 import {
   ALERTAS_REPOSICION_PATH,
   movimientoDetailPath,
@@ -8,8 +11,13 @@ import {
   solicitudMaterialesDetailPath,
   solicitudRevisionDetailPath,
 } from '../inventario/inventarioPaths'
+import { ACTIVIDADES_FONTANERO_PATHS } from '../actividades-fontanero/actividadesFontaneroPaths'
+import { ACTIVIDADES_ADMIN_PATHS } from '../actividades-fontanero/admin/actividadesAdminPaths'
 import { rutaAveriaNotificacion } from './rutaAveriaNotificacion'
 import type { NotificacionAveriaItem } from './types'
+
+const esRolFontanero = (user: AuthUser | null) =>
+  user?.role?.toLowerCase() === 'fontanero'
 
 /**
  * Destino al pulsar un ítem de la campana.
@@ -24,6 +32,7 @@ export function rutaNotificacionCampana(
     | 'idSolicitudMateriales'
     | 'idSalidaInventario'
     | 'idReposicion'
+    | 'idActividad'
     | 'tipo'
   >>,
 ): string | null {
@@ -61,9 +70,23 @@ export function rutaNotificacionCampana(
     return canAccessAdminRoute(user, path) ? path : null
   }
 
+  const idActividad = item.idActividad
+  if (idActividad != null && Number.isInteger(idActividad) && idActividad > 0) {
+    const path = esRolFontanero(user)
+      ? ACTIVIDADES_FONTANERO_PATHS.corregirActividad(idActividad)
+      : ACTIVIDADES_ADMIN_PATHS.revision
+    return canAccessAdminRoute(user, path) ? path : null
+  }
+
   const idSolicitud = item.idSolicitudAusencia
   if (idSolicitud != null && Number.isInteger(idSolicitud) && idSolicitud > 0) {
-    const path = solicitudAusenciaDetailPath(idSolicitud)
+    const esRespuestaFontanero =
+      esRolFontanero(user) ||
+      item.tipo === 'SOLICITUD_AUSENCIA_APROBADA_FONTANERO' ||
+      item.tipo === 'SOLICITUD_AUSENCIA_RECHAZADA_FONTANERO'
+    const path = esRespuestaFontanero
+      ? misSolicitudAusenciaDetailPath(idSolicitud)
+      : solicitudAusenciaDetailPath(idSolicitud)
     return canAccessAdminRoute(user, path) ? path : null
   }
 

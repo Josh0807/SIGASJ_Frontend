@@ -40,6 +40,7 @@ const normalizeItem = (value: unknown): NotificacionAveriaItem | null => {
     ? row.idSalidaInventario
     : null
   const idReposicion = isNullableId(row.idReposicion) ? row.idReposicion : null
+  const idActividad = isNullableId(row.idActividad) ? row.idActividad : null
 
   // Exactamente una referencia válida (o ítem legado solo con idAveria).
   const hasAveria = idAveria != null && idAveria > 0
@@ -48,12 +49,14 @@ const normalizeItem = (value: unknown): NotificacionAveriaItem | null => {
     idSolicitudMateriales != null && idSolicitudMateriales > 0
   const hasSalidaInventario = idSalidaInventario != null && idSalidaInventario > 0
   const hasReposicion = idReposicion != null && idReposicion > 0
+  const hasActividad = idActividad != null && idActividad > 0
   const referenceCount = [
     hasAveria,
     hasSolicitud,
     hasSolicitudMateriales,
     hasSalidaInventario,
     hasReposicion,
+    hasActividad,
   ].filter(Boolean).length
   if (referenceCount === 0) {
     return null
@@ -71,6 +74,7 @@ const normalizeItem = (value: unknown): NotificacionAveriaItem | null => {
       : null,
     idSalidaInventario: hasSalidaInventario ? idSalidaInventario : null,
     idReposicion: hasReposicion ? idReposicion : null,
+    idActividad: hasActividad ? idActividad : null,
     tipo: typeof row.tipo === 'string' ? row.tipo : '',
     titulo: row.titulo,
     mensaje: row.mensaje,

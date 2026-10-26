@@ -5,7 +5,6 @@ import type { ActividadRegistroFormErrors } from '../../utils/validateActividadR
 import ControlClorosForm from './ControlClorosForm'
 import ControlFugasForm from './ControlFugasForm'
 import ControlOperativoForm from './ControlOperativoForm'
-import IncapacidadVacacionesForm from './IncapacidadVacacionesForm'
 import TomaPresionForm from './TomaPresionForm'
 import VisitaCampoForm from './VisitaCampoForm'
 
@@ -17,11 +16,12 @@ export type FormularioActividadProps = {
   disabled: boolean
 }
 
-export const FORMULARIOS_ACTIVIDAD: Record<TipoActividadFontaneroCodigo, ComponentType<FormularioActividadProps>> = {
+export const FORMULARIOS_ACTIVIDAD: Partial<
+  Record<TipoActividadFontaneroCodigo, ComponentType<FormularioActividadProps>>
+> = {
   CONTROL_FUGAS: ControlFugasForm,
   TOMA_PRESION: TomaPresionForm,
   VISITA_CAMPO: VisitaCampoForm,
   CONTROL_CLOROS: ControlClorosForm,
   CONTROL_OPERATIVO: ControlOperativoForm,
-  INCAPACIDAD_VACACIONES: IncapacidadVacacionesForm,
 }

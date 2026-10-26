@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { AdminHeaderProps } from '../props'
 import { useAuthUser } from '../../auth/hooks/useAuthUser'
+import { useAdminHeaderScrollVisibility } from '../hooks/useAdminHeaderScrollVisibility'
 import AdminAccountMenu from './AdminAccountMenu'
 import AdminHeaderMenuToggle from './AdminHeaderMenuToggle'
 import NotificacionesCampana from '../../notificaciones/NotificacionesCampana'
@@ -54,8 +55,14 @@ const AdminHeader = ({
   onToggleMenu,
   menuToggleRef,
 }: AdminHeaderProps) => {
+  const hidden = useAdminHeaderScrollVisibility(menuOpen)
+
   return (
-    <header className="admin-header min-w-0" aria-label="Encabezado del panel administrativo">
+    <header
+      className={`admin-header min-w-0${hidden ? ' admin-header--collapsed' : ''}`}
+      data-scroll-hidden={hidden ? 'true' : 'false'}
+      aria-label="Encabezado del panel administrativo"
+    >
       <div className="admin-header__start min-w-0">
         <AdminHeaderMenuToggle
           menuOpen={menuOpen}
@@ -74,7 +81,12 @@ const AdminHeader = ({
             to="/"
             aria-label="Ver sitio público"
           >
-            Sitio público
+            <span className="admin-header__action-label admin-header__action-label--full">
+              Sitio público
+            </span>
+            <span className="admin-header__action-label admin-header__action-label--short">
+              Sitio
+            </span>
           </Link>
           <AdminAccountMenu triggerContent={<AdminHeaderUser />} />
         </div>

@@ -5695,7 +5695,7 @@ body,
   container-name: admin-header;
   display: flex;
   flex: 0 0 auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px 16px;
@@ -5712,11 +5712,29 @@ body,
   top: 0;
   z-index: var(--z-index-dropdown);
   box-shadow: 0 1px 3px rgba(18, 63, 112, 0.05);
+  transition: transform 0.28s ease, opacity 0.22s ease, box-shadow 0.22s ease;
+}
+
+.admin-header--collapsed {
+  transform: translate3d(0, calc(-100% - 28px), 0);
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-header,
+  .admin-header--collapsed {
+    transition: none;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .admin-header__start {
   display: flex;
-  flex: 1 1 12rem;
+  flex: 1 1 auto;
   align-items: center;
   gap: 14px;
   min-width: 0;
@@ -5736,7 +5754,7 @@ body,
 
 .admin-header__account {
   display: flex;
-  flex: 1 0 auto;
+  flex: 0 1 auto;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
@@ -5853,10 +5871,8 @@ body,
 }
 
 .notificaciones-campana__panel {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: var(--z-index-dropdown);
+  position: fixed;
+  z-index: var(--z-index-toast);
   width: min(22rem, calc(100vw - 2rem));
   max-height: 20rem;
   overflow: auto;
@@ -5911,6 +5927,17 @@ body,
   background: #eef5fb;
 }
 
+.notificaciones-campana__link--static {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
 .notificaciones-campana__title {
   color: #163a63;
   font-size: .84rem;
@@ -5930,7 +5957,7 @@ body,
   display: none;
 }
 
-@container admin-header (max-width: 780px) {
+@container admin-header (max-width: 920px) {
   .admin-header__user-copy {
     display: none;
   }
@@ -5943,6 +5970,17 @@ body,
   .admin-header__action-label--short,
   .admin-account-menu__trigger-label--short {
     display: inline;
+  }
+
+  .admin-header .admin-account-menu__trigger--user {
+    min-height: 48px !important;
+    padding: 4px 10px 4px 4px !important;
+  }
+}
+
+@container admin-header (max-width: 560px) {
+  .admin-header__title {
+    display: none;
   }
 }
 
@@ -9083,6 +9121,7 @@ body,
   }
 
   .admin-header {
+    flex-wrap: nowrap;
     row-gap: 10px;
   }
 
@@ -9092,7 +9131,7 @@ body,
   }
 
   .admin-header__account {
-    flex: 1 0 auto;
+    flex: 0 1 auto;
     flex-wrap: nowrap;
     justify-content: flex-end;
   }
@@ -12389,11 +12428,21 @@ body,
   line-height: 1.45;
 }
 
+.actividades-fontanero-registro .actividad-registro-form__input:disabled,
+.actividades-fontanero-registro .actividad-registro-form__textarea:disabled,
 .actividades-fontanero-registro--corregir .actividad-registro-form__input:disabled,
 .actividades-fontanero-registro--corregir .actividad-registro-form__textarea:disabled {
-  background: #f3f7fb;
-  color: #5b7288;
+  background: #e8eef4;
+  color: #64748b;
+  border-color: #cbd5e1;
+  box-shadow: none;
   cursor: not-allowed;
+  opacity: 1;
+  -webkit-text-fill-color: #64748b;
+}
+
+.actividades-fontanero-registro .actividad-registro-form__field--locked .actividad-registro-form__label {
+  color: #64748b;
 }
 
 /* Registro de actividades: acabado moderno complementario a las utilidades Tailwind. */
@@ -12422,6 +12471,17 @@ body,
   background: #fff;
   box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05);
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.actividades-fontanero-registro .actividad-registro-form__input:disabled,
+.actividades-fontanero-registro .actividad-registro-form__textarea:disabled {
+  background: #e8eef4;
+  color: #64748b;
+  border-color: #cbd5e1;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+  -webkit-text-fill-color: #64748b;
 }
 
 .actividades-fontanero-registro .documento-uploader__pick {
