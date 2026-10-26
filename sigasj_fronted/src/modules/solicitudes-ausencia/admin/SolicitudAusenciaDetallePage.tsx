@@ -53,6 +53,7 @@ export default function SolicitudAusenciaDetallePage() {
   const [aviso, setAviso] = useState<string | null>(null)
   const [busy, setBusy] = useState<'aprobar' | 'rechazar' | null>(null)
   const [modalRechazo, setModalRechazo] = useState(false)
+  const [modalAprobar, setModalAprobar] = useState(false)
   const [motivoRechazo, setMotivoRechazo] = useState('')
   const idValido = Number.isInteger(solicitudId) && solicitudId > 0
   const clave = `${solicitudId}:${recarga}`
@@ -90,26 +91,26 @@ export default function SolicitudAusenciaDetallePage() {
   }, [clave, idValido, solicitudId, salirPorSesion])
 
   useEffect(() => {
-    if (!modalRechazo) return undefined
+    if (!modalRechazo && !modalAprobar) return undefined
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !busy) {
         setModalRechazo(false)
+        setModalAprobar(false)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [modalRechazo, busy])
+  }, [modalRechazo, modalAprobar, busy])
 
   const solicitud = carga.solicitud
+  const mensajeAprobar =
+    solicitud?.tipo === 'VACACIONES'
+      ? `Se descontarán ${solicitud.resumenVacaciones?.diasNetos ?? 'los'} día(s) netos (sin feriados) del saldo.`
+      : 'Se creará el registro oficial en Permisos.'
 
   const aprobar = async () => {
     if (!solicitud || busy) return
-    const diasNetos = solicitud.resumenVacaciones?.diasNetos
-    const mensaje =
-      solicitud.tipo === 'VACACIONES'
-        ? `¿Desea aprobar esta solicitud de vacaciones? Se descontarán ${diasNetos ?? 'los'} día(s) netos (sin feriados) del saldo.`
-        : '¿Desea aprobar esta solicitud de permiso? Se creará el registro oficial en Permisos.'
-    if (!window.confirm(mensaje)) return
+    setModalAprobar(false)
     setBusy('aprobar')
     setAccionError(null)
     setAviso(null)
@@ -383,7 +384,7 @@ export default function SolicitudAusenciaDetallePage() {
                   <button
                     type="button"
                     disabled={Boolean(busy)}
-                    onClick={() => void aprobar()}
+                    onClick={() => setModalAprobar(true)}
                     className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-emerald-500 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(16,185,129,0.32)] transition hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none"
                   >
                     <IconCheck size={20} aria-hidden="true" />
@@ -406,6 +407,47 @@ export default function SolicitudAusenciaDetallePage() {
           </article>
         </>
       )}
+
+      {modalAprobar && solicitud ? (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="aprobar-titulo"
+        >
+          <div className="grid w-full max-w-md gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+            <h2 id="aprobar-titulo" className="m-0 text-xl font-black text-[#062e63]">
+              Aprobar solicitud
+            </h2>
+            <p className="m-0 text-slate-600">
+              {tipoSolicitudAusenciaLabel(solicitud.tipo)} de{' '}
+              {solicitud.colaborador
+                ? nombreCompleto(solicitud.colaborador)
+                : `#${solicitud.colaboradorId}`}
+              . {mensajeAprobar}
+            </p>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-3">
+              <button
+                type="button"
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 font-extrabold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 disabled:opacity-60"
+                disabled={Boolean(busy)}
+                onClick={() => setModalAprobar(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-emerald-500 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-500 px-6 py-3 font-extrabold text-white shadow-[0_11px_26px_rgba(16,185,129,0.28)] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none motion-reduce:transform-none"
+                disabled={Boolean(busy)}
+                onClick={() => void aprobar()}
+              >
+                <IconCheck size={18} aria-hidden="true" />
+                {busy === 'aprobar' ? 'Aprobando…' : 'Confirmar aprobación'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {modalRechazo && solicitud ? (
         <div

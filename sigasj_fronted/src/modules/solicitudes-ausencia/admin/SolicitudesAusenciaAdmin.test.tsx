@@ -20,6 +20,24 @@ const flushAsync = async () => {
   })
 }
 
+const confirmarAprobacionEn = async (container: HTMLElement) => {
+  const abrir = Array.from(container.querySelectorAll('button')).find(
+    (b) => b.textContent?.trim() === 'Aprobar solicitud',
+  )
+  expect(abrir).toBeTruthy()
+  await act(async () => {
+    abrir!.click()
+  })
+  const confirmar = Array.from(container.querySelectorAll('button')).find(
+    (b) => b.textContent?.includes('Confirmar aprobación'),
+  )
+  expect(confirmar).toBeTruthy()
+  await act(async () => {
+    confirmar!.click()
+  })
+  await flushAsync()
+}
+
 const colaborador = {
   id: 7,
   nombre: 'Ana',
@@ -322,19 +340,11 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
   })
 
   it('aprobar PERMISO consume API y refleja APROBADA', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     loginAsRole('Administradora')
     const app = await mountAppRoutes(`${PATH}/1`)
     await flushAsync()
     try {
-      const btn = Array.from(app.container.querySelectorAll('button')).find(
-        (b) => b.textContent?.includes('Aprobar'),
-      )
-      expect(btn).toBeTruthy()
-      await act(async () => {
-        btn!.click()
-      })
-      await flushAsync()
+      await confirmarAprobacionEn(app.container)
       expect(ausenciaApi.aprobarSolicitudAusencia).toHaveBeenCalledWith(1)
       expect(app.container.innerHTML).toContain('Solicitud aprobada')
       expect(app.container.innerHTML).toContain('Aprobada')
@@ -345,7 +355,6 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
   })
 
   it('aprobar VACACIONES consume API y refleja APROBADA', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     const vacPend = base({
       id: 20,
       tipo: 'VACACIONES',
@@ -368,16 +377,20 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
     const app = await mountAppRoutes(`${PATH}/20`)
     await flushAsync()
     try {
-      const btn = Array.from(app.container.querySelectorAll('button')).find(
-        (b) => b.textContent?.includes('Aprobar'),
+      const abrir = Array.from(app.container.querySelectorAll('button')).find(
+        (b) => b.textContent?.trim() === 'Aprobar solicitud',
       )
       await act(async () => {
-        btn!.click()
+        abrir!.click()
+      })
+      expect(app.container.innerHTML).toMatch(/feriados|saldo/i)
+      const confirmar = Array.from(app.container.querySelectorAll('button')).find(
+        (b) => b.textContent?.includes('Confirmar aprobación'),
+      )
+      await act(async () => {
+        confirmar!.click()
       })
       await flushAsync()
-      expect(window.confirm).toHaveBeenCalled()
-      const confirmMsg = String(vi.mocked(window.confirm).mock.calls[0][0])
-      expect(confirmMsg).toMatch(/feriados|saldo/i)
       expect(ausenciaApi.aprobarSolicitudAusencia).toHaveBeenCalledWith(20)
       expect(app.container.innerHTML).toContain('movimiento de vacaciones')
       expect(app.container.innerHTML).toContain('Aprobada')
@@ -427,7 +440,6 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
   })
 
   it('error de saldo insuficiente no marca aprobada', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     vi.spyOn(ausenciaApi, 'aprobarSolicitudAusencia').mockRejectedValue(
       new Error('HTTP 400: Saldo de vacaciones insuficiente'),
     )
@@ -435,13 +447,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
     const app = await mountAppRoutes(`${PATH}/1`)
     await flushAsync()
     try {
-      const btn = Array.from(app.container.querySelectorAll('button')).find(
-        (b) => b.textContent?.includes('Aprobar'),
-      )
-      await act(async () => {
-        btn!.click()
-      })
-      await flushAsync()
+      await confirmarAprobacionEn(app.container)
       expect(app.container.innerHTML).toContain(
         'no cuenta con saldo suficiente de vacaciones',
       )
@@ -453,7 +459,6 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
   })
 
   it('conflicto 409 muestra mensaje y refresca', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     vi.spyOn(ausenciaApi, 'aprobarSolicitudAusencia').mockRejectedValue(
       new Error('HTTP 409: Ya procesada'),
     )
@@ -463,13 +468,7 @@ describe('PBI 6.5.7 — Cola admin RRHH solicitudes', () => {
     await flushAsync()
     const callsAntes = getSpy.mock.calls.length
     try {
-      const btn = Array.from(app.container.querySelectorAll('button')).find(
-        (b) => b.textContent?.includes('Aprobar'),
-      )
-      await act(async () => {
-        btn!.click()
-      })
-      await flushAsync()
+      await confirmarAprobacionEn(app.container)
       expect(app.container.innerHTML).toContain('Esta solicitud ya fue procesada.')
       expect(getSpy.mock.calls.length).toBeGreaterThan(callsAntes)
     } finally {
