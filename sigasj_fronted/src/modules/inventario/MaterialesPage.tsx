@@ -15,11 +15,13 @@ import { useCategorias } from "./categorias/useCategorias";
 import { useProveedores } from "./proveedores/useProveedores";
 import {
   IconAlertTriangle,
+  IconCalendarTime,
   IconCategory,
   IconCheck,
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconFilter,
+  IconPackage,
   IconSearch,
   IconTruck,
   IconX,
@@ -27,6 +29,61 @@ import {
 import { InventoryFormField } from "./InventoryFormField";
 
 const PAGE_SIZE = 10;
+
+type VencimientoUi = {
+  label: string;
+  tone: "none" | "ok" | "soon" | "expired";
+};
+
+function hoyCostaRicaIso(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Costa_Rica",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function formatFechaVencimiento(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const day = iso.slice(0, 10);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+  if (!match) return day;
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+function resolveVencimientoUi(material: Material): VencimientoUi {
+  const requiere =
+    material.requiereFechaVencimiento === true ||
+    material.categoria?.requiereFechaVencimiento === true;
+  if (!requiere) {
+    return { label: "No aplica", tone: "none" };
+  }
+  if (!material.fechaVencimiento) {
+    return { label: "Sin fecha", tone: "soon" };
+  }
+  const day = material.fechaVencimiento.slice(0, 10);
+  const hoy = hoyCostaRicaIso();
+  if (day < hoy) {
+    return {
+      label: `Vencido · ${formatFechaVencimiento(day)}`,
+      tone: "expired",
+    };
+  }
+  const [y, m, d] = hoy.split("-").map(Number);
+  const limiteDate = new Date(Date.UTC(y, m - 1, d + 30));
+  const limiteIso = `${limiteDate.getUTCFullYear()}-${String(limiteDate.getUTCMonth() + 1).padStart(2, "0")}-${String(limiteDate.getUTCDate()).padStart(2, "0")}`;
+  if (day <= limiteIso) {
+    return {
+      label: `Pronto · ${formatFechaVencimiento(day)}`,
+      tone: "soon",
+    };
+  }
+  return {
+    label: formatFechaVencimiento(day),
+    tone: "ok",
+  };
+}
 
 export default function MaterialesPage() {
   const location = useLocation();
@@ -134,8 +191,8 @@ export default function MaterialesPage() {
             </span>
           </div>
           <p className="inventory-page-subtitle">
-            Consulte existencias, ubicación y niveles mínimos de los materiales
-            registrados.
+            Consulte existencias, ubicación, stock mínimo y fechas de
+            vencimiento de los materiales registrados.
           </p>
         </div>
       </header>
@@ -345,95 +402,157 @@ function MaterialTable({
   onStateChange,
 }: TableProps) {
   return (
-    <div className="materials-admin__table-wrap overflow-x-auto !rounded-[22px] !border-sky-100 !bg-white !shadow-[0_12px_30px_rgba(30,90,156,0.07)] [&_thead]:!bg-slate-50/80 [&_th]:!py-5 [&_th]:!text-xs [&_th]:!tracking-[0.04em] [&_td]:!py-5">
+    <div className="materials-admin__table-wrap materials-catalog-table overflow-x-auto !rounded-[22px] !border-sky-100 !bg-white !shadow-[0_12px_30px_rgba(30,90,156,0.07)] [&_thead]:!bg-[#0b3d78] [&_th]:!border-0 [&_th]:!py-4 [&_th]:!text-[0.72rem] [&_th]:!font-extrabold [&_th]:!tracking-[0.06em] [&_th]:!text-white [&_td]:!py-4 [&_td]:!align-top [&_tbody_tr]:!transition-colors hover:[&_tbody_tr]:!bg-sky-50/55">
       <table>
         <caption className="visually-hidden">Listado de materiales</caption>
         <thead>
           <tr>
             <th>Material</th>
             <th>Categoría</th>
-            <th>Proveedor</th>
-            <th>Unidad</th>
+            {canManage ? <th>Proveedor</th> : null}
             <th>Ubicación</th>
             <th>Existencia</th>
-            <th>Stock mínimo</th>
+            <th>Vencimiento</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {materials.map((material) => (
-            <tr key={material.id}>
-              <td data-label="Material">
-                <strong>{material.nombre}</strong>
-                {material.descripcion && <small>{material.descripcion}</small>}
-              </td>
-              <td data-label="Categoría">
-                {material.categoria?.nombre ?? "Sin categoría"}
-              </td>
-              <td data-label="Proveedor">
-                <strong>{material.proveedor?.nombre ?? "Sin proveedor"}</strong>
-                {material.proveedor && !material.proveedor.activo && (
-                  <small>Proveedor inactivo</small>
-                )}
-              </td>
-              <td data-label="Unidad">{material.unidadMedida}</td>
-              <td data-label="Ubicación">
-                {material.ubicacion || "Sin ubicación"}
-              </td>
-              <td
-                data-label="Existencia"
-                className={
-                  material.stockActual <= material.stockMinimo ? "is-low" : ""
-                }
-              >
-                {material.stockActual}
-              </td>
-              <td data-label="Stock mínimo">{material.stockMinimo}</td>
-              <td data-label="Estado">
-                <span
-                  className={`materials-admin__badge !inline-flex !items-center !gap-1.5 !rounded-full !border !px-3 !py-1.5 !text-xs !font-extrabold !shadow-sm ${material.activo ? "is-active !border-emerald-200 !bg-emerald-50 !text-emerald-700" : "is-inactive !border-slate-200 !bg-slate-100 !text-slate-600"}`}
-                >
-                  {material.activo ? (
-                    <IconCircleCheckFilled
-                      className="text-emerald-500"
-                      size={14}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <IconCircleXFilled
-                      className="text-slate-400"
-                      size={14}
-                      aria-hidden="true"
-                    />
-                  )}
-                  {material.activo ? "Activo" : "Inactivo"}
-                </span>
-              </td>
-              <td data-label="Acciones">
-                <div className="materials-admin__row-actions !flex-nowrap !items-center !gap-2 max-[760px]:!flex-col">
-                  {canManage ? (
-                    <>
-                      <Link
-                        className="materials-admin__action !inline-flex !min-h-14 !items-center !justify-center !whitespace-nowrap !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-6 !text-base !font-extrabold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.28)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.03] hover:!from-blue-800 hover:!to-cyan-400 hover:!shadow-[0_16px_32px_rgba(37,99,235,0.38)] active:!translate-y-0 active:!scale-[0.97] focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-blue-600 motion-reduce:!transform-none motion-reduce:!transition-none"
-                        to={materialEditPath(material.id)}
-                        state={{ material }}
-                      >
-                        Editar
-                      </Link>
-                      <MaterialStateAction
-                        material={material}
-                        disabled={changingId !== null}
-                        onChange={onStateChange}
+          {materials.map((material) => {
+            const lowStock = material.stockActual <= material.stockMinimo;
+            const vencimiento = resolveVencimientoUi(material);
+            return (
+              <tr key={material.id}>
+                <td data-label="Material">
+                  <div className="flex min-w-[12rem] max-w-[22rem] items-start gap-3">
+                    <span className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-[#e8f4ff] to-[#d7ebff] text-[#0b6bcb]">
+                      <IconPackage size={20} aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <strong className="block text-[0.98rem] font-extrabold leading-snug tracking-tight text-[#062e63]">
+                        {material.nombre}
+                      </strong>
+                      <span className="mt-1 block text-xs font-semibold text-[#6b849c]">
+                        #{material.id} · {material.unidadMedida}
+                      </span>
+                      {material.descripcion ? (
+                        <small className="mt-1.5 !block !line-clamp-2 !text-[0.8rem] !leading-5 !text-[#6a829a]">
+                          {material.descripcion}
+                        </small>
+                      ) : null}
+                    </div>
+                  </div>
+                </td>
+                <td data-label="Categoría">
+                  <div className="grid gap-1.5">
+                    <span className="font-semibold text-[#1e4b73]">
+                      {material.categoria?.nombre ?? "Sin categoría"}
+                    </span>
+                    {material.categoria?.requiereFechaVencimiento ? (
+                      <span className="inline-flex w-fit items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[0.7rem] font-bold text-amber-800">
+                        <IconCalendarTime size={12} aria-hidden="true" />
+                        Con vencimiento
+                      </span>
+                    ) : null}
+                  </div>
+                </td>
+                {canManage ? (
+                  <td data-label="Proveedor">
+                    <span className="font-semibold text-[#1e4b73]">
+                      {material.proveedor?.nombre ?? "Sin proveedor"}
+                    </span>
+                    {material.proveedor && !material.proveedor.activo ? (
+                      <small className="!mt-1 !block !text-rose-600">
+                        Proveedor inactivo
+                      </small>
+                    ) : null}
+                  </td>
+                ) : null}
+                <td data-label="Ubicación">
+                  <span className="text-[#3d5f7c]">
+                    {material.ubicacion || "Sin ubicación"}
+                  </span>
+                </td>
+                <td data-label="Existencia">
+                  <div className="grid gap-1">
+                    <span
+                      className={`inline-flex w-fit min-w-[2.75rem] items-center justify-center rounded-xl px-2.5 py-1.5 text-sm font-extrabold tabular-nums ${
+                        lowStock
+                          ? "bg-amber-100 text-amber-900 ring-1 ring-amber-200"
+                          : "bg-sky-50 text-[#0b4f8c] ring-1 ring-sky-100"
+                      }`}
+                    >
+                      {material.stockActual}
+                    </span>
+                    <span className="text-[0.72rem] font-semibold text-[#7a92a8]">
+                      Mín. {material.stockMinimo}
+                      {lowStock ? " · bajo" : ""}
+                    </span>
+                  </div>
+                </td>
+                <td data-label="Vencimiento">
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.75rem] font-bold ${
+                      vencimiento.tone === "expired"
+                        ? "border-rose-200 bg-rose-50 text-rose-800"
+                        : vencimiento.tone === "soon"
+                          ? "border-amber-200 bg-amber-50 text-amber-900"
+                          : vencimiento.tone === "ok"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                            : "border-slate-200 bg-slate-50 text-slate-600"
+                    }`}
+                  >
+                    <IconCalendarTime size={13} aria-hidden="true" />
+                    {vencimiento.label}
+                  </span>
+                </td>
+                <td data-label="Estado">
+                  <span
+                    className={`materials-admin__badge !inline-flex !items-center !gap-1.5 !rounded-full !border !px-3 !py-1.5 !text-xs !font-extrabold !shadow-sm ${material.activo ? "is-active !border-emerald-200 !bg-emerald-50 !text-emerald-700" : "is-inactive !border-slate-200 !bg-slate-100 !text-slate-600"}`}
+                  >
+                    {material.activo ? (
+                      <IconCircleCheckFilled
+                        className="text-emerald-500"
+                        size={14}
+                        aria-hidden="true"
                       />
-                    </>
-                  ) : (
-                    <span>Solo lectura</span>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                    ) : (
+                      <IconCircleXFilled
+                        className="text-slate-400"
+                        size={14}
+                        aria-hidden="true"
+                      />
+                    )}
+                    {material.activo ? "Activo" : "Inactivo"}
+                  </span>
+                </td>
+                <td data-label="Acciones">
+                  <div className="materials-admin__row-actions !flex-nowrap !items-center !gap-2 max-[760px]:!flex-col">
+                    {canManage ? (
+                      <>
+                        <Link
+                          className="materials-admin__action !inline-flex !min-h-11 !items-center !justify-center !whitespace-nowrap !rounded-xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-4 !text-sm !font-extrabold !text-white !shadow-[0_8px_18px_rgba(37,99,235,0.22)] !transition-all !duration-300 !ease-out hover:!-translate-y-0.5 hover:!shadow-[0_12px_24px_rgba(37,99,235,0.3)] active:!translate-y-0 focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-blue-600 motion-reduce:!transform-none motion-reduce:!transition-none"
+                          to={materialEditPath(material.id)}
+                          state={{ material }}
+                        >
+                          Editar
+                        </Link>
+                        <MaterialStateAction
+                          material={material}
+                          disabled={changingId !== null}
+                          onChange={onStateChange}
+                        />
+                      </>
+                    ) : (
+                      <span className="text-sm font-semibold text-[#6b849c]">
+                        Solo lectura
+                      </span>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

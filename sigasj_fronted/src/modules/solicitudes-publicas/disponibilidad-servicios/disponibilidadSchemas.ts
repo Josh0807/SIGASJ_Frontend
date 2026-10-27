@@ -1,5 +1,10 @@
 import { z } from 'zod'
 import {
+  CEDULA_FISICA_DIGITOS,
+  TELEFONO_CR_DIGITOS,
+  mensajeDigitosExactos,
+} from '../identificacionCostaRica'
+import {
   requiereAlgunPlanoAdjunto,
   tiposEstrictosDisponibilidad,
   type DocumentoAdjunto,
@@ -101,6 +106,22 @@ export const disponibilidadSolicitanteSchema = z
           })
         }
       }
+      const idMsg = mensajeDigitosExactos(
+        data.identificacionFisica,
+        CEDULA_FISICA_DIGITOS,
+        'cédula',
+      )
+      if (idMsg) {
+        ctx.addIssue({ code: 'custom', path: ['identificacionFisica'], message: idMsg })
+      }
+      const telMsg = mensajeDigitosExactos(
+        data.telefonoFisica,
+        TELEFONO_CR_DIGITOS,
+        'teléfono',
+      )
+      if (telMsg) {
+        ctx.addIssue({ code: 'custom', path: ['telefonoFisica'], message: telMsg })
+      }
     }
 
     if (data.tipoPersona === 'Persona jurídica') {
@@ -130,6 +151,30 @@ export const disponibilidadSolicitanteSchema = z
             message: `No puede superar ${max} caracteres.`,
           })
         }
+      }
+      const idRepMsg = mensajeDigitosExactos(
+        data.identificacionRepresentante,
+        CEDULA_FISICA_DIGITOS,
+        'cédula',
+      )
+      if (idRepMsg) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['identificacionRepresentante'],
+          message: idRepMsg,
+        })
+      }
+      const telRepMsg = mensajeDigitosExactos(
+        data.telefonoRepresentante,
+        TELEFONO_CR_DIGITOS,
+        'teléfono',
+      )
+      if (telRepMsg) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['telefonoRepresentante'],
+          message: telRepMsg,
+        })
       }
     }
   })

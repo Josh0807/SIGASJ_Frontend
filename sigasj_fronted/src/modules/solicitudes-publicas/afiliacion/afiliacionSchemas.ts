@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  cedulaFisicaSchema,
+  telefonoCostaRicaSchema,
+} from '../identificacionCostaRica'
 
 const requiredLimitedText = (label: string, max: number) =>
   z
@@ -19,10 +23,10 @@ export const afiliacionPersonalesSchema = z.object({
     .min(1, 'La fecha de solicitud es obligatoria.')
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ingresa una fecha válida (AAAA-MM-DD).'),
   nombre: requiredLimitedText('el nombre completo', 150),
-  identificacion: requiredLimitedText('la identificación', 30),
+  identificacion: cedulaFisicaSchema('la identificación'),
   vecinoDe: requiredLimitedText('el vecino de / lugar de residencia', 200),
   estadoCivil: requiredLimitedText('el estado civil', 40),
-  telefono: requiredLimitedText('el teléfono', 30),
+  telefono: telefonoCostaRicaSchema('el teléfono'),
   correoElectronico: z
     .string()
     .trim()
@@ -44,9 +48,8 @@ export const afiliacionRecomendacion1Schema = z.object({
     'el nombre del recomendante 1',
     150,
   ),
-  recomendacion1Identificacion: requiredLimitedText(
+  recomendacion1Identificacion: cedulaFisicaSchema(
     'la identificación del recomendante 1',
-    30,
   ),
   recomendacion1NumeroAbonado: requiredLimitedText(
     'el número de abonado del recomendante 1',
@@ -60,9 +63,8 @@ export const afiliacionRecomendacion2Schema = z.object({
     'el nombre del recomendante 2',
     150,
   ),
-  recomendacion2Identificacion: requiredLimitedText(
+  recomendacion2Identificacion: cedulaFisicaSchema(
     'la identificación del recomendante 2',
-    30,
   ),
   recomendacion2NumeroAbonado: requiredLimitedText(
     'el número de abonado del recomendante 2',

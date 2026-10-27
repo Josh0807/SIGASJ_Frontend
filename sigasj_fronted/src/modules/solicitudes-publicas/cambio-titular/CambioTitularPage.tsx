@@ -11,6 +11,12 @@ import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import DocumentRequirements from '../DocumentRequirements'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import {
+  CEDULA_FISICA_MAX_LENGTH,
+  TELEFONO_CR_MAX_LENGTH,
+  limitarCedulaFisica,
+  limitarTelefonoCr,
+} from '../identificacionCostaRica'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import {
   getCambioTitularErrorMessage,
@@ -85,7 +91,12 @@ const TextField = ({
     <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
       {label}{' '}
       {required ? (
-        <span className="sr-only">obligatorio</span>
+        <>
+          <span className="text-rose-600" aria-hidden="true">
+            *
+          </span>
+          <span className="sr-only">obligatorio</span>
+        </>
       ) : (
         <span className="font-medium text-[#607a98]">(opcional)</span>
       )}
@@ -156,7 +167,12 @@ const SelectField = <T extends string>({
     <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
       {label}{' '}
       {required ? (
-        <span className="sr-only">obligatorio</span>
+        <>
+          <span className="text-rose-600" aria-hidden="true">
+            *
+          </span>
+          <span className="sr-only">obligatorio</span>
+        </>
       ) : (
         <span className="font-medium text-[#607a98]">(opcional)</span>
       )}
@@ -219,19 +235,22 @@ const CambioTitularPage = () => {
         name="identificacionSolicitante"
         label="Identificación del solicitante"
         value={values.identificacionSolicitante}
-        maxLength={30}
+        maxLength={CEDULA_FISICA_MAX_LENGTH}
         placeholder="Ej. 1-1234-0567"
-        hint="Cédula, DIMEX u otro documento. Se conservan guiones y ceros."
-        onChange={(value) => update('identificacionSolicitante', value)}
+        hint="Cédula física: máximo 9 dígitos (puede usar guiones)."
+        onChange={(value) =>
+          update('identificacionSolicitante', limitarCedulaFisica(value))
+        }
       />
       <TextField
         name="telefono"
         label="Teléfono de contacto"
         type="tel"
         value={values.telefono}
-        maxLength={30}
+        maxLength={TELEFONO_CR_MAX_LENGTH}
         placeholder="Ej. 8888-1234"
-        onChange={(value) => update('telefono', value)}
+        hint="Exactamente 8 dígitos."
+        onChange={(value) => update('telefono', limitarTelefonoCr(value))}
       />
       <label className="grid gap-2 font-bold text-[#173f6e]">
         Fecha de solicitud
@@ -262,8 +281,12 @@ const CambioTitularPage = () => {
         name="identificacionPropietario"
         label="Identificación del propietario registral"
         value={values.identificacionPropietario}
-        maxLength={30}
-        onChange={(value) => update('identificacionPropietario', value)}
+        maxLength={CEDULA_FISICA_MAX_LENGTH}
+        placeholder="Ej. 1-1234-0567"
+        hint="Cédula física: máximo 9 dígitos."
+        onChange={(value) =>
+          update('identificacionPropietario', limitarCedulaFisica(value))
+        }
       />
       <TextField
         name="folioReal"

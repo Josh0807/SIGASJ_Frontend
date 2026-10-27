@@ -10,6 +10,12 @@ import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsad
 import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import {
+  CEDULA_FISICA_MAX_LENGTH,
+  TELEFONO_CR_MAX_LENGTH,
+  limitarCedulaFisica,
+  limitarTelefonoCr,
+} from '../identificacionCostaRica'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import DisponibilidadDocumentUpload from './DisponibilidadDocumentUpload'
 import type { DocumentoAdjunto } from './documentoAdjunto'
@@ -116,7 +122,12 @@ const TextField = ({
     <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
       {label}{' '}
       {required ? (
-        <span className="sr-only">obligatorio</span>
+        <>
+          <span className="text-rose-600" aria-hidden="true">
+            *
+          </span>
+          <span className="sr-only">obligatorio</span>
+        </>
       ) : (
         <span className="font-medium text-[#607a98]">(opcional)</span>
       )}
@@ -161,7 +172,12 @@ const TextAreaField = ({
     <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
       {label}{' '}
       {required ? (
-        <span className="sr-only">obligatorio</span>
+        <>
+          <span className="text-rose-600" aria-hidden="true">
+            *
+          </span>
+          <span className="sr-only">obligatorio</span>
+        </>
       ) : (
         <span className="font-medium text-[#607a98]">(opcional)</span>
       )}
@@ -205,7 +221,12 @@ const SelectField = <T extends string>({
     <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
       {label}{' '}
       {required ? (
-        <span className="sr-only">obligatorio</span>
+        <>
+          <span className="text-rose-600" aria-hidden="true">
+            *
+          </span>
+          <span className="sr-only">obligatorio</span>
+        </>
       ) : (
         <span className="font-medium text-[#607a98]">(opcional)</span>
       )}
@@ -445,19 +466,24 @@ const DisponibilidadPage = () => {
             name="identificacionFisica"
             label="Identificación"
             value={values.identificacionFisica}
-            maxLength={30}
+            maxLength={CEDULA_FISICA_MAX_LENGTH}
             placeholder="Ej. 1-1234-0567"
-            hint="Se conservan guiones y ceros iniciales."
-            onChange={(value) => update('identificacionFisica', value)}
+            hint="Cédula física: máximo 9 dígitos."
+            onChange={(value) =>
+              update('identificacionFisica', limitarCedulaFisica(value))
+            }
           />
           <TextField
             name="telefonoFisica"
             label="Teléfono"
             type="tel"
             value={values.telefonoFisica}
-            maxLength={30}
+            maxLength={TELEFONO_CR_MAX_LENGTH}
             placeholder="Ej. 8888-1234"
-            onChange={(value) => update('telefonoFisica', value)}
+            hint="Exactamente 8 dígitos."
+            onChange={(value) =>
+              update('telefonoFisica', limitarTelefonoCr(value))
+            }
           />
         </>
       ) : null}
@@ -491,16 +517,24 @@ const DisponibilidadPage = () => {
             name="identificacionRepresentante"
             label="Identificación del representante"
             value={values.identificacionRepresentante}
-            maxLength={30}
-            onChange={(value) => update('identificacionRepresentante', value)}
+            maxLength={CEDULA_FISICA_MAX_LENGTH}
+            placeholder="Ej. 1-1234-0567"
+            hint="Cédula física: máximo 9 dígitos."
+            onChange={(value) =>
+              update('identificacionRepresentante', limitarCedulaFisica(value))
+            }
           />
           <TextField
             name="telefonoRepresentante"
             label="Teléfono del representante"
             type="tel"
             value={values.telefonoRepresentante}
-            maxLength={30}
-            onChange={(value) => update('telefonoRepresentante', value)}
+            maxLength={TELEFONO_CR_MAX_LENGTH}
+            placeholder="Ej. 8888-1234"
+            hint="Exactamente 8 dígitos."
+            onChange={(value) =>
+              update('telefonoRepresentante', limitarTelefonoCr(value))
+            }
           />
         </>
       ) : null}

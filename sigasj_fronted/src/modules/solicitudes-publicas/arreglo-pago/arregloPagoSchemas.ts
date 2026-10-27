@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  cedulaFisicaSchema,
+  telefonoCostaRicaSchema,
+} from '../identificacionCostaRica'
 import { PLAZOS_ARREGLO_PAGO } from './types'
 
 const requiredLimitedText = (label: string, max: number) =>
@@ -6,9 +10,9 @@ const requiredLimitedText = (label: string, max: number) =>
 
 export const arregloPagoApplicantSchema = z.object({
   nombre: requiredLimitedText('el nombre completo', 150),
-  cedula: requiredLimitedText('la cédula o identificación', 30),
+  cedula: cedulaFisicaSchema('la cédula o identificación'),
   vecinoDe: requiredLimitedText('la dirección o lugar de residencia', 200),
-  telefono: requiredLimitedText('el teléfono de contacto', 30),
+  telefono: telefonoCostaRicaSchema('el teléfono de contacto'),
 })
 
 export const arregloPagoServiceSchema = z.object({

@@ -76,6 +76,13 @@ export default function MaterialForm({
       ? [currentProveedor, ...proveedores.data]
       : proveedores.data
 
+  const categoriaSeleccionada = categoryOptions.find(
+    (item) => String(item.id) === values.categoriaId,
+  )
+  const requiereVencimientoPorCategoria = Boolean(
+    categoriaSeleccionada?.requiereFechaVencimiento,
+  )
+
   const update = (field: keyof MaterialFormValues, value: string | boolean) => {
     setValues((current) => {
       const next = { ...current, [field]: value }
@@ -99,7 +106,14 @@ export default function MaterialForm({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (submitting.current) return
-    const nextErrors = validateMaterial(values)
+    const payload: MaterialFormValues = {
+      ...values,
+      requiereFechaVencimiento: requiereVencimientoPorCategoria,
+      fechaVencimiento: requiereVencimientoPorCategoria
+        ? values.fechaVencimiento
+        : '',
+    }
+    const nextErrors = validateMaterial(payload)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) {
       setSubmitError('Revise los campos señalados.')
@@ -110,7 +124,7 @@ export default function MaterialForm({
     setSaving(true)
     setSubmitError(null)
     try {
-      await onSubmit(values)
+      await onSubmit(payload)
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'No fue posible guardar el material.')
     } finally {
@@ -255,35 +269,57 @@ export default function MaterialForm({
             ))}
           </select>,
         )}
-        <label className="materials-admin__form-full !flex !cursor-pointer !items-center !gap-3 !rounded-xl !border !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-sm !font-semibold !text-slate-700 hover:!bg-slate-100 dark:!border-slate-700 dark:!bg-slate-800 dark:!text-slate-200">
-          <input
-            type="checkbox"
-            checked={values.requiereFechaVencimiento}
-            onChange={(e) => {
-              const checked = e.target.checked
-              update('requiereFechaVencimiento', checked)
-              if (!checked) update('fechaVencimiento', '')
-            }}
-            className="!size-4 !accent-indigo-600"
-          />
-          Este material requiere fecha de vencimiento (p. ej. insumos químicos)
-        </label>
-        {values.requiereFechaVencimiento &&
-          field(
-            'fechaVencimiento',
-            'Fecha de vencimiento *',
-            <IconCalendarTime size={20} aria-hidden="true" />,
-            <input
-              value={values.fechaVencimiento}
-              type="date"
-              aria-invalid={Boolean(errors.fechaVencimiento)}
-              onChange={(e) => update('fechaVencimiento', e.target.value)}
-            />,
-          )}
+        {values.categoriaId ? (
+          <div
+            className={`materials-admin__form-full rounded-xl border px-4 py-3.5 ${
+              requiereVencimientoPorCategoria
+                ? 'border-amber-200 bg-amber-50'
+                : 'border-slate-200 bg-[#f4f8fc]'
+            }`}
+            role="status"
+          >
+            <p
+              className={`m-0 flex items-start gap-2 text-sm font-bold leading-snug ${
+                requiereVencimientoPorCategoria
+                  ? 'text-amber-950'
+                  : 'text-[#163f6b]'
+              }`}
+            >
+              <IconCalendarTime size={18} aria-hidden="true" className="mt-0.5 shrink-0" />
+              {requiereVencimientoPorCategoria
+                ? 'Esta categoría exige fecha de vencimiento'
+                : 'Esta categoría no usa fecha de vencimiento'}
+            </p>
+            <p
+              className={`mb-0 mt-1.5 text-sm leading-6 ${
+                requiereVencimientoPorCategoria
+                  ? 'text-amber-900/85'
+                  : 'text-[#526d8c]'
+              }`}
+            >
+              {requiereVencimientoPorCategoria
+                ? 'En ASADA caducan o pierden potencia: hipoclorito, cloro, desinfectantes, reactivos de laboratorio y pegamentos/solventes. Indique la fecha del envase.'
+                : 'Tubería PVC, codos, uniones, válvulas, medidores, herramientas y accesorios metálicos no caducan; no se solicita fecha.'}
+            </p>
+          </div>
+        ) : null}
+        {requiereVencimientoPorCategoria
+          ? field(
+              'fechaVencimiento',
+              'Fecha de vencimiento *',
+              <IconCalendarTime size={20} aria-hidden="true" />,
+              <input
+                value={values.fechaVencimiento}
+                type="date"
+                aria-invalid={Boolean(errors.fechaVencimiento)}
+                onChange={(e) => update('fechaVencimiento', e.target.value)}
+              />,
+            )
+          : null}
         <p className="provider-admin__form-note materials-admin__form-full">
           {mode === 'create'
-            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega. Si la categoría exige vencimiento, el campo se marca automáticamente.'
-            : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí.'}
+            ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega. El vencimiento lo define la categoría del material.'
+            : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí. El vencimiento lo define la categoría.'}
         </p>
         {field(
           'proveedorId',

@@ -11,7 +11,7 @@ describe('afiliacionSchemas', () => {
   const personalesValidos = {
     fechaSolicitud: '2026-10-23',
     nombre: 'María Elena Rodríguez Vargas',
-    identificacion: '01-0234-0567',
+    identificacion: '1-0234-0567',
     vecinoDe: 'San Juan, 200 m norte',
     estadoCivil: 'Casado(a)',
     telefono: '8888-1234',

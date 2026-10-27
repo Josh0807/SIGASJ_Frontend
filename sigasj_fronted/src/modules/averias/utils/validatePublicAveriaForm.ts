@@ -1,3 +1,8 @@
+import {
+  CEDULA_FISICA_DIGITOS,
+  TELEFONO_CR_DIGITOS,
+  soloDigitos,
+} from '../../solicitudes-publicas/identificacionCostaRica'
 import type {
   PublicAveriaFormErrors,
   PublicAveriaFormValues,
@@ -13,8 +18,10 @@ export function validatePublicAveriaForm(
   if (!values.identificacionReportante.trim()) {
     errors.identificacionReportante =
       'Ingrese su número de cédula o identificación.'
-  } else if (values.identificacionReportante.trim().length > 50) {
-    errors.identificacionReportante = 'Use un máximo de 50 caracteres.'
+  } else if (
+    soloDigitos(values.identificacionReportante).length !== CEDULA_FISICA_DIGITOS
+  ) {
+    errors.identificacionReportante = `La cédula debe tener exactamente ${CEDULA_FISICA_DIGITOS} dígitos.`
   }
 
   if (!values.nombreReportante.trim()) {
@@ -25,8 +32,10 @@ export function validatePublicAveriaForm(
 
   if (!values.telefonoReportante.trim()) {
     errors.telefonoReportante = 'Ingrese un número telefónico de contacto.'
-  } else if (values.telefonoReportante.trim().length > 50) {
-    errors.telefonoReportante = 'Use un máximo de 50 caracteres.'
+  } else if (
+    soloDigitos(values.telefonoReportante).length !== TELEFONO_CR_DIGITOS
+  ) {
+    errors.telefonoReportante = `El teléfono debe tener exactamente ${TELEFONO_CR_DIGITOS} dígitos.`
   }
 
   const correo = values.correoReportante.trim()
