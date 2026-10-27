@@ -11,9 +11,11 @@ describe('validación de arreglo de pago', () => {
     expect(arregloPagoServiceSchema.safeParse({ numeroCuentaServicio: 'CTA-1', montoPrimaInicial: '-1', plazoSeleccionado: '6 meses' }).success).toBe(false)
   })
 
-  it('respeta obligatoriedad y longitudes máximas del backend', () => {
+  it('respeta obligatoriedad, teléfono de 8 dígitos y cédula de 9', () => {
     expect(arregloPagoApplicantSchema.safeParse({ nombre: '', cedula: '', vecinoDe: '', telefono: '' }).success).toBe(false)
-    expect(arregloPagoApplicantSchema.safeParse({ nombre: 'A'.repeat(151), cedula: '1', vecinoDe: 'San Juan', telefono: '8888-1234' }).success).toBe(false)
+    expect(arregloPagoApplicantSchema.safeParse({ nombre: 'A'.repeat(151), cedula: '1-1234-0567', vecinoDe: 'San Juan', telefono: '8888-1234' }).success).toBe(false)
+    expect(arregloPagoApplicantSchema.safeParse({ nombre: 'Ana Rodríguez', cedula: '1-1234-056', vecinoDe: 'San Juan', telefono: '8888-1234' }).success).toBe(false)
+    expect(arregloPagoApplicantSchema.safeParse({ nombre: 'Ana Rodríguez', cedula: '1-1234-0567', vecinoDe: 'San Juan', telefono: '8888-123' }).success).toBe(false)
     expect(arregloPagoApplicantSchema.safeParse({ nombre: 'Ana Rodríguez', cedula: '1-1234-0567', vecinoDe: 'San Juan', telefono: '8888-1234' }).success).toBe(true)
   })
 

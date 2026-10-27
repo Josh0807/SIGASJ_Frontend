@@ -1,5 +1,9 @@
 import { z } from 'zod'
 import {
+  cedulaFisicaSchema,
+  telefonoCostaRicaSchema,
+} from '../identificacionCostaRica'
+import {
   CALIDADES_TITULAR,
   MEDIOS_NOTIFICACION,
   MOTIVOS,
@@ -16,9 +20,9 @@ export const servicioSolicitanteSchema = z.object({
   nis: required('el NIS', 50),
   propietarioInmueble: required('el propietario del inmueble'),
   nombreSolicitante: required('el nombre del solicitante'),
-  identificacionSolicitante: required('la identificación', 30),
+  identificacionSolicitante: cedulaFisicaSchema('la identificación'),
   correoElectronico: z.string().trim().min(1, 'Ingresa el correo electrónico.').email('Ingresa un correo electrónico válido.').max(150),
-  telefono: required('el teléfono', 30),
+  telefono: telefonoCostaRicaSchema('el teléfono'),
 })
 
 export const servicioInmuebleSchema = z.object({

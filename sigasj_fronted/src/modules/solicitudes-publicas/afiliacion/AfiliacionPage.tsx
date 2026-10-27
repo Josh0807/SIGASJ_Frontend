@@ -12,6 +12,12 @@ import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SignaturePad from '../arreglo-pago/SignaturePad'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import {
+  CEDULA_FISICA_MAX_LENGTH,
+  TELEFONO_CR_MAX_LENGTH,
+  limitarCedulaFisica,
+  limitarTelefonoCr,
+} from '../identificacionCostaRica'
+import {
   getAfiliacionErrorMessage,
   registrarAfiliacion,
 } from './afiliacionApi'
@@ -77,7 +83,12 @@ const TextField = ({
     <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
       {label}{' '}
       {required ? (
-        <span className="sr-only">obligatorio</span>
+        <>
+          <span className="text-rose-600" aria-hidden="true">
+            *
+          </span>
+          <span className="sr-only">obligatorio</span>
+        </>
       ) : (
         <span className="font-medium text-[#607a98]">(opcional)</span>
       )}
@@ -145,10 +156,10 @@ const AfiliacionPage = () => {
         name="identificacion"
         label="Identificación"
         value={values.identificacion}
-        maxLength={30}
+        maxLength={CEDULA_FISICA_MAX_LENGTH}
         placeholder="1-1234-0567"
-        onChange={(value) => update('identificacion', value)}
-        hint="Se conserva como texto (ceros iniciales y guiones)."
+        onChange={(value) => update('identificacion', limitarCedulaFisica(value))}
+        hint="Cédula física: máximo 9 dígitos (puede usar guiones)."
       />
       <TextField
         name="estadoCivil"
@@ -163,8 +174,10 @@ const AfiliacionPage = () => {
         label="Teléfono"
         type="tel"
         value={values.telefono}
-        maxLength={30}
-        onChange={(value) => update('telefono', value)}
+        maxLength={TELEFONO_CR_MAX_LENGTH}
+        placeholder="8888-1234"
+        onChange={(value) => update('telefono', limitarTelefonoCr(value))}
+        hint="Exactamente 8 dígitos."
       />
       <TextField
         name="correoElectronico"
@@ -235,8 +248,10 @@ const AfiliacionPage = () => {
           name="recomendacion1Identificacion"
           label="Identificación del recomendante 1"
           value={values.recomendacion1Identificacion}
-          maxLength={30}
-          onChange={(value) => update('recomendacion1Identificacion', value)}
+          maxLength={CEDULA_FISICA_MAX_LENGTH}
+          onChange={(value) =>
+            update('recomendacion1Identificacion', limitarCedulaFisica(value))
+          }
         />
         <TextField
           name="recomendacion1NumeroAbonado"
@@ -274,8 +289,10 @@ const AfiliacionPage = () => {
           name="recomendacion2Identificacion"
           label="Identificación del recomendante 2"
           value={values.recomendacion2Identificacion}
-          maxLength={30}
-          onChange={(value) => update('recomendacion2Identificacion', value)}
+          maxLength={CEDULA_FISICA_MAX_LENGTH}
+          onChange={(value) =>
+            update('recomendacion2Identificacion', limitarCedulaFisica(value))
+          }
         />
         <TextField
           name="recomendacion2NumeroAbonado"

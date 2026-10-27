@@ -156,9 +156,15 @@ export default function CategoriaForm({
               <IconCalendarTime size={18} aria-hidden="true" />
               Requiere fecha de vencimiento
             </span>
-            <small className="text-slate-500">
-              Actívelo solo para insumos que caducan (químicos, cloro,
-              reactivos). Tubería PVC, válvulas y herramientas no lo necesitan.
+            <small className="leading-relaxed text-slate-600">
+              <strong className="font-semibold text-[#163f6b]">Sí (se vencen):</strong>{' '}
+              hipoclorito de sodio/calcio, cloro, desinfectantes, reactivos de
+              laboratorio y pegamentos o solventes PVC.
+              <br />
+              <strong className="font-semibold text-[#163f6b]">No:</strong> tubería
+              y accesorios PVC, válvulas, medidores, uniones, codos y
+              herramientas. En ASADA el hipoclorito es inestable y debe
+              controlarse por fecha del fabricante.
             </small>
           </span>
         </label>

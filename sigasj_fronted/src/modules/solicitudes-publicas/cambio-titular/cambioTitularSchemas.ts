@@ -1,5 +1,9 @@
 import { z } from 'zod'
 import {
+  cedulaFisicaSchema,
+  telefonoCostaRicaSchema,
+} from '../identificacionCostaRica'
+import {
   CALIDADES_TITULAR,
   MEDIOS_NOTIFICACION,
   NATURALEZAS_INMUEBLE,
@@ -26,11 +30,10 @@ const optionalLimitedText = (label: string, max: number) =>
 
 export const cambioTitularSolicitanteSchema = z.object({
   nombreSolicitante: requiredLimitedText('el nombre completo del solicitante', 150),
-  identificacionSolicitante: requiredLimitedText(
+  identificacionSolicitante: cedulaFisicaSchema(
     'la identificación del solicitante',
-    30,
   ),
-  telefono: requiredLimitedText('el teléfono de contacto', 30),
+  telefono: telefonoCostaRicaSchema('el teléfono de contacto'),
 })
 
 export const cambioTitularPropietarioInmuebleSchema = z.object({
@@ -38,9 +41,8 @@ export const cambioTitularPropietarioInmuebleSchema = z.object({
     'el nombre del propietario registral',
     150,
   ),
-  identificacionPropietario: requiredLimitedText(
+  identificacionPropietario: cedulaFisicaSchema(
     'la identificación del propietario',
-    30,
   ),
   folioReal: optionalLimitedText('el folio real', 50),
   planoCatastrado: optionalLimitedText('el plano catastrado', 50),

@@ -12,6 +12,14 @@ import {
 } from '../types/publicAveriaForm'
 import { parsePublicAveriaSubmitError } from '../utils/parsePublicAveriaSubmitError'
 import { toCreatePublicAveriaPayload } from '../utils/toCreatePublicAveriaPayload'
+import {
+  CEDULA_FISICA_DIGITOS,
+  CEDULA_FISICA_MAX_LENGTH,
+  TELEFONO_CR_MAX_LENGTH,
+  limitarCedulaFisica,
+  limitarTelefonoCr,
+  soloDigitos,
+} from '../../solicitudes-publicas/identificacionCostaRica'
 import { validatePublicAveriaForm } from '../utils/validatePublicAveriaForm'
 
 const fieldId = (prefix: string, name: string) => `${prefix}-${name}`
@@ -42,7 +50,13 @@ export default function ReportarAveriaForm() {
   }, [])
 
   const update = (name: keyof PublicAveriaFormValues, value: string) => {
-    setValues((current) => ({ ...current, [name]: value }))
+    const nextValue =
+      name === 'identificacionReportante'
+        ? limitarCedulaFisica(value)
+        : name === 'telefonoReportante'
+          ? limitarTelefonoCr(value)
+          : value
+    setValues((current) => ({ ...current, [name]: nextValue }))
     setErrors((current) => ({ ...current, [name]: undefined }))
     if (name === 'identificacionReportante') {
       setCedulaMensaje(null)
@@ -50,11 +64,11 @@ export default function ReportarAveriaForm() {
         window.clearTimeout(cedulaTimerRef.current)
         cedulaTimerRef.current = null
       }
-      const digitos = value.replace(/\D/g, '')
-      // Al completar una cédula válida se consulta sola, sin esperar a salir del campo.
-      if (digitos.length >= 9 && digitos.length <= 12) {
+      const digitos = soloDigitos(nextValue)
+      // Al completar una cédula de 9 dígitos se consulta sola.
+      if (digitos.length === CEDULA_FISICA_DIGITOS) {
         cedulaTimerRef.current = window.setTimeout(() => {
-          void consultarIdentificacion(value)
+          void consultarIdentificacion(nextValue)
         }, 600)
       }
     }
@@ -271,7 +285,8 @@ export default function ReportarAveriaForm() {
                 name="identificacionReportante"
                 type="text"
                 inputMode="text"
-                maxLength={50}
+                maxLength={CEDULA_FISICA_MAX_LENGTH}
+                placeholder="1-2345-6789"
                 required
                 aria-required="true"
                 aria-invalid={Boolean(errors.identificacionReportante)}
@@ -340,7 +355,8 @@ export default function ReportarAveriaForm() {
                 name="telefonoReportante"
                 type="tel"
                 autoComplete="tel"
-                maxLength={50}
+                maxLength={TELEFONO_CR_MAX_LENGTH}
+                placeholder="8888-8888"
                 required
                 aria-required="true"
                 aria-invalid={Boolean(errors.telefonoReportante)}
@@ -358,7 +374,7 @@ export default function ReportarAveriaForm() {
                 </small>
               ) : (
                 <small id={`${fieldId(idPrefix, 'telefonoReportante')}-help`} className="public-averia-form__help">
-                  Ingrese un número donde podamos contactarle.
+                  Exactamente 8 dígitos (ej. 8888-8888).
                 </small>
               )}
             </div>

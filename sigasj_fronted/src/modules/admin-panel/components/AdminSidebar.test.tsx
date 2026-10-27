@@ -77,6 +77,34 @@ describe('AdminSidebar', () => {
     expect(collapsedMarkup).not.toContain('id="admin-solicitudes-submenu"')
   })
 
+  it('agrupa permisos y vacaciones del fontanero en un submenú sin enlaces sueltos', () => {
+    const fontaneroItems = [
+      { path: '/admin/dashboard', title: 'Dashboard', icon: 'dashboard' as const },
+      { path: '/fontanero/solicitar-permiso', title: 'Solicitar permiso', icon: 'rrhh' as const },
+      {
+        path: '/fontanero/solicitar-vacaciones',
+        title: 'Solicitar vacaciones',
+        icon: 'rrhh' as const,
+      },
+      { path: '/fontanero/mis-solicitudes', title: 'Mis solicitudes', icon: 'rrhh' as const },
+      {
+        path: '/fontanero/mi-saldo-vacaciones',
+        title: 'Mi saldo de vacaciones',
+        icon: 'rrhh' as const,
+      },
+    ]
+    const activeMarkup = renderSidebar('/fontanero/mis-solicitudes', fontaneroItems)
+    const collapsedMarkup = renderSidebar('/admin/dashboard', fontaneroItems)
+
+    expect(activeMarkup).toContain('Permisos y vacaciones')
+    expect(activeMarkup).toContain('id="fontanero-ausencias-submenu"')
+    expect(activeMarkup).toContain('href="/fontanero/solicitar-permiso"')
+    expect(activeMarkup).toContain('href="/fontanero/mi-saldo-vacaciones"')
+    expect(activeMarkup).toContain('aria-controls="fontanero-ausencias-submenu"')
+    expect(collapsedMarkup).toContain('aria-expanded="false"')
+    expect(collapsedMarkup).not.toContain('id="fontanero-ausencias-submenu"')
+  })
+
   it('puede recibir un conjunto distinto de opciones segun el usuario', () => {
     const markup = renderSidebar('/', [
       { path: '/admin/dashboard', title: 'Dashboard', icon: 'dashboard' },

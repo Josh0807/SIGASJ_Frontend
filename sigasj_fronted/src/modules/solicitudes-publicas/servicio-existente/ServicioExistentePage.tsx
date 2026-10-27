@@ -10,6 +10,12 @@ import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsad
 import Footer from '../../landing/components/Footer'
 import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import {
+  CEDULA_FISICA_MAX_LENGTH,
+  TELEFONO_CR_MAX_LENGTH,
+  limitarCedulaFisica,
+  limitarTelefonoCr,
+} from '../identificacionCostaRica'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import ServicioExistenteDocumentUpload from './ServicioExistenteDocumentUpload'
 import { getServicioExistenteErrorMessage, registrarServicioExistente } from './servicioExistenteApi'
@@ -48,14 +54,14 @@ const Field = ({ name, label, value, update, type = 'text', optional = false, mu
 }) => {
   const field = useFormWizardField(name)
   const common = { name, value, maxLength, placeholder, onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => update(event.target.value), className: 'min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 py-3 font-medium text-slate-800 outline-none focus:border-sky-500 focus:ring-3 focus:ring-sky-200', ...field.inputProps }
-  return <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">{label} {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <span className="sr-only">obligatorio</span>}{multiline ? <textarea {...common} rows={4} /> : <input {...common} type={type} />}<FormWizardFieldError name={name} /></label>
+  return <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">{label} {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <><span className="text-rose-600" aria-hidden="true"> *</span><span className="sr-only">obligatorio</span></>}{multiline ? <textarea {...common} rows={4} /> : <input {...common} type={type} />}<FormWizardFieldError name={name} /></label>
 }
 
 const Select = ({ name, label, value, options, update, optional = false }: {
   name: keyof ServicioExistenteFormValues; label: string; value: string; options: readonly string[]; update: (value: string) => void; optional?: boolean
 }) => {
   const field = useFormWizardField(name)
-  return <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">{label} {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <span className="sr-only">obligatorio</span>}<select className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none focus:border-sky-500 focus:ring-3 focus:ring-sky-200" name={name} value={value} onChange={(event) => update(event.target.value)} {...field.inputProps}><option value="">Seleccione una opción…</option>{options.map((option) => <option key={option}>{option}</option>)}</select><FormWizardFieldError name={name} /></label>
+  return <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">{label} {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <><span className="text-rose-600" aria-hidden="true"> *</span><span className="sr-only">obligatorio</span></>}<select className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none focus:border-sky-500 focus:ring-3 focus:ring-sky-200" name={name} value={value} onChange={(event) => update(event.target.value)} {...field.inputProps}><option value="">Seleccione una opción…</option>{options.map((option) => <option key={option}>{option}</option>)}</select><FormWizardFieldError name={name} /></label>
 }
 
 const ServicioExistentePage = () => {
@@ -78,7 +84,29 @@ const ServicioExistentePage = () => {
     catch (error) { setSubmitError(getServicioExistenteErrorMessage(error)) }
   }
 
-  const field = (name: keyof ServicioExistenteFormValues, label: string, options: Partial<React.ComponentProps<typeof Field>> = {}) => <Field name={name} label={label} value={String(values[name])} update={(value) => update(name, value as never)} {...options} />
+  const field = (
+    name: keyof ServicioExistenteFormValues,
+    label: string,
+    options: Partial<React.ComponentProps<typeof Field>> = {},
+  ) => (
+    <Field
+      name={name}
+      label={label}
+      value={String(values[name])}
+      update={(value) => {
+        if (name === 'identificacionSolicitante') {
+          update(name, limitarCedulaFisica(value) as never)
+          return
+        }
+        if (name === 'telefono') {
+          update(name, limitarTelefonoCr(value) as never)
+          return
+        }
+        update(name, value as never)
+      }}
+      {...options}
+    />
+  )
   const select = (name: keyof ServicioExistenteFormValues, label: string, options: readonly string[], optional = false) => <Select name={name} label={label} value={String(values[name])} options={options} optional={optional} update={(value) => update(name, value as never)} />
 
   const review = <FormReview sections={[
@@ -106,7 +134,7 @@ const ServicioExistentePage = () => {
   ]} documentsStepIndex={5} documents={values.documentos.filter((document) => document.estado === 'cargado').map((document) => ({ id: String(document.id ?? document.localId), name: document.nombreOriginal, size: document.tamanio, type: document.tipoArchivo }))} />
 
   const steps = [
-    { id: 'servicio-solicitante', title: 'Servicio y solicitante', description: 'Datos del servicio, propietario y persona solicitante.', content: <div className="grid grid-cols-2 gap-5 max-[680px]:grid-cols-1">{select('tipoServicio', 'Tipo de servicio', TIPOS_SERVICIO)}{field('nis', 'NIS', { maxLength: 50 })}{field('propietarioInmueble', 'Propietario del inmueble')}{field('nombreSolicitante', 'Nombre completo del solicitante')}{field('identificacionSolicitante', 'Número de identificación', { maxLength: 30 })}{field('correoElectronico', 'Correo electrónico', { type: 'email' })}{field('telefono', 'Teléfono', { type: 'tel', maxLength: 30 })}</div>, validation: { schema: servicioSolicitanteSchema, getValues: () => values } },
+    { id: 'servicio-solicitante', title: 'Servicio y solicitante', description: 'Datos del servicio, propietario y persona solicitante.', content: <div className="grid grid-cols-2 gap-5 max-[680px]:grid-cols-1">{select('tipoServicio', 'Tipo de servicio', TIPOS_SERVICIO)}{field('nis', 'NIS', { maxLength: 50 })}{field('propietarioInmueble', 'Propietario del inmueble')}{field('nombreSolicitante', 'Nombre completo del solicitante')}{field('identificacionSolicitante', 'Número de identificación', { maxLength: CEDULA_FISICA_MAX_LENGTH, placeholder: 'Ej. 1-2345-6789' })}{field('correoElectronico', 'Correo electrónico', { type: 'email' })}{field('telefono', 'Teléfono', { type: 'tel', maxLength: TELEFONO_CR_MAX_LENGTH, placeholder: 'Ej. 8888-1234' })}</div>, validation: { schema: servicioSolicitanteSchema, getValues: () => values } },
     { id: 'inmueble', title: 'Datos del inmueble', description: 'Condición del inmueble y referencias registrales.', content: <div className="grid grid-cols-2 gap-5 max-[680px]:grid-cols-1">{select('naturalezaInmueble', 'Naturaleza del inmueble', NATURALEZAS_INMUEBLE)}{select('calidadTitular', 'Calidad del titular', CALIDADES_TITULAR)}{field('folioReal', 'Folio real', { optional: true, maxLength: 50 })}{field('planoCatastrado', 'Plano catastrado', { optional: true, maxLength: 50 })}{field('planoAgrimensura', 'Plano de agrimensura', { optional: true, maxLength: 50 })}</div>, validation: { schema: servicioInmuebleSchema, getValues: () => values } },
     { id: 'ubicacion', title: 'Ubicación', description: 'Localización exacta de la propiedad.', content: <div className="grid grid-cols-2 gap-5 max-[680px]:grid-cols-1">{field('provincia', 'Provincia', { maxLength: 80 })}{field('canton', 'Cantón', { maxLength: 80 })}{field('distrito', 'Distrito', { maxLength: 80 })}<div className="col-span-2 max-[680px]:col-span-1">{field('direccionExacta', 'Dirección exacta', { multiline: true, maxLength: 500 })}</div></div>, validation: { schema: servicioUbicacionSchema, getValues: () => values } },
     { id: 'motivo', title: 'Motivo y trámite', description: 'Indica para qué se requiere la constancia y el trámite específico.', content: <div className="grid gap-5">{select('motivo', 'Motivo de la constancia', MOTIVOS)}{values.motivo === 'Otro' ? field('otroMotivo', 'Especifique el motivo', { maxLength: 300 }) : null}{field('tramitePorRealizar', 'Trámite por realizar', { multiline: true, maxLength: 1000, placeholder: 'Ej.: tipo de remodelación, construcción o trámite bancario…' })}</div>, validation: { schema: servicioMotivoSchema, getValues: () => values } },
