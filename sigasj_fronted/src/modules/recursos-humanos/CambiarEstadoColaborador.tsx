@@ -50,22 +50,22 @@ export default function CambiarEstadoColaborador({
   const Icono = inactivar ? IconUserOff : IconUserCheck
   const etiqueta = inactivar ? 'Inactivar' : 'Activar'
   const tono = inactivar
-    ? 'border-red-200 text-red-700 hover:border-red-400 hover:bg-red-50'
-    : 'border-emerald-200 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-50'
+    ? 'border-rose-200 bg-gradient-to-br from-white to-rose-50 text-rose-700 shadow-[0_5px_14px_rgba(225,29,72,0.1)] hover:border-rose-400 hover:from-rose-50 hover:to-red-100 hover:text-rose-800 hover:shadow-[0_9px_20px_rgba(225,29,72,0.2)]'
+    : 'border-emerald-200 bg-gradient-to-br from-white to-emerald-50 text-emerald-700 shadow-[0_5px_14px_rgba(5,150,105,0.1)] hover:border-emerald-400 hover:from-emerald-50 hover:to-teal-100 hover:text-emerald-800 hover:shadow-[0_9px_20px_rgba(5,150,105,0.2)]'
 
   return (
     <>
       <button
         ref={botonRef}
         type="button"
-        className={`inline-flex items-center justify-center gap-1.5 rounded-xl border bg-white font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60 ${compacto ? 'min-h-9 px-3 py-1.5 text-sm' : 'min-h-12 px-5 py-3'} ${tono}`}
+        className={`group inline-flex items-center justify-center gap-2 rounded-xl border font-extrabold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:transform-none disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none ${compacto ? 'min-h-10 px-4 py-2 text-sm' : 'min-h-12 rounded-2xl px-5 py-3'} ${tono}`}
         onClick={() => {
           if (!enviando.current) setAbierto(true)
         }}
         disabled={guardando}
         aria-label={`${etiqueta} a ${nombre}`}
       >
-        <Icono size={compacto ? 16 : 19} aria-hidden="true" />
+        <Icono className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={compacto ? 17 : 20} aria-hidden="true" />
         {guardando ? 'Guardando…' : etiqueta}
       </button>
       <ConfirmDialog

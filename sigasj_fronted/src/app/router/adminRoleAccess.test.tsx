@@ -49,7 +49,20 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
       try {
         expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
         const links = sidebarLinks(app.container.innerHTML)
-        expect(links).toEqual([...EXPECTED_NAV_PATHS[rol]])
+        const expectedVisibleLinks = rol === 'Fontanero'
+          ? [
+              '/admin/dashboard',
+              '/admin/inventario',
+              '/admin/actividades',
+              '/fontanero/averias',
+            ]
+          : [...EXPECTED_NAV_PATHS[rol]]
+        expect(links).toEqual(expectedVisibleLinks)
+        if (rol === 'Administradora') {
+          expect(links).toContain('/admin/solicitudes')
+        } else {
+          expect(links).not.toContain('/admin/solicitudes')
+        }
         if (rol === 'Administradora' || rol === 'Secretaria') {
           expect(links).toContain('/admin/abonados')
         } else {

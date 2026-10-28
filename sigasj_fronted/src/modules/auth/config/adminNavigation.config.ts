@@ -116,11 +116,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'solicitudes',
     title: 'Gestión de solicitudes',
-    allowedRoles: [
-      InternalAdminRoleName.Administradora,
-      InternalAdminRoleName.Secretaria,
-      InternalAdminRoleName.Fontanero,
-    ],
+    allowedRoles: [InternalAdminRoleName.Administradora],
     requiredPermissions: [],
     availableInNav: true,
   },

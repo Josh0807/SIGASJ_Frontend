@@ -215,9 +215,9 @@ export default function ColaboradorHistorialPage() {
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       <Link
         to={idValido ? colaboradorDetailPath(colaboradorId) : RRHH_PATH}
-        className="inline-flex w-fit items-center gap-2 font-bold text-blue-700 no-underline hover:underline"
+        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
       >
-        <IconArrowLeft size={18} aria-hidden="true" />
+        <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
         {idValido ? 'Volver al colaborador' : `Volver a ${RRHH_TITLE}`}
       </Link>
 
