@@ -37,8 +37,9 @@ describe('adminNavigation.config', () => {
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
   })
 
-  it('restringe usuarios, reportes, proyectos y actividades-fontanero a Administradora', () => {
+  it('restringe usuarios, solicitudes, reportes, proyectos y actividades-fontanero a Administradora', () => {
     const usuarios = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'usuarios')
+    const solicitudes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'solicitudes')
     const reportes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'reportes')
     const proyectos = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'proyectos')
     const actividadesAdmin = ADMIN_MODULE_ACCESS.find(
@@ -46,6 +47,7 @@ describe('adminNavigation.config', () => {
     )
 
     expect(usuarios?.allowedRoles).toEqual(['Administradora'])
+    expect(solicitudes?.allowedRoles).toEqual(['Administradora'])
     expect(reportes?.allowedRoles).toEqual(['Administradora'])
     expect(proyectos?.allowedRoles).toEqual(['Administradora'])
     expect(proyectos?.requiredPermissions).toEqual(['projects.manage'])

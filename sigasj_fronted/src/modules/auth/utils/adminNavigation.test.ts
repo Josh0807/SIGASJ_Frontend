@@ -80,12 +80,11 @@ describe('adminNavigation helpers', () => {
     expect(canAccessAdminRoute(secretaria, '/admin/rrhh')).toBe(true)
   })
 
-  it('Fontanero solo ve dashboard e inventario operativo, no el listado admin de averías', () => {
+  it('Fontanero ve solo sus módulos operativos, no solicitudes ni el listado admin de averías', () => {
     const items = getAdminNavItemsForUser(fontanero)
     expect(items.map((item) => item.path)).toEqual([
       '/admin/dashboard',
       '/admin/inventario',
-      '/admin/solicitudes',
       '/admin/actividades',
       '/fontanero/averias',
       '/fontanero/solicitar-permiso',
@@ -93,6 +92,7 @@ describe('adminNavigation helpers', () => {
       '/fontanero/mis-solicitudes',
       '/fontanero/mi-saldo-vacaciones',
     ])
+    expect(canAccessAdminRoute(fontanero, '/admin/solicitudes')).toBe(false)
     expect(canAccessAdminRoute(fontanero, '/admin/averias')).toBe(false)
     expect(canAccessAdminRoute(fontanero, '/fontanero/averias')).toBe(true)
     expect(canAccessAdminRoute(fontanero, '/fontanero/averias/25')).toBe(true)

@@ -107,9 +107,9 @@ describe('Recursos Humanos: colaboradores', () => {
     expect(fila?.textContent).toContain('Fontanero')
     expect(fila?.textContent).toContain('Activo')
     expect(byText(fila!, 'a', 'Ver')?.getAttribute('href')).toBe('/admin/rrhh/1')
-    expect(byText(fila!, 'a', 'Historial')?.getAttribute('href')).toBe(
-      '/admin/rrhh/1/historial',
-    )
+    expect(byText(fila!, 'a', 'Historial')).toBeUndefined()
+    expect(byText(fila!, 'a', 'Editar')).toBeUndefined()
+    expect(byText(fila!, 'button', 'Inactivar')).toBeDefined()
     await view.cleanup()
   })
 

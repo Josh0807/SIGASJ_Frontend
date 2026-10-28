@@ -54,11 +54,10 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/transparencia')
   })
 
-  it('Fontanero accede a operaciones propias, inventario y solicitudes', () => {
+  it('Fontanero accede a operaciones propias e inventario, pero no a gestión de solicitudes', () => {
     expect(EXPECTED_NAV_PATHS.Fontanero).toEqual([
       '/admin/dashboard',
       '/admin/inventario',
-      '/admin/solicitudes',
       '/admin/actividades',
       '/fontanero/averias',
       '/fontanero/solicitar-permiso',
@@ -66,6 +65,12 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/fontanero/mis-solicitudes',
       '/fontanero/mi-saldo-vacaciones',
     ])
+    expect(EXPECTED_NAV_PATHS.Fontanero).not.toContain('/admin/solicitudes')
+    expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/solicitudes')
+    expect(EXPECTED_NAV_PATHS.Administradora).toContain('/admin/solicitudes')
+    expect(
+      canAccessAdminRoute(userFor('Fontanero'), '/admin/solicitudes'),
+    ).toBe(false)
     expect(EXPECTED_NAV_PATHS.Administradora).not.toContain(
       '/fontanero/mi-saldo-vacaciones',
     )

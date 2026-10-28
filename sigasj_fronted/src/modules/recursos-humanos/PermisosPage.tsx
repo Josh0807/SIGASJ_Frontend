@@ -1,4 +1,5 @@
 import {
+  IconArrowLeft,
   IconCalendarOff,
   IconChevronLeft,
   IconChevronRight,
@@ -175,15 +176,13 @@ export default function PermisosPage() {
       </header>
 
       {verColaSolicitudes ? (
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 font-semibold text-amber-950">
-          Las solicitudes pendientes del Fontanero no salen aquí.{' '}
-          <Link
-            className="font-extrabold text-blue-800 underline"
-            to={`${SOLICITUDES_AUSENCIA_ADMIN_PATH}?estado=PENDIENTE`}
-          >
-            Ir a solicitudes a revisar
-          </Link>
-        </p>
+        <Link
+          className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
+          to={`${SOLICITUDES_AUSENCIA_ADMIN_PATH}?estado=PENDIENTE`}
+        >
+          <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
+          Volver a solicitudes a revisar
+        </Link>
       ) : null}
 
       {aviso ? (
@@ -319,18 +318,18 @@ export default function PermisosPage() {
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                         <Link
                           to={permisoDetailPath(permiso.id)}
-                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
+                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-[0_5px_14px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500 hover:from-blue-600 hover:to-sky-500 hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(37,99,235,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
                           aria-label={`Ver permiso de ${nombre}`}
                         >
-                          <IconEye size={16} aria-hidden="true" />
+                          <IconEye className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
                           Ver
                         </Link>
                         <Link
                           to={permisoEditPath(permiso.id)}
-                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 px-4 py-2 text-sm font-extrabold text-white no-underline shadow-[0_8px_18px_rgba(37,99,235,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-800 hover:to-sky-600 hover:text-white hover:no-underline hover:shadow-[0_11px_24px_rgba(37,99,235,0.32)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
                           aria-label={`Editar permiso de ${nombre}`}
                         >
-                          <IconPencil size={16} aria-hidden="true" />
+                          <IconPencil className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
                           Editar
                         </Link>
                       </div>
@@ -344,7 +343,7 @@ export default function PermisosPage() {
 
         {!error && total > 0 ? (
           <nav
-            className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
+            className="flex flex-col items-center justify-between gap-3 border-t border-sky-100 bg-slate-50/60 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
             aria-label="Paginación de permisos"
           >
             <p className="m-0">
@@ -353,7 +352,7 @@ export default function PermisosPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
@@ -365,7 +364,7 @@ export default function PermisosPage() {
               </span>
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >

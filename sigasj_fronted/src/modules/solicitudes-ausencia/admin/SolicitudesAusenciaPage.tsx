@@ -24,7 +24,7 @@ import type {
   TipoSolicitudAusencia,
 } from '../types'
 const accionListadoClassName =
-  'group inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/80 px-3.5 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-none transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 hover:shadow-[0_7px_16px_rgba(37,99,235,0.14)] motion-reduce:transform-none motion-reduce:transition-none'
+  'group inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-[0_5px_14px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500 hover:from-blue-600 hover:to-sky-500 hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(37,99,235,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none'
 
 type Carga = {
   clave: string
@@ -217,7 +217,7 @@ export default function SolicitudesAusenciaPage() {
                     size={17}
                     aria-hidden="true"
                   />
-                  {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver detalle'}
+                  {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver'}
                 </Link>
               </li>
             ))}
@@ -270,7 +270,7 @@ export default function SolicitudesAusenciaPage() {
                           size={17}
                           aria-hidden="true"
                         />
-                        {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver detalle'}
+                        {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver'}
                       </Link>
                     </td>
                   </tr>
