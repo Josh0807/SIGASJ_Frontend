@@ -90,12 +90,15 @@ const LoginPage = () => {
       const raw = err instanceof Error ? err.message : ''
       const isNetworkFailure =
         /failed to fetch|networkerror|load failed/i.test(raw)
+      const offlineMessage = import.meta.env.DEV
+        ? 'No fue posible conectar con el servidor. Confirme que el backend esté en http://localhost:3000.'
+        : 'No fue posible conectar con el servidor. Intente de nuevo en unos minutos.'
       setError(
         isNetworkFailure
-          ? 'No fue posible conectar con el servidor. Confirme que el backend esté en http://localhost:3000.'
+          ? offlineMessage
           : raw
             ? `No fue posible iniciar sesión: ${raw.replace(/^HTTP \d+: /, '')}`
-            : 'No fue posible iniciar sesión. Verifique que el backend esté en http://localhost:3000.',
+            : offlineMessage,
       )
     } finally {
       submittingRef.current = false

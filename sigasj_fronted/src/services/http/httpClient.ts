@@ -1,14 +1,15 @@
 import { getAccessToken } from '../../modules/auth/utils/authStorage'
+import { requireProductionApiBaseUrl } from './apiBaseUrl'
 
 /**
  * En Vite (dev) usa el proxy same-origin `/api` → localhost:3000.
- * Evita "Failed to fetch" al abrir el front por IP de red o por IPv6 localhost.
+ * En producción usa VITE_API_URL (HTTPS de Render), sin caer a localhost.
  */
 const getApiBaseUrl = (): string => {
   if (import.meta.env.DEV) {
     return '/api/v1'
   }
-  return import.meta.env?.VITE_API_URL?.trim() || 'http://localhost:3000/api/v1'
+  return requireProductionApiBaseUrl(import.meta.env.VITE_API_URL)
 }
 
 
