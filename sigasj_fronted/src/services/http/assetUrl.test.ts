@@ -4,6 +4,12 @@ import { getBackendOrigin, resolveBackendAssetUrl } from './assetUrl'
 describe('resolveBackendAssetUrl', () => {
   afterEach(() => vi.unstubAllEnvs())
 
+  it('deriva el origen desde el host de Render cuando VITE_API_URL no trae /api/v1', () => {
+    vi.stubEnv('VITE_API_URL', 'https://sigasj-api.onrender.com')
+    vi.stubEnv('VITE_BACKEND_URL', '')
+    expect(getBackendOrigin()).toBe('https://sigasj-api.onrender.com')
+  })
+
   it('deriva el origen desde VITE_API_URL sin conservar /api/v1', () => {
     vi.stubEnv('VITE_API_URL', 'http://localhost:3000/api/v1')
     vi.stubEnv('VITE_BACKEND_URL', '')
