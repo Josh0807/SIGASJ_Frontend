@@ -1,29 +1,35 @@
-import { type FormEvent, useRef, useState } from 'react'
+import { type FormEvent, useId, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { IconEye, IconEyeOff } from '@tabler/icons-react'
+import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
+import { LANDING_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../components/AuthContext'
-import { fetchWithAuth } from '../../../services/http/httpClient'
+import { loginWithCredentials } from '../services/authApi'
+import {
+  GENERIC_LOGIN_ERROR_MESSAGE,
+  mapLoginErrorMessage,
+} from '../services/loginErrors'
+import {
+  buildAuthSessionFromLoginResponse,
+  LoginResponseSecurityError,
+} from '../services/loginSession'
 import { resolvePostLoginAdminPath } from '../utils/adminNavigation'
 import {
-  INTERNAL_ADMIN_ROLES,
-  InternalAdminRoleName,
-  normalizeInternalRole,
-  type InternalAdminRole,
-} from '../utils/internalRoles'
+  validateLoginForm,
+  type LoginFieldErrors,
+} from './loginSchema'
 
-type AuthLoginResponse = {
-  accessToken: string
-  user: { id: string | number; email: string; role: string; name?: string }
-}
-
-/** Correos alineados con las cuentas de desarrollo del backend (login por rol, sin contraseña en local). */
-const DEV_LOGIN_EMAIL: Record<InternalAdminRole, string> = {
-  Administradora: 'admin@asadasanjuan.cr',
-  Secretaria: 'secretaria@asadasanjuan.cr',
-  Fontanero: 'fontanero@asadasanjuan.cr',
-}
-
-/** El backend en desarrollo ignora la contraseña; el DTO aún exige un string mínimo. */
-const DEV_LOGIN_PASSWORD_PLACEHOLDER = 'dev-login'
+const AuthPageBrand = () => (
+  <div className="auth-page__brand">
+    <span className="auth-page__brand-logo">
+      <img src={asadaLogo} alt="" />
+    </span>
+    <span className="auth-page__brand-text">
+      <strong>SIGASJ</strong>
+      <span>ASADA San Juan</span>
+    </span>
+  </div>
+)
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -31,30 +37,16 @@ const LoginPage = () => {
   const { login } = useAuth()
   const loginState = location.state as { from?: string; message?: string } | null
   const redirectTo = loginState?.from ?? undefined
+  const emailErrorId = useId()
+  const passwordErrorId = useId()
 
-  const [selectedRole, setSelectedRole] = useState<InternalAdminRole>(
-    InternalAdminRoleName.Administradora,
-  )
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const submittingRef = useRef(false)
-
-  const completeLogin = (
-    accessToken: string,
-    role: string,
-    id: string,
-    userEmail?: string,
-    name?: string,
-  ) => {
-    const user = {
-      id,
-      role,
-      email: userEmail,
-      name: name?.trim() || 'Usuario',
-    }
-    login({ accessToken, user })
-    navigate(resolvePostLoginAdminPath(user, redirectTo), { replace: true })
-  }
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -63,43 +55,31 @@ const LoginPage = () => {
     }
 
     setError(null)
+
+    const validation = validateLoginForm({ email, password })
+    if (!validation.success) {
+      setFieldErrors(validation.errors)
+      return
+    }
+
+    setFieldErrors({})
     submittingRef.current = true
     setLoading(true)
 
     try {
-      const payload = await fetchWithAuth<AuthLoginResponse>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({
-          email: DEV_LOGIN_EMAIL[selectedRole],
-          password: DEV_LOGIN_PASSWORD_PLACEHOLDER,
-        }),
+      const payload = await loginWithCredentials(validation.data)
+      const session = buildAuthSessionFromLoginResponse(payload)
+      login(session)
+      navigate(resolvePostLoginAdminPath(session.user, redirectTo), {
+        replace: true,
       })
-
-      if (!payload.accessToken) {
-        throw new Error('El servidor no devolvió un token de acceso.')
-      }
-
-      completeLogin(
-        payload.accessToken,
-        normalizeInternalRole(payload.user.role) ?? selectedRole,
-        String(payload.user.id),
-        payload.user.email,
-        payload.user.name,
-      )
     } catch (err) {
-      const raw = err instanceof Error ? err.message : ''
-      const isNetworkFailure =
-        /failed to fetch|networkerror|load failed/i.test(raw)
-      const offlineMessage = import.meta.env.DEV
-        ? 'No fue posible conectar con el servidor. Confirme que el backend esté en http://localhost:3000.'
-        : 'No fue posible conectar con el servidor. Intente de nuevo en unos minutos.'
-      setError(
-        isNetworkFailure
-          ? offlineMessage
-          : raw
-            ? `No fue posible iniciar sesión: ${raw.replace(/^HTTP \d+: /, '')}`
-            : offlineMessage,
-      )
+      if (err instanceof LoginResponseSecurityError) {
+        setError(GENERIC_LOGIN_ERROR_MESSAGE)
+      } else {
+        const raw = err instanceof Error ? err.message : ''
+        setError(mapLoginErrorMessage(raw))
+      }
     } finally {
       submittingRef.current = false
       setLoading(false)
@@ -107,41 +87,114 @@ const LoginPage = () => {
   }
 
   return (
-    <main className="auth-page w-full min-w-0">
+    <main className="auth-page w-full min-w-0" aria-labelledby="login-title">
       <div className="auth-page__card w-full max-w-md">
-        <h1>Iniciar sesión</h1>
+        <AuthPageBrand />
+        <h1 id="login-title">Iniciar sesión</h1>
         <p className="auth-page__hint">
-          Acceso administrativo de SIGASJ. Selecciona un rol interno; el
-          backend emite un token JWT de ese rol para consultar y guardar el
-          contenido de la landing.
+          Ingresa tus credenciales para acceder al sistema.
         </p>
-        {loginState?.message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 font-semibold text-amber-900" role="status">{loginState.message}</p> : null}
-
-        <form className="auth-page__form" onSubmit={onSubmit}>
-          <label className="auth-page__field" htmlFor="login-role">
-            Rol interno
-          </label>
-          <select
-            id="login-role"
-            className="auth-page__select"
-            value={selectedRole}
-            onChange={(event) =>
-              setSelectedRole(event.target.value as InternalAdminRole)
-            }
+        {loginState?.message ? (
+          <p
+            className="rounded-xl border border-amber-200 bg-amber-50 p-3 font-semibold text-amber-900"
+            role="status"
           >
-            {INTERNAL_ADMIN_ROLES.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
+            {loginState.message}
+          </p>
+        ) : null}
+
+        <form className="auth-page__form" onSubmit={onSubmit} noValidate>
+          <label className="auth-page__field" htmlFor="login-email">
+            Correo electrónico
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              placeholder="nombre@ejemplo.com"
+              value={email}
+              onChange={(event) => {
+                setEmail(event.target.value)
+                if (fieldErrors.email) {
+                  setFieldErrors((current) => ({ ...current, email: undefined }))
+                }
+              }}
+              aria-invalid={fieldErrors.email ? true : undefined}
+              aria-describedby={fieldErrors.email ? emailErrorId : undefined}
+              disabled={loading}
+            />
+            {fieldErrors.email ? (
+              <span id={emailErrorId} className="auth-page__field-error" role="alert">
+                {fieldErrors.email}
+              </span>
+            ) : null}
+          </label>
+
+          <label className="auth-page__field" htmlFor="login-password">
+            Contraseña
+            <span className="auth-page__password-wrap">
+              <input
+                id="login-password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value)
+                  if (fieldErrors.password) {
+                    setFieldErrors((current) => ({
+                      ...current,
+                      password: undefined,
+                    }))
+                  }
+                }}
+                aria-invalid={fieldErrors.password ? true : undefined}
+                aria-describedby={
+                  fieldErrors.password ? passwordErrorId : undefined
+                }
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="auth-page__password-toggle"
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={
+                  showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                }
+                aria-pressed={showPassword}
+              >
+                {showPassword ? (
+                  <IconEyeOff size={20} aria-hidden="true" />
+                ) : (
+                  <IconEye size={20} aria-hidden="true" />
+                )}
+              </button>
+            </span>
+            {fieldErrors.password ? (
+              <span
+                id={passwordErrorId}
+                className="auth-page__field-error"
+                role="alert"
+              >
+                {fieldErrors.password}
+              </span>
+            ) : null}
+          </label>
+
+          {/*
+            BLOCKED — recuperación pendiente.
+            No existe ruta pública de recuperación/reset en el router actual.
+            No se deja enlace muerto (href="#").
+          */}
 
           <button
             type="submit"
             className="auth-page__submit"
             disabled={loading}
           >
-            {loading ? 'Conectando…' : `Entrar como ${selectedRole.toLowerCase()}`}
+            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
         </form>
 
@@ -151,8 +204,8 @@ const LoginPage = () => {
           </p>
         ) : null}
 
-        <Link className="auth-page__back" to="/">
-          Volver a la página principal
+        <Link className="auth-page__back" to={LANDING_ROUTE_PATH}>
+          Volver al inicio
         </Link>
       </div>
     </main>

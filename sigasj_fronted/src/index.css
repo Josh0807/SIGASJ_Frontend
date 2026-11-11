@@ -4899,7 +4899,8 @@ button.material-tracking__detail-link { border: 0; background: transparent; font
   font-weight: 600;
 }
 
-.auth-page__select {
+.auth-page__select,
+.auth-page__form input {
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid #c5d9ea;
@@ -4907,6 +4908,51 @@ button.material-tracking__detail-link { border: 0; background: transparent; font
   background: white;
   color: #123f70;
   font: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auth-page__password-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.auth-page__password-wrap input {
+  padding-right: 48px;
+}
+
+.auth-page__password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1e5a9c;
+  cursor: pointer;
+}
+
+.auth-page__password-toggle:focus-visible {
+  outline: 2px solid #1e5a9c;
+  outline-offset: 2px;
+}
+
+.auth-page__field-error {
+  color: #9b1c1c;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.auth-page__form input[aria-invalid='true'] {
+  border-color: #d46a64;
+  box-shadow: 0 0 0 3px rgba(169, 64, 58, 0.12);
 }
 
 .auth-page__submit,
@@ -4953,7 +4999,8 @@ a.auth-page__submit {
 
 .auth-page__submit:focus-visible,
 .auth-page__back:focus-visible,
-.auth-page__select:focus-visible {
+.auth-page__select:focus-visible,
+.auth-page__form input:focus-visible {
   outline: 2px solid #1e5a9c;
   outline-offset: 2px;
 }
