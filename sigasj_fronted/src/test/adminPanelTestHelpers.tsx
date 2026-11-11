@@ -68,11 +68,40 @@ export const mountInteractiveApp = async (
   }
 }
 
-export const submitLoginForm = async (container: HTMLElement) => {
+const setControlledInputValue = (element: HTMLInputElement, value: string) => {
+  const prototype = Object.getPrototypeOf(element) as HTMLInputElement
+  Object.getOwnPropertyDescriptor(prototype, 'value')?.set?.call(element, value)
+  element.dispatchEvent(new Event('input', { bubbles: true }))
+  element.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
+export const submitLoginForm = async (
+  container: HTMLElement,
+  credentials: { email?: string; password?: string } = {},
+) => {
   const form = container.querySelector('.auth-page__form') as HTMLFormElement | null
   expect(form).not.toBeNull()
 
+  const emailInput = container.querySelector('#login-email') as HTMLInputElement | null
+  const passwordInput = container.querySelector(
+    '#login-password',
+  ) as HTMLInputElement | null
+  expect(emailInput).not.toBeNull()
+  expect(passwordInput).not.toBeNull()
+
   await act(async () => {
+    if (emailInput) {
+      setControlledInputValue(
+        emailInput,
+        credentials.email ?? 'admin@asadasanjuan.cr',
+      )
+    }
+    if (passwordInput) {
+      setControlledInputValue(
+        passwordInput,
+        credentials.password ?? 'Password123!',
+      )
+    }
     form?.requestSubmit()
     await new Promise((resolve) => setTimeout(resolve, 50))
   })
