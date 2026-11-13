@@ -20,6 +20,7 @@ export type AuthLoginResponse = {
 
 /** Endpoint relativo al API client (`/api/v1` en dev vía proxy). */
 export const AUTH_LOGIN_ENDPOINT = '/auth/login'
+export const AUTH_ME_ENDPOINT = '/auth/me'
 
 /**
  * POST /api/v1/auth/login
@@ -34,5 +35,15 @@ export async function loginWithCredentials(
       email: credentials.email,
       password: credentials.password,
     }),
+  })
+}
+
+/**
+ * GET /api/v1/auth/me
+ * Requiere Authorization Bearer. La identidad sale del JWT, no de query/body.
+ */
+export async function fetchCurrentUser(): Promise<AuthLoginUserDto> {
+  return fetchWithAuth<AuthLoginUserDto>(AUTH_ME_ENDPOINT, {
+    method: 'GET',
   })
 }
