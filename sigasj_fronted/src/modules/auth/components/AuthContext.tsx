@@ -12,7 +12,7 @@ import type { AuthUser } from '../types/authUser'
 import { fetchCurrentUser } from '../services/authApi'
 import { normalizeInternalRole } from '../utils/internalRoles'
 import {
-  clearAccessToken,
+  clearAuthSession,
   getAccessToken,
   getAuthUser,
   isAuthenticated,
@@ -117,9 +117,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const me = await fetchCurrentUser()
         if (cancelled) return
         setAuthUser(mapMeToAuthUser(me))
-      } catch {
+      } catch (error) {
         if (cancelled) return
-        clearAccessToken()
+        const isUnauthorized =
+          error instanceof Error && /^HTTP 401:/.test(error.message)
+        clearAuthSession(isUnauthorized ? 'expired' : undefined)
       } finally {
         if (!cancelled) setIsLoading(false)
       }
@@ -136,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
-    clearAccessToken()
+    clearAuthSession()
     setIsLoading(false)
   }, [])
 

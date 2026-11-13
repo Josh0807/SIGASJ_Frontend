@@ -1,11 +1,12 @@
 import { act, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { AuthProvider } from '../../modules/auth/components/AuthContext'
 import {
   clearAccessToken,
   getAccessToken,
+  getAuthUser,
 } from '../../modules/auth/utils/authStorage'
 import { loginWithAdminSession } from '../../test/authTestHelpers'
 import { canAccessAdminRoute } from '../../modules/auth/utils/adminNavigation'
@@ -13,6 +14,26 @@ import AppRoutes from './AppRoutes'
 import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { ADMIN_BASE_PATH, ADMIN_HOME_PATH, PRIVATE_ROUTE_PATHS } from './privateRoutes'
 import { LOGIN_ROUTE_PATH } from './publicRoutes'
+
+vi.mock('../../modules/auth/services/authApi', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('../../modules/auth/services/authApi')
+  >()
+
+  return {
+    ...actual,
+    fetchCurrentUser: vi.fn(async () => {
+      const user = getAuthUser()
+      if (!user?.id || !user.role) throw new Error('SesiÃ³n de prueba ausente')
+      return {
+        id: user.id,
+        email: user.email ?? 'usuario@asadasanjuan.cr',
+        role: user.role,
+        name: user.name,
+      }
+    }),
+  }
+})
 
 const LocationProbe = ({ onPath }: { onPath: (path: string) => void }) => {
   const location = useLocation()

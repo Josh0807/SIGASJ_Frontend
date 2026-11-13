@@ -1,16 +1,35 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes, createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { AuthProvider } from './AuthContext'
 import ProtectedRoute from './ProtectedRoute'
 import {
   clearAccessToken,
+  getAuthUser,
   setAccessToken,
   setAuthUser,
 } from '../utils/authStorage'
 
 describe('ProtectedRoute', () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          id: '1',
+          email: 'ana@asadasanjuan.cr',
+          role: getAuthUser()?.role ?? 'Administradora',
+          name: getAuthUser()?.name ?? 'Ana',
+        }),
+      })),
+    )
+  })
+
   afterEach(() => {
+    vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
   })
@@ -23,7 +42,8 @@ describe('ProtectedRoute', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/abonados']}>
-          <Routes>
+          <AuthProvider>
+            <Routes>
             <Route
               path="/admin/abonados"
               element={
@@ -33,7 +53,8 @@ describe('ProtectedRoute', () => {
               }
             />
             <Route path="/login" element={<p>Iniciar sesión</p>} />
-          </Routes>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -53,7 +74,8 @@ describe('ProtectedRoute', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/abonados']}>
-          <Routes>
+          <AuthProvider>
+            <Routes>
             <Route
               path="/admin/abonados"
               element={
@@ -63,7 +85,8 @@ describe('ProtectedRoute', () => {
               }
             />
             <Route path="/login" element={<p>Iniciar sesión</p>} />
-          </Routes>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -83,7 +106,8 @@ describe('ProtectedRoute', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
-          <Routes>
+          <AuthProvider>
+            <Routes>
             <Route
               path="/admin/dashboard"
               element={
@@ -93,7 +117,8 @@ describe('ProtectedRoute', () => {
               }
             />
             <Route path="/login" element={<p>Pantalla login</p>} />
-          </Routes>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -119,7 +144,8 @@ describe('ProtectedRoute', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/abonados']}>
-          <Routes>
+          <AuthProvider>
+            <Routes>
             <Route
               path="/admin/abonados"
               element={
@@ -129,7 +155,8 @@ describe('ProtectedRoute', () => {
               }
             />
             <Route path="/login" element={<p>Iniciar sesión</p>} />
-          </Routes>
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -170,7 +197,11 @@ describe('ProtectedRoute', () => {
     const root = createRoot(container)
 
     await act(async () => {
-      root.render(<RouterProvider router={router} />)
+      root.render(
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>,
+      )
     })
 
     expect(router.state.location.pathname).toBe('/login')

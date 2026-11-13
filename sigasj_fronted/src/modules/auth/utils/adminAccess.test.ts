@@ -169,4 +169,28 @@ describe('adminAccess', () => {
       evaluateAdminRouteAccess(true, abonado, '/admin/abonados/11', ABONADOS_ALLOWED_ROLES),
     ).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
   })
+
+  it('una lista de roles vacÃ­a deniega la ruta a cualquier usuario autenticado', () => {
+    expect(
+      evaluateRoleAccess(true, administradora, [], '/feature-10'),
+    ).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
+    expect(
+      evaluateDirectRouteAccess(true, administradora, '/feature-10', []),
+    ).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
+    expect(
+      evaluateAdminRouteAccess(true, administradora, '/admin/abonados', []),
+    ).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
+  })
+
+  it('permite reutilizar roles explÃ­citos en rutas futuras fuera del panel actual', () => {
+    const feature10Roles = ['Auditor'] as const
+    const auditor = { role: 'Auditor', id: '10' }
+
+    expect(
+      evaluateDirectRouteAccess(true, auditor, '/feature-10', feature10Roles),
+    ).toBe('allow')
+    expect(
+      evaluateDirectRouteAccess(true, secretaria, '/feature-10', feature10Roles),
+    ).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
+  })
 })

@@ -45,6 +45,27 @@ describe('buildAuthSessionFromLoginResponse', () => {
     ).toBe('Fontanero')
   })
 
+  it('rechaza roles que ya no forman parte de los usuarios internos', () => {
+    expect(() =>
+      buildAuthSessionFromLoginResponse({
+        accessToken: 'token-legado',
+        user: {
+          id: 4,
+          email: 'persona@test.local',
+          role: 'ABONADO',
+          name: 'Persona',
+        },
+      }),
+    ).toThrow(LoginResponseSecurityError)
+
+    expect(() =>
+      buildAuthSessionFromLoginResponse({
+        accessToken: 'token-desconocido',
+        user: { id: 5, email: 'otro@test.local', role: 'ROL_DESCONOCIDO' },
+      }),
+    ).toThrow(LoginResponseSecurityError)
+  })
+
   it('rechaza respuesta sin accessToken real (no inventa token)', () => {
     expect(() =>
       buildAuthSessionFromLoginResponse({

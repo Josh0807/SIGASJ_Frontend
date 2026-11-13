@@ -16,8 +16,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!isAuthenticated) {
+    const requestedPath = `${location.pathname}${location.search}${location.hash}`
+
     return (
-      <Navigate to={LOGIN_ROUTE_PATH} replace state={{ from: location.pathname }} />
+      <Navigate to={LOGIN_ROUTE_PATH} replace state={{ from: requestedPath }} />
     )
   }
 

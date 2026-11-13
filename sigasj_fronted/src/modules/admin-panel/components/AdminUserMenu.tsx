@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useAdminLogout } from '../../auth/hooks/useAdminLogout'
+import { useLogout } from '../../auth/hooks/useLogout'
 import type { AdminUserMenuProps } from '../props'
 
 export type { AdminUserMenuProps }
@@ -15,7 +15,7 @@ const AdminUserMenu = ({
   userInitials = 'AD',
   variant = 'sidebar',
 }: AdminUserMenuProps) => {
-  const logout = useAdminLogout()
+  const logout = useLogout()
   const [isOpen, setIsOpen] = useState(false)
 
   const handleLogout = () => {

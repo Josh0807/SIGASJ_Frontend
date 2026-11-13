@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
+import { AuthProvider, useAuth } from '../components/AuthContext'
 import { useAdminLogout } from './useAdminLogout'
 import {
   clearAccessToken,
@@ -20,6 +21,16 @@ const LogoutProbe = () => {
     <button type="button" className="logout-probe" onClick={logout}>
       Cerrar sesión
     </button>
+  )
+}
+
+const LoggedOutStateProbe = () => {
+  const { isAuthenticated, user } = useAuth()
+  return (
+    <p>
+      Pantalla login - {isAuthenticated ? 'autenticado' : 'sin sesion'} -
+      {user ? ' con usuario' : ' sin usuario'}
+    </p>
   )
 }
 
@@ -41,10 +52,12 @@ describe('useAdminLogout', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
-          <Routes>
-            <Route path="/admin/dashboard" element={<LogoutProbe />} />
-            <Route path={LOGIN_ROUTE_PATH} element={<p>Pantalla login</p>} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/admin/dashboard" element={<LogoutProbe />} />
+              <Route path={LOGIN_ROUTE_PATH} element={<LoggedOutStateProbe />} />
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
@@ -62,6 +75,7 @@ describe('useAdminLogout', () => {
     expect(localStorage.getItem('sigasj_auth_user')).toBeNull()
     expect(localStorage.getItem('otra-funcionalidad')).toBe('valor-persistente')
     expect(container.textContent).toContain('Pantalla login')
+    expect(container.textContent).toContain('sin sesion - sin usuario')
   })
 
   it('navega a la ruta real de login con replace tras invalidar la sesión', async () => {
@@ -75,10 +89,12 @@ describe('useAdminLogout', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
-          <Routes>
-            <Route path="/admin/dashboard" element={<LogoutProbe />} />
-            <Route path={LOGIN_ROUTE_PATH} element={<p>Pantalla login</p>} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/admin/dashboard" element={<LogoutProbe />} />
+              <Route path={LOGIN_ROUTE_PATH} element={<LoggedOutStateProbe />} />
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })

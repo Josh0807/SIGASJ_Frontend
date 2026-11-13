@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ABONADO_ROLE } from '../../modules/auth/utils/internalRoles'
 import {
   clearAccessToken,
@@ -9,6 +9,26 @@ import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigatio
 import { loginAsRole } from '../../test/authTestHelpers'
 import { mountAppRoutes } from '../../test/render-app-routes'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from './publicRoutes'
+
+vi.mock('../../modules/auth/services/authApi', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('../../modules/auth/services/authApi')
+  >()
+
+  return {
+    ...actual,
+    fetchCurrentUser: vi.fn(async () => {
+      const user = getAuthUser()
+      if (!user?.id || !user.role) throw new Error('SesiÃ³n de prueba ausente')
+      return {
+        id: user.id,
+        email: user.email ?? 'usuario@asadasanjuan.cr',
+        role: user.role,
+        name: user.name,
+      }
+    }),
+  }
+})
 
 const RESTRICTED_ADMIN_PATH = '/admin/abonados'
 
