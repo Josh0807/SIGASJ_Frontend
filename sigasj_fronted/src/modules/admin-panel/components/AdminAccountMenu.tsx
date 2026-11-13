@@ -12,7 +12,7 @@ import {
   ADMIN_PROFILE_PATH,
   ADMIN_PROFILE_TITLE,
 } from '../../../app/router/privateRoutes'
-import { useAdminLogout } from '../../auth/hooks/useAdminLogout'
+import { useLogout } from '../../auth/hooks/useLogout'
 import { ADMIN_ACCOUNT_MENU_PLACEHOLDER_ITEMS } from '../config/adminAccountMenuConfig'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 
@@ -30,7 +30,7 @@ const AdminAccountMenu = ({ triggerContent }: { triggerContent?: ReactNode }) =>
   const [isOpen, setIsOpen] = useState(false)
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const isLogoutConfirmingRef = useRef(false)
-  const logout = useAdminLogout()
+  const logout = useLogout()
 
   const closeMenu = useCallback(() => {
     setIsOpen(false)

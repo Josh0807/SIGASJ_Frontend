@@ -61,6 +61,11 @@ export const buildAuthSessionFromLoginResponse = (
   }
 
   const normalizedRole = normalizeInternalRole(rawRole)
+  if (!normalizedRole) {
+    throw new LoginResponseSecurityError(
+      'La respuesta de login contiene un rol sin acceso al Frontend interno.',
+    )
+  }
 
   return {
     accessToken,
@@ -70,7 +75,7 @@ export const buildAuthSessionFromLoginResponse = (
         typeof payload.user.email === 'string'
           ? payload.user.email.trim()
           : undefined,
-      role: normalizedRole ?? rawRole,
+      role: normalizedRole,
       name:
         typeof payload.user.name === 'string' && payload.user.name.trim()
           ? payload.user.name.trim()

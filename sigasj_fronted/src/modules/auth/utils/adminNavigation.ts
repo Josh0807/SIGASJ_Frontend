@@ -324,7 +324,13 @@ export function resolvePostLoginAdminPath(
     return LANDING_ROUTE_PATH
   }
 
-  if (requestedPath && canAccessAdminRoute(user, requestedPath)) {
+  const requestedPathname = requestedPath?.split(/[?#]/, 1)[0]
+  if (
+    requestedPath &&
+    requestedPathname &&
+    requestedPathname.startsWith('/') &&
+    canAccessAdminRoute(user, requestedPathname)
+  ) {
     return requestedPath
   }
 

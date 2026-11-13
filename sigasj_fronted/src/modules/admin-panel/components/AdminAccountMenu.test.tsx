@@ -790,7 +790,7 @@ describe('AdminAccountMenu', () => {
   it('no manipula la sesión directamente y delega en useAdminLogout', () => {
     const source = AdminAccountMenu.toString()
 
-    expect(source).toContain('useAdminLogout')
+    expect(source).toContain('useLogout')
     expect(source).not.toContain('localStorage')
     expect(source).not.toContain('clearAccessToken')
     expect(source).not.toContain('removeItem')

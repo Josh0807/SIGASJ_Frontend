@@ -1,5 +1,5 @@
 import {
-  clearAccessToken,
+  clearAuthSession,
   getAccessToken,
 } from '../../modules/auth/utils/authStorage'
 import { requireProductionApiBaseUrl } from './apiBaseUrl'
@@ -75,7 +75,7 @@ export async function fetchWithAuth<T>(
   if (!response.ok) {
     const isLoginRequest = endpoint.includes('/auth/login')
     if (response.status === 401 && !isLoginRequest && getAccessToken()?.trim()) {
-      clearAccessToken()
+      clearAuthSession('expired')
     }
 
     const errorBody = await response.text().catch(() => '')

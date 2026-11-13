@@ -9,6 +9,9 @@ export type AuthSession = {
 const TOKEN_STORAGE_KEY = 'sigasj_access_token'
 const USER_STORAGE_KEY = 'sigasj_auth_user'
 
+export type AuthSessionEndReason = 'expired'
+let pendingSessionEndReason: AuthSessionEndReason | null = null
+
 type AuthUserListener = () => void
 const authUserListeners = new Set<AuthUserListener>()
 
@@ -135,11 +138,23 @@ export function setAuthUser(user: AuthUser): void {
   notifyAuthUserChange()
 }
 
-export function clearAccessToken(): void {
+/** Elimina de forma atÃ³mica toda la informaciÃ³n local de autenticaciÃ³n. */
+export function clearAuthSession(reason?: AuthSessionEndReason): void {
+  pendingSessionEndReason = reason ?? null
   localStorage.removeItem(TOKEN_STORAGE_KEY)
   localStorage.removeItem(USER_STORAGE_KEY)
   syncAuthUserCache(null, null)
   notifyAuthUserChange()
+}
+
+/** @deprecated Usa clearAuthSession para expresar que tambiÃ©n elimina el usuario. */
+export const clearAccessToken = clearAuthSession
+
+/** Devuelve el motivo pendiente una sola vez para mostrarlo tras la redirecciÃ³n. */
+export function consumeAuthSessionEndReason(): AuthSessionEndReason | null {
+  const reason = pendingSessionEndReason
+  pendingSessionEndReason = null
+  return reason
 }
 
 export function isAuthenticated(): boolean {
@@ -147,6 +162,7 @@ export function isAuthenticated(): boolean {
 }
 
 export function setAuthSession(session: AuthSession): void {
+  pendingSessionEndReason = null
   setAccessToken(session.accessToken)
   setAuthUser(session.user)
 }
