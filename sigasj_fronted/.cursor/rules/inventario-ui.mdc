@@ -1,0 +1,16 @@
+---
+description: Convenciones UI del módulo inventario
+globs: src/modules/inventario/**/*.{tsx,ts,css}
+alwaysApply: false
+---
+
+# Inventario UI
+
+- Shell: `inventory-module-shell inventory-bodega`.
+- Cabeceras: `PageHeader` o `inv-header inv-card`.
+- Acciones: `Button` de `shared/ui` o `inv-btn`.
+- Empty: `EmptyState` o `inv-empty--hero`.
+- Métricas: `MetricPill` o `inv-status-bar__metric`.
+- Feedback: `Alert` (success/danger/warning).
+- No reescribir reglas de negocio (stock, disponibilidad, roles) al estilizar.
+- Conservar textos de tests existentes cuando se cambie copy visual.

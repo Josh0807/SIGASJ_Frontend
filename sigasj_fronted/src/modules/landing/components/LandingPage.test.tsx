@@ -23,14 +23,14 @@ describe('LandingPage', () => {
   it('carga como contenedor de header, bienvenida, secciones y pie', () => {
     const markup = renderLanding()
 
-    expect(markup).toContain('header__inner')
+    expect(markup).toContain('<header')
     expect(markup).toContain('navbar')
     expect(markup).toContain('Sugerencias y Quejas')
     expect(markup).toContain('href="#quejas"')
     expect(markup).toContain('hero')
     expect(markup).toContain('id="hero-title"')
     expect(markup).toContain('<footer')
-    expect(markup).toContain('footer__content')
+    expect(markup).toContain('Acceso administrativo')
   })
 
   it('muestra las secciones principales en el orden definido', () => {

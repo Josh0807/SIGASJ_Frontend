@@ -16,13 +16,13 @@ const ProfilePage = () => {
   return (
     <main className="admin-surface-page" aria-labelledby="profile-page-title">
       <header className="grid gap-2">
-        <p className="m-0 text-xs font-extrabold uppercase tracking-[0.22em] text-blue-600">
+        <p className="m-0 text-xs font-extrabold uppercase tracking-[0.22em] text-[#1e5a9c]">
           Cuenta administrativa
         </p>
-        <h1 id="profile-page-title" className="m-0 text-3xl font-black tracking-tight text-[#062e63]">
+        <h1 id="profile-page-title" className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c]">
           Mi perfil
         </h1>
-        <p className="m-0 text-slate-500">
+        <p className="m-0 text-[#5b7390]">
           Datos de la sesión actual. La edición de cuenta se gestiona con la Administradora.
         </p>
       </header>
@@ -30,18 +30,18 @@ const ProfilePage = () => {
       <section className="admin-surface-card" aria-label="Datos del perfil">
         <div className="flex items-start gap-4">
           <span
-            className="grid size-14 place-items-center rounded-2xl border border-white/70 bg-linear-to-br from-blue-600 to-cyan-400 text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)]"
+            className="grid size-14 place-items-center rounded-2xl border border-white/70 bg-linear-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]"
             aria-hidden="true"
           >
             <IconUserCircle size={30} />
           </span>
           <div className="min-w-0">
-            <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-blue-600">
+            <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-[#1e5a9c]">
               Usuario en sesión
             </p>
-            <h2 className="m-0 truncate text-2xl font-black text-[#062e63]">{displayName}</h2>
+            <h2 className="m-0 truncate text-2xl font-black text-[#1e5a9c]">{displayName}</h2>
             {!hasNamedIdentity ? (
-              <p className="mb-0 mt-1 text-sm text-slate-500">
+              <p className="mb-0 mt-1 text-sm text-[#5b7390]">
                 Nombre no disponible en el perfil; se muestra el correo o un valor por defecto.
               </p>
             ) : null}

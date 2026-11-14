@@ -304,7 +304,7 @@ const ProyectosAdminForm = ({
                 alt="Portada actual del proyecto"
                 className="proyectos-admin__cover-preview"
               />
-              <span className="proyectos-admin__cover-badge !absolute !inset-auto !left-3 !top-3 !h-auto !min-h-0 !w-auto !max-w-[calc(100%-1.5rem)] !rounded-xl !bg-white/95 !px-3 !py-1.5 !text-xs !font-extrabold !leading-tight !text-blue-700 !shadow-md">
+              <span className="proyectos-admin__cover-badge !absolute !inset-auto !left-3 !top-3 !h-auto !min-h-0 !w-auto !max-w-[calc(100%-1.5rem)] !rounded-xl !bg-white/95 !px-3 !py-1.5 !text-xs !font-extrabold !leading-tight !text-[#1e5a9c] !shadow-md">
                 Portada actual
               </span>
             </div>

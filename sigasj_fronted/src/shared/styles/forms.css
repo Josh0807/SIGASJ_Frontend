@@ -1,14 +1,14 @@
 :root {
-  --form-ice: var(--color-sigasj-ice, #eaf6ff);
-  --form-mist: var(--color-sigasj-mist, #bfe3fa);
-  --form-sky: var(--color-sigasj-sky, #7fc4f2);
-  --form-blue: var(--color-sigasj-blue, #3e8fd6);
-  --form-navy: var(--color-sigasj-navy, #1e5a9c);
-  --form-ink: var(--color-sigasj-ink, #123f70);
-  --form-text: #17324d;
-  --form-muted: #5b7390;
-  --form-danger: #9b1c1c;
-  --form-success: #136734;
+  --form-ice: var(--asada-ice, var(--color-sigasj-ice, #eaf6ff));
+  --form-mist: var(--asada-mist, var(--color-sigasj-mist, #bfe3fa));
+  --form-sky: var(--asada-sky, var(--color-sigasj-sky, #7fc4f2));
+  --form-blue: var(--asada-blue, var(--color-sigasj-blue, #3e8fd6));
+  --form-navy: var(--asada-navy, var(--color-sigasj-navy, #1e5a9c));
+  --form-ink: var(--asada-ink, var(--color-sigasj-ink, #123f70));
+  --form-text: var(--asada-text, #17324d);
+  --form-muted: var(--asada-muted, #5b7390);
+  --form-danger: var(--asada-danger, #9b1c1c);
+  --form-success: var(--asada-success, #136734);
   --form-radius: 12px;
   --form-control-height: 44px;
 }
@@ -61,7 +61,7 @@
 .form-success-result__highlight {
   padding: 14px 16px;
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--asada-surface, #ffffff);
   border: 1px solid #cde6d4;
 }
 
@@ -95,7 +95,7 @@
 .form-success-result__meta-item {
   padding: 10px 12px;
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--asada-surface, #ffffff);
   border: 1px solid #d7e5f1;
 }
 
@@ -135,7 +135,7 @@
   border: 1px solid var(--form-mist);
   border-top: 4px solid var(--form-blue);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--asada-surface, #ffffff);
   box-shadow: 0 8px 20px rgba(30, 90, 156, 0.06);
 }
 
@@ -172,7 +172,7 @@
   min-height: var(--form-control-height);
   border: 1px solid #c7dced;
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--asada-surface, #ffffff);
   color: var(--form-text);
   font: inherit;
 }
@@ -276,7 +276,7 @@
   min-height: var(--form-control-height);
   border-radius: 10px;
   border: 1px solid var(--form-mist);
-  background: #ffffff;
+  background: var(--asada-surface, #ffffff);
   color: var(--form-ink);
   font-weight: 700;
 }
@@ -288,7 +288,7 @@
   padding: 16px 18px;
   border: 1px solid var(--form-mist);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--asada-surface, #ffffff);
 }
 
 .materials-admin__empty,

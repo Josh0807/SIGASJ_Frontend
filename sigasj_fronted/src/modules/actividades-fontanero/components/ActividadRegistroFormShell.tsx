@@ -265,10 +265,10 @@ const ActividadRegistroFormShell = ({
       }`}
       aria-labelledby="actividad-registro-title"
     >
-      <header className="actividades-fontanero-registro__header !block !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+      <header className="actividades-fontanero-registro__header !block !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 space-y-3">
-            <p className="actividades-fontanero-registro__eyebrow !text-sm !font-black !tracking-[0.12em] !text-blue-600">Registro de Actividades</p>
+            <p className="actividades-fontanero-registro__eyebrow !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Registro de Actividades</p>
             <h1 id="actividad-registro-title" className="!text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">
           {isCorregirMode
             ? `Corregir: ${tipo.nombre}`
@@ -284,7 +284,7 @@ const ActividadRegistroFormShell = ({
           </div>
           <Link
             to={backLink.to}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline focus:!no-underline"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-5 py-3 font-bold !no-underline text-[#1e5a9c] shadow-md transition hover:-translate-y-0.5 hover:bg-[#eaf6ff] hover:!no-underline focus:!no-underline"
           >
             <IconArrowLeft size={20} aria-hidden="true" />
             {backLink.label}
@@ -357,13 +357,13 @@ const ActividadRegistroFormShell = ({
       ) : (
         <form
           ref={formRef}
-          className="actividad-registro-form !gap-7 !rounded-[28px] !border-blue-100 !bg-white/90 !p-5 !shadow-[0_14px_38px_rgba(30,90,156,0.08)] md:!p-8"
+          className="actividad-registro-form !gap-7 !rounded-[28px] !border-blue-100 !bg-white/90 !p-5 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)] md:!p-8"
           onSubmit={handleSubmit}
           noValidate
           aria-busy={isSubmitting}
         >
           <div className="border-b border-blue-100 pb-6">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Formulario de registro</p>
+            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Formulario de registro</p>
             <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Datos de {tipo.nombre}</h2>
             <p className="mt-2 text-base leading-relaxed text-slate-500">Complete los datos generales y la información específica de esta actividad.</p>
           </div>
@@ -762,7 +762,7 @@ const ActividadRegistroFormShell = ({
                       ? ACTIVIDADES_FONTANERO_PATHS.misActividades
                       : ACTIVIDADES_FONTANERO_PATHS.nueva
                 }
-                className="actividad-registro-form__button actividad-registro-form__button--secondary !gap-2 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md transition hover:!-translate-y-0.5 hover:!bg-blue-50"
+                className="actividad-registro-form__button actividad-registro-form__button--secondary !gap-2 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md transition hover:!-translate-y-0.5 hover:!bg-[#eaf6ff]"
               >
                 <IconArrowLeft size={20} aria-hidden="true" />
                 {isEditBorrador ? 'Cancelar edición' : 'Cancelar'}

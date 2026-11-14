@@ -44,24 +44,24 @@ export default function RrhhSubnav() {
 
   return (
     <nav
-      className="min-w-0 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-[0_10px_30px_rgba(30,90,156,0.08)] ring-1 ring-sky-100 backdrop-blur-sm"
+      className="min-w-0 rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] p-1.5 shadow-[0_8px_22px_rgba(18,63,112,0.06)]"
       aria-label="Secciones de Recursos Humanos"
     >
-      <div className="flex min-w-0 flex-wrap gap-1.5">
+      <div className="flex min-w-0 flex-wrap gap-1">
         {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.end}
             className={({ isActive }) =>
-              `group inline-flex h-12 min-w-[8.75rem] flex-1 items-center justify-center gap-2 rounded-xl px-3 text-center text-sm font-extrabold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+              `group inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-center text-sm font-bold no-underline transition-[background-color,color,box-shadow,transform] duration-200 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--asada-navy,#1e5a9c)] focus-visible:ring-offset-2 motion-reduce:transition-none ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-[0_8px_20px_rgba(37,99,235,0.24)]'
-                  : 'bg-slate-50/80 text-slate-600 hover:bg-sky-50 hover:text-blue-800 hover:shadow-sm'
+                  ? 'bg-[color:var(--asada-navy,#1e5a9c)] text-white shadow-[0_8px_18px_rgba(30,90,156,0.22)]'
+                  : 'bg-transparent text-[color:var(--asada-muted,#5b7390)] hover:bg-[color:var(--asada-ice,#eaf6ff)] hover:text-[color:var(--asada-ink,#123f70)]'
               }`
             }
           >
-            <item.icon size={18} stroke={1.9} aria-hidden="true" />
+            <item.icon size={17} stroke={1.9} aria-hidden="true" />
             <span className="truncate">{item.label}</span>
           </NavLink>
         ))}

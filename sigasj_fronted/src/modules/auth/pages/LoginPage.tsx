@@ -1,6 +1,6 @@
 import { type FormEvent, useId, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { IconEye, IconEyeOff } from '@tabler/icons-react'
+import { IconArrowLeft, IconEye, IconEyeOff } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import { LANDING_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../components/AuthContext'
@@ -27,13 +27,13 @@ const AuthPageBrand = () => (
     </span>
     <span className="auth-page__brand-text">
       <strong>SIGASJ</strong>
-      <span>ASADA San Juan</span>
+      <span>ASADA San Juan de Santa Cruz</span>
     </span>
   </div>
 )
 
 export const SESSION_EXPIRED_MESSAGE =
-  'Tu sesiÃ³n expirÃ³. Inicia sesiÃ³n nuevamente para continuar.'
+  'Tu sesión expiró. Inicia sesión nuevamente para continuar.'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -109,15 +109,20 @@ const LoginPage = () => {
 
   return (
     <main className="auth-page w-full min-w-0" aria-labelledby="login-title">
+      <div className="auth-page__glow" aria-hidden="true" />
       <div className="auth-page__card w-full max-w-md">
         <AuthPageBrand />
-        <h1 id="login-title">Iniciar sesión</h1>
-        <p className="auth-page__hint">
-          Ingresa tus credenciales para acceder al sistema.
-        </p>
+
+        <header className="auth-page__intro">
+          <h1 id="login-title">Iniciar sesión</h1>
+          <p className="auth-page__hint">
+            Ingresa tus credenciales para acceder al sistema.
+          </p>
+        </header>
+
         {statusMessage ? (
           <p
-            className="rounded-xl border border-amber-200 bg-amber-50 p-3 font-semibold text-amber-900"
+            className="auth-page__notice"
             role="status"
           >
             {statusMessage}
@@ -226,6 +231,7 @@ const LoginPage = () => {
         ) : null}
 
         <Link className="auth-page__back" to={LANDING_ROUTE_PATH}>
+          <IconArrowLeft size={18} stroke={1.9} aria-hidden="true" />
           Volver al inicio
         </Link>
       </div>

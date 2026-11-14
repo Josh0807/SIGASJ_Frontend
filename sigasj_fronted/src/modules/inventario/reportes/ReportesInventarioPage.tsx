@@ -208,7 +208,7 @@ export default function ReportesInventarioPage() {
             </button>
             <button
               type="button"
-              className="group gallery-admin__button gallery-admin__filter-reset !min-h-14 !rounded-2xl !border !border-blue-200 !bg-white/90 !px-7 !text-blue-700 !shadow-[0_8px_20px_rgba(15,71,139,0.10)] backdrop-blur-sm transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.015] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(15,71,139,0.18)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 motion-reduce:transform-none motion-reduce:transition-none"
+              className="group gallery-admin__button gallery-admin__filter-reset !min-h-14 !rounded-2xl !border !border-[#bfe3fa] !bg-white/90 !px-7 !text-[#1e5a9c] !shadow-[0_8px_20px_rgba(15,71,139,0.10)] backdrop-blur-sm transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.015] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(15,71,139,0.18)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 motion-reduce:transform-none motion-reduce:transition-none"
               onClick={handleLimpiar}
               disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
             >
@@ -301,7 +301,7 @@ export default function ReportesInventarioPage() {
                 <IconCategory size={26} />
               </span>
               <div>
-                <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#062e63]" id="reporte-categorias-title">Resumen por categoría</h2>
+                <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#1e5a9c]" id="reporte-categorias-title">Resumen por categoría</h2>
                 <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Distribución de materiales y alertas de existencias por clasificación.</p>
               </div>
             </header>
@@ -336,7 +336,7 @@ export default function ReportesInventarioPage() {
                 <IconCalendarX size={26} />
               </span>
               <div>
-                <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#062e63]" id="reporte-vencimiento-title">Materiales próximos a vencer</h2>
+                <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#1e5a9c]" id="reporte-vencimiento-title">Materiales próximos a vencer</h2>
                 <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Materiales con fecha de vencimiento en los próximos 90 días — revise existencias de químicos.</p>
               </div>
             </header>
@@ -380,11 +380,11 @@ export default function ReportesInventarioPage() {
           <section className="material-tracking !mx-0 !max-w-none space-y-5" aria-labelledby="reporte-movimientos-title">
             <header className="material-tracking__header !items-center !rounded-3xl !border-blue-100 !bg-gradient-to-br !from-white !via-blue-50/70 !to-cyan-50/70 !p-7 !shadow-[0_14px_36px_rgba(18,63,112,0.10)]">
               <div className="flex items-center gap-4">
-                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-600/20" aria-hidden="true">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-lg shadow-blue-600/20" aria-hidden="true">
                   <IconArrowsExchange size={28} />
                 </span>
                 <div>
-                  <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#062e63]" id="reporte-movimientos-title">Movimientos del periodo</h2>
+                  <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#1e5a9c]" id="reporte-movimientos-title">Movimientos del periodo</h2>
                   <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Detalle de entradas y salidas según los filtros aplicados.</p>
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function ReportesInventarioPage() {
                 </thead>
                 <tbody>
                   {reporte.movimientos.map((movimiento) => (
-                  <tr className="group transition-colors duration-200 hover:!bg-blue-50/60" key={movimiento.id}>
+                  <tr className="group transition-colors duration-200 hover:!bg-[#eaf6ff]/60" key={movimiento.id}>
                       <td className="!px-5 !py-4 text-slate-500" data-label="Fecha">{formatMovimientoFecha(movimiento.fechaMovimiento)}</td>
                       <td className="!px-5 !py-4 !font-semibold !text-slate-800" data-label="Material">{getMovimientoMaterialNombre(movimiento)}</td>
                       <td data-label="Tipo">
@@ -412,7 +412,7 @@ export default function ReportesInventarioPage() {
                           {formatMovimientoTipo(movimiento.tipo)}
                         </span>
                       </td>
-                      <td className="!px-5 !py-4 !font-bold !text-blue-700" data-label="Cantidad">{formatMovimientoCantidad(movimiento)}</td>
+                      <td className="!px-5 !py-4 !font-bold !text-[#1e5a9c]" data-label="Cantidad">{formatMovimientoCantidad(movimiento)}</td>
                       <td className="!px-5 !py-4 !text-slate-700" data-label="Responsable">{getMovimientoResponsable(movimiento)}</td>
                     </tr>
                   ))}

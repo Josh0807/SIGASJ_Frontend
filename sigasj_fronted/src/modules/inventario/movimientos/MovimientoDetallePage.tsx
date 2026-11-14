@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  IconArrowLeft,
+  IconArrowDownLeft,
+  IconArrowUpRight,
+  IconRefresh,
+} from '@tabler/icons-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import {
+  Alert,
+  Badge,
+  Button,
+  MetricPill,
+  PageHeader,
+} from '../../../shared/ui'
 import { MOVIMIENTOS_PATH } from '../inventarioPaths'
 import { getMovimientoAdmin } from './movimientosApi'
 import {
@@ -28,30 +40,30 @@ export default function MovimientoDetallePage() {
   useEffect(() => {
     let active = true
     const cancelScheduled = runAfterEffect(() => {
-    if (!Number.isInteger(movimientoId) || movimientoId <= 0) {
-      setError('El movimiento indicado no es válido.')
-      setLoading(false)
-      return
-    }
+      if (!Number.isInteger(movimientoId) || movimientoId <= 0) {
+        setError('El movimiento indicado no es válido.')
+        setLoading(false)
+        return
+      }
 
-    setLoading(true)
-    void getMovimientoAdmin(movimientoId)
-      .then((response) => {
-        if (!active) return
-        setMovimiento(response)
-        setError('')
-      })
-      .catch((requestError) => {
-        if (!active) return
-        if (getHttpErrorStatus(requestError) === 401) {
-          navigate('/login', { replace: true })
-          return
-        }
-        setError(movimientoErrorMessage(requestError))
-      })
-      .finally(() => {
-        if (active) setLoading(false)
-      })
+      setLoading(true)
+      void getMovimientoAdmin(movimientoId)
+        .then((response) => {
+          if (!active) return
+          setMovimiento(response)
+          setError('')
+        })
+        .catch((requestError) => {
+          if (!active) return
+          if (getHttpErrorStatus(requestError) === 401) {
+            navigate('/login', { replace: true })
+            return
+          }
+          setError(movimientoErrorMessage(requestError))
+        })
+        .finally(() => {
+          if (active) setLoading(false)
+        })
     })
 
     return () => {
@@ -65,52 +77,92 @@ export default function MovimientoDetallePage() {
     setReloadKey((value) => value + 1)
   }
 
+  const isEntrada = movimiento?.tipo === 'ENTRADA'
+  const codigo = movimiento
+    ? `MOV-${String(movimiento.id).padStart(5, '0')}`
+    : ''
+
   return (
-    <section className="material-detail !mx-0 !w-full !max-w-none !gap-6" aria-labelledby="movimiento-detalle-title">
-      <header className="material-detail__header !w-full !rounded-3xl !border-sky-100 !bg-white !p-8 !shadow-[0_12px_34px_rgba(30,90,156,0.08)]">
-        <div>
-          <p className="material-request__eyebrow">Inventario · Historial</p>
-          <h1 id="movimiento-detalle-title">Detalle del movimiento</h1>
-          <p>Consulta de solo lectura sobre la operación registrada en bodega.</p>
-        </div>
-        <Link className="material-detail__back group !inline-flex !min-h-12 !items-center !gap-2.5 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MOVIMIENTOS_PATH}>
-          <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
-          Volver al historial
-        </Link>
-      </header>
+    <section
+      className="inv-movimiento-detalle"
+      style={{ display: 'grid', gap: 14 }}
+      aria-labelledby="movimiento-detalle-title"
+    >
+      <PageHeader
+        title={<span id="movimiento-detalle-title">Detalle del movimiento</span>}
+        description="Consulta de solo lectura de la operación registrada en bodega."
+        actions={
+          <Button
+            to={MOVIMIENTOS_PATH}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            Volver al historial
+          </Button>
+        }
+      />
 
       {loading ? (
-        <div className="material-tracking__state" role="status">
-          <span className="material-tracking__spinner" aria-hidden="true" />
+        <div className="inv-state" role="status">
           Cargando detalle…
         </div>
       ) : null}
 
       {!loading && error ? (
-        <div className="material-tracking__state material-tracking__state--error" role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={retry}>
-            <IconRefresh size={16} aria-hidden="true" />
+        <Alert
+          tone="danger"
+          title="No se pudo cargar el movimiento"
+          icon={<IconRefresh size={18} aria-hidden="true" />}
+        >
+          <p className="m-0 mb-3">{error}</p>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={retry}
+            leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+          >
             Reintentar
-          </button>
-        </div>
+          </Button>
+        </Alert>
       ) : null}
 
       {!loading && !error && movimiento ? (
-        <article className="!w-full">
-          <dl className="material-detail__summary !grid !w-full !grid-cols-1 !gap-4 !rounded-3xl !border-blue-100 !bg-linear-to-br !from-white !via-blue-50/25 !to-sky-50/60 !p-7 !shadow-[0_14px_36px_rgba(30,90,156,0.1)] md:!grid-cols-2 xl:!grid-cols-3 [&>div]:!rounded-2xl [&>div]:!border [&>div]:!border-blue-100 [&>div]:!bg-white/90 [&>div]:!p-5 [&>div]:!shadow-[0_6px_16px_rgba(30,90,156,0.06)] [&>div]:!transition-all [&>div]:!duration-300 hover:[&>div]:!-translate-y-0.5 hover:[&>div]:!border-blue-200 hover:[&>div]:!shadow-[0_10px_22px_rgba(30,90,156,0.11)] [&_dt]:!mb-1 [&_dt]:!font-extrabold [&_dt]:!tracking-[0.07em] [&_dt]:!text-slate-500 [&_dd]:!text-lg [&_dd]:!font-extrabold [&_dd]:!text-[#073b73]">
+        <article className="inv-panel" style={{ gap: 16 }}>
+          <div className="inv-move-hero">
+            <div>
+              <p className="inv-move-hero__id">{codigo}</p>
+              <p className="inv-move-hero__meta">
+                {getMovimientoMaterialNombre(movimiento)} ·{' '}
+                {formatMovimientoFecha(movimiento.fechaMovimiento)}
+              </p>
+            </div>
+            <div className="inv-move-hero__stats">
+              <Badge tone={isEntrada ? 'success' : 'danger'}>
+                {isEntrada ? (
+                  <IconArrowDownLeft size={14} aria-hidden="true" />
+                ) : (
+                  <IconArrowUpRight size={14} aria-hidden="true" />
+                )}
+                {formatMovimientoTipo(movimiento.tipo)}
+              </Badge>
+              <MetricPill
+                label="Cantidad"
+                value={movimiento.cantidad}
+                unit={movimiento.material?.unidadMedida?.trim() || undefined}
+                tone={isEntrada ? 'primary' : 'danger'}
+                aria-label={`Cantidad: ${formatMovimientoCantidad(movimiento)}`}
+              />
+            </div>
+          </div>
+
+          <dl className="inv-facts">
             <div>
               <dt>Identificador</dt>
-              <dd>MOV-{String(movimiento.id).padStart(5, '0')}</dd>
+              <dd>{codigo}</dd>
             </div>
             <div>
               <dt>Tipo</dt>
-              <dd>
-                <span className={`material-tracking__badge !inline-flex !items-center !gap-2 !rounded-full !px-3.5 !py-2 !text-sm !font-extrabold !shadow-sm ${movimiento.tipo === 'ENTRADA' ? '!border-emerald-200 !bg-emerald-50 !text-emerald-700' : '!border-rose-200 !bg-rose-50 !text-rose-700'}`} data-status={movimiento.tipo}>
-                  <span className={`size-2 rounded-full ${movimiento.tipo === 'ENTRADA' ? 'bg-emerald-500' : 'bg-rose-500'}`} aria-hidden="true" />
-                  {formatMovimientoTipo(movimiento.tipo)}
-                </span>
-              </dd>
+              <dd>{formatMovimientoTipo(movimiento.tipo)}</dd>
             </div>
             <div>
               <dt>Material</dt>
@@ -138,18 +190,22 @@ export default function MovimientoDetallePage() {
                 <dd>{movimiento.proveedor.nombre}</dd>
               </div>
             ) : null}
-            {movimiento.observacion ? (
-              <div className="material-detail__summary-wide">
-                <dt>Motivo u observación</dt>
-                <dd>{movimiento.observacion}</dd>
-              </div>
-            ) : null}
           </dl>
 
+          <p className="inv-note">
+            <strong>Motivo u observación</strong>
+            {movimiento.observacion?.trim() || 'Sin observación registrada.'}
+          </p>
+
           {movimiento.documentos && movimiento.documentos.length > 0 ? (
-            <section className="material-detail__materials" aria-labelledby="movimiento-documentos-title">
-              <h2 id="movimiento-documentos-title">Documentos de respaldo</h2>
-              <ul>
+            <section aria-labelledby="movimiento-documentos-title">
+              <div className="inv-panel__heading">
+                <div>
+                  <h2 id="movimiento-documentos-title">Documentos de respaldo</h2>
+                  <p>{movimiento.documentos.length} archivo(s)</p>
+                </div>
+              </div>
+              <ul className="inv-moves">
                 {movimiento.documentos.map((documento) => (
                   <li key={documento.id}>{documento.nombreOriginal}</li>
                 ))}

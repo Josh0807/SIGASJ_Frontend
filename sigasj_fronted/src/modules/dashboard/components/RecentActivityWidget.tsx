@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
@@ -15,8 +15,15 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
   const { user } = useAuth()
   const canOpenAdminActividades = canAccessAdminRoute(user, '/admin/actividades-fontanero')
   const canOpenFontaneroActividades = canAccessAdminRoute(user, '/admin/actividades')
+  const canOpenAverias = canAccessAdminRoute(user, '/admin/averias')
   const [activities, setActivities] = useState<ActivityItem[]>(activitiesProp ?? [])
   const [isLoading, setIsLoading] = useState(activitiesProp === undefined)
+  const [isError, setIsError] = useState(false)
+  const [reloadToken, setReloadToken] = useState(0)
+
+  const loadActivities = useCallback(() => {
+    setReloadToken((token) => token + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -24,20 +31,25 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
       if (activitiesProp !== undefined) {
         setActivities(activitiesProp)
         setIsLoading(false)
+        setIsError(false)
         return
       }
 
       setIsLoading(true)
+      setIsError(false)
 
       const scope = canOpenAdminActividades
         ? 'admin'
         : canOpenFontaneroActividades
           ? 'fontanero'
-          : null
+          : canOpenAverias
+            ? 'admin'
+            : null
 
       if (scope === null) {
         setActivities([])
         setIsLoading(false)
+        setIsError(false)
         return
       }
 
@@ -45,11 +57,13 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
         .then((items) => {
           if (!cancelled) {
             setActivities(items)
+            setIsError(false)
           }
         })
         .catch(() => {
           if (!cancelled) {
             setActivities([])
+            setIsError(true)
           }
         })
         .finally(() => {
@@ -63,33 +77,74 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
       cancelled = true
       cancelScheduled()
     }
-  }, [activitiesProp, canOpenAdminActividades, canOpenFontaneroActividades])
+  }, [
+    activitiesProp,
+    canOpenAdminActividades,
+    canOpenFontaneroActividades,
+    canOpenAverias,
+    reloadToken,
+  ])
 
   const footerPath = canOpenAdminActividades
     ? ACTIVIDADES_ADMIN_BASE_PATH
     : canOpenFontaneroActividades
       ? ACTIVIDADES_FONTANERO_BASE_PATH
-      : null
+      : canOpenAverias
+        ? '/admin/averias'
+        : null
+
+  const hasActivityAccess =
+    canOpenAdminActividades || canOpenFontaneroActividades || canOpenAverias
+
+  const footerLabel =
+    canOpenAdminActividades || canOpenFontaneroActividades
+      ? 'Ver bitácora completa →'
+      : 'Ver averías →'
 
   return (
-    <div className="dashboard-widget recent-activity-widget group !overflow-hidden !rounded-[26px] !border-blue-100 !bg-linear-to-br !from-white !via-white !to-blue-50/60 !p-7 !shadow-[0_14px_36px_rgba(15,63,110,0.1)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-200 hover:!shadow-[0_20px_44px_rgba(37,99,235,0.15)] motion-reduce:!transform-none motion-reduce:!transition-none">
+    <div className="dashboard-widget recent-activity-widget">
       <div className="dashboard-widget__header">
         <div className="dashboard-widget__title-group">
-          <span className="dashboard-widget__icon dashboard-widget__icon--activity !grid !size-14 !place-items-center !rounded-2xl !border !border-white/70 !bg-linear-to-br !from-blue-600 !to-cyan-400 !text-white !shadow-[0_10px_22px_rgba(37,99,235,0.28)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-110 motion-reduce:!transform-none" aria-hidden="true">
+          <span
+            className="dashboard-widget__icon dashboard-widget__icon--activity"
+            aria-hidden="true"
+          >
             <AdminNavIcon name="reportes" />
           </span>
           <div>
-            <h3 className="dashboard-widget__title !text-lg !font-extrabold !text-[#062e63]">Bitácora de Actividad</h3>
-            <span className="dashboard-widget__subtitle !text-sm !text-slate-500">Operaciones recientes</span>
+            <h3 className="dashboard-widget__title">Actividad reciente</h3>
           </div>
         </div>
+        {!isLoading && activities.length > 0 ? (
+          <span className="recent-activity-widget__count" aria-live="polite">
+            {activities.length} eventos
+          </span>
+        ) : null}
       </div>
 
       <div className="recent-activity-widget__body">
         {isLoading ? (
-          <p className="recent-activity-widget__empty">Cargando actividad…</p>
+          <p className="recent-activity-widget__empty" role="status">
+            Cargando actividad…
+          </p>
+        ) : isError ? (
+          <div className="dashboard-widget__error" role="alert">
+            <span>No se pudo cargar la actividad reciente.</span>
+            <button type="button" onClick={loadActivities}>
+              Reintentar
+            </button>
+          </div>
+        ) : !hasActivityAccess ? (
+          <p className="recent-activity-widget__empty">
+            No hay bitácora disponible para su rol.
+          </p>
         ) : activities.length === 0 ? (
-          <p className="recent-activity-widget__empty !rounded-[20px] !border !border-dashed !border-blue-200 !bg-linear-to-br !from-blue-50 !to-cyan-50/60 !text-slate-500 !shadow-inner">Sin actividad reciente registrada.</p>
+          <div className="recent-activity-widget__empty recent-activity-widget__empty--rich">
+            <p className="recent-activity-widget__empty-title">Sin eventos todavía</p>
+            <p className="recent-activity-widget__empty-copy">
+              Aquí verá reportes, notificaciones y registros de la bitácora.
+            </p>
+          </div>
         ) : (
           <ul className="recent-activity-widget__timeline">
             {activities.map((item) => (
@@ -110,8 +165,8 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
 
       {footerPath ? (
         <div className="dashboard-widget__footer">
-          <Link to={footerPath} className="dashboard-widget__link !inline-flex !items-center !rounded-xl !px-3 !py-2 !font-extrabold !text-blue-700 !transition-all !duration-300 hover:!translate-x-1 hover:!bg-blue-50 hover:!no-underline motion-reduce:!transform-none motion-reduce:!transition-none">
-            Ver historial completo &rarr;
+          <Link to={footerPath} className="dashboard-widget__link">
+            {footerLabel}
           </Link>
         </div>
       ) : null}

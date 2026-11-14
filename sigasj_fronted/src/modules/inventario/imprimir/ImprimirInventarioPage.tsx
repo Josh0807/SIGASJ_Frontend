@@ -4,16 +4,12 @@ import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import {
   IconAlertTriangle,
   IconCalendar,
-  IconCategory,
-  IconEraser,
-  IconFilter,
   IconPrinter,
   IconPackages,
   IconSearch,
-  IconTruck,
+  IconX,
 } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
-import { InventoryFormField } from '../InventoryFormField'
 import { getMaterialesParaImpresion } from '../materialesApi'
 import type { Material, MaterialesQuery } from '../types'
 import { useCategorias } from '../categorias/useCategorias'
@@ -47,6 +43,35 @@ const formatPrintDate = (value: Date) =>
     timeZone: ZONA_HORARIA_ASADA,
   })
 
+const formatPrecio = (value: number | null | undefined) => {
+  if (value == null) return '—'
+  return `₡${Number(value).toLocaleString('es-CR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`
+}
+
+const formatVencimiento = (iso: string | null | undefined) => {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('es-CR', { timeZone: 'UTC' })
+}
+
+const materialCode = (id: number) => `MAT-${String(id).padStart(3, '0')}`
+
+/** Limpia sufijos de semillas QA (p. ej. "Tubo PVC QA 1794…") para lectura. */
+const displayMaterialName = (nombre: string) =>
+  nombre.replace(/\s+QA\s+\d{8,}$/i, '').replace(/\s+QA$/i, '').trim() || nombre
+
+const displayCategoryName = (nombre: string | null | undefined) => {
+  if (!nombre) return 'Sin categoría'
+  return nombre.replace(/\s+QA\s+\d{8,}$/i, '').trim() || nombre
+}
+
+const displayProviderName = (nombre: string | null | undefined) => {
+  if (!nombre) return 'Sin proveedor'
+  return nombre.replace(/\s+QA\s+\d{8,}$/i, '').trim() || nombre
+}
+
 export default function ImprimirInventarioPage() {
   const [draft, setDraft] = useState<DraftFilters>(EMPTY_DRAFT)
   const [applied, setApplied] = useState<DraftFilters>(EMPTY_DRAFT)
@@ -78,24 +103,26 @@ export default function ImprimirInventarioPage() {
   useEffect(() => {
     let cancelled = false
     const cancelScheduled = runAfterEffect(() => {
-    setLoading(true)
-    setError('')
-    getMaterialesParaImpresion(query)
-      .then((result) => {
-        if (cancelled) return
-        setMaterials(result.data)
-        setTotal(result.total)
-        setTruncated(result.truncated)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setMaterials([])
-        setTotal(0)
-        setError('No fue posible cargar el inventario para imprimir. Intente nuevamente.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+      setLoading(true)
+      setError('')
+      getMaterialesParaImpresion(query)
+        .then((result) => {
+          if (cancelled) return
+          setMaterials(result.data)
+          setTotal(result.total)
+          setTruncated(result.truncated)
+        })
+        .catch(() => {
+          if (cancelled) return
+          setMaterials([])
+          setTotal(0)
+          setError(
+            'No fue posible cargar el inventario para imprimir. Intente nuevamente.',
+          )
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
     })
     return () => {
       cancelled = true
@@ -103,7 +130,9 @@ export default function ImprimirInventarioPage() {
     }
   }, [query])
 
-  const lowStock = materials.filter((item) => item.stockActual <= item.stockMinimo).length
+  const lowStock = materials.filter(
+    (item) => item.stockActual <= item.stockMinimo,
+  ).length
   const hasActiveDraft =
     draft.nombre.trim() !== '' ||
     draft.activo !== '' ||
@@ -130,10 +159,12 @@ export default function ImprimirInventarioPage() {
     window.setTimeout(() => window.print(), 0)
   }
 
-  const categoriaNombre =
-    categoriasResult.data.find((item) => String(item.id) === applied.categoriaId)?.nombre
-  const proveedorNombre =
-    proveedoresResult.data.find((item) => String(item.id) === applied.proveedorId)?.nombre
+  const categoriaNombre = categoriasResult.data.find(
+    (item) => String(item.id) === applied.categoriaId,
+  )?.nombre
+  const proveedorNombre = proveedoresResult.data.find(
+    (item) => String(item.id) === applied.proveedorId,
+  )?.nombre
 
   const filterSummary = [
     applied.nombre.trim() ? `Nombre: ${applied.nombre.trim()}` : null,
@@ -147,53 +178,73 @@ export default function ImprimirInventarioPage() {
   ].filter(Boolean)
 
   return (
-    <main className="gallery-admin inventario-print">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="materials-admin__header inventario-print__controls">
-          <div>
-            <p className="materials-admin__eyebrow">Inventario · Documentos</p>
-            <h1>Imprimir inventario</h1>
-            <p>
-              Genere un listado imprimible de materiales, existencias y ubicación para archivo de la
-              ASADA.
-            </p>
-          </div>
-        </header>
-
-        <form
-          className="materials-admin__filters materials-admin__filters--inventory inventario-print__controls min-[1100px]:!grid-cols-[minmax(280px,1.55fr)_minmax(250px,.8fr)_minmax(280px,1fr)_minmax(300px,1fr)]"
-          aria-label="Filtros del listado a imprimir"
-          onSubmit={handleConsultar}
+    <main className="inventario-print" style={{ display: 'grid', gap: 14 }}>
+      <header className="inv-header inv-card inventario-print__controls">
+        <div>
+          <h1>Imprimir inventario</h1>
+          <p>
+            Genere un listado imprimible de materiales, existencias y ubicación
+            para archivo de la ASADA.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="inv-btn inv-btn--primary inventario-print__action"
+          onClick={handleImprimir}
+          disabled={loading || Boolean(error) || materials.length === 0}
         >
-          <InventoryFormField label="Buscar por nombre" icon={<IconSearch size={20} aria-hidden="true" />}>
+          <IconPrinter size={18} aria-hidden="true" />
+          Imprimir
+        </button>
+      </header>
+
+      <form
+        className="inv-panel inventario-print__controls"
+        aria-label="Filtros del listado a imprimir"
+        onSubmit={handleConsultar}
+      >
+        <div className="inv-filters">
+          <label>
+            Buscar material
             <input
               type="search"
               value={draft.nombre}
               maxLength={150}
               placeholder="Ej. Tubo PVC"
               onChange={(event) =>
-                setDraft((current) => ({ ...current, nombre: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  nombre: event.target.value,
+                }))
               }
             />
-          </InventoryFormField>
-          <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
+          </label>
+          <label>
+            Estado
             <select
               value={draft.activo}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, activo: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  activo: event.target.value,
+                }))
               }
             >
               <option value="">Todos los estados</option>
               <option value="true">Activos</option>
               <option value="false">Inactivos</option>
             </select>
-          </InventoryFormField>
-          <InventoryFormField label="Categoría" icon={<IconCategory size={20} aria-hidden="true" />}>
+          </label>
+          <label>
+            Categoría
             <select
               value={draft.categoriaId}
               disabled={categoriasLoading}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, categoriaId: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  categoriaId: event.target.value,
+                }))
               }
             >
               <option value="">Todas las categorías</option>
@@ -204,13 +255,17 @@ export default function ImprimirInventarioPage() {
                 </option>
               ))}
             </select>
-          </InventoryFormField>
-          <InventoryFormField label="Proveedor" icon={<IconTruck size={20} aria-hidden="true" />}>
+          </label>
+          <label>
+            Proveedor
             <select
               value={draft.proveedorId}
               disabled={proveedoresLoading}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, proveedorId: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  proveedorId: event.target.value,
+                }))
               }
             >
               <option value="">Todos los proveedores</option>
@@ -221,147 +276,212 @@ export default function ImprimirInventarioPage() {
                 </option>
               ))}
             </select>
-          </InventoryFormField>
-          <div className="actividades-admin-reportes__actions !col-span-full !grid !w-full !grid-cols-1 !gap-4 sm:!grid-cols-3 [&>button]:!col-auto [&>button]:!m-0 [&>button]:!inline-flex [&>button]:!w-full [&>button]:!items-center [&>button]:!justify-center [&>button]:!gap-2.5">
-            <button
-              type="submit"
-              className="group relative isolate overflow-hidden gallery-admin__button gallery-admin__button--primary !min-h-14 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-7 !text-white !shadow-[0_10px_24px_rgba(29,78,216,0.28)] transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.03] hover:!shadow-[0_16px_32px_rgba(29,78,216,0.36)] active:translate-y-0 active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none motion-reduce:transform-none motion-reduce:transition-none"
-              disabled={loading}
-            >
-              <span className="absolute inset-0 -translate-x-[140%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[140%] motion-reduce:hidden" aria-hidden="true" />
-              <IconSearch className="relative transition-transform duration-300 group-hover:scale-110" size={20} aria-hidden="true" />
-              <span className="relative">{loading ? 'Consultando…' : 'Consultar'}</span>
-            </button>
-            <button
-              type="button"
-              className="group gallery-admin__button gallery-admin__filter-reset !min-h-14 !rounded-2xl !border !border-blue-200 !bg-white/90 !px-7 !text-blue-700 !shadow-[0_8px_20px_rgba(15,71,139,0.10)] backdrop-blur-sm transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.03] hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(15,71,139,0.18)] active:translate-y-0 active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none motion-reduce:transform-none motion-reduce:transition-none"
-              onClick={handleLimpiar}
-              disabled={loading || (!hasActiveDraft && !hasAppliedFilters)}
-            >
-              <IconEraser className="transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110 motion-reduce:transform-none" size={20} aria-hidden="true" />
-              <span>Limpiar filtros</span>
-            </button>
-            <button
-              type="button"
-              className="group relative isolate overflow-hidden gallery-admin__button gallery-admin__button--primary inventario-print__action !min-h-14 !rounded-2xl !border-0 !bg-gradient-to-r !from-sky-600 !via-blue-600 !to-indigo-700 !px-7 !text-white !shadow-[0_10px_24px_rgba(30,64,175,0.28)] transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.03] hover:!shadow-[0_16px_32px_rgba(30,64,175,0.36)] active:translate-y-0 active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none motion-reduce:transform-none motion-reduce:transition-none"
-              onClick={handleImprimir}
-              disabled={loading || Boolean(error) || materials.length === 0}
-            >
-              <span className="absolute inset-0 -translate-x-[140%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[140%] motion-reduce:hidden" aria-hidden="true" />
-              <IconPrinter className="relative transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transform-none motion-reduce:transition-none" size={20} aria-hidden="true" />
-              <span className="relative">Imprimir</span>
-            </button>
-          </div>
-        </form>
+          </label>
+        </div>
 
-        {error ? (
-          <div className="material-tracking__state material-tracking__state--error" role="alert">
-            <p>{error}</p>
-          </div>
-        ) : null}
+        <div className="inv-panel__toolbar" style={{ marginTop: 4 }}>
+          <button
+            type="submit"
+            className="inv-btn inv-btn--primary"
+            disabled={loading}
+          >
+            <IconSearch size={18} aria-hidden="true" />
+            {loading ? 'Consultando…' : 'Consultar'}
+          </button>
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            onClick={handleLimpiar}
+            disabled={loading || (!hasActiveDraft && !hasAppliedFilters)}
+          >
+            <IconX size={18} aria-hidden="true" />
+            Limpiar filtros
+          </button>
+        </div>
+      </form>
 
-        {!loading && !error && truncated ? (
-          <div className="materials-admin__category-error" role="alert">
-            <IconAlertTriangle size={20} aria-hidden="true" />
-            Se muestran {materials.length} de {total} materiales. El listado está limitado a 5000 registros. Aplique filtros para acotar los resultados antes de imprimir.
-          </div>
-        ) : null}
+      {error ? (
+        <div className="inv-error inventario-print__controls" role="alert">
+          <p>{error}</p>
+          <button
+            type="button"
+            className="inv-btn inv-btn--primary"
+            onClick={() => setApplied((current) => ({ ...current }))}
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : null}
 
-        {loading ? (
-          <div className="materials-admin__state inventario-print__controls" role="status">
-            <span className="materials-admin__spinner" />
-            Cargando inventario…
-          </div>
-        ) : null}
+      {!loading && !error && truncated ? (
+        <div className="inv-error inventario-print__controls" role="alert">
+          <IconAlertTriangle size={18} aria-hidden="true" />
+          Se muestran {materials.length} de {total} materiales (máx. 5000).
+          Aplique filtros para acotar antes de imprimir.
+        </div>
+      ) : null}
 
-        {!loading && !error && materials.length === 0 ? (
-          <div className="materials-admin__empty">
-            <h2>{hasAppliedFilters ? 'No hay coincidencias' : 'Aún no hay materiales'}</h2>
-            <p>
-              {hasAppliedFilters
-                ? 'Ajuste los filtros para generar el listado a imprimir.'
-                : 'Registre materiales en el catálogo para poder imprimir el inventario.'}
-            </p>
-          </div>
-        ) : null}
+      {loading ? (
+        <div
+          className="inv-state inventario-print__controls"
+          role="status"
+        >
+          Cargando inventario…
+        </div>
+      ) : null}
 
-        {!loading && !error && materials.length > 0 ? (
-          <section className="inventario-print__sheet !overflow-hidden !rounded-3xl !border-blue-100 !p-0 !shadow-[0_18px_45px_rgba(18,63,112,0.12)]" aria-label="Vista previa del inventario">
-            <header className="inventario-print__letterhead !mb-0 !gap-5 !border-b-blue-100 !bg-gradient-to-br !from-white !via-blue-50/80 !to-cyan-50/70 !px-7 !py-6">
-              <span className="grid size-20 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-white p-2 shadow-lg shadow-blue-900/10">
-                <img className="!size-full !rounded-xl" src={asadaLogo} alt="" />
-              </span>
-              <div>
-                <p className="!text-xs !font-bold !uppercase !tracking-[0.16em] !text-blue-600">ASADA San Juan</p>
-                <h2 className="!my-1 !text-2xl !font-extrabold !tracking-tight !text-slate-800">Inventario de bodega</h2>
-                <p className="!text-sm !text-slate-600">Listado actualizado de materiales y existencias</p>
+      {!loading && !error && materials.length === 0 ? (
+        <div className="inv-empty">
+          <h2 style={{ margin: '0 0 8px', color: 'var(--inv-ink, #123f70)' }}>
+            {hasAppliedFilters ? 'No hay coincidencias' : 'Aún no hay materiales'}
+          </h2>
+          <p style={{ margin: 0 }}>
+            {hasAppliedFilters
+              ? 'Ajuste los filtros para generar el listado a imprimir.'
+              : 'Registre materiales en el catálogo para poder imprimir el inventario.'}
+          </p>
+        </div>
+      ) : null}
+
+      {!loading && !error && materials.length > 0 ? (
+        <section
+          className="inventario-print__sheet inv-print-sheet"
+          aria-label="Vista previa del inventario"
+        >
+          <header className="inv-print-sheet__top">
+            <div className="inv-print-sheet__brand">
+              <img src={asadaLogo} alt="" className="inv-print-sheet__logo" />
+              <div className="inv-print-sheet__titles">
+                <p className="inv-print-sheet__org">ASADA San Juan</p>
+                <h2>Inventario de bodega</h2>
+                <p className="inv-print-sheet__tag">
+                  Listado de materiales y existencias
+                </p>
               </div>
-            </header>
-            <div className="inventario-print__meta !m-0 grid gap-3 !px-7 !py-5 sm:grid-cols-3">
-              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3">
-                <IconCalendar className="shrink-0 text-blue-600" size={22} aria-hidden="true" />
-                <div><small className="block font-bold uppercase tracking-wide text-slate-500">Generado</small><strong className="text-slate-700">{formatPrintDate(printedAt)}</strong></div>
-              </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50/80 px-4 py-3">
-                <IconPackages className="shrink-0 text-blue-600" size={22} aria-hidden="true" />
-                <div><small className="block font-bold uppercase tracking-wide text-blue-500">Materiales</small><strong className="text-blue-800">{total} registrado{total === 1 ? '' : 's'}</strong></div>
-              </div>
-              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${lowStock > 0 ? 'border-amber-200 bg-amber-50/90' : 'border-emerald-200 bg-emerald-50/80'}`}>
-                <IconAlertTriangle className={`shrink-0 ${lowStock > 0 ? 'text-amber-600' : 'text-emerald-600'}`} size={22} aria-hidden="true" />
+            </div>
+
+            <div className="inv-print-sheet__meta" aria-label="Resumen del listado">
+              <article>
+                <IconCalendar size={16} aria-hidden="true" />
                 <div>
-                  <small className="block font-bold uppercase tracking-wide text-slate-500">Stock bajo</small>
-                  <strong className={lowStock > 0 ? 'text-amber-800' : 'text-emerald-800'}>{lowStock} con stock bajo</strong>
-                  {truncated && <small className="block text-slate-400" style={{ fontSize: '0.7em' }}>Solo en los {materials.length} mostrados</small>}
+                  <small>Generado</small>
+                  <strong>{formatPrintDate(printedAt)}</strong>
                 </div>
-              </div>
-              {filterSummary.length > 0 ? <p className="!m-0 text-sm text-slate-500 sm:col-span-3"><strong>Filtros:</strong> {filterSummary.join(' · ')}</p> : null}
+              </article>
+              <article>
+                <IconPackages size={16} aria-hidden="true" />
+                <div>
+                  <small>Materiales</small>
+                  <strong>
+                    {total} registrado{total === 1 ? '' : 's'}
+                  </strong>
+                </div>
+              </article>
+              <article className={lowStock > 0 ? 'is-warn' : 'is-ok'}>
+                <IconAlertTriangle size={16} aria-hidden="true" />
+                <div>
+                  <small>Stock bajo</small>
+                  <strong>
+                    {lowStock} con stock bajo
+                  </strong>
+                  {truncated ? (
+                    <span className="inv-print-sheet__hint">
+                      de {materials.length} mostrados
+                    </span>
+                  ) : null}
+                </div>
+              </article>
             </div>
-            <div className="materials-admin__table-wrap inventario-print__table-wrap !mx-7 !mb-7 !overflow-hidden !rounded-2xl !border-blue-100 !shadow-sm">
-              <table className="w-full">
-                <caption className="visually-hidden">Listado imprimible de materiales</caption>
-                <thead>
-                  <tr>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Material</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Categoría</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Proveedor</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Unidad</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Ubicación</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Existencia</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Stock mínimo</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Precio unit.</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Vencimiento</th>
-                    <th className="!bg-slate-50 !py-4 !text-xs !tracking-wider !text-slate-600">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {materials.map((material) => (
-                    <tr className="transition-colors duration-200 odd:bg-white even:bg-slate-50/40 hover:!bg-blue-50/70" key={material.id}>
+          </header>
+
+          {filterSummary.length > 0 ? (
+            <p className="inv-print-sheet__filters">
+              <strong>Filtros:</strong> {filterSummary.join(' · ')}
+            </p>
+          ) : null}
+
+          <div className="inv-table-wrap inventario-print__table-wrap inv-print-sheet__table">
+            <table className="inv-table">
+              <caption className="visually-hidden">
+                Listado imprimible de materiales
+              </caption>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Material</th>
+                  <th>Categoría</th>
+                  <th>Proveedor</th>
+                  <th>Unidad</th>
+                  <th>Ubicación</th>
+                  <th>Existencia</th>
+                  <th>Mínimo</th>
+                  <th>Precio</th>
+                  <th>Vencimiento</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {materials.map((material) => {
+                  const low = material.stockActual <= material.stockMinimo
+                  const isSeedDesc =
+                    material.descripcion?.toLowerCase().includes('prueba automática') ||
+                    material.descripcion?.toLowerCase().includes('auditoría de inventario')
+                  return (
+                    <tr key={material.id}>
+                      <td data-label="Código">
+                        <code>{materialCode(material.id)}</code>
+                      </td>
                       <td data-label="Material">
-                        <strong>{material.nombre}</strong>
-                        {material.descripcion ? <small>{material.descripcion}</small> : null}
+                        <strong>{displayMaterialName(material.nombre)}</strong>
+                        {material.descripcion && !isSeedDesc ? (
+                          <small className="inv-print-sheet__desc">
+                            {material.descripcion}
+                          </small>
+                        ) : null}
                       </td>
-                      <td data-label="Categoría">{material.categoria?.nombre ?? 'Sin categoría'}</td>
-                      <td data-label="Proveedor">{material.proveedor?.nombre ?? 'Sin proveedor'}</td>
+                      <td data-label="Categoría">
+                        {displayCategoryName(material.categoria?.nombre)}
+                      </td>
+                      <td data-label="Proveedor">
+                        {displayProviderName(material.proveedor?.nombre)}
+                      </td>
                       <td data-label="Unidad">{material.unidadMedida}</td>
-                      <td data-label="Ubicación">{material.ubicacion || 'Sin ubicación'}</td>
-                      <td
-                        data-label="Existencia"
-                        className={material.stockActual <= material.stockMinimo ? 'is-low' : ''}
-                      >
-                        <span className={`inline-grid min-w-10 place-items-center rounded-full px-3 py-1 font-extrabold ${material.stockActual <= material.stockMinimo ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>{material.stockActual}</span>
+                      <td data-label="Ubicación">
+                        {material.ubicacion || 'Sin ubicación'}
                       </td>
-                      <td data-label="Stock mínimo">{material.stockMinimo}</td>
-                      <td data-label="Precio unit.">{material.precioUnitario != null ? `₡${Number(material.precioUnitario).toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</td>
-                      <td data-label="Vencimiento">{material.fechaVencimiento ? new Date(material.fechaVencimiento).toLocaleDateString('es-CR', { timeZone: 'UTC' }) : '—'}</td>
-                      <td data-label="Estado"><span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${material.activo ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'bg-slate-100 text-slate-600 ring-1 ring-slate-200'}`}><span className={`size-2 rounded-full ${material.activo ? 'bg-emerald-500' : 'bg-slate-400'}`} aria-hidden="true" />{material.activo ? 'Activo' : 'Inactivo'}</span></td>
+                      <td data-label="Existencia">
+                        <span
+                          className={`inv-badge ${low ? 'inv-badge--low' : 'inv-badge--ok'}`}
+                        >
+                          {material.stockActual}
+                        </span>
+                      </td>
+                      <td data-label="Mínimo">{material.stockMinimo}</td>
+                      <td data-label="Precio">
+                        {formatPrecio(material.precioUnitario)}
+                      </td>
+                      <td data-label="Vencimiento">
+                        {formatVencimiento(material.fechaVencimiento)}
+                      </td>
+                      <td data-label="Estado">
+                        <span
+                          className={`inv-badge ${material.activo ? 'inv-badge--ok' : 'inv-badge--inactive'}`}
+                        >
+                          {material.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ) : null}
-      </div>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <footer className="inv-print-sheet__footer">
+            Documento generado por SIGASJ · ASADA San Juan
+          </footer>
+        </section>
+      ) : null}
     </main>
   )
 }

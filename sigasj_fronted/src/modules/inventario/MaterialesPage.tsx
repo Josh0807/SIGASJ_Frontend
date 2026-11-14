@@ -1,560 +1,895 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../auth/components/AuthContext";
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import {
+  IconAlertTriangle,
+  IconBox,
+  IconCheck,
+  IconCircleCheck,
+  IconClipboardList,
+  IconPackage,
+  IconPlus,
+  IconX,
+} from '@tabler/icons-react'
+import { useAuth } from '../auth/components/AuthContext'
 import {
   InternalAdminRoleName,
   normalizeInternalRole,
-} from "../auth/utils/internalRoles";
-import { materialEditPath } from "./inventarioPaths";
-import { parseMaterialEstadoError } from "./materialEstadoError";
-import { updateMaterialEstado } from "./materialesApi";
-import MaterialStateAction from "./MaterialStateAction";
-import type { Material } from "./types";
-import { useMateriales } from "./useMateriales";
-import { useCategorias } from "./categorias/useCategorias";
-import { useProveedores } from "./proveedores/useProveedores";
+} from '../auth/utils/internalRoles'
 import {
-  IconAlertTriangle,
-  IconCalendarTime,
-  IconCategory,
-  IconCheck,
-  IconCircleCheckFilled,
-  IconCircleXFilled,
-  IconFilter,
-  IconPackage,
-  IconSearch,
-  IconTruck,
-  IconX,
-} from "@tabler/icons-react";
-import { InventoryFormField } from "./InventoryFormField";
+  MATERIAL_NEW_PATH,
+  materialEditPath,
+  SOLICITUDES_REVISION_PATH,
+} from './inventarioPaths'
+import { parseMaterialEstadoError } from './materialEstadoError'
+import { updateMaterialEstado } from './materialesApi'
+import MaterialStateAction from './MaterialStateAction'
+import type { Material } from './types'
+import { useMateriales } from './useMateriales'
+import { useCategorias } from './categorias/useCategorias'
+import { useProveedores } from './proveedores/useProveedores'
+import { getReporteInventarioAdmin } from './reportes/reportesApi'
+import { getSolicitudesMaterialesAdmin } from './solicitudes-materiales/solicitudesMaterialesApi'
+import { getMovimientosAdmin } from './movimientos/movimientosApi'
+import type { MovimientoInventario } from './movimientos/types'
+import { formatCantidadUnidad, pluralizeUnidad } from './unidadMedidaUtils'
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 10
 
-type VencimientoUi = {
-  label: string;
-  tone: "none" | "ok" | "soon" | "expired";
-};
+type StockTone = 'ok' | 'low' | 'out' | 'inactive'
 
-function hoyCostaRicaIso(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Costa_Rica",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+function stockTone(material: Material): StockTone {
+  if (!material.activo) return 'inactive'
+  if (material.stockActual <= 0) return 'out'
+  if (material.stockActual <= material.stockMinimo) return 'low'
+  return 'ok'
 }
 
-function formatFechaVencimiento(iso: string | null | undefined): string {
-  if (!iso) return "";
-  const day = iso.slice(0, 10);
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
-  if (!match) return day;
-  return `${match[3]}/${match[2]}/${match[1]}`;
+function stockLabel(tone: StockTone): string {
+  if (tone === 'out') return 'Agotado'
+  if (tone === 'low') return 'Stock bajo'
+  if (tone === 'inactive') return 'Inactivo'
+  return 'Disponible'
 }
 
-function resolveVencimientoUi(material: Material): VencimientoUi {
-  const requiere =
-    material.requiereFechaVencimiento === true ||
-    material.categoria?.requiereFechaVencimiento === true;
-  if (!requiere) {
-    return { label: "No aplica", tone: "none" };
-  }
-  if (!material.fechaVencimiento) {
-    return { label: "Sin fecha", tone: "soon" };
-  }
-  const day = material.fechaVencimiento.slice(0, 10);
-  const hoy = hoyCostaRicaIso();
-  if (day < hoy) {
-    return {
-      label: `Vencido · ${formatFechaVencimiento(day)}`,
-      tone: "expired",
-    };
-  }
-  const [y, m, d] = hoy.split("-").map(Number);
-  const limiteDate = new Date(Date.UTC(y, m - 1, d + 30));
-  const limiteIso = `${limiteDate.getUTCFullYear()}-${String(limiteDate.getUTCMonth() + 1).padStart(2, "0")}-${String(limiteDate.getUTCDate()).padStart(2, "0")}`;
-  if (day <= limiteIso) {
-    return {
-      label: `Pronto · ${formatFechaVencimiento(day)}`,
-      tone: "soon",
-    };
-  }
-  return {
-    label: formatFechaVencimiento(day),
-    tone: "ok",
-  };
+function materialCode(id: number): string {
+  return `MAT-${String(id).padStart(3, '0')}`
+}
+
+/** Quita sufijos de semillas QA/demo para lectura en catálogo. */
+function displayLabel(value: string | null | undefined, fallback: string): string {
+  if (!value) return fallback
+  return (
+    value
+      .replace(/\s+QA\s+\d{8,}$/i, '')
+      .replace(/\s+Demo\s+\d{10,}$/i, '')
+      .replace(/\s+\d{10,}$/g, '')
+      .replace(/\s+QA$/i, '')
+      .trim() || value
+  )
+}
+
+function formatMoveDate(iso: string): string {
+  const day = iso.slice(0, 10)
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day)
+  if (!match) return day
+  return `${match[3]}/${match[2]}/${match[1]}`
 }
 
 export default function MaterialesPage() {
-  const location = useLocation();
-  const routeState = location.state as { success?: string; warning?: string } | null;
-  const routeSuccess = routeState?.success;
-  const routeWarning = routeState?.warning;
-  const [searchInput, setSearchInput] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [activo, setActivo] = useState("");
-  const [categoriaId, setCategoriaId] = useState("");
-  const [proveedorId, setProveedorId] = useState("");
-  const [page, setPage] = useState(1);
-  const [changingId, setChangingId] = useState<number | null>(null);
+  const location = useLocation()
+  const routeState = location.state as
+    | { success?: string; warning?: string }
+    | null
+  const routeSuccess = routeState?.success
+  const routeWarning = routeState?.warning
+
+  const [searchInput, setSearchInput] = useState('')
+  const [nombre, setNombre] = useState('')
+  const [activo, setActivo] = useState('')
+  const [categoriaId, setCategoriaId] = useState('')
+  const [proveedorId, setProveedorId] = useState('')
+  const [page, setPage] = useState(1)
+  const [changingId, setChangingId] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [moves, setMoves] = useState<MovimientoInventario[]>([])
+  const [movesLoading, setMovesLoading] = useState(false)
+  const [movesError, setMovesError] = useState<string | null>(null)
+  const [kpi, setKpi] = useState<{
+    total: number | null
+    activos: number | null
+    stockBajo: number | null
+    solicitudes: number | null
+    loading: boolean
+    error: string | null
+  }>({
+    total: null,
+    activos: null,
+    stockBajo: null,
+    solicitudes: null,
+    loading: false,
+    error: null,
+  })
   const [actionMessage, setActionMessage] = useState<{
-    kind: "success" | "error" | "warning";
-    text: string;
+    kind: 'success' | 'error' | 'warning'
+    text: string
   } | null>(() => {
-    if (routeSuccess) return { kind: "success", text: routeSuccess };
-    if (routeWarning) return { kind: "warning", text: routeWarning };
-    return null;
-  });
-  const latestSearch = useRef("");
-  const { user, logout } = useAuth();
-  const currentRole = normalizeInternalRole(user?.role);
-  const canManage = currentRole === InternalAdminRoleName.Administradora;
+    if (routeSuccess) return { kind: 'success', text: routeSuccess }
+    if (routeWarning) return { kind: 'warning', text: routeWarning }
+    return null
+  })
+
+  const latestSearch = useRef('')
+  const { user, logout } = useAuth()
+  const currentRole = normalizeInternalRole(user?.role)
+  const canManage = currentRole === InternalAdminRoleName.Administradora
+  const canViewMoves =
+    currentRole === InternalAdminRoleName.Administradora ||
+    currentRole === InternalAdminRoleName.Secretaria
+  const canCreate = canManage
+  const isNarrow =
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches
+  const [isMobile, setIsMobile] = useState(isNarrow)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 760px)')
+    const onChange = () => setIsMobile(mq.matches)
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const value = searchInput.trim();
+      const value = searchInput.trim()
       if (value !== latestSearch.current) {
-        latestSearch.current = value;
-        setNombre(value);
-        setPage(1);
+        latestSearch.current = value
+        setNombre(value)
+        setPage(1)
       }
-    }, 400);
-    return () => window.clearTimeout(timer);
-  }, [searchInput]);
+    }, 400)
+    return () => window.clearTimeout(timer)
+  }, [searchInput])
 
   const { result, loading, error, refetch } = useMateriales({
     nombre: nombre || undefined,
-    activo: activo === "" ? undefined : activo === "true",
+    activo: activo === '' ? undefined : activo === 'true',
     idCategoria: categoriaId ? Number(categoriaId) : undefined,
     idProveedor: proveedorId ? Number(proveedorId) : undefined,
     page,
     limit: PAGE_SIZE,
-  });
+  })
+
   const {
     result: categorias,
     loading: categoriasLoading,
     error: categoriasError,
     refetch: refetchCategorias,
-  } = useCategorias({ page: 1, limit: 100 });
+  } = useCategorias({ page: 1, limit: 100 })
+
   const {
     result: proveedores,
     loading: proveedoresLoading,
     error: proveedoresError,
     refetch: refetchProveedores,
-  } = useProveedores({ page: 1, limit: 100 });
+  } = useProveedores({ page: 1, limit: 100 })
+
   const filtered = Boolean(
     searchInput.trim() || activo || categoriaId || proveedorId,
-  );
+  )
+
+  useEffect(() => {
+    if (!canManage && currentRole !== InternalAdminRoleName.Secretaria) {
+      setKpi({
+        total: null,
+        activos: null,
+        stockBajo: null,
+        solicitudes: null,
+        loading: false,
+        error: null,
+      })
+      return
+    }
+    let cancelled = false
+    setKpi((prev) => ({ ...prev, loading: true, error: null }))
+    ;(async () => {
+      try {
+        const reporte = await getReporteInventarioAdmin()
+        let solicitudes: number | null = null
+        if (canManage) {
+          try {
+            const pending = await getSolicitudesMaterialesAdmin({
+              estado: 'PENDIENTE',
+              page: 1,
+              limit: 1,
+            })
+            solicitudes = Array.isArray(pending)
+              ? pending.length
+              : (pending.total ?? pending.data?.length ?? null)
+          } catch {
+            solicitudes = null
+          }
+        }
+        if (cancelled) return
+        setKpi({
+          total: reporte.indicadores.totalMateriales,
+          activos: reporte.indicadores.materialesActivos,
+          stockBajo: reporte.indicadores.materialesStockBajo,
+          solicitudes,
+          loading: false,
+          error: null,
+        })
+      } catch {
+        if (cancelled) return
+        setKpi({
+          total: null,
+          activos: null,
+          stockBajo: null,
+          solicitudes: null,
+          loading: false,
+          error: 'No fue posible cargar los indicadores.',
+        })
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [canManage, currentRole])
+
+  const selected = useMemo(
+    () => result.data.find((item) => item.id === selectedId) ?? null,
+    [result.data, selectedId],
+  )
+
+  useEffect(() => {
+    if (!selected || !canViewMoves) {
+      setMoves([])
+      setMovesError(null)
+      setMovesLoading(false)
+      return
+    }
+    let cancelled = false
+    setMovesLoading(true)
+    setMovesError(null)
+    getMovimientosAdmin({ idMaterial: selected.id, page: 1, limit: 5 })
+      .then((response) => {
+        if (cancelled) return
+        setMoves(response.data)
+        setMovesLoading(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setMoves([])
+        setMovesLoading(false)
+        setMovesError('No fue posible cargar los movimientos.')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selected, canViewMoves])
+
+  useEffect(() => {
+    if (selectedId == null) return
+    if (!result.data.some((item) => item.id === selectedId)) {
+      setSelectedId(null)
+      setDetailOpen(false)
+    }
+  }, [result.data, selectedId])
 
   const handleStateChange = async (material: Material, nextActivo: boolean) => {
-    if (changingId !== null) return;
-    setChangingId(material.id);
-    setActionMessage(null);
+    if (changingId !== null) return
+    setChangingId(material.id)
+    setActionMessage(null)
     try {
-      await updateMaterialEstado(material.id, nextActivo);
+      await updateMaterialEstado(material.id, nextActivo)
       setActionMessage({
-        kind: "success",
-        text: `El material «${material.nombre}» fue ${nextActivo ? "reactivado" : "desactivado"} correctamente.`,
-      });
-      refetch();
+        kind: 'success',
+        text: `El material «${material.nombre}» fue ${nextActivo ? 'reactivado' : 'desactivado'} correctamente.`,
+      })
+      refetch()
     } catch (caught) {
-      const parsed = parseMaterialEstadoError(caught);
-      setActionMessage({ kind: "error", text: parsed.message });
-      if (parsed.status === 404) refetch();
-      if (parsed.status === 401) logout();
+      const parsed = parseMaterialEstadoError(caught)
+      setActionMessage({ kind: 'error', text: parsed.message })
+      if (parsed.status === 404) refetch()
+      if (parsed.status === 401) logout()
     } finally {
-      setChangingId(null);
+      setChangingId(null)
     }
-  };
+  }
 
   const clearFilters = () => {
-    setSearchInput("");
-    latestSearch.current = "";
-    setNombre("");
-    setActivo("");
-    setCategoriaId("");
-    setProveedorId("");
-    setPage(1);
-  };
+    setSearchInput('')
+    latestSearch.current = ''
+    setNombre('')
+    setActivo('')
+    setCategoriaId('')
+    setProveedorId('')
+    setPage(1)
+  }
 
-  return (
-    <main className="materials-admin admin-content-modern gallery-admin sigasj-stack !gap-6">
-      <header className="materials-admin__header !flex !min-h-[220px] !items-center !rounded-[24px] !border-sky-100 !bg-white !p-8">
-        <div>
-          <p className="materials-admin__eyebrow inventory-page-eyebrow">
-            Inventario · Bodega
-          </p>
-          <div className="inventory-catalog__heading">
-            <h1 className="inventory-page-title">Catálogo de materiales</h1>
-            <span className="materials-admin__count !rounded-full !border-0 !bg-blue-50 !px-4 !py-2 !text-sm !font-extrabold !text-blue-700">
-              {result.total} materiales
-            </span>
+  const openDetail = (material: Material) => {
+    setSelectedId(material.id)
+    setDetailOpen(true)
+  }
+
+  const closeDetail = () => {
+    setDetailOpen(false)
+    setSelectedId(null)
+  }
+
+  const showKpis = canManage || currentRole === InternalAdminRoleName.Secretaria
+  const from = result.total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
+  const to = Math.min(page * PAGE_SIZE, result.total)
+
+  const detailPanel =
+    selected && detailOpen ? (
+      <aside className="inv-detail" aria-label="Detalle del material">
+        <div className="inv-detail__head">
+          <div>
+            <h2>{displayLabel(selected.nombre, selected.nombre)}</h2>
+            <p className="inv-detail__meta">
+              {materialCode(selected.id)} · {selected.unidadMedida}
+            </p>
           </div>
-          <p className="inventory-page-subtitle">
-            Consulte existencias, ubicación, stock mínimo y fechas de
-            vencimiento de los materiales registrados.
-          </p>
-        </div>
-      </header>
-      <section
-        className={`materials-admin__filters materials-admin__filters--inventory${canManage ? " min-[1100px]:!grid-cols-[minmax(280px,1.55fr)_minmax(250px,.8fr)_minmax(280px,1fr)_minmax(300px,1fr)]" : " materials-admin__filters--plumber"}`}
-        aria-label="Búsqueda y filtros"
-      >
-        <InventoryFormField
-          label="Buscar por nombre"
-          icon={<IconSearch size={20} aria-hidden="true" />}
-        >
-          <input
-            type="search"
-            value={searchInput}
-            maxLength={150}
-            placeholder="Ej. Tubo PVC"
-            onChange={(event) => setSearchInput(event.target.value)}
-          />
-        </InventoryFormField>
-        <InventoryFormField
-          label="Estado"
-          icon={<IconFilter size={20} aria-hidden="true" />}
-        >
-          <select
-            value={activo}
-            onChange={(event) => {
-              setActivo(event.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">Todos los estados</option>
-            <option value="true">Activos</option>
-            <option value="false">Inactivos</option>
-          </select>
-        </InventoryFormField>
-        <InventoryFormField
-          label="Categoría"
-          icon={<IconCategory size={20} aria-hidden="true" />}
-        >
-          <select
-            value={categoriaId}
-            disabled={categoriasLoading}
-            onChange={(event) => {
-              setCategoriaId(event.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">Todas las categorías</option>
-            {categorias.data.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.nombre}
-                {item.activo ? "" : " (inactiva)"}
-              </option>
-            ))}
-          </select>
-        </InventoryFormField>
-        {canManage && (
-          <InventoryFormField
-            label="Proveedor"
-            icon={<IconTruck size={20} aria-hidden="true" />}
-          >
-            <select
-              value={proveedorId}
-              disabled={proveedoresLoading}
-              onChange={(event) => {
-                setProveedorId(event.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="">Todos los proveedores</option>
-              {proveedores.data.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.nombre}
-                  {item.activo ? "" : " (inactivo)"}
-                </option>
-              ))}
-            </select>
-          </InventoryFormField>
-        )}
-        {filtered && (
           <button
             type="button"
-            className="materials-admin__secondary"
-            onClick={clearFilters}
+            className="inv-btn inv-btn--secondary"
+            aria-label="Cerrar detalle"
+            onClick={closeDetail}
           >
-            Limpiar filtros
+            <IconX size={18} aria-hidden="true" />
           </button>
-        )}
-        {categoriasError && (
-          <div className="materials-admin__category-error" role="alert">
-            No fue posible cargar el filtro de categorías.{" "}
-            <button type="button" onClick={refetchCategorias}>
-              Reintentar
-            </button>
+        </div>
+        <span className={`inv-badge inv-badge--${stockTone(selected) === 'ok' ? 'ok' : stockTone(selected) === 'low' ? 'low' : stockTone(selected) === 'out' ? 'out' : 'inactive'}`}>
+          {stockLabel(stockTone(selected))}
+        </span>
+        <dl>
+          <div>
+            <dt>Ubicación</dt>
+            <dd>{selected.ubicacion || 'Sin ubicación'}</dd>
           </div>
-        )}
-        {canManage && proveedoresError && (
-          <div className="materials-admin__category-error" role="alert">
-            No fue posible cargar el filtro de proveedores.{" "}
-            <button type="button" onClick={refetchProveedores}>
-              Reintentar
-            </button>
+          <div>
+            <dt>Existencia</dt>
+            <dd>
+              {formatCantidadUnidad(selected.stockActual, selected.unidadMedida)}
+            </dd>
           </div>
-        )}
-      </section>
-      {actionMessage && (
-        <div
-          className={`flex items-start gap-4 rounded-3xl border p-5 shadow-[0_14px_36px_rgba(15,23,42,0.10)] ${
-            actionMessage.kind === "success"
-              ? "!border-emerald-200 !bg-[linear-gradient(135deg,#ecfdf5_0%,#ffffff_60%,#f0fdfa_100%)] !text-emerald-950"
-              : actionMessage.kind === "warning"
-                ? "!border-amber-200 !bg-[linear-gradient(135deg,#fffbeb_0%,#ffffff_62%,#fff7ed_100%)] !text-amber-950"
-                : "!border-rose-200 !bg-[linear-gradient(135deg,#fff1f2_0%,#ffffff_62%,#fff7ed_100%)] !text-rose-950"
-          }`}
-          role={actionMessage.kind === "error" ? "alert" : "status"}
-        >
-          <span className={`flex size-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg ${
-            actionMessage.kind === "success"
-              ? "bg-linear-to-br from-emerald-500 to-teal-600 shadow-emerald-200"
-              : actionMessage.kind === "warning"
-                ? "bg-linear-to-br from-amber-500 to-orange-600 shadow-amber-200"
-                : "bg-linear-to-br from-rose-500 to-red-600 shadow-rose-200"
-          }`}>
-            {actionMessage.kind === "success" ? <IconCheck size={26} stroke={3} aria-hidden="true" /> : actionMessage.kind === "warning" ? <IconAlertTriangle size={25} aria-hidden="true" /> : <IconX size={25} stroke={2.6} aria-hidden="true" />}
-          </span>
-          <div className="grid min-w-0 flex-1 gap-1.5">
-            <strong className="text-base font-extrabold tracking-tight">
-              {actionMessage.kind === "success" ? "Operación completada" : actionMessage.kind === "warning" ? "Atención" : "No se pudo completar"}
-            </strong>
-            <span className="leading-6 opacity-90">{actionMessage.text}</span>
+          <div>
+            <dt>Stock mínimo</dt>
+            <dd>
+              {formatCantidadUnidad(selected.stockMinimo, selected.unidadMedida)}
+            </dd>
           </div>
-        </div>
-      )}
-      {loading && (
-        <div className="materials-admin__state" role="status">
-          <span className="materials-admin__spinner" />
-          Cargando materiales…
-        </div>
-      )}
-      {!loading && error && (
-        <div className="materials-admin__error" role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={refetch}>
-            Reintentar
-          </button>
-        </div>
-      )}
-      {!loading && !error && result.data.length === 0 && (
-        <div className="materials-admin__empty">
-          <h2>{filtered ? "No hay coincidencias" : "Aún no hay materiales"}</h2>
-          <p>
-            {filtered
-              ? "Pruebe con otros términos o limpie los filtros."
-              : "Los materiales registrados aparecerán aquí."}
-          </p>
-        </div>
-      )}
-      {!loading && !error && result.data.length > 0 && (
-        <MaterialTable
-          materials={result.data}
-          canManage={canManage}
-          changingId={changingId}
-          onStateChange={handleStateChange}
-        />
-      )}
-      {!loading && !error && result.totalPages > 0 && (
-        <nav
-          className="materials-admin__pagination"
-          aria-label="Paginación de materiales"
-        >
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => setPage((value) => Math.max(1, value - 1))}
-          >
-            Anterior
-          </button>
-          <span>
-            Página {page} de {result.totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={page >= result.totalPages}
-            onClick={() =>
-              setPage((value) => Math.min(result.totalPages, value + 1))
-            }
-          >
-            Siguiente
-          </button>
-        </nav>
-      )}
-    </main>
-  );
-}
+          <div>
+            <dt>Categoría</dt>
+            <dd>
+              {displayLabel(selected.categoria?.nombre, 'Sin categoría')}
+            </dd>
+          </div>
+          {canManage ? (
+            <div>
+              <dt>Proveedor</dt>
+              <dd>
+                {displayLabel(selected.proveedor?.nombre, 'Sin proveedor')}
+              </dd>
+            </div>
+          ) : null}
+        </dl>
 
-type TableProps = {
-  materials: Material[];
-  canManage: boolean;
-  changingId: number | null;
-  onStateChange: (material: Material, activo: boolean) => Promise<void>;
-};
-
-function MaterialTable({
-  materials,
-  canManage,
-  changingId,
-  onStateChange,
-}: TableProps) {
-  return (
-    <div className="materials-admin__table-wrap materials-catalog-table overflow-x-auto !rounded-[22px] !border-sky-100 !bg-white !shadow-[0_12px_30px_rgba(30,90,156,0.07)] [&_thead]:!bg-[#0b3d78] [&_th]:!border-0 [&_th]:!py-4 [&_th]:!text-[0.72rem] [&_th]:!font-extrabold [&_th]:!tracking-[0.06em] [&_th]:!text-white [&_td]:!py-4 [&_td]:!align-top [&_tbody_tr]:!transition-colors hover:[&_tbody_tr]:!bg-sky-50/55">
-      <table>
-        <caption className="visually-hidden">Listado de materiales</caption>
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Categoría</th>
-            {canManage ? <th>Proveedor</th> : null}
-            <th>Ubicación</th>
-            <th>Existencia</th>
-            <th>Vencimiento</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {materials.map((material) => {
-            const lowStock = material.stockActual <= material.stockMinimo;
-            const vencimiento = resolveVencimientoUi(material);
-            return (
-              <tr key={material.id}>
-                <td data-label="Material">
-                  <div className="flex min-w-[12rem] max-w-[22rem] items-start gap-3">
-                    <span className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-[#e8f4ff] to-[#d7ebff] text-[#0b6bcb]">
-                      <IconPackage size={20} aria-hidden="true" />
-                    </span>
-                    <div className="min-w-0">
-                      <strong className="block text-[0.98rem] font-extrabold leading-snug tracking-tight text-[#062e63]">
-                        {material.nombre}
-                      </strong>
-                      <span className="mt-1 block text-xs font-semibold text-[#6b849c]">
-                        #{material.id} · {material.unidadMedida}
-                      </span>
-                      {material.descripcion ? (
-                        <small className="mt-1.5 !block !line-clamp-2 !text-[0.8rem] !leading-5 !text-[#6a829a]">
-                          {material.descripcion}
-                        </small>
-                      ) : null}
-                    </div>
-                  </div>
-                </td>
-                <td data-label="Categoría">
-                  <div className="grid gap-1.5">
-                    <span className="font-semibold text-[#1e4b73]">
-                      {material.categoria?.nombre ?? "Sin categoría"}
-                    </span>
-                    {material.categoria?.requiereFechaVencimiento ? (
-                      <span className="inline-flex w-fit items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[0.7rem] font-bold text-amber-800">
-                        <IconCalendarTime size={12} aria-hidden="true" />
-                        Con vencimiento
-                      </span>
-                    ) : null}
-                  </div>
-                </td>
-                {canManage ? (
-                  <td data-label="Proveedor">
-                    <span className="font-semibold text-[#1e4b73]">
-                      {material.proveedor?.nombre ?? "Sin proveedor"}
-                    </span>
-                    {material.proveedor && !material.proveedor.activo ? (
-                      <small className="!mt-1 !block !text-rose-600">
-                        Proveedor inactivo
+        {canViewMoves ? (
+          <div>
+            <h3 style={{ margin: '0 0 8px', fontSize: '0.95rem' }}>
+              Últimos movimientos
+            </h3>
+            {movesLoading ? (
+              <p className="inv-detail__meta">Cargando movimientos…</p>
+            ) : null}
+            {movesError ? (
+              <p className="inv-detail__meta" role="alert">
+                {movesError}
+              </p>
+            ) : null}
+            {!movesLoading && !movesError && moves.length === 0 ? (
+              <p className="inv-detail__meta">Sin movimientos registrados.</p>
+            ) : null}
+            {!movesLoading && moves.length > 0 ? (
+              <ul className="inv-moves">
+                {moves.map((move) => (
+                  <li key={move.id}>
+                    <span>
+                      {move.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'}
+                      <small style={{ display: 'block', color: '#5b7390' }}>
+                        {formatMoveDate(move.fechaMovimiento)}
                       </small>
-                    ) : null}
-                  </td>
-                ) : null}
-                <td data-label="Ubicación">
-                  <span className="text-[#3d5f7c]">
-                    {material.ubicacion || "Sin ubicación"}
-                  </span>
-                </td>
-                <td data-label="Existencia">
-                  <div className="grid gap-1">
-                    <span
-                      className={`inline-flex w-fit min-w-[2.75rem] items-center justify-center rounded-xl px-2.5 py-1.5 text-sm font-extrabold tabular-nums ${
-                        lowStock
-                          ? "bg-amber-100 text-amber-900 ring-1 ring-amber-200"
-                          : "bg-sky-50 text-[#0b4f8c] ring-1 ring-sky-100"
-                      }`}
+                    </span>
+                    <strong
+                      style={{
+                        color: move.tipo === 'ENTRADA' ? '#236c51' : '#b93638',
+                      }}
                     >
-                      {material.stockActual}
-                    </span>
-                    <span className="text-[0.72rem] font-semibold text-[#7a92a8]">
-                      Mín. {material.stockMinimo}
-                      {lowStock ? " · bajo" : ""}
-                    </span>
-                  </div>
-                </td>
-                <td data-label="Vencimiento">
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.75rem] font-bold ${
-                      vencimiento.tone === "expired"
-                        ? "border-rose-200 bg-rose-50 text-rose-800"
-                        : vencimiento.tone === "soon"
-                          ? "border-amber-200 bg-amber-50 text-amber-900"
-                          : vencimiento.tone === "ok"
-                            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                            : "border-slate-200 bg-slate-50 text-slate-600"
-                    }`}
-                  >
-                    <IconCalendarTime size={13} aria-hidden="true" />
-                    {vencimiento.label}
-                  </span>
-                </td>
-                <td data-label="Estado">
-                  <span
-                    className={`materials-admin__badge !inline-flex !items-center !gap-1.5 !rounded-full !border !px-3 !py-1.5 !text-xs !font-extrabold !shadow-sm ${material.activo ? "is-active !border-emerald-200 !bg-emerald-50 !text-emerald-700" : "is-inactive !border-slate-200 !bg-slate-100 !text-slate-600"}`}
-                  >
-                    {material.activo ? (
-                      <IconCircleCheckFilled
-                        className="text-emerald-500"
-                        size={14}
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <IconCircleXFilled
-                        className="text-slate-400"
-                        size={14}
-                        aria-hidden="true"
-                      />
-                    )}
-                    {material.activo ? "Activo" : "Inactivo"}
-                  </span>
-                </td>
-                <td data-label="Acciones">
-                  <div className="materials-admin__row-actions !flex-nowrap !items-center !gap-2 max-[760px]:!flex-col">
-                    {canManage ? (
-                      <>
-                        <Link
-                          className="materials-admin__action !inline-flex !min-h-11 !items-center !justify-center !whitespace-nowrap !rounded-xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-4 !text-sm !font-extrabold !text-white !shadow-[0_8px_18px_rgba(37,99,235,0.22)] !transition-all !duration-300 !ease-out hover:!-translate-y-0.5 hover:!shadow-[0_12px_24px_rgba(37,99,235,0.3)] active:!translate-y-0 focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-blue-600 motion-reduce:!transform-none motion-reduce:!transition-none"
-                          to={materialEditPath(material.id)}
-                          state={{ material }}
+                      {move.tipo === 'ENTRADA' ? '+' : '-'}
+                      {formatCantidadUnidad(move.cantidad, selected.unidadMedida)}
+                    </strong>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div style={{ display: 'grid', gap: 8 }}>
+          {canManage ? (
+            <Link
+              className="inv-btn inv-btn--primary"
+              to={materialEditPath(selected.id)}
+              state={{ material: selected }}
+            >
+              Ver detalle / Editar
+            </Link>
+          ) : (
+            <p className="inv-detail__meta">Consulta en solo lectura.</p>
+          )}
+          {canManage ? (
+            <MaterialStateAction
+              material={selected}
+              disabled={changingId !== null}
+              onChange={handleStateChange}
+            />
+          ) : null}
+        </div>
+      </aside>
+    ) : null
+
+  return (
+    <main className="inv-catalog" style={{ display: 'grid', gap: 16 }}>
+      <header className="inv-header inv-card">
+        <div>
+          <h1>Inventario de bodega</h1>
+          <p>Control de materiales, existencias y movimientos.</p>
+        </div>
+        {canCreate ? (
+          <Link className="inv-btn inv-btn--primary" to={MATERIAL_NEW_PATH}>
+            <IconPlus size={18} aria-hidden="true" />
+            Nuevo material
+          </Link>
+        ) : null}
+      </header>
+
+      {showKpis ? (
+        <section className="inv-kpis" aria-label="Indicadores de inventario">
+          <article className="inv-kpi">
+            <div className="inv-kpi__top">
+              <p className="inv-kpi__label">Materiales registrados</p>
+              <span className="inv-kpi__icon">
+                <IconBox size={18} aria-hidden="true" />
+              </span>
+            </div>
+            <p className="inv-kpi__value">
+              {kpi.loading ? '…' : (kpi.total ?? '—')}
+            </p>
+            {kpi.error ? (
+              <p className="inv-kpi__hint">{kpi.error}</p>
+            ) : (
+              <p className="inv-kpi__hint">Total en catálogo</p>
+            )}
+          </article>
+          <article className="inv-kpi">
+            <div className="inv-kpi__top">
+              <p className="inv-kpi__label">Activos</p>
+              <span className="inv-kpi__icon">
+                <IconCircleCheck size={18} aria-hidden="true" />
+              </span>
+            </div>
+            <p className="inv-kpi__value">
+              {kpi.loading ? '…' : (kpi.activos ?? '—')}
+            </p>
+            <p className="inv-kpi__hint">Disponibles para operar</p>
+          </article>
+          <article className="inv-kpi">
+            <div className="inv-kpi__top">
+              <p className="inv-kpi__label">Stock bajo</p>
+              <span className="inv-kpi__icon">
+                <IconAlertTriangle size={18} aria-hidden="true" />
+              </span>
+            </div>
+            <p className="inv-kpi__value">
+              {kpi.loading ? '…' : (kpi.stockBajo ?? '—')}
+            </p>
+            <p className="inv-kpi__hint">Según stock mínimo</p>
+          </article>
+          <article className="inv-kpi inv-kpi--accent">
+            <div className="inv-kpi__top">
+              <p className="inv-kpi__label">Solicitudes pendientes</p>
+              <span className="inv-kpi__icon">
+                <IconClipboardList size={18} aria-hidden="true" />
+              </span>
+            </div>
+            <p className="inv-kpi__value">
+              {canManage
+                ? kpi.loading
+                  ? '…'
+                  : (kpi.solicitudes ?? '—')
+                : '—'}
+            </p>
+            <p className="inv-kpi__hint">
+              {canManage ? (
+                <Link
+                  to={SOLICITUDES_REVISION_PATH}
+                  style={{ color: 'inherit', textDecoration: 'underline' }}
+                >
+                  Revisar solicitudes
+                </Link>
+              ) : (
+                'Consulta administrativa'
+              )}
+            </p>
+          </article>
+        </section>
+      ) : null}
+
+      {actionMessage ? (
+        <div
+          className="inv-card"
+          style={{
+            display: 'flex',
+            gap: 12,
+            padding: 16,
+            alignItems: 'flex-start',
+            borderColor:
+              actionMessage.kind === 'success'
+                ? '#c5d9c8'
+                : actionMessage.kind === 'warning'
+                  ? '#f5d9a8'
+                  : '#f0c4c4',
+          }}
+          role={actionMessage.kind === 'error' ? 'alert' : 'status'}
+        >
+          <span>
+            {actionMessage.kind === 'success' ? (
+              <IconCheck size={22} aria-hidden="true" />
+            ) : actionMessage.kind === 'warning' ? (
+              <IconAlertTriangle size={22} aria-hidden="true" />
+            ) : (
+              <IconX size={22} aria-hidden="true" />
+            )}
+          </span>
+          <div>
+            <strong>
+              {actionMessage.kind === 'success'
+                ? 'Operación completada'
+                : actionMessage.kind === 'warning'
+                  ? 'Atención'
+                  : 'No se pudo completar'}
+            </strong>
+            <p style={{ margin: '4px 0 0' }}>{actionMessage.text}</p>
+          </div>
+        </div>
+      ) : null}
+
+      <div
+        className={`inv-workspace${detailOpen && selected && !isMobile ? '' : ' is-single'}`}
+      >
+        <section className="inv-panel" aria-label="Catálogo de materiales">
+          <div className="inv-panel__heading">
+            <div>
+              <h2>Catálogo de materiales</h2>
+              <p>
+                {loading
+                  ? 'Cargando listado…'
+                  : error
+                    ? 'No se pudo cargar el listado'
+                    : `${result.total} material${result.total === 1 ? '' : 'es'} en esta consulta`}
+              </p>
+            </div>
+          </div>
+
+          <div className="inv-filters">
+            <label>
+              Buscar material o código
+              <input
+                type="search"
+                value={searchInput}
+                maxLength={150}
+                placeholder="Buscar material o código…"
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
+            </label>
+            <label>
+              Categoría
+              <select
+                value={categoriaId}
+                disabled={categoriasLoading}
+                onChange={(event) => {
+                  setCategoriaId(event.target.value)
+                  setPage(1)
+                }}
+              >
+                <option value="">Todas las categorías</option>
+                {categorias.data.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {displayLabel(item.nombre, item.nombre)}
+                    {item.activo ? '' : ' (inactiva)'}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Estado
+              <select
+                value={activo}
+                onChange={(event) => {
+                  setActivo(event.target.value)
+                  setPage(1)
+                }}
+              >
+                <option value="">Todos los estados</option>
+                <option value="true">Activos</option>
+                <option value="false">Inactivos</option>
+              </select>
+            </label>
+            {canManage ? (
+              <label>
+                Proveedor
+                <select
+                  value={proveedorId}
+                  disabled={proveedoresLoading}
+                  onChange={(event) => {
+                    setProveedorId(event.target.value)
+                    setPage(1)
+                  }}
+                >
+                  <option value="">Todos los proveedores</option>
+                  {proveedores.data.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {displayLabel(item.nombre, item.nombre)}
+                      {item.activo ? '' : ' (inactivo)'}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+            {filtered ? (
+              <button
+                type="button"
+                className="inv-btn inv-btn--secondary"
+                onClick={clearFilters}
+              >
+                Limpiar filtros
+              </button>
+            ) : null}
+          </div>
+
+          {categoriasError ? (
+            <div className="inv-error" role="alert">
+              No fue posible cargar el filtro de categorías.{' '}
+              <button type="button" className="inv-btn inv-btn--secondary" onClick={refetchCategorias}>
+                Reintentar
+              </button>
+            </div>
+          ) : null}
+          {canManage && proveedoresError ? (
+            <div className="inv-error" role="alert">
+              No fue posible cargar el filtro de proveedores.{' '}
+              <button type="button" className="inv-btn inv-btn--secondary" onClick={refetchProveedores}>
+                Reintentar
+              </button>
+            </div>
+          ) : null}
+
+          {loading ? (
+            <div className="inv-state" role="status">
+              Cargando materiales…
+            </div>
+          ) : null}
+
+          {!loading && error ? (
+            <div className="inv-error" role="alert">
+              <p>{error}</p>
+              <button type="button" className="inv-btn inv-btn--primary" onClick={refetch}>
+                Reintentar
+              </button>
+            </div>
+          ) : null}
+
+          {!loading && !error && result.data.length === 0 ? (
+            <div className="inv-empty">
+              <h2 style={{ margin: '0 0 8px', color: '#123f70' }}>
+                {filtered ? 'No hay coincidencias' : 'Aún no hay materiales'}
+              </h2>
+              <p style={{ margin: '0 0 12px' }}>
+                {filtered
+                  ? 'Pruebe con otros términos o limpie los filtros.'
+                  : 'Los materiales registrados aparecerán aquí.'}
+              </p>
+              {filtered ? (
+                <button
+                  type="button"
+                  className="inv-btn inv-btn--secondary"
+                  onClick={clearFilters}
+                >
+                  Limpiar filtros
+                </button>
+              ) : canCreate ? (
+                <Link className="inv-btn inv-btn--primary" to={MATERIAL_NEW_PATH}>
+                  <IconPlus size={18} aria-hidden="true" />
+                  Nuevo material
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
+
+          {!loading && !error && result.data.length > 0 ? (
+            <>
+              <div className="inv-table-wrap">
+                <table className="inv-table inv-table--materials">
+                  <caption className="visually-hidden">
+                    Listado de materiales
+                  </caption>
+                  <colgroup>
+                    <col className="inv-col-code" />
+                    <col className="inv-col-material" />
+                    <col className="inv-col-category" />
+                    <col className="inv-col-location" />
+                    <col className="inv-col-stock" />
+                    <col className="inv-col-min" />
+                    <col className="inv-col-status" />
+                    <col className="inv-col-actions" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th scope="col">Código</th>
+                      <th scope="col">Material</th>
+                      <th scope="col">Categoría</th>
+                      <th scope="col">Ubicación</th>
+                      <th scope="col">Existencia</th>
+                      <th scope="col">Mínimo</th>
+                      <th scope="col">Estado</th>
+                      <th scope="col">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.data.map((material) => {
+                      const tone = stockTone(material)
+                      const selectedRow = material.id === selectedId
+                      const nombre = displayLabel(material.nombre, material.nombre)
+                      const categoria = displayLabel(
+                        material.categoria?.nombre,
+                        'Sin categoría',
+                      )
+                      const ubicacion = material.ubicacion || 'Sin ubicación'
+                      return (
+                        <tr
+                          key={material.id}
+                          className={selectedRow ? 'is-selected' : undefined}
+                          onClick={() => openDetail(material)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              openDetail(material)
+                            }
+                          }}
+                          tabIndex={0}
+                          aria-selected={selectedRow}
                         >
-                          Editar
-                        </Link>
-                        <MaterialStateAction
-                          material={material}
-                          disabled={changingId !== null}
-                          onChange={onStateChange}
-                        />
-                      </>
-                    ) : (
-                      <span className="text-sm font-semibold text-[#6b849c]">
-                        Solo lectura
-                      </span>
-                    )}
+                          <td data-label="Código">
+                            <code className="inv-code">{materialCode(material.id)}</code>
+                          </td>
+                          <td data-label="Material">
+                            <div className="inv-material-cell">
+                              <span className="inv-material-cell__icon" aria-hidden="true">
+                                <IconPackage size={16} />
+                              </span>
+                              <div className="inv-material-cell__text">
+                                <strong className="inv-truncate" title={nombre}>
+                                  {nombre}
+                                </strong>
+                                <small>{material.unidadMedida}</small>
+                              </div>
+                            </div>
+                          </td>
+                          <td data-label="Categoría">
+                            <span className="inv-truncate" title={categoria}>
+                              {categoria}
+                            </span>
+                          </td>
+                          <td data-label="Ubicación">
+                            <span className="inv-truncate" title={ubicacion}>
+                              {ubicacion}
+                            </span>
+                          </td>
+                          <td data-label="Existencia" className="inv-num">
+                            <strong>
+                              {material.stockActual}{' '}
+                              <span className="inv-unit">
+                                {pluralizeUnidad(
+                                  material.unidadMedida,
+                                  material.stockActual,
+                                )}
+                              </span>
+                            </strong>
+                          </td>
+                          <td data-label="Mínimo" className="inv-num">
+                            {material.stockMinimo}
+                          </td>
+                          <td data-label="Estado">
+                            <span
+                              className={`inv-badge inv-badge--${tone === 'ok' ? 'ok' : tone === 'low' ? 'low' : tone === 'out' ? 'out' : 'inactive'}`}
+                            >
+                              {stockLabel(tone)}
+                            </span>
+                          </td>
+                          <td
+                            data-label="Acciones"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            {canManage ? (
+                              <div className="inv-row-actions">
+                                <Link
+                                  className="inv-btn inv-btn--secondary inv-row-action"
+                                  to={materialEditPath(material.id)}
+                                  state={{ material }}
+                                >
+                                  Editar
+                                </Link>
+                                <MaterialStateAction
+                                  material={material}
+                                  disabled={changingId !== null}
+                                  onChange={handleStateChange}
+                                />
+                              </div>
+                            ) : (
+                              <span className="inv-muted-text">Solo lectura</span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {result.totalPages > 0 ? (
+                <nav className="inv-pagination" aria-label="Paginación de materiales">
+                  <span>
+                    Mostrando {from}–{to} de {result.total} materiales
+                  </span>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      className="inv-btn inv-btn--secondary"
+                      disabled={page <= 1}
+                      onClick={() => setPage((value) => Math.max(1, value - 1))}
+                    >
+                      Anterior
+                    </button>
+                    <span style={{ alignSelf: 'center' }}>
+                      {page} / {result.totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      className="inv-btn inv-btn--secondary"
+                      disabled={page >= result.totalPages}
+                      onClick={() =>
+                        setPage((value) => Math.min(result.totalPages, value + 1))
+                      }
+                    >
+                      Siguiente
+                    </button>
                   </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+                </nav>
+              ) : null}
+            </>
+          ) : null}
+        </section>
+
+        {!isMobile && detailOpen && selected ? detailPanel : null}
+      </div>
+
+      {isMobile && detailOpen && selected ? (
+        <div className="inv-detail-drawer" role="dialog" aria-modal="true">
+          {detailPanel}
+        </div>
+      ) : null}
+    </main>
+  )
 }

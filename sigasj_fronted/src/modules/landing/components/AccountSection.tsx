@@ -1,37 +1,41 @@
 import { IconArrowRight, IconDropletExclamation } from '@tabler/icons-react'
-import { Link } from 'react-router-dom'
 import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
 import type { AccountSectionProps } from '../types/AccountSectionProps'
+import Button from '../../../shared/ui/Button'
+import Card from '../../../shared/ui/Card'
+import SectionHeader from '../../../shared/ui/SectionHeader'
 
 const AccountSection = ({ formHref = REPORTAR_AVERIA_ROUTE_PATH }: AccountSectionProps) => (
   <section
-    className="sigasj-action-section sigasj-action-section--first relative isolate overflow-hidden"
+    className="public-section public-section--soft"
     id="reporte-averias"
     aria-labelledby="reporte-averias-title"
   >
-    <div className="pointer-events-none absolute -left-32 -top-36 -z-10 h-64 w-[720px] rotate-[8deg] rounded-[50%] bg-sky-200/35" aria-hidden="true" />
-    <div className="pointer-events-none absolute -right-40 top-12 -z-10 h-48 w-[620px] -rotate-12 rounded-[50%] bg-sky-200/30" aria-hidden="true" />
-    <div className="pointer-events-none absolute bottom-[-105px] left-[16%] -z-10 h-44 w-[760px] -rotate-3 rounded-[50%] bg-sky-100/70" aria-hidden="true" />
-
-    <div className="sigasj-action-card relative">
-      <div className="sigasj-action-icon relative z-10">
-        <IconDropletExclamation className="size-[clamp(40px,4vw,64px)]" stroke={1.8} aria-hidden="true" />
-      </div>
-
-      <div className="sigasj-action-copy relative z-10">
-        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.28em] text-[#1476cf]">Atención de averías</p>
-        <h2 id="reporte-averias-title" className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-[#092e67]">Reportar una avería</h2>
-        <p className="mb-0 mt-4 max-w-[690px] text-base leading-7 text-[#526d8c]">
-          Infórmanos sobre fugas, daños u otras averías en el servicio de agua para que podamos atenderlas oportunamente.
-        </p>
-      </div>
-
-      <Link className="sigasj-action-button relative z-10" to={formHref}>
-        Reportar avería <IconArrowRight size={23} aria-hidden="true" />
-      </Link>
-
-      <span className="pointer-events-none absolute -bottom-20 -right-16 h-36 w-[430px] -rotate-6 rounded-[50%] bg-sky-100/75" aria-hidden="true" />
-      <span className="pointer-events-none absolute -bottom-24 -right-20 h-36 w-[470px] rotate-3 rounded-[50%] border-[24px] border-sky-200/35" aria-hidden="true" />
+    <div className="public-container">
+      <Card className="flex flex-wrap items-center gap-6 p-6 max-[640px]:flex-col max-[640px]:items-stretch">
+        <span
+          className="grid size-12 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface text-sigasj-primary"
+          aria-hidden="true"
+        >
+          <IconDropletExclamation size={24} stroke={1.85} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <SectionHeader
+            id="reporte-averias-title"
+            eyebrow="Atención de averías"
+            title="Reportar una avería"
+            description="Infórmanos sobre fugas, daños u otras averías en el servicio de agua para que podamos atenderlas oportunamente."
+          />
+        </div>
+        <Button
+          to={formHref}
+          variant="primary"
+          rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
+          className="shrink-0 max-[640px]:w-full"
+        >
+          Reportar avería
+        </Button>
+      </Card>
     </div>
   </section>
 )

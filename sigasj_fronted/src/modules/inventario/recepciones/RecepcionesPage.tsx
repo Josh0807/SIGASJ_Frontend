@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { IconArrowLeft, IconRefresh, IconTruckDelivery } from '@tabler/icons-react'
-import { Link, useNavigate } from 'react-router-dom'
-import { MATERIALES_PATH, recepcionDetailPath } from '../inventarioPaths'
+import {
+  IconArrowLeft,
+  IconPackage,
+  IconRefresh,
+  IconTruckDelivery,
+} from '@tabler/icons-react'
+import { useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Button,
+  EmptyState,
+  MetricPill,
+  PageHeader,
+} from '../../../shared/ui'
+import { MATERIALES_PATH, REPOSICIONES_PATH, recepcionDetailPath } from '../inventarioPaths'
 import { getReposicionesAdmin } from '../reposiciones/reposicionesApi'
 import {
   formatReposicionEstado,
@@ -29,31 +41,37 @@ export default function RecepcionesPage() {
   useEffect(() => {
     let active = true
     const cancelScheduled = runAfterEffect(() => {
-    setLoading(true)
-    void getReposicionesAdmin({
-      estado: 'PENDIENTE_RECEPCION',
-      page,
-      limit: 10,
-    })
-      .then((response) => {
-        if (!active) return
-        const items = normalizeReposicionesList(response)
-        setReposiciones(items)
-        setTotal(Array.isArray(response) ? items.length : response.total ?? items.length)
-        setTotalPages(Array.isArray(response) ? 1 : Math.max(response.totalPages ?? 1, 1))
-        setError('')
+      setLoading(true)
+      void getReposicionesAdmin({
+        estado: 'PENDIENTE_RECEPCION',
+        page,
+        limit: 10,
       })
-      .catch((requestError) => {
-        if (!active) return
-        if (getHttpErrorStatus(requestError) === 401) {
-          navigate('/login', { replace: true })
-          return
-        }
-        setError(reposicionErrorMessage(requestError))
-      })
-      .finally(() => {
-        if (active) setLoading(false)
-      })
+        .then((response) => {
+          if (!active) return
+          const items = normalizeReposicionesList(response)
+          setReposiciones(items)
+          setTotal(
+            Array.isArray(response) ? items.length : (response.total ?? items.length),
+          )
+          setTotalPages(
+            Array.isArray(response)
+              ? 1
+              : Math.max(response.totalPages ?? 1, 1),
+          )
+          setError('')
+        })
+        .catch((requestError) => {
+          if (!active) return
+          if (getHttpErrorStatus(requestError) === 401) {
+            navigate('/login', { replace: true })
+            return
+          }
+          setError(reposicionErrorMessage(requestError))
+        })
+        .finally(() => {
+          if (active) setLoading(false)
+        })
     })
     return () => {
       active = false
@@ -67,92 +85,186 @@ export default function RecepcionesPage() {
     setReloadKey((value) => value + 1)
   }
 
+  const from = total === 0 ? 0 : (page - 1) * 10 + 1
+  const to = Math.min(page * 10, total)
+
   return (
-    <section className="material-tracking" aria-labelledby="recepciones-title">
-      <header className="material-tracking__header">
-        <div>
-          <p className="material-request__eyebrow">Inventario · Administración</p>
-          <h1 id="recepciones-title">Recepción de materiales</h1>
-          <p>Consulte las compras pendientes de entrega y registre la recepción física en bodega.</p>
-        </div>
-        <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !py-3 !font-extrabold !text-blue-700 !shadow-[0_8px_20px_rgba(37,99,235,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
-      </header>
+    <section
+      className="inv-recepciones"
+      style={{ display: 'grid', gap: 14 }}
+      aria-labelledby="recepciones-title"
+    >
+      <PageHeader
+        title={<span id="recepciones-title">Recepción de materiales</span>}
+        description="Confirme la entrega física en bodega de las compras pendientes."
+        actions={
+          <>
+            <Button
+              to={REPOSICIONES_PATH}
+              variant="secondary"
+              leftIcon={<IconPackage size={18} aria-hidden="true" />}
+            >
+              Reposiciones
+            </Button>
+            <Button
+              to={MATERIALES_PATH}
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+            >
+              Volver al catálogo
+            </Button>
+          </>
+        }
+      />
 
       {!loading && !error ? (
-        <div className="!flex !w-full !items-center !justify-between !gap-5 !overflow-hidden !rounded-3xl !border !border-teal-100 !bg-linear-to-r !from-white !via-teal-50/40 !to-cyan-50/70 !p-6 !shadow-[0_12px_32px_rgba(13,148,136,0.1)] max-[640px]:!flex-col max-[640px]:!items-stretch">
-          <div className="!flex !items-center !gap-4">
-            <span className="!grid !size-12 !shrink-0 !place-items-center !rounded-2xl !bg-linear-to-br !from-teal-600 !to-cyan-500 !text-white !shadow-[0_9px_20px_rgba(13,148,136,0.25)]"><IconTruckDelivery size={24} aria-hidden="true" /></span>
-            <div>
-              <strong className="!block !text-base !font-extrabold !text-[#073b73]">Recepciones por confirmar</strong>
-              <small className="!mt-1 !block !text-sm !leading-6 !text-slate-500">Compras que se encuentran pendientes de entrega en bodega.</small>
+        <div className="inv-status-bar" role="status">
+          <div className="inv-status-bar__main">
+            <span className="inv-status-bar__icon">
+              <IconTruckDelivery size={20} aria-hidden="true" />
+            </span>
+            <div className="inv-status-bar__copy">
+              <p className="inv-status-bar__title">Recepciones por confirmar</p>
+              <p className="inv-status-bar__hint">
+                Compras pendientes de entrega en bodega
+              </p>
             </div>
           </div>
-          <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-teal-200 !bg-white !px-5 !py-3 !font-extrabold !text-teal-700 !shadow-[0_7px_18px_rgba(13,148,136,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(13,148,136,0.2)] motion-reduce:!transform-none motion-reduce:!transition-none max-[640px]:!w-fit" role="status"><span className="!size-2 !rounded-full !bg-teal-500 !shadow-[0_0_0_5px_rgba(20,184,166,0.12)]" aria-hidden="true" />{total} {total === 1 ? 'compra pendiente' : 'compras pendientes'} de recepción</span>
+          <div className="inv-status-bar__aside">
+            <MetricPill
+              label={total === 1 ? 'compra' : 'compras'}
+              value={total}
+              tone={total === 0 ? 'quiet' : 'primary'}
+            />
+          </div>
         </div>
       ) : null}
 
       {loading ? (
-        <div className="material-tracking__state" role="status">
-          <span className="material-request__spinner" />Cargando compras pendientes…
+        <div className="inv-state" role="status">
+          Cargando compras pendientes…
         </div>
       ) : null}
+
       {error ? (
-        <div className="material-tracking__state material-tracking__state--error" role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={retry}>
-            <IconRefresh size={18} aria-hidden="true" /> Reintentar
-          </button>
-        </div>
+        <Alert
+          tone="danger"
+          title="No se pudieron cargar las recepciones"
+          icon={<IconRefresh size={18} aria-hidden="true" />}
+        >
+          <p className="m-0 mb-3">{error}</p>
+          <Button
+            size="sm"
+            onClick={retry}
+            leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+          >
+            Reintentar
+          </Button>
+        </Alert>
       ) : null}
+
       {!loading && !error && reposiciones.length === 0 ? (
-        <div className="material-tracking__empty">
-          <h2>No hay compras pendientes de recepción</h2>
-          <p>Cuando una reposición quede en espera de entrega, aparecerá aquí para confirmar la recepción.</p>
-        </div>
+        <EmptyState
+          icon={<IconTruckDelivery size={30} aria-hidden="true" />}
+          title="No hay recepciones pendientes"
+          description="Cuando una reposición quede en espera de entrega, aparecerá aquí para confirmarla."
+          actions={
+            <Button to={REPOSICIONES_PATH} variant="secondary">
+              Ver reposiciones
+            </Button>
+          }
+        />
       ) : null}
 
       {!loading && !error && reposiciones.length > 0 ? (
-        <div className="material-tracking__table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Reposición</th>
-                <th>Proveedor</th>
-                <th>Fecha de compra</th>
-                <th>Materiales</th>
-                <th>Estado</th>
-                <th><span className="visually-hidden">Recepción</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {reposiciones.map((reposicion) => (
-                <tr key={reposicion.id}>
-                  <td data-label="Reposición"><strong>{getReposicionCodigo(reposicion)}</strong></td>
-                  <td data-label="Proveedor">{getReposicionProveedorNombre(reposicion)}</td>
-                  <td data-label="Fecha de compra">{formatReposicionFecha(reposicion.fechaCompra)}</td>
-                  <td data-label="Materiales">{resumenMaterialesReposicion(reposicion.detalles ?? [])}</td>
-                  <td data-label="Estado">
-                    <span className="material-tracking__badge" data-status={String(reposicion.estado).toUpperCase()}>
-                      {formatReposicionEstado(String(reposicion.estado))}
-                    </span>
-                  </td>
-                  <td data-label="Recepción">
-                    <Link className="material-tracking__detail-link" to={recepcionDetailPath(reposicion.id)}>
-                      Registrar recepción
-                    </Link>
-                  </td>
+        <section className="inv-panel" aria-label="Listado de recepciones">
+          <div className="inv-panel__heading">
+            <div>
+              <h2>Compras pendientes</h2>
+              <p>
+                Mostrando {from}–{to} de {total}
+              </p>
+            </div>
+          </div>
+          <div className="inv-table-wrap">
+            <table className="inv-table">
+              <caption className="visually-hidden">
+                Compras pendientes de recepción
+              </caption>
+              <thead>
+                <tr>
+                  <th>Reposición</th>
+                  <th>Proveedor</th>
+                  <th>Fecha de compra</th>
+                  <th>Materiales</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {reposiciones.map((reposicion) => (
+                  <tr key={reposicion.id}>
+                    <td data-label="Reposición">
+                      <strong>{getReposicionCodigo(reposicion)}</strong>
+                    </td>
+                    <td data-label="Proveedor">
+                      {getReposicionProveedorNombre(reposicion)}
+                    </td>
+                    <td data-label="Fecha de compra">
+                      {formatReposicionFecha(reposicion.fechaCompra)}
+                    </td>
+                    <td data-label="Materiales">
+                      {resumenMaterialesReposicion(reposicion.detalles ?? [])}
+                    </td>
+                    <td data-label="Estado">
+                      <span className="inv-badge inv-badge--low">
+                        {formatReposicionEstado(String(reposicion.estado))}
+                      </span>
+                    </td>
+                    <td data-label="Acción">
+                      <Button
+                        className="inv-row-action"
+                        size="sm"
+                        to={recepcionDetailPath(reposicion.id)}
+                      >
+                        Registrar recepción
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       ) : null}
 
       {!loading && !error && totalPages > 1 ? (
-        <nav className="material-tracking__pagination" aria-label="Paginación de recepciones">
-          <button type="button" disabled={page <= 1} onClick={() => { setLoading(true); setPage((value) => value - 1) }}>Anterior</button>
-          <span>Página {page} de {totalPages}</span>
-          <button type="button" disabled={page >= totalPages} onClick={() => { setLoading(true); setPage((value) => value + 1) }}>Siguiente</button>
+        <nav className="inv-pagination" aria-label="Paginación de recepciones">
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            disabled={page <= 1}
+            onClick={() => {
+              setLoading(true)
+              setPage((value) => value - 1)
+            }}
+          >
+            Anterior
+          </button>
+          <span>
+            Página {page} de {totalPages}
+          </span>
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            disabled={page >= totalPages}
+            onClick={() => {
+              setLoading(true)
+              setPage((value) => value + 1)
+            }}
+          >
+            Siguiente
+          </button>
         </nav>
       ) : null}
     </section>

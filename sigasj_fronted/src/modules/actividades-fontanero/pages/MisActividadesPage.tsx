@@ -113,9 +113,9 @@ const MisActividadesPage = () => {
       className="actividades-fontanero-historial !mx-0 !max-w-none !gap-7"
       aria-labelledby="mis-actividades-title"
     >
-      <header className="actividades-fontanero-historial__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+      <header className="actividades-fontanero-historial__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
         <div className="min-w-0 space-y-3">
-          <p className="!m-0 !text-sm !font-black !uppercase !tracking-[0.12em] !text-blue-600">
+          <p className="!m-0 !text-sm !font-black !uppercase !tracking-[0.12em] !text-[#1e5a9c]">
             Registro de Actividades
           </p>
           <h1
@@ -131,7 +131,7 @@ const MisActividadesPage = () => {
         <div className="flex shrink-0 flex-col items-stretch gap-3 lg:items-end">
           <Link
             to={ACTIVIDADES_FONTANERO_PATHS.home}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-5 py-3 font-bold !no-underline text-[#1e5a9c] shadow-md transition hover:-translate-y-0.5 hover:bg-[#eaf6ff] hover:!no-underline"
           >
             <IconArrowLeft size={20} aria-hidden="true" />
             Volver al menú de actividades
@@ -146,7 +146,7 @@ const MisActividadesPage = () => {
 
       <div className="actividades-fontanero-historial__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-6 md:!p-8">
         <label className="actividades-fontanero-historial__field">
-          <span className="text-sm font-black uppercase tracking-[0.08em] text-blue-700">Estado</span>
+          <span className="text-sm font-black uppercase tracking-[0.08em] text-[#1e5a9c]">Estado</span>
           <select
             value={estado}
             onChange={(event) => {
@@ -154,7 +154,7 @@ const MisActividadesPage = () => {
               setPage(1)
             }}
             data-testid="mis-actividades-estado"
-            className="!min-h-14 !rounded-2xl !border-blue-200 !bg-white !px-4"
+            className="!min-h-14 !rounded-2xl !border-[#bfe3fa] !bg-white !px-4"
           >
             <option value="">Todos</option>
             {ESTADOS_FILTRO.map((value) => (

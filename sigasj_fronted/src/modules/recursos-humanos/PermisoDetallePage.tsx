@@ -76,14 +76,14 @@ export default function PermisoDetallePage() {
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       <Link
         to={PERMISOS_PATH}
-        className="inline-flex w-fit items-center gap-2 font-bold text-blue-700 no-underline hover:underline"
+        className="inline-flex w-fit items-center gap-2 font-bold text-[#1e5a9c] no-underline hover:underline"
       >
         <IconArrowLeft size={18} aria-hidden="true" />
         Volver a permisos
       </Link>
 
       {cargando ? (
-        <div className="grid gap-4 rounded-2xl border border-sky-100 bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
+        <div className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
           <span className="sr-only">Cargando permiso…</span>
           {[0, 1, 2].map((fila) => (
             <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
@@ -96,7 +96,7 @@ export default function PermisoDetallePage() {
             {idValido && resultado.reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
@@ -120,16 +120,16 @@ export default function PermisoDetallePage() {
             </div>
           ) : null}
 
-          <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)]">
+              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
                 <IconCalendarEvent size={28} aria-hidden="true" />
               </span>
               <div className="min-w-0">
-                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
                   {RRHH_TITLE} · Permiso
                 </p>
-                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#062e63] sm:text-3xl">
+                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
                   {nombreColaboradorPermiso(permiso)}
                 </h1>
                 <p className="mt-2 m-0 font-semibold text-slate-500">{permiso.motivo}</p>
@@ -144,7 +144,7 @@ export default function PermisoDetallePage() {
             </Link>
           </header>
 
-          <section className="grid gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8">
+          <section className="grid gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8">
             <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Información del permiso</h2>
             <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               <Dato label="Colaborador">{nombreColaboradorPermiso(permiso)}</Dato>

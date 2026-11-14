@@ -91,7 +91,7 @@ const IndicatorCard = ({
   const cardContent = (
     <>
       {icon || badgeText || !modernActivitiesStyle ? <div className={`indicator-card__top${modernActivitiesStyle ? ' !items-start' : ''}`}>
-        {icon ? <span className={`indicator-card__icon${modernActivitiesStyle ? ' !grid !size-14 !place-items-center !rounded-2xl !border-0 !bg-linear-to-br !from-blue-600 !to-sky-500 !text-white !shadow-[0_9px_20px_rgba(37,99,235,0.25)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-105' : ''}`} aria-hidden="true">{icon}</span> : <div />}
+        {icon ? <span className={`indicator-card__icon${modernActivitiesStyle ? ' !grid !size-14 !place-items-center !rounded-2xl !border-0 !bg-linear-to-br !from-blue-600 !to-sky-500 !text-white !shadow-[0_9px_20px_rgba(30, 90, 156,0.25)] !transition-transform !duration-300 group-hover:!rotate-3 group-hover:!scale-105' : ''}`} aria-hidden="true">{icon}</span> : <div />}
         {badgeText ? (
           <span className={`indicator-card__badge indicator-card__badge--${badgeType}${modernActivitiesStyle ? ' !border !border-current/15 !px-3 !py-1.5 !font-extrabold' : ''}`}>
             {badgeText}
@@ -103,7 +103,7 @@ const IndicatorCard = ({
         <span
           className={`indicator-card__value ${
             !hasValue ? 'indicator-card__value--unavailable' : ''
-          }${modernActivitiesStyle ? ' !text-[2.5rem] !font-black !tracking-[-0.04em] !text-[#062e63]' : ''}`}
+          }${modernActivitiesStyle ? ' !text-[2.5rem] !font-black !tracking-[-0.04em] !text-[#1e5a9c]' : ''}`}
           aria-label={!hasValue ? `${title}: No disponible` : undefined}
         >
           {displayValue}
@@ -113,7 +113,7 @@ const IndicatorCard = ({
       </div>
 
       {link ? (
-        <span className={`indicator-card__link-text${modernActivitiesStyle ? ' !inline-flex !w-fit !items-center !justify-center !rounded-xl !border !border-blue-200 !bg-blue-50 !px-4 !py-2.5 !font-extrabold !text-blue-700 !shadow-sm !transition-all !duration-300 group-hover:!border-blue-600 group-hover:!bg-blue-600 group-hover:!text-white group-hover:!shadow-md' : ''}`} aria-hidden="true">
+        <span className={`indicator-card__link-text${modernActivitiesStyle ? ' !inline-flex !w-fit !items-center !justify-center !rounded-xl !border !border-[#bfe3fa] !bg-[#eaf6ff] !px-4 !py-2.5 !font-extrabold !text-[#1e5a9c] !shadow-sm !transition-all !duration-300 group-hover:!border-blue-600 group-hover:!bg-blue-600 group-hover:!text-white group-hover:!shadow-md' : ''}`} aria-hidden="true">
           Ver detalles &rarr;
         </span>
       ) : null}

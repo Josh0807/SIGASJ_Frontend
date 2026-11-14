@@ -40,7 +40,7 @@ const AnnouncementCard = ({
   const titleId = `announcement-title-${id}`
   const showMeta = Boolean(safeType || formattedDate || urgent)
 
-  const cardClassName = `flex h-full min-h-[320px] flex-col overflow-hidden rounded-[18px] border-[3px] bg-white shadow-none transition hover:-translate-y-0.5 hover:shadow-none ${urgent ? 'border-amber-300' : 'border-white'}`
+  const cardClassName = `flex h-full min-h-[280px] flex-col overflow-hidden rounded-[13px] border bg-white transition-[border-color,box-shadow] duration-150 hover:border-sigasj-primary/40 hover:shadow-[0_4px_14px_rgba(16,43,56,0.06)] ${urgent ? 'border-sigasj-error/40' : 'border-sigasj-border'}`
 
   const imageAlt = `Ilustración del comunicado: ${safeTitle}`
 
@@ -51,15 +51,15 @@ const AnnouncementCard = ({
       aria-labelledby={titleId}
     >
       {safeImageUrl ? (
-        <div className="m-0.5 aspect-[2.35/1] overflow-hidden rounded-[14px] bg-[#eef8ff]">
+        <div className="aspect-[2.35/1] overflow-hidden rounded-t-[13px] bg-sigasj-surface-soft">
           <button
             type="button"
-            className="block h-full w-full cursor-zoom-in border-0 bg-transparent p-0 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-sky-400"
+            className="block h-full w-full cursor-zoom-in border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sigasj-primary"
             aria-label={`Ver imagen ampliada: ${safeTitle}`}
             onClick={onImageClick}
           >
             <img
-              className="h-full w-full object-contain transition duration-500 hover:scale-[1.01]"
+              className="h-full w-full object-cover"
               src={safeImageUrl}
               alt={imageAlt}
               loading="lazy"
@@ -71,32 +71,32 @@ const AnnouncementCard = ({
 
       <div className="flex flex-1 flex-col px-5 pb-4 pt-3 max-[640px]:px-4">
         {showMeta ? (
-          <p className="m-0 mb-1.5 flex flex-wrap items-center gap-x-2 text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-[#1874c8]">
+          <p className="m-0 mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-sigasj-primary">
             {safeType ? <span>{safeType}</span> : null}
             {formattedDate ? (
               <time dateTime={safePublishedAt}>{formattedDate}</time>
             ) : null}
             {urgent ? (
-              <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-800">
+              <span className="rounded-md bg-[#f8e8e8] px-2 py-1 text-sigasj-error normal-case tracking-normal">
                 Prioridad alta
               </span>
             ) : null}
           </p>
         ) : null}
 
-        <h3 className="m-0 text-[1.05rem] font-extrabold leading-tight text-[#092e67]" id={titleId}>
+        <h3 className="m-0 font-sigasj-display text-[1.05rem] font-bold leading-tight text-sigasj-text" id={titleId}>
           {safeTitle}
         </h3>
 
         {bodyText && !safeImageUrl ? (
-          <p className="mb-0 mt-3 line-clamp-3 text-sm leading-6 text-[#496b78]">{bodyText}</p>
+          <p className="mb-0 mt-3 line-clamp-3 text-sm leading-6 text-sigasj-muted">{bodyText}</p>
         ) : null}
 
         <footer className="mt-auto flex flex-wrap gap-3 pt-3">
           {safeImageUrl ? (
             <button
               type="button"
-              className="announcement-motion-button inline-flex min-h-9 cursor-pointer items-center gap-4 rounded-[10px] border border-[#0872d3] bg-white px-5 text-xs font-bold text-[#0869bd] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-white px-4 text-xs font-semibold text-sigasj-primary-hover transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft"
               onClick={onImageClick}
             >
               Ver imagen <IconArrowRight size={18} aria-hidden="true" />
@@ -113,7 +113,7 @@ const AnnouncementCard = ({
 
           {safeFileUrl ? (
             <a
-              className="announcement-motion-button inline-flex min-h-10 items-center rounded-xl border border-sky-200 px-5 text-sm font-bold text-[#0869bd] no-underline"
+              className="inline-flex min-h-11 items-center rounded-[10px] border border-sigasj-border-strong px-4 text-sm font-semibold text-sigasj-primary-hover no-underline transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft"
               href={safeFileUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -136,7 +136,7 @@ type CardActionProps = {
 const isInternalSpaPath = (href: string) =>
   href.startsWith('/') && !href.startsWith('//')
 
-const cardActionClassName = 'announcement-motion-button inline-flex min-h-10 items-center rounded-xl border border-[#0872d3] bg-white px-5 text-sm font-bold text-[#0869bd] no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400'
+const cardActionClassName = 'inline-flex min-h-11 items-center rounded-[10px] border border-sigasj-border-strong bg-white px-4 text-sm font-semibold text-sigasj-primary-hover no-underline transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft'
 
 const CardAction = ({ label, href, onClick }: CardActionProps) => {
   if (href) {
