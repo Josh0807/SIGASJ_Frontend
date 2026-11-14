@@ -4,12 +4,15 @@ import { LANDING_SECTION_IDS } from './landingSections'
 describe('landingSections', () => {
   it('organiza las secciones en el orden definido', () => {
     expect(LANDING_SECTION_IDS).toEqual([
+      'aviso-institucional',
+      'accesos-rapidos',
       'sobre-nosotros',
-      'comunicados',
-      'transparencia',
       'solicitudes-servicio',
+      'pagos',
       'reporte-averias',
       'quejas',
+      'comunicados',
+      'transparencia',
       'proyectos',
       'galeria',
       'contacto',
@@ -19,8 +22,11 @@ describe('landingSections', () => {
   it('incluye las secciones reutilizables requeridas', () => {
     expect(LANDING_SECTION_IDS).toEqual(
       expect.arrayContaining([
+        'aviso-institucional',
+        'accesos-rapidos',
         'sobre-nosotros',
         'comunicados',
+        'pagos',
         'reporte-averias',
         'quejas',
         'proyectos',

@@ -1,5 +1,6 @@
 import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { getHttpErrorStatus } from '../solicitudes-materiales/solicitudMaterialesUtils'
+import { formatCantidadUnidad } from '../unidadMedidaUtils'
 import type { MovimientoInventario, MovimientosListResponse } from './types'
 
 export { getHttpErrorStatus }
@@ -25,12 +26,8 @@ export const formatMovimientoTipo = (tipo?: string | null) => {
   return tipo ?? '—'
 }
 
-export const formatMovimientoCantidad = (movimiento: MovimientoInventario) => {
-  const unidad = movimiento.material?.unidadMedida?.trim()
-  const cantidad = movimiento.cantidad
-  if (!unidad) return String(cantidad)
-  return `${cantidad} ${unidad}`
-}
+export const formatMovimientoCantidad = (movimiento: MovimientoInventario) =>
+  formatCantidadUnidad(movimiento.cantidad, movimiento.material?.unidadMedida)
 
 export const getMovimientoMaterialNombre = (movimiento: MovimientoInventario) =>
   movimiento.material?.nombre?.trim() || `Material #${movimiento.idMaterial}`

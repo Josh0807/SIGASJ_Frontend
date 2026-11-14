@@ -1,0 +1,568 @@
+/**
+ * Sage IA — gotín + panel (solo .admin-layout--panel).
+ */
+
+.admin-layout--panel .sage-ia {
+  --sage-ia-violet: #7c5cbf;
+  --sage-ia-blue: #3e7fd6;
+  --sage-ia-cyan: #6ec8f0;
+  --sage-ia-ink: #123f70;
+  --sage-ia-muted: #5b7390;
+  --sage-ia-border: #d7e5f1;
+  --sage-ia-bg: #eaf6ff;
+  --sage-ia-card: #ffffff;
+  --sage-ia-primary: var(--asada-navy, #1e5a9c);
+  --sage-ia-radius: 22px;
+  --sage-ia-shadow: 0 16px 40px rgba(18, 63, 112, 0.14);
+}
+
+/* —— Gotín (mascota) —— */
+.admin-layout--panel .sage-ia__gotin {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  /* Forma de gota: punta arriba, cuerpo redondo abajo */
+  border-radius: 52% 48% 48% 52% / 38% 38% 62% 62%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.92) 0 12%, transparent 40%),
+    radial-gradient(circle at 68% 72%, rgba(110, 200, 240, 0.45), transparent 55%),
+    linear-gradient(160deg, var(--sage-ia-violet) 0%, var(--sage-ia-blue) 48%, var(--sage-ia-cyan) 100%);
+  box-shadow:
+    inset 0 -6px 14px rgba(30, 60, 120, 0.18),
+    inset 0 4px 10px rgba(255, 255, 255, 0.35),
+    0 10px 22px rgba(62, 127, 214, 0.28);
+  transform: rotate(-8deg);
+}
+
+.admin-layout--panel .sage-ia__gotin--sm {
+  width: 22px;
+  height: 26px;
+}
+
+.admin-layout--panel .sage-ia__gotin--md {
+  width: 42px;
+  height: 48px;
+}
+
+.admin-layout--panel .sage-ia__gotin--lg {
+  width: 58px;
+  height: 66px;
+}
+
+.admin-layout--panel .sage-ia__gotin-shine {
+  position: absolute;
+  top: 16%;
+  left: 22%;
+  width: 28%;
+  height: 18%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
+.admin-layout--panel .sage-ia__gotin-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.22em;
+  margin-top: 0.18em;
+  transform: rotate(8deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.admin-layout--panel .sage-ia__gotin-eye {
+  width: 0.3em;
+  height: 0.36em;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 1.5px rgba(255, 255, 255, 0.4),
+    0 1px 2px rgba(20, 40, 80, 0.35);
+  position: relative;
+}
+
+.admin-layout--panel .sage-ia__gotin-eye::after {
+  content: '';
+  position: absolute;
+  top: 22%;
+  left: 28%;
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.admin-layout--panel .sage-ia__gotin-blush {
+  position: absolute;
+  top: 52%;
+  width: 0.22em;
+  height: 0.14em;
+  border-radius: 50%;
+  background: rgba(255, 140, 170, 0.55);
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.admin-layout--panel .sage-ia__gotin-blush--left {
+  left: 18%;
+}
+
+.admin-layout--panel .sage-ia__gotin-blush--right {
+  right: 18%;
+}
+
+.admin-layout--panel .sage-ia__gotin-smile {
+  position: absolute;
+  bottom: 26%;
+  left: 50%;
+  width: 0.34em;
+  height: 0.18em;
+  border: 0.045em solid rgba(255, 255, 255, 0.92);
+  border-top: 0;
+  border-radius: 0 0 0.34em 0.34em;
+  transform: translateX(-50%) rotate(8deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.admin-layout--panel .sage-ia__gotin--sm .sage-ia__gotin-blush,
+.admin-layout--panel .sage-ia__gotin--sm .sage-ia__gotin-smile {
+  font-size: 22px;
+}
+
+.admin-layout--panel .sage-ia__gotin--md .sage-ia__gotin-blush,
+.admin-layout--panel .sage-ia__gotin--md .sage-ia__gotin-smile {
+  font-size: 42px;
+}
+
+.admin-layout--panel .sage-ia__gotin--lg .sage-ia__gotin-blush,
+.admin-layout--panel .sage-ia__gotin--lg .sage-ia__gotin-smile {
+  font-size: 58px;
+}
+
+.admin-layout--panel .sage-ia__gotin--sm .sage-ia__gotin-face {
+  font-size: 22px;
+  margin-top: 0.2em;
+}
+
+.admin-layout--panel .sage-ia__gotin--md .sage-ia__gotin-face {
+  font-size: 42px;
+}
+
+.admin-layout--panel .sage-ia__gotin--lg .sage-ia__gotin-face {
+  font-size: 58px;
+}
+
+/* —— Lanzador fijo (gotín + saludo) —— */
+.admin-layout--panel .sage-ia__launcher {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.admin-layout--panel .sage-ia__launcher.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92);
+}
+
+.admin-layout--panel .sage-ia__hello {
+  margin: 0 0 10px;
+  max-width: 11.5rem;
+  padding: 10px 14px;
+  border: 1px solid var(--sage-ia-border);
+  border-radius: 16px 16px 4px 16px;
+  background: var(--sage-ia-card);
+  color: var(--sage-ia-ink);
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 10px 24px rgba(18, 63, 112, 0.12);
+}
+
+.admin-layout--panel .sage-ia__sphere {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  transition: transform 160ms ease;
+}
+
+.admin-layout--panel .sage-ia__sphere:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.admin-layout--panel .sage-ia__sphere:focus-visible {
+  outline: 2px solid var(--sage-ia-primary);
+  outline-offset: 4px;
+}
+
+.admin-layout--panel .sage-ia__sphere-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(126, 200, 255, 0.42), transparent 68%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .admin-layout--panel .sage-ia__launcher:not(.is-hidden) .sage-ia__sphere {
+    animation: sage-ia-float 4.8s ease-in-out infinite;
+  }
+
+  .admin-layout--panel .sage-ia__launcher:not(.is-hidden) .sage-ia__gotin--lg {
+    animation: sage-ia-wobble 5.4s ease-in-out infinite;
+  }
+}
+
+@keyframes sage-ia-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes sage-ia-wobble {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+}
+
+.admin-layout--panel .sage-ia__minimized {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(92px, calc(env(safe-area-inset-bottom) + 88px));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--sage-ia-border);
+  border-radius: 999px;
+  background: var(--sage-ia-card);
+  color: var(--sage-ia-ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: var(--sage-ia-shadow);
+  cursor: pointer;
+}
+
+/* —— Panel —— */
+.admin-layout--panel .sage-ia__panel-root {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+}
+
+.admin-layout--panel .sage-ia__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(18, 63, 112, 0.22);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.admin-layout--panel .sage-ia__panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: min(400px, calc(100vw - 24px));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--sage-ia-border);
+  border-radius: var(--sage-ia-radius);
+  background: var(--sage-ia-bg);
+  box-shadow: var(--sage-ia-shadow);
+  pointer-events: auto;
+}
+
+.admin-layout--panel .sage-ia__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--sage-ia-border);
+  background: var(--sage-ia-card);
+}
+
+.admin-layout--panel .sage-ia__brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-layout--panel .sage-ia__avatar {
+  margin-top: 2px;
+}
+
+.admin-layout--panel .sage-ia__title {
+  margin: 0;
+  color: var(--sage-ia-ink);
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.admin-layout--panel .sage-ia__status {
+  margin: 2px 0 6px;
+  color: var(--sage-ia-muted);
+  font-size: 0.75rem;
+}
+
+.admin-layout--panel .sage-ia__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #b45309;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.admin-layout--panel .sage-ia__badge--live {
+  background: #eaf6ff;
+  color: #123f70;
+}
+
+.admin-layout--panel .sage-ia__header-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.admin-layout--panel .sage-ia__icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--sage-ia-border);
+  border-radius: 12px;
+  background: #f7fbfe;
+  color: var(--sage-ia-ink);
+  cursor: pointer;
+}
+
+.admin-layout--panel .sage-ia__icon-btn:hover {
+  background: #eaf6ff;
+}
+
+.admin-layout--panel .sage-ia__messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--sage-ia-bg);
+}
+
+.admin-layout--panel .sage-ia__row {
+  display: flex;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.admin-layout--panel .sage-ia__row--user {
+  justify-content: flex-end;
+}
+
+.admin-layout--panel .sage-ia__bubble {
+  max-width: min(100%, 320px);
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.admin-layout--panel .sage-ia__bubble--assistant {
+  background: var(--sage-ia-card);
+  border: 1px solid color-mix(in srgb, var(--sage-ia-border) 80%, white);
+  color: var(--sage-ia-ink);
+  border-bottom-left-radius: 6px;
+  box-shadow: 0 6px 16px rgba(18, 63, 112, 0.06);
+}
+
+.admin-layout--panel .sage-ia__bubble--user {
+  background: var(--sage-ia-primary);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+  box-shadow: 0 6px 16px rgba(30, 90, 156, 0.18);
+}
+
+.admin-layout--panel .sage-ia__typing {
+  color: var(--sage-ia-muted);
+  font-style: italic;
+}
+
+.admin-layout--panel .sage-ia__suggestions {
+  padding: 0 16px 12px;
+  background: var(--sage-ia-bg);
+}
+
+.admin-layout--panel .sage-ia__suggestions-label {
+  margin: 0 0 8px;
+  color: var(--sage-ia-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-layout--panel .sage-ia__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-layout--panel .sage-ia__chip {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--sage-ia-border);
+  border-radius: 999px;
+  background: var(--sage-ia-card);
+  color: var(--sage-ia-ink);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-layout--panel .sage-ia__chip:hover:not(:disabled) {
+  border-color: #bfe3fa;
+  background: #fff;
+}
+
+.admin-layout--panel .sage-ia__chip:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.admin-layout--panel .sage-ia__form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--sage-ia-border);
+  background: var(--sage-ia-card);
+}
+
+.admin-layout--panel .sage-ia__form input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--sage-ia-border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--sage-ia-ink);
+  font: inherit;
+}
+
+.admin-layout--panel .sage-ia__form input:focus {
+  outline: 2px solid color-mix(in srgb, var(--sage-ia-primary) 35%, transparent);
+  border-color: var(--sage-ia-primary);
+}
+
+.admin-layout--panel .sage-ia__send {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: #3b82c4;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(30, 90, 156, 0.22);
+}
+
+.admin-layout--panel .sage-ia__send:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.admin-layout--panel .sage-ia__send:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+@media (max-width: 760px) {
+  .admin-layout--panel .sage-ia__panel {
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: auto;
+    border-radius: 18px;
+  }
+
+  .admin-layout--panel .sage-ia__launcher {
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .admin-layout--panel .sage-ia__hello {
+    max-width: 9.5rem;
+    font-size: 0.78rem;
+  }
+
+  .admin-layout--panel .sage-ia__sphere {
+    width: 64px;
+    height: 64px;
+  }
+
+  .admin-layout--panel .sage-ia__gotin--lg {
+    width: 52px;
+    height: 60px;
+  }
+
+  .admin-layout--panel .sage-ia__minimized {
+    bottom: max(84px, calc(env(safe-area-inset-bottom) + 78px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-layout--panel .sage-ia__launcher,
+  .admin-layout--panel .sage-ia__sphere,
+  .admin-layout--panel .sage-ia__gotin--lg,
+  .admin-layout--panel .sage-ia__sphere:hover {
+    animation: none;
+    transition: none;
+  }
+}

@@ -10,6 +10,8 @@ export type AdminSidebarProps = {
   items?: AdminSidebarItem[]
   isDrawer?: boolean
   isOpen?: boolean
+  collapsed?: boolean
+  onToggleCollapsed?: () => void
   onNavigate?: () => void
   onClose?: () => void
   closeButtonRef?: Ref<HTMLButtonElement>

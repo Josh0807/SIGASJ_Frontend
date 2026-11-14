@@ -78,7 +78,7 @@ const applicantName = (row: {
 }
 
 const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
 
 export default function SolicitudesAdminListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -166,19 +166,19 @@ export default function SolicitudesAdminListPage() {
   return (
     <main className="admin-content-modern grid min-w-0 gap-5 sm:gap-6">
       <Link
-        className="group inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-4 font-extrabold text-[#075fae] no-underline shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:bg-white hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
+        className="group inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-[#bfe3fa] bg-white/80 px-4 font-extrabold text-[#075fae] no-underline shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:bg-white hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
         to={SOLICITUDES_ADMIN_PATH}
       >
         <IconArrowLeft className="transition-transform group-hover:-translate-x-0.5 motion-reduce:transform-none" size={18} aria-hidden="true" />
         Volver a Gestión de solicitudes
       </Link>
 
-      <header className="flex flex-col gap-5 rounded-3xl border border-sky-100 bg-white p-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <header className="flex flex-col gap-5 rounded-3xl border border-[#d7e5f1] bg-white p-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="mb-3 mt-0 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          <p className="mb-3 mt-0 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
             Administración · Solicitudes
           </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
+          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
             Trámites digitales
           </h1>
           <p className="mb-0 mt-3 max-w-2xl text-base leading-7 text-slate-500">
@@ -189,7 +189,7 @@ export default function SolicitudesAdminListPage() {
       </header>
 
       <section
-        className="grid gap-4 rounded-3xl border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:p-6 lg:grid-cols-[minmax(240px,2fr)_minmax(180px,1fr)_minmax(190px,1fr)_auto] lg:items-end"
+        className="grid gap-4 rounded-3xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:p-6 lg:grid-cols-[minmax(240px,2fr)_minmax(180px,1fr)_minmax(190px,1fr)_auto] lg:items-end"
         aria-label="Búsqueda y filtros"
       >
         <label className="grid gap-2">
@@ -252,13 +252,13 @@ export default function SolicitudesAdminListPage() {
       </section>
 
       <section
-        className="overflow-hidden rounded-[28px] border border-sky-100/90 bg-white shadow-[0_18px_45px_rgba(30,90,156,0.10)]"
+        className="overflow-hidden rounded-[28px] border border-[#d7e5f1]/90 bg-white shadow-[0_18px_45px_rgba(30, 90, 156,0.10)]"
         aria-label="Listado de solicitudes"
       >
         {loading ? (
           <div className="grid min-h-64 place-items-center p-8" role="status">
             <span className="text-center font-bold text-[#315d87]">
-              <span className="mx-auto mb-3 block size-9 animate-spin rounded-full border-4 border-sky-100 border-t-blue-600" />
+              <span className="mx-auto mb-3 block size-9 animate-spin rounded-full border-4 border-[#d7e5f1] border-t-blue-600" />
               Cargando solicitudes…
             </span>
           </div>
@@ -278,7 +278,7 @@ export default function SolicitudesAdminListPage() {
           <div className="grid min-h-64 place-items-center p-8 text-center">
             <div>
               <IconSearch className="mx-auto text-sky-300" size={42} />
-              <h2 className="mb-0 mt-3 text-xl font-extrabold text-[#073b79]">
+              <h2 className="mb-0 mt-3 text-xl font-extrabold text-[#1e5a9c]">
                 No se encontraron solicitudes
               </h2>
               <p className="mb-0 mt-2 text-slate-500">
@@ -349,7 +349,7 @@ export default function SolicitudesAdminListPage() {
         )}
         {!loading && !error && total > 0 ? (
           <nav
-            className="flex flex-col items-center justify-between gap-4 border-t border-sky-100 bg-slate-50/40 px-6 py-5 text-sm text-slate-500 sm:flex-row"
+            className="flex flex-col items-center justify-between gap-4 border-t border-[#d7e5f1] bg-slate-50/40 px-6 py-5 text-sm text-slate-500 sm:flex-row"
             aria-label="Paginación de solicitudes"
           >
             <p className="m-0 font-medium">

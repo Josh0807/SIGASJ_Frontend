@@ -32,12 +32,12 @@ export default function SolicitudHistorialTimeline({
 
   return (
     <section
-      className="relative overflow-hidden rounded-[26px] border border-sky-100 bg-white p-7 shadow-[0_14px_36px_rgba(39,112,166,0.1)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-gradient-to-r before:from-[#0872d3] before:via-sky-400 before:to-cyan-300 max-[640px]:p-4"
+      className="relative overflow-hidden rounded-[26px] border border-[#d7e5f1] bg-white p-7 shadow-[0_14px_36px_rgba(30, 90, 156,0.1)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-gradient-to-r before:from-[#0872d3] before:via-sky-400 before:to-cyan-300 max-[640px]:p-4"
       aria-labelledby="solicitud-historial-title"
     >
       <h2
         id="solicitud-historial-title"
-        className="m-0 text-xl font-black tracking-[-0.02em] text-[#073b79]"
+        className="m-0 text-xl font-black tracking-[-0.02em] text-[#1e5a9c]"
       >
         Historial de la solicitud
       </h2>
@@ -60,7 +60,7 @@ export default function SolicitudHistorialTimeline({
           {onRetry ? (
             <button
               type="button"
-              className="mt-3 min-h-10 rounded-xl border border-blue-200 bg-white px-3 text-sm font-bold text-blue-800"
+              className="mt-3 min-h-10 rounded-xl border border-[#bfe3fa] bg-white px-3 text-sm font-bold text-blue-800"
               onClick={onRetry}
             >
               Reintentar
@@ -90,7 +90,7 @@ export default function SolicitudHistorialTimeline({
                   className="relative z-10 mt-5 size-3.5 rounded-full border-[3px] border-white bg-[#1476cf] shadow-[0_0_0_4px_rgba(20,118,207,0.16)] transition-transform duration-300 group-hover:scale-125 motion-reduce:transform-none"
                   aria-hidden="true"
                 />
-                <article className="min-w-0 rounded-[22px] border border-sky-100 bg-[linear-gradient(145deg,#ffffff_0%,#fbfdff_100%)] p-5 shadow-[0_7px_20px_rgba(39,112,166,0.07)] transition-all duration-300 group-hover:border-sky-200 group-hover:shadow-[0_13px_28px_rgba(39,112,166,0.13)] max-[640px]:p-4 motion-reduce:transition-none">
+                <article className="min-w-0 rounded-[22px] border border-[#d7e5f1] bg-[linear-gradient(145deg,#ffffff_0%,#fbfdff_100%)] p-5 shadow-[0_7px_20px_rgba(30, 90, 156,0.07)] transition-all duration-300 group-hover:border-[#bfe3fa] group-hover:shadow-[0_13px_28px_rgba(30, 90, 156,0.13)] max-[640px]:p-4 motion-reduce:transition-none">
                   <header className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                     <time
                       className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-xs font-extrabold text-[#173f6e]"
@@ -106,7 +106,7 @@ export default function SolicitudHistorialTimeline({
                     </time>
                   </header>
 
-                  <p className="mb-0 mt-4 text-lg font-black leading-snug tracking-[-0.015em] text-[#073b79]">
+                  <p className="mb-0 mt-4 text-lg font-black leading-snug tracking-[-0.015em] text-[#1e5a9c]">
                     {tituloTransicionHistorial(evento)}
                   </p>
 
@@ -144,7 +144,7 @@ export default function SolicitudHistorialTimeline({
                   ) : null}
 
                   {evento.observacionPublica ? (
-                    <div className="mt-3 rounded-2xl border border-sky-200 bg-sky-50/70 px-4 py-3 shadow-inner">
+                    <div className="mt-3 rounded-2xl border border-[#bfe3fa] bg-sky-50/70 px-4 py-3 shadow-inner">
                       <p className="m-0 text-xs font-extrabold uppercase tracking-wide text-sky-800">
                         Observación pública
                       </p>

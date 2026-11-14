@@ -72,12 +72,12 @@ describe('RequestsSection', () => {
     expect(markup).not.toContain('download=""')
   })
 
-  it('incluye adaptación móvil y foco visible en las acciones', () => {
+  it('incluye adaptación móvil y focos táctiles adecuados en las acciones', () => {
     const markup = renderSection()
 
     expect(markup).toContain('max-[760px]:grid-cols-1')
     expect(markup).toContain('max-[520px]:grid-cols-1')
-    expect((markup.match(/focus-visible:outline-3/g) ?? []).length).toBeGreaterThanOrEqual(8)
+    expect((markup.match(/min-h-11/g) ?? []).length).toBeGreaterThanOrEqual(8)
   })
 
   it('diferencia otros formularios de los trámites digitales', () => {

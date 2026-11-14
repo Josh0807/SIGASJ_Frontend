@@ -65,7 +65,7 @@ export default function MiSaldoVacacionesPage() {
   return (
     <div className="admin-surface-page">
       <header className="grid gap-2">
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63]">
+        <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c]">
           {FONTANERO_MI_SALDO_TITLE}
         </h1>
         <p className="m-0 text-slate-500">
@@ -87,7 +87,7 @@ export default function MiSaldoVacacionesPage() {
             {reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
@@ -98,21 +98,21 @@ export default function MiSaldoVacacionesPage() {
         ) : balance ? (
           <>
             <div className="flex items-start gap-4">
-              <span className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white">
+              <span className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white">
                 <IconBeach size={28} aria-hidden="true" />
               </span>
               <div>
-                <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-blue-600">
+                <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-[#1e5a9c]">
                   Su saldo
                 </p>
-                <h2 className="m-0 text-2xl font-black text-[#062e63]">
+                <h2 className="m-0 text-2xl font-black text-[#1e5a9c]">
                   {nombreCompleto(balance.colaborador)}
                 </h2>
                 <p className="mb-0 mt-1 text-slate-500">{balance.colaborador.cargo}</p>
               </div>
             </div>
             <dl className="m-0 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-sky-100 bg-sky-50/70 px-5 py-4">
+              <div className="rounded-2xl border border-[#d7e5f1] bg-sky-50/70 px-5 py-4">
                 <dt className="text-xs font-extrabold uppercase text-sky-900/70">Adquiridas</dt>
                 <dd className="m-0 text-3xl font-black text-sky-900">
                   {balance.diasAcumulados}

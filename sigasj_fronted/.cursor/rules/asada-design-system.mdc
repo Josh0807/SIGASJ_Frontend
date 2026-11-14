@@ -1,0 +1,16 @@
+---
+description: Design system ASADA/SIGASJ — tokens, shared/ui, inventario
+globs: src/**/*.{tsx,ts,css}
+alwaysApply: false
+---
+
+# Design System ASADA
+
+- Fuente de color: `asada-tokens.css` + `@theme` en `tailwind.css` (misma paleta azul). No reintroducir teal.
+- UI nueva: preferir `src/shared/ui` (`Button`, `Badge`, `Alert`, `Card`, `PageHeader`, `EmptyState`, `MetricPill`, `cn`).
+- Inventario: mantener lógica/roles/stock; estilos con `inv-*` o `shared/ui`. No agregar BEM nuevo a `index.css`.
+- Tailwind Preflight sigue desactivado. No activarlo.
+- Evitar gradientes `from-blue-*` / `to-sky-*` dentro de `.inventory-bodega` (overrides los fuerzan a navy).
+- Motion: CSS corto + `prefers-reduced-motion`; no AOS en admin.
+- Antes de libs nuevas (Radix/shadcn/Playwright/Storybook/TanStack/Recharts/Motion): acordar fase; no dump completo.
+- Ver `DESIGN.md` en la raíz del frontend.

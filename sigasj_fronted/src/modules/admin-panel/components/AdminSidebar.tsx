@@ -7,6 +7,8 @@ import {
   IconClipboardList,
   IconCoin,
   IconFiles,
+  IconLayoutSidebarLeftCollapse,
+  IconLayoutSidebarLeftExpand,
 } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import AdminNavIcon from './AdminNavIcon'
@@ -65,10 +67,8 @@ const FONTANERO_AUSENCIA_SUBLINKS = [
 ] as const
 
 const sublinkClass = (isActive: boolean) =>
-  `group flex min-h-9 items-center gap-2.5 rounded-xl px-3 py-1.5 text-xs font-bold no-underline transition ${
-    isActive
-      ? 'bg-gradient-to-r from-[#3e8fd6] to-[#1e5a9c] text-white shadow-[0_7px_18px_rgba(62,143,214,0.32)]'
-      : 'text-sky-100/80 hover:bg-white/10 hover:text-white'
+  `admin-sidebar__sublink group flex min-h-9 items-center gap-2.5 rounded-xl px-3 py-1.5 text-xs font-bold no-underline transition ${
+    isActive ? 'admin-sidebar__sublink--active' : ''
   }`
 
 const isFontaneroAusenciaNavActive = (pathname: string) =>
@@ -80,6 +80,8 @@ const AdminSidebar = ({
   items = [],
   isDrawer = false,
   isOpen = false,
+  collapsed = false,
+  onToggleCollapsed,
   onNavigate,
   onClose,
   closeButtonRef,
@@ -112,7 +114,7 @@ const AdminSidebar = ({
   <aside
     ref={sidebarRef}
     id="admin-navigation"
-    className="admin-sidebar min-h-0 flex flex-col"
+    className="admin-sidebar"
     aria-label="Menú administrativo"
     role={isDrawer && isOpen ? 'dialog' : undefined}
     aria-modal={isDrawer && isOpen ? true : undefined}
@@ -149,9 +151,10 @@ const AdminSidebar = ({
               <div className="relative grid">
                 <button
                   type="button"
-                  className={`admin-sidebar__link w-full text-left${
+                  className={`admin-sidebar__link admin-sidebar__link--has-submenu${
                     ausenciasActive ? ' admin-sidebar__link--active' : ''
                   }`}
+                  title="Permisos y vacaciones"
                   aria-expanded={ausenciasOpen}
                   aria-controls="fontanero-ausencias-submenu"
                   aria-label={
@@ -159,16 +162,35 @@ const AdminSidebar = ({
                       ? 'Cerrar subsecciones de permisos y vacaciones'
                       : 'Abrir subsecciones de permisos y vacaciones'
                   }
-                  onClick={() => setAusenciasOpen((open) => !open)}
+                  onClick={() => {
+                    if (collapsed) onToggleCollapsed?.()
+                    setAusenciasOpen((open) => !open)
+                  }}
                 >
                   <span className="admin-sidebar__icon" aria-hidden="true" data-icon="rrhh">
                     <AdminNavIcon name="rrhh" />
                   </span>
-                  <span className="admin-sidebar__label min-w-0 flex-1">
+                  <span className="admin-sidebar__label">
                     Permisos y vacaciones
                   </span>
+                </button>
+                <button
+                  className="admin-sidebar__chevron absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-lg border-0 bg-transparent transition"
+                  type="button"
+                  aria-label={
+                    ausenciasOpen
+                      ? 'Cerrar subsecciones de permisos y vacaciones'
+                      : 'Abrir subsecciones de permisos y vacaciones'
+                  }
+                  aria-expanded={ausenciasOpen}
+                  aria-controls="fontanero-ausencias-submenu"
+                  onClick={() => {
+                    if (collapsed) onToggleCollapsed?.()
+                    setAusenciasOpen((open) => !open)
+                  }}
+                >
                   <IconChevronDown
-                    className={`ml-auto shrink-0 transition-transform duration-200 ${ausenciasOpen ? 'rotate-180' : ''}`}
+                    className={`transition-transform duration-200 ${ausenciasOpen ? 'rotate-180' : ''}`}
                     size={17}
                     aria-hidden="true"
                   />
@@ -176,7 +198,7 @@ const AdminSidebar = ({
               </div>
               {ausenciasOpen ? (
                 <div
-                  className="ml-5 grid gap-0.5 border-l border-white/20 pl-3"
+                  className="admin-sidebar__submenu ml-5 grid gap-0.5 border-l pl-3"
                   id="fontanero-ausencias-submenu"
                 >
                   {FONTANERO_AUSENCIA_SUBLINKS.map(({ path: subPath, title: subTitle, Icon }) => (
@@ -201,13 +223,21 @@ const AdminSidebar = ({
           return (
         <div className="grid gap-1" key={path}>
           <div className="relative grid">
-          <NavLink to={path} className={({ isActive }) => `admin-sidebar__link w-full pr-11 text-left${isActive ? ' admin-sidebar__link--active' : ''}`} aria-expanded={requestsOpen} aria-controls="admin-solicitudes-submenu" onClick={onNavigate}>
-            <span className="admin-sidebar__icon" aria-hidden="true" data-icon={icon}><AdminNavIcon name={icon} /></span>
-            <span className="admin-sidebar__label min-w-0 flex-1">{title}</span>
+          <NavLink to={path} title={title} className={({ isActive }) => `admin-sidebar__link admin-sidebar__link--has-submenu${isActive || requestsActive ? ' admin-sidebar__link--active' : ''}`} aria-expanded={requestsOpen} aria-controls="admin-solicitudes-submenu" onClick={onNavigate}>
+            {({ isActive }) => (
+              <>
+                <span className="admin-sidebar__icon" aria-hidden="true" data-icon={icon}><AdminNavIcon name={icon} /></span>
+                <span className="admin-sidebar__label">{title}</span>
+                {isActive || requestsActive ? <span className="admin-sidebar__active-mark" aria-hidden="true" /> : null}
+              </>
+            )}
           </NavLink>
-          <button className="absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-white" type="button" aria-label={requestsOpen ? 'Cerrar subsecciones de solicitudes' : 'Abrir subsecciones de solicitudes'} aria-expanded={requestsOpen} aria-controls="admin-solicitudes-submenu" onClick={() => setRequestsOpen((open) => !open)}><IconChevronDown className={`transition-transform duration-200 ${requestsOpen ? 'rotate-180' : ''}`} size={17} aria-hidden="true" /></button>
+          <button className="admin-sidebar__chevron absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-lg border-0 bg-transparent transition" type="button" aria-label={requestsOpen ? 'Cerrar subsecciones de solicitudes' : 'Abrir subsecciones de solicitudes'} aria-expanded={requestsOpen} aria-controls="admin-solicitudes-submenu" onClick={() => {
+            if (collapsed) onToggleCollapsed?.()
+            setRequestsOpen((open) => !open)
+          }}><IconChevronDown className={`transition-transform duration-200 ${requestsOpen ? 'rotate-180' : ''}`} size={17} aria-hidden="true" /></button>
           </div>
-          {requestsOpen ? <div className="ml-5 grid gap-0.5 border-l border-white/20 pl-3" id="admin-solicitudes-submenu">
+          {requestsOpen ? <div className="admin-sidebar__submenu ml-5 grid gap-0.5 border-l pl-3" id="admin-solicitudes-submenu">
               <NavLink
                 to={FORMULARIOS_OFICIALES_ADMIN_PATH}
                 className={({ isActive }) => sublinkClass(isActive)}
@@ -233,6 +263,7 @@ const AdminSidebar = ({
         <NavLink
           key={path}
           to={path}
+          title={title}
           className={({ isActive }) =>
             isActive
               ? 'admin-sidebar__link admin-sidebar__link--active'
@@ -256,13 +287,34 @@ const AdminSidebar = ({
       })}
     </nav>
     <div className="admin-sidebar__footer">
-      <div className="admin-sidebar__system-status" role="status" aria-label="Estado del sistema: en línea">
-        <span className="admin-sidebar__status-dot" aria-hidden="true" />
-        <span className="admin-sidebar__status-copy">
-          <strong>Sistema en línea</strong>
-          <small>SIGASJ operativo</small>
-        </span>
-      </div>
+      {!collapsed ? (
+        <div className="admin-sidebar__system-status" role="status" aria-label="Estado del sistema: en línea">
+          <span className="admin-sidebar__status-dot" aria-hidden="true" />
+          <span className="admin-sidebar__status-copy">
+            <strong>Sistema en línea</strong>
+            <small>SIGASJ operativo</small>
+          </span>
+        </div>
+      ) : null}
+      {!isDrawer && onToggleCollapsed ? (
+        <button
+          type="button"
+          className="admin-sidebar__collapse"
+          onClick={onToggleCollapsed}
+          aria-pressed={collapsed}
+          title={collapsed ? 'Expandir menú' : 'Contraer menú'}
+          aria-label={collapsed ? 'Expandir menú administrativo' : 'Contraer menú administrativo'}
+        >
+          {collapsed ? (
+            <IconLayoutSidebarLeftExpand size={20} stroke={1.7} aria-hidden="true" />
+          ) : (
+            <IconLayoutSidebarLeftCollapse size={18} stroke={1.7} aria-hidden="true" />
+          )}
+          <span className="admin-sidebar__collapse-label">
+            {collapsed ? 'Expandir' : 'Contraer'}
+          </span>
+        </button>
+      ) : null}
     </div>
   </aside>
   )

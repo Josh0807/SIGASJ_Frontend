@@ -48,7 +48,7 @@ const leerFiltros = (params: URLSearchParams): IncapacidadesFiltros => {
 }
 
 const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
 
 export default function IncapacidadesPage() {
   const navigate = useNavigate()
@@ -184,12 +184,12 @@ export default function IncapacidadesPage() {
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       <RrhhSubnav />
-      <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
             Administración · Incapacidades
           </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
+          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
             Incapacidades del personal
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
@@ -199,7 +199,7 @@ export default function IncapacidadesPage() {
         </div>
         <Link
           to={INCAPACIDAD_NEW_PATH}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] motion-reduce:transform-none"
         >
           <IconCalendarPlus size={20} aria-hidden="true" />
           Registrar incapacidad
@@ -216,7 +216,7 @@ export default function IncapacidadesPage() {
       ) : null}
 
       <section
-        className="grid gap-4 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+        className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
         aria-label="Filtros de incapacidades"
       >
         <label className="grid min-w-0 gap-2">
@@ -260,7 +260,7 @@ export default function IncapacidadesPage() {
         </label>
         <button
           type="button"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
           onClick={limpiarFiltros}
           disabled={!hayFiltros}
         >
@@ -270,7 +270,7 @@ export default function IncapacidadesPage() {
       </section>
 
       <section
-        className="min-w-0 overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl"
+        className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
         aria-busy={cargando}
         aria-label="Listado de incapacidades"
       >
@@ -294,7 +294,7 @@ export default function IncapacidadesPage() {
             {resultado.reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
@@ -304,7 +304,7 @@ export default function IncapacidadesPage() {
           </div>
         ) : incapacidades.length === 0 ? (
           <div className="grid place-items-center gap-3 p-10 text-center">
-            <span className="grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700">
+            <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
               <IconCalendarOff size={28} aria-hidden="true" />
             </span>
             <h2 className="m-0 text-lg font-extrabold text-[#073b73]">
@@ -398,7 +398,7 @@ export default function IncapacidadesPage() {
                         </Link>
                         <Link
                           to={incapacidadEditPath(incapacidad.id)}
-                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-blue-700 hover:no-underline"
+                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-[#1e5a9c] hover:no-underline"
                           aria-label={`Editar incapacidad de ${nombre}`}
                         >
                           <IconPencil size={16} aria-hidden="true" />
@@ -425,7 +425,7 @@ export default function IncapacidadesPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
@@ -437,7 +437,7 @@ export default function IncapacidadesPage() {
               </span>
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >

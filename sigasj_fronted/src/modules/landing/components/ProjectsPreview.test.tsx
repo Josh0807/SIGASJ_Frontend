@@ -96,7 +96,9 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
 
       const alertEl = container.querySelector('[role="alert"]')
       expect(alertEl).not.toBeNull()
-      expect(container.textContent).toContain('HTTP 500: Error en el servidor')
+      expect(container.textContent).toContain(
+        'No fue posible cargar los proyectos. Intente de nuevo más tarde.',
+      )
 
       const retryBtn = container.querySelector(
         '.projects-preview__retry-btn',

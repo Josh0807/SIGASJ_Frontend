@@ -11,6 +11,8 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { Button } from '../../shared/ui/Button'
+import { PageHeader } from '../../shared/ui/PageHeader'
 import { useAuth } from '../auth/components/AuthContext'
 import CambiarEstadoColaborador from './CambiarEstadoColaborador'
 import { COLABORADORES_PAGE_SIZE, getColaboradores } from './colaboradoresApi'
@@ -24,7 +26,6 @@ import {
 import EstadoBadge from './EstadoBadge'
 import {
   COLABORADOR_NEW_PATH,
-  RRHH_TITLE,
   colaboradorDetailPath,
 } from './recursosHumanosPaths'
 import RrhhSubnav from './RrhhSubnav'
@@ -45,7 +46,10 @@ const leerFiltros = (params: URLSearchParams): ColaboradoresFiltros => {
 }
 
 const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 hover:border-sky-300 hover:bg-white focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100'
+  'min-h-11 w-full rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3.5 text-[color:var(--asada-ink,#123f70)] outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[color:var(--asada-muted,#5b7390)] hover:border-[color:var(--asada-navy,#1e5a9c)] focus:border-[color:var(--asada-navy,#1e5a9c)] focus:ring-4 focus:ring-[color:color-mix(in_srgb,var(--asada-navy,#1e5a9c)_16%,transparent)]'
+
+const labelClass =
+  'text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[color:var(--asada-muted,#5b7390)]'
 
 export default function ColaboradoresPage() {
   const navigate = useNavigate()
@@ -167,59 +171,59 @@ export default function ColaboradoresPage() {
   const hasta = Math.min(page * COLABORADORES_PAGE_SIZE, total)
 
   return (
-    <main className="gallery-admin admin-content-modern grid w-full min-w-0 gap-5 sm:gap-6">
+    <main className="admin-content-modern grid w-full min-w-0 gap-4">
       <RrhhSubnav />
-      <header className="gallery-admin__header flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0">
-          <p className="gallery-admin__eyebrow mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
-            Administración · Colaboradores
-          </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
-            {RRHH_TITLE}
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-            Registre, consulte y administre el personal de la ASADA.
-          </p>
-        </div>
-        <Link
-          to={COLABORADOR_NEW_PATH}
-          className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"
-        >
-          <IconUserPlus size={20} aria-hidden="true" />
-          Registrar colaborador
-        </Link>
-      </header>
+
+      <PageHeader
+        title="Colaboradores"
+        description="Consulte y administre el personal de la ASADA."
+        actions={
+          <Button to={COLABORADOR_NEW_PATH} leftIcon={<IconUserPlus size={18} aria-hidden="true" />}>
+            Registrar colaborador
+          </Button>
+        }
+      />
 
       {aviso ? (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-800" role="status">
+        <div
+          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+          role="status"
+        >
           {aviso}
         </div>
       ) : null}
       {accionError ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 font-semibold text-red-800" role="alert">
+        <div
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
+          role="alert"
+        >
           {accionError}
         </div>
       ) : null}
 
       <section
-        className="grid gap-4 rounded-2xl border border-white/80 bg-white/95 p-5 shadow-[0_14px_36px_rgba(30,90,156,0.09)] ring-1 ring-sky-100 sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+        className="grid gap-3 rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] p-4 shadow-[0_10px_24px_rgba(18,63,112,0.06)] md:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
         aria-label="Búsqueda y filtros"
       >
-        <label className="grid min-w-0 gap-2 md:col-span-2 xl:col-span-1">
-          <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-[#163f6b]">Buscar</span>
+        <label className="grid min-w-0 gap-1.5 md:col-span-2 xl:col-span-1">
+          <span className={labelClass}>Buscar</span>
           <span className="relative block">
-            <IconSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={19} aria-hidden="true" />
+            <IconSearch
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--asada-muted,#5b7390)]"
+              size={18}
+              aria-hidden="true"
+            />
             <input
               type="search"
-              className={`${inputClass} pl-11`}
+              className={`${inputClass} pl-10`}
               placeholder="Nombre, apellidos o cédula"
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
             />
           </span>
         </label>
-        <label className="grid min-w-0 gap-2">
-          <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-[#163f6b]">Cargo</span>
+        <label className="grid min-w-0 gap-1.5">
+          <span className={labelClass}>Cargo</span>
           <input
             className={inputClass}
             list="rrhh-cargos-filtro"
@@ -233,8 +237,8 @@ export default function ColaboradoresPage() {
             ))}
           </datalist>
         </label>
-        <label className="grid min-w-0 gap-2">
-          <span className="text-xs font-extrabold uppercase tracking-[0.08em] text-[#163f6b]">Estado</span>
+        <label className="grid min-w-0 gap-1.5">
+          <span className={labelClass}>Estado</span>
           <select
             className={inputClass}
             value={estado}
@@ -247,50 +251,54 @@ export default function ColaboradoresPage() {
         </label>
         <button
           type="button"
-          className="rrhh-touch-target inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-extrabold text-slate-600 shadow-sm transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 enabled:hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45 md:col-span-2 xl:col-span-1"
+          className="rrhh-touch-target inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-4 text-sm font-bold text-[color:var(--asada-muted,#5b7390)] transition-[border-color,color,background-color] duration-200 enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] enabled:hover:text-[color:var(--asada-navy,#1e5a9c)] disabled:cursor-not-allowed disabled:opacity-45 md:col-span-2 xl:col-span-1"
           onClick={limpiarFiltros}
           disabled={!hayFiltros && !busqueda && !cargo}
         >
-          <IconFilterOff size={18} aria-hidden="true" />
-          Limpiar filtros
+          <IconFilterOff size={17} aria-hidden="true" />
+          Limpiar
         </button>
       </section>
 
       <section
-        className="min-w-0 overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_16px_40px_rgba(30,90,156,0.10)] ring-1 ring-sky-100 sm:rounded-3xl"
+        className="min-w-0 overflow-hidden rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] shadow-[0_12px_28px_rgba(18,63,112,0.07)]"
         aria-busy={cargando}
         aria-label="Listado de colaboradores"
       >
         {cargando && !listado ? (
-          <div className="grid gap-3 p-6" role="status">
+          <div className="grid gap-2.5 p-5" role="status">
             <span className="sr-only">Cargando colaboradores…</span>
             {[0, 1, 2].map((fila) => (
-              <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
+              <div
+                key={fila}
+                className="h-12 animate-pulse rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] motion-reduce:animate-none"
+                aria-hidden="true"
+              />
             ))}
           </div>
         ) : error ? (
-          <div className="grid place-items-center gap-4 p-10 text-center" role="alert">
+          <div className="grid place-items-center gap-3 p-8 text-center" role="alert">
             <p className="m-0 font-semibold text-red-700">{error}</p>
             {resultado.reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white px-4 text-sm font-bold text-[color:var(--asada-navy,#1e5a9c)] transition hover:bg-[color:var(--asada-ice,#eaf6ff)]"
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
+                <IconRefresh size={17} aria-hidden="true" />
                 Reintentar
               </button>
             ) : null}
           </div>
         ) : colaboradores.length === 0 ? (
-          <div className="grid place-items-center gap-3 p-10 text-center">
-            <span className="grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700">
-              <IconUsers size={28} aria-hidden="true" />
+          <div className="grid place-items-center gap-2.5 p-8 text-center">
+            <span className="grid size-12 place-items-center rounded-2xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)]">
+              <IconUsers size={24} aria-hidden="true" />
             </span>
-            <h2 className="m-0 text-lg font-extrabold text-[#073b73]">
+            <h2 className="m-0 text-base font-extrabold text-[color:var(--asada-ink,#123f70)]">
               {hayFiltros ? 'Sin resultados' : 'Aún no hay colaboradores'}
             </h2>
-            <p className="m-0 max-w-md text-slate-500">
+            <p className="m-0 max-w-md text-sm text-[color:var(--asada-muted,#5b7390)]">
               {hayFiltros
                 ? 'Ningún colaborador coincide con la búsqueda o los filtros aplicados.'
                 : 'Use “Registrar colaborador” para agregar al personal de la ASADA.'}
@@ -298,47 +306,66 @@ export default function ColaboradoresPage() {
           </div>
         ) : (
           <table className={`w-full border-collapse text-left transition-opacity ${cargando ? 'opacity-60' : ''}`}>
-            <thead className="hidden bg-gradient-to-r from-[#eaf4ff] via-[#f3f8fe] to-[#eaf4ff] text-xs font-black uppercase tracking-[0.1em] text-[#164f8f] xl:table-header-group">
+            <thead className="hidden border-b border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-ice,#eaf6ff)] text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[color:var(--asada-muted,#5b7390)] xl:table-header-group">
               <tr>
-                <th scope="col" className="px-6 py-4">Cédula</th>
-                <th scope="col" className="px-6 py-4">Colaborador</th>
-                <th scope="col" className="px-6 py-4">Cargo</th>
-                <th scope="col" className="px-6 py-4">Estado</th>
-                <th scope="col" className="px-6 py-4 text-right">Acción</th>
+                <th scope="col" className="px-5 py-3">Cédula</th>
+                <th scope="col" className="px-5 py-3">Colaborador</th>
+                <th scope="col" className="px-5 py-3">Cargo</th>
+                <th scope="col" className="px-5 py-3">Estado</th>
+                <th scope="col" className="px-5 py-3 text-right">Acción</th>
               </tr>
             </thead>
-            <tbody className="block divide-y divide-slate-100 xl:table-row-group">
+            <tbody className="block divide-y divide-[color:var(--asada-line,#d7e5f1)] xl:table-row-group">
               {colaboradores.map((colaborador) => {
                 const nombre = nombreCompleto(colaborador)
                 return (
-                  <tr key={colaborador.id} className="group grid gap-2 px-5 py-4 transition-colors duration-200 hover:bg-sky-50/70 xl:table-row xl:p-0">
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">Cédula</span>
-                      <span className="whitespace-nowrap font-mono text-sm font-semibold text-slate-700">{colaborador.cedula}</span>
-                    </td>
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">Colaborador</span>
-                      <span className="min-w-0 text-right xl:text-left">
-                        <span className="block font-black text-[#073b73] transition-colors group-hover:text-blue-700">{nombre}</span>
-                        <span className="block truncate text-sm text-slate-500">{colaborador.correoElectronico}</span>
+                  <tr
+                    key={colaborador.id}
+                    className="group grid gap-2 px-4 py-3.5 transition-colors duration-150 hover:bg-[color:color-mix(in_srgb,var(--asada-ice,#eaf6ff)_55%,white)] xl:table-row xl:p-0"
+                  >
+                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-5 xl:py-3.5">
+                      <span className="text-xs font-bold uppercase text-[color:var(--asada-muted,#5b7390)] xl:hidden">
+                        Cédula
+                      </span>
+                      <span className="whitespace-nowrap font-mono text-sm font-semibold text-[color:var(--asada-ink,#123f70)]">
+                        {colaborador.cedula}
                       </span>
                     </td>
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">Cargo</span>
-                      <span className="font-semibold text-slate-700">{colaborador.cargo}</span>
+                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-5 xl:py-3.5">
+                      <span className="text-xs font-bold uppercase text-[color:var(--asada-muted,#5b7390)] xl:hidden">
+                        Colaborador
+                      </span>
+                      <span className="min-w-0 text-right xl:text-left">
+                        <span className="block font-extrabold text-[color:var(--asada-ink,#123f70)]">
+                          {nombre}
+                        </span>
+                        <span className="block truncate text-sm text-[color:var(--asada-muted,#5b7390)]">
+                          {colaborador.correoElectronico}
+                        </span>
+                      </span>
                     </td>
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">Estado</span>
+                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-5 xl:py-3.5">
+                      <span className="text-xs font-bold uppercase text-[color:var(--asada-muted,#5b7390)] xl:hidden">
+                        Cargo
+                      </span>
+                      <span className="font-semibold text-[color:var(--asada-ink,#123f70)]">
+                        {colaborador.cargo}
+                      </span>
+                    </td>
+                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-5 xl:py-3.5">
+                      <span className="text-xs font-bold uppercase text-[color:var(--asada-muted,#5b7390)] xl:hidden">
+                        Estado
+                      </span>
                       <EstadoBadge activo={colaborador.activo} />
                     </td>
-                    <td className="pt-2 xl:table-cell xl:px-6 xl:py-4">
+                    <td className="pt-1 xl:table-cell xl:px-5 xl:py-3.5">
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                         <Link
                           to={colaboradorDetailPath(colaborador.id)}
-                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-[0_5px_14px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500 hover:from-blue-600 hover:to-sky-500 hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(37,99,235,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
+                          className="rrhh-touch-target inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3 py-1.5 text-sm font-bold text-[color:var(--asada-navy,#1e5a9c)] no-underline transition-[background-color,border-color] duration-150 hover:border-[color:var(--asada-navy,#1e5a9c)] hover:bg-[color:var(--asada-ice,#eaf6ff)] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--asada-navy,#1e5a9c)]"
                           aria-label={`Ver a ${nombre}`}
                         >
-                          <IconEye className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
+                          <IconEye size={16} aria-hidden="true" />
                           Ver
                         </Link>
                         <CambiarEstadoColaborador
@@ -362,7 +389,7 @@ export default function ColaboradoresPage() {
 
         {!error && total > 0 ? (
           <nav
-            className="flex flex-col items-center justify-between gap-3 border-t border-sky-100 bg-slate-50/60 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
+            className="flex flex-col items-center justify-between gap-3 border-t border-[color:var(--asada-line,#d7e5f1)] bg-[color:color-mix(in_srgb,var(--asada-ice,#eaf6ff)_40%,white)] px-4 py-3 text-sm text-[color:var(--asada-muted,#5b7390)] sm:flex-row sm:px-5"
             aria-label="Paginación de colaboradores"
           >
             <p className="m-0">
@@ -371,24 +398,24 @@ export default function ColaboradoresPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
+                className="rrhh-touch-target inline-flex min-h-9 items-center gap-1 rounded-lg border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3 font-bold text-[color:var(--asada-ink,#123f70)] transition enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] disabled:cursor-not-allowed disabled:opacity-45"
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
-                <IconChevronLeft size={17} aria-hidden="true" />
+                <IconChevronLeft size={16} aria-hidden="true" />
                 Anterior
               </button>
-              <span className="px-2 font-semibold text-slate-600">
-                Página {page} de {Math.max(totalPages, 1)}
+              <span className="px-1.5 font-semibold">
+                {page} / {Math.max(totalPages, 1)}
               </span>
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
+                className="rrhh-touch-target inline-flex min-h-9 items-center gap-1 rounded-lg border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3 font-bold text-[color:var(--asada-ink,#123f70)] transition enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] disabled:cursor-not-allowed disabled:opacity-45"
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >
                 Siguiente
-                <IconChevronRight size={17} aria-hidden="true" />
+                <IconChevronRight size={16} aria-hidden="true" />
               </button>
             </div>
           </nav>

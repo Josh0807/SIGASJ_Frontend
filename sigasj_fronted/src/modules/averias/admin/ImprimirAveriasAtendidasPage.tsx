@@ -123,26 +123,26 @@ export default function ImprimirAveriasAtendidasPage() {
   return (
     <main className="gallery-admin averias-admin inventario-print w-full min-w-0">
       <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header inventario-print__controls !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+        <header className="gallery-admin__header inventario-print__controls !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
           <div className="space-y-3">
-            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-blue-600">Panel administrativo</p>
+            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Panel administrativo</p>
             <h1>Imprimir averías atendidas</h1>
             <p>Listado de averías en proceso y reparadas para el archivo de la ASADA.</p>
           </div>
           <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__button !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md" to={AVERIAS_ADMIN_REPORTE_PATH}>
+            <Link className="gallery-admin__button !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md" to={AVERIAS_ADMIN_REPORTE_PATH}>
               Volver al resumen
             </Link>
           </div>
         </header>
 
         <form
-          className="gallery-admin__filters inventario-print__controls w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]"
+          className="gallery-admin__filters inventario-print__controls w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
           aria-label="Rango del reporte"
           onSubmit={aplicarRango}
         >
           <div className="col-span-full border-b border-blue-100 pb-5">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Preparar reporte</p>
+            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Preparar reporte</p>
             <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Seleccione el periodo</h2>
             <p className="mt-2 text-base text-slate-500">Consulte las averías atendidas antes de imprimir.</p>
           </div>
@@ -170,7 +170,7 @@ export default function ImprimirAveriasAtendidasPage() {
             Consultar
           </button>
           <button
-            className="gallery-admin__button inventario-print__action !rounded-2xl !border-blue-200 !bg-white !font-bold !text-blue-700 !shadow-md"
+            className="gallery-admin__button inventario-print__action !rounded-2xl !border-[#bfe3fa] !bg-white !font-bold !text-[#1e5a9c] !shadow-md"
             type="button"
             onClick={imprimir}
             disabled={loading || Boolean(error) || averias.length === 0}
@@ -193,11 +193,11 @@ export default function ImprimirAveriasAtendidasPage() {
         ) : null}
 
         {!loading && !error ? (
-          <article className="inventario-print__sheet !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/40 !p-7 !shadow-[0_16px_40px_rgba(30,90,156,0.10)] md:!p-9">
+          <article className="inventario-print__sheet !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/40 !p-7 !shadow-[0_16px_40px_rgba(30, 90, 156,0.10)] md:!p-9">
             <header className="inventario-print__letterhead !gap-5 !border-blue-100 !pb-6">
               <img className="!h-16 !w-16 !rounded-2xl !border !border-blue-100 !bg-white !p-2 !object-contain !shadow-md" src={asadaLogo} alt="ASADA San Juan" />
               <div>
-                <p className="!mb-1 !text-sm !font-black !uppercase !tracking-[0.12em] !text-blue-600">ASADA San Juan</p>
+                <p className="!mb-1 !text-sm !font-black !uppercase !tracking-[0.12em] !text-[#1e5a9c]">ASADA San Juan</p>
                 <h2>Reporte de averías atendidas</h2>
               </div>
             </header>
@@ -209,8 +209,8 @@ export default function ImprimirAveriasAtendidasPage() {
                 : ' Periodo: todas las fechas.'}
             </p>
             {averias.length === 0 ? (
-              <div className="inventario-print__empty rounded-3xl border border-dashed border-blue-200 bg-white/80 px-6 py-10 text-center shadow-inner">
-                <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-2xl text-blue-600" aria-hidden="true">i</span>
+              <div className="inventario-print__empty rounded-3xl border border-dashed border-[#bfe3fa] bg-white/80 px-6 py-10 text-center shadow-inner">
+                <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eaf6ff] text-2xl text-[#1e5a9c]" aria-hidden="true">i</span>
                 <h3 className="m-0 text-lg font-black text-[#07376f]">Sin averías atendidas</h3>
                 <p className="mb-0 mt-2 text-base font-medium text-slate-500">No hay averías en proceso ni reparadas en el periodo consultado.</p>
               </div>

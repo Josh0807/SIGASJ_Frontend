@@ -23,7 +23,7 @@ import { useAveriaInventario, type AveriaInventarioVariant } from './useAveriaIn
 
 const CATALOG_PAGE_SIZE = 10
 const MODERN_ACTION_CLASS =
-  'gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !no-underline !shadow-[0_10px_24px_rgba(37,99,235,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!text-white hover:!shadow-[0_15px_30px_rgba(37,99,235,0.35)] active:!translate-y-0 active:!scale-[0.97] disabled:!cursor-not-allowed disabled:!opacity-55 disabled:hover:!translate-y-0'
+  'gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !no-underline !shadow-[0_10px_24px_rgba(30, 90, 156,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!text-white hover:!shadow-[0_15px_30px_rgba(30, 90, 156,0.35)] active:!translate-y-0 active:!scale-[0.97] disabled:!cursor-not-allowed disabled:!opacity-55 disabled:hover:!translate-y-0'
 
 const AveriaCatalogoMateriales = () => {
   const [catalogPage, setCatalogPage] = useState(1)
@@ -43,13 +43,13 @@ const AveriaCatalogoMateriales = () => {
   }
 
   return (
-    <div className="averias-inventario__block !mb-6 !rounded-3xl !border !border-blue-100 !bg-white/90 !p-6 !shadow-[0_8px_24px_rgba(30,90,156,0.08)]">
+    <div className="averias-inventario__block !mb-6 !rounded-3xl !border !border-blue-100 !bg-white/90 !p-6 !shadow-[0_8px_24px_rgba(30, 90, 156,0.08)]">
       <h3 className="!mb-5 !text-xl !font-black !tracking-[-0.02em] !text-[#073b73]">Catálogo y existencias</h3>
       <form className="averias-inventario__search !mb-6 !grid !min-w-0 !gap-3 md:!grid-cols-[minmax(0,1fr)_auto] md:!items-end" onSubmit={searchCatalog}>
-        <label className="!grid !min-w-0 !gap-2 !text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-blue-600">
+        <label className="!grid !min-w-0 !gap-2 !text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-[#1e5a9c]">
           Buscar material
           <input
-            className="!box-border !min-h-14 !w-full !min-w-0 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !text-base !font-semibold !normal-case !tracking-normal !text-[#073b73] !shadow-sm !outline-none !transition-all placeholder:!font-medium placeholder:!text-slate-400 hover:!border-blue-300 focus:!border-blue-500 focus:!ring-4 focus:!ring-blue-100"
+            className="!box-border !min-h-14 !w-full !min-w-0 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !text-base !font-semibold !normal-case !tracking-normal !text-[#073b73] !shadow-sm !outline-none !transition-all placeholder:!font-medium placeholder:!text-slate-400 hover:!border-blue-300 focus:!border-[#1e5a9c] focus:!ring-4 focus:!ring-blue-100"
             type="search"
             value={nombreInput}
             onChange={(event) => setNombreInput(event.target.value)}
@@ -83,18 +83,18 @@ const AveriaCatalogoMateriales = () => {
           <table className="averias-inventario__table !w-full !border-collapse">
             <thead className="!bg-linear-to-r !from-blue-50 !to-sky-50">
               <tr className="!border-b !border-blue-100">
-                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-blue-700">Material</th>
-                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-blue-700">Categoría</th>
-                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-blue-700">Unidad</th>
-                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-blue-700">Stock actual</th>
-                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-blue-700">Disponibilidad</th>
+                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-[#1e5a9c]">Material</th>
+                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-[#1e5a9c]">Categoría</th>
+                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-[#1e5a9c]">Unidad</th>
+                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-[#1e5a9c]">Stock actual</th>
+                <th className="!px-4 !py-4 !text-left !text-xs !font-extrabold !uppercase !tracking-[0.06em] !text-[#1e5a9c]">Disponibilidad</th>
               </tr>
             </thead>
             <tbody>
               {catalog.result.data.map((material) => {
                 const sinExistencias = material.stockActual <= 0
                 return (
-                  <tr className="!border-b !border-slate-100 !transition-colors last:!border-0 hover:!bg-blue-50/50" key={material.id}>
+                  <tr className="!border-b !border-slate-100 !transition-colors last:!border-0 hover:!bg-[#eaf6ff]/50" key={material.id}>
                     <td className="!px-4 !py-4 !font-bold !text-[#073b73]">{material.nombre}</td>
                     <td className="!px-4 !py-4 !text-slate-600">{material.categoria?.nombre ?? '—'}</td>
                     <td className="!px-4 !py-4 !text-slate-600">{material.unidadMedida}</td>
@@ -242,10 +242,10 @@ const AveriaMaterialesSection = ({
       {isFontanero ? <AveriaCatalogoMateriales /> : null}
 
       <div className={isFontanero ? 'averias-inventario__columns !grid !gap-5 lg:!grid-cols-2' : 'averias-inventario__columns'}>
-      <div className={isFontanero ? 'averias-inventario__block !rounded-2xl !border !border-blue-100 !bg-white/90 !p-5 !shadow-[0_7px_18px_rgba(30,90,156,0.07)]' : 'averias-inventario__block'}>
+      <div className={isFontanero ? 'averias-inventario__block !rounded-2xl !border !border-blue-100 !bg-white/90 !p-5 !shadow-[0_7px_18px_rgba(30, 90, 156,0.07)]' : 'averias-inventario__block'}>
         <h3>Solicitudes</h3>
         {!includeSolicitudes ? (
-          <p className="averias-admin__muted !rounded-2xl !border !border-dashed !border-blue-200 !bg-blue-50/60 !p-5 !text-center !font-medium !text-slate-500">{AVERIA_MATERIALES_SECRETARIA_SOLICITUDES}</p>
+          <p className="averias-admin__muted !rounded-2xl !border !border-dashed !border-[#bfe3fa] !bg-[#eaf6ff]/60 !p-5 !text-center !font-medium !text-slate-500">{AVERIA_MATERIALES_SECRETARIA_SOLICITUDES}</p>
         ) : null}
         {includeSolicitudes && inventario.solicitudesLoading ? (
           <p className="averias-admin__muted" role="status">
@@ -268,7 +268,7 @@ const AveriaMaterialesSection = ({
         !inventario.solicitudesLoading &&
         !inventario.solicitudesError &&
         inventario.solicitudes.length === 0 ? (
-          <p className="averias-admin__muted !rounded-2xl !border !border-dashed !border-blue-200 !bg-blue-50/60 !p-5 !text-center !font-medium !text-slate-500">{AVERIA_MATERIALES_SIN_SOLICITUDES}</p>
+          <p className="averias-admin__muted !rounded-2xl !border !border-dashed !border-[#bfe3fa] !bg-[#eaf6ff]/60 !p-5 !text-center !font-medium !text-slate-500">{AVERIA_MATERIALES_SIN_SOLICITUDES}</p>
         ) : null}
         {includeSolicitudes && inventario.solicitudes.length > 0 ? (
           <ul className="averias-inventario__list">
@@ -327,7 +327,7 @@ const AveriaMaterialesSection = ({
         ) : null}
       </div>
 
-      <div className={isFontanero ? 'averias-inventario__block !rounded-2xl !border !border-blue-100 !bg-white/90 !p-5 !shadow-[0_7px_18px_rgba(30,90,156,0.07)]' : 'averias-inventario__block'}>
+      <div className={isFontanero ? 'averias-inventario__block !rounded-2xl !border !border-blue-100 !bg-white/90 !p-5 !shadow-[0_7px_18px_rgba(30, 90, 156,0.07)]' : 'averias-inventario__block'}>
         <h3>Salidas</h3>
         {inventario.salidasLoading ? (
           <p className="averias-admin__muted" role="status">
@@ -351,7 +351,7 @@ const AveriaMaterialesSection = ({
         {!inventario.salidasLoading &&
         !inventario.salidasError &&
         inventario.salidas.length === 0 ? (
-          <p className="averias-admin__muted !rounded-2xl !border !border-dashed !border-blue-200 !bg-blue-50/60 !p-5 !text-center !font-medium !text-slate-500">{AVERIA_MATERIALES_SIN_SALIDAS}</p>
+          <p className="averias-admin__muted !rounded-2xl !border !border-dashed !border-[#bfe3fa] !bg-[#eaf6ff]/60 !p-5 !text-center !font-medium !text-slate-500">{AVERIA_MATERIALES_SIN_SALIDAS}</p>
         ) : null}
         {inventario.salidas.length > 0 ? (
           <div className="averias-inventario__table-wrap">

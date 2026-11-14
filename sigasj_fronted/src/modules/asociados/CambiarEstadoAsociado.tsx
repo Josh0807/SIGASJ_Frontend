@@ -137,7 +137,7 @@ function InactivarAsociadoDialog({
             disabled={guardando}
             value={motivo}
             placeholder="Ej. Venta de la propiedad"
-            className="w-full resize-y rounded-xl font-[inherit] border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:opacity-60"
+            className="w-full resize-y rounded-xl font-[inherit] border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200 disabled:opacity-60"
             onChange={(event) => {
               setMotivo(event.target.value)
               if (fieldError) setFieldError(null)
@@ -169,7 +169,7 @@ function InactivarAsociadoDialog({
             <button
               ref={cancelRef}
               type="button"
-              className="confirm-dialog__button confirm-dialog__button--secondary !min-h-12 !rounded-2xl !border !border-slate-200 !bg-white !px-6 !font-extrabold !text-slate-700 !shadow-[0_6px_16px_rgba(15,23,42,0.08)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-300 hover:!bg-blue-50 hover:!text-blue-800 hover:!shadow-[0_10px_22px_rgba(37,99,235,0.14)] active:!translate-y-0 active:!scale-[0.98] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none"
+              className="confirm-dialog__button confirm-dialog__button--secondary !min-h-12 !rounded-2xl !border !border-slate-200 !bg-white !px-6 !font-extrabold !text-slate-700 !shadow-[0_6px_16px_rgba(15,23,42,0.08)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-300 hover:!bg-[#eaf6ff] hover:!text-blue-800 hover:!shadow-[0_10px_22px_rgba(30, 90, 156,0.14)] active:!translate-y-0 active:!scale-[0.98] disabled:!transform-none disabled:!opacity-60 motion-reduce:!transform-none motion-reduce:!transition-none"
               onClick={onCancel}
               disabled={guardando}
             >
@@ -239,7 +239,7 @@ export default function CambiarEstadoAsociado({
       <button
         ref={botonRef}
         type="button"
-        className={`group inline-flex items-center justify-center gap-2 rounded-xl border font-extrabold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:transform-none disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none ${compacto ? 'min-h-10 px-4 py-2 text-sm' : 'min-h-12 rounded-2xl px-5 py-3'} ${tono}`}
+        className={`group inline-flex items-center justify-center gap-2 rounded-xl border font-extrabold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:transform-none disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none ${compacto ? 'min-h-10 px-4 py-2 text-sm' : 'min-h-12 rounded-2xl px-5 py-3'} ${tono}`}
         onClick={() => {
           if (!enviando.current) setAbierto(true)
         }}

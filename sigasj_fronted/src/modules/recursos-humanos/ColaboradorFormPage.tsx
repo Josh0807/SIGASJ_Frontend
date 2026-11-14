@@ -200,11 +200,11 @@ export default function ColaboradorFormPage() {
 
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+      <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8">
+        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
           Administración · {RRHH_TITLE}
         </p>
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">{titulo}</h1>
+        <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">{titulo}</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">
           {modo === 'editar'
             ? 'Actualice la información personal, el puesto o la cuenta vinculada del colaborador.'
@@ -213,7 +213,7 @@ export default function ColaboradorFormPage() {
       </header>
 
       {cargando ? (
-        <div className="grid gap-4 rounded-2xl border border-sky-100 bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
+        <div className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
           <span className="sr-only">Cargando colaborador…</span>
           {[0, 1, 2].map((fila) => (
             <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
@@ -226,7 +226,7 @@ export default function ColaboradorFormPage() {
             {idValido && carga.reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
@@ -250,14 +250,14 @@ export default function ColaboradorFormPage() {
             </div>
           ) : null}
           <form
-            className="grid w-full gap-7 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10"
+            className="grid w-full gap-7 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10"
             noValidate
             onSubmit={submit}
             aria-busy={saving}
             aria-label={titulo}
           >
             <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-700 sm:size-12">
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c] sm:size-12">
                 <IconUser size={25} aria-hidden="true" />
               </span>
               <div className="min-w-0">
@@ -280,7 +280,7 @@ export default function ColaboradorFormPage() {
                       <span className="sr-only"> (obligatorio)</span>
                     </span>
                     <span
-                      className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors[name] ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-blue-500'}`}
+                      className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors[name] ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}
                     >
                       <Icon className={errors[name] ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
                       <input
@@ -307,7 +307,7 @@ export default function ColaboradorFormPage() {
                   <span className="sr-only"> (obligatorio)</span>
                 </span>
                 <span
-                  className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors.puestoId ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-blue-500'}`}
+                  className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors.puestoId ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}
                 >
                   <IconBriefcase className={errors.puestoId ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
                   <select
@@ -339,7 +339,7 @@ export default function ColaboradorFormPage() {
 
               <label className="grid min-w-0 gap-2.5">
                 <span className="text-sm font-bold text-[#163f6b]">Cuenta de usuario (opcional)</span>
-                <span className="flex min-h-14 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 sm:px-5">
+                <span className="flex min-h-14 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#1e5a9c] focus-within:ring-2 focus-within:ring-blue-200 sm:px-5">
                   <IconKey className="text-slate-400" size={20} aria-hidden="true" />
                   <select
                     className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-3 text-slate-800 outline-none"
@@ -365,14 +365,14 @@ export default function ColaboradorFormPage() {
             <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
               <button
                 type="submit"
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-blue-500 bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#1e5a9c] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none"
                 disabled={saving}
               >
                 <IconDeviceFloppy size={20} aria-hidden="true" />
                 {saving ? 'Guardando colaborador…' : 'Guardar colaborador'}
               </button>
               <Link
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-6 py-3.5 font-extrabold text-blue-900 no-underline transition hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50 hover:no-underline sm:w-auto motion-reduce:transform-none"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-6 py-3.5 font-extrabold text-blue-900 no-underline transition hover:-translate-y-1 hover:border-blue-400 hover:bg-[#eaf6ff] hover:no-underline sm:w-auto motion-reduce:transform-none"
                 to={volverA}
               >
                 <IconArrowLeft size={19} aria-hidden="true" />

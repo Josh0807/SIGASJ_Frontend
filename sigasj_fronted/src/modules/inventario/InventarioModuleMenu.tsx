@@ -1,36 +1,36 @@
-import { useEffect, useRef, useState } from 'react'
-import { runAfterEffect } from '../../shared/utils/yieldToEffect'
-import { createPortal } from 'react-dom'
-import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useId, useRef, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import {
+  IconAdjustments,
   IconAlertTriangle,
   IconArrowsExchange,
   IconBox,
   IconCategory,
-  IconChevronDown,
   IconClipboardCheck,
+  IconDots,
   IconFileAnalytics,
-  IconLayoutGrid,
-  IconPrinter,
+  IconPackage,
   IconPackageExport,
   IconPackageImport,
   IconPackageOff,
-  IconPackages,
-  IconPlus,
+  IconPrinter,
+  IconTransfer,
   IconTruck,
 } from '@tabler/icons-react'
 import { useAuth } from '../auth/components/AuthContext'
-import { InternalAdminRoleName, normalizeInternalRole } from '../auth/utils/internalRoles'
+import {
+  InternalAdminRoleName,
+  normalizeInternalRole,
+} from '../auth/utils/internalRoles'
 import {
   ALERTAS_REPOSICION_PATH,
   CATEGORIAS_PATH,
   ENTRADAS_PATH,
-  MATERIAL_NEW_PATH,
+  IMPRIMIR_INVENTARIO_PATH,
   MATERIALES_PATH,
   MOVIMIENTOS_PATH,
   PROVEEDORES_PATH,
   RECEPCIONES_PATH,
-  IMPRIMIR_INVENTARIO_PATH,
   REPORTES_INVENTARIO_PATH,
   REPOSICIONES_PATH,
   SALIDAS_PATH,
@@ -38,131 +38,294 @@ import {
   SOLICITUDES_REVISION_PATH,
 } from './inventarioPaths'
 
-const adminItems = [
-  { label: 'Materiales', description: 'Catálogo y existencias', to: MATERIALES_PATH, icon: IconPackages },
-  { label: 'Nuevo material', description: 'Agregar al catálogo', to: MATERIAL_NEW_PATH, icon: IconPlus },
-  { label: 'Categorías', description: 'Clasificaciones', to: CATEGORIAS_PATH, icon: IconCategory },
-  { label: 'Proveedores', description: 'Contactos comerciales', to: PROVEEDORES_PATH, icon: IconTruck },
-  { label: 'Registrar entrada', description: 'Ingreso a bodega', to: ENTRADAS_PATH, icon: IconPackageImport },
-  { label: 'Registrar salida', description: 'Retiro de materiales', to: SALIDAS_PATH, icon: IconPackageExport },
-  { label: 'Revisar solicitudes', description: 'Aprobaciones pendientes', to: SOLICITUDES_REVISION_PATH, icon: IconClipboardCheck },
-  { label: 'Alertas de reposición', description: 'Existencias críticas', to: ALERTAS_REPOSICION_PATH, icon: IconAlertTriangle },
-  { label: 'Reposiciones', description: 'Compras y seguimiento', to: REPOSICIONES_PATH, icon: IconBox },
-  { label: 'Recepciones', description: 'Material por recibir', to: RECEPCIONES_PATH, icon: IconPackageOff },
-  { label: 'Historial', description: 'Movimientos de inventario', to: MOVIMIENTOS_PATH, icon: IconArrowsExchange },
-  { label: 'Reportes', description: 'Indicadores y análisis', to: REPORTES_INVENTARIO_PATH, icon: IconFileAnalytics },
-  { label: 'Imprimir inventario', description: 'Listado para archivo', to: IMPRIMIR_INVENTARIO_PATH, icon: IconPrinter },
-]
-
-const plumberItems = [
-  adminItems[0],
-  adminItems[2],
-  adminItems[5],
-  { label: 'Mis solicitudes', description: 'Seguimiento de materiales', to: SOLICITUDES_MATERIALES_PATH, icon: IconClipboardCheck },
-]
-
-/** Secretaria: consulta de catálogo; sin salidas ni solicitudes de fontanero. */
-const secretariaItems = [
-  adminItems[0],
-  adminItems[2],
-  adminItems[3],
-]
+type NavItem = {
+  label: string
+  to: string
+  icon: typeof IconPackage
+  match?: (pathname: string) => boolean
+}
 
 type InventarioModuleMenuProps = {
+  /** Cuando true, se renderiza dentro de una página (p. ej. nueva solicitud). */
   inline?: boolean
 }
 
-export default function InventarioModuleMenu({ inline = false }: InventarioModuleMenuProps) {
+function pathStarts(pathname: string, base: string) {
+  return pathname === base || pathname.startsWith(`${base}/`)
+}
+
+function isActiveItem(pathname: string, item: NavItem) {
+  if (item.match) return item.match(pathname)
+  return pathStarts(pathname, item.to)
+}
+
+export default function InventarioModuleMenu({
+  inline = false,
+}: InventarioModuleMenuProps) {
   const { user } = useAuth()
   const location = useLocation()
-  const [open, setOpen] = useState(false)
-  const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
   const role = normalizeInternalRole(user?.role)
-  const items =
-    role === InternalAdminRoleName.Administradora
-      ? adminItems
-      : role === InternalAdminRoleName.Secretaria
-        ? secretariaItems
-        : plumberItems
+  const isAdmin = role === InternalAdminRoleName.Administradora
+  const isSecretaria = role === InternalAdminRoleName.Secretaria
+  const isFontanero = role === InternalAdminRoleName.Fontanero
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef<HTMLDivElement>(null)
+  const moreId = useId()
 
   useEffect(() => {
-    if (inline) {
-      return runAfterEffect(() => setHeaderTarget(null))
+    setMoreOpen(false)
+  }, [location.pathname, location.search])
+
+  useEffect(() => {
+    if (!moreOpen) return
+    const onPointer = (event: MouseEvent) => {
+      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false)
     }
-    const frame = window.requestAnimationFrame(() => {
-      setHeaderTarget(document.querySelector<HTMLElement>('.inventory-module-menu-slot, .materials-admin__header, .material-tracking__header, .material-request__header, .material-detail__header, .gallery-admin__header'))
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMoreOpen(false)
+    }
+    document.addEventListener('mousedown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [moreOpen])
+
+  const tabs: NavItem[] = []
+
+  if (isAdmin || isSecretaria || isFontanero) {
+    tabs.push({
+      label: 'Materiales',
+      to: MATERIALES_PATH,
+      icon: IconPackage,
+      match: (pathname) =>
+        pathStarts(pathname, MATERIALES_PATH) ||
+        pathname === '/admin/inventario' ||
+        pathname === '/admin/inventario/',
     })
-    return () => window.cancelAnimationFrame(frame)
-  }, [inline, location.pathname])
+  }
 
-  useEffect(() => {
-    const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', closeOnOutsideClick)
-    return () => document.removeEventListener('mousedown', closeOnOutsideClick)
-  }, [])
+  if (isAdmin || isSecretaria) {
+    tabs.push({
+      label: 'Movimientos',
+      to: MOVIMIENTOS_PATH,
+      icon: IconTransfer,
+      match: (pathname) =>
+        pathStarts(pathname, MOVIMIENTOS_PATH) ||
+        pathStarts(pathname, ENTRADAS_PATH) ||
+        pathStarts(pathname, SALIDAS_PATH),
+    })
+  } else if (isFontanero) {
+    tabs.push({
+      label: 'Movimientos',
+      to: SALIDAS_PATH,
+      icon: IconTransfer,
+      match: (pathname) => pathStarts(pathname, SALIDAS_PATH),
+    })
+  }
 
-  const menu = (
-    <div ref={containerRef} className={`inventory-module-menu${inline ? ' !static !inset-auto !m-0 !w-full !max-w-none !justify-stretch' : ''}`}>
-      <button
-        type="button"
-        className={`group flex min-h-[52px] items-center justify-between gap-3 !rounded-2xl transition-all duration-300 ease-out hover:-translate-y-0.5 hover:!border-blue-300 hover:!bg-blue-50/70 hover:shadow-[0_10px_24px_rgba(37,99,235,0.12)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 motion-reduce:transform-none motion-reduce:transition-none${inline ? ' !w-full' : ''}`}
-        aria-expanded={open}
-        aria-controls="inventory-module-menu"
-        onClick={() => setOpen((value) => !value)}
-      >
-        <span className="inventory-module-menu__trigger-label">
-          <span className="inventory-module-menu__trigger-icon">
-            <IconLayoutGrid className="transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={18} aria-hidden="true" />
-          </span>
-          Operaciones
-        </span>
-        <IconChevronDown
-          className={`inventory-module-menu__chevron${open ? ' inventory-module-menu__chevron--open' : ''}`}
-          size={18}
-          aria-hidden="true"
-        />
-      </button>
+  if (isAdmin) {
+    tabs.push({
+      label: 'Abastecimiento',
+      to: SOLICITUDES_REVISION_PATH,
+      icon: IconClipboardCheck,
+      match: (pathname) =>
+        pathStarts(pathname, SOLICITUDES_REVISION_PATH) ||
+        pathStarts(pathname, ALERTAS_REPOSICION_PATH) ||
+        pathStarts(pathname, REPOSICIONES_PATH) ||
+        pathStarts(pathname, RECEPCIONES_PATH),
+    })
+  } else if (isFontanero) {
+    tabs.push({
+      label: 'Abastecimiento',
+      to: SOLICITUDES_MATERIALES_PATH,
+      icon: IconClipboardCheck,
+      match: (pathname) => pathStarts(pathname, SOLICITUDES_MATERIALES_PATH),
+    })
+  }
 
-      {open ? (
+  if (isAdmin || isSecretaria || isFontanero) {
+    tabs.push({
+      label: 'Configuración',
+      to: CATEGORIAS_PATH,
+      icon: IconAdjustments,
+      match: (pathname) =>
+        pathStarts(pathname, CATEGORIAS_PATH) ||
+        pathStarts(pathname, PROVEEDORES_PATH),
+    })
+  }
+
+  const movimientosSub: NavItem[] = []
+  if (isAdmin) {
+    movimientosSub.push(
+      { label: 'Registrar entrada', to: ENTRADAS_PATH, icon: IconPackageImport },
+      { label: 'Registrar salida', to: SALIDAS_PATH, icon: IconPackageExport },
+      { label: 'Historial', to: MOVIMIENTOS_PATH, icon: IconArrowsExchange },
+    )
+  } else if (isFontanero) {
+    movimientosSub.push({
+      label: 'Registrar salida',
+      to: SALIDAS_PATH,
+      icon: IconPackageExport,
+    })
+  } else if (isSecretaria) {
+    movimientosSub.push({
+      label: 'Historial',
+      to: MOVIMIENTOS_PATH,
+      icon: IconArrowsExchange,
+    })
+  }
+
+  const abastecimientoSub: NavItem[] = []
+  if (isAdmin) {
+    abastecimientoSub.push(
+      {
+        label: 'Revisar solicitudes',
+        to: SOLICITUDES_REVISION_PATH,
+        icon: IconClipboardCheck,
+      },
+      {
+        label: 'Alertas de reposición',
+        to: ALERTAS_REPOSICION_PATH,
+        icon: IconAlertTriangle,
+      },
+      { label: 'Reposiciones', to: REPOSICIONES_PATH, icon: IconBox },
+      { label: 'Recepciones', to: RECEPCIONES_PATH, icon: IconPackageOff },
+    )
+  } else if (isFontanero) {
+    abastecimientoSub.push({
+      label: 'Mis solicitudes',
+      to: SOLICITUDES_MATERIALES_PATH,
+      icon: IconClipboardCheck,
+    })
+  }
+
+  const configSub: NavItem[] = [
+    { label: 'Categorías', to: CATEGORIAS_PATH, icon: IconCategory },
+  ]
+  if (isAdmin || isSecretaria) {
+    configSub.push({
+      label: 'Proveedores',
+      to: PROVEEDORES_PATH,
+      icon: IconTruck,
+    })
+  }
+
+  const secondary: NavItem[] = []
+  if (isAdmin || isSecretaria) {
+    secondary.push(
+      {
+        label: 'Reportes',
+        to: REPORTES_INVENTARIO_PATH,
+        icon: IconFileAnalytics,
+      },
+      {
+        label: 'Imprimir inventario',
+        to: IMPRIMIR_INVENTARIO_PATH,
+        icon: IconPrinter,
+      },
+    )
+  }
+
+  const onMovimientos = movimientosSub.some((item) =>
+    isActiveItem(location.pathname, item),
+  )
+  const onAbastecimiento = abastecimientoSub.some((item) =>
+    isActiveItem(location.pathname, item),
+  )
+  const onConfig = configSub.some((item) =>
+    isActiveItem(location.pathname, item),
+  )
+
+  let sectionSub: NavItem[] = []
+  if (onMovimientos) sectionSub = movimientosSub
+  else if (onAbastecimiento) sectionSub = abastecimientoSub
+  else if (onConfig) sectionSub = configSub
+
+  if (tabs.length === 0) return null
+
+  return (
+    <div
+      className={`inv-nav-stack${inline ? ' inv-nav-stack--inline' : ''}`}
+      style={{ display: 'grid', gap: 10 }}
+    >
+      <nav className="inv-tabs" aria-label="Secciones de inventario">
+        {tabs.map((tab) => {
+          const active = isActiveItem(location.pathname, tab)
+          const Icon = tab.icon
+          return (
+            <NavLink
+              key={tab.label}
+              to={tab.to}
+              className={`inv-tabs__link${active ? ' is-active' : ''}`}
+              aria-current={active ? 'page' : undefined}
+            >
+              <Icon size={18} stroke={1.8} aria-hidden="true" />
+              {tab.label}
+            </NavLink>
+          )
+        })}
+
+        {secondary.length > 0 ? (
+          <div className="inv-tabs__more" ref={moreRef}>
+            <button
+              type="button"
+              className="inv-tabs__link"
+              aria-expanded={moreOpen}
+              aria-controls={moreId}
+              aria-haspopup="menu"
+              onClick={() => setMoreOpen((value) => !value)}
+            >
+              <IconDots size={18} stroke={1.8} aria-hidden="true" />
+              Más
+            </button>
+            {moreOpen ? (
+              <div id={moreId} className="inv-tabs__dropdown" role="menu">
+                {secondary.map((item) => {
+                  const active = isActiveItem(location.pathname, item)
+                  const Icon = item.icon
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      role="menuitem"
+                      className={active ? 'is-active' : undefined}
+                      onClick={() => setMoreOpen(false)}
+                    >
+                      <Icon size={18} stroke={1.8} aria-hidden="true" />
+                      {item.label}
+                    </NavLink>
+                  )
+                })}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </nav>
+
+      {sectionSub.length > 1 ? (
         <nav
-          id="inventory-module-menu"
-          aria-label="Módulos de inventario"
+          className="inv-tabs inv-tabs--sub"
+          aria-label="Operaciones de la sección"
         >
-          <div className="border-b border-slate-100 px-3 pb-3 pt-1">
-            <strong className="block text-sm text-slate-900">Gestión de inventario</strong>
-            <span className="text-xs text-slate-500">Seleccione la operación que desea realizar.</span>
-          </div>
-          <div className="grid gap-1.5 pt-3 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map(({ label, description, to, icon: Icon }) => {
-              const active = location.pathname === to
-              return (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={() => setOpen(false)}
-                  aria-current={active ? 'page' : undefined}
-                  className={`group flex min-h-16 items-center gap-3 rounded-2xl p-3 no-underline transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 ${active ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-700'}`}
-                >
-                  <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${active ? 'bg-blue-600 text-white' : 'bg-sky-50 text-blue-600 group-hover:bg-blue-100'}`}>
-                    <Icon size={20} stroke={1.8} aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <strong className="block truncate text-sm">{label}</strong>
-                    <small className="block truncate text-[11px] text-slate-500">{description}</small>
-                  </span>
-                </Link>
-              )
-            })}
-          </div>
+          {sectionSub.map((item) => {
+            const active = isActiveItem(location.pathname, item)
+            const Icon = item.icon
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={`inv-tabs__link${active ? ' is-active' : ''}`}
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon size={16} stroke={1.8} aria-hidden="true" />
+                {item.label}
+              </NavLink>
+            )
+          })}
         </nav>
       ) : null}
     </div>
   )
-
-  if (inline) return menu
-  if (!headerTarget) return null
-  return createPortal(menu, headerTarget)
 }

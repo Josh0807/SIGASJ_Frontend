@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import GalleryCard from './GalleryCard'
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { useCallback, useEffect, useMemo, type KeyboardEvent } from 'react'
@@ -18,7 +18,7 @@ const GallerySection = ({
   id = GALLERY_SECTION_ID,
   title = 'Galería',
   description =
-    'Aquí encontrara imágenes de la ASADA San Juan de Santa Cruz.',
+    'Imágenes de la ASADA San Juan de Santa Cruz y de nuestra comunidad.',
   photos: photosProp,
   emptyMessage = 'Próximamente publicaremos fotografías de la comunidad.',
   errorMessage = 'No fue posible cargar la galería. Intenta de nuevo más tarde.',
@@ -105,19 +105,21 @@ const GallerySection = ({
 
   return (
     <section
-      className="relative isolate min-h-0 overflow-hidden bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-12 max-[640px]:px-4 max-[640px]:py-9"
+      className="public-section bg-white"
       id={id}
       aria-labelledby={`${id}-title`}
     >
-      <div className="pointer-events-none absolute -right-36 top-10 -z-10 h-48 w-[680px] -rotate-12 rounded-[50%] border-[42px] border-sky-300/20" aria-hidden="true" />
-      <div className="pointer-events-none absolute -bottom-32 -left-28 -z-10 h-60 w-[920px] rotate-[8deg] rounded-[50%] bg-sky-200/35" aria-hidden="true" />
-      <div className="pointer-events-none absolute -bottom-40 right-[-10%] -z-10 h-64 w-[1050px] -rotate-6 rounded-[50%] border-[52px] border-sky-300/20" aria-hidden="true" />
-
-      <div className="mx-auto w-full max-w-[1040px]">
-        <header className="max-w-[780px]">
-          <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-[#1476cf] before:h-0.5 before:w-9 before:rounded-full before:bg-[#1476cf]">Nuestra comunidad</p>
-          <h2 id={`${id}-title`} className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-[#092e67]">{title}</h2>
-          <p className="mb-0 mt-3 text-base leading-7 text-[#526d8c]">{description}</p>
+      <div className="public-container">
+        <header className="mx-auto max-w-[720px] text-center">
+          <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">
+            Nuestra comunidad
+          </p>
+          <h2 id={`${id}-title`} className="public-section-title">
+            {title}
+          </h2>
+          <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-[1.65] text-sigasj-muted">
+            {description}
+          </p>
         </header>
 
         {showLoading ? (
@@ -132,19 +134,93 @@ const GallerySection = ({
             </button>
           </div>
         ) : hasPhotos ? (
-          <div className="mt-9 outline-none" role="region" aria-roledescription="carrusel" aria-label="Fotografías de la comunidad" tabIndex={canMove ? 0 : -1} onKeyDown={onCarouselKeyDown} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false) }}>
-            {canMove ? <div className="mb-4 flex items-center justify-between"><p className="gallery-section__status m-0 text-xs font-bold tracking-[0.12em] text-[#526d8c]" aria-live="polite">{statusLabel}</p><div className="flex gap-2" aria-label="Controles de la galería"><button className="grid size-[38px] cursor-pointer place-items-center rounded-xl border border-sky-100 bg-white text-[#0872d3] shadow-[0_8px_20px_rgba(39,112,166,0.13)] transition hover:-translate-y-1 hover:bg-[#0872d3] hover:text-white" type="button" onClick={() => goToCarouselIndex(carouselIndex - 1, true)} aria-label="Ver fotografías anteriores"><IconChevronLeft size={20} aria-hidden="true" /></button><button className="grid size-[38px] cursor-pointer place-items-center rounded-xl border border-[#0872d3] bg-[#0872d3] text-white shadow-[0_8px_20px_rgba(8,114,211,0.24)] transition hover:-translate-y-1 hover:bg-[#0764b9]" type="button" onClick={() => goToCarouselIndex(carouselIndex + 1, true)} aria-label="Ver fotografías siguientes"><IconChevronRight size={20} aria-hidden="true" /></button></div></div> : null}
+          <div
+            className="gallery-section__carousel-shell relative mt-10 outline-none"
+            role="region"
+            aria-roledescription="carrusel"
+            aria-label="Fotografías de la comunidad"
+            tabIndex={canMove ? 0 : -1}
+            onKeyDown={onCarouselKeyDown}
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocus={() => setPaused(true)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false)
+            }}
+          >
+            <p className="gallery-section__status sr-only" aria-live="polite">
+              {statusLabel}
+            </p>
+
             <div className="overflow-hidden">
-              <div className="flex transition-transform duration-500 ease-out" style={{ width: `${(photos.length / photosPerView) * 100}%`, transform: `translateX(-${(carouselIndex * 100) / photos.length}%)` }}>
+              <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{
+                  width: `${(photos.length / photosPerView) * 100}%`,
+                  transform: `translateX(-${(carouselIndex * 100) / photos.length}%)`,
+                }}
+              >
                 {photos.map((photo, index) => (
-                  <div key={photo.id} className="min-w-0 px-2 [&>.gallery-section__card]:w-full [&>.gallery-section__card]:basis-full" style={{ width: `${100 / photos.length}%` }}>
-                    <GalleryCard id={photo.id} imageUrl={photo.imageUrl} altText={photo.altText} title={photo.title} description={photo.description} onExpand={() => setLightboxIndex(index)} />
+                  <div
+                    key={photo.id}
+                    className="min-w-0 px-2 sm:px-3"
+                    style={{ width: `${100 / photos.length}%` }}
+                  >
+                    <GalleryCard
+                      id={photo.id}
+                      imageUrl={photo.imageUrl}
+                      altText={photo.altText}
+                      title={photo.title}
+                      description={photo.description}
+                      onExpand={() => setLightboxIndex(index)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
-            {canMove ? <div className="gallery-section__dots mt-6 flex items-center justify-center gap-3" aria-label="Páginas de la galería">{Array.from({ length: totalPages }, (_, index) => <button key={index} type="button" className={`h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all ${index === carouselIndex ? 'is-active w-7 bg-[#0872d3]' : 'w-5 bg-sky-200 hover:bg-sky-300'}`} aria-label={`Ir al grupo ${index + 1}`} aria-current={index === carouselIndex ? 'true' : undefined} onClick={() => goToCarouselIndex(index, true)} />)}</div> : null}
-            <p className="gallery-section__swipe-hint sr-only">Deslice horizontalmente para ver más fotografías.</p>
+
+            {canMove ? (
+              <div className="mt-7 flex flex-col items-center gap-4">
+                <div className="gallery-section__controls flex items-center gap-3" aria-label="Controles de la galería">
+                  <button
+                    className="grid size-11 cursor-pointer place-items-center rounded-full border border-sigasj-border bg-white text-sigasj-ink transition duration-200 hover:-translate-y-0.5 hover:border-sigasj-primary hover:text-sigasj-primary"
+                    type="button"
+                    onClick={() => goToCarouselIndex(carouselIndex - 1, true)}
+                    aria-label="Ver fotografías anteriores"
+                  >
+                    <IconChevronLeft size={20} aria-hidden="true" />
+                  </button>
+                  <button
+                    className="grid size-11 cursor-pointer place-items-center rounded-full border border-sigasj-border bg-white text-sigasj-ink transition duration-200 hover:-translate-y-0.5 hover:border-sigasj-primary hover:text-sigasj-primary"
+                    type="button"
+                    onClick={() => goToCarouselIndex(carouselIndex + 1, true)}
+                    aria-label="Ver fotografías siguientes"
+                  >
+                    <IconChevronRight size={20} aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="gallery-section__dots flex items-center justify-center gap-2" aria-label="Páginas de la galería">
+                  {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300 ${
+                        index === carouselIndex
+                          ? 'is-active w-7 bg-sigasj-primary'
+                          : 'w-2.5 bg-sigasj-border hover:bg-sigasj-border-strong'
+                      }`}
+                      aria-label={`Ir al grupo ${index + 1}`}
+                      aria-current={index === carouselIndex ? 'true' : undefined}
+                      onClick={() => goToCarouselIndex(index, true)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <p className="gallery-section__swipe-hint sr-only">
+              Deslice horizontalmente para ver más fotografías.
+            </p>
           </div>
         ) : (
           <p className="gallery-section__empty" role="status">

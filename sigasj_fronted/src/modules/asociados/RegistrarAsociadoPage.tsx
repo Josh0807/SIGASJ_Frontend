@@ -64,20 +64,20 @@ export default function RegistrarAsociadoPage() {
   }
 
   return <main className="grid w-full gap-5 sm:gap-6">
-    <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-      <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">Administración · Asociados</p>
-      <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">Registrar asociado</h1>
+    <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8">
+      <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">Administración · Asociados</p>
+      <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">Registrar asociado</h1>
       <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">Ingrese la información personal y de contacto del nuevo asociado.</p>
     </header>
     {submitError ? <AsociadoFeedback variant="error">{submitError}</AsociadoFeedback> : null}
-    <form className="grid w-full gap-7 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10" noValidate onSubmit={submit} aria-busy={saving}>
-      <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-700 sm:size-12"><IconUser size={25} aria-hidden="true" /></span><div className="min-w-0"><h2 className="text-lg font-extrabold leading-tight tracking-tight text-[#073b73] sm:text-xl">Información del asociado</h2><p className="mt-2 text-sm leading-6 text-slate-500">Todos los campos marcados con <span className="font-bold text-red-600">*</span> son obligatorios.</p></div></div>
+    <form className="grid w-full gap-7 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10" noValidate onSubmit={submit} aria-busy={saving}>
+      <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c] sm:size-12"><IconUser size={25} aria-hidden="true" /></span><div className="min-w-0"><h2 className="text-lg font-extrabold leading-tight tracking-tight text-[#073b73] sm:text-xl">Información del asociado</h2><p className="mt-2 text-sm leading-6 text-slate-500">Todos los campos marcados con <span className="font-bold text-red-600">*</span> son obligatorios.</p></div></div>
       <div className="grid gap-x-7 gap-y-6 lg:grid-cols-2 lg:gap-y-7">
         {fields.map(({ name, label, icon: Icon, ...input }) => {
           const errorId = `${name}-error`
           return <label className="grid min-w-0 gap-2.5" key={name}>
             <span className="text-sm font-bold text-[#163f6b]">{label} <span className="text-red-600" aria-hidden="true">*</span><span className="sr-only"> (obligatorio)</span></span>
-            <span className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors[name] ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-blue-500'}`}>
+            <span className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors[name] ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}>
               <Icon className={errors[name] ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
               <input className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400" {...input} value={values[name]} required aria-invalid={Boolean(errors[name])} aria-describedby={errors[name] ? errorId : undefined} onChange={(event) => update(name, event.target.value)} />
             </span>
@@ -86,8 +86,8 @@ export default function RegistrarAsociadoPage() {
         })}
       </div>
       <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
-        <button type="submit" className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-blue-500 bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(37,99,235,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] transition hover:-translate-y-1 hover:from-blue-800 hover:to-cyan-500 hover:shadow-[0_17px_34px_rgba(37,99,235,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none motion-reduce:transition-none" disabled={saving}><IconDeviceFloppy className="transition-transform group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={20} aria-hidden="true" />{saving ? 'Guardando asociado…' : 'Guardar asociado'}</button>
-        <Link className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-6 py-3.5 font-extrabold text-blue-900 no-underline shadow-[0_8px_20px_rgba(37,99,235,0.12)] transition hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 sm:w-auto motion-reduce:transform-none motion-reduce:transition-none" to={ASOCIADOS_PATH}><IconArrowLeft className="transition-transform group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />Cancelar</Link>
+        <button type="submit" className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#1e5a9c] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(30, 90, 156,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] transition hover:-translate-y-1 hover:from-blue-800 hover:to-cyan-500 hover:shadow-[0_17px_34px_rgba(30, 90, 156,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none motion-reduce:transition-none" disabled={saving}><IconDeviceFloppy className="transition-transform group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={20} aria-hidden="true" />{saving ? 'Guardando asociado…' : 'Guardar asociado'}</button>
+        <Link className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-6 py-3.5 font-extrabold text-blue-900 no-underline shadow-[0_8px_20px_rgba(30, 90, 156,0.12)] transition hover:-translate-y-1 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-[#1e5a9c] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] sm:w-auto motion-reduce:transform-none motion-reduce:transition-none" to={ASOCIADOS_PATH}><IconArrowLeft className="transition-transform group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />Cancelar</Link>
       </div>
     </form>
   </main>

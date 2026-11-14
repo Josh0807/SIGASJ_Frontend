@@ -100,7 +100,7 @@ describe('pantalla de recepción de materiales', () => {
     })))
     const view = await mount()
     await act(async () => { await Promise.resolve() })
-    expect(view.container.textContent).toContain('No hay compras pendientes de recepción')
+    expect(view.container.textContent).toContain('No hay recepciones pendientes')
     await view.cleanup()
   })
 })

@@ -65,9 +65,9 @@ function TarjetaSaldo({
   tono: 'azul' | 'ambar' | 'violeta' | 'verde'
 }) {
   const tonos = {
-    azul: 'border-sky-100 bg-sky-50/70 text-sky-900',
+    azul: 'border-[#d7e5f1] bg-sky-50/70 text-sky-900',
     ambar: 'border-amber-100 bg-amber-50/70 text-amber-900',
-    violeta: 'border-violet-100 bg-violet-50/70 text-violet-900',
+    violeta: 'border-[#bfe3fa] bg-[#eaf6ff]/70 text-[#1e5a9c]',
     verde: 'border-emerald-100 bg-emerald-50/80 text-emerald-900',
   }
   const mostrar = Number.isFinite(dias) ? dias : 0
@@ -285,11 +285,11 @@ export default function VacacionesPage() {
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       <RrhhSubnav />
-      <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+      <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8">
+        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
           Administración · {RRHH_TITLE}
         </p>
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
+        <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
           Vacaciones del personal
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
@@ -299,12 +299,12 @@ export default function VacacionesPage() {
       </header>
 
       <section
-        className="grid gap-2 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-6"
+        className="grid gap-2 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6"
         aria-label="Selección de colaborador"
       >
         <label className="grid min-w-0 gap-2 lg:max-w-xl">
           <span className="text-sm font-bold text-[#163f6b]">Colaborador</span>
-          <span className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
+          <span className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#1e5a9c] focus-within:ring-2 focus-within:ring-blue-200">
             <IconUser className="text-slate-400" size={20} aria-hidden="true" />
             <select
               className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-3 text-slate-800 outline-none"
@@ -324,8 +324,8 @@ export default function VacacionesPage() {
       </section>
 
       {colaboradorId === null ? (
-        <div className="grid place-items-center gap-3 rounded-2xl border border-sky-100 bg-white p-10 text-center shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl">
-          <span className="grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700">
+        <div className="grid place-items-center gap-3 rounded-2xl border border-[#d7e5f1] bg-white p-10 text-center shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl">
+          <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
             <IconBeach size={28} aria-hidden="true" />
           </span>
           <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Seleccione un colaborador</h2>
@@ -344,7 +344,7 @@ export default function VacacionesPage() {
 
           <div className="grid gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
             <section
-              className="grid gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8"
+              className="grid gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8"
               aria-label="Saldo de vacaciones"
               aria-busy={cargandoBalance}
             >
@@ -361,7 +361,7 @@ export default function VacacionesPage() {
                   {cargaBalance.reintentable ? (
                     <button
                       type="button"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                       onClick={() => setRecarga((n) => n + 1)}
                     >
                       <IconRefresh size={18} aria-hidden="true" />
@@ -372,14 +372,14 @@ export default function VacacionesPage() {
               ) : balanceVisible ? (
                 <>
                   <div className="flex min-w-0 items-start gap-4">
-                    <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)]">
+                    <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
                       <IconBeach size={28} aria-hidden="true" />
                     </span>
                     <div className="min-w-0">
-                      <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.12em] text-blue-600">
+                      <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
                         Saldo de vacaciones
                       </p>
-                      <h2 className="m-0 break-words text-2xl font-black tracking-tight text-[#062e63] sm:text-3xl">
+                      <h2 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
                         {nombre}
                       </h2>
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-slate-500">
@@ -410,7 +410,7 @@ export default function VacacionesPage() {
             </section>
 
             <section
-              className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-8"
+              className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8"
               aria-label="Registrar movimiento de vacaciones"
             >
               <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Registrar movimiento</h2>
@@ -435,7 +435,7 @@ export default function VacacionesPage() {
                           key={tipo.value}
                           className={`flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition ${
                             activo
-                              ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
+                              ? 'border-[#1e5a9c] bg-[#eaf6ff] ring-2 ring-blue-200'
                               : errors.tipo
                                 ? 'border-red-400 bg-white'
                                 : 'border-slate-200 bg-white hover:border-blue-300'
@@ -482,16 +482,16 @@ export default function VacacionesPage() {
                           key={opcion.value}
                           className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition ${
                             values.signoAjuste === opcion.value
-                              ? 'border-violet-500 bg-violet-50 ring-2 ring-violet-200'
+                              ? 'border-[#1e5a9c] bg-[#eaf6ff] ring-2 ring-[#bfe3fa]'
                               : errors.signoAjuste
                                 ? 'border-red-400 bg-white'
-                                : 'border-slate-200 bg-white hover:border-violet-300'
+                                : 'border-slate-200 bg-white hover:border-[#1e5a9c]'
                           }`}
                         >
                           <input
                             type="radio"
                             name="signoAjuste"
-                            className="accent-violet-600"
+                            className="accent-[#1e5a9c]"
                             value={opcion.value}
                             checked={values.signoAjuste === opcion.value}
                             onChange={() => update('signoAjuste', opcion.value)}
@@ -513,7 +513,7 @@ export default function VacacionesPage() {
                     <span className="text-sm font-bold text-[#163f6b]">
                       Días <span className="text-red-600">*</span>
                     </span>
-                    <span className={`flex min-h-12 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 ${errors.cantidadDias ? 'border-red-400' : 'border-slate-200 focus-within:border-blue-500'}`}>
+                    <span className={`flex min-h-12 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 ${errors.cantidadDias ? 'border-red-400' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}>
                       <IconHash className={errors.cantidadDias ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
                       <input
                         type="number"
@@ -538,7 +538,7 @@ export default function VacacionesPage() {
                     <span className="text-sm font-bold text-[#163f6b]">
                       Fecha <span className="text-red-600">*</span>
                     </span>
-                    <span className={`flex min-h-12 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 ${errors.fecha ? 'border-red-400' : 'border-slate-200 focus-within:border-blue-500'}`}>
+                    <span className={`flex min-h-12 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 ${errors.fecha ? 'border-red-400' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}>
                       <IconCalendarEvent className={errors.fecha ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
                       <input
                         type="date"
@@ -567,7 +567,7 @@ export default function VacacionesPage() {
                     )}
                   </span>
                   <textarea
-                    className={`min-h-24 w-full rounded-xl border bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-blue-200 ${errors.observaciones ? 'border-red-400' : 'border-slate-200 focus:border-blue-500'}`}
+                    className={`min-h-24 w-full rounded-xl border bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-blue-200 ${errors.observaciones ? 'border-red-400' : 'border-slate-200 focus:border-[#1e5a9c]'}`}
                     maxLength={500}
                     placeholder={
                       values.tipo === 'AJUSTE'
@@ -585,7 +585,7 @@ export default function VacacionesPage() {
 
                 <button
                   type="submit"
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-blue-500 bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3 font-extrabold text-white shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none motion-reduce:transform-none"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#1e5a9c] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3 font-extrabold text-white shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none motion-reduce:transform-none"
                   disabled={saving}
                 >
                   <IconDeviceFloppy size={20} aria-hidden="true" />
@@ -596,12 +596,12 @@ export default function VacacionesPage() {
           </div>
 
           <section
-            className="min-w-0 overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl"
+            className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
             aria-label="Historial de movimientos de vacaciones"
             aria-busy={cargandoHistorial}
           >
             <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
-              <IconHistory className="text-blue-600" size={22} aria-hidden="true" />
+              <IconHistory className="text-[#1e5a9c]" size={22} aria-hidden="true" />
               <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Historial de movimientos</h2>
             </div>
 
@@ -618,7 +618,7 @@ export default function VacacionesPage() {
                 {cargaHistorial.reintentable ? (
                   <button
                     type="button"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                     onClick={() => setRecarga((n) => n + 1)}
                   >
                     <IconRefresh size={18} aria-hidden="true" />
@@ -628,7 +628,7 @@ export default function VacacionesPage() {
               </div>
             ) : movimientos.length === 0 ? (
               <div className="grid place-items-center gap-3 p-10 text-center">
-                <span className="grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700">
+                <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
                   <IconHistory size={28} aria-hidden="true" />
                 </span>
                 <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Sin movimientos</h2>
@@ -698,7 +698,7 @@ export default function VacacionesPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => actualizarParams({ colaboradorId, page: page - 1 })}
                     disabled={page <= 1 || cargandoHistorial}
                   >
@@ -710,7 +710,7 @@ export default function VacacionesPage() {
                   </span>
                   <button
                     type="button"
-                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => actualizarParams({ colaboradorId, page: page + 1 })}
                     disabled={page >= totalPages || cargandoHistorial}
                   >

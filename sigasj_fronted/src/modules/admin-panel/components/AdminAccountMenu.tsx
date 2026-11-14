@@ -167,11 +167,12 @@ const AdminAccountMenu = ({ triggerContent }: { triggerContent?: ReactNode }) =>
       <button
         ref={triggerRef}
         type="button"
-        className={`admin-account-menu__trigger${triggerContent ? ' admin-account-menu__trigger--user' : ''}`}
+        className={`admin-account-menu__trigger${triggerContent ? ' admin-account-menu__trigger--user admin-account-menu__trigger--circle' : ''}`}
         aria-haspopup="menu"
         aria-controls={menuId}
         aria-expanded={isOpen}
         aria-label="Opciones de cuenta"
+        title="Opciones de cuenta"
         onClick={toggleMenu}
         onKeyDown={handleTriggerKeyDown}
       >

@@ -16,14 +16,14 @@ import { SOLICITUD_MATERIALES_NEW_PATH, SOLICITUDES_MATERIALES_PATH } from '../.
 
 const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
 
-const modernCardClasses = 'group !relative !min-h-[118px] !overflow-hidden !rounded-[22px] !border-sky-100 !bg-white/95 !p-5 !shadow-[0_10px_28px_rgba(15,63,110,0.08)] !transition-all !duration-300 !ease-out hover:!-translate-y-1.5 hover:!border-blue-300 hover:!shadow-[0_20px_42px_rgba(37,99,235,0.18)] active:!translate-y-0 active:!scale-[0.99] focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-blue-600 motion-reduce:!transform-none motion-reduce:!transition-none [&_.quick-access-card__icon]:!size-14 [&_.quick-access-card__icon]:!rounded-[18px] [&_.quick-access-card__icon]:!border [&_.quick-access-card__icon]:!border-white/70 [&_.quick-access-card__icon]:!text-white [&_.quick-access-card__icon]:!shadow-[0_10px_22px_rgba(37,99,235,0.3),inset_0_1px_0_rgba(255,255,255,0.35)] [&_.quick-access-card__icon]:!transition-all [&_.quick-access-card__icon]:!duration-300 hover:[&_.quick-access-card__icon]:!-rotate-3 hover:[&_.quick-access-card__icon]:!scale-110 hover:[&_.quick-access-card__icon]:!shadow-[0_14px_28px_rgba(37,99,235,0.38)] [&_.quick-access-card__title]:!text-base [&_.quick-access-card__title]:!font-extrabold [&_.quick-access-card__title]:!text-[#062e63] [&_.quick-access-card__description]:!mt-1 [&_.quick-access-card__description]:!text-sm [&_.quick-access-card__description]:!leading-6 [&_.quick-access-card__description]:!text-slate-500 [&_.quick-access-card__arrow]:!grid [&_.quick-access-card__arrow]:!size-10 [&_.quick-access-card__arrow]:!place-items-center [&_.quick-access-card__arrow]:!rounded-full [&_.quick-access-card__arrow]:!bg-blue-50 [&_.quick-access-card__arrow]:!text-lg [&_.quick-access-card__arrow]:!font-black [&_.quick-access-card__arrow]:!text-blue-600 [&_.quick-access-card__arrow]:!shadow-inner [&_.quick-access-card__arrow]:!transition-all [&_.quick-access-card__arrow]:!duration-300 hover:[&_.quick-access-card__arrow]:!translate-x-1 hover:[&_.quick-access-card__arrow]:!bg-blue-600 hover:[&_.quick-access-card__arrow]:!text-white hover:[&_.quick-access-card__arrow]:!shadow-[0_8px_18px_rgba(37,99,235,0.28)]'
-const modernPrimaryCardClasses = '!border-blue-200 !bg-linear-to-br !from-blue-50/80 !via-white !to-sky-50'
-const blueIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-blue-600 [&_.quick-access-card__icon]:!to-cyan-500'
-const cyanIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-cyan-600 [&_.quick-access-card__icon]:!to-sky-400'
-const indigoIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-indigo-600 [&_.quick-access-card__icon]:!to-blue-500'
-const violetIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-violet-600 [&_.quick-access-card__icon]:!to-fuchsia-500'
-const tealIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-teal-600 [&_.quick-access-card__icon]:!to-emerald-400'
-const amberIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-amber-500 [&_.quick-access-card__icon]:!to-orange-500'
+const modernCardClasses = 'group !relative !min-h-[118px] !overflow-hidden !rounded-[22px] !border-[#d7e5f1] !bg-white/95 !p-5 !shadow-[0_10px_28px_rgba(30, 90, 156,0.08)] !transition-all !duration-300 !ease-out hover:!-translate-y-1.5 hover:!border-[#1e5a9c] hover:!shadow-[0_16px_36px_rgba(30, 90, 156,0.14)] active:!translate-y-0 active:!scale-[0.99] focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-[#1e5a9c] motion-reduce:!transform-none motion-reduce:!transition-none [&_.quick-access-card__icon]:!size-14 [&_.quick-access-card__icon]:!rounded-[18px] [&_.quick-access-card__icon]:!border [&_.quick-access-card__icon]:!border-white/70 [&_.quick-access-card__icon]:!text-white [&_.quick-access-card__icon]:!shadow-[0_10px_22px_rgba(30, 90, 156,0.28),inset_0_1px_0_rgba(255,255,255,0.35)] [&_.quick-access-card__icon]:!transition-all [&_.quick-access-card__icon]:!duration-300 hover:[&_.quick-access-card__icon]:!-rotate-3 hover:[&_.quick-access-card__icon]:!scale-110 hover:[&_.quick-access-card__icon]:!shadow-[0_14px_28px_rgba(30, 90, 156,0.34)] [&_.quick-access-card__title]:!text-base [&_.quick-access-card__title]:!font-extrabold [&_.quick-access-card__title]:!text-[#1e5a9c] [&_.quick-access-card__description]:!mt-1 [&_.quick-access-card__description]:!text-sm [&_.quick-access-card__description]:!leading-6 [&_.quick-access-card__description]:!text-[#5b7390] [&_.quick-access-card__arrow]:!grid [&_.quick-access-card__arrow]:!size-10 [&_.quick-access-card__arrow]:!place-items-center [&_.quick-access-card__arrow]:!rounded-full [&_.quick-access-card__arrow]:!bg-[#eaf6ff] [&_.quick-access-card__arrow]:!text-lg [&_.quick-access-card__arrow]:!font-black [&_.quick-access-card__arrow]:!text-[#1e5a9c] [&_.quick-access-card__arrow]:!shadow-inner [&_.quick-access-card__arrow]:!transition-all [&_.quick-access-card__arrow]:!duration-300 hover:[&_.quick-access-card__arrow]:!translate-x-1 hover:[&_.quick-access-card__arrow]:!bg-[#1e5a9c] hover:[&_.quick-access-card__arrow]:!text-white hover:[&_.quick-access-card__arrow]:!shadow-[0_8px_18px_rgba(30, 90, 156,0.28)]'
+const modernPrimaryCardClasses = '!border-[#bfe3fa] !bg-linear-to-br !from-[#eaf6ff]/90 !via-white !to-[#bfe3fa]/40'
+const blueIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-[#1e5a9c] [&_.quick-access-card__icon]:!to-[#1e5a9c]'
+const cyanIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-[#1e5a9c] [&_.quick-access-card__icon]:!to-[#1e5a9c]'
+const indigoIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-[#123f70] [&_.quick-access-card__icon]:!to-[#1e5a9c]'
+const violetIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-[#1e5a9c] [&_.quick-access-card__icon]:!to-[#1e5a9c]'
+const tealIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-[#236c51] [&_.quick-access-card__icon]:!to-[#1e5a9c]'
+const amberIconClasses = '[&_.quick-access-card__icon]:!bg-linear-to-br [&_.quick-access-card__icon]:!from-[#b45309] [&_.quick-access-card__icon]:!to-[#1e5a9c]'
 
 type RegistrationNoticeState = {
   actividadRegistrada?: boolean
@@ -93,12 +93,12 @@ const ActividadesFontaneroHomePage = () => {
       className="actividades-fontanero-home !max-w-6xl !gap-6"
       aria-labelledby="actividades-fontanero-title"
     >
-      <header className="actividades-fontanero-home__welcome !rounded-[26px] !border-sky-100 !bg-linear-to-br !from-white !via-white !to-blue-50/70 !p-8 !shadow-[0_16px_42px_rgba(15,63,110,0.1)]">
+      <header className="actividades-fontanero-home__welcome !rounded-[26px] !border-[#d7e5f1] !bg-linear-to-br !from-white !via-white !to-[#eaf6ff]/70 !p-8 !shadow-[0_16px_42px_rgba(15,63,110,0.1)]">
         <div className="actividades-fontanero-home__welcome-content">
-          <span className="actividades-fontanero-home__eyebrow !text-sm !font-extrabold !tracking-[0.12em] !text-blue-600">
+          <span className="actividades-fontanero-home__eyebrow !text-sm !font-extrabold !tracking-[0.12em] !text-[#1e5a9c]">
             Módulo operativo · Fontanero
           </span>
-          <h1 className="!text-4xl !font-black !tracking-[-0.025em] !text-[#062e63]" id="actividades-fontanero-title">Registro de Actividades</h1>
+          <h1 className="!text-4xl !font-black !tracking-[-0.025em] !text-[#1e5a9c]" id="actividades-fontanero-title">Registro de Actividades</h1>
           <p className="actividades-fontanero-home__welcome-text">
             Hola, <strong data-testid="fontanero-display-name">{displayName}</strong>
             {roleLabel ? (
@@ -112,7 +112,7 @@ const ActividadesFontaneroHomePage = () => {
         </div>
         <Link
           to={DASHBOARD_PATH}
-          className="actividades-fontanero-home__back-link !inline-flex !min-h-11 !items-center !rounded-xl !border !border-blue-200 !bg-white !px-4 !font-extrabold !text-blue-700 !shadow-sm !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!bg-blue-50 hover:!no-underline hover:!shadow-md active:!translate-y-0"
+          className="actividades-fontanero-home__back-link !inline-flex !min-h-11 !items-center !rounded-xl !border !border-[#bfe3fa] !bg-white !px-4 !font-extrabold !text-[#1e5a9c] !shadow-sm !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!no-underline hover:!shadow-md active:!translate-y-0"
         >
           Volver al dashboard
         </Link>

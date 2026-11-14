@@ -7,6 +7,8 @@ import { getFontaneroAverias } from '../../averias/services/averiasFontaneroApi'
 import type { AveriaListItem } from '../../averias/admin/types'
 import type { AveriaFontaneroListItem } from '../../averias/fontanero/types'
 import { getAlertasReposicionAdmin } from '../../inventario/alertas-reposicion/alertasReposicionApi'
+import { getNotificacionesPropias } from '../../notificaciones/notificacionesApi'
+import { getSolicitudesAdmin } from '../../solicitudes-publicas/admin/solicitudesAdminApi'
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import type { ActivityItem, AlertItem } from '../props'
 
@@ -87,13 +89,19 @@ const formatRelativeTime = (iso: string | null | undefined): string => {
 
 const toAlertUrgency = (prioridad: string | null | undefined): AlertItem['urgency'] => {
   const value = (prioridad ?? '').trim().toUpperCase()
+  if (!value) {
+    return 'sin'
+  }
   if (value === 'ALTA' || value === 'URGENTE') {
     return 'alta'
   }
   if (value === 'MEDIA') {
     return 'media'
   }
-  return 'baja'
+  if (value === 'BAJA') {
+    return 'baja'
+  }
+  return 'sin'
 }
 
 const toReadableAveriaTitle = (
@@ -231,10 +239,34 @@ export async function getAveriasSummaryMetric(): Promise<ModuleSummaryMetric> {
   }
 }
 
+/** Estados de solicitud digital que cuentan como “en trámite” en el panel. */
+const ESTADOS_SOLICITUD_EN_TRAMITE = ['PENDIENTE', 'EN_REVISION'] as const
+
 export async function getSolicitudesSummaryMetric(): Promise<ModuleSummaryMetric> {
   try {
+    const results = await Promise.allSettled(
+      ESTADOS_SOLICITUD_EN_TRAMITE.map((estado) =>
+        getSolicitudesAdmin({ search: '', estado, tipo: '', page: 1 }),
+      ),
+    )
+    const totals = results.flatMap((result) =>
+      result.status === 'fulfilled' && typeof result.value.total === 'number'
+        ? [result.value.total]
+        : [],
+    )
+    if (totals.length > 0) {
+      return {
+        key: 'solicitudesEnTramite',
+        value: totals.reduce((sum, total) => sum + total, 0),
+      }
+    }
+
+    // Compatibilidad: KPI legacy si el listado digital no responde.
     const raw = await fetchWithAuth<unknown>('/solicitudes/aprobadas-pendientes')
-    return { key: 'solicitudesEnTramite', value: readList(raw, ['solicitudes']).length }
+    return {
+      key: 'solicitudesEnTramite',
+      value: readList(raw, ['solicitudes']).length,
+    }
   } catch {
     return { key: 'solicitudesEnTramite', value: null }
   }
@@ -260,18 +292,93 @@ export async function getRecentDashboardAlerts(
     .map(toAlertFromAdmin)
 }
 
+const toActivityFromNotificacion = (item: {
+  id: number
+  titulo: string
+  mensaje: string
+  fechaCreacion: string
+  idAveria: number | null
+}): ActivityItem => ({
+  id: `notif-${item.id}`,
+  user: 'Sistema',
+  action: 'registró',
+  target: item.titulo.trim() || item.mensaje.trim() || 'evento operativo',
+  timeAgo: formatRelativeTime(item.fechaCreacion),
+  icon: item.idAveria ? 'averias' : 'reportes',
+})
+
+const toActivityFromAveria = (item: AveriaListItem): ActivityItem => ({
+  id: `averia-${item.id}`,
+  user: toDisplayName(item.nombreReportante?.trim() || 'Ciudadanía'),
+  action: 'reportó',
+  target: item.codigoSeguimiento || toReadableAveriaTitle(
+    item.descripcion,
+    item.codigoSeguimiento,
+    item.sectorComunidad,
+  ),
+  timeAgo: formatRelativeTime(item.fechaReporte),
+  icon: 'averias',
+})
+
+async function getOperationalActivityFallback(
+  scope: DashboardOperationsScope,
+): Promise<ActivityItem[]> {
+  const fromNotificaciones = await getNotificacionesPropias()
+    .then((listado) =>
+      listado.data.slice(0, 5).map(toActivityFromNotificacion),
+    )
+    .catch(() => [] as ActivityItem[])
+
+  if (fromNotificaciones.length > 0) {
+    return fromNotificaciones
+  }
+
+  if (scope === 'fontanero') {
+    const listado = await getFontaneroAverias().catch(() => ({ data: [] }))
+    return asArray(listado.data)
+      .filter((row): row is AveriaFontaneroListItem => Boolean(asRecord(row)))
+      .slice(0, 5)
+      .map((item) => ({
+        id: `averia-${item.id}`,
+        user: 'Asignación',
+        action: 'tiene',
+        target: item.codigoSeguimiento || 'avería asignada',
+        timeAgo: formatRelativeTime(item.fechaAsignacion),
+        icon: 'averias' as const,
+      }))
+  }
+
+  const listado = await getAdminAverias({ page: 1, limit: 5 }).catch(() => ({
+    data: [],
+  }))
+  return asArray(listado.data)
+    .filter((row): row is AveriaListItem => Boolean(asRecord(row)))
+    .slice(0, 5)
+    .map(toActivityFromAveria)
+}
+
 export async function getRecentDashboardActivities(
   scope: DashboardOperationsScope,
 ): Promise<ActivityItem[]> {
   if (scope === 'fontanero') {
     const raw = await fetchWithAuth<unknown>('/fontanero/actividades')
-    return readList(raw, ['data', 'actividades'])
+    const fromBitacora = readList(raw, ['data', 'actividades'])
       .map(normalizeActividadFontanero)
       .filter((item): item is ActividadFontaneroRegistrada => item !== null)
       .slice(0, 5)
       .map(toActivityItem)
+    if (fromBitacora.length > 0) {
+      return fromBitacora
+    }
+    return getOperationalActivityFallback(scope)
   }
 
-  const listado = await getActividadesAdmin({ page: 1, limit: 5 })
-  return listado.data.slice(0, 5).map(toActivityItem)
+  const listado = await getActividadesAdmin({ page: 1, limit: 5 }).catch(() => ({
+    data: [] as ActividadFontaneroRegistrada[],
+  }))
+  const fromBitacora = listado.data.slice(0, 5).map(toActivityItem)
+  if (fromBitacora.length > 0) {
+    return fromBitacora
+  }
+  return getOperationalActivityFallback(scope)
 }

@@ -154,7 +154,7 @@ const ActividadesAdminReportesPage = () => {
   return (
     <main className="gallery-admin actividades-admin-reportes">
       <div className="gallery-admin__shell sigasj-stack !gap-7">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
           <div className="min-w-0 space-y-3">
             <span className="gallery-admin__eyebrow">
               Actividades del Fontanero · Administradora
@@ -168,7 +168,7 @@ const ActividadesAdminReportesPage = () => {
           <div className="gallery-admin__header-actions">
             <Link
               to={ACTIVIDADES_ADMIN_PATHS.home}
-              className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-blue-50"
+              className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-[#eaf6ff]"
             >
               Volver al módulo
             </Link>
@@ -176,12 +176,12 @@ const ActividadesAdminReportesPage = () => {
         </header>
 
         <form
-          className="gallery-admin__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]"
+          className="gallery-admin__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
           aria-label="Filtros del reporte"
           onSubmit={handleConsultar}
           noValidate
         >
-          <div className="col-span-full border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Consulta del reporte</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar actividades</h2><p className="mt-2 text-base text-slate-500">Defina los criterios para generar el resumen de actividades.</p></div>
+          <div className="col-span-full border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta del reporte</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar actividades</h2><p className="mt-2 text-base text-slate-500">Defina los criterios para generar el resumen de actividades.</p></div>
           <label className="gallery-admin__field" htmlFor="reportes-fecha-inicio">
             <span>Fecha inicial</span>
             <input
@@ -265,7 +265,7 @@ const ActividadesAdminReportesPage = () => {
             </button>
             <button
               type="button"
-              className="gallery-admin__button gallery-admin__filter-reset !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md"
+              className="gallery-admin__button gallery-admin__filter-reset !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md"
               onClick={handleLimpiar}
               disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
             >
@@ -294,10 +294,10 @@ const ActividadesAdminReportesPage = () => {
         ) : null}
 
         <section
-          className="actividades-admin-reportes__indicators rounded-[28px] border border-blue-100 bg-white/90 p-7 shadow-[0_14px_38px_rgba(30,90,156,0.08)]"
+          className="actividades-admin-reportes__indicators rounded-[28px] border border-blue-100 bg-white/90 p-7 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
           aria-label="Indicadores del reporte"
         >
-          <div className="mb-6 border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Resultados del reporte</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Indicadores de actividades</h2><p className="mt-2 text-base text-slate-500">Totales calculados según los filtros aplicados.</p></div>
+          <div className="mb-6 border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Resultados del reporte</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Indicadores de actividades</h2><p className="mt-2 text-base text-slate-500">Totales calculados según los filtros aplicados.</p></div>
           <div className="admin-dashboard__indicators-grid">
             <IndicatorCard
               title="Total de actividades"
@@ -323,11 +323,11 @@ const ActividadesAdminReportesPage = () => {
         </section>
 
         <section
-          className="actividades-admin-reportes__listado rounded-[28px] border border-blue-100 bg-white/90 p-7 shadow-[0_14px_38px_rgba(30,90,156,0.08)]"
+          className="actividades-admin-reportes__listado rounded-[28px] border border-blue-100 bg-white/90 p-7 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
           aria-labelledby="reportes-listado-title"
         >
           <div className="mb-6 border-b border-blue-100 pb-5">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Detalle del reporte</p>
+            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Detalle del reporte</p>
             <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]" id="reportes-listado-title">Listado de actividades</h2>
             <p className="mt-2 text-base text-slate-500">Fecha, fontanero responsable y tipo de actividad.</p>
           </div>
@@ -345,8 +345,8 @@ const ActividadesAdminReportesPage = () => {
           ) : null}
 
           {showEmpty ? (
-            <div className="gallery-admin__empty !flex !min-h-[180px] !flex-col !items-center !justify-center !rounded-3xl !border !border-dashed !border-blue-200 !bg-gradient-to-br !from-white !to-sky-50/70 !px-6 !py-10 !text-center !shadow-inner" role="status">
-              <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconClipboardOff size={28} aria-hidden="true" /></span>
+            <div className="gallery-admin__empty !flex !min-h-[180px] !flex-col !items-center !justify-center !rounded-3xl !border !border-dashed !border-[#bfe3fa] !bg-gradient-to-br !from-white !to-sky-50/70 !px-6 !py-10 !text-center !shadow-inner" role="status">
+              <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]"><IconClipboardOff size={28} aria-hidden="true" /></span>
               <h3 className="m-0 text-lg font-black text-[#07376f]">Sin actividades encontradas</h3>
               <p className="mb-0 mt-2 text-base text-slate-500">No se encontraron actividades con los filtros seleccionados.</p>
             </div>

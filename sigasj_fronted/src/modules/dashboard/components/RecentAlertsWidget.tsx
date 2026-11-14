@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link } from 'react-router-dom'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
@@ -16,6 +16,7 @@ const URGENCY_LABELS: Record<AlertItem['urgency'], string> = {
   alta: 'Alta',
   media: 'Media',
   baja: 'Baja',
+  sin: 'Abierta',
 }
 
 const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsProp }) => {
@@ -26,6 +27,12 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
   ])
   const [alerts, setAlerts] = useState<AlertItem[]>(alertsProp ?? [])
   const [isLoading, setIsLoading] = useState(alertsProp === undefined)
+  const [isError, setIsError] = useState(false)
+  const [reloadToken, setReloadToken] = useState(0)
+
+  const loadAlerts = useCallback(() => {
+    setReloadToken((token) => token + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -33,6 +40,7 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
       if (alertsProp !== undefined) {
         setAlerts(alertsProp)
         setIsLoading(false)
+        setIsError(false)
         return
       }
 
@@ -45,20 +53,24 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
       if (scope === null) {
         setAlerts([])
         setIsLoading(false)
+        setIsError(false)
         return
       }
 
       setIsLoading(true)
+      setIsError(false)
 
       void getRecentDashboardAlerts(scope)
         .then((items) => {
           if (!cancelled) {
             setAlerts(items)
+            setIsError(false)
           }
         })
         .catch(() => {
           if (!cancelled) {
             setAlerts([])
+            setIsError(true)
           }
         })
         .finally(() => {
@@ -72,7 +84,7 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
       cancelled = true
       cancelScheduled()
     }
-  }, [alertsProp, canOpenAdminAverias, canOpenFontaneroAverias])
+  }, [alertsProp, canOpenAdminAverias, canOpenFontaneroAverias, reloadToken])
 
   const footerPath = canOpenAdminAverias
     ? '/admin/averias'
@@ -81,33 +93,48 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
       : null
 
   return (
-    <div className="dashboard-widget recent-alerts-widget group !overflow-hidden !rounded-[26px] !border-rose-100 !bg-linear-to-br !from-white !via-white !to-rose-50/50 !p-7 !shadow-[0_14px_36px_rgba(15,63,110,0.1)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-rose-200 hover:!shadow-[0_20px_44px_rgba(225,29,72,0.13)] motion-reduce:!transform-none motion-reduce:!transition-none">
+    <div className="dashboard-widget recent-alerts-widget">
       <div className="dashboard-widget__header">
         <div className="dashboard-widget__title-group">
-          <span className="dashboard-widget__icon dashboard-widget__icon--averias !grid !size-14 !place-items-center !rounded-2xl !border !border-white/70 !bg-linear-to-br !from-rose-500 !to-orange-400 !text-white !shadow-[0_10px_22px_rgba(225,29,72,0.28)] !transition-transform !duration-300 group-hover:!-rotate-3 group-hover:!scale-110 motion-reduce:!transform-none" aria-hidden="true">
+          <span
+            className="dashboard-widget__icon dashboard-widget__icon--averias"
+            aria-hidden="true"
+          >
             <AdminNavIcon name="averias" />
           </span>
           <div>
-            <h3 className="dashboard-widget__title !text-lg !font-extrabold !text-[#062e63]">Averías Recientes</h3>
-            <span className="dashboard-widget__subtitle !text-sm !text-slate-500">Reportes prioritarios</span>
+            <h3 className="dashboard-widget__title">Averías recientes</h3>
           </div>
         </div>
-        <span className="recent-alerts-widget__count !rounded-full !border !border-rose-200 !bg-rose-50 !px-3 !py-1.5 !font-extrabold !text-rose-700 !shadow-sm">
-          {isLoading ? '…' : `${alerts.length} activas`}
+        <span className="recent-alerts-widget__count" aria-live="polite">
+          {isLoading ? '…' : `${alerts.length} abiertas`}
         </span>
       </div>
 
       <div className="recent-alerts-widget__body">
         {isLoading ? (
-          <p className="recent-alerts-widget__empty">Cargando averías…</p>
+          <p className="recent-alerts-widget__empty" role="status">
+            Cargando averías…
+          </p>
+        ) : isError ? (
+          <div className="dashboard-widget__error" role="alert">
+            <span>No se pudieron cargar las averías recientes.</span>
+            <button type="button" onClick={loadAlerts}>
+              Reintentar
+            </button>
+          </div>
         ) : alerts.length === 0 ? (
-          <p className="recent-alerts-widget__empty !rounded-[20px] !border !border-dashed !border-rose-200 !bg-linear-to-br !from-rose-50 !to-orange-50/60 !text-slate-500 !shadow-inner">No hay averías prioritarias pendientes.</p>
+          <p className="recent-alerts-widget__empty">
+            No hay averías abiertas en este momento.
+          </p>
         ) : (
           <ul className="recent-alerts-widget__list">
             {alerts.map((alert) => (
               <li key={alert.id} className="recent-alerts-widget__item">
                 <div className="recent-alerts-widget__item-main">
-                  <span className={`recent-alerts-widget__urgency recent-alerts-widget__urgency--${alert.urgency}`}>
+                  <span
+                    className={`recent-alerts-widget__urgency recent-alerts-widget__urgency--${alert.urgency}`}
+                  >
                     {URGENCY_LABELS[alert.urgency]}
                   </span>
                   <div className="recent-alerts-widget__info">
@@ -127,8 +154,8 @@ const RecentAlertsWidget: React.FC<RecentAlertsWidgetProps> = ({ alerts: alertsP
 
       {footerPath ? (
         <div className="dashboard-widget__footer">
-          <Link to={footerPath} className="dashboard-widget__link !inline-flex !items-center !rounded-xl !px-3 !py-2 !font-extrabold !text-blue-700 !transition-all !duration-300 hover:!translate-x-1 hover:!bg-blue-50 hover:!no-underline motion-reduce:!transform-none motion-reduce:!transition-none">
-            Ver todas las averías &rarr;
+          <Link to={footerPath} className="dashboard-widget__link">
+            Ver todas las averías →
           </Link>
         </div>
       ) : null}

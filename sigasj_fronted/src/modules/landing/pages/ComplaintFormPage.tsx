@@ -80,13 +80,13 @@ const ComplaintFormPage = () => {
   }
 
   return (
-    <div className="complaint-form-page receipt-query-page sigasj-complaint-page min-h-screen bg-white" aria-label="Formulario público de sugerencias y quejas">
+    <div className="complaint-form-page receipt-query-page sigasj-complaint-page min-h-screen bg-sigasj-surface" aria-label="Formulario público de sugerencias y quejas">
       <PublicReceiptNavbar returnTo="/#quejas" />
 
-      <main className="receipt-query-page__main sigasj-complaint-main bg-white px-5 py-12 max-[640px]:px-4 max-[640px]:py-8">
+      <main className="receipt-query-page__main sigasj-complaint-main bg-sigasj-surface px-5 py-12 max-[640px]:px-4 max-[640px]:py-8">
         <div className="receipt-query-page__container sigasj-complaint-container mx-auto w-full max-w-[850px]">
           <header className="receipt-query-page__heading sigasj-complaint-heading text-center">
-            <span className="sigasj-complaint-heading-icon mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-sky-100 text-[#0872d3]"><IconMessageCircle size={35} aria-hidden="true" /></span>
+            <span className="sigasj-complaint-heading-icon mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-sigasj-surface-soft text-sigasj-primary"><IconMessageCircle size={35} aria-hidden="true" /></span>
             <p className="complaint-form-page__eyebrow">Atención al usuario</p>
             <h1>Formulario de Sugerencias y Quejas</h1>
             <p>
@@ -95,7 +95,7 @@ const ComplaintFormPage = () => {
             </p>
           </header>
 
-          <section className="receipt-query-page__search-card sigasj-complaint-card mt-8 w-full rounded-[24px] border border-sky-100 bg-white p-8 shadow-[0_18px_50px_rgba(39,112,166,0.13)] max-[640px]:p-5">
+          <section className="receipt-query-page__search-card sigasj-complaint-card mt-8 w-full rounded-[24px] border border-sigasj-border bg-sigasj-surface p-8 shadow-[0_18px_50px_rgba(39,112,166,0.13)] max-[640px]:p-5">
             {submitted ? (
               <FormSuccessResult
                 title="Sugerencia o queja enviada exitosamente"

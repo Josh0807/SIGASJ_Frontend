@@ -17,7 +17,7 @@ export const claseBadgeEstadoSolicitud = (estado: SolicitudEstado | string): str
     case 'PENDIENTE':
       return 'border-amber-200 bg-amber-50 text-amber-800'
     case 'EN_REVISION':
-      return 'border-sky-200 bg-sky-50 text-sky-800'
+      return 'border-[#bfe3fa] bg-sky-50 text-sky-800'
     case 'APROBADA':
       return 'border-emerald-200 bg-emerald-50 text-emerald-800'
     case 'RECHAZADA':

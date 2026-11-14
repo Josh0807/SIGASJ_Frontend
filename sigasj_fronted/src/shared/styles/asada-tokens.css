@@ -1,0 +1,35 @@
+/**
+ * Paleta institucional ASADA San Juan / SIGASJ.
+ * Fuente única para alinear panel, formularios y superficies.
+ */
+:root {
+  --asada-ice: #eaf6ff;
+  --asada-mist: #bfe3fa;
+  --asada-sky: #7fc4f2;
+  --asada-blue: #3e8fd6;
+  --asada-navy: #1e5a9c;
+  --asada-ink: #123f70;
+  --asada-text: #1a2f42;
+  --asada-muted: #5b7390;
+  --asada-surface: #ffffff;
+  --asada-surface-soft: #eaf6ff;
+  --asada-border: #d7e5f1;
+  --asada-border-strong: #bfe3fa;
+  --asada-success: #236c51;
+  --asada-warning: #b45309;
+  --asada-danger: #b93638;
+  --asada-radius: 22px;
+  --asada-radius-sm: 14px;
+  --asada-shadow: 0 10px 28px rgba(30, 90, 156, 0.08);
+  --asada-shadow-soft: 0 4px 14px rgba(30, 90, 156, 0.05);
+  --asada-primary: var(--asada-navy);
+  --asada-primary-hover: #0f3260;
+  /* Footer institucional (texto blanco). */
+  --asada-footer: #0a1f36;
+
+  /* Alias usados por forms / shells legacy */
+  --color-sigasj-navy: var(--asada-navy);
+  --color-sigasj-ink: var(--asada-ink);
+  --color-sigasj-blue: var(--asada-blue);
+  --color-sigasj-ice: var(--asada-ice);
+}

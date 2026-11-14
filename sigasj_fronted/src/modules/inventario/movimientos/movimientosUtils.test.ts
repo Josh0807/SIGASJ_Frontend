@@ -21,7 +21,7 @@ const movimientoBase: MovimientoInventario = {
 describe('movimientosUtils', () => {
   it('formatea tipo y cantidad con unidad', () => {
     expect(formatMovimientoTipo('ENTRADA')).toBe('Entrada')
-    expect(formatMovimientoCantidad(movimientoBase)).toBe('4 Metro')
+    expect(formatMovimientoCantidad(movimientoBase)).toBe('4 Metros')
   })
 
   it('resuelve referencias conocidas', () => {

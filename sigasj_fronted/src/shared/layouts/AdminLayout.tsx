@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } fr
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import AdminMain from '../../modules/admin-panel/components/AdminMain'
 import AdminSidebar from '../../modules/admin-panel/components/AdminSidebar'
+import { SageIaProvider } from '../../modules/sage-ia/SageIaContext'
+import SageIaHost from '../../modules/sage-ia/SageIaHost'
 import { getAdminNavItemsForUser } from '../../modules/auth/utils/adminNavigation'
 import { useAuth } from '../../modules/auth/components/AuthContext'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../app/router/routePaths'
@@ -26,6 +28,7 @@ const AdminLayout = () => {
   const { pathname } = useLocation()
   const navItems = getAdminNavItemsForUser(user)
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true)
   const isMobileNav = useSyncExternalStore(
     subscribeToMobileNav,
     getMobileNavSnapshot,
@@ -80,34 +83,41 @@ const AdminLayout = () => {
   }
 
   return (
-    <div
-      className={`admin-layout admin-layout--panel min-h-screen min-w-0${isNavOpen ? ' admin-layout--nav-open' : ''}`}
-    >
-      {isNavOpen ? (
-        <button
-          type="button"
-          className="admin-nav-backdrop"
-          aria-label="Cerrar menú administrativo"
-          tabIndex={-1}
-          onClick={closeNav}
-        />
-      ) : null}
-      <AdminSidebar
-        items={navItems}
-        isDrawer={isMobileNav}
-        isOpen={isNavOpen}
-        onNavigate={closeNav}
-        onClose={closeNav}
-        closeButtonRef={closeRef}
-      />
-      <AdminMain
-        menuOpen={isNavOpen}
-        onToggleMenu={() => setIsNavOpen((open) => !open)}
-        menuToggleRef={toggleRef}
+    <SageIaProvider>
+      <div
+        className={`admin-layout admin-layout--panel min-h-screen min-w-0${isNavOpen ? ' admin-layout--nav-open' : ''}${
+          isSidebarCollapsed && !isMobileNav ? ' admin-layout--sidebar-collapsed' : ''
+        }`}
       >
-        <Outlet />
-      </AdminMain>
-    </div>
+        {isNavOpen ? (
+          <button
+            type="button"
+            className="admin-nav-backdrop"
+            aria-label="Cerrar menú administrativo"
+            tabIndex={-1}
+            onClick={closeNav}
+          />
+        ) : null}
+        <AdminSidebar
+          items={navItems}
+          isDrawer={isMobileNav}
+          isOpen={isNavOpen}
+          collapsed={isSidebarCollapsed && !isMobileNav}
+          onToggleCollapsed={() => setIsSidebarCollapsed((value) => !value)}
+          onNavigate={closeNav}
+          onClose={closeNav}
+          closeButtonRef={closeRef}
+        />
+        <AdminMain
+          menuOpen={isNavOpen}
+          onToggleMenu={() => setIsNavOpen((open) => !open)}
+          menuToggleRef={toggleRef}
+        >
+          <Outlet />
+        </AdminMain>
+        <SageIaHost />
+      </div>
+    </SageIaProvider>
   )
 }
 

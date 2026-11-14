@@ -1,24 +1,28 @@
 /**
- * Superficies admin compartidas (perfil, placeholders, tarjetas de consulta).
- * Shell canónico: `gallery-admin` + `admin-content-modern` (CMS / proyectos).
- * Inventario (`materials-admin`) y vision-ui conviven; este archivo alinea tokens.
+ * Superficies admin — paleta institucional ASADA.
+ * Scope preferido: .admin-layout--panel
  */
 
-/* Puente: estados vacíos/loading de inventario hacia gallery-admin */
-.admin-content-modern .materials-admin__empty,
-.admin-content-modern .materials-admin__error,
-.admin-content-modern .materials-admin__state {
-  border-radius: 14px;
-  border: 1px solid #d7e5f1;
-  background: #f8fbfe;
-  padding: 1.25rem 1.5rem;
+.admin-layout--panel {
+  --admin-surface-bg: var(--asada-ice, #eaf6ff);
+  --admin-surface-card: var(--asada-surface, #ffffff);
+  --admin-surface-primary: var(--asada-navy, #1e5a9c);
+  --admin-surface-primary-deep: var(--asada-ink, #123f70);
+  --admin-surface-primary-soft: var(--asada-ice, #eaf6ff);
+  --admin-surface-ink: var(--asada-ink, #123f70);
+  --admin-surface-text: var(--asada-text, #1a2f42);
+  --admin-surface-muted: var(--asada-muted, #5b7390);
+  --admin-surface-border: var(--asada-border, #d7e5f1);
+  --admin-surface-success: #3f6b52;
+  --admin-surface-warning: #b45309;
+  --admin-surface-danger: #b93638;
+  --admin-surface-radius: 22px;
+  --admin-surface-radius-sm: 14px;
+  --admin-surface-shadow: 0 10px 28px rgba(18, 63, 112, 0.07);
+  --admin-surface-shadow-soft: 0 4px 14px rgba(18, 63, 112, 0.05);
+  --admin-surface-transition: 150ms ease;
 }
 
-.admin-content-modern .materials-admin__header {
-  border-color: #d7e5f1;
-}
-
-/* Alias de botones canónicos (mismo look que gallery-admin__button) */
 .admin-btn {
   display: inline-flex;
   min-height: 44px;
@@ -26,31 +30,45 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 10px 16px;
-  border: 1px solid #1e5a9c;
-  border-radius: 10px;
-  background: white;
-  color: #1e5a9c;
+  border: 1px solid var(--admin-surface-primary, #1e5a9c);
+  border-radius: 14px;
+  background: var(--asada-surface, #ffffff);
+  color: var(--admin-surface-primary, #1e5a9c);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
   box-sizing: border-box;
+  transition: filter var(--admin-surface-transition, 150ms ease),
+    box-shadow var(--admin-surface-transition, 150ms ease);
 }
 
 .admin-btn--primary {
-  border-color: #1e5a9c;
-  background: #1e5a9c;
+  border-color: var(--admin-surface-primary, #1e5a9c);
+  background: var(--admin-surface-primary, #1e5a9c);
   color: white;
+  box-shadow: 0 8px 18px rgba(30, 90, 156, 0.22);
 }
 
 .admin-btn--primary:hover {
   color: white;
   text-decoration: none;
+  filter: brightness(1.05);
 }
 
 .admin-btn:disabled {
   opacity: 0.7;
   cursor: wait;
+}
+
+.admin-btn:focus-visible {
+  outline: 2px solid var(--admin-surface-primary, #1e5a9c);
+  outline-offset: 2px;
+}
+
+.admin-btn--icon {
+  width: 44px;
+  padding-inline: 0;
 }
 
 .admin-surface-page {
@@ -71,17 +89,17 @@
 .admin-surface-card {
   display: grid;
   gap: 1.25rem;
-  border-radius: 1.625rem;
-  border: 1px solid #dbeafe;
-  background: linear-gradient(to bottom right, #fff, #fff, rgb(239 246 255 / 0.6));
+  border-radius: var(--admin-surface-radius, 22px);
+  border: 1px solid var(--admin-surface-border, #d7e5f1);
+  background: var(--admin-surface-card, #ffffff);
   padding: 1.75rem;
-  box-shadow: 0 14px 36px rgb(15 63 110 / 0.1);
+  box-shadow: var(--admin-surface-shadow, 0 10px 28px rgba(18, 63, 112, 0.07));
 }
 
 .admin-surface-stat {
-  border-radius: 1rem;
-  border: 1px solid #e0f2fe;
-  background: rgb(240 249 255 / 0.7);
+  border-radius: var(--admin-surface-radius-sm, 14px);
+  border: 1px solid var(--admin-surface-border, #d7e5f1);
+  background: #f7fbfe;
   padding: 1rem 1.25rem;
 }
 
@@ -91,18 +109,260 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgb(12 74 110 / 0.7);
+  color: var(--admin-surface-muted, #5b7390);
 }
 
 .admin-surface-stat dd {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #0c4a6e;
+  color: var(--admin-surface-ink, #123f70);
   word-break: break-word;
 }
 
-/* Touch targets + foco teclado (inventario / RRHH en tablet-móvil) */
+.admin-layout--panel .gallery-admin__shell {
+  width: 100%;
+  max-width: none;
+}
+
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__header,
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__filters,
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__form,
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__list,
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__empty,
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__state,
+.admin-layout--panel .gallery-admin__shell > .gallery-admin__error,
+.admin-layout--panel .materials-admin__header,
+.admin-layout--panel .materials-admin__filters,
+.admin-layout--panel .materials-admin__form,
+.admin-layout--panel .materials-admin__table-wrap,
+.admin-layout--panel .materials-admin__state,
+.admin-layout--panel .materials-admin__empty,
+.admin-layout--panel .materials-admin__error,
+.admin-layout--panel .materials-admin__success,
+.admin-layout--panel .materials-admin__warning {
+  border-radius: var(--admin-surface-radius);
+  border-color: var(--admin-surface-border);
+  background: var(--admin-surface-card);
+  box-shadow: var(--admin-surface-shadow-soft);
+}
+
+.admin-layout--panel .gallery-admin__eyebrow,
+.admin-layout--panel .materials-admin__eyebrow {
+  color: var(--admin-surface-primary);
+  letter-spacing: 0.08em;
+}
+
+.admin-layout--panel .gallery-admin__header h1,
+.admin-layout--panel .materials-admin__header h1 {
+  color: var(--admin-surface-ink);
+  letter-spacing: -0.02em;
+}
+
+.admin-layout--panel .gallery-admin__header p,
+.admin-layout--panel .materials-admin__header p:last-child {
+  color: var(--admin-surface-muted);
+}
+
+.admin-layout--panel .gallery-admin__button,
+.admin-layout--panel .materials-admin__secondary,
+.admin-layout--panel .materials-admin__pagination button,
+.admin-layout--panel .materials-admin__error button {
+  border-radius: 14px;
+  border-color: var(--admin-surface-border);
+  color: var(--admin-surface-primary-deep);
+  background: var(--asada-surface, #ffffff);
+  min-height: 44px;
+}
+
+.admin-layout--panel .gallery-admin__button--primary,
+.admin-layout--panel .materials-admin__primary,
+.admin-layout--panel .materials-admin__action {
+  border-color: var(--admin-surface-primary);
+  background: var(--admin-surface-primary);
+  color: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(30, 90, 156, 0.2);
+}
+
+.admin-layout--panel .gallery-admin__button--primary:hover,
+.admin-layout--panel .materials-admin__primary:hover,
+.admin-layout--panel .materials-admin__action:hover {
+  filter: brightness(1.05);
+}
+
+.admin-layout--panel .gallery-admin__field input,
+.admin-layout--panel .gallery-admin__field textarea,
+.admin-layout--panel .gallery-admin__field select,
+.admin-layout--panel .materials-admin input,
+.admin-layout--panel .materials-admin select,
+.admin-layout--panel .materials-admin textarea {
+  border-color: var(--admin-surface-border);
+  border-radius: 14px;
+  color: var(--admin-surface-text);
+  background: var(--asada-ice, #f7fbfe);
+  min-height: 44px;
+}
+
+.admin-layout--panel .gallery-admin__field input:focus,
+.admin-layout--panel .gallery-admin__field textarea:focus,
+.admin-layout--panel .gallery-admin__field select:focus,
+.admin-layout--panel .materials-admin input:focus,
+.admin-layout--panel .materials-admin select:focus,
+.admin-layout--panel .materials-admin textarea:focus {
+  border-color: var(--admin-surface-primary);
+  outline: 2px solid color-mix(in srgb, var(--admin-surface-primary) 28%, transparent);
+  outline-offset: 0;
+  background: var(--asada-surface, #ffffff);
+}
+
+.admin-layout--panel .gallery-admin__field span,
+.admin-layout--panel .materials-admin label {
+  color: var(--admin-surface-ink);
+}
+
+.admin-layout--panel .gallery-admin__item {
+  border: 1px solid var(--admin-surface-border);
+  border-radius: var(--admin-surface-radius-sm);
+  background: var(--admin-surface-card);
+  box-shadow: var(--admin-surface-shadow-soft);
+}
+
+.admin-layout--panel .gallery-admin__empty,
+.admin-layout--panel .gallery-admin__state,
+.admin-layout--panel .gallery-admin__error {
+  border: 1px solid var(--admin-surface-border);
+  border-radius: var(--admin-surface-radius-sm);
+  background: #f7fbfe;
+  color: var(--admin-surface-muted);
+}
+
+.admin-layout--panel .gallery-admin__error,
+.admin-layout--panel .materials-admin__error {
+  background: color-mix(in srgb, var(--admin-surface-danger) 6%, white);
+  border-color: color-mix(in srgb, var(--admin-surface-danger) 28%, var(--admin-surface-border));
+  color: var(--admin-surface-text);
+}
+
+.admin-layout--panel .materials-admin__success {
+  background: color-mix(in srgb, var(--admin-surface-success) 8%, white);
+  border-color: color-mix(in srgb, var(--admin-surface-success) 28%, var(--admin-surface-border));
+  color: var(--admin-surface-success);
+}
+
+.admin-layout--panel .materials-admin__warning {
+  background: color-mix(in srgb, var(--admin-surface-warning) 8%, white);
+  border-color: color-mix(in srgb, var(--admin-surface-warning) 28%, var(--admin-surface-border));
+  color: var(--admin-surface-warning);
+}
+
+.admin-layout--panel .materials-admin {
+  max-width: none;
+  width: 100%;
+  color: var(--admin-surface-text);
+}
+
+.admin-layout--panel .materials-admin th {
+  background: #f7fbfe;
+  color: var(--admin-surface-muted);
+}
+
+.admin-layout--panel .materials-admin__badge.is-active {
+  background: var(--admin-surface-primary-soft);
+  color: var(--admin-surface-success);
+}
+
+.admin-layout--panel .materials-admin__badge.is-inactive {
+  background: #f2f1ed;
+  color: var(--admin-surface-muted);
+}
+
+.admin-layout--panel .materials-admin__count {
+  background: var(--admin-surface-primary-soft);
+  color: var(--admin-surface-primary-deep);
+  border-radius: 999px;
+}
+
+.admin-layout--panel .admin-content-modern .gallery-admin__button--primary {
+  background: var(--admin-surface-primary);
+  border-color: var(--admin-surface-primary);
+}
+
+.admin-layout--panel .confirm-dialog {
+  background: rgba(18, 63, 112, 0.45);
+}
+
+.admin-layout--panel .confirm-dialog__panel {
+  border-radius: var(--admin-surface-radius);
+  border: 1px solid var(--admin-surface-border);
+  box-shadow: 0 20px 48px rgba(18, 63, 112, 0.16);
+  background: var(--asada-surface, #ffffff);
+}
+
+.admin-layout--panel .confirm-dialog__title {
+  color: var(--admin-surface-ink);
+}
+
+.admin-layout--panel .confirm-dialog__message {
+  color: var(--admin-surface-muted);
+}
+
+.admin-layout--panel .confirm-dialog__button--secondary {
+  color: var(--admin-surface-primary-deep);
+  background: var(--asada-surface, #ffffff);
+  box-shadow: inset 0 0 0 1.5px var(--admin-surface-primary);
+}
+
+.admin-layout--panel .confirm-dialog__button--secondary:hover {
+  background: var(--admin-surface-primary-soft);
+}
+
+.admin-layout--panel .confirm-dialog__button:not(.confirm-dialog__button--secondary):not(.confirm-dialog__button--danger) {
+  background: var(--admin-surface-primary);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(30, 90, 156, 0.22);
+}
+
+.admin-layout--panel .confirm-dialog__button--danger {
+  background: var(--admin-surface-danger);
+}
+
+.admin-layout--panel .gallery-admin__skeleton {
+  border: 1px solid var(--admin-surface-border);
+  border-radius: var(--admin-surface-radius-sm);
+  background: var(--admin-surface-card);
+  box-shadow: var(--admin-surface-shadow-soft);
+  padding: 12px;
+}
+
+.admin-layout--panel .quick-access-card,
+.admin-layout--panel .actividades-fontanero-home__card {
+  border: 1px solid var(--admin-surface-border);
+  border-radius: var(--admin-surface-radius);
+  background: var(--admin-surface-card);
+  box-shadow: var(--admin-surface-shadow-soft);
+}
+
+.admin-layout--panel .inventory-module-shell .category-admin .materials-admin__header .materials-admin__eyebrow {
+  color: var(--admin-surface-primary) !important;
+  font-family: inherit !important;
+  letter-spacing: 0.08em !important;
+}
+
+.admin-layout--panel .inventory-module-shell .category-admin .materials-admin__header h1 {
+  color: var(--admin-surface-ink) !important;
+  font-family: inherit !important;
+  font-size: clamp(1.35rem, 2.2vw, 1.8rem) !important;
+  font-weight: 750 !important;
+}
+
+.admin-layout--panel .inventory-module-shell .category-admin .materials-admin__header > div > p:last-child {
+  color: var(--admin-surface-muted) !important;
+  font-family: inherit !important;
+  font-size: 0.95rem !important;
+  line-height: 1.55 !important;
+}
+
 .materials-admin__action,
 .materials-admin__primary,
 .materials-admin__secondary,
@@ -116,8 +376,9 @@
 .materials-admin__secondary:focus-visible,
 .materials-admin__error button:focus-visible,
 .materials-admin__pagination button:focus-visible,
-.materials-admin__category-error button:focus-visible {
-  outline: 2px solid #1d6fd6;
+.gallery-admin__button:focus-visible,
+.admin-btn:focus-visible {
+  outline: 2px solid var(--admin-surface-primary, #1e5a9c);
   outline-offset: 3px;
 }
 
@@ -126,6 +387,14 @@
 }
 
 .rrhh-touch-target:focus-visible {
-  outline: 2px solid #1d6fd6;
+  outline: 2px solid var(--admin-surface-primary, #1e5a9c);
   outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-btn,
+  .admin-layout--panel .gallery-admin__button,
+  .admin-layout--panel .materials-admin__primary {
+    transition: none;
+  }
 }

@@ -5,7 +5,7 @@ import {
 import { requireProductionApiBaseUrl } from './apiBaseUrl'
 
 /**
- * En Vite (dev) usa el proxy same-origin `/api` → localhost:3000.
+ * En Vite (dev) usa el proxy same-origin `/api` → VITE_API_URL (p. ej. :3001).
  * En producción usa VITE_API_URL (HTTPS de Render), sin caer a localhost.
  */
 const getApiBaseUrl = (): string => {

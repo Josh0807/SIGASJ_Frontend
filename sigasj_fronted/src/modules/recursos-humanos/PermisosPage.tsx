@@ -45,7 +45,7 @@ const leerFiltros = (params: URLSearchParams): PermisosFiltros => {
 }
 
 const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
 
 export default function PermisosPage() {
   const navigate = useNavigate()
@@ -152,12 +152,12 @@ export default function PermisosPage() {
   return (
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       <RrhhSubnav />
-      <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
             Administración · Permisos
           </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
+          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
             Permisos del personal
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
@@ -168,7 +168,7 @@ export default function PermisosPage() {
         </div>
         <Link
           to={PERMISO_NEW_PATH}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(37,99,235,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 motion-reduce:transform-none"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] motion-reduce:transform-none"
         >
           <IconCalendarPlus size={20} aria-hidden="true" />
           Registrar permiso
@@ -177,7 +177,7 @@ export default function PermisosPage() {
 
       {verColaSolicitudes ? (
         <Link
-          className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
+          className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 font-extrabold text-[#1e5a9c] no-underline shadow-[0_6px_18px_rgba(30, 90, 156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(30, 90, 156,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
           to={`${SOLICITUDES_AUSENCIA_ADMIN_PATH}?estado=PENDIENTE`}
         >
           <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
@@ -192,7 +192,7 @@ export default function PermisosPage() {
       ) : null}
 
       <section
-        className="grid gap-4 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+        className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
         aria-label="Filtros de permisos"
       >
         <label className="grid min-w-0 gap-2">
@@ -230,7 +230,7 @@ export default function PermisosPage() {
         </label>
         <button
           type="button"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
           onClick={limpiarFiltros}
           disabled={!hayFiltros}
         >
@@ -240,7 +240,7 @@ export default function PermisosPage() {
       </section>
 
       <section
-        className="min-w-0 overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl"
+        className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
         aria-busy={cargando}
         aria-label="Listado de permisos"
       >
@@ -257,7 +257,7 @@ export default function PermisosPage() {
             {resultado.reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
@@ -267,7 +267,7 @@ export default function PermisosPage() {
           </div>
         ) : permisos.length === 0 ? (
           <div className="grid place-items-center gap-3 p-10 text-center">
-            <span className="grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700">
+            <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
               <IconCalendarOff size={28} aria-hidden="true" />
             </span>
             <h2 className="m-0 text-lg font-extrabold text-[#073b73]">
@@ -318,7 +318,7 @@ export default function PermisosPage() {
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                         <Link
                           to={permisoDetailPath(permiso.id)}
-                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-[0_5px_14px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500 hover:from-blue-600 hover:to-sky-500 hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(37,99,235,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
+                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-gradient-to-br from-white to-[#eaf6ff] px-4 py-2 text-sm font-extrabold text-[#1e5a9c] no-underline shadow-[0_5px_14px_rgba(30, 90, 156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1e5a9c] hover:from-[#1e5a9c] hover:to-[#1e5a9c] hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(30, 90, 156,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
                           aria-label={`Ver permiso de ${nombre}`}
                         >
                           <IconEye className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
@@ -326,7 +326,7 @@ export default function PermisosPage() {
                         </Link>
                         <Link
                           to={permisoEditPath(permiso.id)}
-                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 px-4 py-2 text-sm font-extrabold text-white no-underline shadow-[0_8px_18px_rgba(37,99,235,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-800 hover:to-sky-600 hover:text-white hover:no-underline hover:shadow-[0_11px_24px_rgba(37,99,235,0.32)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
+                          className="group rrhh-touch-target inline-flex min-h-10 items-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 px-4 py-2 text-sm font-extrabold text-white no-underline shadow-[0_8px_18px_rgba(30, 90, 156,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-800 hover:to-sky-600 hover:text-white hover:no-underline hover:shadow-[0_11px_24px_rgba(30, 90, 156,0.32)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
                           aria-label={`Editar permiso de ${nombre}`}
                         >
                           <IconPencil className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
@@ -343,7 +343,7 @@ export default function PermisosPage() {
 
         {!error && total > 0 ? (
           <nav
-            className="flex flex-col items-center justify-between gap-3 border-t border-sky-100 bg-slate-50/60 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
+            className="flex flex-col items-center justify-between gap-3 border-t border-[#d7e5f1] bg-slate-50/60 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
             aria-label="Paginación de permisos"
           >
             <p className="m-0">
@@ -352,7 +352,7 @@ export default function PermisosPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
+                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-[#eaf6ff] enabled:hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
@@ -364,7 +364,7 @@ export default function PermisosPage() {
               </span>
               <button
                 type="button"
-                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-blue-50 enabled:hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
+                className="rrhh-touch-target inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 font-extrabold text-slate-600 transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:border-blue-300 enabled:hover:bg-[#eaf6ff] enabled:hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:opacity-70"
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >
