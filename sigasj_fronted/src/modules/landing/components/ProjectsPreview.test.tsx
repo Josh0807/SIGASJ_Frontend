@@ -13,11 +13,19 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
-    // Viewport por defecto para Desktop
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(window, 'matchMedia', {
       writable: true,
       configurable: true,
-      value: 1200,
+      value: (query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+        addListener: () => undefined,
+        removeListener: () => undefined,
+        dispatchEvent: () => false,
+      }),
     })
   })
 
@@ -36,17 +44,6 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
           <ProjectsPreview {...props} />
         </MemoryRouter>,
       )
-    })
-  }
-
-  const setWindowWidth = async (width: number) => {
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: width,
-    })
-    await act(async () => {
-      window.dispatchEvent(new Event('resize'))
     })
   }
 
@@ -69,9 +66,6 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
     element.dispatchEvent(event)
   }
 
-  /* --------------------------------------------------------------------------
-   * 1. Carga, Error y Vacío
-   * -------------------------------------------------------------------------- */
   describe('Estados de consulta (Carga, Error, Vacío)', () => {
     it('Carga: muestra indicador accesible role="status" mientras se obtienen los proyectos', async () => {
       vi.spyOn(proyectosApi, 'getPublicProyectos').mockReturnValue(
@@ -125,11 +119,8 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
     })
   })
 
-  /* --------------------------------------------------------------------------
-   * 2. Proyecto activo y Proyecto inactivo
-   * -------------------------------------------------------------------------- */
   describe('Proyecto activo e inactivo', () => {
-    it('Proyecto activo: renderiza en el carrusel los proyectos activos retornados por la API pública', async () => {
+    it('Proyecto activo: renderiza en grilla los proyectos activos (1–3)', async () => {
       const proyectosActivosMock: proyectosApi.PublicProyecto[] = [
         {
           id: 1,
@@ -157,6 +148,8 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
       expect(cards.length).toBe(2)
       expect(container.textContent).toContain('Construcción Tanque San Juan')
       expect(container.textContent).toContain('Sustitución de Tuberías Sector Norte')
+      expect(container.querySelector('[data-ui="projects-preview__grid"]')).not.toBeNull()
+      expect(container.querySelector('[data-ui="projects-preview__carousel"]')).toBeNull()
     })
 
     it('Proyecto inactivo: cuando el backend no retorna proyectos inactivos en el endpoint público, la interfaz no los renderiza', async () => {
@@ -169,9 +162,6 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
     })
   })
 
-  /* --------------------------------------------------------------------------
-   * 3. Card, Nombre, Imagen, Duración, Estado, Ver más
-   * -------------------------------------------------------------------------- */
   describe('Estructura de Card y campos (Nombre, Imagen, Duración, Estado, Ver más)', () => {
     it('Card y Nombre: estructura semántica <article> con enlaces accesibles y título h3', async () => {
       const proyectosMock: proyectosApi.PublicProyecto[] = [
@@ -269,7 +259,7 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
       expect(durations[1].textContent).toContain('Duración: —')
     })
 
-    it('Estado: muestra etiquetas legibles para PENDIENTE, EN_PROCESO y COMPLETADO', async () => {
+    it('Estado: badge sobre la imagen con color por estado (sin fila inferior)', async () => {
       const proyectosMock: proyectosApi.PublicProyecto[] = [
         { id: 41, nombre: 'P1', duracion: '1m', estado: 'PENDIENTE' },
         { id: 42, nombre: 'P2', duracion: '2m', estado: 'EN_PROCESO' },
@@ -281,14 +271,14 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
       await renderComponent()
 
       const badges = container.querySelectorAll('.projects-preview__badge')
-      expect(badges[0].textContent).toBe('Pendiente')
-      expect(badges[1].textContent).toBe('En proceso')
-      expect(badges[2].textContent).toBe('Completado')
+      expect(badges[0].textContent).toContain('Pendiente')
+      expect(badges[0].className).toContain('bg-sigasj-primary')
+      expect(badges[1].textContent).toContain('En proceso')
+      expect(badges[1].className).toContain('bg-[#f5d000]')
+      expect(badges[2].textContent).toContain('Completado')
+      expect(badges[2].className).toContain('bg-sigasj-success')
 
-      const stateTexts = container.querySelectorAll('.projects-preview__state-text')
-      expect(stateTexts[0].textContent).toContain('Estado: Pendiente')
-      expect(stateTexts[1].textContent).toContain('Estado: En proceso')
-      expect(stateTexts[2].textContent).toContain('Estado: Completado')
+      expect(container.querySelectorAll('.projects-preview__state-text')).toHaveLength(0)
     })
 
     it('Ver más: botón/enlace contiene href hacia /proyectos/:id y aria-label accesible', async () => {
@@ -309,7 +299,7 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
         '.projects-preview__more-btn',
       ) as HTMLAnchorElement
       expect(moreLink).not.toBeNull()
-      expect(moreLink.textContent).toBe('Ver más')
+      expect(moreLink.textContent).toContain('Ver más')
       expect(moreLink.getAttribute('href')).toBe('/proyectos/55')
       expect(moreLink.getAttribute('aria-label')).toBe(
         'Ver más información sobre Tanque Quebrada Honda',
@@ -317,10 +307,7 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
     })
   })
 
-  /* --------------------------------------------------------------------------
-   * 4. Controles: Flecha izquierda, Flecha derecha y Puntos
-   * -------------------------------------------------------------------------- */
-  describe('Controles de carrusel (Flecha izquierda, Flecha derecha)', () => {
+  describe('Coverflow (≥4): flechas, puntos e infinito', () => {
     const cincoProyectos: proyectosApi.PublicProyecto[] = [
       { id: 1, nombre: 'P1', duracion: '1m', estado: 'EN_PROCESO' },
       { id: 2, nombre: 'P2', duracion: '2m', estado: 'EN_PROCESO' },
@@ -329,7 +316,17 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
       { id: 5, nombre: 'P5', duracion: '5m', estado: 'PENDIENTE' },
     ]
 
-    it('Flecha izquierda y Flecha derecha: navegación secuencial y control de estado disabled', async () => {
+    it('activa coverflow con 4+ proyectos y no usa grilla', async () => {
+      vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(cincoProyectos)
+
+      await renderComponent()
+
+      expect(container.querySelector('[data-ui="projects-preview__carousel"]')).not.toBeNull()
+      expect(container.querySelector('[data-ui="projects-preview__grid"]')).toBeNull()
+      expect(container.querySelector('.transparency-coverflow')).not.toBeNull()
+    })
+
+    it('Flecha izquierda y derecha: navegación cíclica sin disabled', async () => {
       vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(cincoProyectos)
 
       await renderComponent()
@@ -343,71 +340,51 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
 
       expect(prevBtn).not.toBeNull()
       expect(nextBtn).not.toBeNull()
-      expect(prevBtn.textContent?.trim()).toBe('‹')
-      expect(nextBtn.textContent?.trim()).toBe('›')
-
-      // Inicialmente en página 1: prev deshabilitado, next habilitado
-      expect(prevBtn.disabled).toBe(true)
+      expect(prevBtn.disabled).toBe(false)
       expect(nextBtn.disabled).toBe(false)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 3',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '1 / 5',
       )
 
-      // Clic en Flecha derecha (avanza a página 2)
       await act(async () => {
         nextBtn.click()
       })
-      expect(prevBtn.disabled).toBe(false)
-      expect(nextBtn.disabled).toBe(false)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '2 / 3',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '2 / 5',
       )
 
-      // Clic en Flecha derecha (avanza a página 3 - final)
-      await act(async () => {
-        nextBtn.click()
-      })
-      expect(prevBtn.disabled).toBe(false)
-      expect(nextBtn.disabled).toBe(true)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '3 / 3',
-      )
-
-      // Clic en Flecha izquierda (retrocede a página 2)
       await act(async () => {
         prevBtn.click()
       })
-      expect(prevBtn.disabled).toBe(false)
-      expect(nextBtn.disabled).toBe(false)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '2 / 3',
+      await act(async () => {
+        prevBtn.click()
+      })
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '5 / 5',
       )
     })
 
-    it('Puntos indicadores: navegación directa al hacer clic en un punto', async () => {
+    it('Puntos indicadores: un punto por proyecto y salto directo', async () => {
       vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(cincoProyectos)
 
       await renderComponent()
 
       const dots = container.querySelectorAll('.projects-preview__dot')
-      expect(dots.length).toBe(3)
-      expect(dots[0].classList.contains('is-active')).toBe(true)
+      expect(dots.length).toBe(5)
+      expect(dots[0].getAttribute('aria-current')).toBe('true')
 
       await act(async () => {
         ;(dots[2] as HTMLButtonElement).click()
       })
 
-      expect(dots[2].classList.contains('is-active')).toBe(true)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '3 / 3',
+      expect(dots[2].getAttribute('aria-current')).toBe('true')
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '3 / 5',
       )
     })
   })
 
-  /* --------------------------------------------------------------------------
-   * 5. Navegación por Touch y Teclado
-   * -------------------------------------------------------------------------- */
-  describe('Interacción por Touch y Teclado', () => {
+  describe('Interacción por Touch y Teclado (coverflow)', () => {
     const cuatroProyectos: proyectosApi.PublicProyecto[] = [
       { id: 1, nombre: 'P1', duracion: '1m', estado: 'EN_PROCESO' },
       { id: 2, nombre: 'P2', duracion: '2m', estado: 'EN_PROCESO' },
@@ -427,34 +404,22 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
       expect(viewport.getAttribute('role')).toBe('region')
       expect(viewport.getAttribute('tabIndex')).toBe('0')
 
-      // Presionar ArrowRight
       await act(async () => {
         viewport.dispatchEvent(
           new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
         )
       })
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '2 / 2',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '2 / 4',
       )
 
-      // Presionar ArrowLeft
       await act(async () => {
         viewport.dispatchEvent(
           new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }),
         )
       })
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 2',
-      )
-
-      // Otra tecla no causa cambios
-      await act(async () => {
-        viewport.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'Space', bubbles: true }),
-        )
-      })
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 2',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '1 / 4',
       )
     })
 
@@ -467,26 +432,24 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
         '.projects-preview__viewport',
       ) as HTMLDivElement
 
-      // Swipe hacia la izquierda: start X=200, move X=100 (diffX = 100 > 30) -> Next
       await act(async () => {
         triggerTouchEvent(viewport, 'touchstart', [{ clientX: 200, clientY: 50 }])
         triggerTouchEvent(viewport, 'touchmove', [{ clientX: 100, clientY: 50 }])
         triggerTouchEvent(viewport, 'touchend')
       })
 
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '2 / 2',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '2 / 4',
       )
 
-      // Swipe hacia la derecha: start X=100, move X=200 (diffX = -100 < -30) -> Prev
       await act(async () => {
         triggerTouchEvent(viewport, 'touchstart', [{ clientX: 100, clientY: 50 }])
         triggerTouchEvent(viewport, 'touchmove', [{ clientX: 200, clientY: 50 }])
         triggerTouchEvent(viewport, 'touchend')
       })
 
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 2',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '1 / 4',
       )
     })
 
@@ -499,94 +462,60 @@ describe('ProjectsPreview — Testing / Frontend / Integración', () => {
         '.projects-preview__viewport',
       ) as HTMLDivElement
 
-      // Desplazamiento vertical (scroll del usuario)
       await act(async () => {
         triggerTouchEvent(viewport, 'touchstart', [{ clientX: 100, clientY: 200 }])
         triggerTouchEvent(viewport, 'touchmove', [{ clientX: 105, clientY: 100 }])
         triggerTouchEvent(viewport, 'touchend')
       })
 
-      // No avanza
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 2',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '1 / 4',
       )
 
-      // Desplazamiento muy corto (<30px)
       await act(async () => {
         triggerTouchEvent(viewport, 'touchstart', [{ clientX: 100, clientY: 50 }])
         triggerTouchEvent(viewport, 'touchmove', [{ clientX: 85, clientY: 50 }])
         triggerTouchEvent(viewport, 'touchend')
       })
 
-      // No avanza
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 2',
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
+        '1 / 4',
       )
     })
   })
 
-  /* --------------------------------------------------------------------------
-   * 6. Responsividad: Desktop, Tablet, Celular
-   * -------------------------------------------------------------------------- */
-  describe('Responsividad (Desktop, Tablet, Celular)', () => {
-    const proyectosMock: proyectosApi.PublicProyecto[] = [
-      { id: 1, nombre: 'P1', duracion: '1m', estado: 'EN_PROCESO' },
-      { id: 2, nombre: 'P2', duracion: '2m', estado: 'EN_PROCESO' },
-      { id: 3, nombre: 'P3', duracion: '3m', estado: 'EN_PROCESO' },
-      { id: 4, nombre: 'P4', duracion: '4m', estado: 'COMPLETADO' },
-    ]
+  describe('Umbral grilla vs coverflow', () => {
+    it('con 3 proyectos usa grilla estática sin controles de carrusel', async () => {
+      const tres: proyectosApi.PublicProyecto[] = [
+        { id: 1, nombre: 'P1', duracion: '1m', estado: 'EN_PROCESO' },
+        { id: 2, nombre: 'P2', duracion: '2m', estado: 'EN_PROCESO' },
+        { id: 3, nombre: 'P3', duracion: '3m', estado: 'EN_PROCESO' },
+      ]
+      vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(tres)
 
-    it('Desktop (>= 1024px): muestra 3 tarjetas por vista con slidesPerView = 3', async () => {
-      vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(proyectosMock)
-
-      await setWindowWidth(1280)
       await renderComponent()
 
-      const slides = container.querySelectorAll('.projects-preview__slide')
-      expect(slides.length).toBe(4)
-      expect((slides[0] as HTMLElement).style.flex).toBe('0 0 33.333333333333336%')
-
-      // Con 4 proyectos y 3 por vista, hay 2 posiciones (4 - 3 + 1 = 2)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 2',
-      )
+      expect(container.querySelector('[data-ui="projects-preview__grid"]')).not.toBeNull()
+      expect(container.querySelector('[aria-label="Proyecto anterior"]')).toBeNull()
+      expect(container.querySelector('.projects-preview__page-indicator')).toBeNull()
     })
 
-    it('Tablet (640px a 1023px): muestra 2 tarjetas por vista con slidesPerView = 2', async () => {
-      vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(proyectosMock)
+    it('con 4 proyectos activa coverflow', async () => {
+      const cuatro: proyectosApi.PublicProyecto[] = [
+        { id: 1, nombre: 'P1', duracion: '1m', estado: 'EN_PROCESO' },
+        { id: 2, nombre: 'P2', duracion: '2m', estado: 'EN_PROCESO' },
+        { id: 3, nombre: 'P3', duracion: '3m', estado: 'EN_PROCESO' },
+        { id: 4, nombre: 'P4', duracion: '4m', estado: 'COMPLETADO' },
+      ]
+      vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(cuatro)
 
-      await setWindowWidth(768)
       await renderComponent()
 
-      const slides = container.querySelectorAll('.projects-preview__slide')
-      expect(slides.length).toBe(4)
-      expect((slides[0] as HTMLElement).style.flex).toBe('0 0 50%')
-
-      // Con 4 proyectos y 2 por vista, hay 3 posiciones (4 - 2 + 1 = 3)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
-        '1 / 3',
-      )
-    })
-
-    it('Celular (< 640px): muestra 1 tarjeta por vista con slidesPerView = 1', async () => {
-      vi.spyOn(proyectosApi, 'getPublicProyectos').mockResolvedValueOnce(proyectosMock)
-
-      await setWindowWidth(375)
-      await renderComponent()
-
-      const slides = container.querySelectorAll('.projects-preview__slide')
-      expect(slides.length).toBe(4)
-      expect((slides[0] as HTMLElement).style.flex).toBe('0 0 100%')
-
-      // Con 4 proyectos y 1 por vista, hay 4 posiciones (4 - 1 + 1 = 4)
-      expect(container.querySelector('.projects-preview__page-indicator')?.textContent).toBe(
+      expect(container.querySelector('[data-ui="projects-preview__carousel"]')).not.toBeNull()
+      expect(container.querySelector('[aria-label="Proyecto anterior"]')).not.toBeNull()
+      expect(container.querySelector('.projects-preview__page-indicator')?.textContent?.trim()).toBe(
         '1 / 4',
       )
     })
   })
 })
-
-
-
-
-

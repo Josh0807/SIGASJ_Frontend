@@ -5,12 +5,13 @@ import SectionHeader from '../../../shared/ui/SectionHeader'
 
 const ComplaintsSection = () => (
   <section
-    className="public-section public-section--canvas"
+    className="public-section public-section--tight public-section--canvas"
     id="quejas"
     aria-labelledby="quejas-title"
   >
     <div className="public-container">
-      <Card className="flex flex-wrap items-center gap-6 p-6 max-[640px]:flex-col max-[640px]:items-stretch">
+      <div data-aos="fade-up">
+      <Card className="transparency-motion-card flex flex-wrap items-center gap-6 p-6 max-[640px]:flex-col max-[640px]:items-stretch">
         <span
           className="grid size-12 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary"
           aria-hidden="true"
@@ -24,22 +25,19 @@ const ComplaintsSection = () => (
             eyebrow="Atención al usuario"
             title="Sugerencias y quejas"
             description="Envíanos tus sugerencias y quejas completando el formulario para brindarte la atención correspondiente."
+            animate={false}
           />
         </div>
-        <div className="shrink-0 max-[640px]:w-full">
-          <Button
-            to="/formulario-quejas"
-            variant="secondary"
-            rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
-            className="max-[640px]:w-full"
-          >
-            Enviar sugerencia o queja
-          </Button>
-          <p className="mb-0 mt-2 max-w-xs text-[12px] leading-5 text-sigasj-muted max-[640px]:max-w-none">
-            Se abre el formulario en línea de la ASADA.
-          </p>
-        </div>
+        <Button
+          to="/formulario-quejas"
+          variant="primary"
+          rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
+          className="landing-lift-button landing-lift-button--solid shrink-0 max-[640px]:w-full"
+        >
+          Enviar sugerencia o queja
+        </Button>
       </Card>
+      </div>
     </div>
   </section>
 )

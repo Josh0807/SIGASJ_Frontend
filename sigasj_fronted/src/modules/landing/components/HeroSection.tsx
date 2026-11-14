@@ -57,7 +57,7 @@ const HeroSection = ({
             size="md"
             leftIcon={<IconTool size={18} stroke={1.9} aria-hidden="true" />}
             rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
-            className="public-hero__cta max-[520px]:w-full"
+            className="landing-lift-button landing-lift-button--solid public-hero__cta max-[520px]:w-full"
           >
             {reportLabel}
           </Button>
@@ -65,7 +65,8 @@ const HeroSection = ({
             href={announcementsHref}
             variant="secondary"
             size="md"
-            className="public-hero__cta max-[520px]:w-full border-white/75 bg-white/15 text-white shadow-none hover:border-white hover:bg-white/25 hover:text-white"
+            rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
+            className="landing-lift-button public-hero__cta max-[520px]:w-full border-white/75 bg-white/15 text-white shadow-none hover:border-white hover:bg-white/25 hover:text-white"
           >
             {announcementsLabel}
           </Button>

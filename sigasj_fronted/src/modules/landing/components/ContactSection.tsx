@@ -45,15 +45,13 @@ const ContactRow = ({
   label: string
   children: ReactNode
 }) => (
-  <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-start gap-4 py-5 first:pt-0 last:pb-0">
-    <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
+  <div className="landing-contact-row grid grid-cols-[2.75rem_minmax(0,1fr)] items-start gap-4 py-5 first:pt-0 last:pb-0">
+    <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary transition-[background-color,color] duration-300">
       <ContactIcon type={icon} />
     </span>
     <div className="min-w-0">
-      <p className="m-0 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-sigasj-muted">
-        {label}
-      </p>
-      <div className="mt-1.5 text-[0.98rem] leading-6 text-sigasj-text">{children}</div>
+      <p className="public-meta">{label}</p>
+      <div className="mt-1.5 text-[0.9375rem] leading-6 text-sigasj-text">{children}</div>
     </div>
   </div>
 )
@@ -100,20 +98,27 @@ const ContactSection = ({
       aria-labelledby={`${id}-title`}
     >
       <div className="public-container">
-        <header className="mx-auto flex w-full max-w-[40rem] flex-col items-center text-center">
-          <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">
+        <header
+          className="mx-auto flex w-full max-w-[40rem] flex-col items-center text-center"
+          data-aos="fade-up"
+        >
+          <p className="public-eyebrow inline-block [margin-inline-end:-0.12em]">
             Canal de atención
           </p>
           <h2 id={`${id}-title`} className="public-section-title w-full text-center">
             {title}
           </h2>
-          <p className="mb-0 mt-4 w-full max-w-[32rem] text-pretty text-center text-base leading-[1.65] text-sigasj-muted">
+          <p className="public-section-intro mx-auto max-w-[32rem] text-center">
             {description}
           </p>
         </header>
 
         <div className="mt-12 grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] items-stretch gap-10 max-[960px]:grid-cols-1 max-[960px]:gap-8">
-          <div className="flex min-w-0 flex-col justify-center divide-y divide-sigasj-border">
+          <div
+            className="flex min-w-0 flex-col justify-center divide-y divide-sigasj-border"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             {phonePrimary ? (
               <ContactRow icon="phone" label="Teléfono principal">
                 <a
@@ -175,7 +180,7 @@ const ContactSection = ({
             ) : null}
           </div>
 
-          <div className="flex min-w-0 flex-col">
+          <div className="flex min-w-0 flex-col" data-aos="fade-up" data-aos-delay="140">
             <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-[13px] bg-sigasj-surface-soft max-[960px]:min-h-[260px]">
               {(showMapEmbed && embeddedMap) || mapEmbedUrl ? (
                 <>
@@ -210,7 +215,7 @@ const ContactSection = ({
 
             {resolvedMapUrl ? (
               <a
-                className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-sigasj-primary px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-sigasj-primary-hover"
+                className="landing-lift-button landing-lift-button--solid mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-5 text-sm font-semibold text-white no-underline"
                 href={resolvedMapUrl}
                 target="_blank"
                 rel="noopener noreferrer"

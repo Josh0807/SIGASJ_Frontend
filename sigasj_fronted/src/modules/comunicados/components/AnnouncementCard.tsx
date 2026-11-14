@@ -1,7 +1,38 @@
 import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { Link } from 'react-router-dom'
 import { IconArrowRight } from '@tabler/icons-react'
-import type { AnnouncementCardProps } from '../types/AnnouncementsSectionProps'
+import type {
+  AnnouncementCardProps,
+  AnnouncementPrioridad,
+} from '../types/AnnouncementsSectionProps'
+
+const PRIORIDAD_BADGE: Record<
+  AnnouncementPrioridad,
+  { label: string; className: string }
+> = {
+  Alta: {
+    label: 'Prioridad alta',
+    className: 'bg-sigasj-error text-white',
+  },
+  Media: {
+    label: 'Prioridad media',
+    className: 'bg-[#f5d000] text-[#1f1a00]',
+  },
+  Baja: {
+    label: 'Prioridad baja',
+    className: 'bg-sigasj-success text-white',
+  },
+}
+
+const resolvePrioridad = (
+  prioridad: AnnouncementCardProps['prioridad'],
+  urgent?: boolean,
+): AnnouncementPrioridad | null => {
+  const raw = typeof prioridad === 'string' ? prioridad.trim() : ''
+  if (raw === 'Alta' || raw === 'Media' || raw === 'Baja') return raw
+  if (urgent) return 'Alta'
+  return null
+}
 
 const AnnouncementCard = ({
   id,
@@ -10,6 +41,7 @@ const AnnouncementCard = ({
   content,
   publishedAt,
   type,
+  prioridad,
   urgent = false,
   moreHref,
   moreLabel = 'Consultar detalle',
@@ -36,13 +68,26 @@ const AnnouncementCard = ({
   const formattedDate = safePublishedAt
     ? formatAnnouncementDate(safePublishedAt)
     : undefined
+  const resolvedPrioridad = resolvePrioridad(prioridad, urgent)
+  const prioridadBadge = resolvedPrioridad
+    ? PRIORIDAD_BADGE[resolvedPrioridad]
+    : null
 
   const titleId = `announcement-title-${id}`
-  const showMeta = Boolean(safeType || formattedDate || urgent)
+  const showMeta = Boolean(safeType || formattedDate)
+  const isHighPriority = resolvedPrioridad === 'Alta'
 
-  const cardClassName = `flex h-full min-h-[280px] flex-col overflow-hidden rounded-[13px] border bg-white transition-[border-color,box-shadow] duration-150 hover:border-sigasj-primary/40 hover:shadow-[0_4px_14px_rgba(16,43,56,0.06)] ${urgent ? 'border-sigasj-error/40' : 'border-sigasj-border'}`
+  const cardClassName = `announcement-motion-card transparency-motion-card flex h-full min-h-[320px] flex-col overflow-hidden rounded-[13px] border bg-white shadow-[0_4px_14px_rgba(16,43,56,0.05)] ${isHighPriority ? 'border-sigasj-error/40' : 'border-sigasj-border'}`
 
   const imageAlt = `Ilustración del comunicado: ${safeTitle}`
+
+  const prioridadBadgeNode = prioridadBadge ? (
+    <span
+      className={`public-meta announcement-card__prioridad absolute right-2.5 top-2.5 z-[1] inline-flex items-center rounded-md px-2.5 py-1 !normal-case !tracking-normal shadow-sm ${prioridadBadge.className}`}
+    >
+      {prioridadBadge.label}
+    </span>
+  ) : null
 
   return (
     <article
@@ -51,11 +96,12 @@ const AnnouncementCard = ({
       aria-labelledby={titleId}
     >
       {safeImageUrl ? (
-        <div className="aspect-[2.35/1] overflow-hidden rounded-t-[13px] bg-sigasj-surface-soft">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-t-[13px] bg-sigasj-surface-soft">
+          {prioridadBadgeNode}
           <button
             type="button"
             className="block h-full w-full cursor-zoom-in border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sigasj-primary"
-            aria-label={`Ver imagen ampliada: ${safeTitle}`}
+            aria-label={`Ver comunicado: ${safeTitle}`}
             onClick={onImageClick}
           >
             <img
@@ -67,24 +113,23 @@ const AnnouncementCard = ({
             />
           </button>
         </div>
+      ) : prioridadBadgeNode ? (
+        <div className="relative min-h-10 bg-sigasj-surface-soft px-5 pt-3">
+          {prioridadBadgeNode}
+        </div>
       ) : null}
 
       <div className="flex flex-1 flex-col px-5 pb-4 pt-3 max-[640px]:px-4">
         {showMeta ? (
-          <p className="m-0 mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-sigasj-primary">
+          <p className="public-meta mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 !tracking-[0.08em]">
             {safeType ? <span>{safeType}</span> : null}
             {formattedDate ? (
               <time dateTime={safePublishedAt}>{formattedDate}</time>
             ) : null}
-            {urgent ? (
-              <span className="rounded-md bg-[#f8e8e8] px-2 py-1 text-sigasj-error normal-case tracking-normal">
-                Prioridad alta
-              </span>
-            ) : null}
           </p>
         ) : null}
 
-        <h3 className="m-0 font-sigasj-display text-[1.05rem] font-bold leading-tight text-sigasj-text" id={titleId}>
+        <h3 className="public-card-title" id={titleId}>
           {safeTitle}
         </h3>
 
@@ -96,7 +141,7 @@ const AnnouncementCard = ({
           {safeImageUrl ? (
             <button
               type="button"
-              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-white px-4 text-xs font-semibold text-sigasj-primary-hover transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft"
+              className="transparency-motion-button inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-white px-4 text-xs font-semibold text-sigasj-primary-hover"
               onClick={onImageClick}
             >
               Ver imagen <IconArrowRight size={18} aria-hidden="true" />

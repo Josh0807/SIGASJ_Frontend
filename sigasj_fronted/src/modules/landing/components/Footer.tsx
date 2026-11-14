@@ -16,7 +16,7 @@ const Footer = () => {
       className="public-footer w-full min-w-0 border-t border-white/10 bg-sigasj-footer text-white"
     >
       <div className="public-container grid grid-cols-3 gap-8 py-10 max-[900px]:grid-cols-1 max-[900px]:gap-8">
-        <div>
+        <div data-aos="fade-up">
           <div className="flex items-center gap-3">
             <img
               className="size-14 rounded-full border border-white/20 object-cover"
@@ -24,8 +24,8 @@ const Footer = () => {
               alt="Logo de la ASADA San Juan de Santa Cruz"
             />
             <div>
-              <strong className="block font-sigasj-display text-xl font-bold">SIGASJ</strong>
-              <span className="text-sm text-white/75">ASADA San Juan de Santa Cruz</span>
+              <strong className="public-card-title block text-white" style={{ fontSize: '1.25rem' }}>SIGASJ</strong>
+              <span className="public-card-text text-white/75">ASADA San Juan de Santa Cruz</span>
             </div>
           </div>
           <p className="mb-0 mt-4 text-sm leading-6 text-white/70">
@@ -33,8 +33,8 @@ const Footer = () => {
           </p>
         </div>
 
-        <div>
-          <h2 className="m-0 font-sigasj-display text-base font-bold">Navegación</h2>
+        <div data-aos="fade-up" data-aos-delay="80">
+          <h2 className="public-card-title text-white">Navegación</h2>
           <ul className="mt-4 m-0 grid list-none gap-2 p-0 text-sm">
             <li><a className="text-white/80 no-underline hover:text-white" href="#accesos-rapidos">Accesos rápidos</a></li>
             <li><a className="text-white/80 no-underline hover:text-white" href="#solicitudes-servicio">Solicitudes</a></li>
@@ -49,8 +49,8 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div>
-          <h2 className="m-0 font-sigasj-display text-base font-bold">Contacto</h2>
+        <div data-aos="fade-up" data-aos-delay="140">
+          <h2 className="public-card-title text-white">Contacto</h2>
           <address className="mt-4 grid gap-3 text-sm not-italic text-white/80">
             <span className="flex items-start gap-2">
               <IconMapPin className="mt-0.5 shrink-0" size={18} stroke={1.85} aria-hidden="true" />
@@ -84,8 +84,8 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-white/15 px-5 py-4 text-center">
-        <p className="m-0 text-[13px] text-white/65">
+      <div className="border-t border-white/15 px-5 py-4 text-center" data-aos="fade-up" data-aos-delay="60">
+        <p className="public-caption m-0 text-white/65">
           © {currentYear} ASADA San Juan de Santa Cruz. Todos los derechos reservados.
         </p>
       </div>

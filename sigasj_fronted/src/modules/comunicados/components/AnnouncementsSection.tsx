@@ -17,7 +17,7 @@ const AnnouncementsSkeleton = () => (
           >
             <div className="overflow-hidden rounded-2xl border border-sigasj-border bg-sigasj-surface p-4 shadow-sm">
               <div
-                className="mb-4 aspect-[16/7] animate-pulse rounded-xl bg-sigasj-surface-soft"
+                className="mb-4 aspect-[16/10] animate-pulse rounded-xl bg-sigasj-surface-soft"
                 aria-hidden="true"
               />
               <div className="mb-3 h-5 w-2/3 animate-pulse rounded bg-sigasj-surface-soft" />
@@ -51,7 +51,19 @@ const AnnouncementsSection = ({
   const showLoading = useDefaultItems && status === 'loading'
   const showError = useDefaultItems && status === 'error'
   const titleId = `${id}-title`
-  const announcementImages = announcements.filter((item) => Boolean(item.imageUrl)).map((item) => ({ id: item.id, imageUrl: item.imageUrl as string, altText: `Ilustración del comunicado: ${item.title}`, title: item.title, description: item.summary || item.content }))
+  const announcementImages = announcements
+    .filter((item) => Boolean(item.imageUrl))
+    .map((item) => ({
+      id: item.id,
+      imageUrl: item.imageUrl as string,
+      altText: `Ilustración del comunicado: ${item.title}`,
+      title: item.title,
+      description: item.summary || item.content,
+      type: item.type,
+      publishedAt: item.publishedAt,
+      prioridad: item.prioridad,
+      urgent: item.urgent,
+    }))
 
   return (
     <section
@@ -60,20 +72,30 @@ const AnnouncementsSection = ({
       aria-labelledby={titleId}
     >
       <div className="mx-auto w-full max-w-[1180px]">
-        <header className="mx-auto max-w-[760px] text-center">
-          <p className="mb-2 inline-block text-xs font-extrabold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">Información oficial</p>
-
+        <header className="mx-auto max-w-[760px] text-center" data-aos="fade-up">
+          <p className="public-eyebrow inline-block [margin-inline-end:-0.12em]">Información oficial</p>
           <h2 id={titleId} className="public-section-title">{title}</h2>
-          <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-7 text-sigasj-muted">{description}</p>
+          <p className="public-section-intro mx-auto">{description}</p>
         </header>
 
         {showLoading ? (
-          <div role="status" aria-live="polite" aria-busy="true">
+          <div
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             <span className="visually-hidden">Cargando comunicados…</span>
             <AnnouncementsSkeleton />
           </div>
         ) : showError ? (
-          <div className="announcements-section__error" role="alert">
+          <div
+            className="announcements-section__error"
+            role="alert"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             <span className="announcements-section__state-icon">
               <AlertIcon />
             </span>
@@ -93,7 +115,12 @@ const AnnouncementsSection = ({
             onImageOpen={(announcement) => setImageIndex(announcementImages.findIndex((item) => item.id === announcement.id))}
           />
         ) : (
-          <div className="announcements-section__empty" role="status">
+          <div
+            className="announcements-section__empty"
+            role="status"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             <span className="announcements-section__state-icon">
               <EmptyInboxIcon />
             </span>

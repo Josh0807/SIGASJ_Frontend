@@ -37,7 +37,10 @@ const InstitutionalNoticeSection = () => {
       className="border-y border-sigasj-border bg-white"
       aria-labelledby="aviso-institucional-title"
     >
-      <div className="public-container flex flex-wrap items-start gap-4 py-4 max-[640px]:gap-3">
+      <div
+        className="public-container flex flex-wrap items-start gap-4 py-4 max-[640px]:gap-3"
+        data-aos="fade-up"
+      >
         <span
           className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface text-sigasj-primary"
           aria-hidden="true"
@@ -50,16 +53,16 @@ const InstitutionalNoticeSection = () => {
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary">
+          <p className="public-eyebrow mb-0">
             {isUrgent ? 'Aviso importante' : 'Aviso institucional'}
           </p>
           <h2
             id="aviso-institucional-title"
-            className="mt-1 font-sigasj-display text-base font-bold leading-snug text-sigasj-text max-[640px]:text-[15px]"
+            className="public-card-title mt-1"
           >
             {featured.title.trim()}
           </h2>
-          <p className="mb-0 mt-1 line-clamp-2 text-sm leading-6 text-sigasj-muted">
+          <p className="public-card-text mt-1 line-clamp-2">
             {summary}
           </p>
         </div>

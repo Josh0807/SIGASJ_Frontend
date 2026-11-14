@@ -19,37 +19,44 @@ const TransparencyCard = ({ id, name, description, fileUrl, fileType }: Transpar
 
   return (
     <article
-      className="transparency-motion-card relative grid min-h-[280px] grid-cols-[150px_minmax(0,1fr)] gap-8 overflow-hidden rounded-[24px] border border-sigasj-border bg-sigasj-surface px-9 py-8 shadow-[0_14px_32px_rgba(30,90,156,0.1)] max-[700px]:min-h-0 max-[700px]:grid-cols-1 max-[700px]:gap-5 max-[700px]:px-6 max-[700px]:py-6"
+      className="transparency-motion-card flex h-full flex-col rounded-[18px] border border-sigasj-border bg-sigasj-surface p-6 shadow-[0_4px_14px_rgba(16,43,56,0.05)] max-[640px]:p-5"
       data-transparency-id={id}
       data-file-type={fileType}
       aria-labelledby={titleId}
     >
-      <div className="relative z-10 grid size-[120px] place-items-center self-start rounded-[22px] bg-gradient-to-br from-sigasj-surface-soft to-sigasj-mist text-sigasj-blue max-[700px]:size-20">
-        {isDocument ? <IconFileDescription size={62} stroke={1.8} aria-hidden="true" /> : <IconPhoto size={62} stroke={1.8} aria-hidden="true" />}
+      <div className="grid size-14 place-items-center rounded-[14px] bg-sigasj-surface-soft text-sigasj-primary">
+        {isDocument ? (
+          <IconFileDescription size={28} stroke={1.8} aria-hidden="true" />
+        ) : (
+          <IconPhoto size={28} stroke={1.8} aria-hidden="true" />
+        )}
       </div>
 
-      <div className="relative z-10 flex min-w-0 flex-col items-start">
-        <h3 className="m-0 text-2xl font-extrabold leading-tight text-sigasj-ink max-[700px]:text-xl" id={titleId}>{safeName}</h3>
-        <p className="mb-0 mt-4 max-w-[760px] line-clamp-3 whitespace-pre-line text-base leading-7 text-sigasj-muted">{safeDescription}</p>
+      <h3 className="public-card-title mt-5 text-[1.35rem] leading-snug max-[640px]:text-[1.2rem]" id={titleId}>
+        {safeName}
+      </h3>
+      <p className="public-card-text mt-2.5 line-clamp-3 whitespace-pre-line text-[1rem] leading-relaxed max-[640px]:text-[0.9375rem]">
+        {safeDescription}
+      </p>
 
-        <footer className="mt-auto pt-5">
-          <a
-            className="transparency-motion-button inline-flex min-h-12 items-center gap-8 rounded-xl border border-sigasj-primary bg-sigasj-surface px-6 text-sm font-bold text-sigasj-primary no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sigasj-sky"
-            href={safeFileUrl}
-            target={TRANSPARENCY_FILE_LINK_TARGET}
-            rel={TRANSPARENCY_FILE_LINK_REL}
-          >
-            {actionLabel} <IconArrowRight size={20} aria-hidden="true" />
-          </a>
-          <p className="mb-0 mt-4 flex items-center gap-2 text-xs font-medium text-sigasj-muted">
-            {isDocument ? <IconFileDescription size={18} aria-hidden="true" /> : <IconPhoto size={18} aria-hidden="true" />}
-            {isDocument ? 'Documento oficial' : 'Imagen oficial'}
-          </p>
-        </footer>
-      </div>
-
-      <span className="pointer-events-none absolute -right-20 -bottom-20 h-36 w-[420px] -rotate-6 rounded-[50%] bg-sigasj-mist/35" aria-hidden="true" />
-      <span className="pointer-events-none absolute -right-24 -bottom-24 h-36 w-[460px] rotate-3 rounded-[50%] border-[24px] border-sigasj-sky/20" aria-hidden="true" />
+      <footer className="mt-auto pt-6">
+        <a
+          className="transparency-motion-button inline-flex min-h-12 items-center gap-2 rounded-[11px] border border-sigasj-border-strong bg-sigasj-surface px-5 text-base font-semibold text-sigasj-primary-hover no-underline transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sigasj-sky"
+          href={safeFileUrl}
+          target={TRANSPARENCY_FILE_LINK_TARGET}
+          rel={TRANSPARENCY_FILE_LINK_REL}
+        >
+          {actionLabel} <IconArrowRight size={20} aria-hidden="true" />
+        </a>
+        <p className="public-caption mb-0 mt-3.5 flex items-center gap-2 text-[0.9rem]">
+          {isDocument ? (
+            <IconFileDescription size={18} aria-hidden="true" />
+          ) : (
+            <IconPhoto size={18} aria-hidden="true" />
+          )}
+          {isDocument ? 'Documento oficial' : 'Imagen oficial'}
+        </p>
+      </footer>
     </article>
   )
 }

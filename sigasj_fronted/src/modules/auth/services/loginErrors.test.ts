@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  BACKEND_UNAVAILABLE_DEV_MESSAGE,
   CREDENTIALS_ERROR_MESSAGE,
   FORBIDDEN_LOGIN_MESSAGE,
-  GENERIC_LOGIN_ERROR_MESSAGE,
   INACTIVE_USER_MESSAGE,
   mapLoginErrorMessage,
 } from './loginErrors'
@@ -20,12 +20,19 @@ describe('mapLoginErrorMessage', () => {
     ).toBe(INACTIVE_USER_MESSAGE)
   })
 
-  it('mapea 403, 500 y red a mensajes comprensibles', () => {
+  it('mapea 403, 500 de proxy y red a mensajes comprensibles', () => {
     expect(mapLoginErrorMessage('HTTP 403: Forbidden')).toBe(
       FORBIDDEN_LOGIN_MESSAGE,
     )
+    // En Vitest/DEV, 5xx vacíos o de proxy apuntan a backend caído.
     expect(mapLoginErrorMessage('HTTP 500: Internal Server Error')).toBe(
-      GENERIC_LOGIN_ERROR_MESSAGE,
+      BACKEND_UNAVAILABLE_DEV_MESSAGE,
+    )
+    expect(mapLoginErrorMessage('HTTP 500: ')).toBe(
+      BACKEND_UNAVAILABLE_DEV_MESSAGE,
+    )
+    expect(mapLoginErrorMessage('Failed to fetch')).toBe(
+      BACKEND_UNAVAILABLE_DEV_MESSAGE,
     )
     expect(mapLoginErrorMessage('Failed to fetch')).not.toMatch(
       /Failed to fetch|AxiosError|ERR_/i,

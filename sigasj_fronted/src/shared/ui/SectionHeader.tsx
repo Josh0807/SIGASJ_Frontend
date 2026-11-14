@@ -6,6 +6,9 @@ type SectionHeaderProps = {
   className?: string
   /** Default: centered (landing). Use `start` for CTA strips with side actions. */
   align?: 'center' | 'start'
+  /** Reveal on scroll (AOS). Default true. */
+  animate?: boolean
+  aosDelay?: number
 }
 
 export function SectionHeader({
@@ -15,6 +18,8 @@ export function SectionHeader({
   description,
   className = '',
   align = 'center',
+  animate = true,
+  aosDelay = 0,
 }: SectionHeaderProps) {
   const isCentered = align === 'center'
 
@@ -27,11 +32,17 @@ export function SectionHeader({
       ]
         .filter(Boolean)
         .join(' ')}
+      {...(animate
+        ? {
+            'data-aos': 'fade-up',
+            'data-aos-delay': String(aosDelay),
+          }
+        : {})}
     >
       {eyebrow ? (
         <p
           className={[
-            'mb-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary',
+            'public-eyebrow',
             isCentered ? 'inline-block [margin-inline-end:-0.12em]' : '',
           ]
             .filter(Boolean)
@@ -51,8 +62,8 @@ export function SectionHeader({
       {description ? (
         <p
           className={[
-            'mb-0 mt-4 text-base leading-[1.65] text-pretty text-sigasj-muted',
-            isCentered ? 'mx-auto max-w-[36rem]' : '',
+            'public-section-intro',
+            isCentered ? 'mx-auto' : '',
           ]
             .filter(Boolean)
             .join(' ')}

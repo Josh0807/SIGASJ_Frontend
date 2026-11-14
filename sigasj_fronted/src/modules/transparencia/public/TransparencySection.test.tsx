@@ -33,7 +33,7 @@ describe('TransparencySection', () => {
     expect(mockUsePublicTransparencia).toHaveBeenCalledWith(false)
   })
 
-  it('renderiza tarjetas en el orden recibido', () => {
+  it('renderiza grilla estática con uno o dos documentos (sin carrusel)', () => {
     const markup = renderToStaticMarkup(
       <TransparencySection
         publications={[
@@ -56,11 +56,37 @@ describe('TransparencySection', () => {
     )
 
     expect(markup).toContain('transparency-section__grid')
+    expect(markup).not.toContain('transparency-section__carousel')
     expect(markup.indexOf('Informe anual')).toBeLessThan(
       markup.indexOf('Muestreo'),
     )
     expect(markup).toContain('Ver documento')
     expect(markup).toContain('Ver imagen')
+  })
+
+  it('activa el carrusel solo con más de tres documentos', () => {
+    const publications = [1, 2, 3, 4].map((n) => ({
+      id: String(n),
+      name: `Documento ${n}`,
+      description: `Descripción ${n}`,
+      fileUrl: `/uploads/transparencia/doc-${n}.pdf`,
+      fileType: 'pdf' as const,
+    }))
+
+    const withThree = renderToStaticMarkup(
+      <TransparencySection publications={publications.slice(0, 3)} />,
+    )
+    expect(withThree).toContain('transparency-section__grid')
+    expect(withThree).not.toContain('transparency-section__carousel')
+
+    const withFour = renderToStaticMarkup(
+      <TransparencySection publications={publications} />,
+    )
+    expect(withFour).toContain('transparency-section__carousel')
+    expect(withFour).not.toContain('transparency-section__grid')
+    expect(withFour).toContain('Documento anterior')
+    expect(withFour).toContain('Documento siguiente')
+    expect(withFour).toContain('Pila de documentos de transparencia')
   })
 
   it('muestra estado de carga cuando los datos aún no están listos', () => {

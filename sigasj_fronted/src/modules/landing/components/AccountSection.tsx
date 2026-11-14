@@ -7,12 +7,13 @@ import SectionHeader from '../../../shared/ui/SectionHeader'
 
 const AccountSection = ({ formHref = REPORTAR_AVERIA_ROUTE_PATH }: AccountSectionProps) => (
   <section
-    className="public-section public-section--soft"
+    className="public-section public-section--tight public-section--soft"
     id="reporte-averias"
     aria-labelledby="reporte-averias-title"
   >
     <div className="public-container">
-      <Card className="flex flex-wrap items-center gap-6 p-6 max-[640px]:flex-col max-[640px]:items-stretch">
+      <div data-aos="fade-up">
+      <Card className="transparency-motion-card flex flex-wrap items-center gap-6 p-6 max-[640px]:flex-col max-[640px]:items-stretch">
         <span
           className="grid size-12 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface text-sigasj-primary"
           aria-hidden="true"
@@ -26,17 +27,19 @@ const AccountSection = ({ formHref = REPORTAR_AVERIA_ROUTE_PATH }: AccountSectio
             eyebrow="Atención de averías"
             title="Reportar una avería"
             description="Infórmanos sobre fugas, daños u otras averías en el servicio de agua para que podamos atenderlas oportunamente."
+            animate={false}
           />
         </div>
         <Button
           to={formHref}
           variant="primary"
           rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
-          className="shrink-0 max-[640px]:w-full"
+          className="landing-lift-button landing-lift-button--solid shrink-0 max-[640px]:w-full"
         >
           Reportar avería
         </Button>
       </Card>
+      </div>
     </div>
   </section>
 )

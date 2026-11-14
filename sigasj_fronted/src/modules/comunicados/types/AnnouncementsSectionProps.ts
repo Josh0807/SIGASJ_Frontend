@@ -1,3 +1,5 @@
+export type AnnouncementPrioridad = 'Alta' | 'Media' | 'Baja'
+
 export type Announcement = {
   id: string
   title: string
@@ -7,6 +9,9 @@ export type Announcement = {
   content?: string
   publishedAt?: string
   type?: string
+  /** Prioridad del aviso (Alta / Media / Baja). */
+  prioridad?: AnnouncementPrioridad | string
+  /** @deprecated Preferir `prioridad`; true cuando prioridad es Alta. */
   urgent?: boolean
   moreHref?: string
   moreLabel?: string

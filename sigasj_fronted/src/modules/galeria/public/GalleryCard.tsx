@@ -1,4 +1,4 @@
-﻿import type { GalleryCardProps } from './GallerySectionProps'
+import type { GalleryCardProps } from './GallerySectionProps'
 
 /**
  * Fotografía pública: la imagen manda; caption mínimo bajo la foto.
@@ -59,14 +59,14 @@ const GalleryCard = ({
         <div className="gallery-section__caption min-w-0 pt-3">
           {safeTitle ? (
             <h3
-              className="gallery-section__title m-0 text-[0.95rem] font-semibold leading-snug text-sigasj-ink"
+              className="gallery-section__title public-card-title"
               id={titleId}
             >
               {safeTitle}
             </h3>
           ) : null}
           {safeDescription ? (
-            <p className="gallery-section__description mb-0 mt-1 line-clamp-2 text-sm leading-relaxed text-sigasj-muted">
+            <p className="gallery-section__description public-card-text mt-1 line-clamp-2">
               {safeDescription}
             </p>
           ) : null}

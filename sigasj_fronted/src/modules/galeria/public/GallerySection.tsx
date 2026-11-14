@@ -110,24 +110,32 @@ const GallerySection = ({
       aria-labelledby={`${id}-title`}
     >
       <div className="public-container">
-        <header className="mx-auto max-w-[720px] text-center">
-          <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">
+        <header className="mx-auto max-w-[720px] text-center" data-aos="fade-up">
+          <p className="public-eyebrow inline-block [margin-inline-end:-0.12em]">
             Nuestra comunidad
           </p>
           <h2 id={`${id}-title`} className="public-section-title">
             {title}
           </h2>
-          <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-[1.65] text-sigasj-muted">
-            {description}
-          </p>
+          <p className="public-section-intro mx-auto">{description}</p>
         </header>
 
         {showLoading ? (
-          <p className="gallery-section__empty" role="status">
+          <p
+            className="gallery-section__empty"
+            role="status"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             Cargando galería…
           </p>
         ) : showError ? (
-          <div className="gallery-section__empty" role="alert">
+          <div
+            className="gallery-section__empty"
+            role="alert"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             <p>{errorMessage}</p>
             <button type="button" onClick={retry}>
               Reintentar
@@ -136,6 +144,8 @@ const GallerySection = ({
         ) : hasPhotos ? (
           <div
             className="gallery-section__carousel-shell relative mt-10 outline-none"
+            data-aos="fade-up"
+            data-aos-delay="80"
             role="region"
             aria-roledescription="carrusel"
             aria-label="Fotografías de la comunidad"
@@ -223,7 +233,12 @@ const GallerySection = ({
             </p>
           </div>
         ) : (
-          <p className="gallery-section__empty" role="status">
+          <p
+            className="gallery-section__empty"
+            role="status"
+            data-aos="fade-up"
+            data-aos-delay="80"
+          >
             {emptyMessage}
           </p>
         )}

@@ -55,20 +55,36 @@ const LandingPage = () => {
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     AOS.init({
-      duration: 700,
+      duration: 650,
       easing: 'ease-out-cubic',
       once: true,
-      offset: 80,
+      offset: 40,
+      anchorPlacement: 'top-bottom',
       disable: reduceMotion,
     })
 
-    const refresh = () => AOS.refreshHard()
-    const timer = window.setTimeout(refresh, 400)
-    window.addEventListener('load', refresh)
+    let refreshTimer: number | undefined
+    const scheduleRefresh = () => {
+      window.clearTimeout(refreshTimer)
+      refreshTimer = window.setTimeout(() => {
+        AOS.refreshHard()
+      }, 60)
+    }
+
+    scheduleRefresh()
+    window.addEventListener('load', scheduleRefresh)
+
+    const main = document.querySelector('main')
+    const observer =
+      main && typeof MutationObserver !== 'undefined'
+        ? new MutationObserver(scheduleRefresh)
+        : null
+    observer?.observe(main!, { childList: true, subtree: true })
 
     return () => {
-      window.clearTimeout(timer)
-      window.removeEventListener('load', refresh)
+      window.clearTimeout(refreshTimer)
+      window.removeEventListener('load', scheduleRefresh)
+      observer?.disconnect()
     }
   }, [])
 
@@ -78,16 +94,10 @@ const LandingPage = () => {
       <main className="w-full min-w-0 overflow-x-clip bg-white">
         <HeroSection />
 
-        {LANDING_SECTIONS.map(({ id, Component }, index) => (
-          <div
-            key={id}
-            data-aos="fade-up"
-            data-aos-delay={Math.min(index * 40, 160)}
-          >
-            <Suspense fallback={<SectionFallback id={id} />}>
-              <Component />
-            </Suspense>
-          </div>
+        {LANDING_SECTIONS.map(({ id, Component }) => (
+          <Suspense key={id} fallback={<SectionFallback id={id} />}>
+            <Component />
+          </Suspense>
         ))}
       </main>
       <Footer />

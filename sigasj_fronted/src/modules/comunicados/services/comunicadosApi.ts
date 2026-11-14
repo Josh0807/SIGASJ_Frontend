@@ -57,6 +57,7 @@ export const mapPublicAnnouncement = (item: AdminComunicado): Announcement => ({
   content: item.contenido ?? undefined,
   publishedAt: item.fechaPublicacion,
   type: item.tipo,
+  prioridad: item.prioridad,
   urgent: item.prioridad === 'Alta',
   imageUrl: resolveBackendAssetUrl(item.imagenUrl || item.url),
 })

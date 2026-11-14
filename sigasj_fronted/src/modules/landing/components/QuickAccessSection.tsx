@@ -68,17 +68,17 @@ const QuickAccessSection = () => (
       />
 
       <ul className="mt-8 m-0 grid list-none grid-cols-4 gap-4 p-0 max-[1024px]:grid-cols-2 max-[520px]:grid-cols-1">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const isHash = item.href.startsWith('#')
           const content = (
             <>
               <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
                 {item.icon}
               </span>
-              <h3 className="mb-0 mt-4 font-sigasj-display text-lg font-bold text-sigasj-text">
+              <h3 className="public-card-title mt-4">
                 {item.title}
               </h3>
-              <p className="mb-0 mt-2 flex-1 text-sm leading-6 text-sigasj-muted">
+              <p className="public-card-text mt-2 flex-1">
                 {item.description}
               </p>
               <span className="mt-4 text-sm font-semibold text-sigasj-primary">
@@ -88,8 +88,13 @@ const QuickAccessSection = () => (
           )
 
           return (
-            <li key={item.id} className="min-w-0">
-              <Card interactive className="h-full p-5">
+            <li
+              key={item.id}
+              className="min-w-0"
+              data-aos="fade-up"
+              data-aos-delay={String(index * 70)}
+            >
+              <Card interactive className="transparency-motion-card h-full p-5">
                 {isHash ? (
                   <a
                     href={item.href}

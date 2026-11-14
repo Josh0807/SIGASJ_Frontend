@@ -107,16 +107,16 @@ const RequestsSection = ({
   return (
   <section className="public-section public-section--canvas" id={id} aria-labelledby={`${id}-title`}>
     <div className="public-container">
-      <header className="mx-auto max-w-[720px] text-center">
-        <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">Trámites en línea</p>
+      <header className="mx-auto max-w-[720px] text-center" data-aos="fade-up">
+        <p className="public-eyebrow inline-block [margin-inline-end:-0.12em]">Trámites en línea</p>
         <h2 id={`${id}-title`} className="public-section-title">{title}</h2>
-        <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-[1.65] text-sigasj-muted">{description}</p>
+        <p className="public-section-intro mx-auto">{description}</p>
       </header>
 
       {downloadError ? <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{downloadError}</p> : null}
 
       <div className="mt-8 grid grid-cols-2 gap-5 max-[760px]:grid-cols-1">
-        {services.map(({ id: serviceId, name, description: serviceDescription, formHref, downloadSlug, viewHref, badge, icon }) => {
+        {services.map(({ id: serviceId, name, description: serviceDescription, formHref, downloadSlug, viewHref, badge, icon }, index) => {
           const officialForm = downloadSlug ? formsBySlug.get(downloadSlug) : undefined
           const downloadAvailable = catalogError
             ? Boolean(downloadSlug)
@@ -128,37 +128,43 @@ const RequestsSection = ({
               ? 'Descargar formulario'
               : 'Formulario no disponible'
           return (
-          <article className="relative flex min-h-[240px] flex-col overflow-hidden rounded-[13px] border border-sigasj-border bg-sigasj-surface px-6 py-5 max-[640px]:min-h-0" key={serviceId}>
+          <div
+            key={serviceId}
+            data-aos="fade-up"
+            data-aos-delay={String(Math.min(index * 70, 280))}
+          >
+          <article className="transparency-motion-card relative flex min-h-[240px] flex-col rounded-[13px] border border-sigasj-border bg-sigasj-surface px-6 py-5 shadow-[0_4px_14px_rgba(16,43,56,0.05)] max-[640px]:min-h-0">
             <div className="relative z-10 grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
               <ServiceIcon type={icon} name={name} />
             </div>
-            <h3 className="relative z-10 mb-0 mt-4 font-sigasj-display text-lg font-bold leading-tight text-sigasj-text">{name}</h3>
-            {badge ? <span className="relative z-10 mt-3 w-fit rounded-md bg-sigasj-surface-soft px-2 py-1 text-[12px] font-semibold text-sigasj-primary-hover">{badge}</span> : null}
-            <p className="relative z-10 mb-5 mt-2 max-w-[430px] text-sm leading-6 text-sigasj-muted">{serviceDescription}</p>
+            <h3 className="public-card-title relative z-10 mt-4">{name}</h3>
+            {badge ? <span className="public-meta relative z-10 mt-3 w-fit rounded-md bg-sigasj-surface-soft px-2 py-1 !normal-case !tracking-normal text-sigasj-primary-hover">{badge}</span> : null}
+            <p className="public-card-text relative z-10 mb-5 mt-2 max-w-[430px]">{serviceDescription}</p>
             {viewHref ? (
-              <Link className="relative z-10 mt-auto flex min-h-11 w-full items-center justify-center gap-3 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover no-underline transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft" to={viewHref}>
+              <Link className="transparency-motion-button relative z-10 mt-auto flex min-h-11 w-full items-center justify-center gap-3 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover no-underline" to={viewHref}>
                 {serviceId === 'seguimiento' ? 'Consultar solicitud' : 'Ver formularios'}
                 {serviceId === 'seguimiento' ? <IconProgressCheck className="shrink-0" size={18} aria-hidden="true" /> : <IconFiles className="shrink-0" size={18} aria-hidden="true" />}
               </Link>
             ) : formHref ? (
             <div className="relative z-10 mt-auto grid grid-cols-2 gap-3 max-[520px]:grid-cols-1">
-              <Link className="flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-4 text-center text-sm font-semibold text-white no-underline transition-colors duration-150 hover:border-sigasj-primary-hover hover:bg-sigasj-primary-hover" to={formHref}>
+              <Link className="landing-lift-button landing-lift-button--solid flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-4 text-center text-sm font-semibold text-white no-underline" to={formHref}>
                 Realizar solicitud <IconArrowRight className="shrink-0" size={18} aria-hidden="true" />
               </Link>
-              <button className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft disabled:cursor-not-allowed disabled:opacity-75" type="button" disabled={downloadDisabled} aria-describedby={!downloadAvailable && !catalogLoading ? `${serviceId}-download-status` : undefined} onClick={() => { if (downloadSlug && downloadAvailable) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
+              <button className="transparency-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover disabled:cursor-not-allowed disabled:opacity-75 disabled:hover:transform-none disabled:hover:shadow-none" type="button" disabled={downloadDisabled} aria-describedby={!downloadAvailable && !catalogLoading ? `${serviceId}-download-status` : undefined} onClick={() => { if (downloadSlug && downloadAvailable) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
                 {downloadLabel} <IconDownload className="shrink-0" size={18} aria-hidden="true" />
               </button>
               {!downloadAvailable && !catalogLoading ? <span className="sr-only" id={`${serviceId}-download-status`}>La ASADA aún no ha publicado el PDF de este trámite.</span> : null}
             </div>
             ) : (
             <div className="relative z-10 mt-auto grid gap-3">
-              <button className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft disabled:cursor-not-allowed disabled:opacity-75" type="button" disabled={downloadDisabled} onClick={() => { if (downloadSlug && downloadAvailable) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
+              <button className="transparency-motion-button flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover disabled:cursor-not-allowed disabled:opacity-75 disabled:hover:transform-none disabled:hover:shadow-none" type="button" disabled={downloadDisabled} onClick={() => { if (downloadSlug && downloadAvailable) { setDownloadError(null); setPresentialDownload({ slug: downloadSlug, name }) } }}>
                 {downloadLabel} <IconDownload className="shrink-0" size={18} aria-hidden="true" />
               </button>
               <p className="m-0 text-center text-xs font-semibold text-sigasj-muted">El formulario en línea estará disponible próximamente.</p>
             </div>
             )}
           </article>
+          </div>
           )
         })}
       </div>

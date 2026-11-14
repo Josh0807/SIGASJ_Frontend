@@ -28,9 +28,10 @@ const GallerySection = lazy(() => import('../../galeria/public/GallerySection'))
 const ContactOnlyBlock = lazy(() => import('../components/ContactOnlyBlock'))
 
 /**
- * Orden institucional de la Landing pública (guía ASADA 2026):
- * Aviso → Accesos → Sobre ASADA → Trámites/recibos → Comunicados →
- * Transparencia → Proyectos → Galería → Contacto.
+ * Orden del landing:
+ * Aviso → Accesos → Sobre ASADA → Transparencia → Trámites →
+ * Averías → Quejas → Consulta recibo / Métodos de pago →
+ * Comunicados → Proyectos → Galería → Contacto.
  */
 export const LANDING_SECTIONS: LandingSectionDefinition[] = [
   {
@@ -49,14 +50,14 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
     Component: AboutSection,
   },
   {
+    id: 'transparencia',
+    title: 'Transparencia',
+    Component: TransparencySection,
+  },
+  {
     id: 'solicitudes-servicio',
     title: 'Solicitudes de servicio',
     Component: RequestsSection,
-  },
-  {
-    id: 'pagos',
-    title: 'Recibos y pagos',
-    Component: ReceiptPaymentSection,
   },
   {
     id: 'reporte-averias',
@@ -69,14 +70,14 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
     Component: ComplaintsSection,
   },
   {
+    id: 'pagos',
+    title: 'Recibos y pagos',
+    Component: ReceiptPaymentSection,
+  },
+  {
     id: 'comunicados',
     title: 'Comunicados',
     Component: AnnouncementsSection,
-  },
-  {
-    id: 'transparencia',
-    title: 'Transparencia',
-    Component: TransparencySection,
   },
   {
     id: 'proyectos',
