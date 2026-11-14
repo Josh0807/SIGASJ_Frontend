@@ -50,7 +50,7 @@ export default function SolicitudDocumentoActions({ solicitudId, document }: Pro
   return (
     <div className="mt-3 grid gap-2">
       <div className="flex flex-wrap gap-2">
-        <button className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-sky-200 bg-white px-3 text-xs font-extrabold text-[#075fae] disabled:cursor-wait disabled:opacity-60" type="button" disabled={action !== null} onClick={() => void openDocument('view')}>
+        <button className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#bfe3fa] bg-white px-3 text-xs font-extrabold text-[#075fae] disabled:cursor-wait disabled:opacity-60" type="button" disabled={action !== null} onClick={() => void openDocument('view')}>
           {action === 'view' ? <IconLoader2 className="animate-spin" size={16} /> : <IconEye size={16} />} Visualizar
         </button>
         <button className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-700 disabled:cursor-wait disabled:opacity-60" type="button" disabled={action !== null} onClick={() => void openDocument('download')}>

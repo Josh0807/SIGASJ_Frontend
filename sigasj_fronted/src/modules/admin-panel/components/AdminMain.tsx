@@ -1,4 +1,5 @@
 import AdminHeader from './AdminHeader'
+import AdminPageTransition from './AdminPageTransition'
 import ErrorBoundary from '../../../shared/components/ErrorBoundary'
 import type { AdminMainProps } from '../props'
 
@@ -18,10 +19,13 @@ const AdminMain = ({
     />
     <div className="admin-main__content admin-content-modern min-w-0" aria-label="Contenido administrativo">
       <div className="admin-main__inner w-full min-w-0">
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <ErrorBoundary>
+          <AdminPageTransition>{children}</AdminPageTransition>
+        </ErrorBoundary>
       </div>
     </div>
   </div>
 )
 
 export default AdminMain
+

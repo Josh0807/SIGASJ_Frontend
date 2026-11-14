@@ -135,13 +135,13 @@ const FormWizard = ({
     <section
       ref={wizardRef}
       className={[
-        'form-wizard overflow-hidden rounded-[24px] border border-sky-100 bg-white shadow-[0_16px_42px_rgba(31,105,165,0.13)]',
+        'form-wizard overflow-hidden rounded-[24px] border border-sigasj-border bg-sigasj-surface shadow-[0_16px_42px_rgba(31,105,165,0.13)]',
         className,
       ].filter(Boolean).join(' ')}
       aria-label="Formulario por pasos"
     >
-      <header className="border-b border-sky-100 bg-[linear-gradient(135deg,#f7fcff_0%,#eaf6ff_100%)] px-7 py-6 max-[640px]:px-5">
-        <div className="flex items-center justify-between gap-4 text-sm font-bold text-[#315d87]">
+      <header className="border-b border-sigasj-border bg-gradient-to-br from-sigasj-surface-soft to-sigasj-canvas px-7 py-6 max-[640px]:px-5">
+        <div className="flex items-center justify-between gap-4 text-sm font-bold text-sigasj-muted">
           <span aria-live="polite">Paso {safeStepIndex + 1} de {steps.length}</span>
           <span aria-hidden="true">{progress}%</span>
         </div>
@@ -163,11 +163,11 @@ const FormWizard = ({
             const isComplete = index < safeStepIndex
             return (
               <li
-                className={`flex min-w-0 items-center gap-2 rounded-xl px-2 py-2 text-sm font-bold ${isCurrent ? 'bg-white text-[#075fae] shadow-sm' : isComplete ? 'text-emerald-700' : 'text-slate-500'}`}
+                className={`flex min-w-0 items-center gap-2 rounded-xl px-2 py-2 text-sm font-bold ${isCurrent ? 'bg-sigasj-surface text-sigasj-primary shadow-sm' : isComplete ? 'text-sigasj-success' : 'text-sigasj-muted'}`}
                 key={step.id}
                 aria-current={isCurrent ? 'step' : undefined}
               >
-                <span className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${isCurrent ? 'bg-[#1476cf] text-white' : isComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`} aria-hidden="true">
+                <span className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${isCurrent ? 'bg-sigasj-primary text-white' : isComplete ? 'bg-sigasj-surface-soft text-sigasj-success' : 'bg-sigasj-surface-soft text-sigasj-muted'}`} aria-hidden="true">
                   {isComplete ? <IconCheck size={16} stroke={3} /> : index + 1}
                 </span>
                 <span className="truncate max-[700px]:whitespace-normal">{step.title}</span>
@@ -192,14 +192,14 @@ const FormWizard = ({
               data-wizard-step={step.id}
             >
               <h2
-                className="m-0 text-[clamp(1.5rem,3vw,2rem)] font-extrabold leading-tight text-[#073b79] focus:outline-none"
+                className="m-0 text-[clamp(1.5rem,3vw,2rem)] font-extrabold leading-tight text-sigasj-ink focus:outline-none"
                 id={titleId}
                 ref={(node) => { titleRefs.current[index] = node }}
                 tabIndex={-1}
               >
                 {step.title}
               </h2>
-              {step.description ? <p className="mb-0 mt-2 leading-7 text-[#526d8c]" id={descriptionId}>{step.description}</p> : null}
+              {step.description ? <p className="mb-0 mt-2 leading-7 text-sigasj-muted" id={descriptionId}>{step.description}</p> : null}
               <div className="mt-6">{step.content}</div>
             </section>
           )
@@ -211,9 +211,9 @@ const FormWizard = ({
           </p>
         ) : null}
 
-        <footer className="mt-8 flex items-center justify-between gap-4 border-t border-sky-100 pt-6 max-[480px]:flex-col-reverse max-[480px]:items-stretch">
+        <footer className="mt-8 flex items-center justify-between gap-4 border-t border-sigasj-border pt-6 max-[480px]:flex-col-reverse max-[480px]:items-stretch">
           <button
-            className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] bg-white px-6 font-bold text-[#0b65b5] transition hover:-translate-y-0.5 hover:bg-sky-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400 disabled:hover:translate-y-0 disabled:hover:bg-white"
+            className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-sigasj-primary bg-sigasj-surface px-6 font-bold text-sigasj-primary transition hover:-translate-y-0.5 hover:bg-sigasj-surface-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:border-sigasj-border disabled:text-sigasj-muted disabled:hover:translate-y-0 disabled:hover:bg-sigasj-surface"
             type="button"
             disabled={isFirstStep || busy}
             onClick={() => moveTo(safeStepIndex - 1)}

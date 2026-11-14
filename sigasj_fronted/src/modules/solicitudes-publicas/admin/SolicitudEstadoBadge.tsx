@@ -1,9 +1,9 @@
 const styles: Record<string, string> = {
   PENDIENTE: 'border-amber-300/80 bg-amber-50 text-amber-800 shadow-[0_2px_7px_rgba(217,119,6,0.08)]',
-  EN_REVISION: 'border-blue-300/80 bg-blue-50 text-blue-800 shadow-[0_2px_7px_rgba(37,99,235,0.08)]',
+  EN_REVISION: 'border-blue-300/80 bg-[#eaf6ff] text-blue-800 shadow-[0_2px_7px_rgba(30, 90, 156,0.08)]',
   APROBADA: 'border-emerald-300/80 bg-emerald-50 text-emerald-800 shadow-[0_2px_7px_rgba(5,150,105,0.08)]',
   RECHAZADA: 'border-red-300/80 bg-red-50 text-red-800 shadow-[0_2px_7px_rgba(220,38,38,0.08)]',
-  FINALIZADA: 'border-violet-300/80 bg-violet-50 text-violet-800 shadow-[0_2px_7px_rgba(124,58,237,0.08)]',
+  FINALIZADA: 'border-slate-300/80 bg-slate-100 text-slate-700 shadow-[0_2px_7px_rgba(71,85,105,0.08)]',
   CANCELADA: 'border-slate-300 bg-slate-100 text-slate-700',
 }
 

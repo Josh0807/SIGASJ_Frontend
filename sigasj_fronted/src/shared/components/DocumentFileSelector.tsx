@@ -99,7 +99,7 @@ export default function DocumentFileSelector({
             const hasError = item.status === 'error'
             return (
               <li className={`flex min-w-0 items-center gap-3 rounded-xl border p-3 max-[480px]:items-start ${hasError ? 'border-red-200 bg-red-50' : item.status === 'uploading' ? 'border-sky-200 bg-sky-50' : 'border-emerald-200 bg-emerald-50'}`} key={item.id}>
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sigasj-surface">
                   {item.status === 'uploading' ? <IconLoader2 className="animate-spin text-sky-600" size={19} aria-hidden="true" /> : hasError ? <IconAlertCircle className="text-red-600" size={19} aria-hidden="true" /> : <IconCheck className="text-emerald-600" size={19} aria-hidden="true" />}
                 </span>
                 <span className="min-w-0 flex-1">

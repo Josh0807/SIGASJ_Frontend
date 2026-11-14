@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { IconWorld } from '@tabler/icons-react'
 import type { AdminHeaderProps } from '../props'
 import { useAuthUser } from '../../auth/hooks/useAuthUser'
 import { useAdminHeaderScrollVisibility } from '../hooks/useAdminHeaderScrollVisibility'
@@ -70,23 +71,25 @@ const AdminHeader = ({
           menuToggleRef={menuToggleRef}
         />
 
-        <p className="admin-header__title max-[520px]:hidden">Panel administrativo</p>
+        <div className="admin-header__brand-block">
+          <p className="admin-header__brand-title">SIGASJ</p>
+          <p className="admin-header__brand-subtitle">
+            ASADA San Juan
+          </p>
+        </div>
       </div>
 
       <div className="admin-header__account min-w-0">
         <div className="admin-header__actions">
           <NotificacionesCampana />
           <Link
-            className="admin-header__action admin-header__action--public"
+            className="admin-header__action admin-header__action--public admin-header__action--circle"
             to="/"
             aria-label="Ver sitio público"
+            title="Sitio público"
           >
-            <span className="admin-header__action-label admin-header__action-label--full">
-              Sitio público
-            </span>
-            <span className="admin-header__action-label admin-header__action-label--short">
-              Sitio
-            </span>
+            <IconWorld size={20} stroke={1.9} aria-hidden="true" />
+            <span className="visually-hidden">Sitio público</span>
           </Link>
           <AdminAccountMenu triggerContent={<AdminHeaderUser />} />
         </div>

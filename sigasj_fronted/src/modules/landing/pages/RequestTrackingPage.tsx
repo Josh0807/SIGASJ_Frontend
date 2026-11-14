@@ -85,42 +85,42 @@ const RequestTrackingPage = () => {
     <>
       <PublicReceiptNavbar returnTo="/#solicitudes-servicio" />
       <main
-        className="relative isolate min-h-[65vh] overflow-hidden bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
+        className="relative isolate min-h-[65vh] overflow-hidden bg-gradient-to-br from-sigasj-canvas via-sigasj-surface-soft to-sigasj-mist/40 px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
         aria-label="Seguimiento público de solicitudes"
         aria-labelledby="tracking-title"
       >
         <div
-          className="pointer-events-none absolute -left-48 top-16 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sky-200/35"
+          className="pointer-events-none absolute -left-48 top-16 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sigasj-mist/35"
           aria-hidden="true"
         />
         <div className="mx-auto w-full max-w-[900px]">
           <header className="max-w-[760px]">
-            <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-[#1476cf] before:h-0.5 before:w-9 before:bg-[#1476cf]">
+            <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-sigasj-primary before:h-0.5 before:w-9 before:bg-sigasj-primary">
               Consulta pública
             </p>
             <h1
               id="tracking-title"
-              className="m-0 text-[clamp(2.2rem,5vw,3.4rem)] font-extrabold leading-none tracking-[-0.04em] text-[#092e67]"
+              className="m-0 text-[clamp(2.2rem,5vw,3.4rem)] font-extrabold leading-none tracking-[-0.04em] text-sigasj-ink"
             >
               Consultar estado de solicitud
             </h1>
-            <p className="mb-0 mt-5 text-base leading-7 text-[#526d8c]">
+            <p className="mb-0 mt-5 text-base leading-7 text-sigasj-muted">
               Ingrese el código de seguimiento y la identificación del
               solicitante registrados al crear la solicitud.
             </p>
           </header>
 
-          <section className="mt-9 rounded-[24px] border border-white bg-white/90 p-8 shadow-[0_14px_32px_rgba(39,112,166,0.13)] max-[640px]:p-5">
+          <section className="mt-9 rounded-[24px] border border-sigasj-border bg-sigasj-surface/90 p-8 shadow-[0_14px_32px_rgba(39,112,166,0.13)] max-[640px]:p-5">
             <form className="grid gap-5" onSubmit={handleSubmit} noValidate>
               <div className="grid gap-5 sm:grid-cols-2">
                 <label
-                  className="grid gap-2 font-bold text-[#173f6e]"
+                  className="grid gap-2 font-bold text-sigasj-ink"
                   htmlFor="tracking-code"
                 >
                   Código de seguimiento
                   <input
                     ref={codigoRef}
-                    className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none transition focus:border-sky-500 focus:ring-3 focus:ring-sky-200 aria-invalid:border-rose-300 aria-invalid:ring-rose-100"
+                    className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist aria-invalid:border-rose-300 aria-invalid:ring-rose-100"
                     id="tracking-code"
                     name="codigo"
                     type="text"
@@ -148,13 +148,13 @@ const RequestTrackingPage = () => {
                 </label>
 
                 <label
-                  className="grid gap-2 font-bold text-[#173f6e]"
+                  className="grid gap-2 font-bold text-sigasj-ink"
                   htmlFor="tracking-id"
                 >
                   Identificación
                   <input
                     ref={identificacionRef}
-                    className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none transition focus:border-sky-500 focus:ring-3 focus:ring-sky-200 aria-invalid:border-rose-300 aria-invalid:ring-rose-100"
+                    className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist aria-invalid:border-rose-300 aria-invalid:ring-rose-100"
                     id="tracking-id"
                     name="identificacion"
                     type="text"
@@ -185,7 +185,7 @@ const RequestTrackingPage = () => {
               </div>
 
               <button
-                className="group requests-motion-button flex min-h-[58px] w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border-0 bg-gradient-to-r from-[#086dcc] via-[#1684d8] to-[#3aa0df] px-7 text-base font-extrabold text-white shadow-[0_12px_26px_rgba(8,114,211,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_17px_34px_rgba(8,114,211,0.34)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 motion-reduce:transform-none motion-reduce:transition-none"
+                className="group requests-motion-button flex min-h-[58px] w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border-0 bg-gradient-to-r from-sigasj-navy via-sigasj-blue to-sigasj-sky px-7 text-base font-extrabold text-white shadow-[0_12px_26px_rgba(8,114,211,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_17px_34px_rgba(8,114,211,0.34)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sigasj-sky disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 motion-reduce:transform-none motion-reduce:transition-none"
                 type="submit"
                 disabled={loading}
               >
@@ -210,7 +210,7 @@ const RequestTrackingPage = () => {
             ) : null}
 
             {loading ? (
-              <p className="mt-5 mb-0 font-semibold text-slate-600" role="status">
+              <p className="mt-5 mb-0 font-semibold text-sigasj-muted" role="status">
                 Consultando…
               </p>
             ) : null}

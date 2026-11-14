@@ -69,8 +69,9 @@ describe('AdminHeader', () => {
     expect(markup).toContain('admin-header__account')
     expect(markup).toContain('admin-header__actions')
     expect(markup).toContain('notificaciones-campana')
-    expect(markup).toContain('Panel administrativo')
+    expect(markup).toContain('panel administrativo')
     expect(markup).toContain('Ver sitio público')
+    expect(markup).toContain('admin-header__action--circle')
     expect(markup).toContain('admin-account-menu')
   })
 

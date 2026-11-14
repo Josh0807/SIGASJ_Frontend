@@ -15,14 +15,14 @@ const AnnouncementsSkeleton = () => (
             key={`announcement-skeleton-${index}`}
             className="min-w-0"
           >
-            <div className="overflow-hidden rounded-2xl border border-sky-100 bg-white p-4 shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-sigasj-border bg-sigasj-surface p-4 shadow-sm">
               <div
-                className="mb-4 aspect-[16/7] animate-pulse rounded-xl bg-sky-100"
+                className="mb-4 aspect-[16/7] animate-pulse rounded-xl bg-sigasj-surface-soft"
                 aria-hidden="true"
               />
-              <div className="mb-3 h-5 w-2/3 animate-pulse rounded bg-sky-100" />
-              <div className="mb-2 h-3 animate-pulse rounded bg-slate-100" />
-              <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+              <div className="mb-3 h-5 w-2/3 animate-pulse rounded bg-sigasj-surface-soft" />
+              <div className="mb-2 h-3 animate-pulse rounded bg-sigasj-border" />
+              <div className="h-3 w-1/2 animate-pulse rounded bg-sigasj-border" />
             </div>
           </div>
         ))}
@@ -55,19 +55,19 @@ const AnnouncementsSection = ({
 
   return (
     <section
-      className="relative isolate min-h-0 overflow-hidden bg-[linear-gradient(135deg,#f9fdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
+      className="relative isolate min-h-0 overflow-hidden bg-gradient-to-br from-sigasj-canvas via-sigasj-surface-soft to-sigasj-mist/40 px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
       id={id}
       aria-labelledby={titleId}
     >
-      <div className="pointer-events-none absolute -left-48 top-20 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sky-200/35" aria-hidden="true" />
-      <div className="pointer-events-none absolute -right-44 top-16 -z-10 h-52 w-[520px] -rotate-[18deg] rounded-[50%] border-[44px] border-sky-300/20" aria-hidden="true" />
+      <div className="pointer-events-none absolute -left-48 top-20 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sigasj-mist/35" aria-hidden="true" />
+      <div className="pointer-events-none absolute -right-44 top-16 -z-10 h-52 w-[520px] -rotate-[18deg] rounded-[50%] border-[44px] border-sigasj-sky/25" aria-hidden="true" />
 
       <div className="mx-auto w-full max-w-[1180px]">
         <header className="max-w-[760px]">
-          <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-[#1476cf] before:h-0.5 before:w-9 before:bg-[#1476cf]">Información oficial</p>
+          <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-sigasj-primary before:h-0.5 before:w-9 before:bg-sigasj-primary">Información oficial</p>
 
-          <h2 id={titleId} className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-[#092e67]">{title}</h2>
-          <p className="mb-0 mt-4 max-w-[720px] text-base leading-7 text-[#526d8c]">{description}</p>
+          <h2 id={titleId} className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-sigasj-ink">{title}</h2>
+          <p className="mb-0 mt-4 max-w-[720px] text-base leading-7 text-sigasj-muted">{description}</p>
         </header>
 
         {showLoading ? (

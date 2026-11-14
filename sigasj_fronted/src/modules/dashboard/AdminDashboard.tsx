@@ -15,8 +15,6 @@ import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
 import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
 import { IconRefresh } from '@tabler/icons-react'
-import welcomeImage from '../../assets/Hero1.png'
-import gotinImage from '../../assets/Gotín sin fondo.png'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   {
@@ -35,7 +33,7 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     value: null,
     detail: 'Requieren atención',
     badgeText: 'Pendientes',
-    badgeType: 'alert',
+    badgeType: 'info',
     icon: 'averias',
     link: '/admin/averias',
   },
@@ -87,9 +85,6 @@ const canShowIndicator = (
     return false
   }
 
-  // El conteo de trámites usa GET /solicitudes/aprobadas-pendientes
-  // (solo Administradora y Secretaria). El fontanero ve "Mis solicitudes",
-  // no este indicador administrativo.
   if (indicator.id === 'solicitudes') {
     const role = normalizeInternalRole(user?.role)
     return (
@@ -99,6 +94,13 @@ const canShowIndicator = (
   }
 
   return true
+}
+
+const resolveGreeting = (date = new Date()) => {
+  const hour = date.getHours()
+  if (hour < 12) return 'Buenos días'
+  if (hour < 19) return 'Buenas tardes'
+  return 'Buenas noches'
 }
 
 const AdminDashboard = () => {
@@ -115,6 +117,7 @@ const AdminDashboard = () => {
     metricKeys,
   )
   const displayName = resolveAuthUserHeaderName(user)
+  const greeting = resolveGreeting()
 
   const indicators: DashboardIndicator[] = visibleDefinitions.map((indicator) => {
     if (indicator.id === 'abonados') {
@@ -133,101 +136,97 @@ const AdminDashboard = () => {
   })
 
   return (
-    <section className="admin-dashboard admin-content-modern w-full min-w-0" aria-labelledby="admin-dashboard-title">
-      <div className="admin-dashboard__shell sigasj-stack">
-        <header className="admin-dashboard__welcome">
-          <img
-            className="admin-dashboard__welcome-art"
-            src={welcomeImage}
-            alt=""
-          />
-          <div className="admin-dashboard__welcome-content">
-            <span className="admin-dashboard__eyebrow">Panel de Control General</span>
-            <p className="admin-dashboard__welcome-kicker">Bienvenido de nuevo,</p>
-            <p className="admin-dashboard__welcome-name">{displayName}</p>
+    <section
+      className="admin-dashboard admin-content-modern w-full min-w-0"
+      aria-labelledby="admin-dashboard-title"
+    >
+      <div className="admin-dashboard__shell">
+        <div className="admin-dashboard__top-grid">
+          <header className="admin-dashboard__welcome-card">
+            <span className="admin-dashboard__eyebrow">Panel operativo</span>
+            {displayName ? (
+              <p className="admin-dashboard__greeting">
+                {greeting}, <strong>{displayName}</strong>
+              </p>
+            ) : null}
             <h1 id="admin-dashboard-title">Dashboard administrativo</h1>
-            <p className="admin-dashboard__welcome-text">
-              ¡Bienvenido al sistema administrativo de ASADA San Juan! Aquí encontrarás
-              un resumen general de la operación del servicio de agua, métricas principales
-              y accesos directos a los módulos de gestión.
+            <p className="admin-dashboard__lead">
+              Resumen del estado del acueducto según su rol: asociados, averías,
+              solicitudes y alertas.
             </p>
-          </div>
-          <div className="admin-dashboard__system-status" role="status" aria-live="polite">
-            <span className="admin-dashboard__status-ring">
-              <img
-                className="admin-dashboard__status-mascot"
-                src={gotinImage}
-                alt="Gotín"
-              />
-            </span>
-            <div className="admin-dashboard__status-info">
-              <strong>Sistema Operativo</strong>
-              <small>¡ASADA San Juan!</small>
+          </header>
+
+          <aside className="admin-dashboard__focus-card" aria-label="Acciones del panel">
+            <div className="admin-dashboard__focus-copy">
+              <h2>Control del día</h2>
+              <p>
+                Refresque las cifras cuando necesite la lectura más reciente.
+              </p>
             </div>
-          </div>
-        </header>
+            {indicators.length > 0 ? (
+              <button
+                type="button"
+                className="admin-dashboard__refresh-btn"
+                onClick={() => {
+                  void refetch()
+                }}
+                disabled={isLoading}
+                aria-label="Actualizar datos del dashboard"
+              >
+                <IconRefresh
+                  className={`admin-dashboard__refresh-icon ${
+                    isLoading ? 'admin-dashboard__refresh-icon--loading' : ''
+                  }`}
+                  aria-hidden="true"
+                  size={18}
+                  stroke={2}
+                />
+                {isLoading ? 'Cargando...' : 'Actualizar datos'}
+              </button>
+            ) : null}
+          </aside>
+        </div>
 
         {indicators.length > 0 ? (
-        <div className="admin-dashboard__section">
-          <div className="admin-dashboard__section-header admin-dashboard__section-header--with-action">
-            <div>
-              <h2>Indicadores generales</h2>
-              <p>Estado operativo en tiempo real del acueducto y servicios.</p>
+          <div className="admin-dashboard__section">
+            <div className="admin-dashboard__section-header">
+              <h2>Indicadores principales</h2>
+              <p>Resumen actual de los módulos disponibles para su cuenta.</p>
             </div>
-            <button
-              type="button"
-              className="admin-dashboard__refresh-btn max-[760px]:w-full max-[760px]:justify-center"
-              onClick={() => {
-                void refetch()
-              }}
-              disabled={isLoading}
-              aria-label="Actualizar datos del dashboard"
-            >
-              <IconRefresh
-                className={`admin-dashboard__refresh-icon ${
-                  isLoading ? 'admin-dashboard__refresh-icon--loading' : ''
-                }`}
-                aria-hidden="true"
-                size={18}
-                stroke={2}
-              />
-              {isLoading ? 'Cargando...' : 'Actualizar datos'}
-            </button>
-          </div>
 
-          {isError ? (
-            <div className="admin-dashboard__global-error" role="alert">
-              <span>No se pudieron actualizar algunos indicadores del servidor.</span>
-              <button type="button" onClick={() => void refetch()}>
-                Reintentar
-              </button>
+            {isError ? (
+              <div className="admin-dashboard__global-error" role="alert">
+                <span>No se pudieron actualizar algunos indicadores del servidor.</span>
+                <button type="button" onClick={() => void refetch()}>
+                  Reintentar
+                </button>
+              </div>
+            ) : null}
+
+            <div className="admin-dashboard__indicators-grid">
+              {indicators.map((indicator) => (
+                <IndicatorCard
+                  key={indicator.id}
+                  title={indicator.label}
+                  value={indicator.value}
+                  description={indicator.detail}
+                  badgeText={indicator.badgeText}
+                  badgeType={indicator.badgeType}
+                  icon={<AdminNavIcon name={indicator.icon} />}
+                  className={`indicator-card--${indicator.id}`}
+                  link={indicator.link}
+                  isLoading={isLoading}
+                  onRetry={() => void refetch()}
+                />
+              ))}
             </div>
-          ) : null}
-
-          <div className="admin-dashboard__indicators-grid">
-            {indicators.map((indicator) => (
-              <IndicatorCard
-                key={indicator.id}
-                title={indicator.label}
-                value={indicator.value}
-                description={indicator.detail}
-                badgeText={indicator.badgeText}
-                badgeType={indicator.badgeType}
-                icon={<AdminNavIcon name={indicator.icon} />}
-                className={`indicator-card--${indicator.id}`}
-                link={indicator.link}
-                isLoading={isLoading}
-                onRetry={() => void refetch()}
-              />
-            ))}
           </div>
-        </div>
         ) : null}
 
-        <div className="admin-dashboard__section !gap-6">
-          <div className="admin-dashboard__section-header !gap-2">
-            <h2 className="!text-2xl !font-black !tracking-[-0.02em] !text-[#062e63]">Operaciones en tiempo real</h2>
-            <p className="!text-base !leading-7 !text-slate-500">Monitoreo de averías del acueducto y bitácora de actividad reciente.</p>
+        <div className="admin-dashboard__section">
+          <div className="admin-dashboard__section-header">
+            <h2>Operación en vivo</h2>
+            <p>Lo más reciente del acueducto, sin salir del panel.</p>
           </div>
           <div className="admin-dashboard__widgets-grid">
             <ErrorBoundary>

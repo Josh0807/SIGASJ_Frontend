@@ -52,11 +52,11 @@ const leerFiltros = (params: URLSearchParams): HistorialColaboradorFiltros => {
 }
 
 const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
 
 const badgeClass = (tipo: TipoEventoHistorialRrhh) => {
   if (tipo === 'PERMISO') {
-    return 'border-sky-200 bg-sky-50 text-sky-800'
+    return 'border-[#bfe3fa] bg-sky-50 text-sky-800'
   }
   if (tipo === 'VACACION') {
     return 'border-emerald-200 bg-emerald-50 text-emerald-800'
@@ -215,7 +215,7 @@ export default function ColaboradorHistorialPage() {
     <main className="grid w-full min-w-0 gap-5 sm:gap-6">
       <Link
         to={idValido ? colaboradorDetailPath(colaboradorId) : RRHH_PATH}
-        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
+        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 font-extrabold text-[#1e5a9c] no-underline shadow-[0_6px_18px_rgba(30, 90, 156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(30, 90, 156,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
       >
         <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
         {idValido ? 'Volver al colaborador' : `Volver a ${RRHH_TITLE}`}
@@ -223,7 +223,7 @@ export default function ColaboradorHistorialPage() {
 
       {cargando && !respuesta ? (
         <div
-          className="grid gap-4 rounded-2xl border border-sky-100 bg-white p-6 sm:rounded-3xl sm:p-8"
+          className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-6 sm:rounded-3xl sm:p-8"
           role="status"
         >
           <span className="sr-only">Cargando historial…</span>
@@ -245,7 +245,7 @@ export default function ColaboradorHistorialPage() {
             {idValido && resultado.reintentable && !es404 ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-5 font-bold text-blue-800 transition hover:bg-blue-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
@@ -263,16 +263,16 @@ export default function ColaboradorHistorialPage() {
         </div>
       ) : (
         <>
-          <header className="flex flex-col gap-5 rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)]">
+              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
                 <IconHistory size={28} aria-hidden="true" />
               </span>
               <div className="min-w-0">
-                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
+                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
                   {RRHH_TITLE} · Historial
                 </p>
-                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#062e63] sm:text-3xl">
+                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
                   Historial administrativo
                 </h1>
                 {colaborador ? (
@@ -289,7 +289,7 @@ export default function ColaboradorHistorialPage() {
           </header>
 
           <section
-            className="grid gap-4 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+            className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
             aria-label="Filtros del historial"
           >
             <label className="grid min-w-0 gap-2">
@@ -333,7 +333,7 @@ export default function ColaboradorHistorialPage() {
             </label>
             <button
               type="button"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
               onClick={limpiarFiltros}
               disabled={!hayFiltros}
             >
@@ -343,7 +343,7 @@ export default function ColaboradorHistorialPage() {
           </section>
 
           <section
-            className="min-w-0 overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl"
+            className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
             aria-busy={cargando}
             aria-label="Historial administrativo"
           >
@@ -360,7 +360,7 @@ export default function ColaboradorHistorialPage() {
               </div>
             ) : eventos.length === 0 ? (
               <div className="grid place-items-center gap-3 p-10 text-center">
-                <span className="grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700">
+                <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
                   <IconCalendarOff size={28} aria-hidden="true" />
                 </span>
                 <h2 className="m-0 text-lg font-extrabold text-[#073b73]">
@@ -445,7 +445,7 @@ export default function ColaboradorHistorialPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => actualizarFiltros({ page: page - 1 })}
                     disabled={page <= 1 || cargando}
                   >
@@ -457,7 +457,7 @@ export default function ColaboradorHistorialPage() {
                   </span>
                   <button
                     type="button"
-                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => actualizarFiltros({ page: page + 1 })}
                     disabled={page >= totalPages || cargando}
                   >

@@ -27,81 +27,181 @@ import MovimientoDetallePage from './movimientos/MovimientoDetallePage'
 import ReportesInventarioPage from './reportes/ReportesInventarioPage'
 import ImprimirInventarioPage from './imprimir/ImprimirInventarioPage'
 import InventarioModuleMenu from './InventarioModuleMenu'
+import './styles/inventory-bodega.css'
 
 const adminOnly = [InternalAdminRoleName.Administradora]
-const adminAndSecretaria = [InternalAdminRoleName.Administradora, InternalAdminRoleName.Secretaria]
-const salidaRoles = [InternalAdminRoleName.Administradora, InternalAdminRoleName.Fontanero]
+const adminAndSecretaria = [
+  InternalAdminRoleName.Administradora,
+  InternalAdminRoleName.Secretaria,
+]
+const salidaRoles = [
+  InternalAdminRoleName.Administradora,
+  InternalAdminRoleName.Fontanero,
+]
 const fontaneroOnly = [InternalAdminRoleName.Fontanero]
-
-const shellClasses = [
-  'inventory-module-shell relative font-sans text-slate-700 [--inventory-accent:#2563eb] [--inventory-soft:#eff6ff]',
-  '[&_.inventory-page-eyebrow]:!mb-4 [&_.inventory-page-eyebrow]:!text-sm [&_.inventory-page-eyebrow]:!font-extrabold [&_.inventory-page-eyebrow]:!uppercase [&_.inventory-page-eyebrow]:!tracking-[0.12em] [&_.inventory-page-eyebrow]:!text-blue-600',
-  '[&_.inventory-page-title]:!m-0 [&_.inventory-page-title]:!text-[clamp(1.75rem,3vw,2.25rem)] [&_.inventory-page-title]:!font-black [&_.inventory-page-title]:!leading-tight [&_.inventory-page-title]:!tracking-[-0.025em] [&_.inventory-page-title]:!text-[#062e63]',
-  '[&_.inventory-page-subtitle]:!mt-3 [&_.inventory-page-subtitle]:!max-w-3xl [&_.inventory-page-subtitle]:!text-lg [&_.inventory-page-subtitle]:!font-normal [&_.inventory-page-subtitle]:!leading-8 [&_.inventory-page-subtitle]:!text-slate-500',
-  '[&_.materials-admin__eyebrow]:!mb-4 [&_.materials-admin__eyebrow]:!text-sm [&_.materials-admin__eyebrow]:!font-extrabold [&_.materials-admin__eyebrow]:!tracking-[0.12em] [&_.materials-admin__eyebrow]:!text-blue-600',
-  '[&_.materials-admin__header_h1]:!m-0 [&_.materials-admin__header_h1]:!text-[clamp(1.75rem,3vw,2.25rem)] [&_.materials-admin__header_h1]:!font-black [&_.materials-admin__header_h1]:!leading-tight [&_.materials-admin__header_h1]:!tracking-[-0.025em] [&_.materials-admin__header_h1]:!text-[#062e63]',
-  '[&_.materials-admin__header>div>p:last-child]:!mt-3 [&_.materials-admin__header>div>p:last-child]:!max-w-3xl [&_.materials-admin__header>div>p:last-child]:!text-lg [&_.materials-admin__header>div>p:last-child]:!font-normal [&_.materials-admin__header>div>p:last-child]:!leading-8 [&_.materials-admin__header>div>p:last-child]:!text-slate-500',
-  '[&_.category-admin_.materials-admin__eyebrow]:!text-blue-600 [&_.category-admin_.materials-admin__header_h1]:!text-[#062e63] [&_.category-admin_.materials-admin__header>div>p:last-child]:!text-slate-500',
-  '[&_.category-admin_.materials-admin__secondary]:!rounded-2xl [&_.category-admin_.materials-admin__secondary]:!border-blue-200 [&_.category-admin_.materials-admin__secondary]:!bg-white [&_.category-admin_.materials-admin__secondary]:!px-6 [&_.category-admin_.materials-admin__secondary]:!text-blue-700 [&_.category-admin_.materials-admin__secondary]:!shadow-[0_8px_20px_rgba(37,99,235,0.12)] [&_.category-admin_.materials-admin__secondary]:!transition-all [&_.category-admin_.materials-admin__secondary]:!duration-300 [&_.category-admin_.materials-admin__secondary]:!ease-out hover:[&_.category-admin_.materials-admin__secondary]:!-translate-y-1 hover:[&_.category-admin_.materials-admin__secondary]:!scale-[1.02] hover:[&_.category-admin_.materials-admin__secondary]:!border-blue-400 hover:[&_.category-admin_.materials-admin__secondary]:!bg-blue-50 hover:[&_.category-admin_.materials-admin__secondary]:!shadow-[0_14px_28px_rgba(37,99,235,0.22)] active:[&_.category-admin_.materials-admin__secondary]:!translate-y-0 active:[&_.category-admin_.materials-admin__secondary]:!scale-[0.98] motion-reduce:[&_.category-admin_.materials-admin__secondary]:!transform-none motion-reduce:[&_.category-admin_.materials-admin__secondary]:!transition-none',
-  '[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!relative [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!overflow-hidden [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!border-0 [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!bg-linear-to-r [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!from-blue-700 [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!via-blue-600 [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!to-sky-500 [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!font-extrabold [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!text-white [&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!shadow-[0_10px_24px_rgba(37,99,235,0.3)] hover:[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!from-blue-800 hover:[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!to-cyan-500 hover:[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!shadow-[0_16px_32px_rgba(37,99,235,0.4)] focus-visible:[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!outline-2 focus-visible:[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!outline-offset-4 focus-visible:[&_.category-admin_.materials-admin__header-actions_.materials-admin__secondary]:!outline-blue-600',
-  '[&_.providers-admin__header_.materials-admin__count]:!rounded-full [&_.providers-admin__header_.materials-admin__count]:!border [&_.providers-admin__header_.materials-admin__count]:!border-sky-200 [&_.providers-admin__header_.materials-admin__count]:!bg-linear-to-r [&_.providers-admin__header_.materials-admin__count]:!from-sky-50 [&_.providers-admin__header_.materials-admin__count]:!to-cyan-50 [&_.providers-admin__header_.materials-admin__count]:!px-4 [&_.providers-admin__header_.materials-admin__count]:!py-2.5 [&_.providers-admin__header_.materials-admin__count]:!font-extrabold [&_.providers-admin__header_.materials-admin__count]:!text-sky-800 [&_.providers-admin__header_.materials-admin__count]:!shadow-[0_7px_18px_rgba(14,165,233,0.12)] [&_.providers-admin__header_.materials-admin__count]:!transition-all [&_.providers-admin__header_.materials-admin__count]:!duration-300 hover:[&_.providers-admin__header_.materials-admin__count]:!-translate-y-0.5 hover:[&_.providers-admin__header_.materials-admin__count]:!shadow-[0_11px_24px_rgba(14,165,233,0.18)]',
-  '[&_.providers-admin__header_.materials-admin__secondary]:!rounded-2xl [&_.providers-admin__header_.materials-admin__secondary]:!border-blue-200 [&_.providers-admin__header_.materials-admin__secondary]:!bg-white [&_.providers-admin__header_.materials-admin__secondary]:!px-5 [&_.providers-admin__header_.materials-admin__secondary]:!font-extrabold [&_.providers-admin__header_.materials-admin__secondary]:!text-blue-700 [&_.providers-admin__header_.materials-admin__secondary]:!shadow-[0_8px_20px_rgba(37,99,235,0.12)] [&_.providers-admin__header_.materials-admin__secondary]:!transition-all [&_.providers-admin__header_.materials-admin__secondary]:!duration-300 hover:[&_.providers-admin__header_.materials-admin__secondary]:!-translate-y-1 hover:[&_.providers-admin__header_.materials-admin__secondary]:!scale-[1.02] hover:[&_.providers-admin__header_.materials-admin__secondary]:!border-blue-400 hover:[&_.providers-admin__header_.materials-admin__secondary]:!bg-blue-50 hover:[&_.providers-admin__header_.materials-admin__secondary]:!shadow-[0_14px_28px_rgba(37,99,235,0.2)] active:[&_.providers-admin__header_.materials-admin__secondary]:!translate-y-0 active:[&_.providers-admin__header_.materials-admin__secondary]:!scale-[0.97]',
-  '[&_.providers-admin__header_.materials-admin__primary]:!rounded-2xl [&_.providers-admin__header_.materials-admin__primary]:!border-0 [&_.providers-admin__header_.materials-admin__primary]:!bg-linear-to-r [&_.providers-admin__header_.materials-admin__primary]:!from-blue-700 [&_.providers-admin__header_.materials-admin__primary]:!to-sky-500 [&_.providers-admin__header_.materials-admin__primary]:!px-5 [&_.providers-admin__header_.materials-admin__primary]:!font-extrabold [&_.providers-admin__header_.materials-admin__primary]:!text-white [&_.providers-admin__header_.materials-admin__primary]:!shadow-[0_10px_24px_rgba(37,99,235,0.28)] [&_.providers-admin__header_.materials-admin__primary]:!transition-all [&_.providers-admin__header_.materials-admin__primary]:!duration-300 hover:[&_.providers-admin__header_.materials-admin__primary]:!-translate-y-1 hover:[&_.providers-admin__header_.materials-admin__primary]:!scale-[1.02] hover:[&_.providers-admin__header_.materials-admin__primary]:!from-blue-800 hover:[&_.providers-admin__header_.materials-admin__primary]:!to-cyan-500 hover:[&_.providers-admin__header_.materials-admin__primary]:!shadow-[0_16px_32px_rgba(37,99,235,0.38)] active:[&_.providers-admin__header_.materials-admin__primary]:!translate-y-0 active:[&_.providers-admin__header_.materials-admin__primary]:!scale-[0.97] motion-reduce:[&_.providers-admin__header_.materials-admin__primary]:!transform-none motion-reduce:[&_.providers-admin__header_.materials-admin__primary]:!transition-none',
-  '[&_.provider-admin__form-heading_h2]:!text-xl [&_.provider-admin__form-heading_h2]:!font-extrabold [&_.provider-admin__form-heading_h2]:!tracking-[-0.015em] [&_.provider-admin__form-heading_h2]:!text-[#073b73]',
-  '[&_.provider-admin__form-heading_p]:!text-sm [&_.provider-admin__form-heading_p]:!leading-6 [&_.provider-admin__form-heading_p]:!text-slate-500',
-  '[&_label>span:first-child]:!text-sm [&_label>span:first-child]:!font-bold [&_label>span:first-child]:!text-[#163f6b]',
-  '[&_.materials-admin__header]:!rounded-[24px] [&_.materials-admin__header]:!border-sky-100 [&_.materials-admin__header]:!bg-white [&_.materials-admin__header]:!p-7 [&_.materials-admin__header]:!shadow-[0_12px_34px_rgba(30,90,156,0.08)]',
-  '[&_.materials-admin__eyebrow]:!text-[var(--inventory-accent)] [&_.materials-admin__count]:!bg-[var(--inventory-soft)] [&_.materials-admin__count]:!text-[var(--inventory-accent)]',
-  '[&_.materials-admin__filters]:!rounded-[22px] [&_.materials-admin__filters]:!border-sky-100 [&_.materials-admin__filters]:!bg-white [&_.materials-admin__filters]:!p-6 [&_.materials-admin__filters]:!shadow-[0_10px_28px_rgba(30,90,156,0.06)]',
-  '[&_.materials-admin__filters_input]:!rounded-xl [&_.materials-admin__filters_select]:!rounded-xl',
-  '[&_.materials-admin__table-wrap]:!rounded-[22px] [&_.materials-admin__table-wrap]:!border-sky-100 [&_.materials-admin__table-wrap]:!shadow-[0_12px_30px_rgba(30,90,156,0.07)]',
-  '[&_.materials-admin__form]:!rounded-[22px] [&_.materials-admin__form]:!border-sky-100 [&_.materials-admin__form]:!bg-white [&_.materials-admin__form]:!shadow-[0_12px_30px_rgba(30,90,156,0.07)]',
-  '[&_.materials-admin__primary]:!inline-flex [&_.materials-admin__primary]:!min-h-12 [&_.materials-admin__primary]:!items-center [&_.materials-admin__primary]:!justify-center [&_.materials-admin__primary]:!gap-2 [&_.materials-admin__primary]:!rounded-xl [&_.materials-admin__primary]:!border-[var(--inventory-accent)] [&_.materials-admin__primary]:!bg-[var(--inventory-accent)] [&_.materials-admin__primary]:!px-5 [&_.materials-admin__primary]:!font-extrabold [&_.materials-admin__primary]:!shadow-[0_8px_18px_rgba(15,63,110,0.16)] hover:[&_.materials-admin__primary]:!-translate-y-0.5',
-  '[&_.materials-admin__secondary]:!inline-flex [&_.materials-admin__secondary]:!min-h-12 [&_.materials-admin__secondary]:!items-center [&_.materials-admin__secondary]:!justify-center [&_.materials-admin__secondary]:!gap-2 [&_.materials-admin__secondary]:!rounded-xl [&_.materials-admin__secondary]:!border-slate-200 [&_.materials-admin__secondary]:!bg-white [&_.materials-admin__secondary]:!px-5 [&_.materials-admin__secondary]:!font-extrabold [&_.materials-admin__secondary]:!text-slate-700 [&_.materials-admin__secondary]:!shadow-sm hover:[&_.materials-admin__secondary]:!border-slate-300 hover:[&_.materials-admin__secondary]:!bg-slate-50',
-  '[&_.materials-admin__form-actions]:!mt-2 [&_.materials-admin__form-actions]:!justify-between [&_.materials-admin__form-actions]:!border-t [&_.materials-admin__form-actions]:!border-slate-100 [&_.materials-admin__form-actions]:!pt-5 max-[760px]:[&_.materials-admin__form-actions]:!flex-col',
-  '[&_.material-tracking]:!mx-0 [&_.material-tracking]:!grid [&_.material-tracking]:!w-full [&_.material-tracking]:!max-w-none [&_.material-tracking]:!gap-6',
-  '[&_.material-tracking__header]:!rounded-[24px] [&_.material-tracking__header]:!border [&_.material-tracking__header]:!border-sky-100 [&_.material-tracking__header]:!bg-white [&_.material-tracking__header]:!p-7 [&_.material-tracking__header]:!shadow-[0_12px_34px_rgba(30,90,156,0.08)]',
-  '[&_.material-tracking__filters]:!flex [&_.material-tracking__filters]:!flex-wrap [&_.material-tracking__filters]:!items-center [&_.material-tracking__filters]:!gap-3 [&_.material-tracking__filters]:!rounded-[22px] [&_.material-tracking__filters]:!border [&_.material-tracking__filters]:!border-sky-100 [&_.material-tracking__filters]:!bg-white [&_.material-tracking__filters]:!p-5 [&_.material-tracking__filters]:!shadow-[0_10px_28px_rgba(30,90,156,0.06)]',
-  '[&_.material-tracking__filters_select]:!min-h-12 [&_.material-tracking__filters_select]:!min-w-[180px] [&_.material-tracking__filters_select]:!flex-1 [&_.material-tracking__filters_select]:!rounded-xl [&_.material-tracking__filters_select]:!border-slate-200 [&_.material-tracking__filters_input]:!min-h-12 [&_.material-tracking__filters_input]:!min-w-[180px] [&_.material-tracking__filters_input]:!flex-1 [&_.material-tracking__filters_input]:!rounded-xl [&_.material-tracking__filters_input]:!border-slate-200',
-  '[&_.material-tracking__table-wrap]:!rounded-[22px] [&_.material-tracking__table-wrap]:!border-sky-100 [&_.material-tracking__table-wrap]:!bg-white [&_.material-tracking__table-wrap]:!shadow-[0_12px_30px_rgba(30,90,156,0.07)]',
-  '[&_.material-tracking__empty]:!rounded-[22px] [&_.material-tracking__empty]:!border-sky-100 [&_.material-tracking__empty]:!bg-white [&_.material-tracking__empty]:!shadow-[0_10px_28px_rgba(30,90,156,0.06)]',
-  '[&_.material-request]:!grid [&_.material-request]:!gap-6',
-  '[&_.material-request__header]:!rounded-[24px] [&_.material-request__header]:!border [&_.material-request__header]:!border-sky-100 [&_.material-request__header]:!bg-white [&_.material-request__header]:!p-7 [&_.material-request__header]:!shadow-[0_12px_34px_rgba(30,90,156,0.08)]',
-  '[&_.material-request__form]:!rounded-[22px] [&_.material-request__form]:!border-sky-100 [&_.material-request__form]:!bg-white [&_.material-request__form]:!p-7 [&_.material-request__form]:!shadow-[0_12px_30px_rgba(30,90,156,0.07)]',
-  '[&_.material-detail]:!grid [&_.material-detail]:!gap-6 [&_.material-detail__header]:!rounded-[24px] [&_.material-detail__header]:!shadow-[0_12px_34px_rgba(30,90,156,0.08)]',
-  '[&_.material-detail__summary]:!rounded-[22px] [&_.material-detail__summary]:!shadow-[0_10px_28px_rgba(30,90,156,0.06)] [&_.material-detail__materials]:!rounded-[22px] [&_.material-detail__materials]:!shadow-[0_10px_28px_rgba(30,90,156,0.06)]',
-  '[&_.material-tracking__detail-link]:!inline-flex [&_.material-tracking__detail-link]:!min-h-10 [&_.material-tracking__detail-link]:!items-center [&_.material-tracking__detail-link]:!justify-center [&_.material-tracking__detail-link]:!rounded-xl [&_.material-tracking__detail-link]:!border [&_.material-tracking__detail-link]:!border-[var(--inventory-accent)] [&_.material-tracking__detail-link]:!bg-[var(--inventory-soft)] [&_.material-tracking__detail-link]:!px-4 [&_.material-tracking__detail-link]:!font-extrabold [&_.material-tracking__detail-link]:!text-[var(--inventory-accent)] [&_.material-tracking__detail-link]:!no-underline hover:[&_.material-tracking__detail-link]:!-translate-y-0.5',
-  '[&_.material-tracking__filter-action]:!inline-flex [&_.material-tracking__filter-action]:!min-h-12 [&_.material-tracking__filter-action]:!items-center [&_.material-tracking__filter-action]:!justify-center [&_.material-tracking__filter-action]:!rounded-xl [&_.material-tracking__filter-action]:!border-slate-200 [&_.material-tracking__filter-action]:!bg-white [&_.material-tracking__filter-action]:!px-5 [&_.material-tracking__filter-action]:!font-extrabold [&_.material-tracking__filter-action]:!text-slate-700 [&_.material-tracking__filter-action]:!shadow-sm',
-  '[&_.material-tracking__pagination_button]:!min-h-11 [&_.material-tracking__pagination_button]:!rounded-xl [&_.material-tracking__pagination_button]:!border-slate-200 [&_.material-tracking__pagination_button]:!bg-white [&_.material-tracking__pagination_button]:!px-5 [&_.material-tracking__pagination_button]:!font-extrabold [&_.material-tracking__pagination_button]:!text-[var(--inventory-accent)] [&_.material-tracking__pagination_button]:!shadow-sm',
-  '[&_.material-tracking__state_button]:!inline-flex [&_.material-tracking__state_button]:!min-h-11 [&_.material-tracking__state_button]:!items-center [&_.material-tracking__state_button]:!justify-center [&_.material-tracking__state_button]:!gap-2 [&_.material-tracking__state_button]:!rounded-xl [&_.material-tracking__state_button]:!border [&_.material-tracking__state_button]:!border-[var(--inventory-accent)] [&_.material-tracking__state_button]:!bg-[var(--inventory-soft)] [&_.material-tracking__state_button]:!px-4 [&_.material-tracking__state_button]:!font-extrabold [&_.material-tracking__state_button]:!text-[var(--inventory-accent)]',
-  '[&_.material-request__primary]:!inline-flex [&_.material-request__primary]:!min-h-12 [&_.material-request__primary]:!items-center [&_.material-request__primary]:!justify-center [&_.material-request__primary]:!gap-2 [&_.material-request__primary]:!rounded-xl [&_.material-request__primary]:!border-[var(--inventory-accent)] [&_.material-request__primary]:!bg-[var(--inventory-accent)] [&_.material-request__primary]:!px-5 [&_.material-request__primary]:!font-extrabold [&_.material-request__primary]:!text-white [&_.material-request__primary]:!shadow-[0_8px_18px_rgba(15,63,110,0.16)]',
-  '[&_.material-request__add]:!rounded-xl [&_.material-request__add]:!border-[var(--inventory-accent)] [&_.material-request__add]:!bg-[var(--inventory-soft)] [&_.material-request__add]:!font-extrabold [&_.material-request__add]:!text-[var(--inventory-accent)] [&_.material-request__remove]:!rounded-xl',
-  '[&_.material-detail__back]:!inline-flex [&_.material-detail__back]:!min-h-11 [&_.material-detail__back]:!items-center [&_.material-detail__back]:!rounded-xl [&_.material-detail__back]:!border [&_.material-detail__back]:!border-slate-200 [&_.material-detail__back]:!bg-white [&_.material-detail__back]:!px-4 [&_.material-detail__back]:!font-extrabold [&_.material-detail__back]:!text-slate-700 [&_.material-detail__back]:!no-underline [&_.material-detail__back]:!shadow-sm',
-  '[&_.material-review__actions]:!flex [&_.material-review__actions]:!flex-wrap [&_.material-review__actions]:!justify-end [&_.material-review__actions]:!gap-3 [&_.material-review__actions]:!border-t [&_.material-review__actions]:!border-slate-100 [&_.material-review__actions]:!pt-5',
-  '[&_.material-review__approve]:!min-h-12 [&_.material-review__approve]:!rounded-xl [&_.material-review__approve]:!border-emerald-600 [&_.material-review__approve]:!bg-emerald-600 [&_.material-review__approve]:!px-5 [&_.material-review__approve]:!font-extrabold [&_.material-review__approve]:!text-white [&_.material-review__approve]:!shadow-[0_8px_18px_rgba(5,150,105,0.18)]',
-  '[&_.material-review__reject]:!min-h-12 [&_.material-review__reject]:!rounded-xl [&_.material-review__reject]:!border-rose-200 [&_.material-review__reject]:!bg-rose-50 [&_.material-review__reject]:!px-5 [&_.material-review__reject]:!font-extrabold [&_.material-review__reject]:!text-rose-700',
-  '[&_.gallery-admin__button]:!min-h-12 [&_.gallery-admin__button]:!rounded-xl [&_.gallery-admin__button]:!px-5 [&_.gallery-admin__button]:!font-extrabold [&_.gallery-admin__button]:!shadow-sm [&_.gallery-admin__button--primary]:!border-[var(--inventory-accent)] [&_.gallery-admin__button--primary]:!bg-[var(--inventory-accent)] [&_.gallery-admin__button--primary]:!text-white',
-  '[&_.gallery-admin__filter-reset]:!border-slate-200 [&_.gallery-admin__filter-reset]:!bg-white [&_.gallery-admin__filter-reset]:!text-slate-700',
-  '[&_input]:transition [&_select]:transition [&_textarea]:transition [&_button]:transition [&_a]:transition',
-].join(' ')
-
-function inventoryTheme(pathname: string) {
-  if (pathname.includes('/categorias')) return '[--inventory-accent:#7c3aed] [--inventory-soft:#f5f3ff]'
-  if (pathname.includes('/proveedores')) return '[--inventory-accent:#0284c7] [--inventory-soft:#f0f9ff]'
-  if (pathname.includes('/entradas')) return '[--inventory-accent:#059669] [--inventory-soft:#ecfdf5]'
-  if (pathname.includes('/salidas')) return '[--inventory-accent:#d97706] [--inventory-soft:#fffbeb]'
-  if (pathname.includes('/alertas-reposicion')) return '[--inventory-accent:#dc2626] [--inventory-soft:#fef2f2]'
-  if (pathname.includes('/reposiciones')) return '[--inventory-accent:#ea580c] [--inventory-soft:#fff7ed]'
-  if (pathname.includes('/recepciones')) return '[--inventory-accent:#0d9488] [--inventory-soft:#f0fdfa]'
-  if (pathname.includes('/movimientos')) return '[--inventory-accent:#0891b2] [--inventory-soft:#ecfeff]'
-  if (pathname.includes('/reportes')) return '[--inventory-accent:#9333ea] [--inventory-soft:#faf5ff]'
-  if (pathname.includes('/imprimir')) return '[--inventory-accent:#0f766e] [--inventory-soft:#f0fdfa]'
-  if (pathname.includes('/solicitudes')) return '[--inventory-accent:#4f46e5] [--inventory-soft:#eef2ff]'
-  return '[--inventory-accent:#2563eb] [--inventory-soft:#eff6ff]'
-}
 
 export default function InventarioRoutes() {
   const { pathname } = useLocation()
-  const usesInlineMenu = pathname.endsWith('/solicitudes-materiales/nueva')
-  return <section className={`${shellClasses} ${inventoryTheme(pathname)}`}>{usesInlineMenu ? null : <InventarioModuleMenu />}<Routes><Route index element={<Navigate to="materiales" replace />} /><Route path="materiales" element={<MaterialesPage />} /><Route path="materiales/nuevo" element={<MaterialCreatePage />} /><Route path="materiales/:id/editar" element={<MaterialEditPage />} /><Route path="categorias" element={<CategoriasPage />} /><Route path="categorias/nueva" element={<CategoriaCreatePage />} /><Route path="categorias/:id/editar" element={<CategoriaEditPage />} /><Route path="proveedores" element={<ProveedoresPage />} /><Route path="proveedores/nuevo" element={<AuthorizedRoute allowedRoles={adminOnly}><ProveedorCreatePage /></AuthorizedRoute>} /><Route path="proveedores/:id/editar" element={<AuthorizedRoute allowedRoles={adminOnly}><ProveedorEditPage /></AuthorizedRoute>} /><Route path="entradas" element={<AuthorizedRoute allowedRoles={adminOnly}><EntradaCreatePage /></AuthorizedRoute>} /><Route path="salidas" element={<AuthorizedRoute allowedRoles={salidaRoles}><SalidaCreatePage /></AuthorizedRoute>} /><Route path="solicitudes" element={<AuthorizedRoute allowedRoles={adminOnly}><SolicitudesRevisionPage /></AuthorizedRoute>} /><Route path="solicitudes/:id" element={<AuthorizedRoute allowedRoles={adminOnly}><SolicitudRevisionDetallePage /></AuthorizedRoute>} /><Route path="alertas-reposicion" element={<AuthorizedRoute allowedRoles={adminOnly}><AlertasReposicionPage /></AuthorizedRoute>} /><Route path="reposiciones" element={<AuthorizedRoute allowedRoles={adminOnly}><ReposicionesPage /></AuthorizedRoute>} /><Route path="reposiciones/:id" element={<AuthorizedRoute allowedRoles={adminOnly}><ReposicionDetallePage /></AuthorizedRoute>} /><Route path="recepciones" element={<AuthorizedRoute allowedRoles={adminOnly}><RecepcionesPage /></AuthorizedRoute>} /><Route path="recepciones/:id" element={<AuthorizedRoute allowedRoles={adminOnly}><RecepcionDetallePage /></AuthorizedRoute>} /><Route path="movimientos" element={<AuthorizedRoute allowedRoles={adminAndSecretaria}><MovimientosPage /></AuthorizedRoute>} /><Route path="movimientos/:id" element={<AuthorizedRoute allowedRoles={adminAndSecretaria}><MovimientoDetallePage /></AuthorizedRoute>} /><Route path="reportes" element={<AuthorizedRoute allowedRoles={adminAndSecretaria}><ReportesInventarioPage /></AuthorizedRoute>} /><Route path="imprimir" element={<AuthorizedRoute allowedRoles={adminAndSecretaria}><ImprimirInventarioPage /></AuthorizedRoute>} /><Route path="solicitudes-materiales" element={<AuthorizedRoute allowedRoles={fontaneroOnly}><SolicitudesMaterialesSeguimientoPage /></AuthorizedRoute>} /><Route path="solicitudes-materiales/nueva" element={<AuthorizedRoute allowedRoles={fontaneroOnly}><SolicitudMaterialesPage /></AuthorizedRoute>} /><Route path="solicitudes-materiales/:id" element={<AuthorizedRoute allowedRoles={fontaneroOnly}><SolicitudMaterialesDetallePage /></AuthorizedRoute>} /><Route path="*" element={<Navigate to="materiales" replace />} /></Routes></section>
+  const hideChrome = pathname.endsWith('/solicitudes-materiales/nueva')
+
+  return (
+    <section className="inventory-module-shell inventory-bodega">
+      {hideChrome ? null : <InventarioModuleMenu />}
+      <Routes>
+        <Route index element={<Navigate to="materiales" replace />} />
+        <Route path="materiales" element={<MaterialesPage />} />
+        <Route path="materiales/nuevo" element={<MaterialCreatePage />} />
+        <Route path="materiales/:id/editar" element={<MaterialEditPage />} />
+        <Route path="categorias" element={<CategoriasPage />} />
+        <Route path="categorias/nueva" element={<CategoriaCreatePage />} />
+        <Route path="categorias/:id/editar" element={<CategoriaEditPage />} />
+        <Route path="proveedores" element={<ProveedoresPage />} />
+        <Route
+          path="proveedores/nuevo"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <ProveedorCreatePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="proveedores/:id/editar"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <ProveedorEditPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="entradas"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <EntradaCreatePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="salidas"
+          element={
+            <AuthorizedRoute allowedRoles={salidaRoles}>
+              <SalidaCreatePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="solicitudes"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <SolicitudesRevisionPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="solicitudes/:id"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <SolicitudRevisionDetallePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="alertas-reposicion"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <AlertasReposicionPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="reposiciones"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <ReposicionesPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="reposiciones/:id"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <ReposicionDetallePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="recepciones"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <RecepcionesPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="recepciones/:id"
+          element={
+            <AuthorizedRoute allowedRoles={adminOnly}>
+              <RecepcionDetallePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="movimientos"
+          element={
+            <AuthorizedRoute allowedRoles={adminAndSecretaria}>
+              <MovimientosPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="movimientos/:id"
+          element={
+            <AuthorizedRoute allowedRoles={adminAndSecretaria}>
+              <MovimientoDetallePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="reportes"
+          element={
+            <AuthorizedRoute allowedRoles={adminAndSecretaria}>
+              <ReportesInventarioPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="imprimir"
+          element={
+            <AuthorizedRoute allowedRoles={adminAndSecretaria}>
+              <ImprimirInventarioPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="solicitudes-materiales"
+          element={
+            <AuthorizedRoute allowedRoles={fontaneroOnly}>
+              <SolicitudesMaterialesSeguimientoPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="solicitudes-materiales/nueva"
+          element={
+            <AuthorizedRoute allowedRoles={fontaneroOnly}>
+              <SolicitudMaterialesPage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="solicitudes-materiales/:id"
+          element={
+            <AuthorizedRoute allowedRoles={fontaneroOnly}>
+              <SolicitudMaterialesDetallePage />
+            </AuthorizedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="materiales" replace />} />
+      </Routes>
+    </section>
+  )
 }

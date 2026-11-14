@@ -20,10 +20,15 @@ const NotificacionesCampana = () => {
   const { listado, loading, error, recargar, marcarLeida } =
     useNotificacionesAveria()
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [panelStyle, setPanelStyle] = useState<CSSProperties>({})
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const close = useCallback(() => setOpen(false), [])
 
@@ -202,9 +207,11 @@ const NotificacionesCampana = () => {
           </span>
         ) : null}
       </button>
-      {typeof document !== 'undefined'
-        ? createPortal(panel, document.body)
-        : panel}
+      {open
+        ? mounted
+          ? createPortal(panel, document.body)
+          : panel
+        : null}
     </div>
   )
 }

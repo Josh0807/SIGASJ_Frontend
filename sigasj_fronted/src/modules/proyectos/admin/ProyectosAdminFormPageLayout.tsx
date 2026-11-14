@@ -16,7 +16,7 @@ const ProyectosAdminFormPageLayout = ({
           <h1>Gestión de Proyectos</h1>
         </div>
         <div className="gallery-admin__header-actions">
-          <Link className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md" to="/admin/dashboard">
+          <Link className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md" to="/admin/dashboard">
             Volver inicio
           </Link>
         </div>

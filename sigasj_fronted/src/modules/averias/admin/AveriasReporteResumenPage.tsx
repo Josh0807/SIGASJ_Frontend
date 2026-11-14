@@ -89,9 +89,9 @@ const AveriasReporteResumenPage = ({
   return (
     <main className="gallery-admin averias-admin w-full min-w-0">
       <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
           <div className="space-y-3">
-            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-blue-600">Panel administrativo</p>
+            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Panel administrativo</p>
             <h1>Resumen de averías</h1>
             <p>Cantidad de averías registradas según su estado actual.</p>
           </div>
@@ -102,16 +102,16 @@ const AveriasReporteResumenPage = ({
             >
               Imprimir averías atendidas
             </Link>
-            <Link className="gallery-admin__button group !inline-flex !items-center !gap-2.5 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !no-underline !shadow-md !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-blue-50 hover:!shadow-[0_12px_26px_rgba(37,99,235,0.2)] active:!translate-y-0 active:!scale-[0.96] motion-reduce:!transform-none motion-reduce:!transition-none" to={AVERIAS_ADMIN_PATH}>
+            <Link className="gallery-admin__button group !inline-flex !items-center !gap-2.5 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_12px_26px_rgba(30, 90, 156,0.2)] active:!translate-y-0 active:!scale-[0.96] motion-reduce:!transform-none motion-reduce:!transition-none" to={AVERIAS_ADMIN_PATH}>
               <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
               Volver a gestión
             </Link>
           </div>
         </header>
 
-        <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]" aria-label="Rango del resumen">
+        <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]" aria-label="Rango del resumen">
           <div className="col-span-full border-b border-blue-100 pb-5">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Consulta del resumen</p>
+            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta del resumen</p>
             <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar por periodo</h2>
           </div>
           <p className="averias-reporte__rango">{rango}</p>
@@ -147,9 +147,9 @@ const AveriasReporteResumenPage = ({
             )}
           </div>
         ) : (
-          <section className="averias-summary-indicators rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_14px_38px_rgba(30,90,156,0.08)] md:p-8" aria-label="Indicadores del resumen" aria-busy={isLoading || undefined}>
+          <section className="averias-summary-indicators rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)] md:p-8" aria-label="Indicadores del resumen" aria-busy={isLoading || undefined}>
             <div className="mb-6 border-b border-blue-100 pb-5">
-              <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Estado general</p>
+              <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Estado general</p>
               <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Indicadores de averías</h2>
               <p className="mt-2 text-base text-slate-500">Resumen de los casos registrados para el periodo seleccionado.</p>
             </div>

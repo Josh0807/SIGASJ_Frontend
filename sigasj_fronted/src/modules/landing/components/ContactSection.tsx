@@ -60,16 +60,16 @@ const ContactSection = ({
     : undefined
 
   return (
-    <section className="sigasj-contact-section relative isolate overflow-hidden bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_58%,#e5f5ff_100%)] px-6 py-12" id={id} aria-labelledby={`${id}-title`}>
-      <div className="sigasj-contact-shell mx-auto w-full max-w-[1120px]">
-        <div className="contact-section__intro max-w-[780px]">
-          <p className="contact-section__eyebrow mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-[#1476cf] before:h-0.5 before:w-9 before:bg-[#1476cf]">Canal de atención</p>
-          <h2 id={`${id}-title`} className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-[#092e67]">{title}</h2>
-          <p className="mb-0 mt-4 text-base leading-7 text-[#526d8c]">{description}</p>
+    <section className="public-section public-section--canvas" id={id} aria-labelledby={`${id}-title`}>
+      <div className="public-container">
+        <div className="contact-section__intro max-w-[720px]">
+          <p className="contact-section__eyebrow mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-sigasj-primary">Canal de atención</p>
+          <h2 id={`${id}-title`} className="m-0 font-sigasj-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold leading-[1.15] tracking-[-0.02em] text-sigasj-text">{title}</h2>
+          <p className="mb-0 mt-4 text-base leading-[1.65] text-sigasj-muted">{description}</p>
         </div>
 
-        <div className="sigasj-contact-grid grid grid-cols-[1.08fr_0.92fr] gap-6 max-[950px]:grid-cols-1">
-          <div className="sigasj-contact-details grid grid-cols-2 gap-4 rounded-[22px] border border-sky-100 bg-white/95 p-7 shadow-[0_16px_36px_rgba(39,112,166,0.12)] max-[620px]:grid-cols-1 max-[620px]:p-4">
+        <div className="sigasj-contact-grid mt-8 grid grid-cols-[1.08fr_0.92fr] gap-5 max-[950px]:grid-cols-1">
+          <div className="sigasj-contact-details grid grid-cols-2 gap-4 rounded-[13px] border border-sigasj-border bg-sigasj-surface p-6 max-[620px]:grid-cols-1 max-[620px]:p-4">
             {phonePrimary ? (
               <div className="sigasj-contact-item">
                 <span className="contact-section__icon"><ContactIcon type="phone" /></span>
@@ -133,7 +133,7 @@ const ContactSection = ({
             ) : null}
           </div>
 
-          <div className="sigasj-contact-map rounded-[22px] border border-sky-100 bg-white/95 p-7 shadow-[0_16px_36px_rgba(39,112,166,0.12)] max-[620px]:p-4">
+          <div className="sigasj-contact-map rounded-[13px] border border-sigasj-border bg-sigasj-surface p-6 max-[620px]:p-4">
             <div className="contact-section__map-heading">
               <span className="contact-section__icon"><ContactIcon type="map" /></span>
               <div><h3>Ubicación</h3><p>Encuentra nuestra oficina en San Juan de Santa Cruz.</p></div>

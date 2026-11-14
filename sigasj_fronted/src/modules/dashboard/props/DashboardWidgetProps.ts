@@ -5,7 +5,7 @@ export type AlertItem = {
   code?: string
   title: string
   location: string
-  urgency: 'alta' | 'media' | 'baja'
+  urgency: 'alta' | 'media' | 'baja' | 'sin'
   timeAgo: string
 }
 

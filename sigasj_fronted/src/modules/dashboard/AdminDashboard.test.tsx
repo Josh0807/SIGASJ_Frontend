@@ -30,12 +30,16 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('<h1 id="admin-dashboard-title">Dashboard administrativo</h1>')
   })
 
-  it('2. Verifica el mensaje de bienvenida y el indicador de estado del sistema', () => {
+  it('2. Verifica el encabezado compacto del dashboard y el saludo', () => {
     const markup = renderDashboard()
-    expect(markup).toContain('¡Bienvenido al sistema administrativo de ASADA San Juan!')
-    expect(markup).toContain('Sistema Operativo')
-    expect(markup).toContain('¡ASADA San Juan!')
-    expect(markup).toContain('alt="Gotín"')
+    expect(markup).toContain('Panel operativo')
+    expect(markup).toContain('Resumen del estado del acueducto según su rol')
+    expect(markup).toContain('Control del día')
+    expect(markup).toContain('Refresque las cifras')
+    expect(markup).toMatch(/Buenos d[ií]as|Buenas tardes|Buenas noches/)
+    expect(markup).not.toContain('alt="Gotín"')
+    expect(markup).not.toContain('Sistema Operativo')
+    expect(markup).not.toContain('Red en línea')
   })
 
   it('3. Muestra los indicadores generales con datos numéricos y sus enlaces a módulos correspondientes', () => {
@@ -52,7 +56,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     })
 
     const markup = renderDashboard()
-    expect(markup).toContain('Indicadores generales')
+    expect(markup).toContain('Indicadores principales')
     expect(markup).toContain('Asociados activos')
     expect(markup).toContain('12')
     expect(markup).not.toContain('1,248')
@@ -74,10 +78,11 @@ describe('AdminDashboard - Pruebas Integrales', () => {
 
   it('4. Renderiza los widgets operativos en tiempo real (Averías recientes y Bitácora)', () => {
     const markup = renderDashboard()
-    expect(markup).toContain('Operaciones en tiempo real')
+    expect(markup).toContain('Operación en vivo')
+    expect(markup).toContain('Lo más reciente del acueducto')
     expect(markup).not.toContain('Ciclo de Lecturas')
-    expect(markup).toContain('Averías Recientes')
-    expect(markup).toContain('Bitácora de Actividad')
+    expect(markup).toContain('Averías recientes')
+    expect(markup).toContain('Actividad reciente')
     expect(markup).toContain('href="/admin/averias"')
     expect(markup).toMatch(/href="\/admin\/actividades(-fontanero)?"/)
   })
@@ -110,7 +115,7 @@ describe('AdminDashboard - Pruebas Integrales', () => {
     expect(markup).toContain('Reintentar')
     expect(markup).toContain('N/D')
     // El dashboard no se bloqueó y sigue mostrando el resto del contenido
-    expect(markup).toContain('Operaciones en tiempo real')
+    expect(markup).toContain('Operación en vivo')
   })
 
   it('7. Diferencia correctamente una métrica en cero (0) de un dato no disponible (null)', () => {

@@ -136,9 +136,9 @@ const ActividadesFontaneroHistorialPage = () => {
       className="actividades-fontanero-historial !mx-0 !max-w-none !gap-7"
       aria-labelledby="historial-actividades-title"
     >
-      <header className="actividades-fontanero-historial__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+      <header className="actividades-fontanero-historial__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
         <div className="min-w-0 space-y-3">
-          <p className="actividades-fontanero-historial__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-blue-600">
+          <p className="actividades-fontanero-historial__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">
             Registro de Actividades
           </p>
           <h1 id="historial-actividades-title" className="!m-0 !text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">
@@ -152,7 +152,7 @@ const ActividadesFontaneroHistorialPage = () => {
         <div className="flex shrink-0 flex-col items-stretch gap-3 lg:items-end">
           <Link
             to={ACTIVIDADES_FONTANERO_PATHS.home}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 font-bold !no-underline text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:bg-blue-50 hover:!no-underline"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-5 py-3 font-bold !no-underline text-[#1e5a9c] shadow-md transition hover:-translate-y-0.5 hover:bg-[#eaf6ff] hover:!no-underline"
           >
             <IconArrowLeft size={20} aria-hidden="true" />
             Volver al menú de actividades
@@ -170,18 +170,18 @@ const ActividadesFontaneroHistorialPage = () => {
       </header>
 
       <form
-        className="actividades-fontanero-historial__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-6 !shadow-[0_14px_38px_rgba(30,90,156,0.08)] md:!p-8"
+        className="actividades-fontanero-historial__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-6 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)] md:!p-8"
         onSubmit={handleConsultar}
         aria-label="Filtros del historial"
       >
         <div className="border-b border-blue-100 pb-5">
-          <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-blue-600">Consulta del historial</p>
+          <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta del historial</p>
           <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar por periodo</h2>
           <p className="mt-2 text-base text-slate-500">Seleccione un rango de fechas para consultar sus actividades.</p>
         </div>
         <div className="actividades-fontanero-historial__filters-row">
           <label className="actividades-fontanero-historial__field">
-            <span className="text-sm font-black uppercase tracking-[0.08em] text-blue-700">Desde</span>
+            <span className="text-sm font-black uppercase tracking-[0.08em] text-[#1e5a9c]">Desde</span>
             <input
               type="date"
               value={draft.fechaInicio}
@@ -192,12 +192,12 @@ const ActividadesFontaneroHistorialPage = () => {
                 }))
               }
               data-testid="historial-fecha-inicio"
-              className="!min-h-14 !rounded-2xl !border-blue-200 !bg-white !px-4 !shadow-sm focus:!border-blue-500 focus:!outline-none focus:!ring-4 focus:!ring-blue-100"
+              className="!min-h-14 !rounded-2xl !border-[#bfe3fa] !bg-white !px-4 !shadow-sm focus:!border-[#1e5a9c] focus:!outline-none focus:!ring-4 focus:!ring-blue-100"
             />
           </label>
 
           <label className="actividades-fontanero-historial__field">
-            <span className="text-sm font-black uppercase tracking-[0.08em] text-blue-700">Hasta</span>
+            <span className="text-sm font-black uppercase tracking-[0.08em] text-[#1e5a9c]">Hasta</span>
             <input
               type="date"
               value={draft.fechaFin}
@@ -208,7 +208,7 @@ const ActividadesFontaneroHistorialPage = () => {
                 }))
               }
               data-testid="historial-fecha-fin"
-              className="!min-h-14 !rounded-2xl !border-blue-200 !bg-white !px-4 !shadow-sm focus:!border-blue-500 focus:!outline-none focus:!ring-4 focus:!ring-blue-100"
+              className="!min-h-14 !rounded-2xl !border-[#bfe3fa] !bg-white !px-4 !shadow-sm focus:!border-[#1e5a9c] focus:!outline-none focus:!ring-4 focus:!ring-blue-100"
             />
           </label>
         </div>
@@ -220,7 +220,7 @@ const ActividadesFontaneroHistorialPage = () => {
         <div className="actividades-fontanero-historial__filters-actions">
           <button
             type="button"
-            className="actividades-fontanero-historial__secondary !order-2 !inline-flex !items-center !gap-2 !rounded-2xl !border-blue-200 !bg-white !px-6 !py-3.5 !font-bold !text-blue-700 !shadow-md transition hover:!-translate-y-0.5 hover:!bg-blue-50"
+            className="actividades-fontanero-historial__secondary !order-2 !inline-flex !items-center !gap-2 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md transition hover:!-translate-y-0.5 hover:!bg-[#eaf6ff]"
             onClick={handleLimpiar}
           >
             <IconEraser size={20} aria-hidden="true" /> Limpiar
@@ -271,11 +271,11 @@ const ActividadesFontaneroHistorialPage = () => {
 
       {isEmpty ? (
         <div
-          className="actividades-fontanero-historial__empty !rounded-[28px] !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-8 !shadow-[0_12px_32px_rgba(30,90,156,0.08)]"
+          className="actividades-fontanero-historial__empty !rounded-[28px] !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-8 !shadow-[0_12px_32px_rgba(30, 90, 156,0.08)]"
           role="status"
           data-testid="historial-lista-vacia"
         >
-          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
             <IconCalendarSearch size={28} aria-hidden="true" />
           </span>
           <p className="actividades-fontanero-historial__empty-title !text-xl !font-black !text-[#07376f]">

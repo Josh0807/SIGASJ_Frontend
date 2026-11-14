@@ -77,21 +77,21 @@ const AveriasFontaneroListPage = ({
   return (
     <main className="gallery-admin averias-admin averias-fontanero w-full min-w-0">
       <div className="gallery-admin__shell sigasj-stack !gap-8 font-sans">
-        <header className="gallery-admin__header !flex !min-h-[220px] !items-center !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]">
+        <header className="gallery-admin__header !flex !min-h-[220px] !items-center !rounded-[26px] !border-[#d7e5f1] !bg-white !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]">
           <div>
-            <p className="gallery-admin__eyebrow !mb-4 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-blue-600">Atención de campo</p>
-            <h1 className="!m-0 !text-[clamp(1.75rem,3vw,2.25rem)] !font-black !leading-tight !tracking-[-0.025em] !text-[#062e63]">{FONTANERO_AVERIAS_TITLE}</h1>
+            <p className="gallery-admin__eyebrow !mb-4 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-[#1e5a9c]">Atención de campo</p>
+            <h1 className="!m-0 !text-[clamp(1.75rem,3vw,2.25rem)] !font-black !leading-tight !tracking-[-0.025em] !text-[#1e5a9c]">{FONTANERO_AVERIAS_TITLE}</h1>
           </div>
-          <Link className="group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-blue-200 !bg-white !px-5 !font-extrabold !text-blue-700 !no-underline !shadow-[0_8px_20px_rgba(37,99,235,0.13)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-blue-50 hover:!text-blue-800 hover:!shadow-[0_14px_28px_rgba(37,99,235,0.22)] active:!translate-y-0 active:!scale-[0.97] focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-blue-600 motion-reduce:!transform-none motion-reduce:!transition-none" to={`${ADMIN_BASE_PATH}/dashboard`}>
+          <Link className="group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_8px_20px_rgba(30, 90, 156,0.13)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!text-blue-800 hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.22)] active:!translate-y-0 active:!scale-[0.97] focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-[#1e5a9c] motion-reduce:!transform-none motion-reduce:!transition-none" to={`${ADMIN_BASE_PATH}/dashboard`}>
             <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
             Volver al dashboard
           </Link>
         </header>
         <section
-          className="averias-admin__section !rounded-[26px] !border-sky-100 !bg-white !p-8 !shadow-[0_14px_38px_rgba(30,90,156,0.08)]"
+          className="averias-admin__section !rounded-[26px] !border-[#d7e5f1] !bg-white !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
           aria-labelledby="averias-fontanero-list-heading"
         >
-          <h2 className="!m-0 !border-b !border-slate-100 !pb-5 !text-xl !font-extrabold !tracking-[-0.015em] !text-[#062e63]" id="averias-fontanero-list-heading">Averías asignadas</h2>
+          <h2 className="!m-0 !border-b !border-slate-100 !pb-5 !text-xl !font-extrabold !tracking-[-0.015em] !text-[#1e5a9c]" id="averias-fontanero-list-heading">Averías asignadas</h2>
           {forbidden ? (
             <p className="gallery-admin__empty" role="alert">
               {AVERIAS_FONTANERO_DETAIL_FORBIDDEN}
@@ -112,7 +112,7 @@ const AveriasFontaneroListPage = ({
               </button>
             </div>
           ) : items.length === 0 ? (
-            <p className="gallery-admin__empty !mt-5 !min-h-[120px] !rounded-[22px] !border !border-dashed !border-blue-200 !bg-linear-to-br !from-blue-50 !to-sky-50 !text-lg !font-normal !text-slate-500 !shadow-inner" role="status">
+            <p className="gallery-admin__empty !mt-5 !min-h-[120px] !rounded-[22px] !border !border-dashed !border-[#bfe3fa] !bg-linear-to-br !from-blue-50 !to-sky-50 !text-lg !font-normal !text-slate-500 !shadow-inner" role="status">
               {AVERIAS_FONTANERO_LIST_EMPTY}
             </p>
           ) : (
@@ -164,7 +164,7 @@ const AveriasFontaneroListPage = ({
                               ) : null}
                             </ul>
                           </div>
-                          <span className="averias-fontanero__tarjeta-flecha !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3 !font-extrabold !text-white !no-underline !shadow-[0_10px_22px_rgba(37,99,235,0.24)] !transition-all !duration-300 group-hover:!-translate-y-0.5 group-hover:!from-blue-700 group-hover:!to-sky-600 group-hover:!shadow-[0_14px_28px_rgba(37,99,235,0.32)]" aria-hidden="true">
+                          <span className="averias-fontanero__tarjeta-flecha !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3 !font-extrabold !text-white !no-underline !shadow-[0_10px_22px_rgba(30, 90, 156,0.24)] !transition-all !duration-300 group-hover:!-translate-y-0.5 group-hover:!from-blue-700 group-hover:!to-sky-600 group-hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.32)]" aria-hidden="true">
                             Ver detalle
                             <IconArrowRight size={19} stroke={2.2} />
                           </span>

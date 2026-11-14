@@ -1,14 +1,15 @@
 import { IconArrowRight, IconBuildingBank, IconBuildingStore, IconClock, IconDeviceMobile, IconMapPin } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   DEFAULT_CONTACTO_UBICACION,
   getPublicContacto,
 } from '../../contacto/services/contactoApi'
 import { BANCO_NACIONAL_URL } from '../config/externalLinks'
+import Button from '../../../shared/ui/Button'
+import Card from '../../../shared/ui/Card'
+import SectionHeader from '../../../shared/ui/SectionHeader'
 
 const ReceiptPaymentSection = () => {
-  const navigate = useNavigate()
   const [sinpeTelefono, setSinpeTelefono] = useState(DEFAULT_CONTACTO_UBICACION.telefono)
 
   useEffect(() => {
@@ -28,63 +29,123 @@ const ReceiptPaymentSection = () => {
   }, [])
 
   return (
-    <section className="sigasj-receipt-section relative isolate min-h-0 overflow-hidden bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-14 max-[640px]:px-4 max-[640px]:py-10" id="pagos" aria-labelledby="receipt-payment-title">
-      <div className="pointer-events-none absolute -left-44 top-32 -z-10 h-[420px] w-[560px] rotate-[-14deg] rounded-[50%] border-[50px] border-sky-300/15" aria-hidden="true" />
-      <div className="pointer-events-none absolute -right-48 top-28 -z-10 h-[380px] w-[620px] -rotate-[18deg] rounded-[50%] bg-sky-200/25" aria-hidden="true" />
-      <div className="pointer-events-none absolute -bottom-40 left-[20%] -z-10 h-64 w-[980px] rotate-3 rounded-[50%] border-[54px] border-sky-300/15" aria-hidden="true" />
-
-      <div className="sigasj-receipt-shell mx-auto w-full max-w-[1050px]">
-        <article className="sigasj-receipt-banner relative flex min-h-[165px] items-center justify-between gap-8 overflow-hidden rounded-[18px] bg-gradient-to-r from-[#1266bd] to-[#2d93d7] px-11 py-8 text-white shadow-[0_14px_34px_rgba(18,102,189,0.22)] max-[700px]:flex-col max-[700px]:items-stretch max-[700px]:px-6">
-          <div className="relative z-10">
-            <p className="mb-2 text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-sky-100">Consulta en línea</p>
-            <h2 id="receipt-payment-title" className="m-0 text-3xl font-extrabold leading-tight text-white">Consulta tu recibo</h2>
-            <p className="mb-0 mt-3 text-sm text-sky-50">Revisa de forma rápida la información de tu recibo de agua.</p>
+    <section
+      className="public-section public-section--surface"
+      id="pagos"
+      aria-labelledby="receipt-payment-title"
+    >
+      <div className="public-container">
+        <Card className="flex flex-wrap items-center justify-between gap-6 p-6">
+          <div className="min-w-0 flex-1">
+            <SectionHeader
+              id="receipt-payment-title"
+              eyebrow="Consulta en línea"
+              title="Consulta tu recibo"
+              description="Revisa de forma rápida la información de tu recibo de agua."
+            />
           </div>
-          <div className="relative z-10 grid w-[270px] shrink-0 gap-3 text-center max-[700px]:w-full">
-            <button type="button" className="receipt-payment__button inline-flex min-h-12 cursor-pointer items-center justify-center gap-7 rounded-full border-0 bg-white px-6 text-sm font-extrabold text-[#0872d3] shadow-[0_8px_18px_rgba(4,56,112,0.2)] transition hover:-translate-y-1 hover:shadow-[0_14px_26px_rgba(4,56,112,0.3)]" onClick={() => navigate('/consulta-recibo')}>
-              Consultar recibo <IconArrowRight size={19} aria-hidden="true" />
-            </button>
-            <p id="receipt-payment-note" className="m-0 text-xs leading-5 text-sky-50">Haz clic en el botón para realizar la consulta en la plataforma de SIGASJ.</p>
-          </div>
-          <div className="pointer-events-none absolute left-[58%] top-1/2 size-36 -translate-y-1/2 rounded-full bg-white/5" aria-hidden="true" />
-        </article>
+          <Button
+            to="/consulta-recibo"
+            variant="primary"
+            rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
+            className="shrink-0 max-[640px]:w-full"
+            aria-describedby="receipt-payment-note"
+          >
+            Consultar recibo
+          </Button>
+          <p id="receipt-payment-note" className="sr-only">
+            Haz clic en el botón para realizar la consulta en la plataforma de SIGASJ.
+          </p>
+        </Card>
 
-        <div className="sigasj-payment-panel mt-8 rounded-[20px] border border-sky-100 bg-white/90 p-7 shadow-[0_14px_34px_rgba(39,112,166,0.12)] backdrop-blur-sm" aria-labelledby="payment-methods-title">
-          <p className="mb-2 text-[0.68rem] font-extrabold uppercase tracking-[0.25em] text-[#1476cf]">Opciones disponibles</p>
-          <h2 id="payment-methods-title" className="m-0 text-3xl font-extrabold leading-tight text-[#092e67]">Métodos de pago</h2>
-          <p className="mb-0 mt-2 text-sm text-[#526d8c]">Elige la alternativa que mejor se adapte a tus necesidades.</p>
+        <div className="mt-8" aria-labelledby="payment-methods-title">
+          <SectionHeader
+            id="payment-methods-title"
+            eyebrow="Opciones disponibles"
+            title="Métodos de pago"
+            description="Elige la alternativa que mejor se adapte a tus necesidades."
+          />
 
-          <div className="sigasj-payment-grid mt-5 grid grid-cols-3 gap-5 max-[900px]:grid-cols-1">
-            <article className="sigasj-payment-card flex min-h-[340px] flex-col rounded-[16px] border border-sky-100 bg-white p-5 shadow-[0_8px_20px_rgba(39,112,166,0.09)] transition hover:-translate-y-1.5 hover:shadow-[0_16px_30px_rgba(39,112,166,0.16)]">
-              <div className="grid size-12 place-items-center rounded-[14px] bg-sky-100 text-[#0872d3]"><IconDeviceMobile size={27} aria-hidden="true" /></div>
-              <h3 className="mb-0 mt-3 text-base font-extrabold text-[#093b82]">SINPE Móvil</h3>
-              <p className="mb-0 mt-1 text-sm leading-5 text-[#526d8c]">Realiza el pago de tu recibo mediante SINPE Móvil al número indicado.</p>
-              <div className="mt-3 grid gap-3">
-                <p className="m-0 rounded-xl bg-sky-50 px-4 py-3">
-                  <span className="block text-[0.62rem] font-bold uppercase text-[#607a98]">WhatsApp ASADA (SINPE)</span>
-                  <strong className="mt-1 block text-lg tracking-[0.08em] text-[#0872d3]">{sinpeTelefono}</strong>
-                </p>
-                <p className="m-0 rounded-xl border-l-2 border-amber-400 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900" role="note">Todo pago realizado por SINPE Móvil debe confirmarse enviando el comprobante al WhatsApp de la ASADA San Juan.</p>
+          <div className="mt-6 grid grid-cols-3 gap-4 max-[900px]:grid-cols-1">
+            <Card className="flex flex-col p-5">
+              <div className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
+                <IconDeviceMobile size={20} stroke={1.85} aria-hidden="true" />
               </div>
-            </article>
+              <h3 className="mb-0 mt-4 font-sigasj-display text-base font-bold text-sigasj-text">
+                SINPE Móvil
+              </h3>
+              <p className="mb-0 mt-2 text-sm leading-6 text-sigasj-muted">
+                Realiza el pago de tu recibo mediante SINPE Móvil al número indicado.
+              </p>
+              <p className="mt-4 mb-0 rounded-[10px] bg-sigasj-surface-soft px-4 py-3">
+                <span className="block text-[12px] font-semibold uppercase tracking-wide text-sigasj-muted">
+                  WhatsApp ASADA (SINPE)
+                </span>
+                <strong className="mt-1 block text-lg tracking-wide text-sigasj-primary">
+                  {sinpeTelefono}
+                </strong>
+              </p>
+              <p
+                className="mb-0 mt-3 rounded-[10px] border border-sigasj-warning/40 bg-sigasj-surface-soft px-4 py-3 text-xs leading-5 text-sigasj-warning"
+                role="note"
+              >
+                Todo pago realizado por SINPE Móvil debe confirmarse enviando el comprobante al
+                WhatsApp de la ASADA San Juan.
+              </p>
+            </Card>
 
-            <article className="sigasj-payment-card flex min-h-[340px] flex-col rounded-[16px] border border-sky-100 bg-white p-5 shadow-[0_8px_20px_rgba(39,112,166,0.09)] transition hover:-translate-y-1.5 hover:shadow-[0_16px_30px_rgba(39,112,166,0.16)]">
-              <div className="grid size-12 place-items-center rounded-[14px] bg-sky-100 text-[#0872d3]"><IconBuildingBank size={27} aria-hidden="true" /></div>
-              <h3 className="mb-0 mt-3 text-base font-extrabold text-[#093b82]">Banco Nacional</h3>
-              <p className="mb-0 mt-1 text-sm leading-5 text-[#526d8c]">Paga por medio de los canales disponibles del Banco Nacional.</p>
-              <ul className="mt-4 grid gap-2 pl-5 text-sm text-[#526d8c]"><li>Banca en línea</li><li>Aplicación móvil</li><li>Sucursales</li></ul>
-              <a className="mt-auto inline-flex min-h-11 items-center justify-center gap-5 rounded-xl border border-[#0872d3] bg-white px-5 text-sm font-extrabold text-[#0872d3] no-underline transition hover:-translate-y-1 hover:bg-[#0872d3] hover:text-white" href={BANCO_NACIONAL_URL} target="_blank" rel="noopener noreferrer" aria-label="Ir al Banco Nacional (abre una plataforma externa en una pestaña nueva)">Ir al Banco Nacional <IconArrowRight size={18} aria-hidden="true" /></a>
-            </article>
+            <Card className="flex flex-col p-5">
+              <div className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
+                <IconBuildingBank size={20} stroke={1.85} aria-hidden="true" />
+              </div>
+              <h3 className="mb-0 mt-4 font-sigasj-display text-base font-bold text-sigasj-text">
+                Banco Nacional
+              </h3>
+              <p className="mb-0 mt-2 text-sm leading-6 text-sigasj-muted">
+                Paga por medio de los canales disponibles del Banco Nacional.
+              </p>
+              <ul className="mt-4 mb-4 grid list-disc gap-1 pl-5 text-sm text-sigasj-muted">
+                <li>Banca en línea</li>
+                <li>Aplicación móvil</li>
+                <li>Sucursales</li>
+              </ul>
+              <Button
+                href={BANCO_NACIONAL_URL}
+                variant="secondary"
+                size="sm"
+                className="mt-auto"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ir al Banco Nacional (abre una plataforma externa en una pestaña nueva)"
+                rightIcon={<IconArrowRight size={16} stroke={1.9} aria-hidden="true" />}
+              >
+                Ir al Banco Nacional
+              </Button>
+            </Card>
 
-            <article className="sigasj-payment-card flex min-h-[340px] flex-col rounded-[16px] border border-sky-100 bg-white p-5 shadow-[0_8px_20px_rgba(39,112,166,0.09)] transition hover:-translate-y-1.5 hover:shadow-[0_16px_30px_rgba(39,112,166,0.16)]">
-              <div className="grid size-12 place-items-center rounded-[14px] bg-sky-100 text-[#0872d3]"><IconBuildingStore size={27} aria-hidden="true" /></div>
-              <h3 className="mb-0 mt-3 text-base font-extrabold text-[#093b82]">Ventanilla de la ASADA</h3>
-              <p className="mb-0 mt-1 text-sm leading-5 text-[#526d8c]">Visita nuestra ventanilla para realizar el pago de forma presencial.</p>
-              <dl className="mt-3 grid gap-2">
-                <div className="relative rounded-xl bg-sky-50 py-3 pl-12 pr-4"><IconClock className="absolute left-4 top-4 text-[#0872d3]" size={18} aria-hidden="true" /><dt className="text-[0.62rem] font-bold uppercase text-[#607a98]">Horario</dt><dd className="m-0 mt-1 text-xs font-bold text-[#174f88]">Lunes a sábado</dd></div>
-                <div className="relative rounded-xl bg-sky-50 py-3 pl-12 pr-4"><IconMapPin className="absolute left-4 top-4 text-[#0872d3]" size={18} aria-hidden="true" /><dt className="text-[0.62rem] font-bold uppercase text-[#607a98]">Atención</dt><dd className="m-0 mt-1 text-xs font-bold text-[#174f88]">7:30 a. m. a 11:30 a. m.</dd></div>
+            <Card className="flex flex-col p-5">
+              <div className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
+                <IconBuildingStore size={20} stroke={1.85} aria-hidden="true" />
+              </div>
+              <h3 className="mb-0 mt-4 font-sigasj-display text-base font-bold text-sigasj-text">
+                Ventanilla de la ASADA
+              </h3>
+              <p className="mb-0 mt-2 text-sm leading-6 text-sigasj-muted">
+                Visita nuestra ventanilla para realizar el pago de forma presencial.
+              </p>
+              <dl className="mt-4 grid gap-2">
+                <div className="relative rounded-[10px] bg-sigasj-surface-soft py-3 pl-12 pr-4">
+                  <IconClock className="absolute left-4 top-4 text-sigasj-primary" size={18} stroke={1.85} aria-hidden="true" />
+                  <dt className="text-[12px] font-semibold uppercase text-sigasj-muted">Horario</dt>
+                  <dd className="m-0 mt-1 text-xs font-semibold text-sigasj-text">Lunes a sábado</dd>
+                </div>
+                <div className="relative rounded-[10px] bg-sigasj-surface-soft py-3 pl-12 pr-4">
+                  <IconMapPin className="absolute left-4 top-4 text-sigasj-primary" size={18} stroke={1.85} aria-hidden="true" />
+                  <dt className="text-[12px] font-semibold uppercase text-sigasj-muted">Atención</dt>
+                  <dd className="m-0 mt-1 text-xs font-semibold text-sigasj-text">7:30 a. m. a 11:30 a. m.</dd>
+                </div>
               </dl>
-            </article>
+            </Card>
           </div>
         </div>
       </div>

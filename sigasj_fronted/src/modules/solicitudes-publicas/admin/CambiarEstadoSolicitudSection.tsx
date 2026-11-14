@@ -118,12 +118,12 @@ export default function CambiarEstadoSolicitudSection({
 
   return (
     <section
-      className="rounded-[22px] border border-sky-100 bg-white p-6 shadow-[0_10px_28px_rgba(39,112,166,0.08)] max-[640px]:p-4"
+      className="rounded-[22px] border border-[#d7e5f1] bg-white p-6 shadow-[0_10px_28px_rgba(30, 90, 156,0.08)] max-[640px]:p-4"
       aria-labelledby={`${estadoId}-title`}
     >
       <h2
         id={`${estadoId}-title`}
-        className="m-0 text-lg font-extrabold text-[#073b79]"
+        className="m-0 text-lg font-extrabold text-[#1e5a9c]"
       >
         Cambiar estado
       </h2>
@@ -136,7 +136,7 @@ export default function CambiarEstadoSolicitudSection({
       <div className="mt-5 grid gap-5 md:grid-cols-2">
         <div className="grid gap-2 md:col-span-2">
           <p className="m-0 text-sm font-bold text-slate-600">Estado actual</p>
-          <p className="m-0 text-base font-extrabold text-[#062e63]">
+          <p className="m-0 text-base font-extrabold text-[#1e5a9c]">
             {labelEstadoSolicitud(estadoActual)}
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function CambiarEstadoSolicitudSection({
           </p>
           <textarea
             id={publicaId}
-            className="min-h-28 w-full resize-y rounded-xl border border-sky-100 bg-sky-50/40 px-3 py-2 text-sm text-slate-800 disabled:opacity-60"
+            className="min-h-28 w-full resize-y rounded-xl border border-[#d7e5f1] bg-sky-50/40 px-3 py-2 text-sm text-slate-800 disabled:opacity-60"
             maxLength={MAX_TEXTO}
             value={observacionPublica}
             disabled={busy || disabled}
@@ -218,7 +218,7 @@ export default function CambiarEstadoSolicitudSection({
         </p>
       ) : null}
 
-      <div className="mt-6 flex justify-end border-t border-sky-100 pt-5 max-[520px]:block">
+      <div className="mt-6 flex justify-end border-t border-[#d7e5f1] pt-5 max-[520px]:block">
         <button
           ref={confirmBtnRef}
           type="button"

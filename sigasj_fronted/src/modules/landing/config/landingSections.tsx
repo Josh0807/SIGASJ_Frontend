@@ -6,40 +6,57 @@ export type LandingSectionDefinition = {
   Component: ComponentType
 }
 
+const InstitutionalNoticeSection = lazy(
+  () => import('../components/InstitutionalNoticeSection'),
+)
+const QuickAccessSection = lazy(() => import('../components/QuickAccessSection'))
 const AboutSection = lazy(() => import('../components/AboutSection'))
+const RequestsSection = lazy(() => import('../components/RequestsSection'))
+const ReceiptPaymentSection = lazy(
+  () => import('../components/ReceiptPaymentSection'),
+)
+const ReportFaultSection = lazy(() => import('../components/ReportFaultSection'))
+const ComplaintsSection = lazy(() => import('../components/ComplaintsSection'))
 const AnnouncementsSection = lazy(
   () => import('../../comunicados/components/AnnouncementsSection'),
 )
-const GallerySection = lazy(() => import('../../galeria/public/GallerySection'))
-const LandingContactBlock = lazy(() => import('../components/LandingContactBlock'))
-const ProjectsPreview = lazy(() => import('../components/ProjectsPreview'))
-const ReportFaultSection = lazy(() => import('../components/ReportFaultSection'))
-const ComplaintsSection = lazy(() => import('../components/ComplaintsSection'))
-const RequestsSection = lazy(() => import('../components/RequestsSection'))
 const TransparencySection = lazy(
   () => import('../../transparencia/public/TransparencySection'),
 )
+const ProjectsPreview = lazy(() => import('../components/ProjectsPreview'))
+const GallerySection = lazy(() => import('../../galeria/public/GallerySection'))
+const ContactOnlyBlock = lazy(() => import('../components/ContactOnlyBlock'))
 
+/**
+ * Orden institucional de la Landing pública (guía ASADA 2026):
+ * Aviso → Accesos → Sobre ASADA → Trámites/recibos → Comunicados →
+ * Transparencia → Proyectos → Galería → Contacto.
+ */
 export const LANDING_SECTIONS: LandingSectionDefinition[] = [
+  {
+    id: 'aviso-institucional',
+    title: 'Aviso institucional',
+    Component: InstitutionalNoticeSection,
+  },
+  {
+    id: 'accesos-rapidos',
+    title: 'Accesos rápidos',
+    Component: QuickAccessSection,
+  },
   {
     id: 'sobre-nosotros',
     title: 'Sobre nosotros',
     Component: AboutSection,
   },
   {
-    id: 'comunicados',
-    title: 'Comunicados',
-    Component: AnnouncementsSection,
-  },
-  {
-    id: 'transparencia',
-    title: 'Transparencia',
-    Component: TransparencySection,
-  },
-  {
     id: 'solicitudes-servicio',
     title: 'Solicitudes de servicio',
     Component: RequestsSection,
+  },
+  {
+    id: 'pagos',
+    title: 'Recibos y pagos',
+    Component: ReceiptPaymentSection,
   },
   {
     id: 'reporte-averias',
@@ -50,6 +67,16 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
     id: 'quejas',
     title: 'Quejas',
     Component: ComplaintsSection,
+  },
+  {
+    id: 'comunicados',
+    title: 'Comunicados',
+    Component: AnnouncementsSection,
+  },
+  {
+    id: 'transparencia',
+    title: 'Transparencia',
+    Component: TransparencySection,
   },
   {
     id: 'proyectos',
@@ -64,7 +91,7 @@ export const LANDING_SECTIONS: LandingSectionDefinition[] = [
   {
     id: 'contacto',
     title: 'Contacto',
-    Component: LandingContactBlock,
+    Component: ContactOnlyBlock,
   },
 ]
 
