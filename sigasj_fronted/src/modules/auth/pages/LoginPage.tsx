@@ -33,7 +33,7 @@ const AuthPageBrand = () => (
 )
 
 export const SESSION_EXPIRED_MESSAGE =
-  'Tu sesiÃ³n expirÃ³. Inicia sesiÃ³n nuevamente para continuar.'
+  'Tu sesión expiró. Inicia sesión nuevamente para continuar.'
 
 const LoginPage = () => {
   const navigate = useNavigate()

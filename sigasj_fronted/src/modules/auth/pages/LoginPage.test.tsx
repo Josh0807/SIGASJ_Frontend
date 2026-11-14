@@ -77,7 +77,7 @@ describe('LoginPage', () => {
     const firstView = await mountLoginPage()
     try {
       expect(firstView.container.textContent).toContain(
-        'Tu sesiÃ³n expirÃ³. Inicia sesiÃ³n nuevamente para continuar.',
+        'Tu sesión expiró. Inicia sesión nuevamente para continuar.',
       )
       expect(firstView.router.state.location.pathname).toBe(LOGIN_ROUTE_PATH)
     } finally {
@@ -86,7 +86,7 @@ describe('LoginPage', () => {
 
     const secondView = await mountLoginPage()
     try {
-      expect(secondView.container.textContent).not.toContain('Tu sesiÃ³n expirÃ³')
+      expect(secondView.container.textContent).not.toContain('Tu sesión expiró')
       expect(secondView.container.querySelector('.auth-page__form')).not.toBeNull()
     } finally {
       await secondView.cleanup()

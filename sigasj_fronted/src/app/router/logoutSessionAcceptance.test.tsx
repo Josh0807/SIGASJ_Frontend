@@ -174,7 +174,7 @@ describe('aceptacion full-stack simulada - logout y expiracion', () => {
       expect(isAuthenticated()).toBe(false)
       expect(getAuthUser()).toBeNull()
       expect(app.currentPath()).toBe('/login')
-      expect(app.container.textContent).toContain('Tu sesiÃ³n expirÃ³')
+      expect(app.container.textContent).toContain('Tu sesión expiró')
       expect(app.container.textContent).not.toContain('Usuario anterior')
       expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {
