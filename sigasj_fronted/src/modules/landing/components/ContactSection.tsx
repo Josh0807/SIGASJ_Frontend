@@ -11,7 +11,16 @@ const iconPaths: Record<ContactIconType, ReactNode> = {
 }
 
 const ContactIcon = ({ type }: ContactIconProps) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <svg
+    className="size-5 stroke-current"
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeWidth="1.9"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
     {iconPaths[type]}
   </svg>
 )
@@ -26,6 +35,28 @@ const whatsappHref = (phone: string) => {
 
 const gmailComposeHref = (email: string) =>
   `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`
+
+const ContactRow = ({
+  icon,
+  label,
+  children,
+}: {
+  icon: ContactIconType
+  label: string
+  children: ReactNode
+}) => (
+  <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-start gap-4 py-5 first:pt-0 last:pb-0">
+    <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
+      <ContactIcon type={icon} />
+    </span>
+    <div className="min-w-0">
+      <p className="m-0 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-sigasj-muted">
+        {label}
+      </p>
+      <div className="mt-1.5 text-[0.98rem] leading-6 text-sigasj-text">{children}</div>
+    </div>
+  </div>
+)
 
 const ContactSection = ({
   id = 'contacto',
@@ -59,120 +90,135 @@ const ContactSection = ({
     ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=k&z=${mapZoom}&output=embed`
     : undefined
 
-  return (
-    <section className="public-section public-section--canvas" id={id} aria-labelledby={`${id}-title`}>
-      <div className="public-container">
-        <div className="contact-section__intro max-w-[720px]">
-          <p className="contact-section__eyebrow mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-sigasj-primary">Canal de atención</p>
-          <h2 id={`${id}-title`} className="m-0 font-sigasj-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold leading-[1.15] tracking-[-0.02em] text-sigasj-text">{title}</h2>
-          <p className="mb-0 mt-4 text-base leading-[1.65] text-sigasj-muted">{description}</p>
-        </div>
+  const linkClass =
+    'font-semibold text-sigasj-primary no-underline transition-colors hover:text-sigasj-primary-hover'
 
-        <div className="sigasj-contact-grid mt-8 grid grid-cols-[1.08fr_0.92fr] gap-5 max-[950px]:grid-cols-1">
-          <div className="sigasj-contact-details grid grid-cols-2 gap-4 rounded-[13px] border border-sigasj-border bg-sigasj-surface p-6 max-[620px]:grid-cols-1 max-[620px]:p-4">
+  return (
+    <section
+      className="public-section bg-white"
+      id={id}
+      aria-labelledby={`${id}-title`}
+    >
+      <div className="public-container">
+        <header className="mx-auto flex w-full max-w-[40rem] flex-col items-center text-center">
+          <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">
+            Canal de atención
+          </p>
+          <h2 id={`${id}-title`} className="public-section-title w-full text-center">
+            {title}
+          </h2>
+          <p className="mb-0 mt-4 w-full max-w-[32rem] text-pretty text-center text-base leading-[1.65] text-sigasj-muted">
+            {description}
+          </p>
+        </header>
+
+        <div className="mt-12 grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] items-stretch gap-10 max-[960px]:grid-cols-1 max-[960px]:gap-8">
+          <div className="flex min-w-0 flex-col justify-center divide-y divide-sigasj-border">
             {phonePrimary ? (
-              <div className="sigasj-contact-item">
-                <span className="contact-section__icon"><ContactIcon type="phone" /></span>
-                <div className="contact-section__item-content">
-                  <h3>Teléfono principal:</h3>
-                  <a
-                    className="contact-section__link"
-                    href={whatsappHref(phonePrimary)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Contactar por WhatsApp al ${phonePrimary}`}
-                  >
-                    {phonePrimary}
-                  </a>
-                </div>
-              </div>
+              <ContactRow icon="phone" label="Teléfono principal">
+                <a
+                  className={linkClass}
+                  href={whatsappHref(phonePrimary)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Contactar por WhatsApp al ${phonePrimary}`}
+                >
+                  {phonePrimary}
+                </a>
+              </ContactRow>
             ) : null}
 
             {phoneNumbers?.length ? (
-              <div className="sigasj-contact-item">
-                <span className="contact-section__icon"><ContactIcon type="phone" /></span>
-                <div className="contact-section__item-content">
-                  <h3>Teléfonos adicionales</h3>
-                  <ul className="contact-section__list">
-                    {phoneNumbers.map((phone) => <li key={phone}><a className="contact-section__link" href={phoneHref(phone)}>{phone}</a></li>)}
-                  </ul>
-                </div>
-              </div>
+              <ContactRow icon="phone" label="Teléfonos adicionales">
+                <ul className="m-0 list-none space-y-1 p-0">
+                  {phoneNumbers.map((phone) => (
+                    <li key={phone}>
+                      <a className={linkClass} href={phoneHref(phone)}>
+                        {phone}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </ContactRow>
             ) : null}
 
             {email ? (
-              <div className="sigasj-contact-item">
-                <span className="contact-section__icon"><ContactIcon type="mail" /></span>
-                <div className="contact-section__item-content">
-                  <h3>Correo electrónico:</h3>
-                  <a
-                    className="contact-section__link"
-                    href={gmailComposeHref(email)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Enviar un correo a ${email}`}
-                  >
-                    {email}
-                  </a>
-                </div>
-              </div>
+              <ContactRow icon="mail" label="Correo electrónico">
+                <a
+                  className={`${linkClass} break-all`}
+                  href={gmailComposeHref(email)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Enviar un correo a ${email}`}
+                >
+                  {email}
+                </a>
+              </ContactRow>
             ) : null}
 
             {attentionHours ? (
-              <div className="sigasj-contact-item">
-                <span className="contact-section__icon"><ContactIcon type="clock" /></span>
-                <div className="contact-section__item-content"><h3>Horario de atención:</h3><p>{attentionHours}</p></div>
-              </div>
+              <ContactRow icon="clock" label="Horario de atención">
+                <p className="m-0 text-sigasj-text">{attentionHours}</p>
+              </ContactRow>
             ) : null}
 
             {address ? (
-              <div className="sigasj-contact-item">
-                <span className="contact-section__icon"><ContactIcon type="location" /></span>
-                <div className="contact-section__item-content"><h3>Dirección física:</h3><address>{address}</address></div>
-              </div>
+              <ContactRow icon="location" label="Dirección física">
+                <address className="m-0 not-italic text-sigasj-text">{address}</address>
+              </ContactRow>
+            ) : null}
+
+            {locationReference ? (
+              <p className="mb-0 mt-4 text-sm text-sigasj-muted">
+                Referencia: {locationReference}
+              </p>
             ) : null}
           </div>
 
-          <div className="sigasj-contact-map rounded-[13px] border border-sigasj-border bg-sigasj-surface p-6 max-[620px]:p-4">
-            <div className="contact-section__map-heading">
-              <span className="contact-section__icon"><ContactIcon type="map" /></span>
-              <div><h3>Ubicación</h3><p>Encuentra nuestra oficina en San Juan de Santa Cruz.</p></div>
+          <div className="flex min-w-0 flex-col">
+            <div className="relative min-h-[280px] flex-1 overflow-hidden rounded-[13px] bg-sigasj-surface-soft max-[960px]:min-h-[260px]">
+              {(showMapEmbed && embeddedMap) || mapEmbedUrl ? (
+                <>
+                  {showMapEmbed && embeddedMap ? (
+                    embeddedMap
+                  ) : (
+                    <iframe
+                      className="absolute inset-0 h-full w-full border-0"
+                      src={mapEmbedUrl}
+                      title="Mapa de la oficina de ASADA San Juan de Santa Cruz"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  )}
+                  {resolvedMapUrl ? (
+                    <a
+                      className="absolute inset-0 z-10"
+                      href={resolvedMapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Abrir esta ubicación en Google Maps"
+                    />
+                  ) : null}
+                </>
+              ) : (
+                <div className="grid h-full min-h-[280px] place-items-center gap-3 px-6 text-center text-sigasj-muted">
+                  <ContactIcon type="location" />
+                  <span>Consulta la ubicación exacta en Google Maps.</span>
+                </div>
+              )}
             </div>
 
-            {(showMapEmbed && embeddedMap) || mapEmbedUrl ? (
-              <div className="contact-section__map-embed sigasj-contact-map-frame">
-                {showMapEmbed && embeddedMap ? embeddedMap : (
-                  <iframe
-                    src={mapEmbedUrl}
-                    title="Mapa de la oficina de ASADA San Juan de Santa Cruz"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                )}
-                {resolvedMapUrl ? (
-                  <a
-                    className="contact-section__map-overlay"
-                    href={resolvedMapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Abrir esta ubicación en Google Maps"
-                  />
-                ) : null}
-              </div>
-            ) : (
-              <div className="contact-section__map-placeholder">
-                <ContactIcon type="location" />
-                <span>Consulta la ubicación exacta en Google Maps.</span>
-              </div>
-            )}
-
             {resolvedMapUrl ? (
-              <a className="sigasj-contact-map-link" href={resolvedMapUrl} target="_blank" rel="noopener noreferrer">
-                Ver ubicación <span aria-hidden="true">&#8599;</span>
+              <a
+                className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-sigasj-primary px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-sigasj-primary-hover"
+                href={resolvedMapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ver ubicación
+                <span aria-hidden="true">↗</span>
               </a>
             ) : null}
-
-            {locationReference ? <p className="contact-section__reference">Referencia: {locationReference}</p> : null}
           </div>
         </div>
       </div>

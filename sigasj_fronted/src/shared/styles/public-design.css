@@ -86,6 +86,18 @@ h3,
   padding-block: var(--space-8);
 }
 
+/* Título de sección landing: mismo tamaño/color/tipo en todo el landing. */
+.public-section-title {
+  margin: 0;
+  color: var(--color-text, #1a2f42);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
 @media (max-width: 640px) {
   .public-section {
     padding-block: var(--space-7);
@@ -103,6 +115,38 @@ h3,
 
 .public-section--canvas {
   background: var(--color-background);
+}
+
+/* Landing: fondo blanco continuo (sin bandas ice/mist). */
+body.landing-page-white {
+  --color-background: #ffffff;
+  background: #ffffff;
+}
+
+body.landing-page-white .public-section--soft,
+body.landing-page-white .public-section--canvas {
+  background: #ffffff;
+}
+
+body.landing-page-white .public-hero__scrim {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 18, 28, 0.34) 0%,
+      transparent 22%
+    ),
+    radial-gradient(
+      ellipse 78% 62% at 50% 58%,
+      rgba(4, 18, 28, 0.52) 0%,
+      rgba(4, 18, 28, 0.22) 46%,
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 88%,
+      #ffffff 100%
+    );
 }
 
 /* Hero público: foto full-bleed; copia centrada. */
@@ -167,7 +211,7 @@ h3,
 }
 
 .public-hero__copy {
-  width: min(100%, 42rem);
+  width: min(100%, 46rem);
   margin-inline: auto;
   padding: 1.25rem 1rem;
   text-align: center;
@@ -177,24 +221,28 @@ h3,
 }
 
 .public-hero__eyebrow {
-  margin: 0 0 0.85rem;
+  display: inline-block;
+  margin: 0 auto 0.85rem;
   color: #fff;
   font-size: 0.8125rem;
   font-weight: 650;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
+  margin-inline-end: -0.12em;
   text-transform: uppercase;
+  text-align: center;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
 }
 
 .public-hero__title {
   margin: 0 auto;
-  max-width: 18ch;
+  max-width: 22ch;
   color: #fff;
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 4.6vw, 3.5rem);
   font-weight: 800;
   line-height: 1.08;
   letter-spacing: -0.03em;
+  text-align: center;
   text-wrap: balance;
   text-shadow: 0 2px 22px rgba(0, 0, 0, 0.55);
 }
@@ -205,6 +253,7 @@ h3,
   color: rgba(255, 255, 255, 0.94);
   font-size: 1.02rem;
   line-height: 1.65;
+  text-align: center;
   text-wrap: pretty;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.5);
 }
@@ -714,6 +763,186 @@ h3,
 
   .public-assistant__chips {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Visor de comunicados: imagen full-bleed + caption centrada. */
+.announcement-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3.5vw, 32px);
+  background: rgba(8, 28, 48, 0.62);
+  backdrop-filter: blur(8px);
+}
+
+.announcement-lightbox__dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 760px);
+  max-height: min(90vh, 880px);
+  overflow: hidden auto;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 28px 70px rgba(8, 34, 64, 0.32);
+}
+
+.announcement-lightbox__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--asada-ink, #123f70);
+  box-shadow: 0 6px 18px rgba(8, 34, 64, 0.18);
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.announcement-lightbox__close:hover {
+  background: #fff;
+  transform: scale(1.04);
+}
+
+.announcement-lightbox__close:focus-visible {
+  outline: 2px solid var(--asada-navy, #1e5a9c);
+  outline-offset: 2px;
+}
+
+.announcement-lightbox__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: min(52vh, 480px);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--asada-ice, #eaf6ff) 70%, #d7e5f1);
+}
+
+.announcement-lightbox__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.announcement-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--asada-navy, #1e5a9c);
+  box-shadow: 0 8px 20px rgba(8, 34, 64, 0.22);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.announcement-lightbox__nav:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.announcement-lightbox__nav:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.announcement-lightbox__nav--prev {
+  left: 12px;
+}
+
+.announcement-lightbox__nav--next {
+  right: 12px;
+}
+
+.announcement-lightbox__counter {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  z-index: 2;
+  margin: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(8, 28, 48, 0.72);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transform: translateX(-50%);
+}
+
+.announcement-lightbox__caption {
+  flex: 0 0 auto;
+  padding: 1.25rem 1.5rem 1.45rem;
+  text-align: center;
+  background: #fff;
+}
+
+.announcement-lightbox__title {
+  margin: 0;
+  color: var(--asada-text, #1a2f42);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.announcement-lightbox__text {
+  margin: 0.65rem auto 0;
+  max-width: 38rem;
+  color: var(--asada-muted, #5b7390);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+@media (max-width: 640px) {
+  .announcement-lightbox {
+    padding: 12px;
+  }
+
+  .announcement-lightbox__dialog {
+    max-height: min(92vh, 820px);
+  }
+
+  .announcement-lightbox__media {
+    aspect-ratio: 4 / 3;
+    max-height: min(42vh, 340px);
+  }
+
+  .announcement-lightbox__caption {
+    padding: 1.1rem 1.1rem 1.25rem;
+  }
+
+  .announcement-lightbox__nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .announcement-lightbox__nav--prev {
+    left: 8px;
+  }
+
+  .announcement-lightbox__nav--next {
+    right: 8px;
   }
 }
 

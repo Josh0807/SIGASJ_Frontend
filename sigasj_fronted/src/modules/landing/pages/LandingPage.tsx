@@ -46,6 +46,13 @@ const LandingPage = () => {
   }, [])
 
   useEffect(() => {
+    document.body.classList.add('landing-page-white')
+    return () => {
+      document.body.classList.remove('landing-page-white')
+    }
+  }, [])
+
+  useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     AOS.init({
       duration: 700,
@@ -66,9 +73,9 @@ const LandingPage = () => {
   }, [])
 
   return (
-    <>
+    <div className="landing-page min-h-svh bg-white">
       <Header />
-      <main className="w-full min-w-0 overflow-x-clip">
+      <main className="w-full min-w-0 overflow-x-clip bg-white">
         <HeroSection />
 
         {LANDING_SECTIONS.map(({ id, Component }, index) => (
@@ -85,7 +92,7 @@ const LandingPage = () => {
       </main>
       <Footer />
       <PublicAssistantBot />
-    </>
+    </div>
   )
 }
 

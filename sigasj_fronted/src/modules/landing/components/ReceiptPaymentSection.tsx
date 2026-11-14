@@ -39,6 +39,7 @@ const ReceiptPaymentSection = () => {
           <div className="min-w-0 flex-1">
             <SectionHeader
               id="receipt-payment-title"
+              align="start"
               eyebrow="Consulta en línea"
               title="Consulta tu recibo"
               description="Revisa de forma rápida la información de tu recibo de agua."

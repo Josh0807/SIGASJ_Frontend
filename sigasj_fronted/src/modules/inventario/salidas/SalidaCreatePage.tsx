@@ -86,8 +86,8 @@ export default function SalidaCreatePage() {
   const displayedStock =
     availability?.kind === 'valid' &&
     availability.data.idMaterial === selectedMaterial?.id
-      ? availability.data.stockActual
-      : selectedMaterial?.stockActual
+    ? availability.data.stockActual
+    : selectedMaterial?.stockActual
 
   useEffect(() => {
     const materialId = Number(values.materialId)
@@ -515,7 +515,7 @@ export default function SalidaCreatePage() {
             Volver al catálogo
           </Button>
         </div>
-      </form>
-    </main>
+    </form>
+  </main>
   )
 }

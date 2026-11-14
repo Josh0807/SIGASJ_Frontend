@@ -20,6 +20,7 @@ const ComplaintsSection = () => (
         <div className="min-w-0 flex-1">
           <SectionHeader
             id="quejas-title"
+            align="start"
             eyebrow="Atención al usuario"
             title="Sugerencias y quejas"
             description="Envíanos tus sugerencias y quejas completando el formulario para brindarte la atención correspondiente."

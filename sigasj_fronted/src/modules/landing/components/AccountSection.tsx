@@ -22,6 +22,7 @@ const AccountSection = ({ formHref = REPORTAR_AVERIA_ROUTE_PATH }: AccountSectio
         <div className="min-w-0 flex-1">
           <SectionHeader
             id="reporte-averias-title"
+            align="start"
             eyebrow="Atención de averías"
             title="Reportar una avería"
             description="Infórmanos sobre fugas, daños u otras averías en el servicio de agua para que podamos atenderlas oportunamente."

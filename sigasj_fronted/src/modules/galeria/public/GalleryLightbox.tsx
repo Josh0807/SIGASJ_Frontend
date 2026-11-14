@@ -75,9 +75,15 @@ const GalleryLightbox = ({ photos, activeIndex, onClose, onNavigate }: GalleryLi
   }
 
   useEffect(() => {
-    closeRef.current?.focus()
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth
     const previousOverflow = document.body.style.overflow
+    const previousPadding = document.body.style.paddingRight
+
     document.body.style.overflow = 'hidden'
+    if (scrollbar > 0) {
+      document.body.style.paddingRight = `${scrollbar}px`
+    }
+    closeRef.current?.focus({ preventScroll: true })
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -91,6 +97,7 @@ const GalleryLightbox = ({ photos, activeIndex, onClose, onNavigate }: GalleryLi
     window.addEventListener('keydown', onKeyDown)
     return () => {
       document.body.style.overflow = previousOverflow
+      document.body.style.paddingRight = previousPadding
       window.removeEventListener('keydown', onKeyDown)
     }
   }, [activeIndex, changePhoto, hasNext, hasPrev, onClose, resetZoom, zoomIn, zoomOut])

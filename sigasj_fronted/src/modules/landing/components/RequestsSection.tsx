@@ -107,10 +107,10 @@ const RequestsSection = ({
   return (
   <section className="public-section public-section--canvas" id={id} aria-labelledby={`${id}-title`}>
     <div className="public-container">
-      <header className="max-w-[720px]">
-        <p className="mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-sigasj-primary">Trámites en línea</p>
-        <h2 id={`${id}-title`} className="m-0 font-sigasj-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold leading-[1.15] tracking-[-0.02em] text-sigasj-text">{title}</h2>
-        <p className="mb-0 mt-4 text-base leading-[1.65] text-sigasj-muted">{description}</p>
+      <header className="mx-auto max-w-[720px] text-center">
+        <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">Trámites en línea</p>
+        <h2 id={`${id}-title`} className="public-section-title">{title}</h2>
+        <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-[1.65] text-sigasj-muted">{description}</p>
       </header>
 
       {downloadError ? <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{downloadError}</p> : null}

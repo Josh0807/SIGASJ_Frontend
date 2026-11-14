@@ -1,10 +1,10 @@
-﻿import AnnouncementsCarousel from './AnnouncementsCarousel'
+import AnnouncementsCarousel from './AnnouncementsCarousel'
+import AnnouncementLightbox from './AnnouncementLightbox'
 import { AlertIcon, EmptyInboxIcon } from './announcementIcons'
 import type { AnnouncementsSectionProps } from '../types/AnnouncementsSectionProps'
 import { ANNOUNCEMENTS_SECTION_ID } from '../../landing/config/landingAnchors'
 import { usePublicAnnouncements } from '../hooks/usePublicAnnouncements'
 import { useState } from 'react'
-import GalleryLightbox from '../../galeria/public/GalleryLightbox'
 
 const AnnouncementsSkeleton = () => (
   <div className="mt-8" aria-hidden="true">
@@ -55,19 +55,16 @@ const AnnouncementsSection = ({
 
   return (
     <section
-      className="relative isolate min-h-0 overflow-hidden bg-gradient-to-br from-sigasj-canvas via-sigasj-surface-soft to-sigasj-mist/40 px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
+      className="relative isolate min-h-0 overflow-hidden bg-white px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
       id={id}
       aria-labelledby={titleId}
     >
-      <div className="pointer-events-none absolute -left-48 top-20 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sigasj-mist/35" aria-hidden="true" />
-      <div className="pointer-events-none absolute -right-44 top-16 -z-10 h-52 w-[520px] -rotate-[18deg] rounded-[50%] border-[44px] border-sigasj-sky/25" aria-hidden="true" />
-
       <div className="mx-auto w-full max-w-[1180px]">
-        <header className="max-w-[760px]">
-          <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-sigasj-primary before:h-0.5 before:w-9 before:bg-sigasj-primary">Información oficial</p>
+        <header className="mx-auto max-w-[760px] text-center">
+          <p className="mb-2 inline-block text-xs font-extrabold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">Información oficial</p>
 
-          <h2 id={titleId} className="m-0 text-[clamp(2.2rem,4vw,3rem)] font-extrabold leading-none tracking-[-0.04em] text-sigasj-ink">{title}</h2>
-          <p className="mb-0 mt-4 max-w-[720px] text-base leading-7 text-sigasj-muted">{description}</p>
+          <h2 id={titleId} className="public-section-title">{title}</h2>
+          <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-7 text-sigasj-muted">{description}</p>
         </header>
 
         {showLoading ? (
@@ -104,7 +101,14 @@ const AnnouncementsSection = ({
           </div>
         )}
       </div>
-      {imageIndex !== null && imageIndex >= 0 ? <GalleryLightbox photos={announcementImages} activeIndex={imageIndex} onClose={() => setImageIndex(null)} onNavigate={setImageIndex} /> : null}
+      {imageIndex !== null && imageIndex >= 0 ? (
+        <AnnouncementLightbox
+          items={announcementImages}
+          activeIndex={imageIndex}
+          onClose={() => setImageIndex(null)}
+          onNavigate={setImageIndex}
+        />
+      ) : null}
     </section>
   )
 }

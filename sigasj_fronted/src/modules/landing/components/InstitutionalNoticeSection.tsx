@@ -34,7 +34,7 @@ const InstitutionalNoticeSection = () => {
   return (
     <section
       id="aviso-institucional"
-      className="border-y border-sigasj-border bg-sigasj-surface-soft"
+      className="border-y border-sigasj-border bg-white"
       aria-labelledby="aviso-institucional-title"
     >
       <div className="public-container flex flex-wrap items-start gap-4 py-4 max-[640px]:gap-3">

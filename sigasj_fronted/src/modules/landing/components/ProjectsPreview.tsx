@@ -119,18 +119,16 @@ const ProjectsPreview = ({
       aria-labelledby={`${id}-title`}
     >
       <div className="public-container">
-        <header className="flex items-end justify-between gap-8 max-[760px]:items-start">
-          <div className="max-w-[720px] text-left">
-            <p className="mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-sigasj-primary">Proyectos</p>
-            <h2 id={`${id}-title`} className="m-0 font-sigasj-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold leading-[1.15] tracking-[-0.02em] text-sigasj-text">{title}</h2>
-            <p className="mb-0 mt-4 max-w-[720px] text-base leading-[1.65] text-sigasj-muted">
-              Conozca las obras en ejecución, proyectos futuros y mejoras en la infraestructura
-              hídrica de la ASADA San Juan de Santa Cruz.
-            </p>
-          </div>
+        <header className="relative mx-auto max-w-[720px] text-center">
+          <p className="mb-2 inline-block text-[13px] font-semibold uppercase tracking-[0.12em] text-sigasj-primary [margin-inline-end:-0.12em]">Proyectos</p>
+          <h2 id={`${id}-title`} className="public-section-title">{title}</h2>
+          <p className="mx-auto mb-0 mt-4 max-w-[36rem] text-pretty text-base leading-[1.65] text-sigasj-muted">
+            Conozca las obras en ejecución, proyectos futuros y mejoras en la infraestructura
+            hídrica de la ASADA San Juan de Santa Cruz.
+          </p>
 
           {proyectos.length > slidesPerView ? (
-            <div className="projects-preview__controls">
+            <div className="projects-preview__controls mt-4 flex justify-center">
               <span className="projects-preview__page-indicator" aria-live="polite">
                 {effectiveIndex + 1} / {maxIndex + 1}
               </span>

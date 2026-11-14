@@ -88,7 +88,7 @@ const AnnouncementCard = ({
           {safeTitle}
         </h3>
 
-        {bodyText && !safeImageUrl ? (
+        {bodyText ? (
           <p className="mb-0 mt-3 line-clamp-3 text-sm leading-6 text-sigasj-muted">{bodyText}</p>
         ) : null}
 

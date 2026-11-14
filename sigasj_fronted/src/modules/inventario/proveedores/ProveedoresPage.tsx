@@ -253,7 +253,7 @@ export default function ProveedoresPage() {
           </button>
         </nav>
       ) : null}
-    </main>
+  </main>
   )
 }
 

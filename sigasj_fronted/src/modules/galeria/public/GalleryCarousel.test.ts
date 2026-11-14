@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 
 const component = readFileSync('src/modules/galeria/public/GallerySection.tsx', 'utf8')
+const card = readFileSync('src/modules/galeria/public/GalleryCard.tsx', 'utf8')
 const css = readFileSync('src/index.css', 'utf8')
 
 describe('carrusel responsive de galería', () => {
@@ -15,18 +16,24 @@ describe('carrusel responsive de galería', () => {
     expect(component).toContain('tabIndex={canMove ? 0 : -1}')
   })
 
-  it('mantiene las fotografías en una fila desplazable', () => {
+  it('prioriza la fotografía sin chrome de tarjeta', () => {
+    expect(card).not.toContain('IconPhoto')
+    expect(card).not.toContain('IconDots')
+    expect(card).toContain('aspect-[4/3]')
+    expect(css).toContain('.gallery-section__card {')
+    expect(css).toContain('box-shadow: none;')
+    expect(css).toContain('background: transparent;')
+  })
+
+  it('mantiene pista desplazable y hint en CSS legacy', () => {
     expect(css).toContain('.gallery-section__grid {')
     expect(css).toContain('display: flex;')
     expect(css).toContain('overflow-x: auto;')
     expect(css).toContain('scroll-snap-type: x mandatory;')
     expect(css).toContain('scrollbar-width: none;')
     expect(css).toContain('.gallery-section__grid::-webkit-scrollbar')
-  })
-
-  it('adapta las tarjetas para tableta y celular', () => {
     expect(css).toContain('flex-basis: calc((100% - 22px) / 2);')
     expect(css).toContain('flex-basis: min(86%, 22rem);')
-    expect(css).toContain('.gallery-section__swipe-hint')
+    expect(component).toContain('gallery-section__swipe-hint')
   })
 })
