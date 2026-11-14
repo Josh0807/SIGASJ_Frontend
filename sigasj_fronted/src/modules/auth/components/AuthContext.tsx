@@ -2,17 +2,22 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useState,
   useSyncExternalStore,
   type ReactNode,
 } from 'react'
 import type { AuthUser } from '../types/authUser'
+import { fetchCurrentUser } from '../services/authApi'
+import { normalizeInternalRole } from '../utils/internalRoles'
 import {
-  clearAccessToken,
+  clearAuthSession,
   getAccessToken,
   getAuthUser,
   isAuthenticated,
   setAuthSession,
+  setAuthUser,
   subscribeAuthUser,
 } from '../utils/authStorage'
 
@@ -24,6 +29,8 @@ export type AuthSession = {
 type AuthContextValue = {
   user: AuthUser | null
   isAuthenticated: boolean
+  /** True mientras se valida la sesión local contra /auth/me. */
+  isLoading: boolean
   login: (session: AuthSession) => void
   logout: () => void
 }
@@ -69,29 +76,81 @@ const subscribeToAuth = (onStoreChange: () => void) =>
     onStoreChange()
   })
 
+const mapMeToAuthUser = (me: {
+  id: string | number
+  email: string
+  role: string
+  name?: string
+}): AuthUser => {
+  const rawRole = typeof me.role === 'string' ? me.role.trim() : ''
+  const normalizedRole = normalizeInternalRole(rawRole)
+
+  return {
+    id: String(me.id).trim(),
+    email: typeof me.email === 'string' ? me.email.trim() : undefined,
+    role: normalizedRole ?? rawRole,
+    name:
+      typeof me.name === 'string' && me.name.trim() ? me.name.trim() : 'Usuario',
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const snapshot = useSyncExternalStore(
     subscribeToAuth,
     getAuthSnapshot,
     getAuthSnapshot,
   )
+  const [isLoading, setIsLoading] = useState(() =>
+    Boolean(getAccessToken()?.trim()),
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    const token = getAccessToken()?.trim()
+    if (!token) {
+      setIsLoading(false)
+      return
+    }
+
+    void (async () => {
+      try {
+        const me = await fetchCurrentUser()
+        if (cancelled) return
+        setAuthUser(mapMeToAuthUser(me))
+      } catch (error) {
+        if (cancelled) return
+        const isUnauthorized =
+          error instanceof Error && /^HTTP 401:/.test(error.message)
+        clearAuthSession(isUnauthorized ? 'expired' : undefined)
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const login = useCallback((session: AuthSession) => {
     setAuthSession(session)
+    setIsLoading(false)
   }, [])
 
   const logout = useCallback(() => {
-    clearAccessToken()
+    clearAuthSession()
+    setIsLoading(false)
   }, [])
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user: snapshot.user,
       isAuthenticated: snapshot.authenticated,
+      isLoading,
       login,
       logout,
     }),
-    [login, logout, snapshot.authenticated, snapshot.user],
+    [isLoading, login, logout, snapshot.authenticated, snapshot.user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

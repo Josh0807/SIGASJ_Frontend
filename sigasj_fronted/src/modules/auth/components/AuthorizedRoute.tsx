@@ -20,7 +20,14 @@ const AuthorizedRoute = ({
   allowedRoles,
 }: AuthorizedRouteProps) => {
   const location = useLocation()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, isLoading, user } = useAuth()
+
+  // La ruta privada exterior suele cubrir este estado, pero mantenerlo aquÃ­
+  // hace que el guard tambiÃ©n sea seguro y reutilizable por sÃ­ solo.
+  if (isLoading) {
+    return null
+  }
+
   const path = requiredPath ?? location.pathname
   const decision = evaluateDirectRouteAccess(
     isAuthenticated,

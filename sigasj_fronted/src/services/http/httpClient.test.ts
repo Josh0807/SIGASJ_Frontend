@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { clearAccessToken, setAccessToken } from '../../modules/auth/utils/authStorage'
+import {
+  clearAccessToken,
+  consumeAuthSessionEndReason,
+  getAccessToken,
+  getAuthUser,
+  setAuthSession,
+  setAccessToken,
+} from '../../modules/auth/utils/authStorage'
 import { fetchWithAuth } from './httpClient'
 
 describe('httpClient (fetchWithAuth)', () => {
@@ -52,6 +59,50 @@ describe('httpClient (fetchWithAuth)', () => {
     await expect(fetchWithAuth('/error-endpoint')).rejects.toThrow(
       'HTTP 500: Internal Server Error',
     )
+  })
+
+  it('un 401 autenticado limpia la sesiÃ³n y registra expiraciÃ³n una sola vez', async () => {
+    setAuthSession({
+      accessToken: 'token-vencido',
+      user: { id: '1', role: 'Administradora' },
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: async () => '',
+      }),
+    )
+
+    await expect(fetchWithAuth('/privado')).rejects.toThrow(/HTTP 401/)
+
+    expect(getAccessToken()).toBeNull()
+    expect(getAuthUser()).toBeNull()
+    expect(consumeAuthSessionEndReason()).toBe('expired')
+    expect(consumeAuthSessionEndReason()).toBeNull()
+  })
+
+  it('un 403 no cierra una sesiÃ³n autenticada', async () => {
+    setAuthSession({
+      accessToken: 'token-vigente',
+      user: { id: '1', role: 'Administradora' },
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+        text: async () => '',
+      }),
+    )
+
+    await expect(fetchWithAuth('/restringido')).rejects.toThrow(/HTTP 403/)
+    expect(getAccessToken()).toBe('token-vigente')
+    expect(getAuthUser()?.role).toBe('Administradora')
+    expect(consumeAuthSessionEndReason()).toBeNull()
   })
 
   it('en desarrollo usa el proxy same-origin /api/v1', async () => {

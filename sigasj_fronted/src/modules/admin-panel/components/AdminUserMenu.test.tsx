@@ -76,7 +76,7 @@ describe('AdminUserMenu', () => {
   it('no implementa un logout propio: delega en useAdminLogout', () => {
     const source = AdminUserMenu.toString()
 
-    expect(source).toContain('useAdminLogout')
+    expect(source).toContain('useLogout')
     expect(source).not.toContain('clearAccessToken')
     expect(source).not.toContain('localStorage')
   })

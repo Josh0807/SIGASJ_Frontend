@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { AUTH_LOGIN_ENDPOINT, loginWithCredentials } from './authApi'
+import {
+  AUTH_LOGIN_ENDPOINT,
+  AUTH_ME_ENDPOINT,
+  fetchCurrentUser,
+  loginWithCredentials,
+} from './authApi'
 
 describe('authApi.loginWithCredentials', () => {
   afterEach(() => {
@@ -38,5 +43,38 @@ describe('authApi.loginWithCredentials', () => {
     })
     expect(String(options.body)).not.toContain('role')
     expect(String(options.body)).not.toContain('passwordHash')
+  })
+})
+
+describe('authApi.fetchCurrentUser', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('consulta GET /auth/me con Authorization Bearer', async () => {
+    localStorage.setItem('sigasj_access_token', 'jwt-sesion')
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        id: 3,
+        email: 'fontanero@asadasanjuan.cr',
+        role: 'FONTANERO',
+        name: 'Fontanero',
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const me = await fetchCurrentUser()
+
+    expect(me.role).toBe('FONTANERO')
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toContain(AUTH_ME_ENDPOINT)
+    expect(url).toContain('/api/v1/auth/me')
+    expect(options.method).toBe('GET')
+    expect((options.headers as Record<string, string>).Authorization).toBe(
+      'Bearer jwt-sesion',
+    )
   })
 })

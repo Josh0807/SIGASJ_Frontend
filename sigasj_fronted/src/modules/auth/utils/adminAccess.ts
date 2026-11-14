@@ -88,8 +88,8 @@ export function evaluateDirectRouteAccess(
     return loginRedirect(path)
   }
 
-  if (allowedRoles && userHasAllowedRole(user, allowedRoles)) {
-    return 'allow'
+  if (allowedRoles) {
+    return evaluateRoleAccess(true, user, allowedRoles, path)
   }
 
   if (isAbonadoRole(user.role)) {
@@ -115,7 +115,7 @@ export function evaluateAdminRouteAccess(
 
   const declaredRoles = allowedRoles ?? getAllowedRolesForAdminPath(path)
 
-  if (declaredRoles && declaredRoles.length > 0) {
+  if (declaredRoles) {
     const roleDecision = evaluateRoleAccess(
       true,
       user,

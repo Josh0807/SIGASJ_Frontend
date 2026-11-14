@@ -5,9 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import {
   clearAccessToken,
+  clearAuthSession,
   getAccessToken,
   getAuthUser,
   isAuthenticated,
+  setAuthSession,
 } from '../utils/authStorage'
 import { AuthProvider } from '../components/AuthContext'
 import { resolvePostLoginAdminPath } from '../utils/adminNavigation'
@@ -67,6 +69,104 @@ describe('LoginPage', () => {
     vi.unstubAllGlobals()
     clearAccessToken()
     document.body.innerHTML = ''
+  })
+
+  it('muestra una sola vez un mensaje comprensible cuando la sesiÃ³n expirÃ³', async () => {
+    clearAuthSession('expired')
+
+    const firstView = await mountLoginPage()
+    try {
+      expect(firstView.container.textContent).toContain(
+        'Tu sesiÃ³n expirÃ³. Inicia sesiÃ³n nuevamente para continuar.',
+      )
+      expect(firstView.router.state.location.pathname).toBe(LOGIN_ROUTE_PATH)
+    } finally {
+      await firstView.cleanup()
+    }
+
+    const secondView = await mountLoginPage()
+    try {
+      expect(secondView.container.textContent).not.toContain('Tu sesiÃ³n expirÃ³')
+      expect(secondView.container.querySelector('.auth-page__form')).not.toBeNull()
+    } finally {
+      await secondView.cleanup()
+    }
+  })
+
+  it.each([
+    { storedRole: 'Secretaria', backendRole: 'SECRETARIA' },
+    { storedRole: 'Fontanero', backendRole: 'FONTANERO' },
+  ] as const)(
+    'redirige desde /login la sesiÃ³n activa del rol $storedRole sin crear un ciclo',
+    async ({ storedRole, backendRole }) => {
+      setAuthSession({
+        accessToken: `token-${storedRole.toLowerCase()}`,
+        user: { id: '2', role: storedRole, name: 'Usuario interno' },
+      })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            id: '2',
+            email: 'usuario@asadasanjuan.cr',
+            role: backendRole,
+            name: 'Usuario interno',
+          }),
+        }),
+      )
+
+      const view = await mountLoginPage()
+      try {
+        await act(async () => {
+          await Promise.resolve()
+        })
+
+        expect(view.router.state.location.pathname).toBe('/admin/dashboard')
+        expect(view.router.state.location.pathname).not.toBe(LOGIN_ROUTE_PATH)
+        expect(view.container.querySelector('.auth-page__form')).toBeNull()
+      } finally {
+        await view.cleanup()
+      }
+    },
+  )
+
+  it('no mantiene en /login a un usuario interno que ya tiene sesiÃ³n', async () => {
+    setAuthSession({
+      accessToken: 'token-activo',
+      user: {
+        id: '1',
+        email: 'admin@asadasanjuan.cr',
+        role: 'Administradora',
+        name: 'Admin',
+      },
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          id: '1',
+          email: 'admin@asadasanjuan.cr',
+          role: 'ADMINISTRADORA',
+          name: 'Admin',
+        }),
+      }),
+    )
+
+    const view = await mountLoginPage()
+    try {
+      await act(async () => {
+        await Promise.resolve()
+      })
+
+      expect(view.router.state.location.pathname).toBe('/admin/dashboard')
+      expect(view.container.querySelector('.auth-page__form')).toBeNull()
+    } finally {
+      await view.cleanup()
+    }
   })
 
   it('renderiza la ruta pública con identidad, campos y botón submit', async () => {

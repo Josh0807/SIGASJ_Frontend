@@ -1,5 +1,5 @@
 import { type FormEvent, useId, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconEye, IconEyeOff } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 import { LANDING_ROUTE_PATH } from '../../../app/router/routePaths'
@@ -13,6 +13,7 @@ import {
   buildAuthSessionFromLoginResponse,
   LoginResponseSecurityError,
 } from '../services/loginSession'
+import { consumeAuthSessionEndReason } from '../utils/authStorage'
 import { resolvePostLoginAdminPath } from '../utils/adminNavigation'
 import {
   validateLoginForm,
@@ -31,10 +32,13 @@ const AuthPageBrand = () => (
   </div>
 )
 
+export const SESSION_EXPIRED_MESSAGE =
+  'Tu sesión expiró. Inicia sesión nuevamente para continuar.'
+
 const LoginPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuth()
+  const { isAuthenticated, isLoading: isAuthLoading, login, user } = useAuth()
   const loginState = location.state as { from?: string; message?: string } | null
   const redirectTo = loginState?.from ?? undefined
   const emailErrorId = useId()
@@ -46,7 +50,24 @@ const LoginPage = () => {
   const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [sessionEndReason] = useState(consumeAuthSessionEndReason)
   const submittingRef = useRef(false)
+  const statusMessage =
+    loginState?.message ??
+    (sessionEndReason === 'expired' ? SESSION_EXPIRED_MESSAGE : undefined)
+
+  if (isAuthLoading) {
+    return null
+  }
+
+  if (isAuthenticated && user) {
+    return (
+      <Navigate
+        to={resolvePostLoginAdminPath(user, redirectTo)}
+        replace
+      />
+    )
+  }
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -99,12 +120,12 @@ const LoginPage = () => {
           </p>
         </header>
 
-        {loginState?.message ? (
+        {statusMessage ? (
           <p
             className="auth-page__notice"
             role="status"
           >
-            {loginState.message}
+            {statusMessage}
           </p>
         ) : null}
 

@@ -1,4 +1,7 @@
-import { getAccessToken } from '../../modules/auth/utils/authStorage'
+import {
+  clearAuthSession,
+  getAccessToken,
+} from '../../modules/auth/utils/authStorage'
 import { requireProductionApiBaseUrl } from './apiBaseUrl'
 
 /**
@@ -70,6 +73,11 @@ export async function fetchWithAuth<T>(
   const response = await fetchRawWithAuth(endpoint, options)
 
   if (!response.ok) {
+    const isLoginRequest = endpoint.includes('/auth/login')
+    if (response.status === 401 && !isLoginRequest && getAccessToken()?.trim()) {
+      clearAuthSession('expired')
+    }
+
     const errorBody = await response.text().catch(() => '')
     let detail = response.statusText || 'Respuesta no exitosa'
     if (errorBody) {

@@ -174,6 +174,18 @@ describe('adminNavigation helpers', () => {
       resolvePostLoginAdminPath(administradora, '/admin/abonados'),
     ).toBe('/admin/abonados')
     expect(
+      resolvePostLoginAdminPath(
+        administradora,
+        '/admin/abonados?pagina=2#resultados',
+      ),
+    ).toBe('/admin/abonados?pagina=2#resultados')
+    expect(
+      resolvePostLoginAdminPath(
+        administradora,
+        'https://sitio-malicioso.example/admin/abonados',
+      ),
+    ).toBe('/admin/dashboard')
+    expect(
       resolvePostLoginAdminPath(fontanero, '/admin/abonados'),
     ).toBe('/admin/dashboard')
     expect(resolvePostLoginAdminPath(abonado, '/admin/abonados')).toBe(
