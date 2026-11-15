@@ -8,6 +8,7 @@ import {
   IconFileText,
   IconFolderCog,
   IconLayoutDashboard,
+  IconMap2,
   IconMenu2,
   IconPhoto,
   IconPackages,

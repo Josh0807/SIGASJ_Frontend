@@ -280,8 +280,17 @@
 .admin-layout--panel:not(.admin-layout--sidebar-collapsed) .admin-sidebar__link.active,
 .admin-layout--panel:not(.admin-layout--sidebar-collapsed) .admin-sidebar button.admin-sidebar__link--active,
 .admin-layout--panel:not(.admin-layout--sidebar-collapsed) .admin-sidebar button.admin-sidebar__link.active {
-  background: var(--asada-ice, #eaf6ff);
+  background: rgba(30, 90, 156, 0.1);
   color: var(--asada-navy, #1e5a9c);
+}
+
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__link--active,
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__link.active,
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar button.admin-sidebar__link--active,
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar button.admin-sidebar__link.active {
+  background: var(--asada-navy, #1e5a9c);
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 90, 156, 0.28);
 }
 
 .admin-layout--panel .admin-sidebar__link--active .admin-sidebar__icon,
@@ -289,6 +298,13 @@
   background: var(--asada-navy, #1e5a9c);
   color: #ffffff;
   box-shadow: 0 10px 22px rgba(30, 90, 156, 0.32);
+}
+
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__link--active .admin-sidebar__icon,
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__link.active .admin-sidebar__icon {
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
 }
 
 .admin-layout--panel .admin-sidebar__icon {
@@ -433,13 +449,13 @@
 .admin-layout--panel .admin-header {
   margin: 16px 16px 0;
   width: auto;
-  min-height: 72px;
-  padding: 14px 20px;
+  min-height: 68px;
+  padding: 12px 20px;
   overflow: visible;
   border: 1px solid var(--sage-border);
-  border-radius: var(--sage-radius);
+  border-radius: 18px;
   background: #ffffff;
-  box-shadow: var(--sage-shadow-soft);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -524,7 +540,7 @@
 
 .admin-layout--panel .admin-main__content {
   /* Espacio inferior para que la esfera Sage no tape paginación/acciones */
-  padding: 16px 16px max(96px, calc(env(safe-area-inset-bottom) + 88px));
+  padding: 20px 24px max(96px, calc(env(safe-area-inset-bottom) + 88px));
   background: transparent;
 }
 

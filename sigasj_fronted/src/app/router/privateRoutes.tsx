@@ -10,6 +10,7 @@ import ActividadesFontaneroRoutes from '../../modules/actividades-fontanero/Acti
 import RecursosHumanosRoutes from '../../modules/recursos-humanos/RecursosHumanosRoutes'
 import AsociadosRoutes from '../../modules/asociados/AsociadosRoutes'
 import AveriasAdminRoutes from '../../modules/averias/admin/AveriasAdminRoutes'
+import MapaRedPage from '../../modules/mapa-red/MapaRedPage'
 import InventarioRoutes from '../../modules/inventario/InventarioRoutes'
 import ProyectosAdminRoutes from '../../modules/proyectos/admin/ProyectosAdminRoutes'
 import GalleryAdminPage from '../../modules/galeria/admin/GalleryAdminPage'
@@ -51,6 +52,7 @@ const ADMIN_MODULE_ELEMENTS: Record<AdminRoutableIconName, ReactElement> = {
   solicitudes: <SolicitudesAdminRoutes />,
   rrhh: <RecursosHumanosRoutes />,
   averias: <AveriasAdminRoutes />,
+  'mapa-red': <MapaRedPage />,
   actividades: <ActividadesFontaneroRoutes />,
   'actividades-fontanero': <ActividadesAdminRoutes />,
   reportes: <PrivateModulePlaceholder title="Gestión de reportes" />,

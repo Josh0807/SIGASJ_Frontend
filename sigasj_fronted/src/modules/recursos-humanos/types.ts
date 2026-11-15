@@ -5,6 +5,19 @@ export type ColaboradorUsuario = {
   activo: boolean
 }
 
+export type JornadaLaboral = 'COMPLETA' | 'MEDIA' | 'POR_HORAS'
+
+export type ModalidadPago = 'MENSUAL' | 'QUINCENAL' | 'SEMANAL' | 'POR_HORA'
+
+export type AntiguedadLaboral = {
+  anios: number
+  meses: number
+  dias: number
+  totalDias: number
+  totalSemanas: number
+  etiqueta: string
+}
+
 export type Colaborador = {
   id: number
   nombre: string
@@ -16,6 +29,11 @@ export type Colaborador = {
   activo: boolean
   usuarioId: number | null
   usuario?: ColaboradorUsuario | null
+  fechaIngreso?: string | null
+  jornadaLaboral?: JornadaLaboral | null
+  diasLaboralesHabituales?: number | null
+  modalidadPago?: ModalidadPago | null
+  antiguedad?: AntiguedadLaboral | null
   createdAt: string
   updatedAt: string
 }
@@ -51,6 +69,10 @@ export type ColaboradorFormValues = {
   correoElectronico: string
   puestoId: string
   usuarioId: string
+  fechaIngreso: string
+  jornadaLaboral: JornadaLaboral | ''
+  diasLaboralesHabituales: string
+  modalidadPago: ModalidadPago | ''
 }
 
 export type ColaboradorPayload = {
@@ -61,8 +83,11 @@ export type ColaboradorPayload = {
   puestoId: number
   cargo?: string
   usuarioId?: number | null
+  fechaIngreso?: string | null
+  jornadaLaboral?: JornadaLaboral | null
+  diasLaboralesHabituales?: number | null
+  modalidadPago?: ModalidadPago | null
 }
-
 export type CuentaUsuario = {
   id: number
   nombre: string

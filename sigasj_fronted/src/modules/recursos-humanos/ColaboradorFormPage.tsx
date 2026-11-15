@@ -2,6 +2,9 @@ import {
   IconArrowLeft,
   IconAt,
   IconBriefcase,
+  IconCalendar,
+  IconClockHour4,
+  IconCoin,
   IconDeviceFloppy,
   IconId,
   IconKey,
@@ -21,6 +24,8 @@ import {
 } from './colaboradoresApi'
 import {
   EMPTY_COLABORADOR_VALUES,
+  JORNADAS_LABORALES,
+  MODALIDADES_PAGO,
   colaboradorErrorMessage,
   esNoAutenticado,
   esReintentable,
@@ -33,7 +38,7 @@ import { getPuestos } from './puestosApi'
 import { RRHH_PATH, RRHH_TITLE, colaboradorDetailPath } from './recursosHumanosPaths'
 import type { ColaboradorFormValues, CuentaUsuario, Puesto } from './types'
 
-type TextField = Exclude<keyof ColaboradorFormValues, 'usuarioId' | 'puestoId'>
+type TextField = 'nombre' | 'apellidos' | 'cedula' | 'correoElectronico'
 
 const fields: Array<{
   name: TextField
@@ -207,8 +212,8 @@ export default function ColaboradorFormPage() {
         <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">{titulo}</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">
           {modo === 'editar'
-            ? 'Actualice la información personal, el puesto o la cuenta vinculada del colaborador.'
-            : 'Ingrese la información personal y el puesto del nuevo colaborador.'}
+            ? 'Actualice la información personal, el expediente laboral, el puesto o la cuenta vinculada del colaborador.'
+            : 'Ingrese la información personal, el expediente laboral y el puesto del nuevo colaborador.'}
         </p>
       </header>
 
@@ -359,6 +364,127 @@ export default function ColaboradorFormPage() {
                     ? 'No fue posible cargar las cuentas de usuario; puede vincularla más tarde.'
                     : 'Vincule la cuenta con la que el colaborador inicia sesión en SIGASJ.'}
                 </small>
+              </label>
+            </div>
+
+            <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4">
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c] sm:size-12">
+                <IconBriefcase size={25} aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-lg font-extrabold leading-tight tracking-tight text-[#073b73] sm:text-xl">
+                  Información laboral
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Fecha de ingreso real, jornada y modalidad de pago. Opcional para registros
+                  antiguos; la antigüedad se calcula automáticamente.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-x-7 gap-y-6 lg:grid-cols-2 lg:gap-y-7">
+              <label className="grid min-w-0 gap-2.5">
+                <span className="text-sm font-bold text-[#163f6b]">Fecha de ingreso laboral</span>
+                <span
+                  className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors.fechaIngreso ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}
+                >
+                  <IconCalendar
+                    className={errors.fechaIngreso ? 'text-red-500' : 'text-slate-400'}
+                    size={20}
+                    aria-hidden="true"
+                  />
+                  <input
+                    className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none"
+                    type="date"
+                    value={values.fechaIngreso}
+                    aria-invalid={Boolean(errors.fechaIngreso)}
+                    onChange={(event) => update('fechaIngreso', event.target.value)}
+                  />
+                </span>
+                {errors.fechaIngreso ? (
+                  <small className="font-semibold text-red-600" role="alert">
+                    {errors.fechaIngreso}
+                  </small>
+                ) : (
+                  <small className="text-slate-500">
+                    Distinta de la fecha de creación del registro en SIGASJ. No puede ser futura.
+                  </small>
+                )}
+              </label>
+
+              <label className="grid min-w-0 gap-2.5">
+                <span className="text-sm font-bold text-[#163f6b]">Jornada laboral</span>
+                <span className="flex min-h-14 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#1e5a9c] focus-within:ring-2 focus-within:ring-blue-200 sm:px-5">
+                  <IconClockHour4 className="text-slate-400" size={20} aria-hidden="true" />
+                  <select
+                    className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-3 text-slate-800 outline-none"
+                    value={values.jornadaLaboral}
+                    aria-label="Jornada laboral"
+                    onChange={(event) => update('jornadaLaboral', event.target.value)}
+                  >
+                    <option value="">Sin definir</option>
+                    {JORNADAS_LABORALES.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+              </label>
+
+              <label className="grid min-w-0 gap-2.5">
+                <span className="text-sm font-bold text-[#163f6b]">
+                  Días laborales habituales (por semana)
+                </span>
+                <span
+                  className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors.diasLaboralesHabituales ? 'border-red-400 focus-within:border-red-500' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}
+                >
+                  <IconCalendar
+                    className={
+                      errors.diasLaboralesHabituales ? 'text-red-500' : 'text-slate-400'
+                    }
+                    size={20}
+                    aria-hidden="true"
+                  />
+                  <input
+                    className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400"
+                    type="number"
+                    min={1}
+                    max={7}
+                    step={1}
+                    placeholder="Ej. 5"
+                    value={values.diasLaboralesHabituales}
+                    aria-invalid={Boolean(errors.diasLaboralesHabituales)}
+                    onChange={(event) => update('diasLaboralesHabituales', event.target.value)}
+                  />
+                </span>
+                {errors.diasLaboralesHabituales ? (
+                  <small className="font-semibold text-red-600" role="alert">
+                    {errors.diasLaboralesHabituales}
+                  </small>
+                ) : (
+                  <small className="text-slate-500">Número entre 1 y 7.</small>
+                )}
+              </label>
+
+              <label className="grid min-w-0 gap-2.5">
+                <span className="text-sm font-bold text-[#163f6b]">Modalidad de pago</span>
+                <span className="flex min-h-14 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#1e5a9c] focus-within:ring-2 focus-within:ring-blue-200 sm:px-5">
+                  <IconCoin className="text-slate-400" size={20} aria-hidden="true" />
+                  <select
+                    className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-3 text-slate-800 outline-none"
+                    value={values.modalidadPago}
+                    aria-label="Modalidad de pago"
+                    onChange={(event) => update('modalidadPago', event.target.value)}
+                  >
+                    <option value="">Sin definir</option>
+                    {MODALIDADES_PAGO.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </span>
               </label>
             </div>
 

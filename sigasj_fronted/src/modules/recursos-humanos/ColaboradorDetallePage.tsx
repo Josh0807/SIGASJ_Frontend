@@ -4,6 +4,8 @@ import {
   IconBriefcase,
   IconCalendar,
   IconCalendarOff,
+  IconClockHour4,
+  IconCoin,
   IconHistory,
   IconId,
   IconInfoCircle,
@@ -11,6 +13,7 @@ import {
   IconMail,
   IconPencil,
   IconRefresh,
+  IconTimeline,
   IconUser,
   IconUserCircle,
 } from '@tabler/icons-react'
@@ -417,6 +420,58 @@ export default function ColaboradorDetallePage() {
             </section>
           ) : null}
 
+
+              <div className="flex items-center gap-3 border-b border-[#d7e5f1] pb-4 pt-2">
+                <span
+                  className="grid size-9 place-items-center rounded-xl bg-[#eaf6ff] text-[#1e5a9c]"
+                  aria-hidden="true"
+                >
+                  <IconBriefcase size={20} />
+                </span>
+                <div>
+                  <h2 className="m-0 text-xl font-black tracking-tight text-[#073b73]">
+                    Información laboral
+                  </h2>
+                  <p className="m-0 mt-1 text-sm text-slate-500">
+                    Expediente laboral distinto de la fecha de registro en SIGASJ.
+                  </p>
+                </div>
+              </div>
+
+              <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <Dato
+                  label="Fecha de ingreso"
+                  icon={<IconCalendar size={18} aria-hidden="true" />}
+                >
+                  {formatearFechaIngreso(colaborador.fechaIngreso)}
+                </Dato>
+                <Dato
+                  label="Antigüedad"
+                  icon={<IconTimeline size={18} aria-hidden="true" />}
+                >
+                  {colaborador.antiguedad?.etiqueta ?? 'Sin fecha de ingreso'}
+                </Dato>
+                <Dato
+                  label="Jornada laboral"
+                  icon={<IconClockHour4 size={18} aria-hidden="true" />}
+                >
+                  {etiquetaJornada(colaborador.jornadaLaboral)}
+                </Dato>
+                <Dato
+                  label="Días laborales habituales"
+                  icon={<IconCalendar size={18} aria-hidden="true" />}
+                >
+                  {colaborador.diasLaboralesHabituales != null
+                    ? `${colaborador.diasLaboralesHabituales} por semana`
+                    : '—'}
+                </Dato>
+                <Dato
+                  label="Modalidad de pago"
+                  icon={<IconCoin size={18} aria-hidden="true" />}
+                >
+                  {etiquetaModalidadPago(colaborador.modalidadPago)}
+                </Dato>
+              </dl>
           {tab === 'asignacion' ? (
             <section className="grid gap-6 rounded-2xl border border-white/80 bg-white px-5 py-6 shadow-[0_16px_38px_rgba(30,90,156,0.09)] ring-1 ring-sky-100 sm:rounded-3xl sm:p-8">
               <div className="flex items-center gap-3 border-b border-[#d7e5f1] pb-4">

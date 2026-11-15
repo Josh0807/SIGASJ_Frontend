@@ -32,13 +32,14 @@
 .admin-dashboard__shell {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
   min-width: 0;
+  padding: 4px 4px 8px;
 }
 
 .admin-dashboard__top-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.85fr);
+  grid-template-columns: minmax(0, 1.55fr) minmax(14rem, 0.72fr);
   gap: 16px;
   min-width: 0;
 }
@@ -49,11 +50,11 @@
   border: 1px solid var(--dash-border);
   border-radius: var(--dash-radius);
   background: var(--dash-card);
-  box-shadow: var(--dash-shadow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .admin-dashboard__welcome-card {
-  padding: 24px 26px;
+  padding: 22px 24px;
 }
 
 .admin-dashboard__focus-card {
@@ -61,31 +62,28 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px 22px 20px;
+  padding: 20px;
   background:
-    linear-gradient(145deg, rgba(231, 238, 233, 0.95), #ffffff 55%),
+    linear-gradient(145deg, rgba(234, 246, 255, 0.98), #ffffff 58%),
     var(--dash-card);
 }
 
 .admin-dashboard__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  margin: 0 0 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(30, 90, 156, 0.1);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--dash-primary);
 }
 
 .admin-dashboard__eyebrow::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--dash-primary);
-  box-shadow: 0 0 0 4px rgba(30, 90, 156, 0.16);
+  display: none;
 }
 
 .admin-dashboard__greeting {
@@ -225,6 +223,14 @@
   cursor: pointer;
 }
 
+.admin-dashboard__section--mapa {
+  gap: 0;
+}
+
+.admin-dashboard__mapa {
+  padding: 0;
+}
+
 .admin-dashboard__indicators-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -247,12 +253,12 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 112px;
-  padding: 20px;
+  min-height: 118px;
+  padding: 18px 18px 16px;
   border: 1px solid var(--dash-border);
-  border-radius: var(--dash-radius);
+  border-radius: 16px;
   background: var(--dash-card);
-  box-shadow: var(--dash-shadow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   text-decoration: none;
   color: inherit;
   transition: transform 150ms ease, box-shadow 150ms ease;

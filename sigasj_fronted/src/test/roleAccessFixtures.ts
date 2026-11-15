@@ -68,6 +68,7 @@ export const SAMPLE_ALLOWED_CONTENT: Record<string, string> = {
   '/admin/solicitudes': 'Gestión de solicitudes',
   '/admin/rrhh': 'Recursos Humanos',
   '/admin/averias': 'Gestión de averías',
+  '/admin/mapa-red': 'Mapa de la red de agua',
   '/admin/actividades': 'Registro de Actividades',
   '/admin/actividades-fontanero': 'Actividades del Fontanero',
   '/admin/reportes': 'Gestión de reportes',

@@ -145,6 +145,16 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     availableInNav: true,
   },
   {
+    segment: 'mapa-red',
+    title: 'Mapa de la red de agua',
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
+    requiredPermissions: ['fault_reports.read'],
+    availableInNav: true,
+  },
+  {
     segment: 'actividades',
     title: 'Registro de Actividades',
     allowedRoles: [InternalAdminRoleName.Fontanero],

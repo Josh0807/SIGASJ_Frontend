@@ -1,5 +1,15 @@
-import { ZONA_HORARIA_ASADA } from '../../shared/utils/fechaAsada'
-import type { Colaborador, ColaboradorFormValues, ColaboradorPayload } from './types'
+import {
+  esFechaCalendario,
+  hoyEnAsada,
+  ZONA_HORARIA_ASADA,
+} from '../../shared/utils/fechaAsada'
+import type {
+  Colaborador,
+  ColaboradorFormValues,
+  ColaboradorPayload,
+  JornadaLaboral,
+  ModalidadPago,
+} from './types'
 
 export type ColaboradorFormErrors = Partial<Record<keyof ColaboradorFormValues, string>>
 
@@ -17,6 +27,19 @@ export const CARGOS_SUGERIDOS = [
   'Personal técnico',
 ] as const
 
+export const JORNADAS_LABORALES: Array<{ value: JornadaLaboral; label: string }> = [
+  { value: 'COMPLETA', label: 'Jornada completa' },
+  { value: 'MEDIA', label: 'Media jornada' },
+  { value: 'POR_HORAS', label: 'Por horas' },
+]
+
+export const MODALIDADES_PAGO: Array<{ value: ModalidadPago; label: string }> = [
+  { value: 'MENSUAL', label: 'Mensual' },
+  { value: 'QUINCENAL', label: 'Quincenal' },
+  { value: 'SEMANAL', label: 'Semanal' },
+  { value: 'POR_HORA', label: 'Por hora' },
+]
+
 export const EMPTY_COLABORADOR_VALUES: ColaboradorFormValues = {
   nombre: '',
   apellidos: '',
@@ -24,6 +47,26 @@ export const EMPTY_COLABORADOR_VALUES: ColaboradorFormValues = {
   correoElectronico: '',
   puestoId: '',
   usuarioId: '',
+  fechaIngreso: '',
+  jornadaLaboral: '',
+  diasLaboralesHabituales: '',
+  modalidadPago: '',
+}
+
+export const etiquetaJornada = (valor: JornadaLaboral | null | undefined) =>
+  JORNADAS_LABORALES.find((item) => item.value === valor)?.label ?? '—'
+
+export const etiquetaModalidadPago = (valor: ModalidadPago | null | undefined) =>
+  MODALIDADES_PAGO.find((item) => item.value === valor)?.label ?? '—'
+
+export const formatearFechaIngreso = (valor: string | null | undefined) => {
+  if (!valor || !esFechaCalendario(valor)) return '—'
+  const [year, month, day] = valor.split('-').map(Number)
+  const fecha = new Date(Date.UTC(year, month - 1, day, 12))
+  return fecha.toLocaleDateString('es-CR', {
+    dateStyle: 'medium',
+    timeZone: ZONA_HORARIA_ASADA,
+  })
 }
 
 export const nombreCompleto = (colaborador: Pick<Colaborador, 'nombre' | 'apellidos'>) =>
@@ -77,6 +120,24 @@ export function validateColaborador(values: ColaboradorFormValues): ColaboradorF
   else if (!EMAIL_PATTERN.test(correo)) {
     errors.correoElectronico = 'Ingrese un correo electrónico válido.'
   }
+
+  const fechaIngreso = values.fechaIngreso.trim()
+  if (fechaIngreso) {
+    if (!esFechaCalendario(fechaIngreso)) {
+      errors.fechaIngreso = 'Use el formato AAAA-MM-DD.'
+    } else if (fechaIngreso > hoyEnAsada()) {
+      errors.fechaIngreso = 'La fecha de ingreso no puede ser futura.'
+    }
+  }
+
+  const dias = values.diasLaboralesHabituales.trim()
+  if (dias) {
+    const n = Number(dias)
+    if (!Number.isInteger(n) || n < 1 || n > 7) {
+      errors.diasLaboralesHabituales = 'Indique un número entre 1 y 7.'
+    }
+  }
+
   return errors
 }
 
@@ -85,6 +146,8 @@ export function toColaboradorPayload(
   modo: 'crear' | 'editar',
 ): ColaboradorPayload {
   const usuarioId = values.usuarioId ? Number(values.usuarioId) : null
+  const fechaIngreso = values.fechaIngreso.trim()
+  const dias = values.diasLaboralesHabituales.trim()
   const payload: ColaboradorPayload = {
     nombre: values.nombre.trim(),
     apellidos: values.apellidos.trim(),
@@ -94,6 +157,19 @@ export function toColaboradorPayload(
   }
   if (usuarioId !== null) payload.usuarioId = usuarioId
   else if (modo === 'editar') payload.usuarioId = null
+
+  if (fechaIngreso) payload.fechaIngreso = fechaIngreso
+  else if (modo === 'editar') payload.fechaIngreso = null
+
+  if (values.jornadaLaboral) payload.jornadaLaboral = values.jornadaLaboral
+  else if (modo === 'editar') payload.jornadaLaboral = null
+
+  if (dias) payload.diasLaboralesHabituales = Number(dias)
+  else if (modo === 'editar') payload.diasLaboralesHabituales = null
+
+  if (values.modalidadPago) payload.modalidadPago = values.modalidadPago
+  else if (modo === 'editar') payload.modalidadPago = null
+
   return payload
 }
 
@@ -104,8 +180,14 @@ export const toColaboradorFormValues = (colaborador: Colaborador): ColaboradorFo
   correoElectronico: colaborador.correoElectronico,
   puestoId: colaborador.puestoId ? String(colaborador.puestoId) : '',
   usuarioId: colaborador.usuarioId ? String(colaborador.usuarioId) : '',
+  fechaIngreso: colaborador.fechaIngreso ?? '',
+  jornadaLaboral: colaborador.jornadaLaboral ?? '',
+  diasLaboralesHabituales:
+    colaborador.diasLaboralesHabituales != null
+      ? String(colaborador.diasLaboralesHabituales)
+      : '',
+  modalidadPago: colaborador.modalidadPago ?? '',
 })
-
 export const getHttpStatus = (error: unknown): number | null => {
   const match = /HTTP\s+(\d{3})/i.exec(error instanceof Error ? error.message : '')
   return match ? Number(match[1]) : null

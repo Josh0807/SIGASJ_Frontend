@@ -15,6 +15,10 @@ const valid = {
   correoElectronico: ' Juan@Example.com ',
   puestoId: '3',
   usuarioId: '',
+  fechaIngreso: '',
+  jornadaLaboral: '' as const,
+  diasLaboralesHabituales: '',
+  modalidadPago: '' as const,
 }
 
 describe('formulario de colaborador', () => {
@@ -48,6 +52,51 @@ describe('formulario de colaborador', () => {
     })
     expect(toColaboradorPayload(valid, 'editar').usuarioId).toBeNull()
     expect(toColaboradorPayload({ ...valid, usuarioId: '7' }, 'crear').usuarioId).toBe(7)
+  })
+
+  it('valida fecha de ingreso futura y días laborales', () => {
+    expect(
+      validateColaborador({ ...valid, fechaIngreso: '2099-01-01' }).fechaIngreso,
+    ).toMatch(/futura/i)
+    expect(
+      validateColaborador({ ...valid, diasLaboralesHabituales: '8' })
+        .diasLaboralesHabituales,
+    ).toMatch(/1 y 7/)
+    expect(
+      validateColaborador({
+        ...valid,
+        fechaIngreso: '2020-03-15',
+        jornadaLaboral: 'COMPLETA',
+        diasLaboralesHabituales: '5',
+        modalidadPago: 'MENSUAL',
+      }),
+    ).toEqual({})
+  })
+
+  it('incluye expediente laboral en el payload', () => {
+    expect(
+      toColaboradorPayload(
+        {
+          ...valid,
+          fechaIngreso: '2020-03-15',
+          jornadaLaboral: 'COMPLETA',
+          diasLaboralesHabituales: '5',
+          modalidadPago: 'MENSUAL',
+        },
+        'crear',
+      ),
+    ).toMatchObject({
+      fechaIngreso: '2020-03-15',
+      jornadaLaboral: 'COMPLETA',
+      diasLaboralesHabituales: 5,
+      modalidadPago: 'MENSUAL',
+    })
+    expect(toColaboradorPayload(valid, 'editar')).toMatchObject({
+      fechaIngreso: null,
+      jornadaLaboral: null,
+      diasLaboralesHabituales: null,
+      modalidadPago: null,
+    })
   })
 
   it('muestra las fechas de auditoría en hora de Costa Rica (UTC-6)', () => {

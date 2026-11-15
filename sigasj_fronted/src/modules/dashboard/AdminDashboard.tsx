@@ -3,7 +3,9 @@ import IndicatorCard from '../../shared/components/IndicatorCard'
 import ErrorBoundary from '../../shared/components/ErrorBoundary'
 import RecentAlertsWidget from './components/RecentAlertsWidget'
 import RecentActivityWidget from './components/RecentActivityWidget'
+import MapaRedPanel from '../mapa-red/MapaRedPanel'
 import { useDashboardMetrics } from './hooks/useDashboardMetrics'
+import { MAPA_RED_PATH } from '../mapa-red/mapaRedPaths'
 import type { DashboardSummaryData } from './services/dashboardService'
 import { useAuth } from '../auth/components/AuthContext'
 import { canAccessAdminRoute } from '../auth/utils/adminNavigation'
@@ -62,18 +64,10 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
 const indicatorMetricKey = (
   indicatorId: DashboardIndicator['id'],
 ): keyof DashboardSummaryData | null => {
-  if (indicatorId === 'abonados') {
-    return 'abonadosActivos'
-  }
-  if (indicatorId === 'averias') {
-    return 'averiasReportadas'
-  }
-  if (indicatorId === 'solicitudes') {
-    return 'solicitudesEnTramite'
-  }
-  if (indicatorId === 'alertas-reposicion') {
-    return 'alertasReposicionPendientes'
-  }
+  if (indicatorId === 'abonados') return 'abonadosActivos'
+  if (indicatorId === 'averias') return 'averiasReportadas'
+  if (indicatorId === 'solicitudes') return 'solicitudesEnTramite'
+  if (indicatorId === 'alertas-reposicion') return 'alertasReposicionPendientes'
   return null
 }
 
@@ -118,6 +112,7 @@ const AdminDashboard = () => {
   )
   const displayName = resolveAuthUserHeaderName(user)
   const greeting = resolveGreeting()
+  const canSeeMapa = canAccessAdminRoute(user, MAPA_RED_PATH)
 
   const indicators: DashboardIndicator[] = visibleDefinitions.map((indicator) => {
     if (indicator.id === 'abonados') {
@@ -141,6 +136,7 @@ const AdminDashboard = () => {
       aria-labelledby="admin-dashboard-title"
     >
       <div className="admin-dashboard__shell">
+        {/* Hero + control del día */}
         <div className="admin-dashboard__top-grid">
           <header className="admin-dashboard__welcome-card">
             <span className="admin-dashboard__eyebrow">Panel operativo</span>
@@ -149,7 +145,7 @@ const AdminDashboard = () => {
                 {greeting}, <strong>{displayName}</strong>
               </p>
             ) : null}
-            <h1 id="admin-dashboard-title">Dashboard administrativo</h1>
+            <h1 id="admin-dashboard-title">Dashboard Administrativo</h1>
             <p className="admin-dashboard__lead">
               Resumen del estado del acueducto según su rol: asociados, averías,
               solicitudes y alertas.
@@ -159,9 +155,7 @@ const AdminDashboard = () => {
           <aside className="admin-dashboard__focus-card" aria-label="Acciones del panel">
             <div className="admin-dashboard__focus-copy">
               <h2>Control del día</h2>
-              <p>
-                Refresque las cifras cuando necesite la lectura más reciente.
-              </p>
+              <p>Refresque las cifras cuando necesite la lectura más reciente.</p>
             </div>
             {indicators.length > 0 ? (
               <button
@@ -187,9 +181,10 @@ const AdminDashboard = () => {
           </aside>
         </div>
 
+        {/* KPIs */}
         {indicators.length > 0 ? (
-          <div className="admin-dashboard__section">
-            <div className="admin-dashboard__section-header">
+          <div className="admin-dashboard__section admin-dashboard__section--kpis">
+            <div className="admin-dashboard__section-header admin-dashboard__section-header--inline">
               <h2>Indicadores principales</h2>
               <p>Resumen actual de los módulos disponibles para su cuenta.</p>
             </div>
@@ -223,10 +218,24 @@ const AdminDashboard = () => {
           </div>
         ) : null}
 
+        {/* Mapa protagonista + analítica inferior */}
+        {canSeeMapa ? (
+          <div className="admin-dashboard__section admin-dashboard__section--mapa">
+            <ErrorBoundary>
+              <MapaRedPanel
+                compact
+                detailHref={MAPA_RED_PATH}
+                className="admin-dashboard__mapa"
+              />
+            </ErrorBoundary>
+          </div>
+        ) : null}
+
+        {/* Widgets reales de operación */}
         <div className="admin-dashboard__section">
           <div className="admin-dashboard__section-header">
             <h2>Operación en vivo</h2>
-            <p>Lo más reciente del acueducto, sin salir del panel.</p>
+            <p>Alertas y actividad reales del sistema.</p>
           </div>
           <div className="admin-dashboard__widgets-grid">
             <ErrorBoundary>
