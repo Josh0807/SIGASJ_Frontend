@@ -71,7 +71,7 @@ describe('LoginPage', () => {
     document.body.innerHTML = ''
   })
 
-  it('muestra una sola vez un mensaje comprensible cuando la sesiÃ³n expirÃ³', async () => {
+  it('muestra una sola vez un mensaje comprensible cuando la sesión expiró', async () => {
     clearAuthSession('expired')
 
     const firstView = await mountLoginPage()

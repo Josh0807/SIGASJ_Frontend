@@ -6,6 +6,9 @@ import { useSolicitudesAdminSecurity } from './useSolicitudesAdminSecurity'
 
 type Props = { solicitudId: number; document: SolicitudDocumentoAdmin }
 
+const secondaryBtn =
+  'inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3.5 text-sm font-extrabold text-[color:var(--asada-navy,#1e5a9c)] shadow-[0_4px_12px_rgba(30,90,156,0.08)] transition hover:-translate-y-0.5 hover:border-[#bfe3fa] hover:bg-[color:var(--asada-ice,#eaf6ff)] disabled:cursor-wait disabled:opacity-60'
+
 export default function SolicitudDocumentoActions({ solicitudId, document }: Props) {
   const [action, setAction] = useState<'view' | 'download' | null>(null)
   const [error, setError] = useState('')
@@ -22,7 +25,8 @@ export default function SolicitudDocumentoActions({ solicitudId, document }: Pro
     if (previewWindow) {
       previewWindow.opener = null
       previewWindow.document.title = `Cargando ${document.nombreOriginal}…`
-      previewWindow.document.body.innerHTML = '<p style="font-family:system-ui;padding:24px;color:#173f6e">Cargando documento…</p>'
+      previewWindow.document.body.innerHTML =
+        '<p style="font-family:system-ui;padding:24px;color:#173f6e">Cargando documento…</p>'
     }
 
     setAction(mode)
@@ -41,7 +45,9 @@ export default function SolicitudDocumentoActions({ solicitudId, document }: Pro
       window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
     } catch (caught) {
       previewWindow?.close()
-      if (!handleSecurityError(caught)) setError(solicitudesAdminError(caught, 'No fue posible consultar el documento.'))
+      if (!handleSecurityError(caught)) {
+        setError(solicitudesAdminError(caught, 'No fue posible consultar el documento.'))
+      }
     } finally {
       setAction(null)
     }
@@ -50,14 +56,39 @@ export default function SolicitudDocumentoActions({ solicitudId, document }: Pro
   return (
     <div className="mt-3 grid gap-2">
       <div className="flex flex-wrap gap-2">
-        <button className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#bfe3fa] bg-white px-3 text-xs font-extrabold text-[#075fae] disabled:cursor-wait disabled:opacity-60" type="button" disabled={action !== null} onClick={() => void openDocument('view')}>
-          {action === 'view' ? <IconLoader2 className="animate-spin" size={16} /> : <IconEye size={16} />} Visualizar
+        <button
+          className={secondaryBtn}
+          type="button"
+          disabled={action !== null}
+          onClick={() => void openDocument('view')}
+        >
+          {action === 'view' ? (
+            <IconLoader2 className="animate-spin" size={17} />
+          ) : (
+            <IconEye size={17} />
+          )}
+          Ver documento
         </button>
-        <button className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-700 disabled:cursor-wait disabled:opacity-60" type="button" disabled={action !== null} onClick={() => void openDocument('download')}>
-          {action === 'download' ? <IconLoader2 className="animate-spin" size={16} /> : <IconDownload size={16} />} Descargar
+        <button
+          className={secondaryBtn}
+          type="button"
+          disabled={action !== null}
+          aria-label="Descargar documento"
+          onClick={() => void openDocument('download')}
+        >
+          {action === 'download' ? (
+            <IconLoader2 className="animate-spin" size={17} />
+          ) : (
+            <IconDownload size={17} />
+          )}
+          Descargar
         </button>
       </div>
-      {error ? <p className="m-0 text-xs font-semibold leading-5 text-red-700" role="alert">{error}</p> : null}
+      {error ? (
+        <p className="m-0 text-xs font-semibold leading-5 text-red-700" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }

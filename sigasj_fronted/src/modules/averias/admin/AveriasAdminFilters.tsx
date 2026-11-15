@@ -1,3 +1,4 @@
+import { IconFilterOff, IconSearch } from '@tabler/icons-react'
 import { ESTADO_AVERIA_OPTIONS } from './estadoAveria'
 import {
   EMPTY_FILTER,
@@ -29,6 +30,10 @@ const TIPO_FILTER_ID = 'averias-admin-tipo'
 const FECHA_DESDE_ID = 'averias-admin-fecha-desde'
 const FECHA_HASTA_ID = 'averias-admin-fecha-hasta'
 
+const labelClass = 'text-sm font-bold text-[#163f6b]'
+const inputClass =
+  'min-h-11 w-full rounded-xl border border-[#d7e5f1] bg-white px-3.5 text-sm text-[#1a2f42] outline-none transition placeholder:text-[#5b7390]/70 focus:border-[#1e5a9c] focus:ring-2 focus:ring-[#bfe3fa]'
+
 const AveriasAdminFilters = ({
   search,
   estado,
@@ -45,113 +50,123 @@ const AveriasAdminFilters = ({
   onClear,
   hasActiveFilters,
 }: AveriasAdminFiltersProps) => (
-  <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]" aria-label="Búsqueda y filtros">
-    <div className="col-span-full border-b border-blue-100 pb-5">
-      <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta de averías</p>
-      <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Buscar y filtrar casos</h2>
-      <p className="mt-2 text-base leading-relaxed text-slate-500">Utilice uno o varios criterios para localizar las averías registradas.</p>
-    </div>
-    <form
-      className="sigasj-filter-search"
-      role="search"
-      onSubmit={(event) => {
-        event.preventDefault()
-      }}
-    >
-      <label className="gallery-admin__field" htmlFor={SEARCH_INPUT_ID}>
-        <span>Buscar por código o Reportante</span>
+  <section
+    className="grid gap-3 rounded-2xl border border-[#d7e5f1] bg-white p-4 shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl sm:p-5"
+    aria-label="Búsqueda y filtros"
+  >
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(0,1.7fr)_repeat(5,minmax(0,1fr))_auto] xl:items-end">
+      <label className="grid min-w-0 gap-1.5 sm:col-span-2 lg:col-span-3 xl:col-span-1" htmlFor={SEARCH_INPUT_ID}>
+        <span className={labelClass}>Buscar</span>
+        <span className="relative block">
+          <IconSearch
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+            size={18}
+            aria-hidden="true"
+          />
+          <input
+            id={SEARCH_INPUT_ID}
+            name="search"
+            type="search"
+            className={`${inputClass} pl-10`}
+            maxLength={150}
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Código o reportante..."
+          />
+        </span>
+      </label>
+
+      <label className="grid min-w-0 gap-1.5" htmlFor={ESTADO_FILTER_ID}>
+        <span className={labelClass}>Estado</span>
+        <select
+          id={ESTADO_FILTER_ID}
+          name="estado"
+          className={inputClass}
+          value={estado}
+          onChange={(event) => onEstadoChange(event.target.value)}
+        >
+          <option value={EMPTY_FILTER}>Todos</option>
+          {ESTADO_AVERIA_OPTIONS.map((option) => (
+            <option value={option.value} key={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="grid min-w-0 gap-1.5" htmlFor={PRIORIDAD_FILTER_ID}>
+        <span className={labelClass}>Prioridad</span>
+        <select
+          id={PRIORIDAD_FILTER_ID}
+          name="prioridad"
+          className={inputClass}
+          value={prioridad}
+          onChange={(event) => onPrioridadChange(event.target.value)}
+        >
+          <option value={EMPTY_FILTER}>Todas</option>
+          {PRIORIDAD_FILTER_OPTIONS.map((option) => (
+            <option value={option.value} key={option.value}>
+              {option.label}
+            </option>
+          ))}
+          <option value={PRIORIDAD_FILTER_UNASSIGNED}>Sin asignar</option>
+        </select>
+      </label>
+
+      <label className="grid min-w-0 gap-1.5" htmlFor={TIPO_FILTER_ID}>
+        <span className={labelClass}>Tipo</span>
         <input
-          id={SEARCH_INPUT_ID}
-          name="search"
-          type="search"
-          maxLength={150}
-          value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Ej. AV-2026-0001 o María"
+          id={TIPO_FILTER_ID}
+          name="tipo"
+          type="text"
+          className={inputClass}
+          maxLength={80}
+          value={tipo}
+          onChange={(event) => onTipoChange(event.target.value)}
+          placeholder="Ej. TUBERIA"
         />
       </label>
-    </form>
-    <label className="gallery-admin__field" htmlFor={ESTADO_FILTER_ID}>
-      <span>Estado</span>
-      <select
-        id={ESTADO_FILTER_ID}
-        name="estado"
-        value={estado}
-        onChange={(event) => onEstadoChange(event.target.value)}
+
+      <label className="grid min-w-0 gap-1.5" htmlFor={FECHA_DESDE_ID}>
+        <span className={labelClass}>Desde</span>
+        <input
+          id={FECHA_DESDE_ID}
+          name="fechaDesde"
+          type="date"
+          className={inputClass}
+          max={fechaHasta || undefined}
+          value={fechaDesde}
+          onChange={(event) => onFechaDesdeChange(event.target.value)}
+        />
+      </label>
+
+      <label className="grid min-w-0 gap-1.5" htmlFor={FECHA_HASTA_ID}>
+        <span className={labelClass}>Hasta</span>
+        <input
+          id={FECHA_HASTA_ID}
+          name="fechaHasta"
+          type="date"
+          className={inputClass}
+          min={fechaDesde || undefined}
+          value={fechaHasta}
+          onChange={(event) => onFechaHastaChange(event.target.value)}
+        />
+      </label>
+
+      <button
+        type="button"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={onClear}
+        disabled={!hasActiveFilters}
       >
-        <option value={EMPTY_FILTER}>Todos</option>
-        {ESTADO_AVERIA_OPTIONS.map((option) => (
-          <option value={option.value} key={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-    <label className="gallery-admin__field" htmlFor={PRIORIDAD_FILTER_ID}>
-      <span>Prioridad</span>
-      <select
-        id={PRIORIDAD_FILTER_ID}
-        name="prioridad"
-        value={prioridad}
-        onChange={(event) => onPrioridadChange(event.target.value)}
-      >
-        <option value={EMPTY_FILTER}>Todas</option>
-        {PRIORIDAD_FILTER_OPTIONS.map((option) => (
-          <option value={option.value} key={option.value}>
-            {option.label}
-          </option>
-        ))}
-        <option value={PRIORIDAD_FILTER_UNASSIGNED}>Sin asignar</option>
-      </select>
-    </label>
-    <label className="gallery-admin__field" htmlFor={TIPO_FILTER_ID}>
-      <span>Tipo</span>
-      <input
-        id={TIPO_FILTER_ID}
-        name="tipo"
-        type="text"
-        maxLength={80}
-        value={tipo}
-        onChange={(event) => onTipoChange(event.target.value)}
-        placeholder="Ej. TUBERIA"
-      />
-    </label>
-    <label className="gallery-admin__field" htmlFor={FECHA_DESDE_ID}>
-      <span>Desde</span>
-      <input
-        id={FECHA_DESDE_ID}
-        name="fechaDesde"
-        type="date"
-        max={fechaHasta || undefined}
-        value={fechaDesde}
-        onChange={(event) => onFechaDesdeChange(event.target.value)}
-      />
-    </label>
-    <label className="gallery-admin__field" htmlFor={FECHA_HASTA_ID}>
-      <span>Hasta</span>
-      <input
-        id={FECHA_HASTA_ID}
-        name="fechaHasta"
-        type="date"
-        min={fechaDesde || undefined}
-        value={fechaHasta}
-        onChange={(event) => onFechaHastaChange(event.target.value)}
-      />
-    </label>
+        <IconFilterOff size={18} aria-hidden="true" />
+        Limpiar<span className="sr-only"> filtros</span>
+      </button>
+    </div>
+
     {fechaDesde && fechaHasta && fechaDesde > fechaHasta ? (
-      <p role="alert" className="gallery-admin__filter-reset">
-        La fecha «Desde» no puede ser posterior a la fecha «Hasta».
-      </p>
-    ) : null}
-    {hasActiveFilters ? (
-      <p className="gallery-admin__filter-reset">
-        <button
-          type="button"
-          className="gallery-admin__button !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3 !font-bold !text-[#1e5a9c] !shadow-md transition hover:-translate-y-0.5 hover:!bg-[#eaf6ff]"
-          onClick={onClear}
-        >
-          Limpiar filtros
-        </button>
+      <p className="m-0 text-sm font-semibold text-red-700" role="alert">
+        La fecha «Desde» no puede ser posterior a «Hasta».
       </p>
     ) : null}
   </section>

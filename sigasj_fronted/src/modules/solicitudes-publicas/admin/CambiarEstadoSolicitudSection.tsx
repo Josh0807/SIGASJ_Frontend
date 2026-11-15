@@ -2,6 +2,7 @@ import { IconRefresh } from '@tabler/icons-react'
 import { useId, useRef, useState } from 'react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import type { SolicitudEstado } from '../types'
+import SolicitudEstadoBadge from './SolicitudEstadoBadge'
 import {
   buildCambiarEstadoPayload,
   cambiarEstadoSolicitudAdmin,
@@ -118,115 +119,128 @@ export default function CambiarEstadoSolicitudSection({
 
   return (
     <section
-      className="rounded-[22px] border border-[#d7e5f1] bg-white p-6 shadow-[0_10px_28px_rgba(30, 90, 156,0.08)] max-[640px]:p-4"
+      className="rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white p-5 shadow-[0_12px_28px_rgba(18,63,112,0.07)] sm:rounded-3xl sm:p-6"
       aria-labelledby={`${estadoId}-title`}
     >
       <h2
         id={`${estadoId}-title`}
-        className="m-0 text-lg font-extrabold text-[#1e5a9c]"
+        className="m-0 text-lg font-black tracking-tight text-[color:var(--asada-ink,#123f70)]"
       >
         Cambiar estado
       </h2>
-      <p className="mb-0 mt-2 text-sm leading-6 text-slate-500">
-        El cambio se registra con trazabilidad en el Backend. La observación
-        pública puede mostrarse al solicitante; la nota interna es solo
-        administrativa.
+      <p className="mb-0 mt-2 text-sm leading-6 text-[color:var(--asada-muted,#5b7390)]">
+        El cambio se registra con trazabilidad. La observación pública puede
+        mostrarse al solicitante; la nota interna es solo administrativa.
       </p>
 
-      <div className="mt-5 grid gap-5 md:grid-cols-2">
-        <div className="grid gap-2 md:col-span-2">
-          <p className="m-0 text-sm font-bold text-slate-600">Estado actual</p>
-          <p className="m-0 text-base font-extrabold text-[#1e5a9c]">
-            {labelEstadoSolicitud(estadoActual)}
-          </p>
+      <div className="mt-5 grid gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[#f7fbff] p-3.5">
+            <p className="m-0 text-sm font-bold text-[color:var(--asada-muted,#5b7390)]">
+              Estado actual
+            </p>
+            <SolicitudEstadoBadge estado={estadoActual} />
+          </div>
+
+          <div className="grid gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white p-3.5">
+            <label
+              className="text-sm font-bold text-[color:var(--asada-ink,#123f70)]"
+              htmlFor={estadoId}
+            >
+              Nuevo estado
+            </label>
+            <select
+              id={estadoId}
+              className="min-h-11 w-full rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3.5 font-semibold text-[color:var(--asada-ink,#123f70)] outline-none transition focus:border-[color:var(--asada-navy,#1e5a9c)] focus:ring-2 focus:ring-sky-200 disabled:opacity-60"
+              value={estadoNuevo}
+              disabled={busy || disabled || opciones.length === 0}
+              onChange={(event) =>
+                setEstadoNuevo(event.target.value as SolicitudEstado)
+              }
+            >
+              {opciones.length === 0 ? (
+                <option value="">No hay estados disponibles</option>
+              ) : (
+                opciones.map((estado) => (
+                  <option key={estado} value={estado}>
+                    {labelEstadoSolicitud(estado)}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
         </div>
 
-        <div className="grid gap-2 md:col-span-2">
-          <label className="text-sm font-bold text-slate-700" htmlFor={estadoId}>
-            Nuevo estado
-          </label>
-          <select
-            id={estadoId}
-            className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 font-semibold text-slate-800 disabled:opacity-60"
-            value={estadoNuevo}
-            disabled={busy || disabled || opciones.length === 0}
-            onChange={(event) =>
-              setEstadoNuevo(event.target.value as SolicitudEstado)
-            }
-          >
-            {opciones.length === 0 ? (
-              <option value="">No hay estados disponibles</option>
-            ) : (
-              opciones.map((estado) => (
-                <option key={estado} value={estado}>
-                  {labelEstadoSolicitud(estado)}
-                </option>
-              ))
-            )}
-          </select>
-        </div>
+        <div className="grid items-stretch gap-4 md:grid-cols-2">
+          <div className="grid gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[#f7fbff] p-3.5">
+            <label
+              className="text-sm font-bold text-[color:var(--asada-ink,#123f70)]"
+              htmlFor={publicaId}
+            >
+              Observación pública
+            </label>
+            <p className="m-0 text-xs leading-5 text-[color:var(--asada-muted,#5b7390)]">
+              Puede mostrarse al solicitante.
+            </p>
+            <textarea
+              id={publicaId}
+              className="min-h-28 w-full flex-1 resize-y rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3.5 py-2.5 text-sm text-[color:var(--asada-ink,#123f70)] outline-none transition focus:border-[color:var(--asada-navy,#1e5a9c)] focus:ring-2 focus:ring-sky-200 disabled:opacity-60"
+              maxLength={MAX_TEXTO}
+              value={observacionPublica}
+              disabled={busy || disabled}
+              onChange={(event) => setObservacionPublica(event.target.value)}
+              placeholder="Opcional"
+            />
+            <p className="m-0 text-xs text-slate-400">
+              {observacionPublica.length}/{MAX_TEXTO}
+            </p>
+          </div>
 
-        <div className="grid gap-2">
-          <label className="text-sm font-bold text-slate-700" htmlFor={publicaId}>
-            Observación pública
-          </label>
-          <p className="m-0 text-xs leading-5 text-slate-500">
-            Esta observación puede mostrarse al solicitante.
-          </p>
-          <textarea
-            id={publicaId}
-            className="min-h-28 w-full resize-y rounded-xl border border-[#d7e5f1] bg-sky-50/40 px-3 py-2 text-sm text-slate-800 disabled:opacity-60"
-            maxLength={MAX_TEXTO}
-            value={observacionPublica}
-            disabled={busy || disabled}
-            onChange={(event) => setObservacionPublica(event.target.value)}
-            placeholder="Opcional"
-          />
-          <p className="m-0 text-xs text-slate-400">
-            {observacionPublica.length}/{MAX_TEXTO}
-          </p>
-        </div>
-
-        <div className="grid gap-2 rounded-xl border border-amber-100 bg-amber-50/50 p-3">
-          <label
-            className="text-sm font-bold text-amber-900"
-            htmlFor={internaId}
-          >
-            Nota interna
-          </label>
-          <p className="m-0 text-xs leading-5 text-amber-800/80">
-            Uso interno administrativo. No se muestra al solicitante.
-          </p>
-          <textarea
-            id={internaId}
-            className="min-h-28 w-full resize-y rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 disabled:opacity-60"
-            maxLength={MAX_TEXTO}
-            value={notaInterna}
-            disabled={busy || disabled}
-            onChange={(event) => setNotaInterna(event.target.value)}
-            placeholder="Opcional"
-          />
-          <p className="m-0 text-xs text-amber-700/70">
-            {notaInterna.length}/{MAX_TEXTO}
-          </p>
+          <div className="grid gap-2 rounded-xl border border-amber-200 bg-[#fff9e6] p-3.5">
+            <label className="text-sm font-bold text-amber-950" htmlFor={internaId}>
+              Nota interna
+            </label>
+            <p className="m-0 text-xs leading-5 text-amber-900/80">
+              Solo administrativa. No se muestra al solicitante.
+            </p>
+            <textarea
+              id={internaId}
+              className="min-h-28 w-full flex-1 resize-y rounded-xl border border-amber-300/70 bg-white px-3.5 py-2.5 text-sm text-[color:var(--asada-ink,#123f70)] outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200 disabled:opacity-60"
+              maxLength={MAX_TEXTO}
+              value={notaInterna}
+              disabled={busy || disabled}
+              onChange={(event) => setNotaInterna(event.target.value)}
+              placeholder="Opcional"
+            />
+            <p className="m-0 text-xs text-amber-800/70">
+              {notaInterna.length}/{MAX_TEXTO}
+            </p>
+          </div>
         </div>
       </div>
 
       {error ? (
-        <p className="mt-4 mb-0 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800" role="alert">
+        <p
+          className="mt-4 mb-0 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
 
-      <div className="mt-6 flex justify-end border-t border-[#d7e5f1] pt-5 max-[520px]:block">
+      <div className="mt-5 flex flex-wrap items-center justify-end gap-3 border-t border-[color:var(--asada-line,#d7e5f1)] pt-4">
         <button
           ref={confirmBtnRef}
           type="button"
-          className="group inline-flex min-h-12 items-center justify-center gap-2.5 rounded-2xl border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white shadow-[0_10px_22px_rgba(8,114,211,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_15px_30px_rgba(8,114,211,0.32)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 disabled:hover:shadow-[0_10px_22px_rgba(8,114,211,0.24)] motion-reduce:transform-none motion-reduce:transition-none max-[520px]:w-full"
+          className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-0 bg-[color:var(--asada-navy,#1e5a9c)] px-5 font-extrabold text-white shadow-[0_8px_18px_rgba(30,90,156,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#174a82] disabled:cursor-not-allowed disabled:opacity-55 max-[520px]:w-full"
           disabled={!puedeEnviar}
           onClick={abrirConfirmacion}
         >
-          <IconRefresh className={`transition-transform duration-300 motion-reduce:transform-none ${busy ? 'animate-spin' : 'group-hover:rotate-[-35deg]'}`} size={19} aria-hidden="true" />
+          <IconRefresh
+            className={`transition-transform duration-300 ${busy ? 'animate-spin' : 'group-hover:rotate-[-35deg]'}`}
+            size={18}
+            aria-hidden="true"
+          />
           {busy ? 'Actualizando…' : 'Cambiar estado'}
         </button>
       </div>

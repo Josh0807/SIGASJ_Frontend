@@ -5,6 +5,7 @@ type AveriasDetailFieldProps = {
   children: ReactNode
   multiline?: boolean
   modern?: boolean
+  icon?: ReactNode
 }
 
 const AveriasDetailField = ({
@@ -12,6 +13,7 @@ const AveriasDetailField = ({
   children,
   multiline = false,
   modern = false,
+  icon,
 }: AveriasDetailFieldProps) => (
   <div
     className={`${multiline ? 'averias-admin__field is-multiline' : 'averias-admin__field'} ${
@@ -20,8 +22,33 @@ const AveriasDetailField = ({
         : ''
     }`}
   >
-    <dt className={modern ? '!mb-2 !text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-[#1e5a9c]' : undefined}>{label}</dt>
-    <dd className={`${multiline ? 'averias-admin__prewrap' : ''} ${modern ? '!m-0 !text-base !font-bold !leading-relaxed !text-[#073b73]' : ''}`.trim() || undefined}>{children}</dd>
+    <dt
+      className={
+        modern
+          ? '!mb-2 !text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-[#1e5a9c]'
+          : icon
+            ? 'averias-admin__field-label'
+            : undefined
+      }
+    >
+      {icon ? (
+        <span className="averias-admin__field-icon" aria-hidden="true">
+          {icon}
+        </span>
+      ) : null}
+      {label}
+    </dt>
+    <dd
+      className={
+        `${multiline ? 'averias-admin__prewrap' : ''} ${
+          modern
+            ? '!m-0 !text-base !font-bold !leading-relaxed !text-[#073b73]'
+            : ''
+        }`.trim() || undefined
+      }
+    >
+      {children}
+    </dd>
   </div>
 )
 

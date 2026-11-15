@@ -158,6 +158,35 @@ describe('AveriaMaterialesSection', () => {
     )
     expect(salidaLink?.getAttribute('href')).toContain('idAveria=14')
     expect(salidaLink?.getAttribute('href')).toContain('/admin/inventario/salidas')
+    const usar = [...container.querySelectorAll('a')].find((anchor) =>
+      anchor.textContent?.includes('Usar en salida'),
+    )
+    expect(usar?.getAttribute('href')).toContain('idMaterial=1')
+  })
+
+  it('limpia sufijos de seed en nombres del catálogo', async () => {
+    vi.mocked(materialesApi.getMateriales).mockResolvedValue({
+      data: [
+        {
+          ...tubo,
+          nombre: 'Cloro granulado 65% 1794636457463',
+          categoria: {
+            id: 3,
+            nombre: 'Insumos químicos 1794636457463',
+            descripcion: null,
+            activo: true,
+          },
+        },
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    })
+    await renderSection()
+    expect(container.textContent).toContain('Cloro granulado 65%')
+    expect(container.textContent).toContain('Insumos químicos')
+    expect(container.textContent).not.toContain('1794636457463')
   })
 
   it('consulta solicitudes y salidas de la avería abierta', async () => {

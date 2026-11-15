@@ -160,7 +160,8 @@ describe('Consulta Pública de Recibos SIGASJ', () => {
       )
 
       expect(markup).toContain('Consulta tu recibo')
-      expect(markup).toContain('receipt-payment__button')
+      expect(markup).toContain('href="/consulta-recibo"')
+      expect(markup).toContain('Consultar recibo')
       expect(markup).not.toContain('admin-sidebar')
       expect(markup).not.toContain('admin-header')
     })

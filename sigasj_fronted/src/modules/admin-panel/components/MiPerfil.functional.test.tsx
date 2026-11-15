@@ -1,4 +1,5 @@
 import { act, useEffect } from 'react'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
@@ -114,6 +115,7 @@ const mountApp = async (path: string): Promise<MountedApp> => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,

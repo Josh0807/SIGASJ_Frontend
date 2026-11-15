@@ -254,18 +254,15 @@ export async function getSolicitudesSummaryMetric(): Promise<ModuleSummaryMetric
         ? [result.value.total]
         : [],
     )
-    if (totals.length > 0) {
-      return {
-        key: 'solicitudesEnTramite',
-        value: totals.reduce((sum, total) => sum + total, 0),
-      }
+    // Solo trámites digitales (PENDIENTE + EN_REVISION). No usar
+    // /solicitudes/aprobadas-pendientes (legacy SolicitudServicio).
+    if (totals.length === 0) {
+      return { key: 'solicitudesEnTramite', value: null }
     }
 
-    // Compatibilidad: KPI legacy si el listado digital no responde.
-    const raw = await fetchWithAuth<unknown>('/solicitudes/aprobadas-pendientes')
     return {
       key: 'solicitudesEnTramite',
-      value: readList(raw, ['solicitudes']).length,
+      value: totals.reduce((sum, total) => sum + total, 0),
     }
   } catch {
     return { key: 'solicitudesEnTramite', value: null }

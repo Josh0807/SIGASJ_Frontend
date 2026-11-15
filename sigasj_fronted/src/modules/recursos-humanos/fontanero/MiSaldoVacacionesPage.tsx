@@ -1,15 +1,18 @@
-import { IconBeach, IconRefresh } from '@tabler/icons-react'
+import { IconRefresh } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { Link, useNavigate } from 'react-router-dom'
-import { FONTANERO_SOLICITAR_VACACIONES_PATH } from '../../solicitudes-ausencia/solicitudesAusenciaPaths'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
+import { Alert } from '../../../shared/ui/Alert'
+import { Button } from '../../../shared/ui/Button'
+import { Card } from '../../../shared/ui/Card'
+import { PageHeader } from '../../../shared/ui/PageHeader'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useAuth } from '../../auth/components/AuthContext'
-import { esNoAutenticado, esReintentable, nombreCompleto } from '../colaboradorForm'
-import {
-  FONTANERO_MI_SALDO_TITLE,
-} from '../recursosHumanosPaths'
+import { FONTANERO_SOLICITAR_VACACIONES_PATH } from '../../solicitudes-ausencia/solicitudesAusenciaPaths'
+import { esNoAutenticado, esReintentable } from '../colaboradorForm'
+import { FONTANERO_MI_SALDO_TITLE } from '../recursosHumanosPaths'
 import type { BalanceVacaciones } from '../types'
+import VacacionesSaldoPanel from '../VacacionesSaldoPanel'
 import { getBalanceVacacionesPropio } from '../vacacionesApi'
 import { vacacionesErrorMessage } from '../vacacionesForm'
 
@@ -30,31 +33,31 @@ export default function MiSaldoVacacionesPage() {
   useEffect(() => {
     const controller = new AbortController()
     const cancelScheduled = runAfterEffect(() => {
-    setCargando(true)
-    getBalanceVacacionesPropio(controller.signal)
-      .then((data) => {
-        if (controller.signal.aborted) return
-        setBalance(data)
-        setError(null)
-      })
-      .catch((err: unknown) => {
-        if (controller.signal.aborted) return
-        if (esNoAutenticado(err)) {
-          salirPorSesion()
-          return
-        }
-        setBalance(null)
-        setError(
-          vacacionesErrorMessage(
-            err,
-            'No fue posible consultar su saldo de vacaciones.',
-          ),
-        )
-        setReintentable(esReintentable(err))
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setCargando(false)
-      })
+      setCargando(true)
+      getBalanceVacacionesPropio(controller.signal)
+        .then((data) => {
+          if (controller.signal.aborted) return
+          setBalance(data)
+          setError(null)
+        })
+        .catch((err: unknown) => {
+          if (controller.signal.aborted) return
+          if (esNoAutenticado(err)) {
+            salirPorSesion()
+            return
+          }
+          setBalance(null)
+          setError(
+            vacacionesErrorMessage(
+              err,
+              'No fue posible consultar su saldo de vacaciones.',
+            ),
+          )
+          setReintentable(esReintentable(err))
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setCargando(false)
+        })
     })
     return () => {
       cancelScheduled()
@@ -63,83 +66,65 @@ export default function MiSaldoVacacionesPage() {
   }, [recarga, salirPorSesion])
 
   return (
-    <div className="admin-surface-page">
-      <header className="grid gap-2">
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c]">
-          {FONTANERO_MI_SALDO_TITLE}
-        </h1>
-        <p className="m-0 text-slate-500">
-          Consulta de solo lectura.{' '}
-          <Link to={FONTANERO_SOLICITAR_VACACIONES_PATH} className="font-bold text-blue-800">
-            Solicitar vacaciones
-          </Link>
-        </p>
-      </header>
+    <div className="admin-content-modern grid w-full min-w-0 gap-4">
+      <PageHeader
+        title={FONTANERO_MI_SALDO_TITLE}
+        description={
+          <>
+            Consulta de solo lectura.{' '}
+            <Link
+              to={FONTANERO_SOLICITAR_VACACIONES_PATH}
+              className="font-bold text-sigasj-primary underline-offset-2 hover:underline"
+            >
+              Solicitar vacaciones
+            </Link>
+          </>
+        }
+      />
 
-      <section className="admin-surface-card" aria-busy={cargando}>
+      <Card
+        as="section"
+        padded
+        className="!p-5 sm:!p-6"
+        aria-busy={cargando}
+        aria-label="Saldo de vacaciones"
+      >
         {cargando && !balance ? (
-          <p className="m-0 text-slate-500" role="status">
-            Cargando saldo…
-          </p>
+          <div className="grid gap-3" role="status">
+            <span className="sr-only">Cargando saldo…</span>
+            {[0, 1, 2].map((fila) => (
+              <div
+                key={fila}
+                className="h-14 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+            ))}
+          </div>
         ) : error ? (
-          <div className="grid gap-4 text-center" role="alert">
-            <p className="m-0 font-semibold text-red-700">{error}</p>
+          <div className="grid gap-3">
+            <Alert tone="danger">{error}</Alert>
             {reintentable ? (
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
-              </button>
+              </Button>
             ) : null}
           </div>
         ) : balance ? (
-          <>
-            <div className="flex items-start gap-4">
-              <span className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white">
-                <IconBeach size={28} aria-hidden="true" />
-              </span>
-              <div>
-                <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-[#1e5a9c]">
-                  Su saldo
-                </p>
-                <h2 className="m-0 text-2xl font-black text-[#1e5a9c]">
-                  {nombreCompleto(balance.colaborador)}
-                </h2>
-                <p className="mb-0 mt-1 text-slate-500">{balance.colaborador.cargo}</p>
-              </div>
-            </div>
-            <dl className="m-0 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-[#d7e5f1] bg-sky-50/70 px-5 py-4">
-                <dt className="text-xs font-extrabold uppercase text-sky-900/70">Adquiridas</dt>
-                <dd className="m-0 text-3xl font-black text-sky-900">
-                  {balance.diasAcumulados}
-                </dd>
-              </div>
-              <div className="rounded-2xl border border-amber-100 bg-amber-50/70 px-5 py-4">
-                <dt className="text-xs font-extrabold uppercase text-amber-900/70">Disfrutadas</dt>
-                <dd className="m-0 text-3xl font-black text-amber-900">
-                  {balance.diasDisfrutados}
-                </dd>
-              </div>
-              <div className="rounded-2xl border border-violet-100 bg-violet-50/70 px-5 py-4">
-                <dt className="text-xs font-extrabold uppercase text-violet-900/70">Ajustes netos</dt>
-                <dd className="m-0 text-3xl font-black text-violet-900">
-                  {balance.diasAjusteNeto ?? 0}
-                </dd>
-              </div>
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 px-5 py-4">
-                <dt className="text-xs font-extrabold uppercase text-emerald-900/70">Disponibles</dt>
-                <dd className="m-0 text-3xl font-black text-emerald-900">
-                  {balance.diasDisponibles}
-                </dd>
-              </div>
-            </dl>
-          </>
+          <VacacionesSaldoPanel
+            balance={balance}
+            eyebrow="Su saldo"
+            cargando={cargando}
+            compacto
+          />
         ) : null}
-      </section>
+      </Card>
     </div>
   )
 }

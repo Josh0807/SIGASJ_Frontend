@@ -13,7 +13,6 @@ import { canEditAveriaAsignacion } from './canEditAveriaAsignacion'
 import { parseAveriaAdminId } from './parseAveriaAdminId'
 import { AVERIAS_ADMIN_HISTORIAL_PATH } from './averiasAdminPaths'
 import { averiasAdminListPathFromState } from './averiasAdminListSearch'
-import { InternalAdminRoleName, normalizeInternalRole } from '../../auth/utils/internalRoles'
 import {
   AVERIAS_ADMIN_DETAIL_ERROR,
   AVERIAS_ADMIN_DETAIL_LOADING_MESSAGE,
@@ -72,11 +71,6 @@ const AveriasAdminDetailPage = ({
       ? mutatedAveria
       : fetchedAveria
   const canAssignFontanero = user == null || canEditAveriaAsignacion(user)
-  const role = normalizeInternalRole(user?.role)
-  const canRevisarSolicitudes =
-    user == null || role === InternalAdminRoleName.Administradora
-  const canRegistrarSalida =
-    user == null || role === InternalAdminRoleName.Administradora
 
   if (loading) {
     return (
@@ -146,10 +140,14 @@ const AveriasAdminDetailPage = ({
           </div>
           <div className="gallery-admin__header-actions">
             <Link
-              className="gallery-admin__button group !inline-flex !min-h-12 !items-center !gap-2.5 !rounded-xl !border !border-[#bfe3fa] !bg-gradient-to-br !from-white !to-[#eaf6ff] !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_6px_18px_rgba(30, 90, 156,0.1)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!from-blue-50 hover:!to-sky-100 hover:!shadow-[0_10px_24px_rgba(30, 90, 156,0.18)] active:!translate-y-0 active:!scale-[0.98]"
+              className="gallery-admin__button group !inline-flex !min-h-12 !items-center !gap-2.5 !rounded-xl !border !border-[#bfe3fa] !bg-gradient-to-br !from-white !to-[#eaf6ff] !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_6px_18px_rgba(30,90,156,0.1)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!from-blue-50 hover:!to-sky-100 hover:!shadow-[0_10px_24px_rgba(30,90,156,0.18)] active:!translate-y-0 active:!scale-[0.98]"
               to={listPath}
             >
-              <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1" size={19} aria-hidden="true" />
+              <IconArrowLeft
+                className="!transition-transform !duration-300 group-hover:!-translate-x-1"
+                size={19}
+                aria-hidden="true"
+              />
               {backLabel}
             </Link>
           </div>
@@ -157,8 +155,6 @@ const AveriasAdminDetailPage = ({
         <AveriasAdminDetailView
           averia={averia}
           canAssignFontanero={canAssignFontanero}
-          canRevisarSolicitudes={canRevisarSolicitudes}
-          canRegistrarSalida={canRegistrarSalida}
           onAveriaUpdated={setMutatedAveria}
           onUnauthorized={() => setForceLogin(true)}
           onForbidden={() => setForceForbidden(true)}

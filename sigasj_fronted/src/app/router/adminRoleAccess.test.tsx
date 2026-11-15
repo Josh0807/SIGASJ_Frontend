@@ -81,7 +81,7 @@ describe('pruebas de navegación y acceso por rol (11.4.5)', () => {
             ]
           : [...EXPECTED_NAV_PATHS[rol]]
         expect(links).toEqual(expectedVisibleLinks)
-        if (rol === 'Administradora') {
+        if (rol === 'Administradora' || rol === 'Secretaria') {
           expect(links).toContain('/admin/solicitudes')
         } else {
           expect(links).not.toContain('/admin/solicitudes')

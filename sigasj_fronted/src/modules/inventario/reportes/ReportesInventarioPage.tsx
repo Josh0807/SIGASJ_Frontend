@@ -49,7 +49,7 @@ export default function ReportesInventarioPage() {
   const { reporte, loading, error, refetch } = useReporteInventario(applied)
   const { result: materialesResult, loading: materialesLoading } = useMateriales({
     page: 1,
-    limit: 500,
+    limit: 100,
   })
   const { result: categoriasResult, loading: categoriasLoading } = useCategorias({
     page: 1,

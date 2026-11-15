@@ -1,13 +1,19 @@
 import {
   IconAlertCircle,
   IconArrowLeft,
+  IconBuilding,
   IconCalendar,
   IconClipboardText,
   IconFileDescription,
+  IconHome,
+  IconMail,
   IconMessage2,
+  IconPencil,
+  IconPhone,
   IconRefresh,
+  IconUser,
 } from '@tabler/icons-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -23,7 +29,12 @@ import {
 } from './solicitudesAdminApi'
 import { SOLICITUDES_ADMIN_TRAMITES_PATH } from './solicitudesAdminPaths'
 import type { HistorialSolicitudEvento } from './solicitudesAdminTypes'
-import { presentSolicitudForm } from './solicitudFormPresentation'
+import {
+  groupPresentedFormSections,
+  presentSolicitudForm,
+  type PresentedFormField,
+  type PresentedFormSectionId,
+} from './solicitudFormPresentation'
 import type { SolicitudEstado } from '../types'
 import type { SolicitudAdminDetail } from './types'
 import { useSolicitudesAdminSecurity } from './useSolicitudesAdminSecurity'
@@ -84,8 +95,62 @@ const displayValue = (value: unknown) => {
     }
     return value
   }
-  if (typeof value === 'object') return JSON.stringify(value)
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value)
+    } catch {
+      return 'No indicado'
+    }
+  }
   return String(value)
+}
+
+const sectionIcon = (id: PresentedFormSectionId): ReactNode => {
+  if (id === 'solicitante') return <IconUser size={20} aria-hidden="true" />
+  if (id === 'inmueble') return <IconHome size={20} aria-hidden="true" />
+  if (id === 'contacto') return <IconPhone size={20} aria-hidden="true" />
+  if (id === 'firma') return <IconPencil size={20} aria-hidden="true" />
+  return <IconBuilding size={20} aria-hidden="true" />
+}
+
+const fieldIcon = (key: string): ReactNode | null => {
+  const normalized = key.toLowerCase()
+  if (normalized.includes('telefono')) return <IconPhone size={15} aria-hidden="true" />
+  if (normalized.includes('correo') || normalized.includes('mail') || normalized.includes('notific')) {
+    return <IconMail size={15} aria-hidden="true" />
+  }
+  return null
+}
+
+const cardClass =
+  'flex h-full flex-col rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white p-4 shadow-[0_8px_20px_rgba(18,63,112,0.06)] sm:rounded-3xl sm:p-5'
+
+const FieldRow = ({ field }: { field: PresentedFormField }) => {
+  const icon = fieldIcon(field.key)
+  const isImage =
+    typeof field.value === 'string' && field.value.startsWith('data:image/')
+
+  return (
+    <div className="grid gap-1.5 border-b border-[color:var(--asada-line,#d7e5f1)] py-2.5 last:border-b-0 sm:grid-cols-[minmax(8.5rem,36%)_minmax(0,1fr)] sm:items-baseline sm:gap-3">
+      <dt className="text-sm font-semibold text-[color:var(--asada-muted,#5b7390)]">
+        {field.label}
+      </dt>
+      <dd className="m-0 flex min-w-0 items-start gap-2 break-words text-[0.95rem] font-bold leading-5 text-[color:var(--asada-ink,#123f70)]">
+        {icon ? (
+          <span className="mt-0.5 text-[color:var(--asada-navy,#1e5a9c)]">{icon}</span>
+        ) : null}
+        {isImage ? (
+          <img
+            className="max-h-28 max-w-full rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-slate-50 p-2 object-contain"
+            src={field.value as string}
+            alt={field.label}
+          />
+        ) : (
+          displayValue(field.value)
+        )}
+      </dd>
+    </div>
+  )
 }
 
 export default function SolicitudAdminDetailPage() {
@@ -163,6 +228,11 @@ export default function SolicitudAdminDetailPage() {
     [detail],
   )
 
+  const formSections = useMemo(
+    () => groupPresentedFormSections(formEntries, detail?.tipoSolicitud?.slug),
+    [detail?.tipoSolicitud?.slug, formEntries],
+  )
+
   const adminEntries = useMemo(() => {
     if (!detail) return []
     return Object.entries(detail.camposAdministrativos ?? {}).filter(([key]) => {
@@ -220,19 +290,76 @@ export default function SolicitudAdminDetailPage() {
   const documentosCount = detail.documentos?.length ?? 0
   const tipoNombre =
     detail.tipoSolicitud?.nombre ?? detail.tipoSolicitud?.slug ?? 'Solicitud'
+  const documentosCard = (
+    <section className={cardClass} aria-labelledby="documents-title">
+      <h2
+        className="m-0 flex items-center gap-2 text-lg font-black text-[color:var(--asada-ink,#123f70)]"
+        id="documents-title"
+      >
+        <span className="grid size-9 place-items-center rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)]">
+          <IconFileDescription size={20} aria-hidden="true" />
+        </span>
+        Documentos adjuntos
+        <span className="rounded-full bg-[color:var(--asada-ice,#eaf6ff)] px-2.5 py-1 text-xs font-bold text-[color:var(--asada-navy,#1e5a9c)]">
+          {documentosCount}
+        </span>
+      </h2>
+      {documentosCount ? (
+        <ul className="mb-0 mt-4 grid list-none gap-3 p-0">
+          {(detail.documentos ?? []).map((document) => (
+            <li
+              className="min-w-0 rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[#f3f9ff] p-4"
+              key={document.id}
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-[color:var(--asada-navy,#1e5a9c)] shadow-sm">
+                  <IconFileDescription size={20} aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <strong
+                    className="block truncate text-[color:var(--asada-ink,#123f70)]"
+                    title={document.nombreOriginal}
+                  >
+                    {document.nombreOriginal}
+                  </strong>
+                  <small className="text-[color:var(--asada-muted,#5b7390)]">
+                    {document.tipoDocumento} ·{' '}
+                    {formatBytes(document.tamano ?? document.tamanio)}
+                    {document.mimeType ? ` · ${document.mimeType}` : ''}
+                  </small>
+                </span>
+              </div>
+              <SolicitudDocumentoActions solicitudId={detail.id} document={document} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mb-0 mt-3 text-[color:var(--asada-muted,#5b7390)]">
+          Esta solicitud no tiene documentos adjuntos.
+        </p>
+      )}
+    </section>
+  )
 
   return (
-    <main className="admin-content-modern grid min-w-0 gap-4">
+    <main className="admin-content-modern grid min-w-0 gap-4 sm:gap-5">
       <Link
-        className="inline-flex min-h-10 w-fit items-center gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3.5 text-sm font-bold text-[color:var(--asada-navy,#1e5a9c)] no-underline transition hover:bg-[color:var(--asada-ice,#eaf6ff)]"
+        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 text-sm font-extrabold text-[color:var(--asada-navy,#1e5a9c)] no-underline shadow-[0_6px_18px_rgba(30,90,156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[color:var(--asada-ice,#eaf6ff)] hover:no-underline"
         to={SOLICITUDES_ADMIN_TRAMITES_PATH}
       >
-        <IconArrowLeft size={17} /> Volver a trámites
+        <IconArrowLeft
+          className="transition-transform group-hover:-translate-x-1"
+          size={17}
+        />{' '}
+        Volver a trámites
       </Link>
 
-      <header className="rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] p-5 shadow-[0_12px_28px_rgba(18,63,112,0.07)] sm:p-6">
+      <header className={cardClass}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
+            <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[color:var(--asada-navy,#1e5a9c)]">
+              Solicitudes · Detalle
+            </p>
             <h1 className="m-0 break-all text-[clamp(1.45rem,3vw,2rem)] font-black tracking-[-0.03em] text-[color:var(--asada-ink,#123f70)]">
               {detail.codigoSeguimiento}
             </h1>
@@ -244,7 +371,7 @@ export default function SolicitudAdminDetailPage() {
         </div>
 
         <dl className="mt-5 grid gap-3 border-t border-[color:var(--asada-line,#d7e5f1)] pt-5 sm:grid-cols-3">
-          <div className="flex gap-3 rounded-xl bg-[color:var(--asada-ice,#eaf6ff)]/70 p-3.5">
+          <div className="flex gap-3 rounded-xl bg-[#eaf6ff] p-3.5">
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white text-[color:var(--asada-navy,#1e5a9c)]">
               <IconCalendar size={18} aria-hidden="true" />
             </span>
@@ -257,7 +384,7 @@ export default function SolicitudAdminDetailPage() {
               </dd>
             </span>
           </div>
-          <div className="flex gap-3 rounded-xl bg-[color:var(--asada-ice,#eaf6ff)]/70 p-3.5">
+          <div className="flex gap-3 rounded-xl bg-[#eaf6ff] p-3.5">
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white text-[color:var(--asada-navy,#1e5a9c)]">
               <IconClipboardText size={18} aria-hidden="true" />
             </span>
@@ -272,7 +399,7 @@ export default function SolicitudAdminDetailPage() {
               </dd>
             </span>
           </div>
-          <div className="flex gap-3 rounded-xl bg-[color:var(--asada-ice,#eaf6ff)]/70 p-3.5">
+          <div className="flex gap-3 rounded-xl bg-[#eaf6ff] p-3.5">
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white text-[color:var(--asada-navy,#1e5a9c)]">
               <IconMessage2 size={18} aria-hidden="true" />
             </span>
@@ -288,75 +415,126 @@ export default function SolicitudAdminDetailPage() {
         </dl>
       </header>
 
-      <section
-        className="rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white p-5 shadow-[0_10px_24px_rgba(18,63,112,0.06)] sm:p-6"
-        aria-labelledby="form-data-title"
-      >
-        <h2
-          className="m-0 text-lg font-black tracking-[-0.02em] text-[color:var(--asada-ink,#123f70)]"
-          id="form-data-title"
-        >
-          Datos del formulario
-        </h2>
-        {formEntries.length ? (
-          <dl className="mt-4 grid gap-x-8 gap-y-0 sm:grid-cols-2 lg:grid-cols-3">
-            {formEntries.map(({ key, label, value }) => (
-              <div
-                className="min-w-0 border-b border-[color:var(--asada-line,#d7e5f1)] py-3.5"
-                key={key}
+      {formSections.length || adminEntries.length ? (
+        (() => {
+          const sectionById = Object.fromEntries(
+            formSections.map((section) => [section.id, section]),
+          )
+          const renderFormSection = (sectionId: PresentedFormSectionId) => {
+            const section = sectionById[sectionId]
+            if (!section) return null
+            return (
+              <section
+                key={section.id}
+                className={cardClass}
+                aria-labelledby={`form-section-${section.id}`}
               >
-                <dt className="text-xs font-bold uppercase tracking-[0.05em] text-[color:var(--asada-muted,#5b7390)]">
-                  {label}
-                </dt>
-                <dd className="m-0 mt-1.5 break-words text-[0.95rem] font-semibold leading-6 text-[color:var(--asada-ink,#123f70)]">
-                  {typeof value === 'string' && value.startsWith('data:image/') ? (
-                    <img
-                      className="max-h-28 max-w-full rounded-lg border bg-white p-2 object-contain"
-                      src={value}
-                      alt={label}
+                <h2
+                  className="m-0 flex shrink-0 items-center gap-2.5 border-b border-[color:var(--asada-line,#d7e5f1)] pb-2.5 text-base font-black tracking-tight text-[color:var(--asada-ink,#123f70)] sm:text-lg"
+                  id={`form-section-${section.id}`}
+                >
+                  <span className="grid size-8 place-items-center rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)] sm:size-9">
+                    {sectionIcon(section.id)}
+                  </span>
+                  {section.title}
+                </h2>
+                <dl className="m-0 min-h-0 flex-1">
+                  {section.fields.map((field) => (
+                    <FieldRow key={field.key} field={field} />
+                  ))}
+                </dl>
+              </section>
+            )
+          }
+
+          const adminCard =
+            adminEntries.length > 0 ? (
+              <section
+                key="campos-administrativos"
+                className={cardClass}
+                aria-labelledby="admin-summary-title"
+              >
+                <h2
+                  className="m-0 flex shrink-0 items-center gap-2.5 border-b border-[color:var(--asada-line,#d7e5f1)] pb-2.5 text-base font-black tracking-tight text-[color:var(--asada-ink,#123f70)] sm:text-lg"
+                  id="admin-summary-title"
+                >
+                  <span className="grid size-8 place-items-center rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)] sm:size-9">
+                    <IconBuilding size={20} aria-hidden="true" />
+                  </span>
+                  Campos administrativos
+                </h2>
+                <dl className="m-0 min-h-0 flex-1">
+                  {adminEntries.map(([key, value]) => (
+                    <FieldRow
+                      key={key}
+                      field={{ key, label: labelFor(key), value }}
                     />
-                  ) : (
-                    displayValue(value)
-                  )}
-                </dd>
+                  ))}
+                </dl>
+              </section>
+            ) : null
+
+          const pairRow = (...cells: Array<ReactNode | null>) => {
+            const visible = cells.filter(Boolean)
+            if (visible.length === 0) return null
+            return (
+              <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
+                {visible}
               </div>
-            ))}
-          </dl>
-        ) : (
+            )
+          }
+
+          const otrosSection = sectionById.otros
+          const otrosFullWidth = Boolean(
+            otrosSection && otrosSection.fields.length > 4,
+          )
+
+          return (
+            <div className="grid gap-3">
+              {pairRow(
+                renderFormSection('solicitante'),
+                renderFormSection('inmueble'),
+              )}
+              {pairRow(renderFormSection('contacto'), adminCard)}
+              {pairRow(renderFormSection('firma'), documentosCard)}
+              {!otrosFullWidth ? renderFormSection('otros') : null}
+              {otrosFullWidth ? (
+                <section
+                  className={cardClass}
+                  aria-labelledby="form-section-otros"
+                >
+                  <h2
+                    className="m-0 flex shrink-0 items-center gap-2.5 border-b border-[color:var(--asada-line,#d7e5f1)] pb-2.5 text-base font-black tracking-tight text-[color:var(--asada-ink,#123f70)] sm:text-lg"
+                    id="form-section-otros"
+                  >
+                    <span className="grid size-8 place-items-center rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)] sm:size-9">
+                      {sectionIcon('otros')}
+                    </span>
+                    {otrosSection!.title}
+                  </h2>
+                  <dl className="m-0 min-h-0 flex-1">
+                    {otrosSection!.fields.map((field) => (
+                      <FieldRow key={field.key} field={field} />
+                    ))}
+                  </dl>
+                </section>
+              ) : null}
+            </div>
+          )
+        })()
+      ) : (
+        <section className={cardClass} aria-labelledby="form-data-title">
+          <h2
+            className="m-0 text-lg font-black tracking-tight text-[color:var(--asada-ink,#123f70)]"
+            id="form-data-title"
+          >
+            Datos del formulario
+          </h2>
           <p className="mb-0 mt-4 text-[color:var(--asada-muted,#5b7390)]">
             No hay datos específicos disponibles.
           </p>
-        )}
-      </section>
-
-      {adminEntries.length ? (
-        <section
-          className="rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white p-5 shadow-[0_10px_24px_rgba(18,63,112,0.06)] sm:p-6"
-          aria-labelledby="admin-summary-title"
-        >
-          <h2
-            className="m-0 text-lg font-black tracking-[-0.02em] text-[color:var(--asada-ink,#123f70)]"
-            id="admin-summary-title"
-          >
-            Campos administrativos
-          </h2>
-          <dl className="mt-4 grid gap-x-8 gap-y-0 sm:grid-cols-2 lg:grid-cols-3">
-            {adminEntries.map(([key, value]) => (
-              <div
-                className="min-w-0 border-b border-[color:var(--asada-line,#d7e5f1)] py-3.5"
-                key={key}
-              >
-                <dt className="text-xs font-bold uppercase tracking-[0.05em] text-[color:var(--asada-muted,#5b7390)]">
-                  {labelFor(key)}
-                </dt>
-                <dd className="m-0 mt-1.5 break-words text-sm font-bold text-[color:var(--asada-ink,#123f70)]">
-                  {displayValue(value)}
-                </dd>
-              </div>
-            ))}
-          </dl>
         </section>
-      ) : null}
+      )}
 
       {puedeCambiarEstado ? (
         <div>
@@ -396,55 +574,7 @@ export default function SolicitudAdminDetailPage() {
         </div>
       ) : null}
 
-      <section
-        className="rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white p-5 shadow-[0_10px_24px_rgba(18,63,112,0.06)] sm:p-6"
-        aria-labelledby="documents-title"
-      >
-        <h2
-          className="m-0 flex items-center gap-2 text-lg font-black text-[color:var(--asada-ink,#123f70)]"
-          id="documents-title"
-        >
-          <IconFileDescription size={20} aria-hidden="true" />
-          Documentos adjuntos
-          <span className="rounded-full bg-[color:var(--asada-ice,#eaf6ff)] px-2.5 py-1 text-xs font-bold text-[color:var(--asada-navy,#1e5a9c)]">
-            {documentosCount}
-          </span>
-        </h2>
-        {documentosCount ? (
-          <ul className="mb-0 mt-4 grid list-none gap-3 p-0 md:grid-cols-2">
-            {(detail.documentos ?? []).map((document) => (
-              <li
-                className="min-w-0 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:color-mix(in_srgb,var(--asada-ice,#eaf6ff)_35%,white)] p-4"
-                key={document.id}
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white text-[color:var(--asada-navy,#1e5a9c)]">
-                    <IconFileDescription size={20} aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <strong
-                      className="block truncate text-[color:var(--asada-ink,#123f70)]"
-                      title={document.nombreOriginal}
-                    >
-                      {document.nombreOriginal}
-                    </strong>
-                    <small className="text-[color:var(--asada-muted,#5b7390)]">
-                      {document.tipoDocumento} ·{' '}
-                      {formatBytes(document.tamano ?? document.tamanio)}
-                      {document.mimeType ? ` · ${document.mimeType}` : ''}
-                    </small>
-                  </span>
-                </div>
-                <SolicitudDocumentoActions solicitudId={detail.id} document={document} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mb-0 mt-3 text-[color:var(--asada-muted,#5b7390)]">
-            Esta solicitud no tiene documentos adjuntos.
-          </p>
-        )}
-      </section>
+      {!(formSections.length || adminEntries.length) ? documentosCard : null}
 
       {!puedeCambiarEstado && exitoEstado ? (
         <p

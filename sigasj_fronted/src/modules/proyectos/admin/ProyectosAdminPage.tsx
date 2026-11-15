@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
+import { Button } from '../../../shared/ui/Button'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import {
   ESTADO_PROYECTO_OPTIONS,
   type EstadoProyecto,
@@ -115,32 +117,25 @@ const ProyectosAdminPage = () => {
 
   return (
     <main className="gallery-admin proyectos-admin admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div>
-            <p className="gallery-admin__eyebrow">Panel administrativo</p>
-            <h1>Gestión de Proyectos</h1>
-            <p>
-              Consulte los proyectos institucionales, filtre por nombre, estado
-              de ejecución y visibilidad pública.
-            </p>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
-              Volver inicio
-            </Link>
-            <Link
-              className="gallery-admin__button gallery-admin__button--primary"
-              to={PROYECTOS_ADMIN_NEW_PATH}
-            >
-              Nuevo proyecto
-            </Link>
-          </div>
-        </header>
+      <div className="gallery-admin__shell sigasj-stack gap-4">
+        <PageHeader
+          title="Gestión de Proyectos"
+          description="Consulte los proyectos institucionales, filtre por nombre, estado de ejecución y visibilidad pública."
+          actions={
+            <>
+              <Button to="/admin/dashboard" variant="secondary" size="sm">
+                Volver inicio
+              </Button>
+              <Button to={PROYECTOS_ADMIN_NEW_PATH} size="sm">
+                Nuevo proyecto
+              </Button>
+            </>
+          }
+        />
 
         <section className="gallery-admin__filters w-full" aria-label="Búsqueda y filtros">
           <form
-            className="sigasj-filter-search"
+            className="admin-compact-filters"
             role="search"
             onSubmit={(event) => {
               event.preventDefault()
@@ -159,53 +154,53 @@ const ProyectosAdminPage = () => {
                 placeholder="Ej. acueducto, tanque…"
               />
             </label>
-          </form>
-          <label className="gallery-admin__field" htmlFor={ESTADO_FILTER_ID}>
-            <span>Estado</span>
-            <select
-              id={ESTADO_FILTER_ID}
-              name="estado"
-              value={estado}
-              onChange={(event) => {
-                setEstado(event.target.value)
-                setPage(DEFAULT_PROYECTOS_PAGE)
-              }}
-            >
-              <option value={EMPTY_FILTER}>Todos los estados</option>
-              {ESTADO_PROYECTO_OPTIONS.map((estadoProyecto) => (
-                <option value={estadoProyecto.value} key={estadoProyecto.value}>
-                  {estadoProyecto.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="gallery-admin__field" htmlFor={ACTIVO_FILTER_ID}>
-            <span>Visibilidad</span>
-            <select
-              id={ACTIVO_FILTER_ID}
-              name="activo"
-              value={activo}
-              onChange={(event) => {
-                setActivo(event.target.value)
-                setPage(DEFAULT_PROYECTOS_PAGE)
-              }}
-            >
-              <option value={EMPTY_FILTER}>Todos</option>
-              <option value="true">Activos</option>
-              <option value="false">Inactivos</option>
-            </select>
-          </label>
-          {hasActiveFilters ? (
-            <p className="gallery-admin__filter-reset">
-              <button
-                type="button"
-                className="gallery-admin__button"
-                onClick={clearFilters}
+            <label className="gallery-admin__field" htmlFor={ESTADO_FILTER_ID}>
+              <span>Estado</span>
+              <select
+                id={ESTADO_FILTER_ID}
+                name="estado"
+                value={estado}
+                onChange={(event) => {
+                  setEstado(event.target.value)
+                  setPage(DEFAULT_PROYECTOS_PAGE)
+                }}
               >
-                Limpiar filtros
-              </button>
-            </p>
-          ) : null}
+                <option value={EMPTY_FILTER}>Todos los estados</option>
+                {ESTADO_PROYECTO_OPTIONS.map((estadoProyecto) => (
+                  <option value={estadoProyecto.value} key={estadoProyecto.value}>
+                    {estadoProyecto.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="gallery-admin__field" htmlFor={ACTIVO_FILTER_ID}>
+              <span>Visibilidad</span>
+              <select
+                id={ACTIVO_FILTER_ID}
+                name="activo"
+                value={activo}
+                onChange={(event) => {
+                  setActivo(event.target.value)
+                  setPage(DEFAULT_PROYECTOS_PAGE)
+                }}
+              >
+                <option value={EMPTY_FILTER}>Todos</option>
+                <option value="true">Activos</option>
+                <option value="false">Inactivos</option>
+              </select>
+            </label>
+            {hasActiveFilters ? (
+              <p className="gallery-admin__filter-reset">
+                <button
+                  type="button"
+                  className="gallery-admin__button"
+                  onClick={clearFilters}
+                >
+                  Limpiar filtros
+                </button>
+              </p>
+            ) : null}
+          </form>
         </section>
 
         {actionError ? (

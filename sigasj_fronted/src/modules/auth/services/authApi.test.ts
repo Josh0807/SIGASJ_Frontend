@@ -6,6 +6,9 @@ import {
   loginWithCredentials,
 } from './authApi'
 
+// vitest.setup.ts mockea authApi globalmente; aqui se prueba la implementacion real.
+vi.unmock('./authApi')
+
 describe('authApi.loginWithCredentials', () => {
   afterEach(() => {
     vi.unstubAllGlobals()

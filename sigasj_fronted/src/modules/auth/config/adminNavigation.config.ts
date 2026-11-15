@@ -116,7 +116,11 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'solicitudes',
     title: 'Gestión de solicitudes',
-    allowedRoles: [InternalAdminRoleName.Administradora],
+    // Alineado con BE: Admin + Sec mutan estado; Fontanero solo lectura vía API (sin nav).
+    allowedRoles: [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Secretaria,
+    ],
     requiredPermissions: [],
     availableInNav: true,
   },

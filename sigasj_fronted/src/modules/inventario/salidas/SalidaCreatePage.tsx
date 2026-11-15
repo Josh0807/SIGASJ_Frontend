@@ -52,8 +52,15 @@ export default function SalidaCreatePage() {
   const idSolicitud = parseRelatedId(
     searchParams.get('idSolicitud') ?? searchParams.get('solicitudId'),
   )
+  const idMaterialPrefill = parseRelatedId(
+    searchParams.get('idMaterial') ?? searchParams.get('materialId'),
+  )
   const returnToAveria = readSafeAveriaReturnPath(searchParams.get('from'))
-  const [values, setValues] = useState(EMPTY_VALUES)
+  const [values, setValues] = useState(() =>
+    idMaterialPrefill
+      ? { ...EMPTY_VALUES, materialId: String(idMaterialPrefill) }
+      : EMPTY_VALUES,
+  )
   const [errors, setErrors] = useState<SalidaFormErrors>({})
   const [availability, setAvailability] = useState<Availability>(null)
   const [saving, setSaving] = useState(false)
@@ -68,7 +75,7 @@ export default function SalidaCreatePage() {
   const { result: materiales, loading, error, refetch } = useMateriales({
     activo: true,
     page: 1,
-    limit: 500,
+    limit: 100,
   })
   const materialListTruncated = materiales.total > materiales.data.length
   const availableMaterials = materiales.data.filter(

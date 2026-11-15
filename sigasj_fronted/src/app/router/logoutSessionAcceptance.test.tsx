@@ -1,4 +1,5 @@
 import { act } from 'react'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -63,6 +64,7 @@ const mountApp = async (path: string) => {
     root.render(<RouterProvider router={router} />)
     await Promise.resolve()
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,

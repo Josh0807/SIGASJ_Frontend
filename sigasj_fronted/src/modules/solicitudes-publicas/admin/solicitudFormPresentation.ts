@@ -60,6 +60,116 @@ formFields['servicio-existente'] = formFields['constancia-servicio']
 
 export type PresentedFormField = { key: string; label: string; value: unknown }
 
+export type PresentedFormSectionId =
+  | 'solicitante'
+  | 'inmueble'
+  | 'contacto'
+  | 'firma'
+  | 'otros'
+
+export type PresentedFormSection = {
+  id: PresentedFormSectionId
+  title: string
+  fields: PresentedFormField[]
+}
+
+const SECTION_META: Record<
+  PresentedFormSectionId,
+  { title: string; keys: string[] }
+> = {
+  solicitante: {
+    title: 'Datos del solicitante',
+    keys: [
+      'nombre',
+      'nombreSolicitante',
+      'nombrecompleto',
+      'identificacion',
+      'cedula',
+      'identificacionSolicitante',
+      'nombrePropietarioRegistral',
+      'identificacionPropietario',
+      'tipoPersona',
+      'estadoCivil',
+      'vecinoDe',
+      'lugarDeResidencia',
+      'propietarioInmueble',
+    ],
+  },
+  inmueble: {
+    title: 'Datos del inmueble',
+    keys: [
+      'nis',
+      'folioReal',
+      'planoCatastrado',
+      'planoAgrimensura',
+      'naturalezaInmueble',
+      'calidadTitular',
+      'facturaANombreDe',
+      'numeroPlano',
+      'numeroAbonado',
+      'numeroCuentaServicio',
+      'provincia',
+      'canton',
+      'distrito',
+      'direccionExacta',
+      'tipoServicio',
+      'proposito',
+      'descripcionProyecto',
+      'motivo',
+      'tramitePorRealizar',
+      'montoPrimaInicial',
+      'plazoSeleccionado',
+    ],
+  },
+  contacto: {
+    title: 'Contacto y notificación',
+    keys: [
+      'telefono',
+      'correoElectronico',
+      'mediosNotificacion',
+      'medioNotificacion',
+      'canalNotificacion',
+      'notificacion',
+    ],
+  },
+  firma: {
+    title: 'Firma',
+    keys: ['firma', 'firmaSolicitante'],
+  },
+  otros: {
+    title: 'Otros datos',
+    keys: [],
+  },
+}
+
+const normalizeKey = (key: string) => key.toLowerCase().replace(/[\s_-]/g, '')
+
+const sectionForKey = (key: string): PresentedFormSectionId => {
+  const normalized = normalizeKey(key)
+  if (normalized.includes('firma')) return 'firma'
+  if (
+    SECTION_META.contacto.keys.some((item) => normalizeKey(item) === normalized) ||
+    normalized.includes('telefono') ||
+    normalized.includes('correo') ||
+    normalized.includes('notific')
+  ) {
+    return 'contacto'
+  }
+  if (SECTION_META.solicitante.keys.some((item) => normalizeKey(item) === normalized)) {
+    return 'solicitante'
+  }
+  if (SECTION_META.inmueble.keys.some((item) => normalizeKey(item) === normalized)) {
+    return 'inmueble'
+  }
+  if (
+    normalized.includes('recomendacion') ||
+    normalized.includes('fecha')
+  ) {
+    return 'otros'
+  }
+  return 'otros'
+}
+
 export const presentSolicitudForm = (slug: string | undefined, detail: Record<string, unknown> | null): PresentedFormField[] => {
   if (!detail) return []
   const configured = formFields[slug ?? ''] ?? []
@@ -69,4 +179,44 @@ export const presentSolicitudForm = (slug: string | undefined, detail: Record<st
     .filter(([key]) => !used.has(key) && !['id', 'solicitudId', 'createdAt', 'updatedAt'].includes(key))
     .map(([key, value]) => ({ key, label: key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replaceAll('_', ' ').replace(/^./, (letter) => letter.toUpperCase()), value }))
   return [...preferred, ...extras]
+}
+
+export const groupPresentedFormSections = (
+  fields: PresentedFormField[],
+  slug?: string,
+): PresentedFormSection[] => {
+  const buckets: Record<PresentedFormSectionId, PresentedFormField[]> = {
+    solicitante: [],
+    inmueble: [],
+    contacto: [],
+    firma: [],
+    otros: [],
+  }
+
+  for (const field of fields) {
+    buckets[sectionForKey(field.key)].push(field)
+  }
+
+  const firmaTitle =
+    slug === 'cambio-titular'
+      ? 'Firma del nuevo titular'
+      : buckets.firma[0]?.label?.toLowerCase().includes('firma')
+        ? buckets.firma[0].label
+        : 'Firma'
+
+  const order: PresentedFormSectionId[] = [
+    'solicitante',
+    'inmueble',
+    'contacto',
+    'firma',
+    'otros',
+  ]
+
+  return order
+    .filter((id) => buckets[id].length > 0)
+    .map((id) => ({
+      id,
+      title: id === 'firma' ? firmaTitle : SECTION_META[id].title,
+      fields: buckets[id],
+    }))
 }

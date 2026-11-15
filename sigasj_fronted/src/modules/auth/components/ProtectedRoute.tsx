@@ -11,7 +11,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
 
-  if (isLoading) {
+  // Sesión local ya presente: render optimista mientras se valida con el backend.
+  if (isLoading && !isAuthenticated) {
     return null
   }
 

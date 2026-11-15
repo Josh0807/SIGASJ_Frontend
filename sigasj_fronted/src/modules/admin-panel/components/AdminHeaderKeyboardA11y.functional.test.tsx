@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { resolve } from 'node:path'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -93,6 +94,7 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,

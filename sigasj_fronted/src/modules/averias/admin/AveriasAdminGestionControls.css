@@ -17,6 +17,32 @@
   background: #f4f8fc;
 }
 
+.averias-admin__estado-panel--row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.averias-admin__estado-panel--row .averias-admin__estado-panel-copy {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.averias-admin__estado-panel--row .averias-admin__estado-label {
+  margin: 0;
+}
+
+.averias-admin__estado-panel--row .averias-admin__hint,
+.averias-admin__estado-panel--row .averias-admin__horario-hint {
+  margin: 0;
+  max-width: 28rem;
+  text-align: right;
+}
+
 .averias-admin__estado-panel-copy {
   display: flex;
   flex-wrap: wrap;

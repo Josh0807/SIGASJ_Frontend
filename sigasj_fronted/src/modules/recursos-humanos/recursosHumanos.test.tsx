@@ -288,12 +288,41 @@ describe('Recursos Humanos: colaboradores', () => {
     expect(view.container.textContent).toContain('juan@example.com')
     expect(view.container.textContent).toContain('Sin cuenta vinculada')
     expect(byText(view.container, 'a', 'Editar')?.getAttribute('href')).toBe('/admin/rrhh/1/editar')
+    expect(view.container.textContent).not.toContain('Más acciones')
+
+    await act(async () => {
+      Array.from(view.container.querySelectorAll('button')).find(
+        (button) => button.textContent?.trim() === 'Asignación y permisos',
+      )?.click()
+    })
     expect(byText(view.container, 'a', 'Vacaciones')?.getAttribute('href')).toBe(
       '/admin/rrhh/vacaciones?colaboradorId=1',
     )
     expect(byText(view.container, 'a', 'Incapacidades')?.getAttribute('href')).toBe(
       '/admin/rrhh/incapacidades?colaboradorId=1',
     )
+
+    stubApi((url) => {
+      if (url.pathname.includes('/historial')) {
+        return response({
+          colaborador: juan,
+          historial: [],
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+        })
+      }
+      return url.pathname.endsWith('/1')
+        ? response(juan)
+        : response({ message: 'Not Found' }, false, 404)
+    })
+    await act(async () => {
+      Array.from(view.container.querySelectorAll('button')).find(
+        (button) => button.textContent?.trim() === 'Historial',
+      )?.click()
+    })
+    await flush()
     expect(byText(view.container, 'a', 'Historial')?.getAttribute('href')).toBe(
       '/admin/rrhh/1/historial',
     )

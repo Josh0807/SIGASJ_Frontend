@@ -144,11 +144,14 @@ const AveriasAdminAsignacionControls = ({
         </p>
       ) : null}
 
-      <dl className="averias-admin__fields">
-        <AveriasDetailField label="Fontanero asignado">
+      <div className="averias-admin-asignacion__status">
+        <span className="averias-admin-asignacion__status-label">
+          Fontanero asignado
+        </span>
+        <span className="averias-admin-asignacion__status-badge">
           {AVERIA_UNASSIGNED_LABEL}
-        </AveriasDetailField>
-      </dl>
+        </span>
+      </div>
 
       {listError ? (
         <ActivityFeedback
@@ -157,7 +160,7 @@ const AveriasAdminAsignacionControls = ({
           action={
             <button
               type="button"
-              className="gallery-admin__button"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-[#eaf6ff]"
               onClick={() => refetchFontaneros()}
             >
               Reintentar
@@ -234,15 +237,19 @@ const AveriasAdminAsignacionControls = ({
           <button
             ref={assignButtonRef}
             type="button"
-            className="gallery-admin__button group !inline-flex !min-h-13 !w-full !items-center !justify-center !gap-2.5 !rounded-xl !border-0 !bg-gradient-to-r !from-blue-700 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(23,105,220,0.24)] !transition-all !duration-300 enabled:hover:!-translate-y-0.5 enabled:hover:!brightness-105 enabled:hover:!shadow-[0_14px_30px_rgba(23,105,220,0.32)] active:!translate-y-0 active:!scale-[0.98] disabled:!cursor-not-allowed disabled:!bg-none disabled:!bg-slate-200 disabled:!text-slate-500 disabled:!shadow-none"
+            className="averias-admin-asignacion__submit group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 px-5 py-3 font-extrabold text-white shadow-[0_8px_18px_rgba(30,90,156,0.24)] transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:from-blue-800 enabled:hover:to-sky-600 enabled:hover:shadow-[0_11px_24px_rgba(30,90,156,0.32)] enabled:active:translate-y-0 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
             disabled={busy || selectedFontaneroId == null}
             aria-busy={assigning}
             onClick={handleAssignClick}
           >
             {assigning ? (
-              <IconLoader2 className="!animate-spin" size={20} aria-hidden="true" />
+              <IconLoader2 className="animate-spin" size={19} aria-hidden="true" />
             ) : (
-              <IconUserPlus className="!transition-transform !duration-300 group-hover:!scale-110" size={20} aria-hidden="true" />
+              <IconUserPlus
+                className="transition-transform duration-200 group-enabled:group-hover:scale-110"
+                size={19}
+                aria-hidden="true"
+              />
             )}
             {assigning ? 'Asignando…' : 'Asignar fontanero'}
           </button>

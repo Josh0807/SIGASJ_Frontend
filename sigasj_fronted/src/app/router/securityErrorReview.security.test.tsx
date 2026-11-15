@@ -1,4 +1,6 @@
 import { act } from 'react'
+import { submitLoginForm } from '../../test/adminPanelTestHelpers'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
@@ -101,6 +103,7 @@ const mountApp = async (path: string) => {
   await act(async () => {
     root.render(<RouterProvider router={router} />)
   })
+  await waitForAppRoutesReady(container)
 
   await act(async () => {
     await Promise.resolve()
@@ -115,11 +118,7 @@ const mountApp = async (path: string) => {
       })
     },
     submitLogin: async () => {
-      const form = container.querySelector<HTMLFormElement>('.auth-page__form')
-      expect(form).not.toBeNull()
-      await act(async () => {
-        form?.requestSubmit()
-      })
+      await submitLoginForm(container)
     },
     confirmLogout: async () => {
       const trigger = container.querySelector<HTMLButtonElement>(
@@ -246,8 +245,11 @@ describe('revisión técnica de errores — pruebas de seguridad', () => {
     )
 
     await expect(fetchWithAuth('/usuarios')).rejects.toThrow(/401/)
-    expect(isAuthenticated()).toBe(true)
+    // 401 = sesión vencida: httpClient limpia la sesión local (no es un éxito).
+    expect(isAuthenticated()).toBe(false)
 
+    // 403 = sin permiso: la sesión debe conservarse.
+    loginAsRole('Administradora')
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({

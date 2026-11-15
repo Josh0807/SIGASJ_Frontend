@@ -119,7 +119,7 @@ describe('navegación conjunta entre área pública y administrativa', () => {
     try {
       expect(publicArea.currentPath()).toBe('/')
       expect(publicArea.container.innerHTML).toContain('hero')
-      expect(publicArea.container.innerHTML).toContain('header__inner')
+      expect(publicArea.container.innerHTML).toContain('public-container')
       expect(hasAdminChrome(publicArea.container.innerHTML)).toBe(false)
       expect(publicArea.errors).toEqual([])
       expect(publicArea.warnings).toEqual([])

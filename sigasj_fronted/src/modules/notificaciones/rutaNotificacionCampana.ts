@@ -51,6 +51,14 @@ export function rutaNotificacionCampana(
     return canAccessAdminRoute(user, path) ? path : null
   }
 
+  // Backend guarda el id de AlertaReposicion en `idReposicion` para este tipo
+  // (no es ReposicionMaterial). Debe abrir el listado de alertas.
+  if (item.tipo === 'ALERTA_REPOSICION_ADMINISTRADORA') {
+    return canAccessAdminRoute(user, ALERTAS_REPOSICION_PATH)
+      ? ALERTAS_REPOSICION_PATH
+      : null
+  }
+
   const idReposicion = item.idReposicion
   if (idReposicion != null && Number.isInteger(idReposicion) && idReposicion > 0) {
     const detailPath = reposicionDetailPath(idReposicion)

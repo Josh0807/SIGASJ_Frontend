@@ -40,6 +40,13 @@ export type SolicitudAusenciaFontanero = {
   updatedAt: string
 }
 
+export type AvisoCorreoSolicitud = {
+  enviado: boolean
+  destinos: string[]
+  vistaPreviaUrl?: string | null
+  motivoOmitido?: string | null
+}
+
 export type SolicitudAusencia = {
   id: number
   colaboradorId: number
@@ -65,6 +72,8 @@ export type SolicitudAusencia = {
     diasDisfrutados: number
     diasDisponibles: number
   } | null
+  /** Solo en respuesta de aprobar/rechazar. */
+  avisoCorreo?: AvisoCorreoSolicitud
 }
 
 export type SolicitudesAusenciaListado = {

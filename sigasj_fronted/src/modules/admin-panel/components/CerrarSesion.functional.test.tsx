@@ -1,4 +1,6 @@
 import { act, useEffect } from 'react'
+import { submitLoginForm } from '../../../test/adminPanelTestHelpers'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryRouter, MemoryRouter, RouterProvider, useLocation } from 'react-router-dom'
@@ -208,20 +210,13 @@ const mountApp = async (path: string): Promise<MountedApp> => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
     root,
     currentPath: () => pathname,
-    submitLogin: async () => {
-      const submit = container.querySelector<HTMLButtonElement>('.auth-page__submit')
-      expect(submit).not.toBeNull()
-
-      await act(async () => {
-        submit?.click()
-        await new Promise((resolve) => setTimeout(resolve, 50))
-      })
-    },
+    submitLogin: () => submitLoginForm(container),
     openAccountMenu: async () => {
       const trigger = container.querySelector<HTMLButtonElement>(
         '.admin-account-menu__trigger',
@@ -276,16 +271,9 @@ const mountInteractiveApp = async (
   await act(async () => {
     root.render(<RouterProvider router={router} />)
   })
+  await waitForAppRoutesReady(container)
 
-  const submitLogin = async () => {
-    const form = container.querySelector('.auth-page__form') as HTMLFormElement | null
-    expect(form).not.toBeNull()
-
-    await act(async () => {
-      form?.requestSubmit()
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    })
-  }
+  const submitLogin = () => submitLoginForm(container)
 
   const logoutFromMenu = async () => {
     const trigger = container.querySelector(
@@ -394,7 +382,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
   it('Prueba 2 — abrir confirmación sin ejecutar logout inmediatamente', async () => {
     const consoleSpy = collectConsole()
-    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    const clearSpy = vi.spyOn(authStorage, 'clearAuthSession')
 
     setAccessToken('token-funcional')
     setAuthUser({
@@ -422,7 +410,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
       expect(clearSpy).not.toHaveBeenCalled()
       expect(isAuthenticated()).toBe(true)
       expect(getAccessToken()).toBe('token-funcional')
-      expect(getAuthUser()?.name).toBe('María')
+      expect(getAuthUser()?.name).toBe('María Solís')
       expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(app.container.querySelector('.confirm-dialog')).not.toBeNull()
       expect(
@@ -451,7 +439,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
   it('Prueba 3 — confirmar cierre ejecuta logout, invalida sesión y redirige al login', async () => {
     const consoleSpy = collectConsole()
-    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    const clearSpy = vi.spyOn(authStorage, 'clearAuthSession')
 
     setAccessToken('token-usuario-a')
     setAuthUser({
@@ -487,7 +475,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
   it('Prueba 4 — AdminHeader no conserva nombre, rol ni sesión anterior tras logout', async () => {
     const consoleSpy = collectConsole()
-    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    const clearSpy = vi.spyOn(authStorage, 'clearAuthSession')
 
     setAccessToken('token-usuario-a')
     setAuthUser({
@@ -717,7 +705,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
   it('Cancelar cierra el diálogo sin afectar sesión, layout ni ruta actual', async () => {
     const consoleSpy = collectConsole()
-    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    const clearSpy = vi.spyOn(authStorage, 'clearAuthSession')
 
     const app = await mountApp(LOGIN_ROUTE_PATH)
 
@@ -767,7 +755,7 @@ describe('Cerrar sesión — pruebas funcionales', () => {
 
   it('Escape en el diálogo se comporta como Cancelar', async () => {
     const consoleSpy = collectConsole()
-    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    const clearSpy = vi.spyOn(authStorage, 'clearAuthSession')
 
     const app = await mountApp(LOGIN_ROUTE_PATH)
 
@@ -820,14 +808,14 @@ describe('Cerrar sesión — pruebas funcionales', () => {
     try {
       expect(app.currentPath()).toBe(ADMIN_HOME_PATH)
       expect(isAuthenticated()).toBe(true)
-      expect(getAuthUser()?.name).toBe('María')
+      expect(getAuthUser()?.name).toBe('María Solís')
 
       await app.cancelLogoutDialog()
 
       expect(getAccessToken()).toBe('token-funcional')
-      expect(getAuthUser()).toEqual({
-        name: 'María',
-        lastName: 'Solís',
+      // /auth/me (mock global) re-normaliza name/lastName en un solo nombre completo.
+      expect(getAuthUser()).toMatchObject({
+        name: 'María Solís',
         role: 'Administradora',
       })
       expect(isAuthenticated()).toBe(true)

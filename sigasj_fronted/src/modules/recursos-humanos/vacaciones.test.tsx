@@ -190,10 +190,14 @@ const tarjeta = (container: ParentNode, label: string) => {
   const dt = Array.from(container.querySelectorAll<HTMLElement>('dt')).find(
     (node) => node.textContent?.trim() === label,
   )
-  const dd = dt?.nextElementSibling
+  const dd = dt?.nextElementSibling as HTMLElement | null | undefined
   if (!dt || !dd) return undefined
-  return [dt.textContent, ...Array.from(dd.children).map((n) => n.textContent)]
-    .map((t) => t?.trim())
+  const valor = Array.from(dd.querySelectorAll('strong, span, em'))
+    .map((n) => n.textContent?.trim())
+    .filter(Boolean)
+  if (valor.length > 0) return [dt.textContent?.trim(), ...valor].join(' ')
+  return [dt.textContent, dd.textContent]
+    .map((t) => t?.replace(/\s+/g, ' ').trim())
     .filter(Boolean)
     .join(' ')
 }
@@ -245,7 +249,8 @@ describe('Recursos Humanos: vacaciones', () => {
     expect(tarjeta(view.container, 'Adquiridas')).toBe('Adquiridas 20 días')
     expect(tarjeta(view.container, 'Disfrutadas')).toBe('Disfrutadas 8 días')
     expect(tarjeta(view.container, 'Disponibles')).toBe('Disponibles 12 días')
-    expect(view.container.textContent).toContain('Calculado a partir de 2 movimientos')
+    expect(view.container.textContent).toContain('Registrar movimiento')
+    expect(view.container.textContent).not.toContain('Saldo disponible:')
     await view.cleanup()
   })
 
@@ -377,7 +382,7 @@ describe('Recursos Humanos: vacaciones', () => {
     })
     const view = await mount('/admin/rrhh/vacaciones?colaboradorId=1')
     expect(view.container.textContent).toContain('Mostrando 1–10 de 12 movimientos')
-    expect(view.container.textContent).toContain('Página 1 de 2')
+    expect(view.container.textContent).toContain('1 / 2')
 
     await act(async () => byText(view.container, 'button', 'Siguiente')!.click())
     await flush()
@@ -385,7 +390,7 @@ describe('Recursos Humanos: vacaciones', () => {
     expect(ultima.searchParams.get('page')).toBe('2')
     expect(ultima.searchParams.get('colaboradorId')).toBe('1')
     expect(view.container.textContent).toContain('Mostrando 11–12 de 12 movimientos')
-    expect(view.container.textContent).toContain('Página 2 de 2')
+    expect(view.container.textContent).toContain('2 / 2')
     await view.cleanup()
   })
 

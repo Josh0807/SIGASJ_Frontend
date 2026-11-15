@@ -1,4 +1,5 @@
 import { act, type ComponentProps } from 'react'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -22,7 +23,9 @@ import {
 const renderHeader = (props: ComponentProps<typeof AdminHeader> = {}) =>
   renderToStaticMarkup(
     <MemoryRouter>
-      <AdminHeader {...props} />
+      <AuthProvider>
+        <AdminHeader {...props} />
+      </AuthProvider>
     </MemoryRouter>,
   )
 
@@ -184,10 +187,13 @@ describe('AdminHeader', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminHeader />
+          <AuthProvider>
+            <AdminHeader />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const header = () => container.querySelector('.admin-header') as HTMLElement
     expect(header().getAttribute('data-scroll-hidden')).toBe('false')
@@ -228,10 +234,13 @@ describe('AdminHeader', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminHeader menuOpen={false} onToggleMenu={onToggleMenu} />
+          <AuthProvider>
+            <AdminHeader menuOpen={false} onToggleMenu={onToggleMenu} />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const toggle = container.querySelector(
       '.admin-menu-toggle',
@@ -255,10 +264,13 @@ describe('AdminHeader', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminHeader />
+          <AuthProvider>
+            <AdminHeader />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     expect(readUserSection()).toContain('Usuario')
 
@@ -314,10 +326,13 @@ describe('AdminHeader', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminHeader />
+          <AuthProvider>
+            <AdminHeader />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     expect(readUserSection()).toContain('María Solís')
     expect(readUserSection()).toContain('Administradora')
@@ -363,6 +378,7 @@ describe('AdminHeader', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -428,13 +444,16 @@ describe('AdminHeader', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/galeria']}>
-          <Routes>
-            <Route path="/admin/galeria" element={<AdminHeader />} />
-            <Route path="/login" element={<p>Pantalla login</p>} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/admin/galeria" element={<AdminHeader />} />
+              <Route path="/login" element={<p>Pantalla login</p>} />
+            </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',

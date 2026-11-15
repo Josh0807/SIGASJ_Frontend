@@ -1,4 +1,6 @@
 import { act, useEffect } from 'react'
+import { submitLoginForm } from '../../../test/adminPanelTestHelpers'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -17,7 +19,9 @@ import { LOGIN_ROUTE_PATH } from '../../../app/router/publicRoutes'
 const renderHeader = () =>
   renderToStaticMarkup(
     <MemoryRouter>
-      <AdminHeader />
+      <AuthProvider>
+        <AdminHeader />
+      </AuthProvider>
     </MemoryRouter>,
   )
 
@@ -77,6 +81,7 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -158,15 +163,7 @@ const assertNoSensitiveUserDataInHeader = (html: string) => {
   expect(html).not.toContain('contraseña')
 }
 
-const submitLogin = async (container: HTMLElement) => {
-  const submit = container.querySelector<HTMLButtonElement>('.auth-page__submit')
-  expect(submit).not.toBeNull()
-
-  await act(async () => {
-    submit?.click()
-    await new Promise((resolve) => setTimeout(resolve, 50))
-  })
-}
+const submitLogin = (container: HTMLElement) => submitLoginForm(container)
 
 const confirmLogoutInDialog = async (container: HTMLElement) => {
   const confirmButton = container.querySelector(
@@ -243,8 +240,8 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
 
       expect(user.name).toBe('Usuario')
       expect(user.role).toBe('Administradora')
-      expect(app.container.querySelector('.admin-header')?.textContent).toContain(
-        'Panel administrativo',
+      expect(app.container.querySelector('.admin-header')?.getAttribute('aria-label')).toBe(
+        'Encabezado del panel administrativo',
       )
       assertNoSensitiveUserDataInHeader(app.container.innerHTML)
       expect(consoleSpy.errors).toEqual([])
@@ -291,7 +288,9 @@ describe('AdminHeader — información del usuario (pruebas funcionales)', () =>
 
       try {
         expect(noRoleApp.container.querySelector('.admin-header')).toBeNull()
-        expect(noRoleApp.currentPath()).toBe(LOGIN_ROUTE_PATH)
+        // Rol inválido: AdminAreaGate envía a /login y LoginPage (sesión local aún
+        // presente) redirige al inicio público, nunca al panel.
+        expect(noRoleApp.currentPath()).toBe('/')
         assertStableUserMarkup(noRoleApp.container.innerHTML)
       } finally {
         await noRoleApp.cleanup()
@@ -546,7 +545,7 @@ describe('AdminHeader — pruebas funcionales', () => {
       expect(app.container.querySelector('.admin-header')).toBe(header)
       expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(outletTitle(app.container)).toBe('Galería de fotografías')
-      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
 
       await app.clickSidebarLink('/admin/transparencia')
       expect(app.currentPath()).toBe('/admin/transparencia')
@@ -579,7 +578,8 @@ describe('AdminHeader — pruebas funcionales', () => {
       expect(header?.textContent).toContain('Administradora')
       expect(header?.querySelector('.admin-header__avatar')).not.toBeNull()
       expect(
-        fullUserApp.container.querySelector('.visually-hidden')?.textContent,
+        fullUserApp.container.querySelector('.admin-header__user .visually-hidden')
+          ?.textContent,
       ).toContain('María Solís')
     } finally {
       await fullUserApp.cleanup()
@@ -664,7 +664,7 @@ describe('AdminHeader — pruebas funcionales', () => {
       const markup = renderPath('/')
 
       expect(markup).toContain('hero')
-      expect(markup).toContain('header__inner')
+      expect(markup).toContain('public-container')
       expect(markup).not.toContain('admin-header')
       expect(markup).not.toContain('admin-layout')
       expect(markup).not.toContain('admin-sidebar')

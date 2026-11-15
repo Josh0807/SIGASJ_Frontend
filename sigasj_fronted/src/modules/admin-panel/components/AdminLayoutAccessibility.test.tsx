@@ -1,4 +1,5 @@
 import { act } from 'react'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -61,10 +62,13 @@ describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminUserMenu />
+          <AuthProvider>
+            <AdminUserMenu />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector<HTMLButtonElement>('.admin-user-menu__trigger')
     expect(trigger).not.toBeNull()
@@ -115,6 +119,7 @@ describe('AdminLayout Accessibility (WCAG AA & Keyboard Navigation)', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const links = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href]'))
     expect(links.length).toBeGreaterThan(0)

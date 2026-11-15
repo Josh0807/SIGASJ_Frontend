@@ -1,6 +1,9 @@
 import { useRef, useState, type FormEvent } from 'react'
+import { IconDeviceFloppy } from '@tabler/icons-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
-import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
+import { Alert } from '../../../shared/ui/Alert'
+import { buttonVariants } from '../../../shared/ui/button-variants'
+import { cn } from '../../../shared/ui/cn'
 import {
   extractHttpErrorMessage,
   getHttpErrorStatus,
@@ -29,6 +32,11 @@ import {
 
 const PRIORIDAD_SELECT_ID = 'averia-fontanero-prioridad'
 const TIPO_SELECT_ID = 'averia-fontanero-clasificacion'
+
+const labelClass =
+  'text-[0.72rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted'
+const fieldClass =
+  'min-h-11 w-full rounded-xl border border-sigasj-border bg-white px-3.5 text-[0.95rem] font-semibold text-sigasj-ink outline-none transition focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)] disabled:cursor-not-allowed disabled:opacity-60'
 
 const toPrioridadValue = (value: string): 'BAJA' | 'MEDIA' | 'ALTA' | '' => {
   const normalized = value.trim().toUpperCase()
@@ -132,66 +140,91 @@ const AveriasFontaneroClasificacionForm = ({
 
   return (
     <form
-      className="averias-admin__gestion-controls averias-fontanero__calificar !grid !min-w-0 !grid-cols-1 !gap-5 !rounded-3xl !border !border-blue-100 !bg-linear-to-br !from-white !to-[#eaf6ff]/70 !p-6 !shadow-[0_10px_28px_rgba(30, 90, 156,0.10)] md:!grid-cols-2"
+      className="averias-admin__gestion-controls averias-fontanero__calificar grid gap-4 rounded-2xl border border-sigasj-border bg-white p-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)] lg:items-end"
       onSubmit={handleSubmit}
     >
-      <div className="!col-span-full !border-b !border-blue-100 !pb-4">
-        <p className="averias-admin__estado-label !m-0 !text-xl !font-black !tracking-[-0.02em] !text-[#073b73]">{AVERIAS_FONTANERO_CALIFICAR_TITULO}</p>
-        <p className="averias-admin__hint !mt-2 !mb-0 !max-w-2xl !text-sm !leading-relaxed !text-slate-500">{AVERIAS_FONTANERO_CALIFICAR_HINT}</p>
+      <div className="min-w-0">
+        <p className="averias-admin__estado-label m-0 text-base font-extrabold tracking-tight text-sigasj-ink">
+          {AVERIAS_FONTANERO_CALIFICAR_TITULO}
+        </p>
+        <p className="averias-admin__hint mb-0 mt-1 max-w-xl text-sm font-semibold leading-snug text-sigasj-muted">
+          {AVERIAS_FONTANERO_CALIFICAR_HINT}
+        </p>
       </div>
-      <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor={PRIORIDAD_SELECT_ID}>
-        <span className="!text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-[#1e5a9c]">Prioridad</span>
-        <select
-          className="!box-border !min-h-14 !w-full !min-w-0 !max-w-full !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-4 !text-base !font-bold !text-[#073b73] !shadow-sm !outline-none !transition-all !duration-200 hover:!border-blue-300 focus:!border-[#1e5a9c] focus:!ring-4 focus:!ring-blue-100 disabled:!cursor-not-allowed disabled:!opacity-60"
-          id={PRIORIDAD_SELECT_ID}
-          name="prioridad"
-          value={prioridad}
-          disabled={saving}
-          required
-          onChange={(event) => setPrioridad(toPrioridadValue(event.target.value))}
+
+      <div className="flex flex-wrap items-end gap-3">
+        <label
+          className="gallery-admin__field grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
+          htmlFor={PRIORIDAD_SELECT_ID}
         >
-          <option value="" disabled>
-            Seleccione
-          </option>
-          {PRIORIDAD_AVERIA_FONTANERO_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          <span className={labelClass}>Prioridad</span>
+          <select
+            className={fieldClass}
+            id={PRIORIDAD_SELECT_ID}
+            name="prioridad"
+            value={prioridad}
+            disabled={saving}
+            required
+            onChange={(event) =>
+              setPrioridad(toPrioridadValue(event.target.value))
+            }
+          >
+            <option value="" disabled>
+              Seleccione
             </option>
-          ))}
-        </select>
-      </label>
-      <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor={TIPO_SELECT_ID}>
-        <span className="!text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-[#1e5a9c]">Tipo</span>
-        <select
-          className="!box-border !min-h-14 !w-full !min-w-0 !max-w-full !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-4 !text-base !font-bold !text-[#073b73] !shadow-sm !outline-none !transition-all !duration-200 hover:!border-blue-300 focus:!border-[#1e5a9c] focus:!ring-4 focus:!ring-blue-100 disabled:!cursor-not-allowed disabled:!opacity-60"
-          id={TIPO_SELECT_ID}
-          name="clasificacion"
-          value={tipo}
-          disabled={saving}
-          required
-          onChange={(event) => setTipo(toTipoValue(event.target.value))}
+            {PRIORIDAD_AVERIA_FONTANERO_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label
+          className="gallery-admin__field grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
+          htmlFor={TIPO_SELECT_ID}
         >
-          <option value="" disabled>
-            Seleccione
-          </option>
-          {TIPO_AVERIA_FONTANERO_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          <span className={labelClass}>Tipo</span>
+          <select
+            className={fieldClass}
+            id={TIPO_SELECT_ID}
+            name="clasificacion"
+            value={tipo}
+            disabled={saving}
+            required
+            onChange={(event) => setTipo(toTipoValue(event.target.value))}
+          >
+            <option value="" disabled>
+              Seleccione
             </option>
-          ))}
-        </select>
-      </label>
-      {error ? <ActivityFeedback variant="error" message={error} /> : null}
-      <button
-        ref={guardarRef}
-        className="gallery-admin__button !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(30, 90, 156,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(30, 90, 156,0.35)] active:!translate-y-0 active:!scale-[0.97] disabled:!cursor-not-allowed disabled:!opacity-55 disabled:hover:!translate-y-0"
-        type="submit"
-        disabled={saving}
-      >
-        {saving
-          ? AVERIAS_FONTANERO_CALIFICAR_LOADING
-          : AVERIAS_FONTANERO_CALIFICAR_GUARDAR}
-      </button>
+            {TIPO_AVERIA_FONTANERO_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <button
+          ref={guardarRef}
+          type="submit"
+          className={cn(
+            buttonVariants({ variant: 'primary', size: 'sm' }),
+            'w-full sm:w-auto',
+          )}
+          disabled={saving}
+        >
+          <IconDeviceFloppy size={16} aria-hidden="true" />
+          <span>
+            {saving
+              ? AVERIAS_FONTANERO_CALIFICAR_LOADING
+              : AVERIAS_FONTANERO_CALIFICAR_GUARDAR}
+          </span>
+        </button>
+      </div>
+
+      {error ? <Alert tone="danger">{error}</Alert> : null}
+
       <ConfirmDialog
         isOpen={confirmOpen}
         title={AVERIAS_FONTANERO_CALIFICAR_CONFIRM_TITULO}

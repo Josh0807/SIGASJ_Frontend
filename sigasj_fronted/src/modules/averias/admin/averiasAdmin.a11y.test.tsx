@@ -67,11 +67,11 @@ describe('accesibilidad del listado administrativo de averías', () => {
     expect(
       container.querySelector('label[for="averias-admin-fecha-hasta"]'),
     ).toBeTruthy()
-    expect(container.querySelector('form[role="search"]')).toBeTruthy()
+    expect(container.querySelector('section[aria-label="Búsqueda y filtros"]')).toBeTruthy()
     expect(container.querySelector('table caption')?.textContent).toBe(
       'Listado de averías',
     )
-    expect(container.querySelectorAll('th[scope="col"]').length).toBe(5)
+    expect(container.querySelectorAll('th[scope="col"]').length).toBe(7)
 
     const detail = [...container.querySelectorAll('a')].find(
       (anchor) => anchor.textContent === 'Ver detalle',

@@ -12,10 +12,7 @@ import { findAveriaDetailFixture } from './fixtures/averiasAdminDetail.fixture'
 import { ESTADO_AVERIA_LABELS } from './estadoAveria'
 import * as averiasAdminApi from '../services/averiasAdminApi'
 import * as salidasApi from '../../inventario/salidas/salidasApi'
-import {
-  AVERIA_CLASIFICACION_FONTANERO_HINT,
-  AVERIA_ESTADO_FONTANERO_HINT,
-} from './AveriasAdminGestionControls'
+import { AVERIA_ESTADO_FONTANERO_HINT } from './AveriasAdminGestionControls'
 import type { AveriaDetail } from './types'
 
 const adminDir = dirname(fileURLToPath(import.meta.url))
@@ -98,7 +95,7 @@ describe('AveriasAdminGestion (PBI 2.3)', () => {
     expect(container.querySelector('#averia-gestion-estado')).toBeNull()
     expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
     expect(container.querySelector('#averia-gestion-clasificacion')).toBeNull()
-    expect(container.textContent).toContain(AVERIA_CLASIFICACION_FONTANERO_HINT)
+    expect(container.textContent).toContain(AVERIA_ESTADO_FONTANERO_HINT)
     expect(averiasAdminApi.patchAdminAveriaPrioridad).not.toHaveBeenCalled()
     expect(averiasAdminApi.patchAdminAveriaClasificacion).not.toHaveBeenCalled()
   })

@@ -1,4 +1,6 @@
 import { act } from 'react'
+import { submitLoginForm } from '../../test/adminPanelTestHelpers'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
@@ -51,6 +53,7 @@ const mountInteractiveApp = async (
   await act(async () => {
     root.render(<RouterProvider router={router} />)
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -75,15 +78,7 @@ const mountInteractiveApp = async (
   }
 }
 
-const submitLogin = async (container: HTMLElement) => {
-  const form = container.querySelector('.auth-page__form') as HTMLFormElement | null
-  expect(form).not.toBeNull()
-
-  await act(async () => {
-    form?.requestSubmit()
-    await new Promise((resolve) => setTimeout(resolve, 50))
-  })
-}
+const submitLogin = (container: HTMLElement) => submitLoginForm(container)
 
 const logoutFromAccountMenu = async (container: HTMLElement) => {
   const trigger = container.querySelector(

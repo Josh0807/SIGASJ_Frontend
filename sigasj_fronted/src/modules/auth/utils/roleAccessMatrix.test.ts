@@ -66,11 +66,14 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
       '/fontanero/mi-saldo-vacaciones',
     ])
     expect(EXPECTED_NAV_PATHS.Fontanero).not.toContain('/admin/solicitudes')
-    expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/solicitudes')
+    expect(EXPECTED_NAV_PATHS.Secretaria).toContain('/admin/solicitudes')
     expect(EXPECTED_NAV_PATHS.Administradora).toContain('/admin/solicitudes')
     expect(
       canAccessAdminRoute(userFor('Fontanero'), '/admin/solicitudes'),
     ).toBe(false)
+    expect(
+      canAccessAdminRoute(userFor('Secretaria'), '/admin/solicitudes'),
+    ).toBe(true)
     expect(EXPECTED_NAV_PATHS.Administradora).not.toContain(
       '/fontanero/mi-saldo-vacaciones',
     )

@@ -56,18 +56,19 @@ const AveriasHistorialFilters = ({
   )
 
   return (
-    <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]" aria-label="Filtros del historial">
-      <div className="col-span-full border-b border-blue-100 pb-5">
-        <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta del historial</p>
-        <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar averías</h2>
-        <p className="mt-2 text-base text-slate-500">Use uno o varios criterios para encontrar los casos registrados.</p>
-      </div>
+    <section
+      className="gallery-admin__filters averias-admin__filters"
+      aria-label="Filtros del historial"
+    >
       <form
-        className="sigasj-filter-search"
+        className="averias-admin__filters-form"
         role="search"
         onSubmit={(event) => event.preventDefault()}
       >
-        <label className="gallery-admin__field" htmlFor="averias-historial-codigo">
+        <label
+          className="gallery-admin__field averias-admin__field--search"
+          htmlFor="averias-historial-codigo"
+        >
           <span>Código de seguimiento</span>
           <input
             id="averias-historial-codigo"
@@ -79,114 +80,130 @@ const AveriasHistorialFilters = ({
             placeholder="Ej. AV-2026-0042"
           />
         </label>
+        <label className="gallery-admin__field" htmlFor="averias-historial-estado">
+          <span>Estado</span>
+          <select
+            id="averias-historial-estado"
+            name="estado"
+            value={estado}
+            onChange={(event) => onEstadoChange(event.target.value)}
+          >
+            <option value={EMPTY_FILTER}>Todos</option>
+            {ESTADO_AVERIA_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label
+          className="gallery-admin__field"
+          htmlFor="averias-historial-prioridad"
+        >
+          <span>Prioridad</span>
+          <select
+            id="averias-historial-prioridad"
+            name="prioridad"
+            value={prioridad}
+            onChange={(event) => onPrioridadChange(event.target.value)}
+          >
+            <option value={EMPTY_FILTER}>Todas</option>
+            {PRIORIDAD_FILTER_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+            <option value={PRIORIDAD_FILTER_UNASSIGNED}>Sin prioridad</option>
+          </select>
+        </label>
+        <label className="gallery-admin__field" htmlFor="averias-historial-tipo">
+          <span>Tipo</span>
+          <select
+            id="averias-historial-tipo"
+            name="tipo"
+            value={tipo}
+            onChange={(event) => onTipoChange(event.target.value)}
+          >
+            <option value={EMPTY_FILTER}>Todos</option>
+            {TIPO_AVERIA_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label
+          className="gallery-admin__field"
+          htmlFor="averias-historial-fontanero"
+        >
+          <span>Fontanero</span>
+          <select
+            id="averias-historial-fontanero"
+            name="fontaneroId"
+            value={fontaneroId}
+            onChange={(event) => onFontaneroChange(event.target.value)}
+          >
+            <option value={EMPTY_FILTER}>Todos</option>
+            {fontaneroId && !fontaneroConocido ? (
+              <option value={fontaneroId}>Fontanero #{fontaneroId}</option>
+            ) : null}
+            {fontaneros.map((fontanero) => (
+              <option value={String(fontanero.id)} key={fontanero.id}>
+                {getFontaneroAsignableLabel(fontanero)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="gallery-admin__field" htmlFor="averias-historial-sector">
+          <span>Sector o comunidad</span>
+          <input
+            id="averias-historial-sector"
+            name="sector"
+            type="search"
+            maxLength={150}
+            value={sector}
+            onChange={(event) => onSectorChange(event.target.value)}
+            placeholder="Ej. San Juan"
+          />
+        </label>
+        <label
+          className="gallery-admin__field"
+          htmlFor="averias-historial-fecha-desde"
+        >
+          <span>Desde</span>
+          <input
+            id="averias-historial-fecha-desde"
+            name="fechaDesde"
+            type="date"
+            value={fechaDesde}
+            onChange={(event) => onFechaDesdeChange(event.target.value)}
+          />
+        </label>
+        <label
+          className="gallery-admin__field"
+          htmlFor="averias-historial-fecha-hasta"
+        >
+          <span>Hasta</span>
+          <input
+            id="averias-historial-fecha-hasta"
+            name="fechaHasta"
+            type="date"
+            value={fechaHasta}
+            onChange={(event) => onFechaHastaChange(event.target.value)}
+          />
+        </label>
+        {hasActiveFilters ? (
+          <p className="gallery-admin__filter-reset">
+            <button
+              type="button"
+              className="gallery-admin__button"
+              onClick={onClear}
+            >
+              Limpiar filtros
+            </button>
+          </p>
+        ) : null}
       </form>
-      <label className="gallery-admin__field" htmlFor="averias-historial-estado">
-        <span>Estado</span>
-        <select
-          id="averias-historial-estado"
-          name="estado"
-          value={estado}
-          onChange={(event) => onEstadoChange(event.target.value)}
-        >
-          <option value={EMPTY_FILTER}>Todos</option>
-          {ESTADO_AVERIA_OPTIONS.map((option) => (
-            <option value={option.value} key={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="gallery-admin__field" htmlFor="averias-historial-prioridad">
-        <span>Prioridad</span>
-        <select
-          id="averias-historial-prioridad"
-          name="prioridad"
-          value={prioridad}
-          onChange={(event) => onPrioridadChange(event.target.value)}
-        >
-          <option value={EMPTY_FILTER}>Todas</option>
-          {PRIORIDAD_FILTER_OPTIONS.map((option) => (
-            <option value={option.value} key={option.value}>
-              {option.label}
-            </option>
-          ))}
-          <option value={PRIORIDAD_FILTER_UNASSIGNED}>Sin prioridad</option>
-        </select>
-      </label>
-      <label className="gallery-admin__field" htmlFor="averias-historial-tipo">
-        <span>Tipo</span>
-        <select
-          id="averias-historial-tipo"
-          name="tipo"
-          value={tipo}
-          onChange={(event) => onTipoChange(event.target.value)}
-        >
-          <option value={EMPTY_FILTER}>Todos</option>
-          {TIPO_AVERIA_OPTIONS.map((option) => (
-            <option value={option.value} key={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="gallery-admin__field" htmlFor="averias-historial-fontanero">
-        <span>Fontanero</span>
-        <select
-          id="averias-historial-fontanero"
-          name="fontaneroId"
-          value={fontaneroId}
-          onChange={(event) => onFontaneroChange(event.target.value)}
-        >
-          <option value={EMPTY_FILTER}>Todos</option>
-          {fontaneroId && !fontaneroConocido ? (
-            <option value={fontaneroId}>Fontanero #{fontaneroId}</option>
-          ) : null}
-          {fontaneros.map((fontanero) => (
-            <option value={String(fontanero.id)} key={fontanero.id}>
-              {getFontaneroAsignableLabel(fontanero)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="gallery-admin__field" htmlFor="averias-historial-sector">
-        <span>Sector o comunidad</span>
-        <input
-          id="averias-historial-sector"
-          name="sector"
-          type="search"
-          maxLength={150}
-          value={sector}
-          onChange={(event) => onSectorChange(event.target.value)}
-          placeholder="Ej. San Juan"
-        />
-      </label>
-      <label className="gallery-admin__field" htmlFor="averias-historial-fecha-desde">
-        <span>Desde</span>
-        <input
-          id="averias-historial-fecha-desde"
-          name="fechaDesde"
-          type="date"
-          value={fechaDesde}
-          onChange={(event) => onFechaDesdeChange(event.target.value)}
-        />
-      </label>
-      <label className="gallery-admin__field" htmlFor="averias-historial-fecha-hasta">
-        <span>Hasta</span>
-        <input
-          id="averias-historial-fecha-hasta"
-          name="fechaHasta"
-          type="date"
-          value={fechaHasta}
-          onChange={(event) => onFechaHastaChange(event.target.value)}
-        />
-      </label>
-      {hasActiveFilters ? (
-        <p className="gallery-admin__filter-reset">
-          <button type="button" className="gallery-admin__button" onClick={onClear}>
-            Limpiar filtros
-          </button>
-        </p>
-      ) : null}
     </section>
   )
 }

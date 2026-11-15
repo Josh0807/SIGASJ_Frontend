@@ -50,11 +50,18 @@ export function solicitudMaterialesDesdeAveriaHref(
   return `${SOLICITUD_MATERIALES_NEW_PATH}?${params.toString()}`
 }
 
-export function salidaDesdeAveriaHref(idAveria: number, from: string): string {
+export function salidaDesdeAveriaHref(
+  idAveria: number,
+  from: string,
+  idMaterial?: number,
+): string {
   const params = new URLSearchParams({
     idAveria: String(idAveria),
     from,
   })
+  if (idMaterial != null && Number.isInteger(idMaterial) && idMaterial > 0) {
+    params.set('idMaterial', String(idMaterial))
+  }
   return `${SALIDAS_PATH}?${params.toString()}`
 }
 

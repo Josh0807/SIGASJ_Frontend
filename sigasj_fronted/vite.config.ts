@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
       setupFiles: ['./vitest.setup.ts'],
+      // Las rutas React.lazy se transforman en el primer render; 5s se queda corto con workers en paralelo.
+      testTimeout: 20000,
     },
     server: {
       host: true,

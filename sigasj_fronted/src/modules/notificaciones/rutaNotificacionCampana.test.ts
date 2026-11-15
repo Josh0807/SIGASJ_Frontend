@@ -115,6 +115,6 @@ describe('rutaNotificacionCampana', () => {
         { role: 'Administradora', id: '1' },
         { tipo: 'ALERTA_REPOSICION_ADMINISTRADORA', idReposicion: 5 },
       ),
-    ).toBe('/admin/inventario/reposiciones/5')
+    ).toBe('/admin/inventario/alertas-reposicion')
   })
 })

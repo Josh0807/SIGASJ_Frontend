@@ -6,13 +6,49 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { IconBell } from '@tabler/icons-react'
+import {
+  IconAlertTriangle,
+  IconBell,
+  IconCalendarEvent,
+  IconClipboardCheck,
+  IconClipboardList,
+  IconPackageExport,
+  IconTool,
+} from '@tabler/icons-react'
 import { useAuthUser } from '../auth/hooks/useAuthUser'
+import {
+  cleanNotificacionTexto,
+  formatNotificacionRelativeTime,
+  resolveNotificacionMensaje,
+  resolveNotificacionVisual,
+  type NotificacionVisualKind,
+} from './notificacionCampanaUi'
 import { rutaNotificacionCampana } from './rutaNotificacionCampana'
 import { useNotificacionesAveria } from './useNotificacionesAveria'
+
+function NotificacionIcon({ kind }: { kind: NotificacionVisualKind }) {
+  const props = { size: 18, stroke: 1.85, 'aria-hidden': true as const }
+  switch (kind) {
+    case 'reposicion':
+      return <IconAlertTriangle {...props} />
+    case 'salida':
+      return <IconPackageExport {...props} />
+    case 'materiales':
+      return <IconClipboardList {...props} />
+    case 'ausencia':
+      return <IconCalendarEvent {...props} />
+    case 'actividad':
+      return <IconClipboardCheck {...props} />
+    case 'averia':
+      return <IconTool {...props} />
+    default:
+      return <IconBell {...props} />
+  }
+}
 
 const NotificacionesCampana = () => {
   const panelId = useId()
@@ -50,7 +86,7 @@ const NotificacionesCampana = () => {
     const rect = trigger.getBoundingClientRect()
     const gutter = 8
     const viewportWidth = document.documentElement.clientWidth
-    const width = Math.min(352, viewportWidth - gutter * 2)
+    const width = Math.min(380, viewportWidth - gutter * 2)
     const left = Math.min(
       Math.max(gutter, rect.right - width),
       Math.max(gutter, viewportWidth - width - gutter),
@@ -114,6 +150,41 @@ const NotificacionesCampana = () => {
 
   const unread = listado.noLeidas
 
+  const renderItemContent = (item: (typeof listado.data)[number]): ReactNode => {
+    const visual = resolveNotificacionVisual(item.tipo)
+    const titulo = cleanNotificacionTexto(item.titulo)
+    const mensaje = resolveNotificacionMensaje(item.titulo, item.mensaje)
+    const timeLabel = formatNotificacionRelativeTime(item.fechaCreacion)
+
+    return (
+      <>
+        <span
+          className={`notificaciones-campana__icon notificaciones-campana__icon--${visual.tone}`}
+          data-kind={visual.kind}
+        >
+          <NotificacionIcon kind={visual.kind} />
+        </span>
+        <span className="notificaciones-campana__body">
+          <span className="notificaciones-campana__title-row">
+            {!item.leida ? (
+              <span
+                className="notificaciones-campana__dot"
+                aria-hidden="true"
+              />
+            ) : null}
+            <span className="notificaciones-campana__title">{titulo}</span>
+          </span>
+          {mensaje ? (
+            <span className="notificaciones-campana__message">{mensaje}</span>
+          ) : null}
+          {timeLabel ? (
+            <span className="notificaciones-campana__meta">{timeLabel}</span>
+          ) : null}
+        </span>
+      </>
+    )
+  }
+
   const panel = (
     <div
       ref={panelRef}
@@ -124,6 +195,20 @@ const NotificacionesCampana = () => {
       aria-label="Notificaciones internas"
       style={open ? panelStyle : undefined}
     >
+      <header className="notificaciones-campana__head">
+        <div>
+          <p className="notificaciones-campana__head-title">Notificaciones</p>
+          <p className="notificaciones-campana__head-sub">
+            {unread > 0
+              ? `${unread} sin leer`
+              : 'Al día con su bandeja'}
+          </p>
+        </div>
+        {unread > 0 ? (
+          <span className="notificaciones-campana__head-badge">{unread}</span>
+        ) : null}
+      </header>
+
       {loading ? (
         <p className="notificaciones-campana__state">Cargando notificaciones…</p>
       ) : null}
@@ -133,18 +218,17 @@ const NotificacionesCampana = () => {
         </p>
       ) : null}
       {!loading && !error && listado.data.length === 0 ? (
-        <p className="notificaciones-campana__state">No hay notificaciones.</p>
+        <div className="notificaciones-campana__empty">
+          <span className="notificaciones-campana__empty-icon" aria-hidden="true">
+            <IconBell size={22} stroke={1.7} />
+          </span>
+          <p className="notificaciones-campana__state">No hay notificaciones.</p>
+        </div>
       ) : null}
       {!loading && !error && listado.data.length > 0 ? (
         <ul className="notificaciones-campana__list">
           {listado.data.map((item) => {
             const to = rutaNotificacionCampana(user, item)
-            const content = (
-              <>
-                <span className="notificaciones-campana__title">{item.titulo}</span>
-                <span className="notificaciones-campana__message">{item.mensaje}</span>
-              </>
-            )
             const markAndClose = () => {
               if (!item.leida) {
                 void marcarLeida(item.id)
@@ -166,7 +250,7 @@ const NotificacionesCampana = () => {
                     to={to}
                     onClick={markAndClose}
                   >
-                    {content}
+                    {renderItemContent(item)}
                   </Link>
                 ) : (
                   <button
@@ -174,7 +258,7 @@ const NotificacionesCampana = () => {
                     className="notificaciones-campana__link notificaciones-campana__link--static"
                     onClick={markAndClose}
                   >
-                    {content}
+                    {renderItemContent(item)}
                   </button>
                 )}
               </li>

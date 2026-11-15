@@ -1,17 +1,28 @@
-import { Link, Navigate } from 'react-router-dom'
-import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
+import { Navigate } from 'react-router-dom'
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconMapPin,
+  IconRefresh,
+  IconTool,
+} from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
-import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
-import { useFontaneroAverias } from '../hooks/useFontaneroAverias'
+import { Alert } from '../../../shared/ui/Alert'
+import { Badge } from '../../../shared/ui/Badge'
+import { Button } from '../../../shared/ui/Button'
+import { Card } from '../../../shared/ui/Card'
+import { EmptyState } from '../../../shared/ui/EmptyState'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import AveriaStatusBadge from '../admin/AveriaStatusBadge'
 import { formatAveriaAdminDateTime } from '../admin/formatAveriaAdminDate'
-import { agruparColaFontanero } from './colaFontanero'
+import { useFontaneroAverias } from '../hooks/useFontaneroAverias'
 import {
   MENSAJE_PENDIENTE_HORARIO_FONTANERO,
   esPendienteDeAtencion,
   mostrarAvisoHorarioFontanero,
 } from '../utils/averiaPendienteAtencion'
+import { agruparColaFontanero } from './colaFontanero'
 import {
   FONTANERO_AVERIAS_TITLE,
   averiasFontaneroDetailPath,
@@ -29,12 +40,22 @@ import {
   type AveriaFontaneroListItem,
 } from './types'
 
-const prioridadTono = (prioridad: string | null | undefined): string => {
+const tonoPrioridad = (
+  prioridad: string | null | undefined,
+): 'danger' | 'warning' | 'info' | 'neutral' => {
   const valor = prioridad?.trim().toUpperCase()
-  if (valor === 'ALTA') return 'alta'
-  if (valor === 'MEDIA') return 'media'
-  if (valor === 'BAJA') return 'baja'
-  return 'sin'
+  if (valor === 'ALTA') return 'danger'
+  if (valor === 'MEDIA') return 'warning'
+  if (valor === 'BAJA') return 'info'
+  return 'neutral'
+}
+
+const tonoIconoGrupo = (
+  grupoId: 'EN_ATENCION' | 'ASIGNADA' | 'PENDIENTE',
+): string => {
+  if (grupoId === 'EN_ATENCION') return 'bg-emerald-100 text-emerald-800'
+  if (grupoId === 'ASIGNADA') return 'bg-amber-100 text-amber-900'
+  return 'bg-sky-100 text-sky-900'
 }
 
 export type AveriasFontaneroListPageProps = {
@@ -75,109 +96,198 @@ const AveriasFontaneroListPage = ({
   const forbidden = forbiddenProp ?? remote.forbidden
 
   return (
-    <main className="gallery-admin averias-admin averias-fontanero w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack !gap-8 font-sans">
-        <header className="gallery-admin__header !flex !min-h-[220px] !items-center !rounded-[26px] !border-[#d7e5f1] !bg-white !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]">
-          <div>
-            <p className="gallery-admin__eyebrow !mb-4 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-[#1e5a9c]">Atención de campo</p>
-            <h1 className="!m-0 !text-[clamp(1.75rem,3vw,2.25rem)] !font-black !leading-tight !tracking-[-0.025em] !text-[#1e5a9c]">{FONTANERO_AVERIAS_TITLE}</h1>
-          </div>
-          <Link className="group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_8px_20px_rgba(30, 90, 156,0.13)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!text-blue-800 hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.22)] active:!translate-y-0 active:!scale-[0.97] focus-visible:!outline-2 focus-visible:!outline-offset-4 focus-visible:!outline-[#1e5a9c] motion-reduce:!transform-none motion-reduce:!transition-none" to={`${ADMIN_BASE_PATH}/dashboard`}>
-            <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
+    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+      <PageHeader
+        eyebrow="Atención de campo"
+        title={FONTANERO_AVERIAS_TITLE}
+        description="Cola de averías asignadas a usted. Abra el detalle para iniciar o continuar la atención."
+        actions={
+          <Button
+            to={`${ADMIN_BASE_PATH}/dashboard`}
+            variant="secondary"
+            size="sm"
+            leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+          >
             Volver al dashboard
-          </Link>
-        </header>
-        <section
-          className="averias-admin__section !rounded-[26px] !border-[#d7e5f1] !bg-white !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
-          aria-labelledby="averias-fontanero-list-heading"
-        >
-          <h2 className="!m-0 !border-b !border-slate-100 !pb-5 !text-xl !font-extrabold !tracking-[-0.015em] !text-[#1e5a9c]" id="averias-fontanero-list-heading">Averías asignadas</h2>
-          {forbidden ? (
-            <p className="gallery-admin__empty" role="alert">
-              {AVERIAS_FONTANERO_DETAIL_FORBIDDEN}
-            </p>
-          ) : loading && items.length === 0 ? (
-            <p className="gallery-admin__empty" role="status" aria-busy="true">
+          </Button>
+        }
+      />
+
+      <Card
+        as="section"
+        className="!grid !gap-4 !p-4 sm:!p-5"
+        aria-labelledby="averias-fontanero-list-heading"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sigasj-border pb-3">
+          <h2
+            className="m-0 text-[1.05rem] font-extrabold tracking-tight text-sigasj-ink"
+            id="averias-fontanero-list-heading"
+          >
+            Averías asignadas
+          </h2>
+          {items.length > 0 ? (
+            <Badge tone="info">
+              {items.length} avería{items.length === 1 ? '' : 's'}
+            </Badge>
+          ) : null}
+        </div>
+
+        {forbidden ? (
+          <Alert tone="danger" role="alert">
+            {AVERIAS_FONTANERO_DETAIL_FORBIDDEN}
+          </Alert>
+        ) : loading && items.length === 0 ? (
+          <Card padded className="!p-5" role="status" aria-busy="true">
+            <span className="sr-only">{AVERIAS_FONTANERO_LIST_LOADING}</span>
+            <p className="m-0 font-semibold text-sigasj-muted">
               {AVERIAS_FONTANERO_LIST_LOADING}
             </p>
-          ) : error ? (
-            <div className="gallery-admin__empty" role="alert">
-              <p>{error || AVERIAS_FONTANERO_LIST_ERROR}</p>
-              <button
-                className="gallery-admin__button"
+            <div className="mt-3 grid gap-3">
+              {[0, 1].map((fila) => (
+                <div
+                  key={fila}
+                  className="h-16 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          </Card>
+        ) : error ? (
+          <Alert tone="danger">
+            <div className="grid gap-3">
+              <p className="m-0 font-semibold">
+                {error || AVERIAS_FONTANERO_LIST_ERROR}
+              </p>
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                 onClick={remote.refetch}
               >
                 Intentar nuevamente
-              </button>
+              </Button>
             </div>
-          ) : items.length === 0 ? (
-            <p className="gallery-admin__empty !mt-5 !min-h-[120px] !rounded-[22px] !border !border-dashed !border-[#bfe3fa] !bg-linear-to-br !from-blue-50 !to-sky-50 !text-lg !font-normal !text-slate-500 !shadow-inner" role="status">
-              {AVERIAS_FONTANERO_LIST_EMPTY}
-            </p>
-          ) : (
-            <div className="averias-fontanero__grupos">
-              {grupos.map((grupo) => (
-                <section key={grupo.id} aria-labelledby={`averias-fontanero-grupo-${grupo.id}`}>
-                  <h3 id={`averias-fontanero-grupo-${grupo.id}`}>{grupo.titulo}</h3>
-                  <ul className="averias-fontanero__tarjetas">
-                    {grupo.items.map((item) => (
+          </Alert>
+        ) : items.length === 0 ? (
+          <EmptyState
+            icon={<IconTool size={28} aria-hidden="true" />}
+            title="Sin averías en cola"
+            description={AVERIAS_FONTANERO_LIST_EMPTY}
+          />
+        ) : (
+          <div className="grid gap-5">
+            {grupos.map((grupo) => (
+              <section
+                key={grupo.id}
+                className="grid gap-3"
+                aria-labelledby={`averias-fontanero-grupo-${grupo.id}`}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3
+                    id={`averias-fontanero-grupo-${grupo.id}`}
+                    className="m-0 text-sm font-extrabold uppercase tracking-[0.06em] text-sigasj-muted"
+                  >
+                    {grupo.titulo}
+                  </h3>
+                  <Badge tone="neutral">{grupo.items.length}</Badge>
+                </div>
+
+                <ul className="m-0 grid list-none gap-3 p-0">
+                  {grupo.items.map((item) => {
+                    const avisoHorario = mostrarAvisoHorarioFontanero(
+                      String(item.estado),
+                      dentroDeHorario,
+                    )
+                    const avisoPendiente =
+                      !avisoHorario && esPendienteDeAtencion(String(item.estado))
+
+                    return (
                       <li key={item.id}>
-                        <Link
-                          className={`averias-fontanero__tarjeta group averias-fontanero__tarjeta--${prioridadTono(item.prioridad)}`}
-                          to={averiasFontaneroDetailPath(item.id)}
-                          aria-label={`Ver detalle de la avería ${item.codigoSeguimiento}`}
+                        <Card
+                          padded
+                          className="!grid !gap-3.5 !p-4 transition-shadow duration-200 hover:shadow-[0_10px_28px_rgba(30,90,156,0.12)] sm:!grid-cols-[auto_minmax(0,1fr)_auto] sm:!items-start sm:!gap-4"
                         >
-                          <span className="averias-fontanero__tarjeta-icono" aria-hidden="true">
-                            <AdminNavIcon name="averias" />
+                          <span
+                            className={`grid size-11 shrink-0 place-items-center rounded-xl ${tonoIconoGrupo(grupo.id)}`}
+                            aria-hidden="true"
+                          >
+                            <IconTool size={20} />
                           </span>
-                          <div className="averias-fontanero__tarjeta-contenido">
-                            <div className="averias-fontanero__tarjeta-titulo">
-                              <h4>{item.codigoSeguimiento}</h4>
-                              <AveriaStatusBadge estado={item.estado} />
+
+                          <div className="grid min-w-0 gap-2.5">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h4 className="m-0 text-base font-extrabold tracking-tight text-sigasj-ink">
+                                {item.codigoSeguimiento}
+                              </h4>
+                              <AveriaStatusBadge
+                                estado={item.estado}
+                                variant="flat"
+                              />
                             </div>
-                            <p className="averias-fontanero__tarjeta-sub">
-                              <span>Asignada el {formatAveriaAdminDateTime(item.fechaAsignacion)}</span>
+
+                            <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-sigasj-muted">
+                              <span>
+                                Asignada el{' '}
+                                {formatAveriaAdminDateTime(item.fechaAsignacion)}
+                              </span>
                               <span aria-hidden="true">·</span>
-                              <strong>{item.sectorComunidad}</strong>
+                              <span className="inline-flex items-center gap-1 text-sigasj-ink">
+                                <IconMapPin size={14} aria-hidden="true" />
+                                {item.sectorComunidad}
+                              </span>
                             </p>
-                            <p className="averias-fontanero__tarjeta-ubicacion" title={item.ubicacion}>
+
+                            <p
+                              className="m-0 line-clamp-2 text-sm font-semibold text-sigasj-ink"
+                              title={item.ubicacion}
+                            >
                               {item.ubicacion}
                             </p>
-                            <ul className="averias-fontanero__tarjeta-datos">
-                              <li>
-                                <span>Prioridad</span>
+
+                            <div className="flex flex-wrap gap-2">
+                              <Badge tone={tonoPrioridad(item.prioridad)}>
+                                Prioridad{' '}
                                 {getFontaneroPrioridadLabel(item.prioridad)}
-                              </li>
-                              <li>
-                                <span>Tipo</span>
-                                {getFontaneroTipoLabel(item.tipoAveria)}
-                              </li>
-                              {mostrarAvisoHorarioFontanero(String(item.estado), dentroDeHorario) ? (
-                                <li className="averias-fontanero__tarjeta-nota">
-                                  {MENSAJE_PENDIENTE_HORARIO_FONTANERO}
-                                </li>
-                              ) : esPendienteDeAtencion(String(item.estado)) ? (
-                                <li className="averias-fontanero__tarjeta-nota">
-                                  {AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
-                                </li>
-                              ) : null}
-                            </ul>
+                              </Badge>
+                              <Badge tone="neutral">
+                                Tipo {getFontaneroTipoLabel(item.tipoAveria)}
+                              </Badge>
+                            </div>
+
+                            {avisoHorario ? (
+                              <Alert tone="warning" className="!py-2.5 !text-sm">
+                                {MENSAJE_PENDIENTE_HORARIO_FONTANERO}
+                              </Alert>
+                            ) : avisoPendiente ? (
+                              <Alert tone="info" className="!py-2.5 !text-sm">
+                                {AVERIAS_FONTANERO_ATENCION_NO_INICIADA}
+                              </Alert>
+                            ) : null}
                           </div>
-                          <span className="averias-fontanero__tarjeta-flecha !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3 !font-extrabold !text-white !no-underline !shadow-[0_10px_22px_rgba(30, 90, 156,0.24)] !transition-all !duration-300 group-hover:!-translate-y-0.5 group-hover:!from-blue-700 group-hover:!to-sky-600 group-hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.32)]" aria-hidden="true">
+
+                          <Button
+                            to={averiasFontaneroDetailPath(item.id)}
+                            size="sm"
+                            className="w-full sm:w-auto sm:self-center"
+                            rightIcon={
+                              <IconArrowRight size={16} aria-hidden="true" />
+                            }
+                            aria-label={`Ver detalle de la avería ${item.codigoSeguimiento}`}
+                          >
                             Ver detalle
-                            <IconArrowRight size={19} stroke={2.2} />
-                          </span>
-                        </Link>
+                          </Button>
+                        </Card>
                       </li>
-                    ))}
-                  </ul>
-                  </section>
-                ))}
-              </div>
-            )}
-        </section>
-      </div>
+                    )
+                  })}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )}
+      </Card>
     </main>
   )
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { IconChartBar, IconChevronRight, IconHistory } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -242,67 +243,95 @@ const AveriasAdminPage = ({
     })
   }
 
+  const showPagination =
+    !(isLoading && listItems.length === 0) && !errorMessage
+
   return (
-    <main className="gallery-admin averias-admin w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack !gap-7">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-          <div className="min-w-0 space-y-3">
-            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !uppercase !tracking-[0.12em] !text-[#1e5a9c]">Panel administrativo</p>
-            <h1>Gestión de averías</h1>
-            <p>Consulte y dé seguimiento a las averías reportadas.</p>
-          </div>
-          <div className="gallery-admin__header-actions !gap-3">
-            <Link className="gallery-admin__button !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-6 !py-3.5 !font-bold !text-white !no-underline !shadow-lg !shadow-blue-200 transition hover:-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600" to={AVERIAS_ADMIN_REPORTE_PATH}>
-              Resumen
-            </Link>
-            <Link className="gallery-admin__button !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-[#eaf6ff]" to={AVERIAS_ADMIN_HISTORIAL_PATH}>
-              Historial
-            </Link>
-          </div>
-        </header>
-
-        <AveriasAdminFilters
-          search={searchInput}
-          estado={estado}
-          prioridad={prioridad}
-          tipo={tipoInput}
-          fechaDesde={fechaDesde}
-          fechaHasta={fechaHasta}
-          onSearchChange={setSearchInput}
-          onEstadoChange={(value) => patchFilters({ estado: value })}
-          onPrioridadChange={(value) => patchFilters({ prioridad: value })}
-          onTipoChange={setTipoInput}
-          onFechaDesdeChange={(value) => patchFilters({ fechaDesde: value })}
-          onFechaHastaChange={(value) => patchFilters({ fechaHasta: value })}
-          onClear={clearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-
-        <section aria-label="Listado de averías">
-          <AveriasAdminQueryStates
-            loading={isLoading}
-            error={errorMessage}
-            hasResults={listItems.length > 0}
-            onRetry={onRetry ?? remote.refetch}
+    <main className="gallery-admin admin-content-modern averias-admin grid w-full min-w-0 gap-5 sm:gap-6">
+      <header className="gallery-admin__header flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <nav aria-label="Ruta de navegación" className="mb-3">
+            <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-sm font-semibold text-slate-500">
+              <li>Administración</li>
+              <li aria-hidden="true" className="inline-flex items-center">
+                <IconChevronRight size={16} />
+              </li>
+              <li aria-current="page" className="text-[#1e5a9c]">
+                Averías
+              </li>
+            </ol>
+          </nav>
+          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
+            Gestión de averías
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500">
+            Consulte y dé seguimiento a las averías reportadas.
+          </p>
+        </div>
+        <div className="gallery-admin__header-actions flex flex-col gap-3 sm:flex-row">
+          <Link
+            to={AVERIAS_ADMIN_HISTORIAL_PATH}
+            className="gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"
           >
-            <AveriasAdminTable items={listItems} onViewDetail={onViewDetail} />
-          </AveriasAdminQueryStates>
-        </section>
+            <IconHistory size={20} aria-hidden="true" />
+            Historial
+          </Link>
+          <Link
+            to={AVERIAS_ADMIN_REPORTE_PATH}
+            className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"
+          >
+            <IconChartBar size={20} aria-hidden="true" />
+            Resumen
+          </Link>
+        </div>
+      </header>
 
-        {isLoading && listItems.length === 0 ? null : errorMessage ? null : (
-          <AveriasAdminPagination
-            page={page}
-            totalPages={listTotalPages}
-            total={listTotal}
-            loading={isLoading}
-            onPageChange={goToPage}
+      <AveriasAdminFilters
+        search={searchInput}
+        estado={estado}
+        prioridad={prioridad}
+        tipo={tipoInput}
+        fechaDesde={fechaDesde}
+        fechaHasta={fechaHasta}
+        onSearchChange={setSearchInput}
+        onEstadoChange={(value) => patchFilters({ estado: value })}
+        onPrioridadChange={(value) => patchFilters({ prioridad: value })}
+        onTipoChange={setTipoInput}
+        onFechaDesdeChange={(value) => patchFilters({ fechaDesde: value })}
+        onFechaHastaChange={(value) => patchFilters({ fechaHasta: value })}
+        onClear={clearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
+
+      <section aria-label="Listado de averías" className="min-w-0">
+        <AveriasAdminQueryStates
+          loading={isLoading}
+          error={errorMessage}
+          hasResults={listItems.length > 0}
+          onRetry={onRetry ?? remote.refetch}
+        >
+          <AveriasAdminTable
+            items={listItems}
+            onViewDetail={onViewDetail}
+            footer={
+              showPagination ? (
+                <AveriasAdminPagination
+                  page={page}
+                  totalPages={listTotalPages}
+                  total={listTotal}
+                  limit={limit}
+                  loading={isLoading}
+                  onPageChange={goToPage}
+                />
+              ) : null
+            }
           />
-        )}
+        </AveriasAdminQueryStates>
+      </section>
 
-        <p className="visually-hidden">
-          Límite de página preparado: {limit} registros.
-        </p>
-      </div>
+      <p className="sr-only">
+        Límite de página preparado: {limit} registros.
+      </p>
     </main>
   )
 }

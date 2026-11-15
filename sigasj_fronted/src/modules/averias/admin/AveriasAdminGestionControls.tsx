@@ -4,12 +4,12 @@ import {
   mostrarAvisoPendienteAdmin,
 } from '../utils/averiaPendienteAtencion'
 import AveriasDetailField from './AveriasDetailField'
+import AveriaPrioridadBadge from './AveriaPrioridadBadge'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import './AveriasAdminGestionControls.css'
 import {
   AVERIA_UNAVAILABLE_LABEL,
-  getPrioridadLabel,
   getTipoAveriaDetailLabel,
   type AveriaDetail,
 } from './types'
@@ -42,10 +42,10 @@ const AveriasAdminGestionControls = ({
       : AVERIA_UNAVAILABLE_LABEL
 
   return (
-    <div className="averias-admin__gestion">
-      <div className="averias-admin__estado-panel">
+    <div className="averias-admin__gestion averias-admin__gestion--compact">
+      <div className="averias-admin__estado-panel averias-admin__estado-panel--row">
         <div className="averias-admin__estado-panel-copy">
-          <p className="averias-admin__estado-label">Estado</p>
+          <p className="averias-admin__estado-label">Estado actual</p>
           <AveriaStatusBadge estado={averia.estado} />
         </div>
         <p
@@ -63,18 +63,14 @@ const AveriasAdminGestionControls = ({
       </div>
 
       <div className="averias-admin__gestion-bloque">
-        <p className="averias-admin__gestion-caption">Calificación</p>
         <dl className="averias-admin__gestion-readonly">
           <AveriasDetailField label="Tipo de avería">
             {getTipoAveriaDetailLabel(averia.tipoAveria)}
           </AveriasDetailField>
           <AveriasDetailField label="Prioridad">
-            {getPrioridadLabel(averia.prioridad)}
+            <AveriaPrioridadBadge prioridad={averia.prioridad} />
           </AveriasDetailField>
         </dl>
-        <p className="averias-admin__hint" role="note">
-          {AVERIA_CLASIFICACION_FONTANERO_HINT}
-        </p>
       </div>
 
       <div className="averias-admin__gestion-bloque">
