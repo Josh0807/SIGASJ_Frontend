@@ -1,12 +1,22 @@
+import {
+  IconCalendar,
+  IconClipboardList,
+  IconId,
+  IconInfoCircle,
+  IconMail,
+  IconMapPin,
+  IconMessageCircle,
+  IconPhone,
+  IconUser,
+  IconUserPlus,
+} from '@tabler/icons-react'
 import AveriasAdminAsignacionControls from './AveriasAdminAsignacionControls'
 import AveriasAdminEventosHistorial from './AveriasAdminEventosHistorial'
 import AveriasAdminGestionControls from './AveriasAdminGestionControls'
 import AveriasDetailField from './AveriasDetailField'
-import AveriaMaterialesSection from '../inventario/AveriaMaterialesSection'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
 import {
   AVERIA_UNAVAILABLE_LABEL,
-  getAbonadoRelacionadoLabel,
   getObservacionesLabel,
   getOptionalPersonalLabel,
   type AveriaDetail,
@@ -15,8 +25,6 @@ import {
 type AveriasAdminDetailViewProps = {
   averia: AveriaDetail
   canAssignFontanero?: boolean
-  canRevisarSolicitudes?: boolean
-  canRegistrarSalida?: boolean
   onAveriaUpdated?: (averia: AveriaDetail) => void
   onUnauthorized?: () => void
   onForbidden?: () => void
@@ -25,72 +33,144 @@ type AveriasAdminDetailViewProps = {
 const AveriasAdminDetailView = ({
   averia,
   canAssignFontanero = false,
-  canRevisarSolicitudes = false,
-  canRegistrarSalida = false,
   onAveriaUpdated,
   onUnauthorized,
   onForbidden,
-}: AveriasAdminDetailViewProps) => (
-  <div className="averias-admin__detail">
-    <div className="averias-admin__detail-grid">
+}: AveriasAdminDetailViewProps) => {
+  const hasObservaciones =
+    Array.isArray(averia.observaciones) && averia.observaciones.length > 0
+
+  return (
+    <div className="averias-admin__detail">
+      <div className="averias-admin__detail-grid">
+        <section
+          className="averias-admin__section averias-admin__section--ficha"
+          aria-labelledby="averia-reportante-heading"
+        >
+          <h2 id="averia-reportante-heading">
+            <IconUser size={20} aria-hidden="true" />
+            Datos del reportante
+          </h2>
+          <dl className="averias-admin__fields averias-admin__ficha-filas">
+            <AveriasDetailField
+              label="Nombre completo"
+              icon={<IconUser size={14} stroke={1.75} />}
+            >
+              {averia.nombreReportante}
+            </AveriasDetailField>
+            <AveriasDetailField
+              label="Identificación"
+              icon={<IconId size={14} stroke={1.75} />}
+            >
+              {getOptionalPersonalLabel(averia.identificacionReportante)}
+            </AveriasDetailField>
+            <AveriasDetailField
+              label="Teléfono"
+              icon={<IconPhone size={14} stroke={1.75} />}
+            >
+              {averia.telefonoReportante}
+            </AveriasDetailField>
+            <AveriasDetailField
+              label="Fecha y hora del reporte"
+              icon={<IconCalendar size={14} stroke={1.75} />}
+            >
+              {formatAveriaAdminDateTimeOrUnavailable(
+                averia.fechaReporte,
+                AVERIA_UNAVAILABLE_LABEL,
+              )}
+            </AveriasDetailField>
+            <AveriasDetailField
+              label="Correo electrónico"
+              icon={<IconMail size={14} stroke={1.75} />}
+              multiline
+            >
+              <span
+                className="averias-admin__ficha-correo"
+                title={getOptionalPersonalLabel(averia.correoReportante)}
+              >
+                {getOptionalPersonalLabel(averia.correoReportante)}
+              </span>
+            </AveriasDetailField>
+          </dl>
+        </section>
+
+        <section
+          className="averias-admin__section averias-admin__section--gestion"
+          aria-labelledby="averia-gestion-heading"
+        >
+          <h2 id="averia-gestion-heading">
+            <IconClipboardList size={20} aria-hidden="true" />
+            Gestión de la avería
+          </h2>
+          <AveriasAdminGestionControls
+            key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}:${averia.fechaInicioAtencion ?? ''}:${averia.fechaResolucion ?? ''}`}
+            averia={averia}
+          />
+        </section>
+
+        <section
+          className="averias-admin__section averias-admin__section--ubicacion"
+          aria-labelledby="averia-ubicacion-heading"
+        >
+          <h2 id="averia-ubicacion-heading">
+            <IconMapPin size={20} aria-hidden="true" />
+            Ubicación y descripción
+          </h2>
+          <dl className="averias-admin__fields averias-admin__fields--ubicacion">
+            <AveriasDetailField
+              label="Sector / comunidad"
+              icon={<IconMapPin size={14} stroke={1.75} />}
+            >
+              {averia.sectorComunidad}
+            </AveriasDetailField>
+            <AveriasDetailField
+              label="Ubicación específica"
+              icon={<IconMapPin size={14} stroke={1.75} />}
+            >
+              {averia.ubicacion}
+            </AveriasDetailField>
+            <AveriasDetailField
+              label="Descripción"
+              multiline
+              icon={<IconClipboardList size={14} stroke={1.75} />}
+            >
+              <span className="averias-admin__descripcion-destacada">
+                {averia.descripcion}
+              </span>
+            </AveriasDetailField>
+          </dl>
+        </section>
+
+        <section
+          className="averias-admin__section averias-admin__section--asignacion"
+          aria-labelledby="averia-asignacion-heading"
+        >
+          <h2 id="averia-asignacion-heading">
+            <IconUserPlus size={20} aria-hidden="true" />
+            Asignación de avería
+          </h2>
+          <AveriasAdminAsignacionControls
+            key={`${averia.id}:${averia.estado}:${averia.fontanero?.id ?? 'none'}:${averia.fechaAsignacion ?? ''}`}
+            averia={averia}
+            canAssign={canAssignFontanero}
+            onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
+          />
+        </section>
+      </div>
+
       <section
-        className="averias-admin__section averias-admin__section--ficha"
-        aria-labelledby="averia-reportante-heading"
+        className={`averias-admin__section averias-admin__section--observaciones${
+          hasObservaciones ? '' : ' is-empty'
+        }`}
+        aria-labelledby="averia-obs-heading"
       >
-        <h2 id="averia-reportante-heading">Datos del Reportante</h2>
-        <dl className="averias-admin__fields averias-admin__ficha-filas">
-          <AveriasDetailField label="Fecha y hora del reporte">
-            {formatAveriaAdminDateTimeOrUnavailable(
-              averia.fechaReporte,
-              AVERIA_UNAVAILABLE_LABEL,
-            )}
-          </AveriasDetailField>
-          <AveriasDetailField label="Nombre completo">
-            {averia.nombreReportante}
-          </AveriasDetailField>
-          <AveriasDetailField label="Identificación">
-            {getOptionalPersonalLabel(averia.identificacionReportante)}
-          </AveriasDetailField>
-          <AveriasDetailField label="Teléfono">
-            {averia.telefonoReportante}
-          </AveriasDetailField>
-          <AveriasDetailField label="Correo">
-            {getOptionalPersonalLabel(averia.correoReportante)}
-          </AveriasDetailField>
-          <AveriasDetailField label="Abonado relacionado">
-            {getAbonadoRelacionadoLabel(averia.idAbonado, averia.abonado)}
-          </AveriasDetailField>
-        </dl>
-      </section>
-
-      <section className="averias-admin__section" aria-labelledby="averia-gestion-heading">
-        <h2 id="averia-gestion-heading">Gestión de la avería</h2>
-        <AveriasAdminGestionControls
-          key={`${averia.id}:${averia.estado}:${averia.prioridad ?? ''}:${averia.tipoAveria ?? ''}:${averia.fontanero?.id ?? ''}:${averia.fechaInicioAtencion ?? ''}:${averia.fechaResolucion ?? ''}`}
-          averia={averia}
-        />
-      </section>
-    </div>
-
-    <div className="averias-admin__detail-grid">
-      <section
-        className="averias-admin__section"
-        aria-labelledby="averia-asignacion-heading"
-      >
-        <h2 id="averia-asignacion-heading">Asignación de avería</h2>
-        <AveriasAdminAsignacionControls
-          key={`${averia.id}:${averia.estado}:${averia.fontanero?.id ?? 'none'}:${averia.fechaAsignacion ?? ''}`}
-          averia={averia}
-          canAssign={canAssignFontanero}
-          onAveriaUpdated={onAveriaUpdated ?? (() => undefined)}
-        />
-      </section>
-
-      <section className="averias-admin__section" aria-labelledby="averia-obs-heading">
-        <h2 id="averia-obs-heading">Observaciones</h2>
-        {averia.observaciones && averia.observaciones.length > 0 ? (
+        <h2 id="averia-obs-heading">
+          <IconMessageCircle size={20} aria-hidden="true" />
+          Observaciones y seguimiento
+        </h2>
+        {hasObservaciones ? (
           <ol className="averias-fontanero__observaciones-list">
-            {averia.observaciones.map((item) => (
+            {averia.observaciones!.map((item) => (
               <li key={item.id}>
                 <p className="averias-admin__prewrap">{item.observacion}</p>
                 <p className="averias-admin__muted">
@@ -106,43 +186,20 @@ const AveriasAdminDetailView = ({
             ))}
           </ol>
         ) : (
-          <p className="averias-admin__empty-note">
-            {getObservacionesLabel(averia.observacionesAtencion)}
+          <p className="averias-admin__empty-note averias-admin__empty-note--banner">
+            <IconInfoCircle size={18} aria-hidden="true" />
+            <span>{getObservacionesLabel(averia.observacionesAtencion)}</span>
           </p>
         )}
       </section>
+
+      <AveriasAdminEventosHistorial
+        averiaId={averia.id}
+        onUnauthorized={onUnauthorized}
+        onForbidden={onForbidden}
+      />
     </div>
-
-    <section className="averias-admin__section" aria-labelledby="averia-ubicacion-heading">
-      <h2 id="averia-ubicacion-heading">Ubicación de la avería</h2>
-      <dl className="averias-admin__fields averias-admin__fields--ubicacion">
-        <AveriasDetailField label="Sector / comunidad">
-          {averia.sectorComunidad}
-        </AveriasDetailField>
-        <AveriasDetailField label="Descripción">
-          {averia.descripcion}
-        </AveriasDetailField>
-        <AveriasDetailField label="Ubicación" multiline>
-          {averia.ubicacion}
-        </AveriasDetailField>
-      </dl>
-    </section>
-
-    <AveriaMaterialesSection
-      averiaId={averia.id}
-      codigoSeguimiento={averia.codigoSeguimiento}
-      variant="admin"
-      canRevisarSolicitudes={canRevisarSolicitudes}
-      canRegistrarSalida={canRegistrarSalida}
-      onUnauthorized={onUnauthorized}
-    />
-
-    <AveriasAdminEventosHistorial
-      averiaId={averia.id}
-      onUnauthorized={onUnauthorized}
-      onForbidden={onForbidden}
-    />
-  </div>
-)
+  )
+}
 
 export default AveriasAdminDetailView

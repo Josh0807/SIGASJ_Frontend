@@ -61,6 +61,28 @@ describe('validateMovimientoVacaciones', () => {
     )
     expect(errors.cantidadDias).toBe('Solo hay 3 días disponibles.')
   })
+
+  it('no deja disfrutar en feriado nacional', () => {
+    const errors = validateMovimientoVacaciones({
+      ...valido,
+      tipo: 'DISFRUTADO',
+      fecha: '2026-01-01',
+      cantidadDias: '1',
+    })
+    expect(errors.fecha).toMatch(/feriado/i)
+  })
+
+  it('permite AJUSTE en feriado (ajuste neto)', () => {
+    expect(
+      validateMovimientoVacaciones({
+        ...valido,
+        tipo: 'AJUSTE',
+        signoAjuste: '1',
+        fecha: '2026-01-01',
+        observaciones: 'Feriado laborado',
+      }),
+    ).toEqual({})
+  })
 })
 
 describe('toMovimientoVacacionesPayload', () => {

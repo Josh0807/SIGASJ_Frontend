@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { resolve } from 'node:path'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -46,6 +47,7 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -139,7 +141,7 @@ describe('AdminHeader — menú móvil (pruebas funcionales)', () => {
       expect(app.container.querySelector('#admin-navigation')).not.toBeNull()
       expect(app.container.querySelector('.admin-nav-backdrop')).not.toBeNull()
       expect(app.container.querySelector('.admin-header')).toBe(headerBefore)
-      expect(app.container.textContent).toContain('Panel administrativo')
+      expect(app.container.querySelector('.admin-header')?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
       expect(app.container.textContent).toContain('Dashboard administrativo')
     } finally {
       await app.cleanup()

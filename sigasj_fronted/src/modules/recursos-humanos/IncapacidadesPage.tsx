@@ -5,12 +5,20 @@ import {
   IconChevronRight,
   IconEye,
   IconFilterOff,
+  IconFirstAidKit,
   IconPencil,
   IconRefresh,
+  IconUser,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { Alert } from '../../shared/ui/Alert'
+import { Badge } from '../../shared/ui/Badge'
+import { Button } from '../../shared/ui/Button'
+import { Card } from '../../shared/ui/Card'
+import { EmptyState } from '../../shared/ui/EmptyState'
+import { PageHeader } from '../../shared/ui/PageHeader'
 import { useAuth } from '../auth/components/AuthContext'
 import { getColaboradoresOpciones } from './colaboradoresApi'
 import {
@@ -47,8 +55,10 @@ const leerFiltros = (params: URLSearchParams): IncapacidadesFiltros => {
   }
 }
 
-const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
+const labelClass =
+  'text-[0.72rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted'
+const fieldClass =
+  'min-h-11 w-full rounded-xl border border-sigasj-border bg-white px-3.5 text-[0.95rem] font-semibold text-sigasj-ink outline-none transition focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
 
 export default function IncapacidadesPage() {
   const navigate = useNavigate()
@@ -182,272 +192,378 @@ export default function IncapacidadesPage() {
   const hasta = Math.min(page * INCAPACIDADES_PAGE_SIZE, total)
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
+    <main className="admin-content-modern grid w-full min-w-0 gap-4">
       <RrhhSubnav />
-      <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-            Administración · Incapacidades
-          </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
-            Incapacidades del personal
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-            Registre y consulte los periodos de incapacidad administrativa de
-            los colaboradores.
-          </p>
-        </div>
-        <Link
-          to={INCAPACIDAD_NEW_PATH}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3.5 font-extrabold text-white no-underline shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-1 hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] motion-reduce:transform-none"
-        >
-          <IconCalendarPlus size={20} aria-hidden="true" />
-          Registrar incapacidad
-        </Link>
-      </header>
+
+      <PageHeader
+        eyebrow="Administración · Incapacidades"
+        title="Incapacidades del personal"
+        description="Registre y consulte los periodos de incapacidad administrativa de los colaboradores."
+        actions={
+          <Button
+            to={INCAPACIDAD_NEW_PATH}
+            size="sm"
+            leftIcon={<IconCalendarPlus size={16} aria-hidden="true" />}
+          >
+            Registrar incapacidad
+          </Button>
+        }
+      />
 
       {aviso ? (
-        <div
-          className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-800"
-          role="status"
-        >
+        <Alert tone="success" role="status">
           {aviso}
-        </div>
+        </Alert>
       ) : null}
 
-      <section
-        className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+      <Card
+        as="section"
+        padded
+        className="!p-3.5"
         aria-label="Filtros de incapacidades"
       >
-        <label className="grid min-w-0 gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Colaborador</span>
-          <select
-            className={inputClass}
-            value={colaboradorId}
-            onChange={(event) =>
-              actualizarFiltros({ colaboradorId: event.target.value })
-            }
-          >
-            <option value="">Todos los colaboradores</option>
-            {colaboradores.map((colaborador) => (
-              <option key={colaborador.id} value={String(colaborador.id)}>
-                {nombreCompleto(colaborador)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="grid min-w-0 gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Desde</span>
-          <input
-            type="date"
-            className={inputClass}
-            value={fechaInicio}
-            onChange={(event) =>
-              actualizarFiltros({ fechaInicio: event.target.value })
-            }
-          />
-        </label>
-        <label className="grid min-w-0 gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Hasta</span>
-          <input
-            type="date"
-            className={inputClass}
-            value={fechaFin}
-            onChange={(event) =>
-              actualizarFiltros({ fechaFin: event.target.value })
-            }
-          />
-        </label>
-        <button
-          type="button"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
-          onClick={limpiarFiltros}
-          disabled={!hayFiltros}
-        >
-          <IconFilterOff size={18} aria-hidden="true" />
-          Limpiar filtros
-        </button>
-      </section>
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="grid min-w-0 flex-1 gap-1.5 sm:min-w-[14rem] sm:max-w-[18rem]">
+            <span className={labelClass}>Colaborador</span>
+            <select
+              className={fieldClass}
+              value={colaboradorId}
+              aria-label="Filtrar por colaborador"
+              onChange={(event) =>
+                actualizarFiltros({ colaboradorId: event.target.value })
+              }
+            >
+              <option value="">Todos los colaboradores</option>
+              {colaboradores.map((colaborador) => (
+                <option key={colaborador.id} value={String(colaborador.id)}>
+                  {nombreCompleto(colaborador)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[11rem]">
+            <span className={labelClass}>Desde</span>
+            <input
+              type="date"
+              className={fieldClass}
+              value={fechaInicio}
+              aria-label="Filtrar desde"
+              onChange={(event) =>
+                actualizarFiltros({ fechaInicio: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[11rem]">
+            <span className={labelClass}>Hasta</span>
+            <input
+              type="date"
+              className={fieldClass}
+              value={fechaFin}
+              aria-label="Filtrar hasta"
+              onChange={(event) =>
+                actualizarFiltros({ fechaFin: event.target.value })
+              }
+            />
+          </label>
+          {hayFiltros ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+              onClick={limpiarFiltros}
+            >
+              Limpiar filtros
+            </Button>
+          ) : null}
+        </div>
+      </Card>
 
-      <section
-        className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
-        aria-busy={cargando}
-        aria-label="Listado de incapacidades"
-      >
-        {cargando && !listado ? (
-          <div className="grid gap-3 p-6" role="status">
-            <span className="sr-only">Cargando incapacidades…</span>
+      {cargando && !listado ? (
+        <Card padded className="!p-5" role="status" aria-busy="true">
+          <span className="sr-only">Cargando incapacidades…</span>
+          <div className="grid gap-3">
             {[0, 1, 2].map((fila) => (
               <div
                 key={fila}
-                className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"
+                className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
                 aria-hidden="true"
               />
             ))}
           </div>
-        ) : error ? (
-          <div
-            className="grid place-items-center gap-4 p-10 text-center"
-            role="alert"
-          >
-            <p className="m-0 font-semibold text-red-700">{error}</p>
+        </Card>
+      ) : error ? (
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{error}</p>
             {resultado.reintentable ? (
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
-              </button>
+              </Button>
             ) : null}
           </div>
-        ) : incapacidades.length === 0 ? (
-          <div className="grid place-items-center gap-3 p-10 text-center">
-            <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
-              <IconCalendarOff size={28} aria-hidden="true" />
-            </span>
-            <h2 className="m-0 text-lg font-extrabold text-[#073b73]">
-              {hayFiltros
-                ? 'No se encontraron incapacidades con los filtros seleccionados.'
-                : 'No se encontraron incapacidades.'}
-            </h2>
-            <p className="m-0 max-w-md text-slate-500">
-              {hayFiltros
-                ? 'Pruebe otros criterios o limpie los filtros.'
-                : 'Use “Registrar incapacidad” para anotar un periodo administrativo.'}
-            </p>
-          </div>
-        ) : (
-          <table
-            className={`w-full border-collapse text-left transition-opacity ${cargando ? 'opacity-60' : ''}`}
-          >
-            <thead className="hidden bg-slate-50 text-xs font-extrabold uppercase tracking-wider text-slate-500 xl:table-header-group">
-              <tr>
-                <th scope="col" className="px-6 py-4">
-                  Colaborador
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Inicio
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Fin
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Observaciones
-                </th>
-                <th scope="col" className="px-6 py-4 text-right">
-                  Acción
-                </th>
-              </tr>
-            </thead>
-            <tbody className="block divide-y divide-slate-100 xl:table-row-group">
-              {incapacidades.map((incapacidad) => {
-                const nombre = nombreColaboradorIncapacidad(incapacidad)
-                return (
-                  <tr
-                    key={incapacidad.id}
-                    className="grid gap-2 px-5 py-4 transition hover:bg-sky-50/50 xl:table-row xl:p-0"
-                  >
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">
+        </Alert>
+      ) : incapacidades.length === 0 ? (
+        <EmptyState
+          icon={<IconCalendarOff size={28} aria-hidden="true" />}
+          title={
+            hayFiltros
+              ? 'No se encontraron incapacidades con los filtros seleccionados.'
+              : 'No se encontraron incapacidades.'
+          }
+          description={
+            hayFiltros
+              ? 'Pruebe otros criterios o limpie los filtros.'
+              : 'Use “Registrar incapacidad” para anotar un periodo administrativo.'
+          }
+          actions={
+            hayFiltros ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+                onClick={limpiarFiltros}
+              >
+                Limpiar filtros
+              </Button>
+            ) : (
+              <Button
+                to={INCAPACIDAD_NEW_PATH}
+                size="sm"
+                leftIcon={<IconCalendarPlus size={16} aria-hidden="true" />}
+              >
+                Registrar incapacidad
+              </Button>
+            )
+          }
+        />
+      ) : (
+        <>
+          <ul className="m-0 grid list-none gap-3 p-0 xl:hidden">
+            {incapacidades.map((incapacidad) => {
+              const nombre = nombreColaboradorIncapacidad(incapacidad)
+              return (
+                <li key={incapacidad.id}>
+                  <Card padded className="!grid !gap-3 !p-4">
+                    <div className="min-w-0">
+                      <p className="m-0 flex items-center gap-1.5 text-sm font-semibold text-sigasj-muted">
+                        <IconUser size={14} aria-hidden="true" />
                         Colaborador
-                      </span>
-                      <span className="min-w-0 text-right xl:text-left">
-                        <span className="block font-extrabold text-[#073b73]">
+                      </p>
+                      <p className="mb-0 mt-1 text-base font-extrabold text-sigasj-ink">
+                        {nombre}
+                      </p>
+                      {incapacidad.colaborador?.cedula ? (
+                        <p className="m-0 text-sm font-semibold text-sigasj-muted">
+                          {incapacidad.colaborador.cedula}
+                        </p>
+                      ) : null}
+                    </div>
+                    <p className="m-0 text-sm font-semibold tabular-nums text-sigasj-muted">
+                      {formatearFechaPermiso(incapacidad.fechaInicio)} —{' '}
+                      {formatearFechaPermiso(incapacidad.fechaFin)}
+                    </p>
+                    <p className="m-0 text-sm font-semibold text-sigasj-ink">
+                      {resumenObservaciones(incapacidad.observaciones)}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        to={incapacidadDetailPath(incapacidad.id)}
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={<IconEye size={16} aria-hidden="true" />}
+                        aria-label={`Ver detalle de incapacidad de ${nombre}`}
+                      >
+                        Ver detalle
+                      </Button>
+                      <Button
+                        to={incapacidadEditPath(incapacidad.id)}
+                        size="sm"
+                        leftIcon={<IconPencil size={16} aria-hidden="true" />}
+                        aria-label={`Editar incapacidad de ${nombre}`}
+                      >
+                        Editar
+                      </Button>
+                    </div>
+                  </Card>
+                </li>
+              )
+            })}
+          </ul>
+
+          <Card
+            as="section"
+            className={`hidden min-w-0 overflow-hidden !p-0 xl:block ${cargando ? 'opacity-60' : ''}`}
+            aria-busy={cargando}
+            aria-label="Listado de incapacidades"
+          >
+            <div className="flex items-center gap-2.5 border-b border-sigasj-border px-4 py-3.5 sm:px-5">
+              <span className="grid size-8 place-items-center rounded-xl bg-sigasj-surface-soft text-sigasj-primary">
+                <IconFirstAidKit size={18} aria-hidden="true" />
+              </span>
+              <h2 className="m-0 text-[1.05rem] font-extrabold tracking-tight text-sigasj-ink">
+                Registros
+              </h2>
+              <Badge tone="info" className="ml-auto">
+                {total} incapacidad{total === 1 ? '' : 'es'}
+              </Badge>
+            </div>
+
+            <table className="w-full border-collapse text-left">
+              <thead className="bg-[color-mix(in_srgb,var(--color-sigasj-ice)_70%,white)] text-[0.68rem] font-bold uppercase tracking-[0.08em] text-sigasj-muted">
+                <tr>
+                  <th scope="col" className="px-5 py-3">
+                    Colaborador
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Inicio
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Fin
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Observaciones
+                  </th>
+                  <th scope="col" className="px-5 py-3 text-right">
+                    Acción
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-sigasj-border">
+                {incapacidades.map((incapacidad) => {
+                  const nombre = nombreColaboradorIncapacidad(incapacidad)
+                  return (
+                    <tr
+                      key={incapacidad.id}
+                      className="transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--color-sigasj-ice)_55%,white)]"
+                    >
+                      <td className="px-5 py-3.5">
+                        <span className="block font-extrabold text-sigasj-ink">
                           {nombre}
                         </span>
-                        <span className="block text-sm text-slate-500">
-                          {incapacidad.colaborador?.cedula}
-                        </span>
-                      </span>
-                    </td>
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">
-                        Inicio
-                      </span>
-                      <span className="font-semibold text-slate-700">
+                        {incapacidad.colaborador?.cedula ? (
+                          <span className="block text-sm font-semibold text-sigasj-muted">
+                            {incapacidad.colaborador.cedula}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
                         {formatearFechaPermiso(incapacidad.fechaInicio)}
-                      </span>
-                    </td>
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">
-                        Fin
-                      </span>
-                      <span className="font-semibold text-slate-700">
+                      </td>
+                      <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
                         {formatearFechaPermiso(incapacidad.fechaFin)}
-                      </span>
-                    </td>
-                    <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4">
-                      <span className="text-xs font-bold uppercase text-slate-400 xl:hidden">
-                        Observaciones
-                      </span>
-                      <span className="font-semibold text-slate-700">
-                        {resumenObservaciones(incapacidad.observaciones)}
-                      </span>
-                    </td>
-                    <td className="pt-2 xl:table-cell xl:px-6 xl:py-4">
-                      <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-                        <Link
-                          to={incapacidadDetailPath(incapacidad.id)}
-                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-3 py-1.5 text-sm font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
-                          aria-label={`Ver detalle de incapacidad de ${nombre}`}
-                        >
-                          <IconEye size={16} aria-hidden="true" />
-                          Ver detalle
-                        </Link>
-                        <Link
-                          to={incapacidadEditPath(incapacidad.id)}
-                          className="rrhh-touch-target inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-600 no-underline transition hover:border-blue-300 hover:text-[#1e5a9c] hover:no-underline"
-                          aria-label={`Editar incapacidad de ${nombre}`}
-                        >
-                          <IconPencil size={16} aria-hidden="true" />
-                          Editar
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
+                      </td>
+                      <td className="max-w-[24rem] px-5 py-3.5 text-sm font-semibold text-sigasj-ink">
+                        <span className="line-clamp-2">
+                          {resumenObservaciones(incapacidad.observaciones)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <Button
+                            to={incapacidadDetailPath(incapacidad.id)}
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<IconEye size={16} aria-hidden="true" />}
+                            aria-label={`Ver detalle de incapacidad de ${nombre}`}
+                          >
+                            Ver detalle
+                          </Button>
+                          <Button
+                            to={incapacidadEditPath(incapacidad.id)}
+                            size="sm"
+                            leftIcon={
+                              <IconPencil size={16} aria-hidden="true" />
+                            }
+                            aria-label={`Editar incapacidad de ${nombre}`}
+                          >
+                            Editar
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
 
-        {!error && total > 0 ? (
+            <nav
+              className="flex flex-col items-center justify-between gap-3 border-t border-sigasj-border px-4 py-3.5 text-sm text-sigasj-muted sm:flex-row sm:px-5"
+              aria-label="Paginación de incapacidades"
+            >
+              <p className="m-0 font-semibold">
+                Mostrando {desde}–{hasta} de {total} incapacidad
+                {total === 1 ? '' : 'es'}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
+                  disabled={page <= 1 || cargando}
+                  onClick={() => actualizarFiltros({ page: page - 1 })}
+                >
+                  Anterior
+                </Button>
+                <span className="px-1.5 font-semibold text-sigasj-ink">
+                  Página {page} de {Math.max(totalPages, 1)}
+                </span>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
+                  disabled={page >= totalPages || cargando}
+                  onClick={() => actualizarFiltros({ page: page + 1 })}
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </nav>
+          </Card>
+
           <nav
-            className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
-            aria-label="Paginación de incapacidades"
+            className="flex flex-wrap items-center justify-between gap-3 xl:hidden"
+            aria-label="Paginación de incapacidades (móvil)"
           >
-            <p className="m-0">
+            <p className="m-0 text-sm font-semibold text-sigasj-muted">
               Mostrando {desde}–{hasta} de {total} incapacidad
               {total === 1 ? '' : 'es'}
             </p>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
-                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
-                onClick={() => actualizarFiltros({ page: page - 1 })}
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
                 disabled={page <= 1 || cargando}
+                onClick={() => actualizarFiltros({ page: page - 1 })}
               >
-                <IconChevronLeft size={17} aria-hidden="true" />
                 Anterior
-              </button>
-              <span className="px-2 font-semibold text-slate-600">
-                Página {page} de {Math.max(totalPages, 1)}
-              </span>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
-                onClick={() => actualizarFiltros({ page: page + 1 })}
+                variant="secondary"
+                size="sm"
+                rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
                 disabled={page >= totalPages || cargando}
+                onClick={() => actualizarFiltros({ page: page + 1 })}
               >
                 Siguiente
-                <IconChevronRight size={17} aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           </nav>
-        ) : null}
-      </section>
+        </>
+      )}
     </main>
   )
 }

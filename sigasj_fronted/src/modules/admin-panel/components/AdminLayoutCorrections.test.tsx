@@ -51,7 +51,9 @@ describe('AdminLayout Responsive Corrections & Modal Utilities', () => {
     const markup = renderDashboardLayout()
 
     expect(markup).toContain('admin-header')
-    expect(markup).toContain('admin-sidebar__system-status')
+    // El sidebar arranca colapsado (sin system-status); el footer y el toggle son estables.
+    expect(markup).toContain('admin-sidebar__footer')
+    expect(markup).toContain('admin-sidebar__collapse')
     expect(markup).toContain('admin-account-menu')
     expect(markup).toContain('admin-header__actions')
   })

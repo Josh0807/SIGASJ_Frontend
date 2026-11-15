@@ -27,5 +27,8 @@ describe('averiaInventarioPaths', () => {
     expect(salidaDesdeAveriaHref(14, adminAveriaReturnPath(14))).toBe(
       '/admin/inventario/salidas?idAveria=14&from=%2Fadmin%2Faverias%2F14',
     )
+    expect(salidaDesdeAveriaHref(14, fontaneroAveriaReturnPath(14), 7)).toBe(
+      '/admin/inventario/salidas?idAveria=14&from=%2Ffontanero%2Faverias%2F14&idMaterial=7',
+    )
   })
 })

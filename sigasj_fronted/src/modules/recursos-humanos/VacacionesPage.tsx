@@ -1,23 +1,32 @@
 import {
+  IconAdjustmentsHorizontal,
   IconBeach,
-  IconCalendarEvent,
   IconChevronLeft,
   IconChevronRight,
   IconDeviceFloppy,
   IconHash,
   IconHistory,
+  IconMinus,
+  IconPlus,
   IconRefresh,
   IconUser,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { Alert } from '../../shared/ui/Alert'
+import { Badge } from '../../shared/ui/Badge'
+import { Button } from '../../shared/ui/Button'
+import { Card } from '../../shared/ui/Card'
+import { EmptyState } from '../../shared/ui/EmptyState'
+import { PageHeader } from '../../shared/ui/PageHeader'
 import { useAuth } from '../auth/components/AuthContext'
-import EstadoBadge from './EstadoBadge'
+import FechaFeriadoPicker from '../solicitudes-ausencia/FechaFeriadoPicker'
+import { esFeriadoCostaRica } from '../solicitudes-ausencia/feriadosCostaRica'
 import { getColaboradoresOpciones } from './colaboradoresApi'
 import { esNoAutenticado, esReintentable, nombreCompleto } from './colaboradorForm'
-import { RRHH_TITLE } from './recursosHumanosPaths'
 import RrhhSubnav from './RrhhSubnav'
+import VacacionesSaldoPanel from './VacacionesSaldoPanel'
 import type {
   BalanceVacaciones,
   Colaborador,
@@ -34,14 +43,30 @@ import {
   EMPTY_MOVIMIENTO_VACACIONES_VALUES,
   TIPOS_MOVIMIENTO_VACACIONES,
   avisoMovimientoRegistrado,
+  claseDiasMovimiento,
   diasConSigno,
   formatearFechaMovimiento,
   tipoMovimientoLabel,
+  tonoBadgeMovimiento,
   toMovimientoVacacionesPayload,
   vacacionesErrorMessage,
   validateMovimientoVacaciones,
   type MovimientoVacacionesFormErrors,
 } from './vacacionesForm'
+
+const iconoTipoMovimiento = {
+  ACUMULADO: IconPlus,
+  DISFRUTADO: IconMinus,
+  AJUSTE: IconAdjustmentsHorizontal,
+} as const
+
+const labelClass = 'text-[0.78rem] font-bold text-sigasj-ink'
+const fieldShell =
+  'flex min-h-11 items-center gap-2.5 rounded-xl border border-sigasj-border bg-white px-3.5 transition focus-within:border-sigasj-primary focus-within:ring-2 focus-within:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
+const fieldShellError =
+  'flex min-h-11 items-center gap-2.5 rounded-xl border border-red-400 bg-white px-3.5 transition focus-within:ring-2 focus-within:ring-red-200'
+const inputClass =
+  'min-w-0 flex-1 border-0 bg-transparent py-2.5 text-[0.95rem] text-sigasj-ink outline-none placeholder:text-sigasj-muted'
 
 type Carga = { clave: string; error: string | null; reintentable: boolean }
 
@@ -53,33 +78,6 @@ const leerParams = (params: URLSearchParams) => {
       Number.isInteger(colaboradorId) && colaboradorId > 0 ? colaboradorId : null,
     page: Number.isInteger(page) && page > 0 ? page : 1,
   }
-}
-
-function TarjetaSaldo({
-  label,
-  dias,
-  tono,
-}: {
-  label: string
-  dias: number
-  tono: 'azul' | 'ambar' | 'violeta' | 'verde'
-}) {
-  const tonos = {
-    azul: 'border-[#d7e5f1] bg-sky-50/70 text-sky-900',
-    ambar: 'border-amber-100 bg-amber-50/70 text-amber-900',
-    violeta: 'border-[#bfe3fa] bg-[#eaf6ff]/70 text-[#1e5a9c]',
-    verde: 'border-emerald-100 bg-emerald-50/80 text-emerald-900',
-  }
-  const mostrar = Number.isFinite(dias) ? dias : 0
-  return (
-    <div className={`grid min-w-0 gap-1 rounded-2xl border px-5 py-4 ${tonos[tono]}`}>
-      <dt className="text-xs font-extrabold uppercase tracking-wider opacity-70">{label}</dt>
-      <dd className="m-0 flex items-baseline gap-1.5">
-        <span className="text-3xl font-black tabular-nums sm:text-4xl">{mostrar}</span>
-        <span className="font-bold opacity-80">{Math.abs(mostrar) === 1 ? 'día' : 'días'}</span>
-      </dd>
-    </div>
-  )
 }
 
 export default function VacacionesPage() {
@@ -136,7 +134,15 @@ export default function VacacionesPage() {
     const controller = new AbortController()
     getColaboradoresOpciones(controller.signal)
       .then((respuesta) => {
-        if (!controller.signal.aborted) setColaboradores(respuesta.data)
+        if (controller.signal.aborted) return
+        // Activos primero para no confundir homónimos inactivos (p. ej. seeds duplicados).
+        const ordenados = [...respuesta.data].sort((a, b) => {
+          if (a.activo === b.activo) {
+            return nombreCompleto(a).localeCompare(nombreCompleto(b), 'es')
+          }
+          return a.activo ? -1 : 1
+        })
+        setColaboradores(ordenados)
       })
       .catch((err: unknown) => {
         if (!controller.signal.aborted && esNoAutenticado(err)) salirPorSesion()
@@ -283,31 +289,26 @@ export default function VacacionesPage() {
   const hasta = Math.min(page * MOVIMIENTOS_VACACIONES_PAGE_SIZE, total)
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
+    <main className="admin-content-modern grid w-full min-w-0 gap-4">
       <RrhhSubnav />
-      <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8">
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-          Administración · {RRHH_TITLE}
-        </p>
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
-          Vacaciones del personal
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-          Consulte el saldo de vacaciones de cada colaborador y registre adquisiciones o disfrutes.
-          El saldo lo calcula el sistema a partir del historial.
-        </p>
-      </header>
 
-      <section
-        className="grid gap-2 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6"
+      <PageHeader
+        title="Vacaciones del personal"
+        description="Consulte el saldo y registre adquisiciones, disfrutes o ajustes. El saldo se calcula desde el historial."
+      />
+
+      <Card
+        as="section"
+        padded
+        className="!p-3.5"
         aria-label="Selección de colaborador"
       >
-        <label className="grid min-w-0 gap-2 lg:max-w-xl">
-          <span className="text-sm font-bold text-[#163f6b]">Colaborador</span>
-          <span className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#1e5a9c] focus-within:ring-2 focus-within:ring-blue-200">
-            <IconUser className="text-slate-400" size={20} aria-hidden="true" />
+        <label className="grid min-w-0 gap-1.5 lg:max-w-xl">
+          <span className={labelClass}>Colaborador</span>
+          <span className={fieldShell}>
+            <IconUser className="text-sigasj-muted" size={18} aria-hidden="true" />
             <select
-              className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-3 text-slate-800 outline-none"
+              className="w-0 min-w-0 flex-1 truncate border-0 bg-transparent py-2.5 text-[0.95rem] text-sigasj-ink outline-none"
               value={colaboradorId ? String(colaboradorId) : ''}
               onChange={(event) => seleccionarColaborador(event.target.value)}
               aria-label="Seleccione un colaborador"
@@ -316,262 +317,315 @@ export default function VacacionesPage() {
               {colaboradores.map((colaborador) => (
                 <option key={colaborador.id} value={String(colaborador.id)}>
                   {nombreCompleto(colaborador)} · {colaborador.cedula}
+                  {colaborador.activo ? '' : ' (Inactivo)'}
                 </option>
               ))}
             </select>
           </span>
         </label>
-      </section>
+      </Card>
 
       {colaboradorId === null ? (
-        <div className="grid place-items-center gap-3 rounded-2xl border border-[#d7e5f1] bg-white p-10 text-center shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl">
-          <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
-            <IconBeach size={28} aria-hidden="true" />
-          </span>
-          <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Seleccione un colaborador</h2>
-          <p className="m-0 max-w-md text-slate-500">
-            Elija un colaborador para ver sus días adquiridos, disfrutados y disponibles, y para
-            registrar nuevos movimientos.
-          </p>
-        </div>
+        <EmptyState
+          icon={<IconBeach size={32} aria-hidden="true" />}
+          title="Seleccione un colaborador"
+          description="Elija un colaborador para ver sus días adquiridos, disfrutados y disponibles, y para registrar nuevos movimientos."
+        />
       ) : (
         <>
-          {aviso ? (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-800" role="status">
-              {aviso}
-            </div>
+          {aviso ? <Alert tone="success">{aviso}</Alert> : null}
+
+          {colaboradorSeleccionado && !colaboradorSeleccionado.activo ? (
+            <Alert tone="warning">
+              Este colaborador está marcado como inactivo. Si ve saldo en cero, revise si existe
+              otro registro activo con el mismo nombre (p. ej. el vinculado al usuario Fontanero).
+            </Alert>
           ) : null}
 
-          <div className="grid gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
-            <section
-              className="grid gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8"
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-stretch">
+            <Card
+              as="section"
+              padded
+              className="!flex !h-full !flex-col !p-5 sm:!p-6"
               aria-label="Saldo de vacaciones"
               aria-busy={cargandoBalance}
             >
               {cargandoBalance && !balanceVisible ? (
-                <div className="grid gap-4" role="status">
+                <div className="grid gap-3" role="status">
                   <span className="sr-only">Cargando saldo de vacaciones…</span>
                   {[0, 1, 2].map((fila) => (
-                    <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
+                    <div
+                      key={fila}
+                      className="h-14 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
+                      aria-hidden="true"
+                    />
                   ))}
                 </div>
               ) : errorBalance ? (
-                <div className="grid place-items-center gap-4 text-center" role="alert">
-                  <p className="m-0 font-semibold text-red-700">{errorBalance}</p>
+                <div className="grid place-items-center gap-3 py-6 text-center" role="alert">
+                  <p className="m-0 font-semibold text-sigasj-error">{errorBalance}</p>
                   {cargaBalance.reintentable ? (
-                    <button
+                    <Button
                       type="button"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                      variant="secondary"
+                      size="sm"
+                      leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                       onClick={() => setRecarga((n) => n + 1)}
                     >
-                      <IconRefresh size={18} aria-hidden="true" />
                       Reintentar
-                    </button>
+                    </Button>
                   ) : null}
                 </div>
               ) : balanceVisible ? (
-                <>
-                  <div className="flex min-w-0 items-start gap-4">
-                    <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
-                      <IconBeach size={28} aria-hidden="true" />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-                        Saldo de vacaciones
-                      </p>
-                      <h2 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
-                        {nombre}
-                      </h2>
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-slate-500">
-                        <span className="font-semibold">{balanceVisible.colaborador.cargo}</span>
-                        <span aria-hidden="true">·</span>
-                        <span className="text-sm">{balanceVisible.colaborador.cedula}</span>
-                        <EstadoBadge activo={balanceVisible.colaborador.activo} />
-                      </div>
-                    </div>
-                  </div>
-                  <dl className={`m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 ${cargandoBalance ? 'opacity-60' : ''}`}>
-                    <TarjetaSaldo label="Adquiridas" dias={balanceVisible.diasAcumulados} tono="azul" />
-                    <TarjetaSaldo label="Disfrutadas" dias={balanceVisible.diasDisfrutados} tono="ambar" />
-                    <TarjetaSaldo
-                      label="Ajustes netos"
-                      dias={balanceVisible.diasAjusteNeto ?? 0}
-                      tono="violeta"
-                    />
-                    <TarjetaSaldo label="Disponibles" dias={balanceVisible.diasDisponibles} tono="verde" />
-                  </dl>
-                  <p className="m-0 text-sm text-slate-500">
-                    {balanceVisible.totalMovimientos === 0
-                      ? 'Aún no hay movimientos registrados para este colaborador.'
-                      : `Calculado a partir de ${balanceVisible.totalMovimientos} movimiento${balanceVisible.totalMovimientos === 1 ? '' : 's'}.`}
-                  </p>
-                </>
-              ) : null}
-            </section>
-
-            <section
-              className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8"
-              aria-label="Registrar movimiento de vacaciones"
-            >
-              <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Registrar movimiento</h2>
-              <p className="mb-5 mt-1 text-sm text-slate-500">
-                Disfrutes y ajustes que resten no pueden superar el saldo disponible. El ajuste exige motivo.
-              </p>
-              {submitError ? (
-                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800" role="alert">
-                  {submitError}
+                <div className="min-h-0 flex-1">
+                  <VacacionesSaldoPanel balance={balanceVisible} cargando={cargandoBalance} />
                 </div>
               ) : null}
-              <form className="grid gap-5" noValidate onSubmit={submit} aria-busy={saving} aria-label="Formulario de movimiento de vacaciones">
+            </Card>
+
+            <Card
+              as="section"
+              padded
+              className="!flex !h-full !flex-col !p-5 sm:!p-6"
+              aria-label="Registrar movimiento de vacaciones"
+            >
+              <div className="mb-5 flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[color:var(--asada-navy,#1e5a9c)] text-white shadow-[0_8px_16px_rgba(30,90,156,0.22)]">
+                  <IconPlus size={18} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="m-0 text-[1.05rem] font-extrabold tracking-tight text-sigasj-ink">
+                    Registrar movimiento
+                  </h2>
+                  <p className="mb-0 mt-1 text-sm leading-5 text-sigasj-muted">
+                    Disfrutes y ajustes que resten no pueden superar el saldo. Los feriados van
+                    en ámbar.
+                  </p>
+                </div>
+              </div>
+              {submitError ? (
+                <Alert tone="danger" className="mb-4">
+                  {submitError}
+                </Alert>
+              ) : null}
+              <form
+                className="grid flex-1 gap-4"
+                noValidate
+                onSubmit={submit}
+                aria-busy={saving}
+                aria-label="Formulario de movimiento de vacaciones"
+              >
                 <fieldset className="m-0 grid gap-2 border-0 p-0">
-                  <legend className="mb-2 text-sm font-bold text-[#163f6b]">
-                    Tipo <span className="text-red-600">*</span>
+                  <legend className={`mb-1 ${labelClass}`}>
+                    Tipo <span className="text-sigasj-error">*</span>
                   </legend>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {TIPOS_MOVIMIENTO_VACACIONES.map((tipo) => {
                       const activo = values.tipo === tipo.value
+                      const Icono = iconoTipoMovimiento[tipo.value]
+                      const tonoActivo =
+                        tipo.value === 'DISFRUTADO'
+                          ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-200'
+                          : tipo.value === 'AJUSTE'
+                            ? 'border-sigasj-primary bg-[color-mix(in_srgb,var(--color-sigasj-primary)_10%,white)] ring-2 ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
+                            : 'border-sky-400 bg-sky-50 ring-2 ring-sky-200'
+                      const iconoActivo =
+                        tipo.value === 'DISFRUTADO'
+                          ? 'bg-amber-500 text-white'
+                          : tipo.value === 'AJUSTE'
+                            ? 'bg-sigasj-primary text-white'
+                            : 'bg-sky-600 text-white'
                       return (
                         <label
                           key={tipo.value}
-                          className={`flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition ${
+                          title={tipo.descripcion}
+                          className={`flex cursor-pointer items-start gap-2.5 rounded-xl border px-3 py-2.5 transition duration-150 ${
                             activo
-                              ? 'border-[#1e5a9c] bg-[#eaf6ff] ring-2 ring-blue-200'
+                              ? tonoActivo
                               : errors.tipo
                                 ? 'border-red-400 bg-white'
-                                : 'border-slate-200 bg-white hover:border-blue-300'
+                                : 'border-sigasj-border bg-white hover:border-sigasj-primary/45'
                           }`}
                         >
                           <input
                             type="radio"
                             name="tipo"
-                            className="mt-1 accent-blue-600"
+                            className="sr-only"
                             value={tipo.value}
                             checked={activo}
                             aria-invalid={Boolean(errors.tipo)}
                             onChange={() => {
                               update('tipo', tipo.value)
                               if (tipo.value !== 'AJUSTE') update('signoAjuste', '')
+                              if (
+                                tipo.value === 'DISFRUTADO' &&
+                                values.fecha &&
+                                esFeriadoCostaRica(values.fecha)
+                              ) {
+                                update('fecha', '')
+                              }
                             }}
                           />
-                          <span className="grid gap-0.5">
-                            <span className="font-extrabold text-[#073b73]">{tipo.label}</span>
-                            <span className="text-xs text-slate-500">{tipo.descripcion}</span>
+                          <span
+                            className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg ${
+                              activo ? iconoActivo : 'bg-sigasj-surface-soft text-sigasj-primary'
+                            }`}
+                            aria-hidden="true"
+                          >
+                            <Icono size={16} />
+                          </span>
+                          <span className="grid min-w-0 gap-0.5">
+                            <span className="text-sm font-extrabold text-sigasj-ink">
+                              {tipo.label}
+                            </span>
+                            <span className="text-[0.72rem] font-semibold leading-4 text-sigasj-muted">
+                              {tipo.resumen}
+                            </span>
                           </span>
                         </label>
                       )
                     })}
                   </div>
                   {errors.tipo ? (
-                    <small className="font-semibold text-red-600" role="alert">{errors.tipo}</small>
+                    <small className="font-semibold text-sigasj-error" role="alert">
+                      {errors.tipo}
+                    </small>
                   ) : null}
                 </fieldset>
 
                 {values.tipo === 'AJUSTE' ? (
                   <fieldset className="m-0 grid gap-2 border-0 p-0">
-                    <legend className="mb-2 text-sm font-bold text-[#163f6b]">
-                      Efecto del ajuste <span className="text-red-600">*</span>
+                    <legend className={`mb-1 ${labelClass}`}>
+                      Efecto del ajuste <span className="text-sigasj-error">*</span>
                     </legend>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {(
                         [
-                          { value: '1' as const, label: 'Suma días' },
-                          { value: '-1' as const, label: 'Resta días' },
+                          { value: '1' as const, label: 'Suma días', Icono: IconPlus },
+                          { value: '-1' as const, label: 'Resta días', Icono: IconMinus },
                         ] as const
-                      ).map((opcion) => (
+                      ).map(({ value, label, Icono }) => (
                         <label
-                          key={opcion.value}
-                          className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition ${
-                            values.signoAjuste === opcion.value
-                              ? 'border-[#1e5a9c] bg-[#eaf6ff] ring-2 ring-[#bfe3fa]'
+                          key={value}
+                          className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 py-2.5 transition duration-150 ${
+                            values.signoAjuste === value
+                              ? 'border-sigasj-primary bg-[color-mix(in_srgb,var(--color-sigasj-primary)_10%,white)] ring-2 ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
                               : errors.signoAjuste
                                 ? 'border-red-400 bg-white'
-                                : 'border-slate-200 bg-white hover:border-[#1e5a9c]'
+                                : 'border-sigasj-border bg-white hover:border-sigasj-primary/45'
                           }`}
                         >
                           <input
                             type="radio"
                             name="signoAjuste"
-                            className="accent-[#1e5a9c]"
-                            value={opcion.value}
-                            checked={values.signoAjuste === opcion.value}
-                            onChange={() => update('signoAjuste', opcion.value)}
+                            className="sr-only"
+                            value={value}
+                            checked={values.signoAjuste === value}
+                            onChange={() => update('signoAjuste', value)}
                           />
-                          <span className="font-extrabold text-[#073b73]">{opcion.label}</span>
+                          <Icono size={16} className="text-sigasj-primary" aria-hidden="true" />
+                          <span className="text-sm font-extrabold text-sigasj-ink">{label}</span>
                         </label>
                       ))}
                     </div>
                     {errors.signoAjuste ? (
-                      <small className="font-semibold text-red-600" role="alert">
+                      <small className="font-semibold text-sigasj-error" role="alert">
                         {errors.signoAjuste}
                       </small>
                     ) : null}
                   </fieldset>
                 ) : null}
 
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <label className="grid min-w-0 gap-2">
-                    <span className="text-sm font-bold text-[#163f6b]">
-                      Días <span className="text-red-600">*</span>
-                    </span>
-                    <span className={`flex min-h-12 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 ${errors.cantidadDias ? 'border-red-400' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}>
-                      <IconHash className={errors.cantidadDias ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        min={1}
-                        step={1}
-                        className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400"
-                        placeholder="Ej. 3"
-                        value={values.cantidadDias}
-                        required
-                        aria-label="Cantidad de días"
-                        aria-invalid={Boolean(errors.cantidadDias)}
-                        onChange={(event) => update('cantidadDias', event.target.value)}
-                      />
-                    </span>
-                    {errors.cantidadDias ? (
-                      <small className="font-semibold text-red-600" role="alert">{errors.cantidadDias}</small>
-                    ) : null}
-                  </label>
+                <div className="grid gap-3.5">
+                  <div className="grid gap-3.5 sm:grid-cols-2 sm:items-start">
+                    <label className="grid min-w-0 gap-1.5 self-start">
+                      <span className={labelClass}>
+                        Días <span className="text-sigasj-error">*</span>
+                      </span>
+                      <span className={errors.cantidadDias ? fieldShellError : fieldShell}>
+                        <IconHash
+                          className={
+                            errors.cantidadDias ? 'text-sigasj-error' : 'text-sigasj-muted'
+                          }
+                          size={18}
+                          aria-hidden="true"
+                        />
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          step={1}
+                          className={inputClass}
+                          placeholder="Ej. 3"
+                          value={values.cantidadDias}
+                          required
+                          aria-label="Cantidad de días"
+                          aria-invalid={Boolean(errors.cantidadDias)}
+                          onChange={(event) => update('cantidadDias', event.target.value)}
+                        />
+                      </span>
+                    </label>
 
-                  <label className="grid min-w-0 gap-2">
-                    <span className="text-sm font-bold text-[#163f6b]">
-                      Fecha <span className="text-red-600">*</span>
-                    </span>
-                    <span className={`flex min-h-12 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 ${errors.fecha ? 'border-red-400' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}>
-                      <IconCalendarEvent className={errors.fecha ? 'text-red-500' : 'text-slate-400'} size={20} aria-hidden="true" />
-                      <input
-                        type="date"
-                        className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none"
-                        value={values.fecha}
-                        required
-                        aria-label="Fecha del movimiento"
-                        aria-invalid={Boolean(errors.fecha)}
-                        onChange={(event) => update('fecha', event.target.value)}
-                      />
-                    </span>
-                    {errors.fecha ? (
-                      <small className="font-semibold text-red-600" role="alert">{errors.fecha}</small>
-                    ) : null}
-                  </label>
+                    <FechaFeriadoPicker
+                      label="Fecha"
+                      value={values.fecha}
+                      required
+                      compacto
+                      sinMensajes
+                      error={errors.fecha}
+                      bloquearFeriados={values.tipo === 'DISFRUTADO'}
+                      onChange={(iso) => update('fecha', iso)}
+                    />
+                  </div>
+
+                  {errors.cantidadDias ? (
+                    <small className="font-semibold text-sigasj-error" role="alert">
+                      {errors.cantidadDias}
+                    </small>
+                  ) : null}
+                  {errors.fecha ? (
+                    <small className="font-semibold text-sigasj-error" role="alert">
+                      {errors.fecha}
+                    </small>
+                  ) : values.fecha &&
+                    esFeriadoCostaRica(values.fecha) &&
+                    values.tipo !== 'DISFRUTADO' ? (
+                    <p className="m-0 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm font-semibold leading-5 text-amber-950">
+                      Feriado seleccionado. Si el colaborador laboró ese día, regístrelo como{' '}
+                      <span className="font-extrabold">Ajuste (+)</span> — suma al saldo (ajuste
+                      neto).
+                    </p>
+                  ) : (
+                    <small className="font-semibold text-sigasj-muted">
+                      {values.tipo === 'DISFRUTADO'
+                        ? 'Feriados en ámbar: no se pueden disfrutar. Si laboró, use Ajuste (+).'
+                        : values.tipo === 'AJUSTE'
+                          ? 'Feriado laborado = Ajuste (+) (ajuste neto al saldo).'
+                          : 'Los feriados nacionales aparecen en ámbar en el calendario.'}
+                    </small>
+                  )}
                 </div>
 
-                <label className="grid min-w-0 gap-2">
-                  <span className="text-sm font-bold text-[#163f6b]">
+                <label className="grid min-w-0 gap-1.5">
+                  <span className={labelClass}>
                     {values.tipo === 'AJUSTE' ? (
                       <>
-                        Motivo <span className="text-red-600">*</span>
+                        Motivo <span className="text-sigasj-error">*</span>
                       </>
                     ) : (
                       'Observaciones (opcional)'
                     )}
                   </span>
                   <textarea
-                    className={`min-h-24 w-full rounded-xl border bg-white px-4 py-3 text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-blue-200 ${errors.observaciones ? 'border-red-400' : 'border-slate-200 focus:border-[#1e5a9c]'}`}
+                    className={`min-h-[5.5rem] w-full rounded-xl border bg-white px-3.5 py-2.5 text-[0.95rem] text-sigasj-ink outline-none transition placeholder:text-sigasj-muted focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)] ${
+                      errors.observaciones ? 'border-red-400' : 'border-sigasj-border'
+                    }`}
                     maxLength={500}
                     placeholder={
                       values.tipo === 'AJUSTE'
-                        ? 'Motivo del ajuste administrativo'
+                        ? values.fecha && esFeriadoCostaRica(values.fecha)
+                          ? 'Ej. Ajuste por feriado laborado (ajuste neto)'
+                          : 'Motivo del ajuste administrativo'
                         : 'Ej. Vacaciones de fin de año'
                     }
                     value={values.observaciones}
@@ -579,148 +633,191 @@ export default function VacacionesPage() {
                     onChange={(event) => update('observaciones', event.target.value)}
                   />
                   {errors.observaciones ? (
-                    <small className="font-semibold text-red-600" role="alert">{errors.observaciones}</small>
+                    <small className="font-semibold text-sigasj-error" role="alert">
+                      {errors.observaciones}
+                    </small>
                   ) : null}
                 </label>
 
-                <button
-                  type="submit"
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#1e5a9c] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-6 py-3 font-extrabold text-white shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none motion-reduce:transform-none"
-                  disabled={saving}
-                >
-                  <IconDeviceFloppy size={20} aria-hidden="true" />
-                  {saving ? 'Guardando movimiento…' : 'Guardar movimiento'}
-                </button>
+                <div className="mt-auto pt-1">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    loading={saving}
+                    leftIcon={<IconDeviceFloppy size={18} aria-hidden="true" />}
+                  >
+                    {saving ? 'Guardando movimiento…' : 'Guardar movimiento'}
+                  </Button>
+                </div>
               </form>
-            </section>
+            </Card>
           </div>
 
-          <section
-            className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
+          <Card
+            as="section"
+            className="min-w-0 overflow-hidden !p-0"
             aria-label="Historial de movimientos de vacaciones"
             aria-busy={cargandoHistorial}
           >
-            <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
-              <IconHistory className="text-[#1e5a9c]" size={22} aria-hidden="true" />
-              <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Historial de movimientos</h2>
+            <div className="flex items-center gap-2.5 border-b border-sigasj-border px-4 py-3.5 sm:px-5">
+              <span className="grid size-8 place-items-center rounded-xl bg-sigasj-surface-soft text-sigasj-primary">
+                <IconHistory size={18} aria-hidden="true" />
+              </span>
+              <h2 className="m-0 text-[1.05rem] font-extrabold tracking-tight text-sigasj-ink">
+                Historial de movimientos
+              </h2>
+              {total > 0 ? (
+                <Badge tone="info" className="ml-auto">
+                  {total} movimiento{total === 1 ? '' : 's'}
+                </Badge>
+              ) : null}
             </div>
 
             {cargandoHistorial && !historial ? (
-              <div className="grid gap-3 p-6" role="status">
+              <div className="grid gap-3 p-5" role="status">
                 <span className="sr-only">Cargando historial…</span>
                 {[0, 1, 2].map((fila) => (
-                  <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
+                  <div
+                    key={fila}
+                    className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
                 ))}
               </div>
             ) : errorHistorial ? (
-              <div className="grid place-items-center gap-4 p-10 text-center" role="alert">
-                <p className="m-0 font-semibold text-red-700">{errorHistorial}</p>
+              <div className="grid place-items-center gap-3 p-8 text-center" role="alert">
+                <p className="m-0 font-semibold text-sigasj-error">{errorHistorial}</p>
                 {cargaHistorial.reintentable ? (
-                  <button
+                  <Button
                     type="button"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                    variant="secondary"
+                    size="sm"
+                    leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                     onClick={() => setRecarga((n) => n + 1)}
                   >
-                    <IconRefresh size={18} aria-hidden="true" />
                     Reintentar
-                  </button>
+                  </Button>
                 ) : null}
               </div>
             ) : movimientos.length === 0 ? (
-              <div className="grid place-items-center gap-3 p-10 text-center">
-                <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
-                  <IconHistory size={28} aria-hidden="true" />
-                </span>
-                <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Sin movimientos</h2>
-                <p className="m-0 max-w-md text-slate-500">
-                  Registre el primer movimiento de vacaciones de {nombre || 'este colaborador'} con el
-                  formulario de arriba.
-                </p>
-              </div>
+              <EmptyState
+                className="border-0 bg-transparent shadow-none"
+                icon={<IconHistory size={28} aria-hidden="true" />}
+                title="Sin movimientos"
+                description={`Registre el primer movimiento de vacaciones de ${nombre || 'este colaborador'} con el formulario de arriba.`}
+              />
             ) : (
-              <table className={`w-full border-collapse text-left transition-opacity ${cargandoHistorial ? 'opacity-60' : ''}`}>
-                <thead className="hidden bg-slate-50 text-xs font-extrabold uppercase tracking-wider text-slate-500 md:table-header-group">
+              <table
+                className={`w-full border-collapse text-left transition-opacity ${cargandoHistorial ? 'opacity-60' : ''}`}
+              >
+                <thead className="hidden bg-[color-mix(in_srgb,var(--color-sigasj-ice)_70%,white)] text-[0.68rem] font-bold uppercase tracking-[0.08em] text-sigasj-muted md:table-header-group">
                   <tr>
-                    <th scope="col" className="px-6 py-4">Fecha</th>
-                    <th scope="col" className="px-6 py-4">Tipo</th>
-                    <th scope="col" className="px-6 py-4 text-right">Días</th>
-                    <th scope="col" className="px-6 py-4">Observaciones</th>
+                    <th scope="col" className="px-5 py-3">
+                      Fecha
+                    </th>
+                    <th scope="col" className="px-5 py-3">
+                      Tipo
+                    </th>
+                    <th scope="col" className="px-5 py-3 text-right">
+                      Días
+                    </th>
+                    <th scope="col" className="px-5 py-3">
+                      Observaciones
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="block divide-y divide-slate-100 md:table-row-group">
-                  {movimientos.map((movimiento) => {
-                    const disfrutado = movimiento.tipo === 'DISFRUTADO'
-                    return (
-                      <tr key={movimiento.id} className="grid gap-2 px-5 py-4 transition hover:bg-sky-50/50 md:table-row md:p-0">
-                        <td className="flex items-center justify-between gap-3 md:table-cell md:px-6 md:py-4">
-                          <span className="text-xs font-bold uppercase text-slate-400 md:hidden">Fecha</span>
-                          <span className="font-semibold tabular-nums text-slate-700">{formatearFechaMovimiento(movimiento.fecha)}</span>
-                        </td>
-                        <td className="flex items-center justify-between gap-3 md:table-cell md:px-6 md:py-4">
-                          <span className="text-xs font-bold uppercase text-slate-400 md:hidden">Tipo</span>
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold ring-1 ${
-                              disfrutado
-                                ? 'bg-amber-50 text-amber-800 ring-amber-200'
-                                : 'bg-sky-50 text-sky-800 ring-sky-200'
-                            }`}
-                          >
-                            {tipoMovimientoLabel(movimiento.tipo)}
-                          </span>
-                        </td>
-                        <td className="flex items-center justify-between gap-3 md:table-cell md:px-6 md:py-4 md:text-right">
-                          <span className="text-xs font-bold uppercase text-slate-400 md:hidden">Días</span>
-                          <span className={`font-black tabular-nums ${disfrutado ? 'text-amber-700' : 'text-emerald-700'}`}>
-                            {diasConSigno(movimiento)}
-                          </span>
-                        </td>
-                        <td className="flex items-start justify-between gap-3 md:table-cell md:px-6 md:py-4">
-                          <span className="text-xs font-bold uppercase text-slate-400 md:hidden">Observaciones</span>
-                          <span className="min-w-0 break-words text-right text-slate-600 md:text-left">
-                            {movimiento.observaciones ?? '—'}
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                <tbody className="block divide-y divide-sigasj-border md:table-row-group">
+                  {movimientos.map((movimiento) => (
+                    <tr
+                      key={movimiento.id}
+                      className="grid gap-2 px-4 py-3.5 transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--color-sigasj-ice)_55%,white)] md:table-row md:p-0"
+                    >
+                      <td className="flex items-center justify-between gap-3 md:table-cell md:px-5 md:py-3.5">
+                        <span className="text-[0.68rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted md:hidden">
+                          Fecha
+                        </span>
+                        <span className="font-semibold tabular-nums text-sigasj-ink">
+                          {formatearFechaMovimiento(movimiento.fecha)}
+                        </span>
+                      </td>
+                      <td className="flex items-center justify-between gap-3 md:table-cell md:px-5 md:py-3.5">
+                        <span className="text-[0.68rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted md:hidden">
+                          Tipo
+                        </span>
+                        <Badge
+                          tone={tonoBadgeMovimiento(movimiento.tipo)}
+                          className={
+                            movimiento.tipo === 'ACUMULADO'
+                              ? 'bg-sky-50 text-sky-800'
+                              : movimiento.tipo === 'DISFRUTADO'
+                                ? 'bg-amber-50 text-amber-800'
+                                : undefined
+                          }
+                        >
+                          {tipoMovimientoLabel(movimiento.tipo)}
+                        </Badge>
+                      </td>
+                      <td className="flex items-center justify-between gap-3 md:table-cell md:px-5 md:py-3.5 md:text-right">
+                        <span className="text-[0.68rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted md:hidden">
+                          Días
+                        </span>
+                        <span
+                          className={`text-base font-extrabold tabular-nums ${claseDiasMovimiento(movimiento)}`}
+                        >
+                          {diasConSigno(movimiento)}
+                        </span>
+                      </td>
+                      <td className="flex items-start justify-between gap-3 md:table-cell md:px-5 md:py-3.5">
+                        <span className="text-[0.68rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted md:hidden">
+                          Observaciones
+                        </span>
+                        <span className="min-w-0 break-words text-right text-sm font-medium leading-5 text-sigasj-muted md:text-left">
+                          {movimiento.observaciones ?? '—'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             )}
 
             {!errorHistorial && total > 0 ? (
               <nav
-                className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
+                className="flex flex-col items-center justify-between gap-3 border-t border-sigasj-border px-4 py-3.5 text-sm text-sigasj-muted sm:flex-row sm:px-5"
                 aria-label="Paginación del historial"
               >
-                <p className="m-0">
+                <p className="m-0 font-semibold">
                   Mostrando {desde}–{hasta} de {total} movimiento{total === 1 ? '' : 's'}
                 </p>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     type="button"
-                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+                    variant="secondary"
+                    size="sm"
+                    leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
                     onClick={() => actualizarParams({ colaboradorId, page: page - 1 })}
                     disabled={page <= 1 || cargandoHistorial}
                   >
-                    <IconChevronLeft size={17} aria-hidden="true" />
                     Anterior
-                  </button>
-                  <span className="px-2 font-semibold text-slate-600">
-                    Página {page} de {Math.max(totalPages, 1)}
+                  </Button>
+                  <span className="px-1.5 font-semibold text-sigasj-ink">
+                    {page} / {Math.max(totalPages, 1)}
                   </span>
-                  <button
+                  <Button
                     type="button"
-                    className="rrhh-touch-target inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+                    variant="secondary"
+                    size="sm"
+                    rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
                     onClick={() => actualizarParams({ colaboradorId, page: page + 1 })}
                     disabled={page >= totalPages || cargandoHistorial}
                   >
                     Siguiente
-                    <IconChevronRight size={17} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </div>
               </nav>
             ) : null}
-          </section>
+          </Card>
         </>
       )}
     </main>

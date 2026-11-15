@@ -1,3 +1,4 @@
+import { act } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ADMIN_HOME_PATH,
@@ -151,6 +152,19 @@ describe('QA — Tarea 3: menú y accesos por rol', () => {
       try {
         const visiblePaths = EXPECTED_NAV_PATHS[role]
         const blockedPaths = EXPECTED_BLOCKED_PATHS[role]
+
+        // Permisos/vacaciones/saldo del Fontanero viven en un submenú colapsado por defecto.
+        const ausenciasToggle = app.container.querySelector<HTMLButtonElement>(
+          'button.admin-sidebar__chevron[aria-controls="fontanero-ausencias-submenu"]',
+        )
+        if (role === 'Fontanero') {
+          expect(ausenciasToggle).not.toBeNull()
+          await act(async () => {
+            ausenciasToggle?.click()
+          })
+        } else {
+          expect(ausenciasToggle).toBeNull()
+        }
 
         for (const path of visiblePaths) {
           const href = `href="${path}"`

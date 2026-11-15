@@ -1,4 +1,5 @@
 import { act } from 'react'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -63,6 +64,7 @@ const mountApp = async (path: string) => {
     root.render(<RouterProvider router={router} />)
     await Promise.resolve()
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -174,7 +176,7 @@ describe('aceptacion full-stack simulada - logout y expiracion', () => {
       expect(isAuthenticated()).toBe(false)
       expect(getAuthUser()).toBeNull()
       expect(app.currentPath()).toBe('/login')
-      expect(app.container.textContent).toContain('Tu sesiÃ³n expirÃ³')
+      expect(app.container.textContent).toContain('Tu sesión expiró')
       expect(app.container.textContent).not.toContain('Usuario anterior')
       expect(app.container.innerHTML).not.toContain('admin-layout')
     } finally {

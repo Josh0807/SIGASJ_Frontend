@@ -1,9 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import * as asociadosApi from '../../asociados/asociadosApi'
 import * as alertasApi from '../../inventario/alertas-reposicion/alertasReposicionApi'
+import * as solicitudesAdminApi from '../../solicitudes-publicas/admin/solicitudesAdminApi'
+import * as httpClient from '../../../services/http/httpClient'
 import {
   getAbonadosSummaryMetric,
   getAlertasReposicionSummaryMetric,
+  getSolicitudesSummaryMetric,
 } from './dashboardService'
 
 describe('getAbonadosSummaryMetric', () => {
@@ -77,3 +80,43 @@ describe('getAlertasReposicionSummaryMetric', () => {
     })
   })
 })
+
+describe('getSolicitudesSummaryMetric', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('suma totales digitales PENDIENTE + EN_REVISION', async () => {
+    const getSolicitudesAdmin = vi
+      .spyOn(solicitudesAdminApi, 'getSolicitudesAdmin')
+      .mockImplementation(async ({ estado }) => ({
+        data: [],
+        total: estado === 'PENDIENTE' ? 3 : 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      }))
+    const fetchWithAuth = vi.spyOn(httpClient, 'fetchWithAuth')
+
+    await expect(getSolicitudesSummaryMetric()).resolves.toEqual({
+      key: 'solicitudesEnTramite',
+      value: 5,
+    })
+    expect(getSolicitudesAdmin).toHaveBeenCalledTimes(2)
+    expect(fetchWithAuth).not.toHaveBeenCalled()
+  })
+
+  it('no usa el KPI legacy aprobadas-pendientes si el listado digital falla', async () => {
+    vi.spyOn(solicitudesAdminApi, 'getSolicitudesAdmin').mockRejectedValue(
+      new Error('HTTP 500'),
+    )
+    const fetchWithAuth = vi.spyOn(httpClient, 'fetchWithAuth')
+
+    await expect(getSolicitudesSummaryMetric()).resolves.toEqual({
+      key: 'solicitudesEnTramite',
+      value: null,
+    })
+    expect(fetchWithAuth).not.toHaveBeenCalled()
+  })
+})
+

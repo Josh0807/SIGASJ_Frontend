@@ -250,7 +250,10 @@ export default function InventarioModuleMenu({
       className={`inv-nav-stack${inline ? ' inv-nav-stack--inline' : ''}`}
       style={{ display: 'grid', gap: 10 }}
     >
-      <nav className="inv-tabs" aria-label="Secciones de inventario">
+      <nav
+        className={`inv-tabs${inline ? ' inv-tabs--rail' : ''}`}
+        aria-label="Secciones de inventario"
+      >
         {tabs.map((tab) => {
           const active = isActiveItem(location.pathname, tab)
           const Icon = tab.icon

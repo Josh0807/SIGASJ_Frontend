@@ -1,4 +1,5 @@
 import { act, useEffect } from 'react'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -60,6 +61,7 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -93,7 +95,7 @@ describe('AppRoutes y AdminLayout', () => {
     }
 
     expect(renderPath('/')).toContain('hero')
-    expect(renderPath('/')).toContain('header__inner')
+    expect(renderPath('/')).toContain('public-container')
     expect(renderPath('/')).not.toContain('admin-header')
     expect(renderPath('/')).not.toContain('admin-sidebar')
     expect(renderPath('/login')).toContain('auth-page')
@@ -174,7 +176,7 @@ describe('AppRoutes y AdminLayout', () => {
   it('renderiza LandingPage en / sin AdminLayout', () => {
     const markup = renderPath('/')
 
-    expect(markup).toContain('header__inner')
+    expect(markup).toContain('public-container')
     expect(markup).toContain('navbar')
     expect(markup).toContain('hero')
     expect(markup).toContain('id="comunicados"')
@@ -196,8 +198,8 @@ describe('AppRoutes y AdminLayout', () => {
 
   it('conserva el Header público y no mezcla AdminHeader ni AdminSidebar', () => {
     const landing = renderPath('/')
-    expect(landing).toContain('class="header"')
-    expect(landing).toContain('header__inner')
+    expect(landing).toContain('public-header')
+    expect(landing).toContain('public-container')
     expect(landing).toContain('navbar')
     expect(landing).not.toContain('admin-header')
     expect(landing).not.toContain('admin-sidebar')
@@ -243,6 +245,7 @@ describe('AppRoutes y AdminLayout', () => {
           </MemoryRouter>,
         )
       })
+      await waitForAppRoutesReady(container)
 
       expect(container.innerHTML).toContain('auth-page')
       expect(container.innerHTML).not.toContain('admin-layout')
@@ -262,7 +265,13 @@ describe('AppRoutes y AdminLayout', () => {
     expect(dashboard).toContain('admin-sidebar')
     expect(dashboard).toContain('admin-header')
     expect(dashboard).toContain('admin-main__content')
-    expect(dashboard).toContain('Dashboard administrativo')
+    // El dashboard es lazy: en SSR estático solo se renderiza el fallback.
+    const app = await mountApp('/admin/dashboard')
+    try {
+      expect(app.container.innerHTML).toContain('Dashboard administrativo')
+    } finally {
+      await app.cleanup()
+    }
   })
 
   it('reutiliza AdminLayout en todas las rutas privadas existentes', () => {
@@ -296,7 +305,7 @@ describe('AppRoutes y AdminLayout', () => {
     }
   })
 
-  it('anida los módulos existentes bajo un solo AdminLayout en /admin', () => {
+  it('anida los módulos existentes bajo un solo AdminLayout en /admin', async () => {
     loginWithAdminSession()
 
     const dashboard = renderPath('/admin/dashboard')
@@ -304,11 +313,24 @@ describe('AppRoutes y AdminLayout', () => {
     const averias = renderPath('/admin/averias')
 
     expect(dashboard).toContain('admin-layout')
-    expect(dashboard).toContain('Dashboard administrativo')
     expect(abonados).toContain('admin-layout')
-    expect(abonados).toContain('Gestión de asociados')
     expect(averias).toContain('admin-layout')
-    expect(averias).toContain('Gestión de averías')
+
+    // Los módulos son lazy: el título real se valida con montaje en DOM.
+    const expectedTitles: Array<[string, string]> = [
+      ['/admin/dashboard', 'Dashboard administrativo'],
+      ['/admin/abonados', 'Gestión de asociados'],
+      ['/admin/averias', 'Gestión de averías'],
+    ]
+    for (const [path, title] of expectedTitles) {
+      const app = await mountApp(path)
+      try {
+        expect(app.container.innerHTML).toContain('admin-layout')
+        expect(app.container.innerHTML).toContain(title)
+      } finally {
+        await app.cleanup()
+      }
+    }
     expect(renderPath('/')).not.toContain('admin-layout')
     expect(renderPath('/login')).not.toContain('admin-layout')
   })
@@ -379,6 +401,7 @@ describe('AppRoutes y AdminLayout', () => {
           </MemoryRouter>,
         )
       })
+      await waitForAppRoutesReady(container)
 
       expect(container.innerHTML).toContain('admin-layout')
       expect(container.innerHTML).toContain('Dashboard administrativo')
@@ -405,6 +428,7 @@ describe('AppRoutes y AdminLayout', () => {
           </MemoryRouter>,
         )
       })
+      await waitForAppRoutesReady(container)
 
       expect(container.innerHTML).not.toContain('admin-layout')
       expect(container.innerHTML).not.toContain('Dashboard administrativo')
@@ -518,7 +542,7 @@ describe('AppRoutes y AdminLayout', () => {
     try {
       expect(app.location().pathname).toBe('/')
       expect(app.container.innerHTML).toContain('hero')
-      expect(app.container.innerHTML).toContain('header__inner')
+      expect(app.container.innerHTML).toContain('public-container')
       expect(app.container.innerHTML).toContain('navbar')
       expect(app.container.innerHTML).toContain('id="comunicados"')
       expect(app.container.innerHTML).toContain('footer')

@@ -148,7 +148,20 @@ describe('Proyectos admin — 401 reutiliza la sesión global', () => {
 
   it('registro: POST 401 invalida la sesión y no deja el formulario privado usable', async () => {
     loginAsRole('Administradora')
-    stubUnauthorizedFetch()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+        const method = (init?.method ?? 'GET').toUpperCase()
+        if (method === 'PATCH' || method === 'PUT' || method === 'POST') {
+          return unauthorizedResponse
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => detalle,
+        }
+      }),
+    )
 
     const app = await mountAppRoutes('/admin/proyectos/nuevo')
     try {

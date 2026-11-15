@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { presentSolicitudForm } from './solicitudFormPresentation'
+import {
+  groupPresentedFormSections,
+  presentSolicitudForm,
+} from './solicitudFormPresentation'
 
 describe('presentSolicitudForm', () => {
   it('usa etiquetas propias del formulario y conserva campos nuevos del backend', () => {
@@ -19,5 +22,26 @@ describe('presentSolicitudForm', () => {
 
   it.each(['arreglo-pago', 'cambio-titular', 'infraestructura-linderos', 'afiliacion', 'disponibilidad-servicios', 'constancia-servicio'])('representa el trámite %s', (slug) => {
     expect(presentSolicitudForm(slug, { firma: 'data:image/png;base64,abc' }).length).toBeGreaterThan(0)
+  })
+
+  it('agrupa el formulario de cambio de titular en secciones del detalle', () => {
+    const sections = groupPresentedFormSections(
+      presentSolicitudForm('cambio-titular', {
+        nombreSolicitante: 'Carlos',
+        telefono: '8888-8888',
+        nis: 'NIS-1',
+        firma: 'data:image/png;base64,abc',
+      }),
+      'cambio-titular',
+    )
+    expect(sections.map((section) => section.id)).toEqual([
+      'solicitante',
+      'inmueble',
+      'contacto',
+      'firma',
+    ])
+    expect(sections.find((section) => section.id === 'firma')?.title).toBe(
+      'Firma del nuevo titular',
+    )
   })
 })

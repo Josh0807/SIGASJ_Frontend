@@ -1,13 +1,13 @@
+import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { IconArrowRight } from '@tabler/icons-react'
-import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
+import { IconEye } from '@tabler/icons-react'
+import AveriaPrioridadBadge from './AveriaPrioridadBadge'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { averiasAdminDetailPath } from './averiasAdminPaths'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
 import { esPendienteDeAtencion } from '../utils/averiaPendienteAtencion'
 import {
   getFontaneroLabel,
-  getPrioridadLabel,
   getTipoAveriaDetailLabel,
   type AveriaListItem,
 } from './types'
@@ -15,183 +15,128 @@ import {
 type AveriasAdminTableProps = {
   items: AveriaListItem[]
   onViewDetail?: (id: number) => void
+  footer?: ReactNode
 }
 
-const AveriasAdminTable = ({ items, onViewDetail }: AveriasAdminTableProps) => {
+const cell =
+  'flex items-center justify-between gap-3 xl:table-cell xl:px-6 xl:py-4'
+const mobileLabel =
+  'text-xs font-bold uppercase text-slate-500 xl:hidden'
+
+const AveriasAdminTable = ({ items, onViewDetail, footer }: AveriasAdminTableProps) => {
   const location = useLocation()
-  const detailAction = (id: number) => (
-    <Link
-      className="gallery-admin__button group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-6 !py-3 !font-extrabold !text-white !no-underline !shadow-[0_10px_22px_rgba(30, 90, 156,0.24)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600 hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.32)] focus-visible:!ring-4 focus-visible:!ring-blue-200"
-      to={averiasAdminDetailPath(id)}
-      state={{ listSearch: location.search }}
-      onClick={() => onViewDetail?.(id)}
-    >
-      Ver detalle
-      <IconArrowRight className="transition-transform duration-300 group-hover:translate-x-1" size={19} stroke={2.2} aria-hidden="true" />
-    </Link>
-  )
 
   return (
-    <>
-      <div className="table-responsive averias-admin__table averias-admin__table--listado overflow-x-auto">
-        <table>
-          <caption className="visually-hidden">Listado de averías</caption>
-          <colgroup>
-            <col className="averias-admin__col-codigo" />
-            <col className="averias-admin__col-persona" />
-            <col className="averias-admin__col-lugar" />
-            <col className="averias-admin__col-seguimiento" />
-            <col className="averias-admin__col-accion" />
-          </colgroup>
-          <thead className="visually-hidden">
-            <tr>
-              <th scope="col">Código</th>
-              <th scope="col">Reportante</th>
-              <th scope="col">Ubicación</th>
-              <th scope="col">Seguimiento</th>
-              <th scope="col">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td colSpan={5}>
-                  <article
-                    className={`averias-admin__fila averias-admin__fila--${String(item.estado).toLowerCase().replace(/_/g, '-')}`}
-                  >
-                    <span className="averias-admin__fila-icono" aria-hidden="true">
-                      <AdminNavIcon name="averias" />
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] sm:rounded-3xl">
+      <table className="w-full border-collapse text-left">
+        <caption className="sr-only">Listado de averías</caption>
+        <thead className="hidden border-b border-[#d7e5f1] bg-[#f3f8fd] text-[0.7rem] font-bold uppercase tracking-[0.08em] text-slate-500 xl:table-header-group">
+          <tr>
+            <th scope="col" className="px-6 py-4">
+              Código
+            </th>
+            <th scope="col" className="px-6 py-4">
+              Reportante
+            </th>
+            <th scope="col" className="px-6 py-4">
+              Ubicación
+            </th>
+            <th scope="col" className="px-6 py-4">
+              Seguimiento
+            </th>
+            <th scope="col" className="px-6 py-4">
+              Estado
+            </th>
+            <th scope="col" className="px-6 py-4">
+              Prioridad
+            </th>
+            <th scope="col" className="px-6 py-4 text-right">
+              Acción
+            </th>
+          </tr>
+        </thead>
+        <tbody className="block divide-y divide-slate-100 xl:table-row-group">
+          {items.map((item) => {
+            const pendienteSinInicio =
+              esPendienteDeAtencion(String(item.estado)) &&
+              item.fontanero != null
+
+            return (
+              <tr
+                key={item.id}
+                className="grid gap-2 px-5 py-4 transition hover:bg-sky-50/50 xl:table-row xl:p-0"
+              >
+                <td className={cell}>
+                  <span className={mobileLabel}>Código</span>
+                  <span className="font-mono text-sm font-bold text-[#1e5a9c]">
+                    {item.codigoSeguimiento}
+                  </span>
+                </td>
+                <td className={cell}>
+                  <span className={mobileLabel}>Reportante</span>
+                  <span className="min-w-0 text-right xl:text-left">
+                    <span className="block text-sm font-extrabold text-[#1e5a9c]">
+                      {item.nombreReportante}
                     </span>
-                    <div className="averias-admin__fila-cuerpo">
-                      <div className="averias-admin__fila-titulo">
-                        <span className="averias-admin__codigo">
-                          {item.codigoSeguimiento}
-                        </span>
-                        <span className="averias-admin__persona">
-                          {item.nombreReportante}
-                        </span>
-                        <AveriaStatusBadge estado={item.estado} />
-                      </div>
-                      <p className="averias-admin__fila-sub">
-                        <span className="averias-admin__fecha">
-                          {formatAveriaAdminDateTime(item.fechaReporte)}
-                        </span>
-                        <span aria-hidden="true">·</span>
-                        <span className="averias-admin__sector">
-                          {item.sectorComunidad}
-                        </span>
-                        <span aria-hidden="true">·</span>
-                        <span
-                          className={
-                            item.fontanero ? undefined : 'averias-admin__muted'
-                          }
-                        >
-                          {getFontaneroLabel(item.fontanero)}
-                        </span>
-                      </p>
-                      <p className="averias-admin__direccion" title={item.ubicacion}>
-                        {item.ubicacion}
-                      </p>
-                      <div className="averias-admin__fila-pie">
-                        <span
-                          className={
-                            item.prioridad
-                              ? `averias-admin__badge averias-admin__badge--prioridad is-${item.prioridad.toLowerCase()}`
-                              : 'averias-admin__badge averias-admin__badge--vacio'
-                          }
-                        >
-                          <span className="averias-admin__fila-etiqueta">Prioridad</span>
-                          {getPrioridadLabel(item.prioridad)}
-                        </span>
-                        <span
-                          className={
-                            item.tipoAveria
-                              ? 'averias-admin__badge averias-admin__badge--tipo'
-                              : 'averias-admin__badge averias-admin__badge--vacio'
-                          }
-                        >
-                          <span className="averias-admin__fila-etiqueta">Tipo</span>
-                          {getTipoAveriaDetailLabel(item.tipoAveria)}
-                        </span>
-                        {esPendienteDeAtencion(String(item.estado)) &&
-                        item.fontanero != null ? (
-                          <span className="averias-admin__fila-aviso">
-                            Atención no iniciada
-                          </span>
-                        ) : null}
-                        <p className="averias-admin__detalle" title={item.descripcion}>
-                          {item.descripcion}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="averias-admin__fila-accion">
-                      {detailAction(item.id)}
-                    </div>
-                  </article>
+                    <span className="block text-xs text-slate-500">
+                      {formatAveriaAdminDateTime(item.fechaReporte)}
+                    </span>
+                  </span>
+                </td>
+                <td className={cell}>
+                  <span className={mobileLabel}>Ubicación</span>
+                  <span className="min-w-0 text-right xl:text-left">
+                    <span className="block text-sm font-semibold text-[#1a2f42]">
+                      {item.sectorComunidad}
+                    </span>
+                    <span
+                      className="block truncate text-xs text-slate-500"
+                      title={item.ubicacion}
+                    >
+                      {item.ubicacion}
+                    </span>
+                  </span>
+                </td>
+                <td className={cell}>
+                  <span className={mobileLabel}>Seguimiento</span>
+                  <span className="min-w-0 text-right xl:text-left">
+                    <span className="block text-sm font-semibold text-[#1a2f42]">
+                      {getTipoAveriaDetailLabel(item.tipoAveria)}
+                    </span>
+                    <span className="block text-xs text-slate-500">
+                      {getFontaneroLabel(item.fontanero)}
+                      {pendienteSinInicio ? ' · Atención no iniciada' : ''}
+                    </span>
+                  </span>
+                </td>
+                <td className={cell}>
+                  <span className={mobileLabel}>Estado</span>
+                  <AveriaStatusBadge estado={item.estado} variant="flat" />
+                </td>
+                <td className={cell}>
+                  <span className={mobileLabel}>Prioridad</span>
+                  <AveriaPrioridadBadge prioridad={item.prioridad} />
+                </td>
+                <td className="pt-2 xl:table-cell xl:px-6 xl:py-4">
+                  <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+                    <Link
+                      className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#d7e5f1] bg-white px-4 py-2 text-sm font-bold text-[#1e5a9c] no-underline transition-colors hover:border-[#1e5a9c] hover:bg-[#eaf6ff] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] motion-reduce:transition-none"
+                      to={averiasAdminDetailPath(item.id)}
+                      state={{ listSearch: location.search }}
+                      onClick={() => onViewDetail?.(item.id)}
+                    >
+                      <IconEye size={16} aria-hidden="true" />
+                      Ver detalle
+                    </Link>
+                  </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <ul className="averias-admin__cards">
-        {items.map((item) => (
-          <li className="averias-admin__card" key={`card-${item.id}`}>
-            <header className="averias-admin__card-head">
-              <span className="averias-admin__codigo">{item.codigoSeguimiento}</span>
-              <AveriaStatusBadge estado={item.estado} />
-            </header>
-            {esPendienteDeAtencion(String(item.estado)) && item.fontanero != null ? (
-              <p className="averias-admin__estado-note">Atención no iniciada</p>
-            ) : null}
-            <dl className="averias-admin__card-meta averias-admin__card-meta--listado">
-              <div>
-                <dt>Fecha</dt>
-                <dd>{formatAveriaAdminDateTime(item.fechaReporte)}</dd>
-              </div>
-              <div>
-                <dt>Reportante</dt>
-                <dd>{item.nombreReportante}</dd>
-              </div>
-              <div>
-                <dt>Sector</dt>
-                <dd>{item.sectorComunidad}</dd>
-              </div>
-              <div>
-                <dt>Ubicación</dt>
-                <dd>
-                  <span className="averias-admin__clamp" title={item.ubicacion}>
-                    {item.ubicacion}
-                  </span>
-                </dd>
-              </div>
-              <div>
-                <dt>Descripción</dt>
-                <dd>
-                  <span className="averias-admin__clamp" title={item.descripcion}>
-                    {item.descripcion}
-                  </span>
-                </dd>
-              </div>
-              <div>
-                <dt>Prioridad</dt>
-                <dd>{getPrioridadLabel(item.prioridad)}</dd>
-              </div>
-              <div>
-                <dt>Tipo</dt>
-                <dd>{getTipoAveriaDetailLabel(item.tipoAveria)}</dd>
-              </div>
-              <div>
-                <dt>Fontanero</dt>
-                <dd>{getFontaneroLabel(item.fontanero)}</dd>
-              </div>
-            </dl>
-            {detailAction(item.id)}
-          </li>
-        ))}
-      </ul>
-    </>
+            )
+          })}
+        </tbody>
+      </table>
+      {footer}
+    </div>
   )
 }
 

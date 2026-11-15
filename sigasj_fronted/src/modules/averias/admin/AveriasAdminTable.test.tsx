@@ -84,17 +84,17 @@ describe('AveriasAdminTable', () => {
         </MemoryRouter>,
       )
     })
-    const link = [...container.querySelectorAll('a')].find(
-      (anchor) => anchor.textContent === 'Ver detalle',
+    const link = [...container.querySelectorAll('a')].find((anchor) =>
+      anchor.textContent?.includes('Ver'),
     )
     expect(link?.getAttribute('href')).toBe('/admin/averias/1')
   })
 
-  it('navega a /admin/averias/:id desde Ver detalle', async () => {
+  it('navega a /admin/averias/:id desde Ver', async () => {
     const onViewDetail = vi.fn()
     await renderTable([AVERIAS_ADMIN_UI_FIXTURE_ITEMS[0]], onViewDetail)
-    const link = [...container.querySelectorAll('a')].find(
-      (anchor) => anchor.textContent === 'Ver detalle',
+    const link = [...container.querySelectorAll('a')].find((anchor) =>
+      anchor.textContent?.includes('Ver'),
     )
     expect(link?.getAttribute('href')).toBe('/admin/averias/1')
     await act(async () => {

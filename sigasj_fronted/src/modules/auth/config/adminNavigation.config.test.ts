@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { ADMIN_MODULE_ACCESS, ROLE_PERMISSIONS, ABONADOS_ALLOWED_ROLES } from './adminNavigation.config'
 import { INTERNAL_ADMIN_ROLES, InternalAdminRoleName, ABONADO_ROLE } from '../utils/internalRoles'
 
@@ -37,7 +37,7 @@ describe('adminNavigation.config', () => {
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
   })
 
-  it('restringe usuarios, solicitudes, reportes, proyectos y actividades-fontanero a Administradora', () => {
+  it('restringe usuarios, reportes, proyectos y actividades-fontanero a Administradora', () => {
     const usuarios = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'usuarios')
     const solicitudes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'solicitudes')
     const reportes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'reportes')
@@ -47,13 +47,14 @@ describe('adminNavigation.config', () => {
     )
 
     expect(usuarios?.allowedRoles).toEqual(['Administradora'])
-    expect(solicitudes?.allowedRoles).toEqual(['Administradora'])
+    expect(solicitudes?.allowedRoles).toEqual(['Administradora', 'Secretaria'])
     expect(reportes?.allowedRoles).toEqual(['Administradora'])
     expect(proyectos?.allowedRoles).toEqual(['Administradora'])
     expect(proyectos?.requiredPermissions).toEqual(['projects.manage'])
     expect(actividadesAdmin?.allowedRoles).toEqual(['Administradora'])
     expect(actividadesAdmin?.requiredPermissions).toEqual(['activities.read_all'])
   })
+
 
   it('restringe el registro operativo de actividades al Fontanero', () => {
     const actividades = ADMIN_MODULE_ACCESS.find(

@@ -1,4 +1,6 @@
 import { act } from 'react'
+import { submitLoginForm } from '../../test/adminPanelTestHelpers'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
@@ -64,6 +66,7 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -78,12 +81,7 @@ const mountApp = async (path: string) => {
       })
     },
     submitLogin: async () => {
-      const form = container.querySelector<HTMLFormElement>('.auth-page__form')
-      expect(form).not.toBeNull()
-      await act(async () => {
-        form?.requestSubmit()
-        await new Promise((resolve) => setTimeout(resolve, 50))
-      })
+      await submitLoginForm(container)
     },
     navigate: async (to: string) => {
       const app = await mountApp(to)
@@ -132,7 +130,7 @@ describe('seguridad — sesión Administradora', () => {
       expect(app.currentPath()).not.toBe(LOGIN_ROUTE_PATH)
       assertAdminChrome(app.container.innerHTML)
       expect(app.container.innerHTML).toContain('Dashboard administrativo')
-      expect(app.container.innerHTML).toContain('Panel administrativo')
+      expect(app.container.innerHTML).toContain('Encabezado del panel administrativo')
     } finally {
       await app.cleanup()
     }

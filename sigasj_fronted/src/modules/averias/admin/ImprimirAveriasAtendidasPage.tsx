@@ -1,9 +1,11 @@
 import { ZONA_HORARIA_ASADA } from '../../../shared/utils/fechaAsada'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { Link, useSearchParams } from 'react-router-dom'
-import { IconPrinter } from '@tabler/icons-react'
+import { useSearchParams } from 'react-router-dom'
+import { IconArrowLeft, IconPrinter } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
+import { Button } from '../../../shared/ui/Button'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getAveriasAtendidasParaImpresion } from '../services/averiasAdminApi'
 import { ESTADO_AVERIA_LABELS, isEstadoAveria } from './estadoAveria'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
@@ -122,30 +124,29 @@ export default function ImprimirAveriasAtendidasPage() {
 
   return (
     <main className="gallery-admin averias-admin inventario-print w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header inventario-print__controls !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-          <div className="space-y-3">
-            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Panel administrativo</p>
-            <h1>Imprimir averías atendidas</h1>
-            <p>Listado de averías en proceso y reparadas para el archivo de la ASADA.</p>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__button !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md" to={AVERIAS_ADMIN_REPORTE_PATH}>
+      <div className="gallery-admin__shell sigasj-stack gap-4">
+        <PageHeader
+          className="inventario-print__controls"
+          title="Imprimir averías atendidas"
+          description="Listado de averías en proceso y reparadas para el archivo de la ASADA."
+          actions={
+            <Button
+              to={AVERIAS_ADMIN_REPORTE_PATH}
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+            >
               Volver al resumen
-            </Link>
-          </div>
-        </header>
+            </Button>
+          }
+        />
 
         <form
-          className="gallery-admin__filters inventario-print__controls w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
+          className="gallery-admin__filters averias-admin__filters inventario-print__controls"
           aria-label="Rango del reporte"
           onSubmit={aplicarRango}
         >
-          <div className="col-span-full border-b border-blue-100 pb-5">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Preparar reporte</p>
-            <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Seleccione el periodo</h2>
-            <p className="mt-2 text-base text-slate-500">Consulte las averías atendidas antes de imprimir.</p>
-          </div>
+          <div className="averias-admin__filters-form">
           <label className="gallery-admin__field" htmlFor="averias-imprimir-desde">
             <span>Desde</span>
             <input
@@ -166,11 +167,11 @@ export default function ImprimirAveriasAtendidasPage() {
               onChange={(event) => setDraftHasta(event.target.value)}
             />
           </label>
-          <button className="gallery-admin__button !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !font-bold !text-white !shadow-lg !shadow-blue-200" type="submit" disabled={loading}>
+          <button className="gallery-admin__button" type="submit" disabled={loading}>
             Consultar
           </button>
           <button
-            className="gallery-admin__button inventario-print__action !rounded-2xl !border-[#bfe3fa] !bg-white !font-bold !text-[#1e5a9c] !shadow-md"
+            className="gallery-admin__button inventario-print__action"
             type="button"
             onClick={imprimir}
             disabled={loading || Boolean(error) || averias.length === 0}
@@ -178,6 +179,7 @@ export default function ImprimirAveriasAtendidasPage() {
             <IconPrinter size={18} aria-hidden="true" />
             Imprimir
           </button>
+          </div>
         </form>
 
         {error ? (

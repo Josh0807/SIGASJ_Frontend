@@ -1,5 +1,10 @@
-import { IconArrowLeft, IconCheck, IconX } from '@tabler/icons-react'
-import { useCallback, useEffect, useId, useState } from 'react'
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconFileDescription,
+  IconX,
+} from '@tabler/icons-react'
+import { useCallback, useEffect, useId, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -32,6 +37,25 @@ type Carga = {
   clave: string
   solicitud: SolicitudAusencia | null
   error: string | null
+}
+
+function DetalleCampo({
+  label,
+  children,
+}: {
+  label: string
+  children: ReactNode
+}) {
+  return (
+    <div className="grid gap-1 py-3.5 sm:grid-cols-[minmax(8rem,32%)_minmax(0,1fr)] sm:items-baseline sm:gap-4">
+      <dt className="text-sm font-semibold text-[color:var(--asada-muted,#5b7390)]">
+        {label}
+      </dt>
+      <dd className="m-0 break-words text-[0.95rem] font-bold leading-5 text-[color:var(--asada-ink,#123f70)]">
+        {children}
+      </dd>
+    </div>
+  )
 }
 
 /**
@@ -108,6 +132,23 @@ export default function SolicitudAusenciaDetallePage() {
       ? `Se descontarán ${solicitud.resumenVacaciones?.diasNetos ?? 'los'} día(s) netos (sin feriados) del saldo.`
       : 'Se creará el registro oficial en Permisos.'
 
+  const textoAvisoCorreo = (
+    decision: 'aprobada' | 'rechazada',
+    aviso?: SolicitudAusencia['avisoCorreo'],
+  ) => {
+    if (!aviso) {
+      return 'Se intentó avisar por campana; el correo no reportó estado.'
+    }
+    if (aviso.enviado && aviso.destinos.length > 0) {
+      const destinos = aviso.destinos.join(', ')
+      if (aviso.vistaPreviaUrl) {
+        return `Correo de ${decision} generado hacia ${destinos} (vista previa de prueba: ${aviso.vistaPreviaUrl}).`
+      }
+      return `Correo de ${decision} enviado a ${destinos}.`
+    }
+    return `No se envió correo${aviso.motivoOmitido ? `: ${aviso.motivoOmitido}` : '.'}`
+  }
+
   const aprobar = async () => {
     if (!solicitud || busy) return
     setModalAprobar(false)
@@ -117,11 +158,11 @@ export default function SolicitudAusenciaDetallePage() {
     try {
       const actualizada = await aprobarSolicitudAusencia(solicitud.id)
       setCarga({ clave, solicitud: actualizada, error: null })
-      setAviso(
+      const base =
         actualizada.tipo === 'VACACIONES'
-          ? 'Solicitud aprobada. El movimiento de vacaciones quedó en RRHH. Se intentó avisar al Fontanero por campana y por correo (si SMTP está activo).'
-          : 'Solicitud aprobada. El permiso quedó en RRHH. Se intentó avisar al Fontanero por campana y por correo (si SMTP está activo).',
-      )
+          ? 'Solicitud aprobada. El movimiento de vacaciones quedó en RRHH.'
+          : 'Solicitud aprobada. El permiso quedó en RRHH.'
+      setAviso(`${base} ${textoAvisoCorreo('aprobada', actualizada.avisoCorreo)}`)
     } catch (err: unknown) {
       if (esNoAutenticado(err)) {
         salirPorSesion()
@@ -148,7 +189,7 @@ export default function SolicitudAusenciaDetallePage() {
       )
       setCarga({ clave, solicitud: actualizada, error: null })
       setAviso(
-        'Solicitud rechazada. No se generó registro en RRHH. Se intentó avisar al Fontanero por campana y por correo (si SMTP está activo).',
+        `Solicitud rechazada. No se generó registro en RRHH. ${textoAvisoCorreo('rechazada', actualizada.avisoCorreo)}`,
       )
       setModalRechazo(false)
       setMotivoRechazo('')
@@ -231,92 +272,81 @@ export default function SolicitudAusenciaDetallePage() {
             </div>
           ) : null}
 
-          <article className="grid min-w-0 gap-5 rounded-2xl border border-sky-100 bg-white p-4 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-            <header className="grid min-w-0 gap-3">
-              <p className="mb-0 text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-blue-600 sm:text-sm">
+          <article className="min-w-0 overflow-hidden rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white shadow-[0_12px_28px_rgba(18,63,112,0.07)] sm:rounded-3xl">
+            <header className="border-b border-[color:var(--asada-line,#d7e5f1)] px-4 py-4 sm:px-6 sm:py-5">
+              <p className="mb-0 text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-[color:var(--asada-navy,#1e5a9c)]">
                 {RRHH_TITLE} · Solicitud de ausencia
               </p>
-              <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="m-0 text-2xl font-black text-[#062e63] sm:text-3xl">
+              <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2.5">
+                <h1 className="m-0 text-[clamp(1.35rem,3vw,1.85rem)] font-black tracking-tight text-[color:var(--asada-ink,#123f70)]">
                   {tipoSolicitudAusenciaLabel(solicitud.tipo)}
                 </h1>
                 <span
-                  className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(solicitud.estado)}`}
+                  className={`inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-extrabold tracking-[0.01em] ${estadoSolicitudAusenciaClassName(solicitud.estado)}`}
                 >
+                  <span
+                    className={`size-2 rounded-full ${
+                      solicitud.estado === 'PENDIENTE'
+                        ? 'bg-amber-500'
+                        : solicitud.estado === 'APROBADA'
+                          ? 'bg-emerald-500'
+                          : 'bg-rose-500'
+                    }`}
+                    aria-hidden="true"
+                  />
                   {estadoSolicitudAusenciaLabel(solicitud.estado)}
                 </span>
               </div>
             </header>
 
-            <dl className="grid min-w-0 gap-3">
-              <div className="min-w-0 rounded-xl bg-slate-50 px-4 py-3">
-                <dt className="text-xs font-extrabold uppercase text-slate-500">
-                  Colaborador
-                </dt>
-                <dd className="m-0 mt-1 break-words font-semibold text-slate-800">
-                  {solicitud.colaborador
-                    ? nombreCompleto(solicitud.colaborador)
-                    : `#${solicitud.colaboradorId}`}
-                </dd>
-              </div>
-              <div className="min-w-0 rounded-xl bg-slate-50 px-4 py-3">
-                <dt className="text-xs font-extrabold uppercase text-slate-500">
-                  Correo para aviso
-                </dt>
-                <dd className="m-0 mt-1 break-words font-semibold text-slate-800">
-                  {solicitud.correoNotificacion?.trim() ||
-                    solicitud.colaborador?.correoElectronico?.trim() ||
-                    'Sin correo indicado'}
-                </dd>
-              </div>
-              <div className="min-w-0 rounded-xl bg-slate-50 px-4 py-3">
-                <dt className="text-xs font-extrabold uppercase text-slate-500">Periodo</dt>
-                <dd className="m-0 mt-1 font-semibold text-slate-800">
-                  {formatearFechaPermiso(solicitud.fechaInicio)} —{' '}
-                  {formatearFechaPermiso(solicitud.fechaFin)}
-                </dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 px-4 py-3 ">
-                <dt className="text-xs font-extrabold uppercase text-slate-500">Motivo</dt>
-                <dd className="m-0 mt-1 break-words font-semibold text-slate-800">
-                  {solicitud.motivo?.trim() || 'Sin motivo'}
-                </dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 px-4 py-3">
-                <dt className="text-xs font-extrabold uppercase text-slate-500">
-                  Fecha de solicitud
-                </dt>
-                <dd className="m-0 mt-1 font-semibold text-slate-800">
-                  {formatearFechaPermiso(solicitud.createdAt.slice(0, 10))}
-                </dd>
-              </div>
+            <dl className="m-0 divide-y divide-[color:var(--asada-line,#d7e5f1)] px-4 sm:px-6">
+              <DetalleCampo label="Colaborador">
+                {solicitud.colaborador
+                  ? nombreCompleto(solicitud.colaborador)
+                  : `#${solicitud.colaboradorId}`}
+              </DetalleCampo>
+              <DetalleCampo label="Correo para aviso">
+                {solicitud.correoNotificacion?.trim() ||
+                  solicitud.colaborador?.correoElectronico?.trim() ||
+                  'Sin correo indicado'}
+              </DetalleCampo>
+              <DetalleCampo label="Periodo">
+                {formatearFechaPermiso(solicitud.fechaInicio)} —{' '}
+                {formatearFechaPermiso(solicitud.fechaFin)}
+              </DetalleCampo>
+              <DetalleCampo label="Motivo">
+                {solicitud.motivo?.trim() || 'Sin motivo'}
+              </DetalleCampo>
+              <DetalleCampo label="Fecha de solicitud">
+                {formatearFechaPermiso(solicitud.createdAt.slice(0, 10))}
+              </DetalleCampo>
               {solicitud.tipo === 'VACACIONES' && solicitud.resumenVacaciones ? (
-                <div className="rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3 ">
-                  <dt className="text-xs font-extrabold uppercase text-sky-800">
-                    Días a descontar (sin feriados)
+                <div className="grid gap-1.5 bg-[#f7fbff] py-3.5 sm:grid-cols-[minmax(8rem,32%)_minmax(0,1fr)] sm:gap-4">
+                  <dt className="text-sm font-semibold text-[color:var(--asada-navy,#1e5a9c)]">
+                    Días a descontar
                   </dt>
-                  <dd className="m-0 mt-1 font-semibold text-slate-800">
+                  <dd className="m-0 text-[0.95rem] font-bold leading-5 text-[color:var(--asada-ink,#123f70)]">
                     Calendario: {solicitud.resumenVacaciones.diasCalendario} · Feriados:{' '}
                     {solicitud.resumenVacaciones.feriados.length} · Netos:{' '}
                     {solicitud.resumenVacaciones.diasNetos}
+                    {solicitud.resumenVacaciones.feriados.length > 0 ? (
+                      <ul className="mb-0 mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-[color:var(--asada-muted,#5b7390)]">
+                        {solicitud.resumenVacaciones.feriados.map((f) => (
+                          <li key={f.fecha}>
+                            {formatearFechaPermiso(f.fecha)} — {f.nombre}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </dd>
-                  {solicitud.resumenVacaciones.feriados.length > 0 ? (
-                    <ul className="m-0 mt-2 list-disc space-y-1 pl-5 text-sm font-medium text-slate-600">
-                      {solicitud.resumenVacaciones.feriados.map((f) => (
-                        <li key={f.fecha}>
-                          {formatearFechaPermiso(f.fecha)} — {f.nombre}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
                 </div>
               ) : null}
               {solicitud.tipo === 'VACACIONES' && solicitud.saldoVacaciones ? (
-                <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 ">
-                  <dt className="text-xs font-extrabold uppercase text-emerald-800">
-                    Saldo de vacaciones (actual)
+                <div className="grid gap-1.5 bg-emerald-50/50 py-3.5 sm:grid-cols-[minmax(8rem,32%)_minmax(0,1fr)] sm:gap-4">
+                  <dt className="text-sm font-semibold text-emerald-800">
+                    Saldo de vacaciones
                   </dt>
-                  <dd className="m-0 mt-1 font-semibold text-emerald-950">
+                  <dd className="m-0 text-[0.95rem] font-bold leading-5 text-emerald-950">
                     Disponibles: {solicitud.saldoVacaciones.diasDisponibles} · Adquiridas:{' '}
                     {solicitud.saldoVacaciones.diasAcumulados} · Disfrutadas:{' '}
                     {solicitud.saldoVacaciones.diasDisfrutados}
@@ -324,88 +354,86 @@ export default function SolicitudAusenciaDetallePage() {
                 </div>
               ) : null}
               {solicitud.registroGeneradoId ? (
-                <div className="rounded-xl bg-slate-50 px-4 py-3 ">
-                  <dt className="text-xs font-extrabold uppercase text-slate-500">
-                    Registro RRHH generado
-                  </dt>
-                  <dd className="m-0 mt-1 font-semibold text-slate-800">
-                    {solicitud.registroGeneradoTipo} #{solicitud.registroGeneradoId}
-                  </dd>
-                </div>
+                <DetalleCampo label="Registro RRHH">
+                  {solicitud.registroGeneradoTipo} #{solicitud.registroGeneradoId}
+                </DetalleCampo>
               ) : null}
               {solicitud.motivoRechazo ? (
-                <div className="rounded-xl bg-amber-50 px-4 py-3 ">
-                  <dt className="text-xs font-extrabold uppercase text-amber-800">
+                <div className="grid gap-1.5 rounded-xl border border-amber-200 bg-[#fff9e6] px-3 py-3.5 my-3 sm:grid-cols-[minmax(8rem,32%)_minmax(0,1fr)] sm:gap-4">
+                  <dt className="text-sm font-semibold text-amber-900">
                     Motivo de rechazo
                   </dt>
-                  <dd className="m-0 mt-1 font-semibold text-amber-950">
+                  <dd className="m-0 text-[0.95rem] font-bold leading-5 text-amber-950">
                     {solicitud.motivoRechazo}
                   </dd>
                 </div>
               ) : null}
             </dl>
 
-              <section className="mt-2 grid gap-2 border-t border-slate-100 pt-5">
-                <h2 className="m-0 text-xs font-extrabold uppercase tracking-wider text-slate-500">
-                  Evidencia
-                </h2>
-                {solicitud.documentos?.length ? (
-                  <ul className="m-0 grid list-none gap-2 p-0">
-                    {solicitud.documentos.map((doc) => (
-                      <li
-                        key={doc.id}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+            <section className="border-t border-[color:var(--asada-line,#d7e5f1)] px-4 py-4 sm:px-6">
+              <h2 className="m-0 flex items-center gap-2 text-sm font-black tracking-tight text-[color:var(--asada-ink,#123f70)]">
+                <span className="grid size-8 place-items-center rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)]">
+                  <IconFileDescription size={17} aria-hidden="true" />
+                </span>
+                Evidencia
+              </h2>
+              {solicitud.documentos?.length ? (
+                <ul className="mb-0 mt-3 grid list-none gap-2 p-0">
+                  {solicitud.documentos.map((doc) => (
+                    <li
+                      key={doc.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[#f7fbff] px-3.5 py-3"
+                    >
+                      <span className="min-w-0 break-words text-sm font-bold text-[color:var(--asada-ink,#123f70)]">
+                        {doc.nombreOriginal}
+                      </span>
+                      <button
+                        type="button"
+                        className="inline-flex min-h-10 items-center rounded-xl border border-[#bfe3fa] bg-white px-3 text-sm font-extrabold text-[color:var(--asada-navy,#1e5a9c)]"
+                        onClick={() =>
+                          void abrirEvidenciaSolicitudAusencia(
+                            doc.rutaReferenciaArchivo,
+                            'admin',
+                          )
+                        }
                       >
-                        <span className="font-semibold text-slate-800">
-                          {doc.nombreOriginal}
-                        </span>
-                        <button
-                          type="button"
-                          className="inline-flex min-h-10 items-center rounded-xl border border-blue-200 bg-white px-3 text-sm font-bold text-blue-800"
-                          onClick={() =>
-                            void abrirEvidenciaSolicitudAusencia(
-                              doc.rutaReferenciaArchivo,
-                              'admin',
-                            )
-                          }
-                        >
-                          Ver documento
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="m-0 text-sm font-semibold text-slate-500">
-                    Sin evidencia adjunta.
-                  </p>
-                )}
-              </section>
+                        Ver documento
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mb-0 mt-3 text-sm font-semibold text-[color:var(--asada-muted,#5b7390)]">
+                  Sin evidencia adjunta.
+                </p>
+              )}
+            </section>
 
-              {solicitud.estado === 'PENDIENTE' ? (
-                <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4">
-                  <button
-                    type="button"
-                    disabled={Boolean(busy)}
-                    onClick={() => setModalAprobar(true)}
-                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-emerald-500 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(16,185,129,0.32)] transition hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none"
-                  >
-                    <IconCheck size={20} aria-hidden="true" />
-                    {busy === 'aprobar' ? 'Aprobando…' : 'Aprobar solicitud'}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={Boolean(busy)}
-                    onClick={() => {
-                      setMotivoRechazo('')
-                      setModalRechazo(true)
-                    }}
-                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-white px-6 py-3.5 font-extrabold text-rose-700 transition hover:-translate-y-1 hover:border-rose-400 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rose-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none"
-                  >
-                    <IconX size={20} aria-hidden="true" />
-                    Rechazar
-                  </button>
-                </div>
-              ) : null}
+            {solicitud.estado === 'PENDIENTE' ? (
+              <div className="flex flex-col gap-3 border-t border-[color:var(--asada-line,#d7e5f1)] px-4 py-4 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
+                <button
+                  type="button"
+                  disabled={Boolean(busy)}
+                  onClick={() => setModalAprobar(true)}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border-0 bg-[color:var(--asada-navy,#1e5a9c)] px-5 font-extrabold text-white shadow-[0_8px_18px_rgba(30,90,156,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174a82] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                >
+                  <IconCheck size={18} aria-hidden="true" />
+                  {busy === 'aprobar' ? 'Aprobando…' : 'Aprobar solicitud'}
+                </button>
+                <button
+                  type="button"
+                  disabled={Boolean(busy)}
+                  onClick={() => {
+                    setMotivoRechazo('')
+                    setModalRechazo(true)
+                  }}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-5 font-extrabold text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                >
+                  <IconX size={18} aria-hidden="true" />
+                  Rechazar
+                </button>
+              </div>
+            ) : null}
           </article>
         </>
       )}

@@ -277,7 +277,7 @@ describe('FormulariosDescargablesAdminPage', () => {
     await view.cleanup()
   })
 
-  it('edita metadata sin llamar al endpoint de archivo', async () => {
+  it('edita metadata en pantalla completa y vuelve al listado', async () => {
     vi.mocked(api.updateFormularioDescargable).mockResolvedValueOnce({
       ...activo,
       nombre: 'Formulario A editado',
@@ -288,7 +288,12 @@ describe('FormulariosDescargablesAdminPage', () => {
       item.textContent?.includes('Formulario A'),
     ) as HTMLElement
     await clickButton(card, 'Editar')
-    const form = dialogForm(view.container)
+    expect(view.container.textContent).toContain('Editar formulario')
+    expect(view.container.textContent).toContain('Volver al listado')
+    expect(view.container.querySelector('[role="dialog"]')).toBeNull()
+
+    const form = view.container.querySelector('form') as HTMLFormElement
+    expect(form).toBeTruthy()
     const nombre = form.querySelector('input') as HTMLInputElement
     const valueSetter = Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,
@@ -310,7 +315,25 @@ describe('FormulariosDescargablesAdminPage', () => {
       expect.objectContaining({ nombre: 'Formulario A editado' }),
     )
     expect(api.replaceFormularioDescargableArchivo).not.toHaveBeenCalled()
+    expect(view.container.textContent).toContain('Formularios descargables')
     expect(view.container.textContent).toContain('Formulario A editado')
+    expect(view.container.textContent).toMatch(
+      /Información actualizada correctamente/i,
+    )
+    await view.cleanup()
+  })
+
+  it('desde editar, Volver al listado regresa sin guardar', async () => {
+    const view = await mount()
+    const card = [...view.container.querySelectorAll('article')].find((item) =>
+      item.textContent?.includes('Formulario A'),
+    ) as HTMLElement
+    await clickButton(card, 'Editar')
+    expect(view.container.textContent).toContain('Editar formulario')
+    await clickButton(view.container, 'Volver al listado')
+    expect(view.container.textContent).toContain('Formularios descargables')
+    expect(view.container.textContent).toContain('Formulario A')
+    expect(api.updateFormularioDescargable).not.toHaveBeenCalled()
     await view.cleanup()
   })
 
@@ -356,7 +379,7 @@ describe('FormulariosDescargablesAdminPage', () => {
     await view.cleanup()
   })
 
-  it('reemplazo fallido conserva el PDF anterior', async () => {
+  it('reemplazo fallido desde editar conserva el PDF anterior', async () => {
     vi.mocked(api.replaceFormularioDescargableArchivo).mockRejectedValueOnce(
       new Error('HTTP 400: PDF inválido'),
     )
@@ -364,11 +387,12 @@ describe('FormulariosDescargablesAdminPage', () => {
     const card = [...view.container.querySelectorAll('article')].find((item) =>
       item.textContent?.includes('Formulario A'),
     ) as HTMLElement
-    await clickButton(card, 'Reemplazar PDF')
-    const form = dialogForm(view.container)
-    expect(form.textContent).toContain('a.pdf')
+    expect(card.textContent).not.toContain('Reemplazar PDF')
+    await clickButton(card, 'Editar')
+    expect(view.container.textContent).toContain('Cambiar PDF (opcional)')
+    expect(view.container.textContent).toContain('a.pdf')
 
-    const fileInput = [...form.querySelectorAll('input')].find(
+    const fileInput = [...view.container.querySelectorAll('input')].find(
       (input) => input.type === 'file',
     ) as HTMLInputElement
     const file = new File(['%PDF-1.4'], 'nuevo.pdf', { type: 'application/pdf' })
@@ -383,9 +407,7 @@ describe('FormulariosDescargablesAdminPage', () => {
       await Promise.resolve()
     })
 
-    await act(async () => {
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-    })
+    await clickButton(view.container, 'Reemplazar PDF')
     const confirm = document.body.querySelector(
       '[role="alertdialog"]',
     ) as HTMLElement
@@ -395,9 +417,8 @@ describe('FormulariosDescargablesAdminPage', () => {
       await Promise.resolve()
     })
 
-    // El listado conserva el PDF confirmado por el servidor (a.pdf).
-    expect(card.textContent).toContain('a.pdf')
-    expect(card.textContent).not.toContain('nuevo.pdf')
+    expect(view.container.textContent).toContain('a.pdf')
+    expect(view.container.textContent).not.toContain('nuevo.pdf')
     expect(api.replaceFormularioDescargableArchivo).toHaveBeenCalled()
     await view.cleanup()
   })

@@ -4,16 +4,14 @@ import {
   IconPencil,
   IconPlus,
   IconRefresh,
-  IconUpload,
   IconX,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import FormularioDescargableCreateDialog from './FormularioDescargableCreateDialog'
-import FormularioDescargableEditDialog from './FormularioDescargableEditDialog'
+import FormularioDescargableEditPage from './FormularioDescargableEditPage'
 import FormularioDescargableEstadoAction from './FormularioDescargableEstadoAction'
-import FormularioDescargableReplaceDialog from './FormularioDescargableReplaceDialog'
 import {
   createFormularioDescargable,
   listFormulariosDescargablesAdmin,
@@ -31,7 +29,6 @@ import type {
 type DialogMode =
   | { type: 'create' }
   | { type: 'edit'; formulario: FormularioDescargableAdmin }
-  | { type: 'replace'; formulario: FormularioDescargableAdmin }
   | null
 
 const FormulariosDescargablesAdminPage = () => {
@@ -113,11 +110,34 @@ const FormulariosDescargablesAdminPage = () => {
   }
 
   const handleReplace = async (file: File) => {
-    if (dialog?.type !== 'replace') return
+    if (dialog?.type !== 'edit') return
     const id = dialog.formulario.id
     await runMutation(
       () => replaceFormularioDescargableArchivo(id, file),
       'Documento reemplazado correctamente.',
+      false,
+    )
+  }
+
+  if (dialog?.type === 'edit') {
+    const editing =
+      items.find((item) => item.id === dialog.formulario.id) ?? dialog.formulario
+    return (
+      <FormularioDescargableEditPage
+        formulario={editing}
+        submitting={submitting}
+        error={error}
+        success={success}
+        onDismissSuccess={() => setSuccess(null)}
+        onBack={() => {
+          if (!submitting) {
+            setDialog(null)
+            setError(null)
+          }
+        }}
+        onSave={handleEdit}
+        onReplacePdf={handleReplace}
+      />
     )
   }
 
@@ -332,17 +352,6 @@ const FormulariosDescargablesAdminPage = () => {
                   >
                     <IconPencil size={17} aria-hidden="true" /> Editar
                   </button>
-                  <button
-                    className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-sky-200 bg-white px-4 text-sm font-extrabold text-[#0b65b5]"
-                    type="button"
-                    disabled={submitting || estadoBusyId !== null}
-                    onClick={() => {
-                      setSuccess(null)
-                      setDialog({ type: 'replace', formulario: item })
-                    }}
-                  >
-                    <IconUpload size={17} aria-hidden="true" /> Reemplazar PDF
-                  </button>
                   <FormularioDescargableEstadoAction
                     formulario={item}
                     disabled={
@@ -366,26 +375,6 @@ const FormulariosDescargablesAdminPage = () => {
             if (!submitting) setDialog(null)
           }}
           onSave={handleCreate}
-        />
-      ) : null}
-      {dialog?.type === 'edit' ? (
-        <FormularioDescargableEditDialog
-          formulario={dialog.formulario}
-          submitting={submitting}
-          onCancel={() => {
-            if (!submitting) setDialog(null)
-          }}
-          onSave={handleEdit}
-        />
-      ) : null}
-      {dialog?.type === 'replace' ? (
-        <FormularioDescargableReplaceDialog
-          formulario={dialog.formulario}
-          submitting={submitting}
-          onCancel={() => {
-            if (!submitting) setDialog(null)
-          }}
-          onSave={handleReplace}
         />
       ) : null}
     </main>

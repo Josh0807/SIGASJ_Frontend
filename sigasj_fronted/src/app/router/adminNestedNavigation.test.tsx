@@ -1,4 +1,5 @@
 import { act, useEffect } from 'react'
+import { waitForAppRoutesReady } from '../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, useLocation } from 'react-router-dom'
@@ -51,6 +52,7 @@ const mountApp = async (path: string) => {
       </MemoryRouter>,
     )
   })
+  await waitForAppRoutesReady(container)
 
   return {
     container,
@@ -201,7 +203,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(header).not.toBeNull()
       expect(content).not.toBeNull()
       expect(outletTitle(app.container)).toBe('Dashboard administrativo')
-      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
 
       const firstClick = await app.clickSidebarLink('/admin/abonados')
       expect(firstClick.defaultPrevented).toBe(true)
@@ -211,7 +213,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(hasAdminChrome(app.container)).toBe(true)
       expect(outletTitle(app.container)).toBe('Gestión de asociados')
-      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
       expect(header?.textContent).not.toContain('Gestión de asociados')
       expect(sidebar?.querySelector('h1')).toBeNull()
 
@@ -223,7 +225,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(hasAdminChrome(app.container)).toBe(true)
       expect(outletTitle(app.container)).toBe('Gestión de averías')
-      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
       expect(header?.textContent).not.toContain('Gestión de averías')
 
       expect(errors).toEqual([])
@@ -274,7 +276,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       const content = app.container.querySelector('.admin-main__content')
 
       expect(outletTitle(app.container)).toBe('Dashboard administrativo')
-      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
 
       await app.openAccountMenu()
       const profileClick = await app.clickAccountMenuProfile()
@@ -286,7 +288,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(app.container.querySelector('.admin-main__content')).toBe(content)
       expect(hasAdminChrome(app.container)).toBe(true)
       assertProfileOutletOnly(app.container)
-      expect(header?.textContent).toContain('Panel administrativo')
+      expect(header?.getAttribute('aria-label')).toBe('Encabezado del panel administrativo')
       expect(header?.querySelector('h1')).toBeNull()
     } finally {
       await app.cleanup()
@@ -312,7 +314,7 @@ describe('navegación de rutas administrativas anidadas', () => {
     try {
       expect(app.currentPath()).toBe('/')
       expect(app.container.innerHTML).toContain('hero')
-      expect(app.container.innerHTML).toContain('header__inner')
+      expect(app.container.innerHTML).toContain('public-container')
       expect(app.container.innerHTML).toContain('footer')
       expect(app.container.innerHTML).not.toContain('admin-layout')
       expect(app.container.innerHTML).not.toContain('admin-sidebar')
@@ -353,7 +355,7 @@ describe('navegación de rutas administrativas anidadas', () => {
       expect(backClick.defaultPrevented).toBe(true)
       expect(toLogin.currentPath()).toBe('/')
       expect(toLogin.container.innerHTML).toContain('hero')
-      expect(toLogin.container.innerHTML).toContain('header__inner')
+      expect(toLogin.container.innerHTML).toContain('public-container')
       expect(hasAdminChrome(toLogin.container)).toBe(false)
     } finally {
       await toLogin.cleanup()

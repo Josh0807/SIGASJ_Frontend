@@ -1,4 +1,5 @@
 import { act } from 'react'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -85,7 +86,9 @@ describe('AdminAccountMenu', () => {
   it('renderiza Mi perfil sin acciones de cuenta no implementadas', () => {
     const markup = renderToStaticMarkup(
       <MemoryRouter>
-        <AdminAccountMenu />
+        <AuthProvider>
+          <AdminAccountMenu />
+        </AuthProvider>
       </MemoryRouter>,
     )
 
@@ -124,6 +127,7 @@ describe('AdminAccountMenu', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -172,10 +176,13 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminAccountMenu />
+          <AuthProvider>
+            <AdminAccountMenu />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -222,6 +229,7 @@ describe('AdminAccountMenu', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -304,13 +312,16 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
+          <AuthProvider>
           <Routes>
             <Route path="/admin/dashboard" element={<AdminAccountMenu />} />
             <Route path={LOGIN_ROUTE_PATH} element={<p>Pantalla login</p>} />
           </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -356,10 +367,13 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminAccountMenu />
+          <AuthProvider>
+            <AdminAccountMenu />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -399,6 +413,7 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
+          <AuthProvider>
           <Routes>
             <Route
               path="/admin/dashboard"
@@ -411,9 +426,11 @@ describe('AdminAccountMenu', () => {
             />
             <Route path={ADMIN_PROFILE_PATH} element={<p>Pantalla perfil</p>} />
           </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -455,6 +472,7 @@ describe('AdminAccountMenu', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -498,10 +516,13 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminAccountMenu />
+          <AuthProvider>
+            <AdminAccountMenu />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -538,10 +559,13 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter>
-          <AdminAccountMenu />
+          <AuthProvider>
+            <AdminAccountMenu />
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -597,6 +621,7 @@ describe('AdminAccountMenu', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     expect(isAuthenticated()).toBe(true)
     expect(getAuthUser()?.name).toBe('Ana')
@@ -620,7 +645,7 @@ describe('AdminAccountMenu', () => {
     await cancelLogoutInDialog(container)
 
     expect(getAccessToken()).toBe('local-admin-session')
-    expect(getAuthUser()).toEqual({ name: 'Ana', role: 'Administradora' })
+    expect(getAuthUser()).toMatchObject({ name: 'Ana', role: 'Administradora' })
     expect(isAuthenticated()).toBe(true)
     expect(container.querySelector('.confirm-dialog')).toBeNull()
     expect(container.innerHTML).toContain('admin-layout')
@@ -649,6 +674,7 @@ describe('AdminAccountMenu', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -699,13 +725,16 @@ describe('AdminAccountMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/dashboard']}>
+          <AuthProvider>
           <Routes>
             <Route path="/admin/dashboard" element={<AdminAccountMenu />} />
             <Route path={LOGIN_ROUTE_PATH} element={<p>Pantalla login</p>} />
           </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',
@@ -731,7 +760,7 @@ describe('AdminAccountMenu', () => {
   })
 
   it('ejecuta logout únicamente al confirmar el diálogo con el botón Cerrar sesión', async () => {
-    const clearSpy = vi.spyOn(authStorage, 'clearAccessToken')
+    const clearSpy = vi.spyOn(authStorage, 'clearAuthSession')
     setAccessToken('local-admin-session')
     setAuthUser({ name: 'Ana', role: 'ADMINISTRADORA' })
 
@@ -748,6 +777,7 @@ describe('AdminAccountMenu', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector(
       '.admin-account-menu__trigger',

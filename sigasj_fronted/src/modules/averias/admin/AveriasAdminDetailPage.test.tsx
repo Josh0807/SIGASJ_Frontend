@@ -128,7 +128,7 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
     expect(container.querySelector('#averia-gestion-clasificacion')).toBeNull()
     expect(container.textContent).toContain(
-      'El Fontanero califica la prioridad (Baja, Media o Alta) y el tipo (Tubo madre o Tubo medidor).',
+      'El Fontanero actualiza el estado al atender o resolver la avería.',
     )
   })
 
@@ -160,7 +160,7 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.querySelector('#averia-gestion-estado')).toBeNull()
     expect(container.querySelector('#averia-gestion-prioridad')).toBeNull()
     expect(container.querySelector('#averia-gestion-clasificacion')).toBeNull()
-    expect(container.textContent).toContain('Materiales y movimientos')
+    expect(container.textContent).not.toContain('Materiales y movimientos')
   })
 
   it('muestra fallbacks de una avería recién recibida', async () => {
@@ -168,7 +168,8 @@ describe('AveriasAdminDetailPage', () => {
     expect(container.textContent).toContain('AV-2026-0001')
     expect(container.textContent).toContain('Recibida')
     expect(container.textContent).toContain(AVERIA_NOT_PROVIDED_LABEL)
-    expect(container.textContent).toContain(AVERIA_NO_ABONADO_LABEL)
+    expect(container.textContent).not.toContain(AVERIA_NO_ABONADO_LABEL)
+    expect(container.textContent).not.toContain('Abonado relacionado')
     expect(container.textContent).toContain(AVERIA_UNASSIGNED_LABEL)
     expect(container.textContent).toContain(AVERIA_UNCLASSIFIED_LABEL)
     expect(container.textContent).toContain(AVERIA_UNAVAILABLE_LABEL)

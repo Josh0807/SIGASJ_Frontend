@@ -1,10 +1,13 @@
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
-import {
-  LOGIN_ROUTE_PATH,
-} from '../../../app/router/routePaths'
-import { useFontaneroAveria } from '../hooks/useFontaneroAveria'
+import { IconArrowLeft, IconTool } from '@tabler/icons-react'
+import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
+import { Alert } from '../../../shared/ui/Alert'
+import { Button } from '../../../shared/ui/Button'
+import { Card } from '../../../shared/ui/Card'
 import AveriaStatusBadge from '../admin/AveriaStatusBadge'
+import { useFontaneroAveria } from '../hooks/useFontaneroAveria'
+import AveriaFaucetIllustration from './AveriaFaucetIllustration'
 import AveriasFontaneroDetailView from './AveriasFontaneroDetailView'
 import { FONTANERO_AVERIAS_PATH } from './averiasFontaneroPaths'
 import {
@@ -26,9 +29,14 @@ export type AveriasFontaneroDetailPageProps = {
 }
 
 const BackLink = () => (
-  <Link className="gallery-admin__button" to={FONTANERO_AVERIAS_PATH}>
+  <Button
+    to={FONTANERO_AVERIAS_PATH}
+    variant="secondary"
+    size="sm"
+    leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+  >
     {AVERIAS_FONTANERO_BACK_LABEL}
-  </Link>
+  </Button>
 )
 
 const AveriasFontaneroDetailPage = ({
@@ -74,123 +82,143 @@ const AveriasFontaneroDetailPage = ({
 
   if (loading) {
     return (
-      <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div role="status" aria-live="polite" aria-busy="true">
-            <p>{AVERIAS_FONTANERO_DETAIL_LOADING_MESSAGE}</p>
-            <div className="gallery-admin__skeleton" aria-hidden="true">
-              <div className="gallery-admin__skeleton-row">
-                <span className="indicator-card__skeleton" />
-                <span className="indicator-card__skeleton indicator-card__skeleton--badge" />
-              </div>
-              <div className="gallery-admin__skeleton-row">
-                <span className="indicator-card__skeleton" />
-                <span className="indicator-card__skeleton" />
-              </div>
-            </div>
+      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+        <BackLink />
+        <Card padded className="!p-5" role="status" aria-live="polite" aria-busy="true">
+          <p className="m-0 font-semibold text-sigasj-muted">
+            {AVERIAS_FONTANERO_DETAIL_LOADING_MESSAGE}
+          </p>
+          <div className="mt-3 grid gap-3" aria-hidden="true">
+            <div className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none" />
+            <div className="h-24 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none" />
           </div>
-        </div>
+        </Card>
       </main>
     )
   }
 
   if (forbidden) {
     return (
-      <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div className="gallery-admin__empty" role="alert">
-            <h1>{AVERIAS_FONTANERO_DETAIL_FORBIDDEN}</h1>
+      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+        <Alert tone="danger" role="alert">
+          <div className="grid gap-3">
+            <h1 className="m-0 text-base font-extrabold">
+              {AVERIAS_FONTANERO_DETAIL_FORBIDDEN}
+            </h1>
             <BackLink />
           </div>
-        </div>
+        </Alert>
       </main>
     )
   }
 
   if (error) {
     return (
-      <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div className="gallery-admin__empty" role="alert">
-            <p>{AVERIAS_FONTANERO_DETAIL_ERROR}</p>
-            <button
-              className="gallery-admin__button"
-              type="button"
-              onClick={remote.refetch}
-            >
-              Intentar nuevamente
-            </button>
-            <BackLink />
+      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+        <Alert tone="danger" role="alert">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{AVERIAS_FONTANERO_DETAIL_ERROR}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={remote.refetch}
+              >
+                Intentar nuevamente
+              </Button>
+              <BackLink />
+            </div>
           </div>
-        </div>
+        </Alert>
       </main>
     )
   }
 
   if (notFound || averia == null) {
     return (
-      <main className="gallery-admin averias-admin averias-fontanero">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div className="gallery-admin__empty" role="status">
-            <h1>{AVERIAS_FONTANERO_DETAIL_NOT_FOUND}</h1>
+      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+        <Alert tone="info" role="status">
+          <div className="grid gap-3">
+            <h1 className="m-0 text-base font-extrabold">
+              {AVERIAS_FONTANERO_DETAIL_NOT_FOUND}
+            </h1>
             <BackLink />
           </div>
-        </div>
+        </Alert>
       </main>
     )
   }
 
   return (
-    <main className="gallery-admin averias-admin averias-fontanero w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header !w-full !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-blue-50/25 !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)]">
-          <div>
-            <p className="gallery-admin__eyebrow !mb-3 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-[#1e5a9c]">Atención de campo</p>
-            <h1 className="!text-[clamp(2rem,4vw,2.75rem)] !font-black !tracking-[-0.03em] !text-[#1e5a9c]">Avería asignada</h1>
-            <div className="averias-fontanero__header-meta !mt-4 !flex !flex-wrap !items-center !gap-3">
-              <p className="averias-admin__codigo !m-0 !rounded-full !border !border-slate-200 !bg-white !px-4 !py-2 !font-extrabold !text-slate-600 !shadow-sm">{averia.codigoSeguimiento}</p>
-              <p className="averias-admin__header-badge !m-0 [&>*]:!shadow-sm">
+    <main className="averias-fontanero admin-content-modern grid w-full min-w-0 gap-4">
+      <div className="justify-self-start">
+        <BackLink />
+      </div>
+
+      <header className="gallery-admin__header relative overflow-hidden rounded-[1.5rem] border border-[#d7e8f7] bg-gradient-to-br from-white via-[#f7fbff] to-[#eaf4ff] px-5 py-5 shadow-[0_14px_32px_rgba(30,90,156,0.1)] sm:min-h-[8.5rem] sm:px-7 sm:py-6">
+        <div
+          className="pointer-events-none absolute -right-2 -bottom-6 hidden size-52 rounded-full bg-[radial-gradient(circle,rgba(186,230,253,0.55)_0%,rgba(224,242,254,0.2)_48%,transparent_72%)] sm:block"
+          aria-hidden="true"
+        />
+
+        {/* Tubo + llave bajados: manija visible, codo recortado abajo */}
+        <AveriaFaucetIllustration className="pointer-events-none absolute -bottom-3 -right-1 z-[1] hidden h-[11.5rem] w-[15rem] sm:block lg:-bottom-4 lg:right-0 lg:h-[12.5rem] lg:w-[16.5rem]" />
+
+        <div className="relative z-[2] grid max-w-[34rem] items-center gap-4 pr-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-5 sm:pr-40">
+          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#38bdf8] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
+            <IconTool size={30} stroke={2.2} aria-hidden="true" />
+          </span>
+
+          <div className="min-w-0">
+            <p className="gallery-admin__eyebrow m-0 mb-1 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-sigasj-primary">
+              Atención de campo
+            </p>
+            <h1 className="m-0 text-[clamp(1.45rem,2.6vw,1.85rem)] font-black tracking-[-0.03em] text-sigasj-ink">
+              Avería asignada
+            </h1>
+            <div className="averias-fontanero__header-meta mt-3 flex flex-wrap items-center gap-2">
+              <p className="averias-admin__codigo m-0 inline-flex rounded-full border border-[#cfe4f7] bg-[#f3f9ff] px-3.5 py-1.5 text-sm font-extrabold text-sigasj-ink shadow-sm">
+                {averia.codigoSeguimiento}
+              </p>
+              <p className="averias-admin__header-badge m-0">
                 <AveriaStatusBadge estado={averia.estado} />
               </p>
             </div>
           </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link group !inline-flex !min-h-12 !items-center !justify-center !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !py-3 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_8px_20px_rgba(30, 90, 156,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={FONTANERO_AVERIAS_PATH}>
-              {AVERIAS_FONTANERO_BACK_LABEL}
-            </Link>
-          </div>
-        </header>
-        <AveriasFontaneroDetailView
-          averia={averia}
-          successMessage={successMessage}
-          onResolved={(updated, message) => {
-            setResolvedAveria(updated)
-            setSuccessMessage(message)
-          }}
-          onAtencionIniciada={(updated, message) => {
-            setResolvedAveria(updated)
-            setSuccessMessage(message)
-          }}
-          onClasificada={(updated, message) => {
-            setResolvedAveria(updated)
-            setSuccessMessage(message)
-          }}
-          onObservacionCreated={(item: AveriaObservacionItem) => {
-            setResolvedAveria((current) => {
-              const base = current ?? averia
-              const existing = base.observaciones ?? []
-              if (existing.some((row) => row.id === item.id)) {
-                return base
-              }
-              return {
-                ...base,
-                observaciones: [...existing, item],
-              }
-            })
-          }}
-          onUnauthorized={() => setForceLogin(true)}
-        />
-      </div>
+        </div>
+      </header>
+
+      <AveriasFontaneroDetailView
+        averia={averia}
+        successMessage={successMessage}
+        onResolved={(updated, message) => {
+          setResolvedAveria(updated)
+          setSuccessMessage(message)
+        }}
+        onAtencionIniciada={(updated, message) => {
+          setResolvedAveria(updated)
+          setSuccessMessage(message)
+        }}
+        onClasificada={(updated, message) => {
+          setResolvedAveria(updated)
+          setSuccessMessage(message)
+        }}
+        onObservacionCreated={(item: AveriaObservacionItem) => {
+          setResolvedAveria((current) => {
+            const base = current ?? averia
+            const existing = base.observaciones ?? []
+            if (existing.some((row) => row.id === item.id)) {
+              return base
+            }
+            return {
+              ...base,
+              observaciones: [...existing, item],
+            }
+          })
+        }}
+        onUnauthorized={() => setForceLogin(true)}
+      />
     </main>
   )
 }

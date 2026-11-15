@@ -13,11 +13,11 @@ describe('seguridad frontend de solicitudes administrativas', () => {
     })
   })
 
-  it.each(['Abonado', 'Ayudante'])('rechaza acceso directo al rol %s', (role) => {
+  it.each(['Abonado', 'Ayudante', 'Fontanero'])('rechaza acceso directo al rol %s', (role) => {
     expect(evaluateDirectRouteAccess(true, { id: '8', role }, detailPath)).toEqual({ to: UNAUTHORIZED_ROUTE_PATH })
   })
 
-  it.each(['Administradora', 'Secretaria', 'Fontanero'])('permite acceso directo al rol %s', (role) => {
+  it.each(['Administradora', 'Secretaria'])('permite acceso directo al rol %s', (role) => {
     expect(evaluateDirectRouteAccess(true, { id: '2', role }, detailPath)).toBe('allow')
   })
 

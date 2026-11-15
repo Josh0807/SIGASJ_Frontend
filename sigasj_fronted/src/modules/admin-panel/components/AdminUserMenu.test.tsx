@@ -1,4 +1,6 @@
 import { act } from 'react'
+import { AuthProvider } from '../../auth/components/AuthContext'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -19,7 +21,9 @@ describe('AdminUserMenu', () => {
   const renderMenu = () =>
     renderToStaticMarkup(
       <MemoryRouter>
-        <AdminUserMenu userName="Administrador" userRole="ASADA San Juan" />
+        <AuthProvider>
+          <AdminUserMenu userName="Administrador" userRole="ASADA San Juan" />
+        </AuthProvider>
       </MemoryRouter>,
     )
 
@@ -40,13 +44,16 @@ describe('AdminUserMenu', () => {
     await act(async () => {
       root.render(
         <MemoryRouter initialEntries={['/admin/abonados']}>
+          <AuthProvider>
           <Routes>
             <Route path="/admin/abonados" element={<AdminUserMenu />} />
             <Route path={LOGIN_ROUTE_PATH} element={<p>Iniciar sesión</p>} />
           </Routes>
+          </AuthProvider>
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const trigger = container.querySelector<HTMLButtonElement>('.admin-user-menu__trigger')
     expect(trigger).not.toBeNull()

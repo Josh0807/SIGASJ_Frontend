@@ -31,6 +31,7 @@ import { getReporteInventarioAdmin } from './reportes/reportesApi'
 import { getSolicitudesMaterialesAdmin } from './solicitudes-materiales/solicitudesMaterialesApi'
 import { getMovimientosAdmin } from './movimientos/movimientosApi'
 import type { MovimientoInventario } from './movimientos/types'
+import { materialDisplayLabel as displayLabel } from './materialDisplayLabel'
 import { formatCantidadUnidad, pluralizeUnidad } from './unidadMedidaUtils'
 
 const PAGE_SIZE = 10
@@ -53,19 +54,6 @@ function stockLabel(tone: StockTone): string {
 
 function materialCode(id: number): string {
   return `MAT-${String(id).padStart(3, '0')}`
-}
-
-/** Quita sufijos de semillas QA/demo para lectura en catálogo. */
-function displayLabel(value: string | null | undefined, fallback: string): string {
-  if (!value) return fallback
-  return (
-    value
-      .replace(/\s+QA\s+\d{8,}$/i, '')
-      .replace(/\s+Demo\s+\d{10,}$/i, '')
-      .replace(/\s+\d{10,}$/g, '')
-      .replace(/\s+QA$/i, '')
-      .trim() || value
-  )
 }
 
 function formatMoveDate(iso: string): string {

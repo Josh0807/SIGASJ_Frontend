@@ -137,6 +137,37 @@
   box-shadow: var(--inv-shadow);
 }
 
+/* Columna derecha (nueva solicitud): grilla 2×2 ordenada */
+.inventory-bodega .inv-nav-stack--inline .inv-tabs--rail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: stretch;
+  min-height: 0;
+  padding: 10px;
+}
+
+.inventory-bodega .inv-nav-stack--inline .inv-tabs--rail .inv-tabs__link {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inventory-bodega .inv-nav-stack--inline .inv-tabs--rail .inv-tabs__more {
+  margin-left: 0;
+  grid-column: 1 / -1;
+}
+
+.inventory-bodega .inv-nav-stack--inline .inv-tabs--rail .inv-tabs__more > .inv-tabs__link {
+  width: 100%;
+}
+
 .inventory-bodega .inv-tabs__link {
   display: inline-flex;
   align-items: center;

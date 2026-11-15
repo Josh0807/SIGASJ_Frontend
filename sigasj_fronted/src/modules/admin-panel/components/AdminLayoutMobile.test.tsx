@@ -1,4 +1,5 @@
 import { act } from 'react'
+import { waitForAppRoutesReady } from '../../../test/waitForAppRoutesReady'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -70,6 +71,7 @@ describe('AdminLayout Mobile Integration', () => {
         </MemoryRouter>,
       )
     })
+    await waitForAppRoutesReady(container)
 
     const toggleBtn = container.querySelector<HTMLButtonElement>('.admin-menu-toggle')
     expect(toggleBtn).not.toBeNull()

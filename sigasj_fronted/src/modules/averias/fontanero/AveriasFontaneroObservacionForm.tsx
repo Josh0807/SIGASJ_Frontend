@@ -1,10 +1,13 @@
 import { useId, useRef, useState, type FormEvent } from 'react'
+import { IconPlus } from '@tabler/icons-react'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
 import {
   extractHttpErrorMessage,
   getHttpErrorStatus,
 } from '../../actividades-fontanero/utils/httpErrorStatus'
+import { buttonVariants } from '../../../shared/ui/button-variants'
+import { cn } from '../../../shared/ui/cn'
 import { isAbortError } from '../admin/averiaAdminError'
 import { createFontaneroObservacion } from '../services/averiasFontaneroApi'
 import {
@@ -99,14 +102,17 @@ const AveriasFontaneroObservacionForm = ({
 
   return (
     <form
-      className="averias-fontanero__observacion-form !mt-6 !grid !gap-4 !rounded-3xl !border !border-blue-100 !bg-linear-to-br !from-white !to-[#eaf6ff]/70 !p-6 !shadow-[0_10px_28px_rgba(30, 90, 156,0.09)]"
+      className="averias-fontanero__observacion-form mt-2 grid gap-3 rounded-2xl border border-sigasj-border bg-white p-4"
       onSubmit={handleSubmit}
     >
-      <label htmlFor={fieldId} className="averias-fontanero__resolver-label !text-xs !font-extrabold !uppercase !tracking-[0.08em] !text-[#1e5a9c]">
+      <label
+        htmlFor={fieldId}
+        className="averias-fontanero__resolver-label text-[0.72rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted"
+      >
         {AVERIAS_FONTANERO_OBSERVACION_NUEVA_LABEL}
       </label>
       <textarea
-        className="!box-border !min-h-36 !w-full !resize-y !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !py-4 !text-base !font-medium !leading-relaxed !text-[#073b73] !shadow-sm !outline-none !transition-all !duration-200 placeholder:!text-slate-400 hover:!border-blue-300 focus:!border-[#1e5a9c] focus:!ring-4 focus:!ring-blue-100 disabled:!cursor-not-allowed disabled:!opacity-60"
+        className="box-border min-h-32 w-full resize-y rounded-xl border border-sigasj-border bg-[color-mix(in_srgb,var(--color-sigasj-ice)_45%,white)] px-4 py-3 text-[0.95rem] font-medium leading-relaxed text-sigasj-ink outline-none transition placeholder:text-sigasj-muted focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)] disabled:cursor-not-allowed disabled:opacity-60"
         ref={textareaRef}
         id={fieldId}
         name="observacion"
@@ -125,9 +131,26 @@ const AveriasFontaneroObservacionForm = ({
           }
         }}
       />
-      <p className="!m-0 !text-right !text-xs !font-bold !text-slate-400" aria-live="polite">
-        {observacion.length}/{OBSERVACION_AVERIA_MAX_LENGTH}
-      </p>
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <p
+          className="m-0 text-xs font-bold tabular-nums text-sigasj-muted"
+          aria-live="polite"
+        >
+          {observacion.length}/{OBSERVACION_AVERIA_MAX_LENGTH}
+        </p>
+        <button
+          className={cn(buttonVariants({ variant: 'primary', size: 'sm' }))}
+          type="submit"
+          disabled={submitting}
+        >
+          <IconPlus size={16} aria-hidden="true" />
+          <span>
+            {submitting
+              ? AVERIAS_FONTANERO_OBSERVACION_LOADING
+              : AVERIAS_FONTANERO_OBSERVACION_GUARDAR}
+          </span>
+        </button>
+      </div>
       {fieldError ? (
         <p id={errorId} className="averias-fontanero__resolver-error" role="alert">
           {fieldError}
@@ -140,17 +163,10 @@ const AveriasFontaneroObservacionForm = ({
         <ActivityFeedback variant="success" message={successMessage} />
       ) : null}
       {submitting ? (
-        <p role="status" aria-live="polite">
+        <p className="sr-only" role="status" aria-live="polite">
           {AVERIAS_FONTANERO_OBSERVACION_LOADING}
         </p>
       ) : null}
-      <button
-        className="gallery-admin__button !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(30, 90, 156,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(30, 90, 156,0.35)] active:!translate-y-0 active:!scale-[0.97] disabled:!cursor-not-allowed disabled:!opacity-55 disabled:hover:!translate-y-0"
-        type="submit"
-        disabled={submitting}
-      >
-        {AVERIAS_FONTANERO_OBSERVACION_GUARDAR}
-      </button>
     </form>
   )
 }

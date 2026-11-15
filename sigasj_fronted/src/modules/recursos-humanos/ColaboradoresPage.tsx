@@ -46,7 +46,7 @@ const leerFiltros = (params: URLSearchParams): ColaboradoresFiltros => {
 }
 
 const inputClass =
-  'min-h-11 w-full rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3.5 text-[color:var(--asada-ink,#123f70)] outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[color:var(--asada-muted,#5b7390)] hover:border-[color:var(--asada-navy,#1e5a9c)] focus:border-[color:var(--asada-navy,#1e5a9c)] focus:ring-4 focus:ring-[color:color-mix(in_srgb,var(--asada-navy,#1e5a9c)_16%,transparent)]'
+  'h-10 min-h-10 w-full rounded-[10px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3 text-sm text-[color:var(--asada-ink,#123f70)] outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[color:var(--asada-muted,#5b7390)] hover:border-[color:var(--asada-navy,#1e5a9c)] focus:border-[color:var(--asada-navy,#1e5a9c)] focus:ring-[3px] focus:ring-[color:color-mix(in_srgb,var(--asada-navy,#1e5a9c)_16%,transparent)]'
 
 const labelClass =
   'text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[color:var(--asada-muted,#5b7390)]'
@@ -178,7 +178,11 @@ export default function ColaboradoresPage() {
         title="Colaboradores"
         description="Consulte y administre el personal de la ASADA."
         actions={
-          <Button to={COLABORADOR_NEW_PATH} leftIcon={<IconUserPlus size={18} aria-hidden="true" />}>
+          <Button
+            to={COLABORADOR_NEW_PATH}
+            size="sm"
+            leftIcon={<IconUserPlus size={16} aria-hidden="true" />}
+          >
             Registrar colaborador
           </Button>
         }
@@ -202,27 +206,27 @@ export default function ColaboradoresPage() {
       ) : null}
 
       <section
-        className="grid gap-3 rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] p-4 shadow-[0_10px_24px_rgba(18,63,112,0.06)] md:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+        className="grid gap-2.5 rounded-[14px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3.5 py-3 shadow-[0_4px_14px_rgba(30,90,156,0.05)] md:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
         aria-label="Búsqueda y filtros"
       >
-        <label className="grid min-w-0 gap-1.5 md:col-span-2 xl:col-span-1">
+        <label className="grid min-w-0 gap-1 md:col-span-2 xl:col-span-1">
           <span className={labelClass}>Buscar</span>
           <span className="relative block">
             <IconSearch
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--asada-muted,#5b7390)]"
-              size={18}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--asada-muted,#5b7390)]"
+              size={16}
               aria-hidden="true"
             />
             <input
               type="search"
-              className={`${inputClass} pl-10`}
+              className={`${inputClass} pl-9`}
               placeholder="Nombre, apellidos o cédula"
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
             />
           </span>
         </label>
-        <label className="grid min-w-0 gap-1.5">
+        <label className="grid min-w-0 gap-1">
           <span className={labelClass}>Cargo</span>
           <input
             className={inputClass}
@@ -237,7 +241,7 @@ export default function ColaboradoresPage() {
             ))}
           </datalist>
         </label>
-        <label className="grid min-w-0 gap-1.5">
+        <label className="grid min-w-0 gap-1">
           <span className={labelClass}>Estado</span>
           <select
             className={inputClass}
@@ -251,11 +255,11 @@ export default function ColaboradoresPage() {
         </label>
         <button
           type="button"
-          className="rrhh-touch-target inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-4 text-sm font-bold text-[color:var(--asada-muted,#5b7390)] transition-[border-color,color,background-color] duration-200 enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] enabled:hover:text-[color:var(--asada-navy,#1e5a9c)] disabled:cursor-not-allowed disabled:opacity-45 md:col-span-2 xl:col-span-1"
+          className="rrhh-touch-target inline-flex h-10 min-h-10 items-center justify-center gap-2 rounded-[10px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3 text-sm font-bold text-[color:var(--asada-muted,#5b7390)] transition-[border-color,color,background-color] duration-200 enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] enabled:hover:text-[color:var(--asada-navy,#1e5a9c)] disabled:cursor-not-allowed disabled:opacity-45 md:col-span-2 xl:col-span-1"
           onClick={limpiarFiltros}
           disabled={!hayFiltros && !busqueda && !cargo}
         >
-          <IconFilterOff size={17} aria-hidden="true" />
+          <IconFilterOff size={16} aria-hidden="true" />
           Limpiar
         </button>
       </section>

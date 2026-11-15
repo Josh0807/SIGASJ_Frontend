@@ -10,18 +10,18 @@
 
 .averias-admin .gallery-admin__header h1 {
   margin: 0;
-  color: #07376f;
-  font-size: clamp(1.875rem, 3vw, 2.25rem);
-  font-weight: 900;
-  line-height: 1.12;
+  color: var(--asada-ink, #123f70);
+  font-size: clamp(1.2rem, 2vw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.15;
   letter-spacing: -0.025em;
 }
 
 .averias-admin .gallery-admin__header > div:first-child > p:last-child {
   margin: 0;
-  color: #64748b;
-  font-size: 1.125rem;
-  line-height: 1.65;
+  color: var(--asada-muted, #5b7390);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 /* Nueva solicitud: columna de acciones estable, por encima de reglas heredadas. */
@@ -73,44 +73,44 @@
   }
 }
 
-/* Prioridad final: jerarquía de las vistas administrativas de averías. */
+/* Averías: misma escala que PageHeader / filtros del resto del panel. */
 .averias-admin .gallery-admin__header h1 {
   margin: 0 !important;
-  color: #07376f !important;
-  font-size: clamp(1.875rem, 3vw, 2.25rem) !important;
-  font-weight: 900 !important;
-  line-height: 1.12 !important;
+  color: var(--asada-ink, #123f70) !important;
+  font-size: clamp(1.2rem, 2vw, 1.35rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
   letter-spacing: -0.025em !important;
 }
 
 .averias-admin .gallery-admin__header > div:first-child > p:last-child {
   margin: 0 !important;
-  color: #64748b !important;
-  font-size: 1.125rem !important;
-  line-height: 1.65 !important;
+  color: var(--asada-muted, #5b7390) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.35 !important;
 }
 
 .averias-admin .gallery-admin__filters .gallery-admin__field > span {
-  color: #174f87 !important;
-  font-size: 0.78rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.045em !important;
+  color: var(--asada-ink, #123f70) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
 }
 
 .averias-admin .gallery-admin__filters :is(input, select) {
-  min-height: 56px !important;
-  padding-inline: 16px !important;
-  border-color: #bfdbfe !important;
-  border-radius: 16px !important;
+  min-height: 44px !important;
+  padding-inline: 12px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  border-radius: 10px !important;
   background-color: #fff !important;
-  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+  box-shadow: none !important;
 }
 
 .averias-admin .gallery-admin__filters :is(input, select):focus {
   outline: none !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13), 0 8px 20px rgba(30, 90, 156, 0.08) !important;
+  border-color: var(--asada-blue, #3e8fd6) !important;
+  box-shadow: 0 0 0 3px rgba(62, 143, 214, 0.16) !important;
 }
 
 .averias-summary-indicators .admin-dashboard__indicators-grid {
@@ -121,11 +121,11 @@
 .averias-summary-indicators .indicator-card {
   min-height: 0 !important;
   justify-content: flex-start !important;
-  padding: 22px !important;
-  border-color: #dbeafe !important;
-  border-radius: 20px !important;
-  background: linear-gradient(145deg, #ffffff, #f7fbff) !important;
-  box-shadow: 0 8px 22px rgba(30, 90, 156, 0.07) !important;
+  padding: 14px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  border-radius: 12px !important;
+  background: var(--asada-surface, #ffffff) !important;
+  box-shadow: none !important;
 }
 
 .averias-summary-indicators .indicator-card__body {
@@ -283,105 +283,123 @@
 }
 
 .admin-content-modern .gallery-admin__shell {
-  gap: 28px !important;
+  gap: 16px !important;
 }
 
 .admin-content-modern .gallery-admin__header {
-  padding: 28px 32px !important;
-  border-color: #d7e5f1 !important;
-  border-radius: 22px !important;
+  padding: 14px 18px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  border-radius: var(--asada-radius-sm, 14px) !important;
   background: var(--asada-surface, #ffffff) !important;
-  box-shadow: 0 10px 28px rgba(18, 63, 112, 0.07) !important;
+  box-shadow: var(--asada-shadow-soft, 0 4px 14px rgba(30, 90, 156, 0.05)) !important;
 }
 
 .admin-content-modern .gallery-admin__eyebrow {
-  color: #1e5a9c !important;
-  font-size: 0.78rem !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.1em !important;
+  color: var(--asada-navy, #1e5a9c) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
 }
 
 .admin-content-modern .gallery-admin__header h1 {
-  margin-block: 10px !important;
-  color: #123f70 !important;
-  font-size: clamp(1.55rem, 2.4vw, 2rem) !important;
-  font-weight: 750 !important;
+  margin-block: 2px 4px !important;
+  color: var(--asada-ink, #123f70) !important;
+  font-size: clamp(1.2rem, 2vw, 1.35rem) !important;
+  font-weight: 800 !important;
   letter-spacing: -0.025em !important;
 }
 
 .admin-content-modern .gallery-admin__header > div:first-child > p:last-child {
-  color: #5b7390 !important;
-  font-size: 1rem !important;
-  line-height: 1.55 !important;
+  color: var(--asada-muted, #5b7390) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.35 !important;
 }
 
 .admin-content-modern .gallery-admin__filters {
-  padding: 24px !important;
-  border-color: #d7e5f1 !important;
-  border-radius: 22px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-bottom: 0 !important;
+  padding: 14px 16px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  border-radius: var(--asada-radius-sm, 14px) !important;
   background: var(--asada-surface, #ffffff) !important;
-  box-shadow: 0 10px 28px rgba(18, 63, 112, 0.06) !important;
+  box-shadow: var(--asada-shadow-soft, 0 4px 14px rgba(30, 90, 156, 0.05)) !important;
 }
 
 .admin-content-modern .gallery-admin__filters::before {
-  content: "Buscar y filtrar registros";
-  grid-column: 1 / -1;
-  display: block;
-  margin-bottom: 4px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #d7e5f1;
-  color: #123f70;
-  font-size: 1.25rem;
-  font-weight: 750;
-  letter-spacing: -0.02em;
+  content: none !important;
+  display: none !important;
+}
+
+.admin-content-modern .gallery-admin__filters form[role="search"],
+.admin-content-modern .gallery-admin__filters .sigasj-filter-search,
+.admin-content-modern .gallery-admin__filters .admin-compact-filters {
+  display: contents !important;
 }
 
 .admin-content-modern .gallery-admin__filters .gallery-admin__field > span {
-  color: #1a2f42 !important;
-  font-size: 0.78rem !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.045em !important;
+  color: var(--asada-ink, #123f70) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
 }
 
 .admin-content-modern .gallery-admin__filters :is(input, select) {
-  min-height: 48px !important;
-  padding-inline: 14px !important;
-  border-color: #d7e5f1 !important;
-  border-radius: 14px !important;
-  background: #f7fbfe !important;
+  min-height: 40px !important;
+  height: 40px !important;
+  padding-block: 0 !important;
+  padding-inline: 12px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
   box-shadow: none !important;
+  box-sizing: border-box !important;
 }
 
 .admin-content-modern .gallery-admin__button--primary {
   border: 0 !important;
-  border-radius: 14px !important;
-  background: #1e5a9c !important;
+  border-radius: 10px !important;
+  background: var(--asada-navy, #1e5a9c) !important;
   color: #fff !important;
-  font-weight: 750 !important;
-  box-shadow: 0 8px 18px rgba(30, 90, 156, 0.22) !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
 }
 
 .admin-content-modern .admin-modern-home-link {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: 48px !important;
-  padding: 12px 20px !important;
-  border: 1px solid #d7e5f1 !important;
-  border-radius: 14px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  border: 1px solid var(--asada-border, #d7e5f1) !important;
+  border-radius: 10px !important;
   background: var(--asada-surface, #fff) !important;
-  color: #1e5a9c !important;
-  font-weight: 750 !important;
+  color: var(--asada-navy, #1e5a9c) !important;
+  font-weight: 700 !important;
   text-decoration: none !important;
-  box-shadow: 0 6px 16px rgba(18, 63, 112, 0.06) !important;
-  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease !important;
+  box-shadow: none !important;
+  transition: background 160ms ease, border-color 160ms ease !important;
 }
 
 .admin-content-modern .admin-modern-home-link:hover {
-  transform: translateY(-2px);
-  background: #eaf6ff !important;
-  box-shadow: 0 10px 22px rgba(18, 63, 112, 0.1) !important;
+  background: var(--asada-ice, #eaf6ff) !important;
+  border-color: var(--asada-mist, #bfe3fa) !important;
+}
+
+@media (max-width: 900px) {
+  .admin-content-modern .gallery-admin__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-content-modern .gallery-admin__filters {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
 }
 
 .admin-content-modern .gallery-admin__list {
@@ -555,45 +573,45 @@
   }
 }
 
-/* Jerarquía moderna de las vistas administrativas de averías. */
+/* Averías (override final): alinear con el resto del panel. */
 .averias-admin .gallery-admin__header h1 {
   margin: 0 !important;
-  color: #07376f !important;
-  font-size: clamp(1.875rem, 3vw, 2.25rem) !important;
-  font-weight: 900 !important;
-  line-height: 1.12 !important;
+  color: var(--asada-ink, #123f70) !important;
+  font-size: clamp(1.2rem, 2vw, 1.35rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
   letter-spacing: -0.025em !important;
 }
 
 .averias-admin .gallery-admin__header > div:first-child > p:last-child {
   margin: 0 !important;
-  color: #64748b !important;
-  font-size: 1.125rem !important;
-  line-height: 1.65 !important;
+  color: var(--asada-muted, #5b7390) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.35 !important;
 }
 
 .averias-admin .gallery-admin__filters .gallery-admin__field > span {
-  color: #174f87 !important;
-  font-size: 0.78rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.045em !important;
+  color: var(--asada-ink, #123f70) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
 }
 
 .averias-admin .gallery-admin__filters :is(input, select) {
-  min-height: 56px !important;
-  padding-inline: 16px !important;
-  border-color: #bfdbfe !important;
-  border-radius: 16px !important;
+  min-height: 44px !important;
+  padding-inline: 12px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  border-radius: 10px !important;
   background-color: #fff !important;
-  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.05) !important;
+  box-shadow: none !important;
   transition: border-color 160ms ease, box-shadow 160ms ease !important;
 }
 
 .averias-admin .gallery-admin__filters :is(input, select):focus {
   outline: none !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.13), 0 8px 20px rgba(30, 90, 156, 0.08) !important;
+  border-color: var(--asada-blue, #3e8fd6) !important;
+  box-shadow: 0 0 0 3px rgba(62, 143, 214, 0.16) !important;
 }
 
 /* Override definitivo de la composición solicitada. */
@@ -6052,7 +6070,7 @@ body,
   width: 40px;
   min-width: 40px;
   padding: 8px;
-  color: #1e5a9c;
+  color: var(--asada-navy, #1e5a9c);
 }
 
 .notificaciones-campana__badge {
@@ -6063,7 +6081,7 @@ body,
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  background: #1e5a9c;
+  background: var(--asada-danger, #b93638);
   color: #ffffff;
   font-size: .65rem;
   font-weight: 700;
@@ -6074,58 +6092,132 @@ body,
 .notificaciones-campana__panel {
   position: fixed;
   z-index: var(--z-index-toast);
-  width: min(22rem, calc(100vw - 2rem));
-  max-height: 20rem;
-  overflow: auto;
-  padding: 8px;
-  border: 1px solid #c7d9ea;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  width: min(23.75rem, calc(100vw - 2rem));
+  max-height: min(28rem, calc(100vh - 5rem));
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--asada-border, #d7e5f1);
+  border-radius: 16px;
   background: var(--asada-surface, #ffffff);
-  box-shadow: 0 8px 24px rgba(30, 90, 156, 0.12);
+  box-shadow: var(--asada-shadow, 0 10px 28px rgba(30, 90, 156, 0.08));
 }
 
 @media (min-width: 761px) {
   .notificaciones-campana__panel {
-    width: min(22rem, calc(100vw - var(--admin-sidebar-width) - 3rem));
+    width: min(23.75rem, calc(100vw - var(--admin-sidebar-width) - 3rem));
   }
+}
+
+.notificaciones-campana__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--asada-border, #d7e5f1);
+  background: linear-gradient(
+    180deg,
+    var(--asada-ice, #eaf6ff) 0%,
+    var(--asada-surface, #ffffff) 100%
+  );
+}
+
+.notificaciones-campana__head-title {
+  margin: 0;
+  color: var(--asada-ink, #123f70);
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.notificaciones-campana__head-sub {
+  margin: 2px 0 0;
+  color: var(--asada-muted, #5b7390);
+  font-size: .75rem;
+}
+
+.notificaciones-campana__head-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--asada-navy, #1e5a9c);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 800;
 }
 
 .notificaciones-campana__state {
   margin: 0;
-  padding: 12px;
-  color: #61788d;
+  padding: 16px;
+  color: var(--asada-muted, #5b7390);
   font-size: .84rem;
+  text-align: center;
 }
 
 .notificaciones-campana__state--error {
-  color: #9c2b2b;
+  color: var(--asada-danger, #b93638);
+}
+
+.notificaciones-campana__empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 20px 16px 24px;
+}
+
+.notificaciones-campana__empty-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--asada-ice, #eaf6ff);
+  color: var(--asada-navy, #1e5a9c);
+}
+
+.notificaciones-campana__empty .notificaciones-campana__state {
+  padding: 0;
 }
 
 .notificaciones-campana__list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 8px;
+  overflow: auto;
+  display: grid;
+  gap: 4px;
 }
 
 .notificaciones-campana__item {
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
 }
 
 .notificaciones-campana__item--unread {
-  background: #eef5fb;
+  background: var(--asada-ice, #eaf6ff);
+  border-color: color-mix(in srgb, var(--asada-mist, #bfe3fa) 70%, transparent);
 }
 
 .notificaciones-campana__link {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 11px;
   color: inherit;
   text-decoration: none;
+  border-radius: 12px;
+  transition: background 160ms ease;
 }
 
 .notificaciones-campana__link:hover {
-  background: #eef5fb;
+  background: color-mix(in srgb, var(--asada-ice, #eaf6ff) 80%, #fff);
 }
 
 .notificaciones-campana__link--static {
@@ -6139,15 +6231,92 @@ body,
   color: inherit;
 }
 
+.notificaciones-campana__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--asada-ice, #eaf6ff);
+  color: var(--asada-navy, #1e5a9c);
+}
+
+.notificaciones-campana__icon--warning {
+  background: #fff7ed;
+  color: var(--asada-warning, #b45309);
+}
+
+.notificaciones-campana__icon--danger {
+  background: #fef2f2;
+  color: var(--asada-danger, #b93638);
+}
+
+.notificaciones-campana__icon--success {
+  background: #ecfdf5;
+  color: var(--asada-success, #236c51);
+}
+
+.notificaciones-campana__icon--info,
+.notificaciones-campana__icon--neutral {
+  background: var(--asada-ice, #eaf6ff);
+  color: var(--asada-navy, #1e5a9c);
+}
+
+.notificaciones-campana__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.notificaciones-campana__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.notificaciones-campana__dot {
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--asada-navy, #1e5a9c);
+  flex-shrink: 0;
+}
+
 .notificaciones-campana__title {
-  color: #163a63;
+  color: var(--asada-ink, #123f70);
   font-size: .84rem;
   font-weight: 700;
+  line-height: 1.35;
+}
+
+.notificaciones-campana__item--unread .notificaciones-campana__title {
+  font-weight: 800;
 }
 
 .notificaciones-campana__message {
-  color: #61788d;
+  color: var(--asada-muted, #5b7390);
   font-size: .78rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notificaciones-campana__meta {
+  color: color-mix(in srgb, var(--asada-muted, #5b7390) 85%, #fff);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notificaciones-campana__link {
+    transition: none;
+  }
 }
 
 .admin-header__action-label--short {
@@ -15507,13 +15676,105 @@ button.actividad-historial-card__action:focus-visible {
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  word-spacing: 0.06em;
 }
 
 .averias-admin .gallery-admin__shell {
   width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+
+.averias-admin .gallery-admin__filters.averias-admin__filters,
+.averias-admin .averias-admin__filters {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-bottom: 0 !important;
+  padding: 10px 12px !important;
+  border: 1px solid var(--asada-border, #d7e5f1) !important;
+  border-radius: 12px !important;
+  background: var(--asada-surface, #ffffff) !important;
+  box-shadow: var(--asada-shadow-soft, 0 4px 14px rgba(30, 90, 156, 0.05)) !important;
+}
+
+.averias-admin .gallery-admin__filters.averias-admin__filters::before,
+.averias-admin .averias-admin__filters::before {
+  content: none !important;
+  display: none !important;
+}
+
+.averias-admin .averias-admin__filters form[role="search"],
+.averias-admin .averias-admin__filters .averias-admin__filters-form {
+  display: contents !important;
+}
+
+.averias-admin__field--search {
+  grid-column: 1 / -1 !important;
+}
+
+.averias-admin__filters-note,
+.averias-admin .averias-reporte__rango {
+  grid-column: 1 / -1 !important;
+  margin: 0;
+  color: var(--asada-muted, #5b7390);
+  font-size: 0.78rem;
+}
+
+.averias-admin .gallery-admin__filter-reset {
+  grid-column: 1 / -1 !important;
+  margin: 0 !important;
+}
+
+.averias-admin .gallery-admin__field {
+  gap: 4px !important;
+}
+
+.averias-admin .gallery-admin__filters :is(input, select) {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding-inline: 10px !important;
+  border-radius: 9px !important;
+}
+
+.averias-summary-indicators {
+  padding: 16px !important;
+  border: 1px solid var(--asada-border, #d7e5f1) !important;
+  border-radius: var(--asada-radius-sm, 14px) !important;
+  background: var(--asada-surface, #ffffff) !important;
+  box-shadow: var(--asada-shadow-soft, 0 4px 14px rgba(30, 90, 156, 0.05)) !important;
+}
+
+.averias-summary-indicators__head {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--asada-border, #d7e5f1);
+}
+
+.averias-summary-indicators__head h2 {
+  margin: 0;
+  color: var(--asada-ink, #123f70);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.averias-summary-indicators__head p {
+  margin: 4px 0 0;
+  color: var(--asada-muted, #5b7390);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .averias-admin .gallery-admin__filters.averias-admin__filters,
+  .averias-admin .averias-admin__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .averias-admin .gallery-admin__filters.averias-admin__filters,
+  .averias-admin .averias-admin__filters {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
 }
 
 .averias-admin .gallery-admin__field input:focus-visible,
@@ -15557,7 +15818,7 @@ button.actividad-historial-card__action:focus-visible {
 }
 
 .averias-admin__table--listado tbody tr + tr td {
-  padding-top: 16px;
+  padding-top: 8px;
 }
 
 .averias-admin__fila {
@@ -15568,14 +15829,14 @@ button.actividad-historial-card__action:focus-visible {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px 20px;
+  gap: 8px 14px;
   overflow: hidden;
-  padding: 18px 22px 18px 26px;
-  border: 1px solid #e0f0fb;
-  border-radius: 22px;
+  padding: 12px 14px 12px 16px;
+  border: 1px solid var(--asada-border, #d7e5f1);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 10px 28px rgba(15, 63, 110, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: var(--asada-shadow-soft, 0 4px 14px rgba(30, 90, 156, 0.05));
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .averias-admin__fila::before {
@@ -16082,6 +16343,84 @@ button.actividad-historial-card__action:focus-visible {
   box-shadow: 0 6px 16px rgba(190, 18, 60, 0.16);
 }
 
+/* Listado admin: pill de estado plano (punto + texto) y prioridad con contorno. */
+.averias-admin__badge--flat {
+  min-height: 30px;
+  padding: 4px 12px;
+  background: var(--averias-badge-bg, #f8fafc);
+  box-shadow: none;
+}
+
+.averias-admin__badge--flat::before {
+  box-shadow: none;
+}
+
+.averias-admin__badge--flat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.averias-admin__badge--estado.is-recibida.averias-admin__badge--flat,
+.averias-admin__badge--estado.is-en-atencion.averias-admin__badge--flat {
+  background: #eff6ff;
+}
+
+.averias-admin__badge--estado.is-en-revision.averias-admin__badge--flat {
+  background: #f5f3ff;
+}
+
+.averias-admin__badge--estado.is-asignada.averias-admin__badge--flat {
+  background: #ecfeff;
+}
+
+.averias-admin__badge--estado.is-pendiente.averias-admin__badge--flat {
+  background: #fffbeb;
+}
+
+.averias-admin__badge--estado.is-resuelta.averias-admin__badge--flat {
+  background: #ecfdf5;
+}
+
+.averias-admin__badge--estado.is-cancelada.averias-admin__badge--flat {
+  background: #fff1f2;
+}
+
+.averias-admin__prioridad-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.averias-admin__prioridad-pill.is-baja {
+  border-color: #7dd3fc;
+  color: #0369a1;
+}
+
+.averias-admin__prioridad-pill.is-media {
+  border-color: #fcd34d;
+  color: #a16207;
+}
+
+.averias-admin__prioridad-pill.is-alta {
+  border-color: #fdba74;
+  color: #c2410c;
+}
+
+.averias-admin__prioridad-pill.is-urgente {
+  border-color: #fda4af;
+  color: #be123c;
+}
+
 .averias-admin__cards {
   display: none;
   margin: 0;
@@ -16157,52 +16496,128 @@ button.actividad-historial-card__action:focus-visible {
 
 .averias-admin__detail {
   display: grid;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
 }
 
 .averias-admin__detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 12px;
+  align-items: stretch;
 }
 
 .averias-admin__section {
   min-width: 0;
-  padding: 22px 24px;
-  border: 1px solid #d7e5f1;
-  border-radius: 16px;
-  background: var(--asada-surface, #ffffff);
-  box-shadow: 0 8px 24px rgba(18, 63, 112, 0.05);
+  padding: 18px 20px;
+  border: 1px solid rgba(191, 227, 250, 0.9);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 12px 28px rgba(30, 90, 156, 0.08);
 }
 
 .averias-admin__section h2 {
-  margin: 0 0 16px;
-  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #e6eef6;
   color: #123f70;
-  font-size: 1.08rem;
+  font-size: 1.02rem;
+  font-weight: 800;
   word-spacing: 0.06em;
+}
+
+.averias-admin__section h2 svg {
+  flex: none;
+  color: #1e5a9c;
+}
+
+.averias-admin__field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.averias-admin__field-icon {
+  display: inline-flex;
+  color: #4f8bb8;
+}
+
+.averias-admin__empty-note--banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 14px 16px;
+  border: 1px solid #d7e8f5;
+  border-radius: 12px;
+  background: #eef7fd;
+  color: #3d5f7a;
+  text-align: center;
+}
+
+.averias-admin__empty-note--banner svg {
+  flex: none;
+  color: #1e5a9c;
+}
+
+.averias-admin__estado-panel--row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.averias-admin__estado-panel--row .averias-admin__estado-panel-copy {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.averias-admin__estado-panel--row .averias-admin__estado-label {
+  margin: 0;
+}
+
+.averias-admin__estado-panel--row .averias-admin__hint,
+.averias-admin__estado-panel--row .averias-admin__horario-hint {
+  margin: 0;
+  max-width: 28rem;
+  text-align: right;
+}
+
+.averias-admin__hint--footer {
+  margin: 0;
 }
 
 .averias-admin__fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 16px;
   margin: 0;
 }
 
 .averias-admin__fields--ubicacion {
-  grid-template-columns: minmax(9rem, 0.4fr) minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.averias-admin__fields--ubicacion > .averias-admin__field.is-multiline {
+  grid-column: 1 / -1;
 }
 
 .averias-admin__empty-note {
   margin: 0;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
   background: #f4f8fb;
   color: #5d7388;
-  line-height: 1.45;
+  font-size: 0.92rem;
+  line-height: 1.4;
 }
 
 .averias-admin__field.is-multiline {
@@ -16416,12 +16831,13 @@ button.actividad-historial-card__action:focus-visible {
 
 @media (max-width: 1199px) {
   .averias-admin .gallery-admin__filters,
-  .averias-admin .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .averias-admin .gallery-admin__filters:has(.gallery-admin__field:nth-child(3)),
+  .averias-admin .gallery-admin__filters.averias-admin__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   .averias-admin .gallery-admin__filters form[role="search"] {
-    grid-column: 1 / -1;
+    display: contents !important;
   }
 
   .averias-admin__detail-grid {
@@ -16761,16 +17177,20 @@ button.actividad-historial-card__action:focus-visible {
 }
 
 .averias-admin__detail .averias-admin__section {
-  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 14px 16px;
 }
 
 .averias-admin__detail .averias-admin__section h2 {
-  margin-bottom: 14px;
-  font-size: 1.18rem;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  font-size: 1rem;
 }
 
 .averias-admin__detail .averias-admin__fields {
-  gap: 14px 22px;
+  gap: 10px 16px;
 }
 
 .averias-admin__detail .averias-admin__section--ficha {
@@ -16780,22 +17200,38 @@ button.actividad-historial-card__action:focus-visible {
 
 .averias-admin__detail .averias-admin__ficha-filas {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   flex: 1;
-  grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: minmax(52px, 1fr);
-  gap: 0;
+  align-content: start;
 }
 
 .averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field {
   display: grid;
-  grid-template-columns: minmax(9rem, 0.8fr) minmax(0, 1.4fr);
-  align-items: center;
-  gap: 16px;
-  padding: 10px 4px;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field:hover {
+  transform: translateY(-2px);
+  border-color: #bfe3fa;
+  box-shadow: 0 8px 20px rgba(30, 90, 156, 0.08);
 }
 
 .averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field + .averias-admin__field {
-  border-top: 1px solid #edf3f8;
+  border-top: 1px solid #e6eef6;
+}
+
+.averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field.is-multiline {
+  grid-column: 1 / -1;
 }
 
 .averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field dd {
@@ -16803,57 +17239,163 @@ button.actividad-historial-card__action:focus-visible {
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 520px) {
-  .averias-admin__detail .averias-admin__ficha-filas > .averias-admin__field {
+.averias-admin__detail .averias-admin__ficha-correo {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .averias-admin__detail .averias-admin__ficha-filas {
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+  }
+
+  .averias-admin__detail .averias-admin__ficha-correo {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
 
 .averias-admin__detail .averias-admin__field dt {
   color: #2a6a96;
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
 .averias-admin__detail .averias-admin__field dd {
-  margin-top: 4px;
+  margin-top: 2px;
   color: #1b3550;
-  font-size: 1.02rem;
-  font-weight: 500;
-  line-height: 1.45;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.4;
 }
 
 .averias-admin__detail .averias-admin__hint,
 .averias-admin__detail .averias-admin__horario-hint,
 .averias-admin__detail .averias-admin__muted,
 .averias-admin__detail .averias-admin__empty-note {
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.88rem;
+  line-height: 1.4;
 }
 
 .averias-admin__detail .averias-admin__estado-label {
   color: #2a6a96;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
+.averias-admin__detail .averias-admin__estado-panel {
+  margin-bottom: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f3f6f9;
+  border: 1px solid #e4ebf2;
+}
+
 .averias-admin__detail .averias-admin__estado-panel .averias-admin__badge {
-  min-height: 28px;
-  padding: 4px 12px;
-  font-size: 0.86rem;
+  min-height: 26px;
+  padding: 3px 10px;
+  font-size: 0.82rem;
+}
+
+.averias-admin__detail .averias-admin__gestion--compact {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+  align-content: start;
 }
 
 .averias-admin__detail .averias-admin__gestion-bloque {
-  gap: 10px;
-  margin-top: 14px;
-  padding-top: 12px;
+  gap: 6px;
+  margin-top: 0;
+  padding-top: 8px;
+  border-top: 1px solid #e6eef6;
 }
 
 .averias-admin__detail .averias-admin__gestion-caption {
+  margin: 0 0 4px;
   color: #123f70;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.averias-admin__detail .averias-admin__gestion-readonly {
+  gap: 8px 14px;
+}
+
+.averias-admin__detail .averias-admin__section--ubicacion {
+  border-color: #d7e5f1;
+  background: var(--asada-surface, #ffffff);
+}
+
+.averias-admin__detail .averias-admin__section--ubicacion .averias-admin__fields--ubicacion {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  align-content: stretch;
+}
+
+.averias-admin__detail .averias-admin__section--ubicacion .averias-admin__field.is-multiline {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.averias-admin__detail .averias-admin__section--ubicacion .averias-admin__field.is-multiline dd {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.averias-admin__detail .averias-admin__descripcion-destacada {
+  display: block;
+  flex: 1;
+  margin-top: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #eaf6ff;
+  color: #123f70;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.averias-admin__detail .averias-admin__section--asignacion .averias-admin-asignacion {
+  flex: 1;
+  align-content: start;
+}
+
+.averias-admin__detail .averias-admin__section--observaciones {
+  height: auto;
+}
+
+.averias-admin__detail .averias-admin__section--observaciones.is-empty {
+  align-self: stretch;
+}
+
+.averias-admin__detail .averias-admin__section--observaciones.is-empty .averias-admin__empty-note {
+  margin-top: 0;
+}
+
+.averias-admin.gallery-admin > .gallery-admin__shell {
+  padding-inline: clamp(1rem, 2.4vw, 2rem);
+  padding-block: 1.25rem 1.75rem;
+}
+
+.averias-admin.gallery-admin > .gallery-admin__shell.sigasj-stack {
+  gap: 16px;
+}
+
+.averias-admin .gallery-admin__header {
+  margin-bottom: 0;
+  padding: 18px 20px;
+  border: 1px solid #d7e5f1;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(18, 63, 112, 0.05);
 }
 
 .averias-fontanero .gallery-admin__header .gallery-admin__eyebrow {

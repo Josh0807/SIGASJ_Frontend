@@ -22,9 +22,9 @@ const AuthorizedRoute = ({
   const location = useLocation()
   const { isAuthenticated, isLoading, user } = useAuth()
 
-  // La ruta privada exterior suele cubrir este estado, pero mantenerlo aquÃ­
-  // hace que el guard tambiÃ©n sea seguro y reutilizable por sÃ­ solo.
-  if (isLoading) {
+  // Misma política optimista que ProtectedRoute: con sesión local ya presente
+  // se renderiza mientras se valida contra el backend.
+  if (isLoading && !isAuthenticated) {
     return null
   }
 

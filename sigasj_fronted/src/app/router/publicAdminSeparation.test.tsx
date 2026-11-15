@@ -98,8 +98,8 @@ describe('separación entre interfaz pública y administrativa', () => {
     try {
       expect(app.currentPath()).toBe('/')
       expect(app.container.innerHTML).toContain('hero')
-      expect(app.container.innerHTML).toContain('class="header"')
-      expect(app.container.innerHTML).toContain('header__inner')
+      expect(app.container.innerHTML).toContain('public-header')
+      expect(app.container.innerHTML).toContain('public-container')
       expect(hasAdminChrome(app.container.innerHTML)).toBe(false)
       expect(app.errors).toEqual([])
       expect(app.warnings).toEqual([])

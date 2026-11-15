@@ -15,7 +15,7 @@ import {
   type KeyboardEvent,
 } from 'react'
 import { createPortal } from 'react-dom'
-import { feriadosDelAnio } from './feriadosCostaRica'
+import { esFeriadoCostaRica, feriadosDelAnio } from './feriadosCostaRica'
 
 const PANEL_WIDTH = 344
 const PANEL_GAP = 8
@@ -30,6 +30,14 @@ type Props = {
   required?: boolean
   min?: string
   max?: string
+  /** Si true, los feriados no se pueden seleccionar (p. ej. disfrute). */
+  bloquearFeriados?: boolean
+  /** Texto de ayuda bajo el campo (leyenda de feriados / ajustes). */
+  hint?: string
+  /** Estilo más compacto para formularios densos. */
+  compacto?: boolean
+  /** No renderiza error/hint/feriado debajo (el padre los muestra). */
+  sinMensajes?: boolean
 }
 
 const DIAS_SEMANA = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do']
@@ -87,6 +95,10 @@ export default function FechaFeriadoPicker({
   required,
   min,
   max,
+  bloquearFeriados = false,
+  hint,
+  compacto = false,
+  sinMensajes = false,
 }: Props) {
   const panelId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
@@ -106,12 +118,12 @@ export default function FechaFeriadoPicker({
 
   useEffect(() => {
     if (!abierto) return
-    const p = parseIso(value)
+    const p = parseIso(value) ?? parseIso(min ?? '') ?? parseIso(hoyIso())
     if (p) {
       setVistaY(p.y)
       setVistaM(p.m)
     }
-  }, [abierto, value])
+  }, [abierto, value, min])
 
   const posicionarPanel = () => {
     const trigger = triggerRef.current
@@ -228,7 +240,24 @@ export default function FechaFeriadoPicker({
     return items
   }, [vistaY, vistaM, mapaFeriados])
 
+  const vistaClave = vistaY * 100 + vistaM
+  const minClave = min
+    ? (() => {
+        const p = parseIso(min)
+        return p ? p.y * 100 + p.m : null
+      })()
+    : null
+  const maxClave = max
+    ? (() => {
+        const p = parseIso(max)
+        return p ? p.y * 100 + p.m : null
+      })()
+    : null
+  const puedeMesAnterior = minClave == null || vistaClave > minClave
+  const puedeMesSiguiente = maxClave == null || vistaClave < maxClave
+
   const mesAnterior = () => {
+    if (!puedeMesAnterior) return
     if (vistaM === 1) {
       setVistaM(12)
       setVistaY((y) => y - 1)
@@ -236,6 +265,7 @@ export default function FechaFeriadoPicker({
   }
 
   const mesSiguiente = () => {
+    if (!puedeMesSiguiente) return
     if (vistaM === 12) {
       setVistaM(1)
       setVistaY((y) => y + 1)
@@ -245,6 +275,7 @@ export default function FechaFeriadoPicker({
   const seleccionar = (iso: string, fueraMes: boolean) => {
     if (min && iso < min) return
     if (max && iso > max) return
+    if (bloquearFeriados && esFeriadoCostaRica(iso)) return
     onChange(iso)
     setAbierto(false)
     if (fueraMes) {
@@ -269,48 +300,74 @@ export default function FechaFeriadoPicker({
     hoverFeriado ||
     (value && mapaFeriados.get(value) ? mapaFeriados.get(value)! : null)
 
+  const feriadoSeleccionado = value
+    ? (mapaFeriados.get(value) ??
+      (esFeriadoCostaRica(value)
+        ? feriadosDelAnio(Number(value.slice(0, 4))).find((f) => f.fecha === value)
+            ?.nombre ?? 'Feriado nacional'
+        : null))
+    : null
+
   return (
-    <div className="relative grid min-w-0 gap-2.5" ref={rootRef}>
-      <span className="text-sm font-bold text-[#163f6b]">
+    <div className={`relative grid min-w-0 ${compacto ? 'gap-1.5' : 'gap-2.5'}`} ref={rootRef}>
+      <span className={compacto ? 'text-[0.78rem] font-bold text-sigasj-ink' : 'text-sm font-bold text-[#163f6b]'}>
         {label} {required ? <span className="text-red-600">*</span> : null}
       </span>
+      {/* Compatible con tests / autofill: el picker visual es el control principal. */}
+      <input
+        type="date"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        value={value}
+        min={min}
+        max={max}
+        onChange={(event) => {
+          const iso = event.target.value
+          if (!iso) {
+            onChange('')
+            return
+          }
+          if (min && iso < min) return
+          if (max && iso > max) return
+          if (bloquearFeriados && esFeriadoCostaRica(iso)) return
+          onChange(iso)
+        }}
+      />
       <button
         ref={triggerRef}
         type="button"
-        className={`group flex min-h-14 w-full items-center gap-3 rounded-xl border bg-white px-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:px-5 ${
+        className={`group flex w-full items-center gap-2.5 rounded-xl border bg-white text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+          compacto ? 'min-h-11 px-3.5' : 'min-h-14 px-4 sm:px-5'
+        } ${
           error
             ? 'border-red-400'
             : abierto
-              ? 'border-blue-500 ring-2 ring-blue-100'
-              : 'border-slate-200 hover:border-blue-300'
+              ? 'border-sigasj-primary ring-2 ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
+              : 'border-sigasj-border hover:border-sigasj-primary/45'
         }`}
         aria-haspopup="dialog"
         aria-expanded={abierto}
         aria-controls={panelId}
         aria-invalid={Boolean(error)}
+        aria-label={label}
         onClick={() => setAbierto((v) => !v)}
         onKeyDown={onTriggerKey}
       >
+        <IconCalendarEvent
+          className={`shrink-0 ${error ? 'text-sigasj-error' : 'text-sigasj-muted'}`}
+          size={18}
+          aria-hidden="true"
+        />
         <span
-          className={`grid size-9 shrink-0 place-items-center rounded-full transition ${
-            error
-              ? 'bg-red-50 text-red-500'
-              : abierto
-                ? 'bg-[#062e63] text-white'
-                : 'bg-sky-50 text-blue-700 group-hover:bg-sky-100'
-          }`}
-        >
-          <IconCalendarEvent size={18} aria-hidden="true" />
-        </span>
-        <span
-          className={`min-w-0 flex-1 py-3 font-semibold tracking-wide ${
-            visible ? 'text-slate-800' : 'text-slate-400'
-          }`}
+          className={`min-w-0 flex-1 truncate font-semibold tracking-wide ${
+            compacto ? 'py-2.5 text-[0.95rem]' : 'py-3'
+          } ${visible ? 'text-sigasj-ink' : 'text-sigasj-muted'}`}
         >
           {visible || 'dd / mm / aaaa'}
         </span>
-        {value && mapaFeriados.get(value) ? (
-          <span className="hidden shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-wide text-amber-900 sm:inline-flex">
+        {feriadoSeleccionado ? (
+          <span className="shrink-0 rounded-md bg-amber-100 px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wide text-amber-900">
             Feriado
           </span>
         ) : null}
@@ -336,8 +393,9 @@ export default function FechaFeriadoPicker({
               <header className="flex items-center justify-between gap-2 bg-[#062e63] px-4 py-3.5 text-white">
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-full border-0 bg-white/10 text-white transition hover:bg-white/20"
+              className="inline-flex size-8 items-center justify-center rounded-full border-0 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-35"
               aria-label="Mes anterior"
+              disabled={!puedeMesAnterior}
               onClick={mesAnterior}
             >
               <IconChevronLeft size={18} aria-hidden="true" />
@@ -352,8 +410,9 @@ export default function FechaFeriadoPicker({
             </div>
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-full border-0 bg-white/10 text-white transition hover:bg-white/20"
+              className="inline-flex size-8 items-center justify-center rounded-full border-0 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-35"
               aria-label="Mes siguiente"
+              disabled={!puedeMesSiguiente}
               onClick={mesSiguiente}
             >
               <IconChevronRight size={18} aria-hidden="true" />
@@ -377,15 +436,19 @@ export default function FechaFeriadoPicker({
                   (min != null && celda.iso < min) ||
                   (max != null && celda.iso > max)
                 const esFeriado = Boolean(celda.feriado) && !celda.fueraMes
+                const feriadoBloqueado = esFeriado && bloquearFeriados
+                const deshabilitado = fueraRango || feriadoBloqueado
 
                 return (
                   <button
                     key={celda.iso + String(celda.fueraMes)}
                     type="button"
-                    disabled={fueraRango}
+                    disabled={deshabilitado}
                     title={
                       celda.feriado
-                        ? `Feriado: ${celda.feriado}`
+                        ? feriadoBloqueado
+                          ? `Feriado: ${celda.feriado} (no válido para disfrute; use Ajuste si laboró)`
+                          : `Feriado: ${celda.feriado}`
                         : formatearVisible(celda.iso)
                     }
                     aria-label={
@@ -410,21 +473,24 @@ export default function FechaFeriadoPicker({
                     className={[
                       'mx-auto flex size-9 items-center justify-center rounded-full border-0 text-[0.8125rem] font-semibold transition duration-150',
                       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500',
-                      fueraRango ? 'cursor-not-allowed opacity-30' : '',
+                      deshabilitado ? 'cursor-not-allowed opacity-35' : '',
                       celda.fueraMes && !seleccionado
                         ? 'bg-transparent text-slate-300'
                         : '',
                       !celda.fueraMes &&
                       !seleccionado &&
                       !esFeriado &&
-                      !fueraRango
+                      !deshabilitado
                         ? 'bg-transparent text-slate-700 hover:bg-white hover:text-[#062e63] hover:shadow-sm'
                         : '',
                       esHoy && !seleccionado && !esFeriado
                         ? 'bg-white text-blue-700 shadow-sm ring-1 ring-blue-200'
                         : '',
-                      esFeriado && !seleccionado && !fueraRango
+                      esFeriado && !seleccionado && !deshabilitado
                         ? 'bg-amber-400 text-amber-950 shadow-[0_4px_10px_rgba(245,158,11,0.35)] hover:bg-amber-300'
+                        : '',
+                      esFeriado && feriadoBloqueado
+                        ? 'bg-amber-100 text-amber-800 line-through decoration-amber-700/50'
                         : '',
                       seleccionado && !esFeriado
                         ? 'bg-[#062e63] text-white shadow-[0_6px_14px_rgba(6,46,99,0.35)]'
@@ -457,12 +523,26 @@ export default function FechaFeriadoPicker({
                 </p>
               ) : feriadosDelMes.length > 0 ? (
                 <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
-                  {feriadosDelMes.map((f) => (
+                  {feriadosDelMes.map((f) => {
+                    const fueraRangoChip =
+                      (min != null && f.fecha < min) ||
+                      (max != null && f.fecha > max)
+                    const chipBloqueado = bloquearFeriados || fueraRangoChip
+                    return (
                     <li key={f.fecha}>
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1.5 rounded-full border-0 bg-amber-50 px-2.5 py-1 text-[0.7rem] font-bold text-amber-950 transition hover:bg-amber-100"
-                        title={f.nombre}
+                        disabled={chipBloqueado}
+                        className={`inline-flex items-center gap-1.5 rounded-full border-0 bg-amber-50 px-2.5 py-1 text-[0.7rem] font-bold text-amber-950 transition hover:bg-amber-100 ${
+                          chipBloqueado ? 'cursor-not-allowed opacity-50' : ''
+                        }`}
+                        title={
+                          bloquearFeriados
+                            ? `${f.nombre} (no válido para disfrute)`
+                            : fueraRangoChip
+                              ? `${f.nombre} (fuera de rango)`
+                              : f.nombre
+                        }
                         onClick={() => seleccionar(f.fecha, false)}
                       >
                         <span className="grid size-5 place-items-center rounded-full bg-amber-400 text-[0.65rem] font-black text-amber-950">
@@ -471,7 +551,8 @@ export default function FechaFeriadoPicker({
                         <span className="max-w-[9rem] truncate">{f.nombre}</span>
                       </button>
                     </li>
-                  ))}
+                    )
+                  })}
                 </ul>
               ) : (
                 <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.7rem] font-medium text-slate-500">
@@ -483,9 +564,22 @@ export default function FechaFeriadoPicker({
                     <span className="size-2.5 rounded-full bg-white ring-1 ring-blue-300" />
                     Hoy
                   </span>
-                  <span className="text-slate-400">Sin feriados este mes</span>
+                  {bloquearFeriados ? (
+                    <span className="text-amber-800">
+                      Feriados bloqueados para disfrute
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">Sin feriados este mes</span>
+                  )}
                 </p>
               )}
+              {bloquearFeriados ? (
+                <p className="mb-0 mt-2 text-[0.68rem] font-semibold leading-4 text-slate-500">
+                  Si el colaborador laboró en feriado, regístrelo como{' '}
+                  <span className="text-[#062e63]">Ajuste (+)</span> — eso suma al
+                  saldo (ajuste neto).
+                </p>
+              ) : null}
             </div>
           </div>
             </div>,
@@ -493,10 +587,17 @@ export default function FechaFeriadoPicker({
           )
         : null}
 
-      {error ? (
+      {sinMensajes ? null : error ? (
         <small className="font-semibold text-red-600" role="alert">
           {error}
         </small>
+      ) : feriadoSeleccionado && !bloquearFeriados ? (
+        <small className="font-semibold text-amber-800">
+          Feriado: {feriadoSeleccionado}. Si laboró ese día, use Ajuste (+) como
+          ajuste neto.
+        </small>
+      ) : hint ? (
+        <small className="font-semibold text-sigasj-muted">{hint}</small>
       ) : null}
     </div>
   )

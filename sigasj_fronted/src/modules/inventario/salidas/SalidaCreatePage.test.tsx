@@ -34,7 +34,7 @@ describe('integración del formulario de salida', () => {
   it('consulta activos con stock, verifica disponibilidad y registra una sola salida con la avería', async () => {
     const response = { movimiento: { id: 45, tipo: 'SALIDA', cantidad: 4, idMaterial: 4, idUsuario: 3, idAveria: 42, idSolicitud: null, observacion: 'Reparación', fechaMovimiento: '2026-09-11' }, stockAnterior: 8, stockActual: 4, diferencia: -4, agotadoTotal: false, bajoStockMinimo: false, mensaje: 'Salida física registrada exitosamente.' }
     const fetchMock = vi.fn((url: string, options?: RequestInit) => {
-      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok({ ...availability, disponible: false }))
+      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok(availability))
       if (String(url).endsWith('/inventario/salidas') && options?.method === 'POST') return new Promise<Response>((resolve) => window.setTimeout(() => resolve(ok(response, 201)), 20))
       return Promise.resolve(ok(catalog))
     })
@@ -85,9 +85,11 @@ describe('integración del formulario de salida', () => {
     await view.cleanup()
   })
 
-  it('impide una salida que deje el material por debajo del stock mínimo', async () => {
-    const fetchMock = vi.fn((url: string) => {
-      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok({ ...availability, cantidadSolicitada: 7, stockResultante: 1, mensaje: 'Salida autorizada.' }))
+  it('advierte cuando la salida deja el material bajo el mínimo y permite confirmarla', async () => {
+    const response = { movimiento: { id: 46, tipo: 'SALIDA', cantidad: 7, idMaterial: 4, idUsuario: 3, idAveria: null, idSolicitud: null, observacion: null, fechaMovimiento: '2026-09-11' }, stockAnterior: 8, stockActual: 1, diferencia: -7, agotadoTotal: false, bajoStockMinimo: true, mensaje: 'Salida registrada. El material quedó bajo el mínimo.' }
+    const fetchMock = vi.fn((url: string, options?: RequestInit) => {
+      if (String(url).includes('/disponibilidad')) return Promise.resolve(ok({ ...availability, cantidadSolicitada: 7, stockResultante: 1, esBajoMinimo: true, mensaje: 'Quedará 1 unidad, por debajo del mínimo (2).' }))
+      if (String(url).endsWith('/inventario/salidas') && options?.method === 'POST') return Promise.resolve(ok(response, 201))
       return Promise.resolve(ok(catalog))
     })
     vi.stubGlobal('fetch', fetchMock)
@@ -95,12 +97,12 @@ describe('integración del formulario de salida', () => {
     const select = view.container.querySelector('select') as HTMLSelectElement
     const quantity = view.container.querySelector('input[type="number"]') as HTMLInputElement
     await act(async () => { setValue(select, '4'); setValue(quantity, '7'); await waitForPrecheck() })
-    expect(view.container.textContent).toContain('Puede retirar como máximo 6')
+    expect(view.container.textContent).toContain('El material quedará bajo el mínimo')
+    expect(view.container.textContent).toContain('Quedará 1 unidad, por debajo del mínimo (2).')
     const submit = view.container.querySelector('button[type="submit"]') as HTMLButtonElement
     expect(submit.disabled).toBe(false)
-    await act(async () => submit.click())
-    expect(view.container.textContent).toContain('No se pudo registrar la salida')
-    expect(fetchMock.mock.calls.some(([, options]) => (options as RequestInit | undefined)?.method === 'POST')).toBe(false)
+    await act(async () => { submit.click(); await new Promise((resolve) => window.setTimeout(resolve, 30)) })
+    expect(fetchMock.mock.calls.filter(([, options]) => (options as RequestInit | undefined)?.method === 'POST')).toHaveLength(1)
     await view.cleanup()
   })
 })

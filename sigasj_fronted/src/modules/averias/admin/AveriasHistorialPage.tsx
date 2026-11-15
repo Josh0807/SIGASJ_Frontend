@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { IconArrowLeft } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
+import { Button } from '../../../shared/ui/Button'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import { useAdminAveriasHistorial } from '../hooks/useAdminAveriasHistorial'
 import { getAdminAveriaFontaneros } from '../services/averiasAdminApi'
 import AveriasAdminPagination from './AveriasAdminPagination'
@@ -265,22 +267,21 @@ const AveriasHistorialPage = ({
 
   return (
     <main className="gallery-admin averias-admin w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-          <div className="space-y-3">
-            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Panel administrativo</p>
-            <h1>Historial de averías</h1>
-            <p>
-              Consulte averías actuales y resueltas. Esta vista no modifica los casos.
-            </p>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__button group !inline-flex !items-center !gap-2.5 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_12px_26px_rgba(30, 90, 156,0.2)] active:!translate-y-0 active:!scale-[0.96] motion-reduce:!transform-none motion-reduce:!transition-none" to={AVERIAS_ADMIN_PATH}>
-              <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
+      <div className="gallery-admin__shell sigasj-stack gap-4">
+        <PageHeader
+          title="Historial de averías"
+          description="Consulte averías actuales y resueltas. Esta vista no modifica los casos."
+          actions={
+            <Button
+              to={AVERIAS_ADMIN_PATH}
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+            >
               Volver a gestión
-            </Link>
-          </div>
-        </header>
+            </Button>
+          }
+        />
 
         <AveriasHistorialFilters
           codigoSeguimiento={codigoInput}

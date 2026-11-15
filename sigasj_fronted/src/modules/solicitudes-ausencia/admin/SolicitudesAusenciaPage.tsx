@@ -1,7 +1,22 @@
-import { IconEye, IconRefresh } from '@tabler/icons-react'
+import {
+  IconBeach,
+  IconCalendarEvent,
+  IconChevronLeft,
+  IconChevronRight,
+  IconEye,
+  IconFilterOff,
+  IconRefresh,
+  IconUser,
+} from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
+import { Alert } from '../../../shared/ui/Alert'
+import { Badge } from '../../../shared/ui/Badge'
+import { Button } from '../../../shared/ui/Button'
+import { Card } from '../../../shared/ui/Card'
+import { EmptyState } from '../../../shared/ui/EmptyState'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import { useAuth } from '../../auth/components/AuthContext'
 import {
   esNoAutenticado,
@@ -9,7 +24,6 @@ import {
   nombreCompleto,
 } from '../../recursos-humanos/colaboradorForm'
 import { formatearFechaPermiso } from '../../recursos-humanos/permisoForm'
-import { RRHH_TITLE } from '../../recursos-humanos/recursosHumanosPaths'
 import RrhhSubnav from '../../recursos-humanos/RrhhSubnav'
 import {
   estadoSolicitudAusenciaClassName,
@@ -23,8 +37,6 @@ import type {
   SolicitudAusencia,
   TipoSolicitudAusencia,
 } from '../types'
-const accionListadoClassName =
-  'group inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 no-underline shadow-[0_5px_14px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-500 hover:from-blue-600 hover:to-sky-500 hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(37,99,235,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none'
 
 type Carga = {
   clave: string
@@ -34,6 +46,13 @@ type Carga = {
   error: string | null
   reintentable: boolean
 }
+
+const labelClass = 'text-[0.72rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted'
+const selectClass =
+  'min-h-11 w-full min-w-[10rem] rounded-xl border border-sigasj-border bg-white px-3.5 text-[0.95rem] font-semibold text-sigasj-ink outline-none transition focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
+
+const tonoTipo = (tipo: TipoSolicitudAusencia): 'info' | 'warning' =>
+  tipo === 'VACACIONES' ? 'info' : 'warning'
 
 /**
  * PBI 6.5.7 — Cola administrativa de solicitudes (solo lectura + enlace a detalle).
@@ -106,205 +125,324 @@ export default function SolicitudesAusenciaPage() {
     setParams(siguientes)
   }
 
-  return (
-    <div className="mx-auto grid w-full min-w-0 max-w-6xl gap-4 py-2 sm:gap-5 sm:py-4">
-      <RrhhSubnav />
-      <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
-          Administración · {RRHH_TITLE}
-        </p>
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#062e63] sm:text-4xl">
-          Solicitudes a revisar
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-          Cola de permiso y vacaciones que envía el Fontanero. Al aprobar un
-          permiso se registra en Permisos otorgados; al aprobar vacaciones se
-          descuenta el saldo.
-        </p>
-      </header>
+  const limpiarFiltros = () => {
+    const siguientes = new URLSearchParams(params)
+    siguientes.delete('estado')
+    siguientes.delete('tipo')
+    siguientes.delete('page')
+    setParams(siguientes)
+  }
 
-      <section
-        className="flex flex-wrap gap-3 rounded-2xl border border-sky-100 bg-white p-4"
+  return (
+    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+      <RrhhSubnav />
+
+      <PageHeader
+        title="Solicitudes a revisar"
+        description="Permisos y vacaciones enviados por el personal. Al aprobar un permiso queda en Permisos otorgados; al aprobar vacaciones se descuenta el saldo."
+      />
+
+      <Card
+        as="section"
+        padded
+        className="!p-3.5"
         aria-label="Filtros de solicitudes"
       >
-        <label className="grid gap-1">
-          <span className="text-xs font-bold uppercase text-slate-500">Estado</span>
-          <select
-            className="min-h-11 rounded-xl border border-slate-200 px-3"
-            value={estado}
-            onChange={(e) => actualizar({ estado: e.target.value })}
-          >
-            <option value="">Todos</option>
-            <option value="PENDIENTE">Pendiente</option>
-            <option value="APROBADA">Aprobada</option>
-            <option value="RECHAZADA">Rechazada</option>
-          </select>
-        </label>
-        <label className="grid gap-1">
-          <span className="text-xs font-bold uppercase text-slate-500">Tipo</span>
-          <select
-            className="min-h-11 rounded-xl border border-slate-200 px-3"
-            value={tipo}
-            onChange={(e) => actualizar({ tipo: e.target.value })}
-          >
-            <option value="">Todos</option>
-            <option value="PERMISO">Permiso</option>
-            <option value="VACACIONES">Vacaciones</option>
-          </select>
-        </label>
-      </section>
-
-      {cargando ? (
-        <div
-          className="rounded-2xl border border-sky-100 bg-white p-8 font-semibold text-slate-600"
-          role="status"
-        >
-          Cargando solicitudes…
-        </div>
-      ) : carga.error ? (
-        <div
-          className="grid gap-3 rounded-2xl border border-red-200 bg-red-50 p-6"
-          role="alert"
-        >
-          <p className="m-0 font-semibold text-red-800">{carga.error}</p>
-          {carga.reintentable ? (
-            <button
-              type="button"
-              className="inline-flex w-fit min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-4 font-bold text-blue-800"
-              onClick={() => setRecarga((n) => n + 1)}
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[14rem]">
+            <span className={labelClass}>Estado</span>
+            <select
+              className={selectClass}
+              value={estado}
+              aria-label="Filtrar por estado"
+              onChange={(e) => actualizar({ estado: e.target.value })}
             >
-              <IconRefresh size={18} aria-hidden="true" /> Reintentar
-            </button>
+              <option value="">Todos</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="APROBADA">Aprobada</option>
+              <option value="RECHAZADA">Rechazada</option>
+            </select>
+          </label>
+          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[14rem]">
+            <span className={labelClass}>Tipo</span>
+            <select
+              className={selectClass}
+              value={tipo}
+              aria-label="Filtrar por tipo"
+              onChange={(e) => actualizar({ tipo: e.target.value })}
+            >
+              <option value="">Todos</option>
+              <option value="PERMISO">Permiso</option>
+              <option value="VACACIONES">Vacaciones</option>
+            </select>
+          </label>
+          {hayFiltro ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+              onClick={limpiarFiltros}
+            >
+              Limpiar
+            </Button>
           ) : null}
         </div>
+      </Card>
+
+      {cargando ? (
+        <Card padded className="!p-5" role="status" aria-busy="true">
+          <span className="sr-only">Cargando solicitudes…</span>
+          <div className="grid gap-3">
+            {[0, 1, 2].map((fila) => (
+              <div
+                key={fila}
+                className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        </Card>
+      ) : carga.error ? (
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{carga.error}</p>
+            {carga.reintentable ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+                onClick={() => setRecarga((n) => n + 1)}
+              >
+                Reintentar
+              </Button>
+            ) : null}
+          </div>
+        </Alert>
       ) : !carga.data.length ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-slate-600">
-          {hayFiltro
-            ? 'No se encontraron solicitudes con el estado seleccionado.'
-            : 'No hay solicitudes registradas.'}
-        </div>
+        <EmptyState
+          icon={<IconCalendarEvent size={28} aria-hidden="true" />}
+          title={hayFiltro ? 'Sin resultados' : 'Sin solicitudes'}
+          description={
+            hayFiltro
+              ? 'No hay solicitudes con esos filtros. Pruebe otra combinación o limpie los filtros.'
+              : 'Cuando el personal envíe permisos o vacaciones, aparecerán aquí para su revisión.'
+          }
+          actions={
+            hayFiltro ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+                onClick={limpiarFiltros}
+              >
+                Limpiar filtros
+              </Button>
+            ) : null
+          }
+        />
       ) : (
         <>
           <ul className="m-0 grid list-none gap-3 p-0 lg:hidden">
             {carga.data.map((item) => (
-              <li
-                key={item.id}
-                className="grid gap-3 rounded-2xl border border-sky-100 bg-white p-4 shadow-[0_8px_24px_rgba(30,90,156,0.06)]"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-extrabold text-[#062e63]">
-                    {item.colaborador
-                      ? nombreCompleto(item.colaborador)
-                      : `#${item.colaboradorId}`}
-                  </span>
-                  <span
-                    className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
+              <li key={item.id}>
+                <Card padded className="!grid !gap-3 !p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="m-0 flex items-center gap-1.5 text-sm font-semibold text-sigasj-muted">
+                        <IconUser size={14} aria-hidden="true" />
+                        Colaborador
+                      </p>
+                      <p className="mb-0 mt-1 text-base font-extrabold text-sigasj-ink">
+                        {item.colaborador
+                          ? nombreCompleto(item.colaborador)
+                          : `#${item.colaboradorId}`}
+                      </p>
+                    </div>
+                    <span
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
+                    >
+                      {estadoSolicitudAusenciaLabel(item.estado)}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge tone={tonoTipo(item.tipo)}>
+                      {item.tipo === 'VACACIONES' ? (
+                        <IconBeach size={13} aria-hidden="true" />
+                      ) : null}
+                      {tipoSolicitudAusenciaLabel(item.tipo)}
+                    </Badge>
+                    <span className="text-sm font-semibold text-sigasj-muted">
+                      {formatearFechaPermiso(item.fechaInicio)} —{' '}
+                      {formatearFechaPermiso(item.fechaFin)}
+                    </span>
+                  </div>
+                  <Button
+                    to={solicitudAusenciaDetailPath(item.id)}
+                    variant={item.estado === 'PENDIENTE' ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="w-fit"
+                    leftIcon={<IconEye size={16} aria-hidden="true" />}
                   >
-                    {estadoSolicitudAusenciaLabel(item.estado)}
-                  </span>
-                </div>
-                <p className="m-0 text-sm text-slate-600">
-                  {tipoSolicitudAusenciaLabel(item.tipo)} ·{' '}
-                  {formatearFechaPermiso(item.fechaInicio)} —{' '}
-                  {formatearFechaPermiso(item.fechaFin)}
-                </p>
-                <Link
-                  to={solicitudAusenciaDetailPath(item.id)}
-                  className={`${accionListadoClassName} w-fit self-start`}
-                >
-                  <IconEye
-                    className="transition-transform duration-300 group-hover:scale-110"
-                    size={17}
-                    aria-hidden="true"
-                  />
-                  {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver'}
-                </Link>
+                    {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver detalle'}
+                  </Button>
+                </Card>
               </li>
             ))}
           </ul>
 
-          <div className="hidden overflow-x-auto rounded-2xl border border-sky-100 bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] lg:block">
+          <Card as="section" className="hidden min-w-0 overflow-hidden !p-0 lg:block">
+            <div className="flex items-center gap-2.5 border-b border-sigasj-border px-4 py-3.5 sm:px-5">
+              <span className="grid size-8 place-items-center rounded-xl bg-sigasj-surface-soft text-sigasj-primary">
+                <IconCalendarEvent size={18} aria-hidden="true" />
+              </span>
+              <h2 className="m-0 text-[1.05rem] font-extrabold tracking-tight text-sigasj-ink">
+                Listado
+              </h2>
+              <Badge tone="info" className="ml-auto">
+                {carga.total} solicitud{carga.total === 1 ? '' : 'es'}
+              </Badge>
+            </div>
+
             <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-slate-100 text-xs font-extrabold uppercase tracking-wider text-slate-500">
-                  <th className="px-4 py-3">Colaborador</th>
-                  <th className="px-4 py-3">Tipo</th>
-                  <th className="px-4 py-3">Periodo</th>
-                  <th className="px-4 py-3">Estado</th>
-                  <th className="px-4 py-3">Solicitud</th>
-                  <th className="px-4 py-3">Acción</th>
+              <thead className="bg-[color-mix(in_srgb,var(--color-sigasj-ice)_70%,white)] text-[0.68rem] font-bold uppercase tracking-[0.08em] text-sigasj-muted">
+                <tr>
+                  <th scope="col" className="px-5 py-3">
+                    Colaborador
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Tipo
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Periodo
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Estado
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Solicitud
+                  </th>
+                  <th scope="col" className="px-5 py-3 text-right">
+                    Acción
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-sigasj-border">
                 {carga.data.map((item) => (
-                  <tr key={item.id} className="border-b border-slate-50">
-                    <td className="px-4 py-3 font-semibold text-slate-800">
-                      {item.colaborador
-                        ? nombreCompleto(item.colaborador)
-                        : `#${item.colaboradorId}`}
+                  <tr
+                    key={item.id}
+                    className="transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--color-sigasj-ice)_55%,white)]"
+                  >
+                    <td className="px-5 py-3.5">
+                      <span className="font-extrabold text-sigasj-ink">
+                        {item.colaborador
+                          ? nombreCompleto(item.colaborador)
+                          : `#${item.colaboradorId}`}
+                      </span>
                     </td>
-                    <td className="px-4 py-3">
-                      {tipoSolicitudAusenciaLabel(item.tipo)}
+                    <td className="px-5 py-3.5">
+                      <Badge tone={tonoTipo(item.tipo)}>
+                        {tipoSolicitudAusenciaLabel(item.tipo)}
+                      </Badge>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
                       {formatearFechaPermiso(item.fechaInicio)} —{' '}
                       {formatearFechaPermiso(item.fechaFin)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <span
-                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
+                        className={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
                       >
                         {estadoSolicitudAusenciaLabel(item.estado)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
                       {formatearFechaPermiso(item.createdAt.slice(0, 10))}
                     </td>
-                    <td className="px-4 py-3">
-                      <Link
+                    <td className="px-5 py-3.5 text-right">
+                      <Button
                         to={solicitudAusenciaDetailPath(item.id)}
-                        className={accionListadoClassName}
+                        variant={item.estado === 'PENDIENTE' ? 'primary' : 'secondary'}
+                        size="sm"
+                        leftIcon={<IconEye size={16} aria-hidden="true" />}
                       >
-                        <IconEye
-                          className="transition-transform duration-300 group-hover:scale-110"
-                          size={17}
-                          aria-hidden="true"
-                        />
                         {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver'}
-                      </Link>
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm text-slate-500">
-            <span>
-              Página {page} de {Math.max(1, carga.totalPages)} · {carga.total}{' '}
-              solicitudes
-            </span>
+            <nav
+              className="flex flex-col items-center justify-between gap-3 border-t border-sigasj-border px-4 py-3.5 text-sm text-sigasj-muted sm:flex-row sm:px-5"
+              aria-label="Paginación de solicitudes"
+            >
+              <p className="m-0 font-semibold">
+                Página {page} de {Math.max(1, carga.totalPages)} · {carga.total}{' '}
+                solicitud{carga.total === 1 ? '' : 'es'}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
+                  disabled={page <= 1 || cargando}
+                  onClick={() => actualizar({ page: String(page - 1) })}
+                >
+                  Anterior
+                </Button>
+                <span className="px-1.5 font-semibold text-sigasj-ink">
+                  {page} / {Math.max(1, carga.totalPages)}
+                </span>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
+                  disabled={page >= carga.totalPages || cargando}
+                  onClick={() => actualizar({ page: String(page + 1) })}
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </nav>
+          </Card>
+
+          <nav
+            className="flex flex-wrap items-center justify-between gap-3 lg:hidden"
+            aria-label="Paginación de solicitudes (móvil)"
+          >
+            <p className="m-0 text-sm font-semibold text-sigasj-muted">
+              {page} / {Math.max(1, carga.totalPages)} · {carga.total}
+            </p>
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
-                className="min-h-10 rounded-xl border border-slate-200 px-3 font-bold disabled:opacity-40"
+                variant="secondary"
+                size="sm"
                 disabled={page <= 1}
                 onClick={() => actualizar({ page: String(page - 1) })}
               >
                 Anterior
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="min-h-10 rounded-xl border border-slate-200 px-3 font-bold disabled:opacity-40"
+                variant="secondary"
+                size="sm"
                 disabled={page >= carga.totalPages}
                 onClick={() => actualizar({ page: String(page + 1) })}
               >
                 Siguiente
-              </button>
+              </Button>
             </div>
-          </div>
+          </nav>
         </>
       )}
-    </div>
+    </main>
   )
 }

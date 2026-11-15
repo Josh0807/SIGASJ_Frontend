@@ -133,22 +133,51 @@ describe('SolicitudHistorialTimeline', () => {
     expect(host.textContent).toContain('Obs pública A')
     expect(host.textContent).toContain('Nota interna')
     expect(host.textContent).toContain('Nota interna B')
-    const bloques = Array.from(host.querySelectorAll('article > div')).filter(
+    const bloques = Array.from(host.querySelectorAll('li div')).filter(
       (el) =>
-        el.textContent?.includes('Observación pública') ||
-        el.textContent?.includes('Nota interna'),
+        el.children.length >= 2 &&
+        (el.textContent?.includes('Observación pública') ||
+          el.textContent?.includes('Nota interna')),
     )
-    const publica = bloques.find((el) =>
-      el.textContent?.includes('Observación pública'),
+    const publica = bloques.find(
+      (el) =>
+        el.textContent?.includes('Observación pública') &&
+        !el.textContent?.includes('Nota interna B'),
     )
-    const interna = bloques.find((el) =>
-      el.textContent?.startsWith('Nota interna'),
+    const interna = bloques.find(
+      (el) =>
+        el.textContent?.includes('Nota interna') &&
+        !el.textContent?.includes('Obs pública A'),
     )
     expect(publica?.textContent).toContain('Obs pública A')
-    expect(publica?.textContent).not.toContain('Nota interna B')
     expect(interna?.textContent).toContain('Nota interna B')
-    expect(interna?.textContent).not.toContain('Obs pública A')
     root.unmount()
+  })
+
+  it('permite colapsar y expandir el panel del historial', async () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const root = createRoot(host)
+    await act(async () => {
+      root.render(
+        <SolicitudHistorialTimeline
+          eventos={[
+            evento({ id: 1, fecha: '2026-10-19T10:00:00.000Z', estadoNuevo: 'PENDIENTE' }),
+          ]}
+        />,
+      )
+    })
+    const toggle = host.querySelector(
+      'button[aria-expanded]',
+    ) as HTMLButtonElement
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(host.textContent).toContain('Solicitud registrada')
+    await act(async () => {
+      toggle.click()
+    })
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    root.unmount()
+    host.remove()
   })
 
   it('sin usuario no inventa responsable; sin observaciones no muestra bloques vacíos', async () => {

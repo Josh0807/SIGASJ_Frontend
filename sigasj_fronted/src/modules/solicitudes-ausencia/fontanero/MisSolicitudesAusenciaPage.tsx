@@ -1,7 +1,20 @@
-import { IconClipboardList, IconEye, IconPlus, IconRefresh } from '@tabler/icons-react'
+import {
+  IconBeach,
+  IconCalendarEvent,
+  IconClipboardList,
+  IconEye,
+  IconPlus,
+  IconRefresh,
+} from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
+import { Alert } from '../../../shared/ui/Alert'
+import { Badge } from '../../../shared/ui/Badge'
+import { Button } from '../../../shared/ui/Button'
+import { Card } from '../../../shared/ui/Card'
+import { EmptyState } from '../../../shared/ui/EmptyState'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import { useAuth } from '../../auth/components/AuthContext'
 import { esNoAutenticado, esReintentable } from '../../recursos-humanos/colaboradorForm'
 import { formatearFechaPermiso } from '../../recursos-humanos/permisoForm'
@@ -17,13 +30,30 @@ import {
   FONTANERO_SOLICITAR_AUSENCIA_PATH,
   misSolicitudAusenciaDetailPath,
 } from '../solicitudesAusenciaPaths'
-import type { SolicitudAusenciaFontanero } from '../types'
+import type { SolicitudAusenciaFontanero, TipoSolicitudAusencia } from '../types'
 
 type Carga = {
   clave: string
   data: SolicitudAusenciaFontanero[]
   error: string | null
   reintentable: boolean
+}
+
+const tonoTipo = (tipo: TipoSolicitudAusencia): 'info' | 'warning' =>
+  tipo === 'VACACIONES' ? 'info' : 'warning'
+
+const detalleSecundario = (item: SolicitudAusenciaFontanero): string => {
+  if (item.tipo === 'VACACIONES') {
+    const resumen = item.resumenVacaciones
+    if (resumen) {
+      const feriados = resumen.feriados.length
+      return feriados > 0
+        ? `${resumen.diasNetos} día${resumen.diasNetos === 1 ? '' : 's'} netos · ${feriados} feriado${feriados === 1 ? '' : 's'}`
+        : `${resumen.diasNetos} día${resumen.diasNetos === 1 ? '' : 's'} a descontar`
+    }
+    return 'Solicitud de vacaciones'
+  }
+  return resumirMotivo(item.motivo)
 }
 
 /**
@@ -76,156 +106,188 @@ export default function MisSolicitudesAusenciaPage() {
   }, [clave, salirPorSesion])
 
   return (
-    <div className="mx-auto grid w-full max-w-5xl gap-5 overflow-x-hidden px-4 py-6 sm:px-6">
-      <header className="rounded-2xl border border-sky-100 bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30,90,156,0.08)] sm:rounded-3xl sm:p-8">
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-blue-600">
-          Fontanero
-        </p>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="m-0 flex items-center gap-3 text-2xl font-black tracking-tight text-[#062e63] sm:text-4xl">
-              <IconClipboardList
-                className="shrink-0 text-blue-600"
-                size={34}
-                aria-hidden="true"
-              />
-              {FONTANERO_MIS_SOLICITUDES_TITLE}
-            </h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-              Consulte el historial y el estado de sus solicitudes de permiso o vacaciones.
-            </p>
-          </div>
-          <Link
+    <div className="admin-content-modern grid w-full min-w-0 gap-4">
+      <PageHeader
+        title={FONTANERO_MIS_SOLICITUDES_TITLE}
+        description="Consulte el historial y el estado de sus permisos y vacaciones."
+        actions={
+          <Button
             to={FONTANERO_SOLICITAR_AUSENCIA_PATH}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-600 px-4 font-bold text-white no-underline hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            size="sm"
+            leftIcon={<IconPlus size={16} aria-hidden="true" />}
           >
-            <IconPlus size={18} aria-hidden="true" />
-            Solicitar permiso o vacaciones
-          </Link>
-        </div>
-      </header>
+            Nueva solicitud
+          </Button>
+        }
+      />
 
       {cargando ? (
-        <div
-          className="rounded-2xl border border-sky-100 bg-white p-8 font-semibold text-slate-600"
-          role="status"
-        >
-          Cargando solicitudes…
-        </div>
+        <Card padded className="!p-5" role="status" aria-busy="true">
+          <span className="sr-only">Cargando solicitudes…</span>
+          <div className="grid gap-3">
+            {[0, 1, 2].map((fila) => (
+              <div
+                key={fila}
+                className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        </Card>
       ) : carga.error ? (
-        <div
-          className="grid gap-3 rounded-2xl border border-red-200 bg-red-50 p-6"
-          role="alert"
-        >
-          <p className="m-0 font-semibold text-red-800">{carga.error}</p>
-          {carga.reintentable ? (
-            <button
-              type="button"
-              className="inline-flex w-fit min-h-11 items-center gap-2 rounded-xl border border-blue-200 bg-white px-4 font-bold text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              onClick={() => setRecarga((n) => n + 1)}
-            >
-              <IconRefresh size={18} aria-hidden="true" />
-              Reintentar
-            </button>
-          ) : null}
-        </div>
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{carga.error}</p>
+            {carga.reintentable ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+                onClick={() => setRecarga((n) => n + 1)}
+              >
+                Reintentar
+              </Button>
+            ) : null}
+          </div>
+        </Alert>
       ) : !carga.data.length ? (
-        <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-8 text-slate-600">
-          <p className="m-0 text-lg font-semibold text-slate-700">
-            Aún no tiene solicitudes registradas.
-          </p>
-          <Link
-            to={FONTANERO_SOLICITAR_AUSENCIA_PATH}
-            className="inline-flex w-fit min-h-11 items-center gap-2 rounded-xl border border-blue-200 px-4 font-bold text-blue-800 no-underline hover:bg-sky-50"
-          >
-            Solicitar permiso o vacaciones
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconClipboardList size={28} aria-hidden="true" />}
+          title="Sin solicitudes"
+          description="Cuando envíe un permiso o vacaciones, el historial y el estado aparecerán aquí."
+          actions={
+            <Button
+              to={FONTANERO_SOLICITAR_AUSENCIA_PATH}
+              size="sm"
+              leftIcon={<IconPlus size={16} aria-hidden="true" />}
+            >
+              Solicitar permiso o vacaciones
+            </Button>
+          }
+        />
       ) : (
         <>
-          {/* Mobile / tablet: cards */}
           <ul className="m-0 grid list-none gap-3 p-0 md:hidden">
             {carga.data.map((item) => (
-              <li
-                key={item.id}
-                className="grid gap-3 rounded-2xl border border-sky-100 bg-white p-4 shadow-[0_8px_24px_rgba(30,90,156,0.06)]"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-extrabold text-[#062e63]">
-                    {tipoSolicitudAusenciaLabel(item.tipo)}
-                  </span>
-                  <span
-                    className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
+              <li key={item.id}>
+                <Card padded className="!grid !gap-3 !p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <Badge tone={tonoTipo(item.tipo)}>
+                      {item.tipo === 'VACACIONES' ? (
+                        <IconBeach size={13} aria-hidden="true" />
+                      ) : (
+                        <IconCalendarEvent size={13} aria-hidden="true" />
+                      )}
+                      {tipoSolicitudAusenciaLabel(item.tipo)}
+                    </Badge>
+                    <span
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
+                    >
+                      {estadoSolicitudAusenciaLabel(item.estado)}
+                    </span>
+                  </div>
+                  <p className="m-0 text-sm font-semibold tabular-nums text-sigasj-muted">
+                    {formatearFechaPermiso(item.fechaInicio)} —{' '}
+                    {formatearFechaPermiso(item.fechaFin)}
+                  </p>
+                  <p className="m-0 text-sm font-semibold text-sigasj-ink">
+                    {detalleSecundario(item)}
+                  </p>
+                  <Button
+                    to={misSolicitudAusenciaDetailPath(item.id)}
+                    variant="secondary"
+                    size="sm"
+                    className="w-fit"
+                    leftIcon={<IconEye size={16} aria-hidden="true" />}
                   >
-                    {estadoSolicitudAusenciaLabel(item.estado)}
-                  </span>
-                </div>
-                <p className="m-0 text-sm text-slate-600">
-                  {formatearFechaPermiso(item.fechaInicio)} —{' '}
-                  {formatearFechaPermiso(item.fechaFin)}
-                </p>
-                <p className="m-0 text-sm text-slate-700">{resumirMotivo(item.motivo)}</p>
-                <Link
-                  to={misSolicitudAusenciaDetailPath(item.id)}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 font-bold text-blue-700 no-underline hover:bg-sky-50"
-                >
-                  <IconEye size={18} aria-hidden="true" />
-                  Ver detalle
-                </Link>
+                    Ver detalle
+                  </Button>
+                </Card>
               </li>
             ))}
           </ul>
 
-          {/* Desktop: table */}
-          <div className="hidden overflow-x-auto rounded-2xl border border-sky-100 bg-white shadow-[0_12px_30px_rgba(30,90,156,0.07)] md:block">
+          <Card as="section" className="hidden min-w-0 overflow-hidden !p-0 md:block">
+            <div className="flex items-center gap-2.5 border-b border-sigasj-border px-4 py-3.5 sm:px-5">
+              <span className="grid size-8 place-items-center rounded-xl bg-sigasj-surface-soft text-sigasj-primary">
+                <IconClipboardList size={18} aria-hidden="true" />
+              </span>
+              <h2 className="m-0 text-[1.05rem] font-extrabold tracking-tight text-sigasj-ink">
+                Historial
+              </h2>
+              <Badge tone="info" className="ml-auto">
+                {carga.data.length} solicitud{carga.data.length === 1 ? '' : 'es'}
+              </Badge>
+            </div>
+
             <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-slate-100 text-xs font-extrabold uppercase tracking-wider text-slate-500">
-                  <th className="px-4 py-3">Tipo</th>
-                  <th className="px-4 py-3">Periodo</th>
-                  <th className="px-4 py-3">Motivo</th>
-                  <th className="px-4 py-3">Estado</th>
-                  <th className="px-4 py-3">Solicitud</th>
-                  <th className="px-4 py-3">Acción</th>
+              <thead className="bg-[color-mix(in_srgb,var(--color-sigasj-ice)_70%,white)] text-[0.68rem] font-bold uppercase tracking-[0.08em] text-sigasj-muted">
+                <tr>
+                  <th scope="col" className="px-5 py-3">
+                    Tipo
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Periodo
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Detalle
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Estado
+                  </th>
+                  <th scope="col" className="px-5 py-3">
+                    Solicitud
+                  </th>
+                  <th scope="col" className="px-5 py-3 text-right">
+                    Acción
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-sigasj-border">
                 {carga.data.map((item) => (
-                  <tr key={item.id} className="border-b border-slate-50">
-                    <td className="px-4 py-3 font-semibold text-slate-800">
-                      {tipoSolicitudAusenciaLabel(item.tipo)}
+                  <tr
+                    key={item.id}
+                    className="transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--color-sigasj-ice)_55%,white)]"
+                  >
+                    <td className="px-5 py-3.5">
+                      <Badge tone={tonoTipo(item.tipo)}>
+                        {tipoSolicitudAusenciaLabel(item.tipo)}
+                      </Badge>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
                       {formatearFechaPermiso(item.fechaInicio)} —{' '}
                       {formatearFechaPermiso(item.fechaFin)}
                     </td>
-                    <td className="max-w-xs px-4 py-3 text-slate-700">
-                      {resumirMotivo(item.motivo)}
+                    <td className="max-w-xs px-5 py-3.5 text-sm font-semibold text-sigasj-ink">
+                      {detalleSecundario(item)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <span
-                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
+                        className={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
                       >
                         {estadoSolicitudAusenciaLabel(item.estado)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
                       {formatearFechaPermiso(item.createdAt.slice(0, 10))}
                     </td>
-                    <td className="px-4 py-3">
-                      <Link
+                    <td className="px-5 py-3.5 text-right">
+                      <Button
                         to={misSolicitudAusenciaDetailPath(item.id)}
-                        className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 font-bold text-blue-700 no-underline hover:bg-sky-50"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={<IconEye size={16} aria-hidden="true" />}
                       >
-                        <IconEye size={18} aria-hidden="true" />
-                        Ver detalle
-                      </Link>
+                        Ver
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
         </>
       )}
     </div>

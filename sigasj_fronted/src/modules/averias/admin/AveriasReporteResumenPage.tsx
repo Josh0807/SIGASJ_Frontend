@@ -1,10 +1,12 @@
-import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { IconArrowLeft } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
+import { Button } from '../../../shared/ui/Button'
+import { PageHeader } from '../../../shared/ui/PageHeader'
 import { useAdminAveriasReporteResumen } from '../hooks/useAdminAveriasReporteResumen'
 import { AVERIAS_ADMIN_IMPRIMIR_PATH, AVERIAS_ADMIN_PATH } from './averiasAdminPaths'
 import {
@@ -88,53 +90,57 @@ const AveriasReporteResumenPage = ({
 
   return (
     <main className="gallery-admin averias-admin w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-          <div className="space-y-3">
-            <p className="gallery-admin__eyebrow !m-0 !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Panel administrativo</p>
-            <h1>Resumen de averías</h1>
-            <p>Cantidad de averías registradas según su estado actual.</p>
-          </div>
-          <div className="gallery-admin__header-actions !gap-3">
-            <Link
-              className="gallery-admin__button !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-6 !py-3.5 !font-bold !text-white !no-underline !shadow-lg !shadow-blue-200"
-              to={`${AVERIAS_ADMIN_IMPRIMIR_PATH}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`}
-            >
-              Imprimir averías atendidas
-            </Link>
-            <Link className="gallery-admin__button group !inline-flex !items-center !gap-2.5 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_12px_26px_rgba(30, 90, 156,0.2)] active:!translate-y-0 active:!scale-[0.96] motion-reduce:!transform-none motion-reduce:!transition-none" to={AVERIAS_ADMIN_PATH}>
-              <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none" size={19} aria-hidden="true" />
-              Volver a gestión
-            </Link>
-          </div>
-        </header>
+      <div className="gallery-admin__shell sigasj-stack gap-4">
+        <PageHeader
+          title="Resumen de averías"
+          description="Cantidad de averías registradas según su estado actual."
+          actions={
+            <>
+              <Button
+                to={`${AVERIAS_ADMIN_IMPRIMIR_PATH}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`}
+                size="sm"
+              >
+                Imprimir averías atendidas
+              </Button>
+              <Button
+                to={AVERIAS_ADMIN_PATH}
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+              >
+                Volver a gestión
+              </Button>
+            </>
+          }
+        />
 
-        <section className="gallery-admin__filters w-full !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]" aria-label="Rango del resumen">
-          <div className="col-span-full border-b border-blue-100 pb-5">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta del resumen</p>
-            <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar por periodo</h2>
-          </div>
-          <p className="averias-reporte__rango">{rango}</p>
-          <label className="gallery-admin__field" htmlFor="averias-reporte-desde">
-            <span>Desde</span>
-            <input
-              id="averias-reporte-desde"
-              name="fechaDesde"
-              type="date"
-              value={fechas.fechaDesde}
-              onChange={(event) => updateFecha('fechaDesde', event.target.value)}
-            />
-          </label>
-          <label className="gallery-admin__field" htmlFor="averias-reporte-hasta">
-            <span>Hasta</span>
-            <input
-              id="averias-reporte-hasta"
-              name="fechaHasta"
-              type="date"
-              value={fechas.fechaHasta}
-              onChange={(event) => updateFecha('fechaHasta', event.target.value)}
-            />
-          </label>
+        <section
+          className="gallery-admin__filters averias-admin__filters"
+          aria-label="Rango del resumen"
+        >
+          <form className="averias-admin__filters-form" onSubmit={(e) => e.preventDefault()}>
+            <p className="averias-reporte__rango averias-admin__filters-note">{rango}</p>
+            <label className="gallery-admin__field" htmlFor="averias-reporte-desde">
+              <span>Desde</span>
+              <input
+                id="averias-reporte-desde"
+                name="fechaDesde"
+                type="date"
+                value={fechas.fechaDesde}
+                onChange={(event) => updateFecha('fechaDesde', event.target.value)}
+              />
+            </label>
+            <label className="gallery-admin__field" htmlFor="averias-reporte-hasta">
+              <span>Hasta</span>
+              <input
+                id="averias-reporte-hasta"
+                name="fechaHasta"
+                type="date"
+                value={fechas.fechaHasta}
+                onChange={(event) => updateFecha('fechaHasta', event.target.value)}
+              />
+            </label>
+          </form>
         </section>
 
         {errorMessage ? (
@@ -147,11 +153,14 @@ const AveriasReporteResumenPage = ({
             )}
           </div>
         ) : (
-          <section className="averias-summary-indicators rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)] md:p-8" aria-label="Indicadores del resumen" aria-busy={isLoading || undefined}>
-            <div className="mb-6 border-b border-blue-100 pb-5">
-              <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Estado general</p>
-              <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Indicadores de averías</h2>
-              <p className="mt-2 text-base text-slate-500">Resumen de los casos registrados para el periodo seleccionado.</p>
+          <section
+            className="averias-summary-indicators"
+            aria-label="Indicadores del resumen"
+            aria-busy={isLoading || undefined}
+          >
+            <div className="averias-summary-indicators__head">
+              <h2>Indicadores de averías</h2>
+              <p>Resumen de los casos registrados para el periodo seleccionado.</p>
             </div>
             <p className="visually-hidden">
               {isLoading ? AVERIAS_REPORTE_LOADING_MESSAGE : rango}

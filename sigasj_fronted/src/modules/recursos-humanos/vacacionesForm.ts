@@ -1,3 +1,4 @@
+import { esFeriadoCostaRica } from '../solicitudes-ausencia/feriadosCostaRica'
 import { getHttpStatus } from './colaboradorForm'
 import { esFechaCalendario, fechaPermisoIso } from './permisoForm'
 import type {
@@ -15,23 +16,45 @@ export const TIPOS_MOVIMIENTO_VACACIONES: ReadonlyArray<{
   value: TipoMovimientoVacaciones
   label: string
   descripcion: string
+  resumen: string
 }> = [
   {
     value: 'ACUMULADO',
     label: 'Adquisición',
+    resumen: 'Suma al saldo',
     descripcion: 'Registra días de vacaciones adquiridos (suma al saldo disponible).',
   },
   {
     value: 'DISFRUTADO',
     label: 'Disfrute',
+    resumen: 'Resta del saldo',
     descripcion: 'Registra días disfrutados (resta del saldo disponible).',
   },
   {
     value: 'AJUSTE',
     label: 'Ajuste',
+    resumen: 'Corrección admin.',
     descripcion: 'Corrección administrativa con motivo obligatorio (suma o resta).',
   },
 ]
+
+export const tonoBadgeMovimiento = (
+  tipo: TipoMovimientoVacaciones,
+): 'info' | 'warning' | 'neutral' => {
+  if (tipo === 'DISFRUTADO') return 'warning'
+  if (tipo === 'AJUSTE') return 'neutral'
+  return 'info'
+}
+
+export const claseDiasMovimiento = (
+  movimiento: Pick<MovimientoVacaciones, 'tipo' | 'signoAjuste'>,
+) => {
+  if (movimiento.tipo === 'DISFRUTADO') return 'text-sigasj-warning'
+  if (movimiento.tipo === 'AJUSTE' && movimiento.signoAjuste === -1) {
+    return 'text-sigasj-warning'
+  }
+  return 'text-sigasj-success'
+}
 
 export const EMPTY_MOVIMIENTO_VACACIONES_VALUES: MovimientoVacacionesFormValues = {
   tipo: '',
@@ -134,6 +157,12 @@ export function validateMovimientoVacaciones(
     errors.fecha = 'La fecha es obligatoria.'
   } else if (!esFechaCalendario(values.fecha)) {
     errors.fecha = 'Use una fecha válida.'
+  } else if (
+    values.tipo === 'DISFRUTADO' &&
+    esFeriadoCostaRica(values.fecha.trim())
+  ) {
+    errors.fecha =
+      'La fecha de disfrute no puede ser un feriado. Si laboró ese día, use Ajuste (+).'
   }
 
   if (values.observaciones.trim().length > 500) {
