@@ -1,10 +1,27 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { IconAlertTriangle, IconArrowsExchange, IconCalendar, IconCalendarX, IconCategory, IconEraser, IconPackage, IconRefresh, IconSearch } from '@tabler/icons-react'
+import {
+  IconAlertTriangle,
+  IconCalendarX,
+  IconCategory,
+  IconEraser,
+  IconPackage,
+  IconRefresh,
+  IconSearch,
+} from '@tabler/icons-react'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
-import { Alert, Button, EmptyState, PageHeader } from '../../../shared/ui'
-import { InventoryFormField } from '../InventoryFormField'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+  adminFilterSelectClassName,
+} from '../../../shared/ui'
 import {
   formatMovimientoCantidad,
   formatMovimientoFecha,
@@ -109,80 +126,126 @@ export default function ReportesInventarioPage() {
     reporte.movimientos.length === 0
 
   return (
-    <main
+    <AdminShell
       className="inv-reportes"
-      style={{ display: 'grid', gap: 14 }}
       aria-labelledby="reportes-inventario-title"
     >
       <PageHeader
+        id="reportes-inventario-title"
         eyebrow="Inventario · Administración"
-        title={<span id="reportes-inventario-title">Reportes de inventario</span>}
+        title="Reportes de inventario"
         description="Consulte indicadores y movimientos del inventario. Los cálculos provienen del servidor."
       />
 
-        <form
-          className="inv-panel gallery-admin__filters"
-          aria-label="Filtros del reporte de inventario"
-          onSubmit={handleConsultar}
-          noValidate
+      <form
+        aria-label="Filtros del reporte de inventario"
+        onSubmit={handleConsultar}
+        noValidate
+      >
+        <AdminFilters
+          className="!grid-cols-1"
+          summary={
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="submit"
+                disabled={loading}
+                leftIcon={<IconSearch size={18} aria-hidden="true" />}
+              >
+                {loading ? 'Consultando…' : 'Consultar'}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleLimpiar}
+                disabled={
+                  loading ||
+                  (!hasActiveDraft && Object.keys(applied).length === 0)
+                }
+                leftIcon={<IconEraser size={18} aria-hidden="true" />}
+              >
+                Limpiar filtros
+              </Button>
+            </div>
+          }
         >
-          <InventoryFormField label="Fecha inicial" icon={<IconCalendar size={20} aria-hidden="true" />}>
+          <AdminFilterField label="Fecha inicial">
             <input
               id="reporte-fecha-desde"
               type="date"
+              className={adminFilterControlClassName}
               value={draft.fechaDesde}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, fechaDesde: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  fechaDesde: event.target.value,
+                }))
               }
             />
-          </InventoryFormField>
+          </AdminFilterField>
 
-          <InventoryFormField label="Fecha final" icon={<IconCalendar size={20} aria-hidden="true" />}>
+          <AdminFilterField label="Fecha final">
             <input
               id="reporte-fecha-hasta"
               type="date"
+              className={adminFilterControlClassName}
               value={draft.fechaHasta}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, fechaHasta: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  fechaHasta: event.target.value,
+                }))
               }
             />
-          </InventoryFormField>
+          </AdminFilterField>
 
-          <InventoryFormField label="Material" icon={<IconPackage size={20} aria-hidden="true" />}>
+          <AdminFilterField label="Material">
             <select
               id="reporte-material"
+              className={adminFilterSelectClassName}
               value={draft.materialId}
               disabled={materialesLoading}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, materialId: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  materialId: event.target.value,
+                }))
               }
             >
               <option value="">Todos los materiales</option>
               {(materialesResult?.data ?? []).map((material) => (
-                <option key={material.id} value={material.id}>{material.nombre}</option>
+                <option key={material.id} value={material.id}>
+                  {material.nombre}
+                </option>
               ))}
             </select>
-          </InventoryFormField>
+          </AdminFilterField>
 
-          <InventoryFormField label="Categoría" icon={<IconCategory size={20} aria-hidden="true" />}>
+          <AdminFilterField label="Categoría">
             <select
               id="reporte-categoria"
+              className={adminFilterSelectClassName}
               value={draft.categoriaId}
               disabled={categoriasLoading}
               onChange={(event) =>
-                setDraft((current) => ({ ...current, categoriaId: event.target.value }))
+                setDraft((current) => ({
+                  ...current,
+                  categoriaId: event.target.value,
+                }))
               }
             >
               <option value="">Todas las categorías</option>
               {(categoriasResult?.data ?? []).map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.nombre}
+                </option>
               ))}
             </select>
-          </InventoryFormField>
+          </AdminFilterField>
 
-          <InventoryFormField label="Tipo de movimiento" icon={<IconArrowsExchange size={20} aria-hidden="true" />}>
+          <AdminFilterField label="Tipo de movimiento">
             <select
               id="reporte-tipo"
+              className={adminFilterSelectClassName}
               value={draft.tipo}
               onChange={(event) =>
                 setDraft((current) => ({
@@ -195,27 +258,9 @@ export default function ReportesInventarioPage() {
               <option value="ENTRADA">Entradas</option>
               <option value="SALIDA">Salidas</option>
             </select>
-          </InventoryFormField>
-
-          <div className="actividades-admin-reportes__actions flex flex-wrap items-center gap-2">
-            <Button
-              type="submit"
-              disabled={loading}
-              leftIcon={<IconSearch size={18} aria-hidden="true" />}
-            >
-              {loading ? 'Consultando…' : 'Consultar'}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleLimpiar}
-              disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
-              leftIcon={<IconEraser size={18} aria-hidden="true" />}
-            >
-              Limpiar filtros
-            </Button>
-          </div>
-        </form>
+          </AdminFilterField>
+        </AdminFilters>
+      </form>
 
         {filterError ? (
           <Alert tone="danger" title="No se pudo consultar el reporte">
@@ -428,6 +473,6 @@ export default function ReportesInventarioPage() {
             </div>
           </section>
         ) : null}
-    </main>
+    </AdminShell>
   )
 }

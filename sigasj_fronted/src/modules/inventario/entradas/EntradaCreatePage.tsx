@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { IconAlertTriangle, IconAlignLeft, IconArrowLeft, IconBuildingStore, IconCheck, IconCurrencyDollar, IconDeviceFloppy, IconNumbers, IconPackage, IconRulerMeasure, IconTrendingUp, IconTruckDelivery } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
-import { Button } from '../../../shared/ui'
+import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
 import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { MATERIALES_PATH } from '../inventarioPaths'
@@ -73,8 +73,14 @@ export default function EntradaCreatePage() {
     finally { submitting.current = false; setSaving(false) }
   }
 
-  return <main className="materials-admin materials-admin--form inventory-entry sigasj-stack">
-    <header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Movimientos</p><h1>Registrar entrada de materiales</h1><p>Registre los materiales recibidos en bodega. Las existencias serán calculadas y actualizadas por el servidor.</p></div></header>
+  return (
+  <AdminShell className="inventory-entry" aria-labelledby="entrada-create-title">
+    <PageHeader
+      id="entrada-create-title"
+      eyebrow="Inventario · Movimientos"
+      title="Registrar entrada de materiales"
+      description="Registre los materiales recibidos en bodega. Las existencias serán calculadas y actualizadas por el servidor."
+    />
     {feedback && (
       <div
         className={`flex items-start gap-5 overflow-hidden rounded-3xl border p-6 shadow-[0_18px_45px_rgba(15,23,42,0.10)] ${feedback.kind === 'success' ? 'border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-teal-50/70 text-emerald-950' : 'border-rose-200 bg-linear-to-br from-rose-50 via-white to-orange-50/60 text-rose-950'}`}
@@ -149,5 +155,6 @@ export default function EntradaCreatePage() {
         <Button to={MATERIALES_PATH} variant="secondary" leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}>Volver al catálogo</Button>
       </div>
     </form>
-  </main>
+  </AdminShell>
+  )
 }

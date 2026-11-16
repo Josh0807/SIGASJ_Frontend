@@ -13,33 +13,32 @@ const ProyectosAdminRowActions = ({
   editTo,
   onToggleVisibilidad,
 }: ProyectosAdminRowActionsProps) => (
-  <div className="gallery-admin__actions">
+  <div className="flex flex-wrap items-center justify-end gap-2">
     <Button
       to={editTo}
-      variant="primary"
+      variant="secondary"
       size="sm"
       aria-label={`Editar ${proyecto.nombre}`}
       leftIcon={<IconPencil size={16} aria-hidden="true" />}
     >
       Editar
     </Button>
-    <button
+    <Button
       type="button"
-      className={`gallery-admin__button${
-        proyecto.activo
-          ? ' proyectos-admin__action--pause'
-          : ' proyectos-admin__action--play'
-      }`}
+      variant="secondary"
+      size="sm"
       aria-label={`${proyecto.activo ? 'Inactivar' : 'Activar'} visibilidad de ${proyecto.nombre}`}
       onClick={() => onToggleVisibilidad(proyecto)}
+      leftIcon={
+        proyecto.activo ? (
+          <IconPlayerPause size={16} aria-hidden="true" />
+        ) : (
+          <IconPlayerPlay size={16} aria-hidden="true" />
+        )
+      }
     >
-      {proyecto.activo ? (
-        <IconPlayerPause size={16} aria-hidden="true" />
-      ) : (
-        <IconPlayerPlay size={16} aria-hidden="true" />
-      )}
       {proyecto.activo ? 'Inactivar' : 'Activar'}
-    </button>
+    </Button>
   </div>
 )
 

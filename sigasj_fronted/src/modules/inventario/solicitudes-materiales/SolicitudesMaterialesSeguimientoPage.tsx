@@ -1,15 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
+  IconChevronLeft,
+  IconChevronRight,
   IconClipboardList,
   IconEye,
-  IconFilter,
   IconPackage,
   IconPlus,
   IconRefresh,
 } from '@tabler/icons-react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Button } from '../../../shared/ui'
-import { InventoryFormField } from '../InventoryFormField'
+import { useNavigate } from 'react-router-dom'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterSelectClassName,
+} from '../../../shared/ui'
 import {
   SOLICITUD_MATERIALES_NEW_PATH,
   SOLICITUDES_MATERIALES_PATH,
@@ -119,202 +129,220 @@ export default function SolicitudesMaterialesSeguimientoPage() {
   }
 
   return (
-    <section
-      className="material-tracking material-tracking--fontanero"
+    <AdminShell
+      className="material-tracking material-tracking--fontanero gap-5 sm:gap-6"
       aria-labelledby="material-tracking-title"
     >
-      <header className="material-tracking__header material-tracking__header--fontanero">
-        <div className="material-tracking__header-main">
-          <span className="material-tracking__header-icon" aria-hidden="true">
-            <IconPackage size={28} stroke={2.2} />
+      <PageHeader
+        id="material-tracking-title"
+        eyebrow="Inventario · Fontanero"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconPackage size={22} aria-hidden="true" />
+            Mis solicitudes de materiales
           </span>
-          <div className="material-tracking__header-copy">
-            <p className="material-request__eyebrow inventory-page-eyebrow">
-              Inventario · Fontanero
-            </p>
-            <h1 className="inventory-page-title" id="material-tracking-title">
-              Mis solicitudes de materiales
-            </h1>
-            <p className="inventory-page-subtitle">
-              Consulte el estado y detalle de las solicitudes que ha realizado.
-            </p>
-          </div>
-        </div>
-
-        <Button
-          to={SOLICITUD_MATERIALES_NEW_PATH}
-          variant="primary"
-          leftIcon={<IconPlus size={20} aria-hidden="true" />}
-        >
-          Nueva solicitud
-        </Button>
-      </header>
-
-      <div className="material-tracking__panel">
-        <div className="material-tracking__filters material-tracking__filters--panel">
-          <InventoryFormField
-            label="Estado"
-            icon={<IconFilter size={18} aria-hidden="true" />}
+        }
+        description="Consulte el estado y detalle de las solicitudes que ha realizado."
+        actions={
+          <Button
+            to={SOLICITUD_MATERIALES_NEW_PATH}
+            variant="primary"
+            leftIcon={<IconPlus size={20} aria-hidden="true" />}
           >
-            <select
-              id="solicitud-estado"
-              value={status}
-              onChange={(event) =>
-                changeStatus(event.target.value as typeof status)
-              }
-            >
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option === 'TODAS'
-                    ? 'Todos los estados'
-                    : formatSolicitudStatus(option)}
-                </option>
-              ))}
-            </select>
-          </InventoryFormField>
+            Nueva solicitud
+          </Button>
+        }
+      />
 
-          {!loading && !error ? (
-            <span className="material-tracking__count" role="status">
+      <AdminFilters
+        aria-label="Filtro por estado"
+        summary={
+          !loading && !error ? (
+            <>
               <IconClipboardList size={18} aria-hidden="true" />
-              {total} {total === 1 ? 'solicitud' : 'solicitudes'}
-            </span>
-          ) : null}
-        </div>
-
-        {loading ? (
-          <div className="material-tracking__state" role="status">
-            <span className="material-request__spinner" />
-            Cargando sus solicitudes…
-          </div>
-        ) : null}
-
-        {error ? (
-          <div
-            className="material-tracking__state material-tracking__state--error"
-            role="alert"
+              <strong className="text-sigasj-ink">{total}</strong>
+              <span>{total === 1 ? 'solicitud' : 'solicitudes'}</span>
+            </>
+          ) : null
+        }
+      >
+        <AdminFilterField label="Estado">
+          <select
+            id="solicitud-estado"
+            className={adminFilterSelectClassName}
+            value={status}
+            onChange={(event) =>
+              changeStatus(event.target.value as typeof status)
+            }
           >
-            <p>{error}</p>
-            <button type="button" onClick={retry}>
-              <IconRefresh size={18} aria-hidden="true" /> Reintentar
-            </button>
-          </div>
-        ) : null}
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option === 'TODAS'
+                  ? 'Todos los estados'
+                  : formatSolicitudStatus(option)}
+              </option>
+            ))}
+          </select>
+        </AdminFilterField>
+      </AdminFilters>
 
-        {!loading && !error && requests.length === 0 && status === 'TODAS' ? (
-          <div className="material-tracking__empty">
-            <h2>Aún no tiene solicitudes</h2>
-            <p>Cuando registre una solicitud podrá consultar aquí su estado.</p>
+      {error ? (
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{error}</p>
             <Button
-              to={SOLICITUD_MATERIALES_NEW_PATH}
-              variant="primary"
-              leftIcon={<IconPlus size={20} aria-hidden="true" />}
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="justify-self-start"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+              onClick={retry}
             >
-              Crear primera solicitud
+              Reintentar
             </Button>
           </div>
-        ) : null}
+        </Alert>
+      ) : null}
 
-        {!loading && !error && requests.length === 0 && status !== 'TODAS' ? (
-          <div className="material-tracking__empty">
-            <h2>No hay resultados</h2>
-            <p>No tiene solicitudes con el estado seleccionado.</p>
-            <button
-              type="button"
-              className="material-tracking__filter-action"
-              onClick={() => changeStatus('TODAS')}
-            >
-              Ver todos los estados
-            </button>
+      <Card
+        as="section"
+        className="material-tracking__panel !gap-4 !p-0 overflow-hidden"
+        aria-label="Listado de solicitudes"
+      >
+        {loading ? (
+          <Alert tone="info" className="m-4">
+            Cargando sus solicitudes…
+          </Alert>
+        ) : !error && requests.length === 0 && status === 'TODAS' ? (
+          <div className="p-4 sm:p-5">
+            <EmptyState
+              title="Aún no tiene solicitudes"
+              description="Cuando registre una solicitud podrá consultar aquí su estado."
+              actions={
+                <Button
+                  to={SOLICITUD_MATERIALES_NEW_PATH}
+                  variant="primary"
+                  leftIcon={<IconPlus size={20} aria-hidden="true" />}
+                >
+                  Crear primera solicitud
+                </Button>
+              }
+            />
           </div>
-        ) : null}
-
-        {!loading && !error && filtered.length > 0 ? (
-          <div className="material-tracking__table-wrap material-tracking__table-wrap--panel">
-            <table>
-              <thead>
-                <tr>
-                  <th>Solicitud</th>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  <th>Materiales</th>
-                  <th>Avería</th>
-                  <th>
-                    <span className="sr-only">Acción</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((request) => (
-                  <tr key={request.id}>
-                    <td data-label="Solicitud">
-                      <strong>{request.codigo || `#${request.id}`}</strong>
-                    </td>
-                    <td data-label="Fecha">
-                      {formatSolicitudDate(request.fechaSolicitud)}
-                    </td>
-                    <td data-label="Estado">
-                      <span
-                        className={`material-tracking__badge ${statusTone(request.estado)}`}
-                        data-status={request.estado.toUpperCase()}
-                      >
-                        {formatSolicitudStatus(request.estado)}
-                      </span>
-                    </td>
-                    <td data-label="Materiales">
-                      <span className="material-tracking__qty">
-                        {getSolicitudMaterialesCount(request)}
-                      </span>
-                    </td>
-                    <td data-label="Avería">
-                      {getSolicitudAveriaReference(request)}
-                    </td>
-                    <td data-label="Acción" className="material-tracking__row-action">
-                      <Link
-                        className="material-tracking__detail-link"
-                        to={`${SOLICITUDES_MATERIALES_PATH}/${request.id}`}
-                      >
-                        <IconEye size={18} aria-hidden="true" />
-                        Ver detalle
-                      </Link>
-                    </td>
+        ) : !error && requests.length === 0 && status !== 'TODAS' ? (
+          <div className="p-4 sm:p-5">
+            <EmptyState
+              title="No hay resultados"
+              description="No tiene solicitudes con el estado seleccionado."
+              actions={
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => changeStatus('TODAS')}
+                >
+                  Ver todos los estados
+                </Button>
+              }
+            />
+          </div>
+        ) : !error && filtered.length > 0 ? (
+          <>
+            <div className="material-tracking__table-wrap material-tracking__table-wrap--panel">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Solicitud</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Materiales</th>
+                    <th>Avería</th>
+                    <th>
+                      <span className="sr-only">Acción</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
+                </thead>
+                <tbody>
+                  {filtered.map((request) => (
+                    <tr key={request.id}>
+                      <td data-label="Solicitud">
+                        <strong>{request.codigo || `#${request.id}`}</strong>
+                      </td>
+                      <td data-label="Fecha">
+                        {formatSolicitudDate(request.fechaSolicitud)}
+                      </td>
+                      <td data-label="Estado">
+                        <span
+                          className={`material-tracking__badge ${statusTone(request.estado)}`}
+                          data-status={request.estado.toUpperCase()}
+                        >
+                          {formatSolicitudStatus(request.estado)}
+                        </span>
+                      </td>
+                      <td data-label="Materiales">
+                        <span className="material-tracking__qty">
+                          {getSolicitudMaterialesCount(request)}
+                        </span>
+                      </td>
+                      <td data-label="Avería">
+                        {getSolicitudAveriaReference(request)}
+                      </td>
+                      <td data-label="Acción" className="material-tracking__row-action">
+                        <Button
+                          to={`${SOLICITUDES_MATERIALES_PATH}/${request.id}`}
+                          variant="secondary"
+                          size="sm"
+                          leftIcon={<IconEye size={16} aria-hidden="true" />}
+                        >
+                          Ver detalle
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-        {!loading && !error && totalPages > 1 ? (
-          <nav
-            className="material-tracking__pagination"
-            aria-label="Paginación de solicitudes"
-          >
-            <button
-              type="button"
-              disabled={page <= 1}
-              onClick={() => {
-                setLoading(true)
-                setPage((value) => value - 1)
-              }}
-            >
-              Anterior
-            </button>
-            <span>
-              Página {page} de {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={page >= totalPages}
-              onClick={() => {
-                setLoading(true)
-                setPage((value) => value + 1)
-              }}
-            >
-              Siguiente
-            </button>
-          </nav>
+            {totalPages > 1 ? (
+              <nav
+                className="flex flex-col items-center justify-between gap-3 border-t border-sigasj-border px-4 py-4 text-sm text-sigasj-muted sm:flex-row sm:px-5"
+                aria-label="Paginación de solicitudes"
+              >
+                <p className="m-0 font-semibold">
+                  Página {page} de {totalPages}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
+                    disabled={page <= 1}
+                    onClick={() => {
+                      setLoading(true)
+                      setPage((value) => value - 1)
+                    }}
+                  >
+                    Anterior
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
+                    disabled={page >= totalPages}
+                    onClick={() => {
+                      setLoading(true)
+                      setPage((value) => value + 1)
+                    }}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              </nav>
+            ) : null}
+          </>
         ) : null}
-      </div>
-    </section>
+      </Card>
+    </AdminShell>
   )
 }

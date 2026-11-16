@@ -9,12 +9,15 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
-import { Alert } from '../../../shared/ui/Alert'
-import { Badge } from '../../../shared/ui/Badge'
-import { Button } from '../../../shared/ui/Button'
-import { Card } from '../../../shared/ui/Card'
-import { EmptyState } from '../../../shared/ui/EmptyState'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import {
+  AdminShell,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+} from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useAuth } from '../../auth/components/AuthContext'
 import {
@@ -130,8 +133,9 @@ export default function MisSolicitudesAusenciaPage() {
   }, [clave, salirPorSesion])
 
   return (
-    <div className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="mis-solicitudes-ausencia-title">
       <PageHeader
+        id="mis-solicitudes-ausencia-title"
         title="Mis solicitudes"
         description="Historial y estado de permisos y vacaciones."
         actions={
@@ -322,6 +326,6 @@ export default function MisSolicitudesAusenciaPage() {
           </Card>
         </>
       )}
-    </div>
+    </AdminShell>
   )
 }

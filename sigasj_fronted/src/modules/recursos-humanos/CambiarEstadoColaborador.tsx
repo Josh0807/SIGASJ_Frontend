@@ -1,8 +1,13 @@
 import { IconUserCheck, IconUserOff } from '@tabler/icons-react'
 import { useRef, useState } from 'react'
 import ConfirmDialog from '../../shared/components/ConfirmDialog'
+import { Button } from '../../shared/ui'
 import { cambiarEstadoColaborador } from './colaboradoresApi'
-import { colaboradorErrorMessage, esNoAutenticado, nombreCompleto } from './colaboradorForm'
+import {
+  colaboradorErrorMessage,
+  esNoAutenticado,
+  nombreCompleto,
+} from './colaboradorForm'
 import type { Colaborador } from './types'
 
 type Props = {
@@ -33,14 +38,22 @@ export default function CambiarEstadoColaborador({
     enviando.current = true
     setGuardando(true)
     try {
-      const actualizado = await cambiarEstadoColaborador(colaborador.id, !inactivar)
+      const actualizado = await cambiarEstadoColaborador(
+        colaborador.id,
+        !inactivar,
+      )
       onCambiado({ ...colaborador, ...actualizado, activo: !inactivar })
     } catch (error) {
       if (esNoAutenticado(error)) {
         onNoAutenticado()
         return
       }
-      onError(colaboradorErrorMessage(error, 'No fue posible cambiar el estado del colaborador.'))
+      onError(
+        colaboradorErrorMessage(
+          error,
+          'No fue posible cambiar el estado del colaborador.',
+        ),
+      )
     } finally {
       enviando.current = false
       setGuardando(false)
@@ -49,25 +62,24 @@ export default function CambiarEstadoColaborador({
 
   const Icono = inactivar ? IconUserOff : IconUserCheck
   const etiqueta = inactivar ? 'Inactivar' : 'Activar'
-  const tono = inactivar
-    ? 'border-rose-200 bg-gradient-to-br from-white to-rose-50 text-rose-700 shadow-[0_5px_14px_rgba(225,29,72,0.1)] hover:border-rose-400 hover:from-rose-50 hover:to-red-100 hover:text-rose-800 hover:shadow-[0_9px_20px_rgba(225,29,72,0.2)]'
-    : 'border-emerald-200 bg-gradient-to-br from-white to-emerald-50 text-emerald-700 shadow-[0_5px_14px_rgba(5,150,105,0.1)] hover:border-emerald-400 hover:from-emerald-50 hover:to-teal-100 hover:text-emerald-800 hover:shadow-[0_9px_20px_rgba(5,150,105,0.2)]'
 
   return (
     <>
-      <button
+      <Button
         ref={botonRef}
         type="button"
-        className={`group inline-flex items-center justify-center gap-2 rounded-xl border font-extrabold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:transform-none disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none ${compacto ? 'min-h-10 px-4 py-2 text-sm' : 'min-h-12 px-5 py-3'} ${tono}`}
+        variant={inactivar ? 'danger' : 'secondary'}
+        size={compacto ? 'sm' : 'md'}
+        leftIcon={<Icono size={compacto ? 16 : 18} aria-hidden="true" />}
         onClick={() => {
           if (!enviando.current) setAbierto(true)
         }}
         disabled={guardando}
+        loading={guardando}
         aria-label={`${etiqueta} a ${nombre}`}
       >
-        <Icono className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={compacto ? 17 : 20} aria-hidden="true" />
-        {guardando ? 'Guardando…' : etiqueta}
-      </button>
+        {etiqueta}
+      </Button>
       <ConfirmDialog
         isOpen={abierto}
         title={inactivar ? 'Inactivar colaborador' : 'Activar colaborador'}
@@ -78,8 +90,8 @@ export default function CambiarEstadoColaborador({
         }
         confirmLabel={etiqueta}
         confirmDanger={inactivar}
-        onCancel={() => setAbierto(false)}
         onConfirm={() => void confirmar()}
+        onCancel={() => setAbierto(false)}
         returnFocusRef={botonRef}
       />
     </>

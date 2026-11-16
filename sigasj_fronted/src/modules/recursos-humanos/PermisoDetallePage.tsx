@@ -1,7 +1,8 @@
-import { IconArrowLeft, IconCalendarEvent, IconPencil, IconRefresh } from '@tabler/icons-react'
+import { IconArrowLeft, IconPencil, IconRefresh } from '@tabler/icons-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { AdminShell, Button, PageHeader } from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import { esNoAutenticado, esReintentable, formatearFechaAuditoria, nombreCompleto } from './colaboradorForm'
 import { formatearFechaPermiso, nombreColaboradorPermiso, permisoErrorMessage } from './permisoForm'
@@ -73,14 +74,35 @@ export default function PermisoDetallePage() {
   }, [clave, permisoId, idValido, salirPorSesion])
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      <Link
-        to={PERMISOS_PATH}
-        className="inline-flex w-fit items-center gap-2 font-bold text-[#1e5a9c] no-underline hover:underline"
-      >
-        <IconArrowLeft size={18} aria-hidden="true" />
-        Volver a permisos
-      </Link>
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="permiso-detalle-title">
+      <PageHeader
+        id="permiso-detalle-title"
+        eyebrow={`${RRHH_TITLE} · Permiso`}
+        title={permiso ? nombreColaboradorPermiso(permiso) : 'Detalle de permiso'}
+        description={permiso?.motivo}
+        actions={
+          <>
+            <Button
+              to={PERMISOS_PATH}
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+            >
+              Volver a permisos
+            </Button>
+            {permiso ? (
+              <Button
+                to={permisoEditPath(permiso.id)}
+                variant="primary"
+                size="sm"
+                leftIcon={<IconPencil size={16} aria-hidden="true" />}
+              >
+                Editar
+              </Button>
+            ) : null}
+          </>
+        }
+      />
 
       {cargando ? (
         <div className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
@@ -94,22 +116,22 @@ export default function PermisoDetallePage() {
           <p className="m-0 font-semibold text-red-800">{error ?? 'No fue posible cargar el permiso.'}</p>
           <div className="flex flex-wrap justify-center gap-3">
             {idValido && resultado.reintentable ? (
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                variant="secondary"
+                leftIcon={<IconRefresh size={18} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
-              </button>
+              </Button>
             ) : null}
-            <Link
+            <Button
               to={PERMISOS_PATH}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 no-underline hover:no-underline"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
             >
-              <IconArrowLeft size={18} aria-hidden="true" />
               Volver al listado
-            </Link>
+            </Button>
           </div>
         </div>
       ) : (
@@ -119,30 +141,6 @@ export default function PermisoDetallePage() {
               {aviso}
             </div>
           ) : null}
-
-          <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex min-w-0 items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
-                <IconCalendarEvent size={28} aria-hidden="true" />
-              </span>
-              <div className="min-w-0">
-                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-                  {RRHH_TITLE} · Permiso
-                </p>
-                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
-                  {nombreColaboradorPermiso(permiso)}
-                </h1>
-                <p className="mt-2 m-0 font-semibold text-slate-500">{permiso.motivo}</p>
-              </div>
-            </div>
-            <Link
-              to={permisoEditPath(permiso.id)}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#d6e6f8] bg-[#f3f8fe] px-5 py-3 font-bold text-[#1d5fb8] no-underline transition hover:border-[#1d6fd6] hover:bg-[#1d6fd6] hover:text-white hover:no-underline"
-            >
-              <IconPencil size={19} aria-hidden="true" />
-              Editar
-            </Link>
-          </header>
 
           <section className="grid gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8">
             <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Información del permiso</h2>
@@ -163,6 +161,6 @@ export default function PermisoDetallePage() {
           </section>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

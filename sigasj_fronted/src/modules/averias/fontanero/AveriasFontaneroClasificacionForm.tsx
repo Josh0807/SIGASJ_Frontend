@@ -1,9 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
-import { Alert } from '../../../shared/ui/Alert'
-import { buttonVariants } from '../../../shared/ui/button-variants'
-import { cn } from '../../../shared/ui/cn'
+import { Alert, Button } from '../../../shared/ui'
 import {
   extractHttpErrorMessage,
   getHttpErrorStatus,
@@ -154,7 +152,7 @@ const AveriasFontaneroClasificacionForm = ({
 
       <div className="flex flex-wrap items-end gap-3">
         <label
-          className="gallery-admin__field grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
+          className="grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
           htmlFor={PRIORIDAD_SELECT_ID}
         >
           <span className={labelClass}>Prioridad</span>
@@ -181,7 +179,7 @@ const AveriasFontaneroClasificacionForm = ({
         </label>
 
         <label
-          className="gallery-admin__field grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
+          className="grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
           htmlFor={TIPO_SELECT_ID}
         >
           <span className={labelClass}>Tipo</span>
@@ -205,22 +203,22 @@ const AveriasFontaneroClasificacionForm = ({
           </select>
         </label>
 
-        <button
+        <Button
           ref={guardarRef}
           type="submit"
-          className={cn(
-            buttonVariants({ variant: 'primary', size: 'sm' }),
-            'w-full sm:w-auto',
-          )}
+          variant="primary"
+          size="sm"
+          className="w-full sm:w-auto"
           disabled={saving}
+          loading={saving}
+          leftIcon={
+            saving ? undefined : <IconDeviceFloppy size={16} aria-hidden="true" />
+          }
         >
-          <IconDeviceFloppy size={16} aria-hidden="true" />
-          <span>
-            {saving
-              ? AVERIAS_FONTANERO_CALIFICAR_LOADING
-              : AVERIAS_FONTANERO_CALIFICAR_GUARDAR}
-          </span>
-        </button>
+          {saving
+            ? AVERIAS_FONTANERO_CALIFICAR_LOADING
+            : AVERIAS_FONTANERO_CALIFICAR_GUARDAR}
+        </Button>
       </div>
 
       {error ? <Alert tone="danger">{error}</Alert> : null}

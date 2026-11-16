@@ -1,4 +1,4 @@
-import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import MaterialForm from './MaterialForm'
 import { MATERIALES_PATH } from './inventarioPaths'
 import { materialApiError } from './materialFormUtils'
@@ -8,6 +8,7 @@ import { useMaterial } from './useMaterial'
 import { useAuth } from '../auth/components/AuthContext'
 import { InternalAdminRoleName, normalizeInternalRole } from '../auth/utils/internalRoles'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../app/router/routePaths'
+import { AdminShell, Alert, Button, PageHeader } from '../../shared/ui'
 
 export default function MaterialEditPage() {
   const navigate = useNavigate()
@@ -25,24 +26,33 @@ export default function MaterialEditPage() {
   if (validId === null) return <Navigate to={MATERIALES_PATH} replace />
   if (loading) {
     return (
-      <main className="materials-admin">
-        <div className="materials-admin__state" role="status">
-          <span className="materials-admin__spinner" />
-          Cargando material…
-        </div>
-      </main>
+      <AdminShell aria-labelledby="material-edit-title">
+        <PageHeader
+          id="material-edit-title"
+          eyebrow="Inventario · Materiales"
+          title="Editar material"
+          description="Actualice la ficha. La existencia no se modifica aquí; solo con entradas y salidas."
+        />
+        <Alert tone="info">Cargando material…</Alert>
+      </AdminShell>
     )
   }
   if (error || !material) {
     return (
-      <main className="materials-admin">
-        <div className="materials-admin__error" role="alert">
-          <p>{error ?? 'El material no existe.'}</p>
-          <Link className="materials-admin__secondary" to={MATERIALES_PATH}>
+      <AdminShell aria-labelledby="material-edit-title">
+        <PageHeader
+          id="material-edit-title"
+          eyebrow="Inventario · Materiales"
+          title="Editar material"
+          description="Actualice la ficha. La existencia no se modifica aquí; solo con entradas y salidas."
+        />
+        <Alert tone="danger">
+          <p className="m-0 mb-3">{error ?? 'El material no existe.'}</p>
+          <Button to={MATERIALES_PATH} variant="secondary" size="sm">
             Volver al catálogo
-          </Link>
-        </div>
-      </main>
+          </Button>
+        </Alert>
+      </AdminShell>
     )
   }
 
@@ -86,14 +96,13 @@ export default function MaterialEditPage() {
   }
 
   return (
-    <main className="materials-admin materials-admin--form sigasj-stack">
-      <header className="materials-admin__header">
-        <div>
-          <p className="materials-admin__eyebrow">Inventario · Materiales</p>
-          <h1>Editar material</h1>
-          <p>Actualice la ficha. La existencia no se modifica aquí; solo con entradas y salidas.</p>
-        </div>
-      </header>
+    <AdminShell aria-labelledby="material-edit-title">
+      <PageHeader
+        id="material-edit-title"
+        eyebrow="Inventario · Materiales"
+        title="Editar material"
+        description="Actualice la ficha. La existencia no se modifica aquí; solo con entradas y salidas."
+      />
       <MaterialForm
         mode="edit"
         initialValues={initialValues}
@@ -102,6 +111,6 @@ export default function MaterialEditPage() {
         currentProveedor={material.proveedor}
         onSubmit={submit}
       />
-    </main>
+    </AdminShell>
   )
 }

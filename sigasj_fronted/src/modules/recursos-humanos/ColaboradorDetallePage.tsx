@@ -20,6 +20,7 @@ import {
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { AdminShell, Button, PageHeader } from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import CambiarEstadoColaborador from './CambiarEstadoColaborador'
 import EstadoBadge from './EstadoBadge'
@@ -135,11 +136,6 @@ const badgeEventoClass = (tipo: TipoEventoHistorialRrhh) => {
   return 'border-amber-200 bg-amber-50 text-amber-900'
 }
 
-const primaryBtnClass =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-transparent bg-[#1e5a9c] px-5 py-2.5 font-bold text-white no-underline shadow-[0_6px_16px_rgba(30,90,156,0.2)] transition hover:bg-[#174f87] hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c]'
-
-const secondaryBtnClass =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-2.5 font-bold text-[#1e5a9c] no-underline transition hover:border-[#1e5a9c] hover:bg-[#f3f9fd] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c]'
 export default function ColaboradorDetallePage() {
   const { id } = useParams()
   const colaboradorId = Number(id)
@@ -240,18 +236,76 @@ export default function ColaboradorDetallePage() {
   }, [colaboradorId, historialClave, idValido, salirPorSesion, tab])
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      <Link
-        to={RRHH_PATH}
-        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 font-extrabold text-[#1e5a9c] no-underline shadow-[0_6px_18px_rgba(30,90,156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(30,90,156,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
-      >
-        <IconArrowLeft
-          className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none"
-          size={19}
-          aria-hidden="true"
-        />
-        Volver a {RRHH_TITLE}
-      </Link>
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="colaborador-detalle-title">
+      <PageHeader
+        id="colaborador-detalle-title"
+        eyebrow={`${RRHH_TITLE} · Detalle`}
+        title={colaborador ? nombreCompleto(colaborador) : 'Colaborador'}
+        description={
+          colaborador ? (
+            <span className="inline-flex flex-wrap items-center gap-2">
+              <span>{colaborador.cargo}</span>
+              <EstadoBadge activo={colaborador.activo} />
+            </span>
+          ) : (
+            'Consulte la ficha, asignaciones e historial del personal.'
+          )
+        }
+        actions={
+          colaborador ? (
+            <span className="flex flex-wrap items-center gap-2">
+              <Button
+                to={RRHH_PATH}
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+              >
+                Volver a {RRHH_TITLE}
+              </Button>
+              <Button
+                to={colaboradorEditPath(colaborador.id)}
+                variant="primary"
+                size="sm"
+                leftIcon={<IconPencil size={16} aria-hidden="true" />}
+              >
+                Editar
+              </Button>
+              <Button
+                to={colaboradorHistorialPath(colaborador.id)}
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconHistory size={16} aria-hidden="true" />}
+              >
+                Historial
+              </Button>
+              <CambiarEstadoColaborador
+                colaborador={colaborador}
+                onCambiado={(actualizado) => {
+                  setAccionError(null)
+                  setColaborador(actualizado)
+                  setAviso(
+                    `El colaborador quedó ${actualizado.activo ? 'activo' : 'inactivo'}.`,
+                  )
+                }}
+                onError={(mensaje) => {
+                  setAviso(null)
+                  setAccionError(mensaje)
+                }}
+                onNoAutenticado={salirPorSesion}
+              />
+            </span>
+          ) : (
+            <Button
+              to={RRHH_PATH}
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+            >
+              Volver a {RRHH_TITLE}
+            </Button>
+          )
+        }
+      />
 
       {cargando ? (
         <div
@@ -277,22 +331,22 @@ export default function ColaboradorDetallePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {idValido && resultado.reintentable ? (
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-[#eaf6ff]"
+                variant="secondary"
+                leftIcon={<IconRefresh size={18} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
-              </button>
+              </Button>
             ) : null}
-            <Link
+            <Button
               to={RRHH_PATH}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 no-underline hover:no-underline"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
             >
-              <IconArrowLeft size={18} aria-hidden="true" />
               Volver al listado
-            </Link>
+            </Button>
           </div>
         </div>
       ) : (
@@ -313,61 +367,6 @@ export default function ColaboradorDetallePage() {
               {accionError}
             </div>
           ) : null}
-
-          <header className="flex flex-col gap-5 rounded-3xl border border-[#d7e5f1] bg-white p-5 shadow-[0_4px_14px_rgba(30,90,156,0.05)] sm:p-7 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex min-w-0 items-start gap-4">
-              <span
-                className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#1e5a9c] text-base font-extrabold tracking-wide text-white shadow-[0_8px_18px_rgba(30,90,156,0.22)]"
-                aria-hidden="true"
-              >
-                {iniciales(colaborador.nombre, colaborador.apellidos)}
-              </span>
-              <div className="min-w-0">
-                <p className="mb-1 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#1e5a9c]">
-                  {RRHH_TITLE} · Detalle
-                </p>
-                <h1 className="m-0 break-words text-2xl font-extrabold tracking-tight text-[#123f70] sm:text-[1.75rem]">
-                  {nombreCompleto(colaborador)}
-                </h1>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-slate-500">
-                  <span className="font-semibold text-[#1a2f42]">{colaborador.cargo}</span>
-                  <span aria-hidden="true">·</span>
-                  <EstadoBadge activo={colaborador.activo} />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-[#e8f1f8] bg-[#f7fbfe] p-2.5">
-              <Link to={colaboradorEditPath(colaborador.id)} className={primaryBtnClass}>
-                <IconPencil size={18} aria-hidden="true" />
-                Editar
-              </Link>
-
-              <Link
-                to={colaboradorHistorialPath(colaborador.id)}
-                className={secondaryBtnClass}
-              >
-                <IconHistory size={18} aria-hidden="true" />
-                Historial
-              </Link>
-
-              <CambiarEstadoColaborador
-                colaborador={colaborador}
-                onCambiado={(actualizado) => {
-                  setAccionError(null)
-                  setColaborador(actualizado)
-                  setAviso(
-                    `El colaborador quedó ${actualizado.activo ? 'activo' : 'inactivo'}.`,
-                  )
-                }}
-                onError={(mensaje) => {
-                  setAviso(null)
-                  setAccionError(mensaje)
-                }}
-                onNoAutenticado={salirPorSesion}
-              />
-            </div>
-          </header>
 
           <nav
             className="flex flex-col gap-2 rounded-3xl border border-[#d7e5f1] bg-white p-2.5 shadow-[0_4px_14px_rgba(30,90,156,0.05)] sm:flex-row sm:flex-wrap sm:items-center"
@@ -567,13 +566,14 @@ export default function ColaboradorDetallePage() {
                 <p className="m-0 text-sm text-slate-500">
                   Últimos eventos registrados para este colaborador.
                 </p>
-                <Link
+                <Button
                   to={colaboradorHistorialPath(colaborador.id)}
-                  className={secondaryBtnClass}
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconHistory size={18} aria-hidden="true" />}
                 >
-                  <IconHistory size={18} aria-hidden="true" />
                   Historial completo
-                </Link>
+                </Button>
               </div>
 
               {cargandoHistorial ? (
@@ -594,14 +594,16 @@ export default function ColaboradorDetallePage() {
                 >
                   <p className="m-0 font-semibold text-red-800">{historialEstado.error}</p>
                   {historialEstado.reintentable ? (
-                    <button
+                    <Button
                       type="button"
-                      className={`${secondaryBtnClass} w-fit`}
+                      variant="secondary"
+                      size="sm"
+                      className="w-fit"
+                      leftIcon={<IconRefresh size={18} aria-hidden="true" />}
                       onClick={() => setHistorialRecarga((n) => n + 1)}
                     >
-                      <IconRefresh size={18} aria-hidden="true" />
                       Reintentar
-                    </button>
+                    </Button>
                   ) : null}
                 </div>
               ) : !historial?.length ? (
@@ -634,18 +636,19 @@ export default function ColaboradorDetallePage() {
               )}
 
               <div className="flex flex-wrap gap-3 pt-1">
-                <Link
+                <Button
                   to={colaboradorHistorialPath(colaborador.id)}
-                  className={primaryBtnClass}
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<IconHistory size={18} aria-hidden="true" />}
                 >
-                  <IconHistory size={18} aria-hidden="true" />
                   Ver historial completo
-                </Link>
+                </Button>
               </div>
             </SectionCard>
           ) : null}
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

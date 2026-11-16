@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from 'react'
-import { IconFileText, IconUpload } from '@tabler/icons-react'
-import { Button } from '../../../shared/ui'
+import { IconFileText } from '@tabler/icons-react'
+import { AdminFileControl, Button, Card } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { TransparenciaFormValues } from './types'
 import {
@@ -135,6 +135,7 @@ const TransparenciaAdminForm = ({
   }
 
   return (
+    <Card as="div" padded className="min-w-0 w-full">
     <form
       className="gallery-admin__form gallery-admin__form--editor admin-modern-form w-full !max-w-none"
       onSubmit={handleSubmit}
@@ -224,24 +225,13 @@ const TransparenciaAdminForm = ({
             )}
           </div>
 
-          <label className="gallery-admin__field gallery-admin__field--file">
-            <span>
-              {mode === 'create' ? 'Archivo *' : 'Reemplazar archivo (opcional)'}
-            </span>
-            <span className="gallery-admin__file-control">
-              <IconUpload size={18} aria-hidden="true" />
-              <input
-                type="file"
-                accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"
-                onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
-              />
-            </span>
-            <small>
-              {selectedFileLabel
-                ? selectedFileLabel
-                : `Máximo ${formatTransparenciaMaxSizeLabel()}. Formatos: PDF, JPG, JPEG, PNG.`}
-            </small>
-          </label>
+          <AdminFileControl
+            accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"
+            label={mode === 'create' ? 'Archivo *' : 'Reemplazar archivo (opcional)'}
+            fileName={selectedFileLabel}
+            hint={`Máximo ${formatTransparenciaMaxSizeLabel()}. Formatos: PDF, JPG, JPEG, PNG.`}
+            onFileChange={onFileChange}
+          />
 
           {fileError ? (
             <p className="gallery-admin__form-error" role="alert">
@@ -270,6 +260,7 @@ const TransparenciaAdminForm = ({
         </Button>
       </div>
     </form>
+    </Card>
   )
 }
 

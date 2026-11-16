@@ -1,7 +1,7 @@
 import { IconArrowLeft, IconAt, IconDeviceFloppy, IconId, IconUser, IconUsers } from '@tabler/icons-react'
 import { useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '../../shared/ui'
+import { AdminShell, Button, Card, PageHeader } from '../../shared/ui'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
 import { asociadoBackendFieldErrors, asociadoSubmitError, toRegistrarAsociadoPayload, validateAsociado, type AsociadoFormErrors } from './asociadoForm'
@@ -64,14 +64,27 @@ export default function RegistrarAsociadoPage() {
     }
   }
 
-  return <main className="grid w-full gap-5 sm:gap-6">
-    <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8">
-      <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">Administración · Asociados</p>
-      <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">Registrar asociado</h1>
-      <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">Ingrese la información personal y de contacto del nuevo asociado.</p>
-    </header>
-    {submitError ? <AsociadoFeedback variant="error">{submitError}</AsociadoFeedback> : null}
-    <form className="grid w-full gap-7 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10" noValidate onSubmit={submit} aria-busy={saving}>
+  return (
+    <AdminShell
+      className="gap-5 sm:gap-6"
+      aria-labelledby="registrar-asociado-title"
+    >
+      <PageHeader
+        id="registrar-asociado-title"
+        eyebrow="Administración · Asociados"
+        title="Registrar asociado"
+        description="Ingrese la información personal y de contacto del nuevo asociado."
+      />
+      {submitError ? (
+        <AsociadoFeedback variant="error">{submitError}</AsociadoFeedback>
+      ) : null}
+      <Card as="section" padded className="!p-5 sm:!p-6 lg:!p-8">
+        <form
+          className="grid w-full gap-7 lg:gap-8"
+          noValidate
+          onSubmit={submit}
+          aria-busy={saving}
+        >
       <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c] sm:size-12"><IconUser size={25} aria-hidden="true" /></span><div className="min-w-0"><h2 className="text-lg font-extrabold leading-tight tracking-tight text-[#073b73] sm:text-xl">Información del asociado</h2><p className="mt-2 text-sm leading-6 text-slate-500">Todos los campos marcados con <span className="font-bold text-red-600">*</span> son obligatorios.</p></div></div>
       <div className="grid gap-x-7 gap-y-6 lg:grid-cols-2 lg:gap-y-7">
         {fields.map(({ name, label, icon: Icon, ...input }) => {
@@ -90,6 +103,8 @@ export default function RegistrarAsociadoPage() {
         <Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto" disabled={saving} loading={saving} leftIcon={<IconDeviceFloppy size={20} aria-hidden="true" />}>{saving ? 'Guardando asociado…' : 'Guardar asociado'}</Button>
         <Button to={ASOCIADOS_PATH} variant="secondary" size="lg" className="w-full sm:w-auto" leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}>Cancelar</Button>
       </div>
-    </form>
-  </main>
+        </form>
+      </Card>
+    </AdminShell>
+  )
 }

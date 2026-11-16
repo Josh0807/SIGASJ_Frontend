@@ -1,10 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { IconArrowLeft } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconChevronLeft,
+  IconChevronRight,
+  IconClipboardList,
+  IconRefresh,
+} from '@tabler/icons-react'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterSelectClassName,
+} from '../../../shared/ui'
 import { useAuth } from '../../auth/components/AuthContext'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import ActividadDetalleOverlay from '../components/ActividadDetalleOverlay'
-import ActivityFeedback from '../components/ActivityFeedback'
 import HistorialActividadCard from '../components/HistorialActividadCard'
 import { getActividadDetalle, getMisActividades } from '../services/actividadesFontaneroApi'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
@@ -109,52 +125,48 @@ const MisActividadesPage = () => {
   }
 
   return (
-    <section
-      className="actividades-fontanero-historial !mx-0 !max-w-none !gap-7"
+    <AdminShell
+      className="gap-5 sm:gap-6"
       aria-labelledby="mis-actividades-title"
     >
-      <header className="actividades-fontanero-historial__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-        <div className="min-w-0 space-y-3">
-          <p className="!m-0 !text-sm !font-black !uppercase !tracking-[0.12em] !text-[#1e5a9c]">
-            Registro de Actividades
-          </p>
-          <h1
-            id="mis-actividades-title"
-            className="!m-0 !text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl"
-          >
-            Mis actividades
-          </h1>
-          <p className="!m-0 !text-lg !leading-relaxed !text-slate-500">
-            Consulte todas las actividades que ha registrado y su estado de revisión.
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-col items-stretch gap-3 lg:items-end">
-          <Link
+      <PageHeader
+        id="mis-actividades-title"
+        eyebrow="Registro de actividades"
+        title="Mis actividades"
+        description="Consulte todas las actividades que ha registrado y su estado de revisión."
+        actions={
+          <Button
             to={ACTIVIDADES_FONTANERO_PATHS.home}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-5 py-3 font-bold !no-underline text-[#1e5a9c] shadow-md transition hover:-translate-y-0.5 hover:bg-[#eaf6ff] hover:!no-underline"
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
           >
-            <IconArrowLeft size={20} aria-hidden="true" />
-            Volver al menú de actividades
-          </Link>
-          {!isLoading && !error ? (
-            <p role="status" data-testid="mis-actividades-total">
-              {filtradas.length} {filtradas.length === 1 ? 'actividad' : 'actividades'}
-            </p>
-          ) : null}
-        </div>
-      </header>
+            Menú de actividades
+          </Button>
+        }
+      />
 
-      <div className="actividades-fontanero-historial__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-6 md:!p-8">
-        <label className="actividades-fontanero-historial__field">
-          <span className="text-sm font-black uppercase tracking-[0.08em] text-[#1e5a9c]">Estado</span>
+      <AdminFilters
+        aria-label="Filtro por estado"
+        summary={
+          !isLoading && !error ? (
+            <>
+              <strong className="text-sigasj-ink" data-testid="mis-actividades-total">
+                {filtradas.length}
+              </strong>
+              <span>{filtradas.length === 1 ? 'actividad' : 'actividades'}</span>
+            </>
+          ) : null
+        }
+      >
+        <AdminFilterField label="Estado">
           <select
+            className={adminFilterSelectClassName}
             value={estado}
             onChange={(event) => {
               setEstado(event.target.value)
               setPage(1)
             }}
             data-testid="mis-actividades-estado"
-            className="!min-h-14 !rounded-2xl !border-[#bfe3fa] !bg-white !px-4"
           >
             <option value="">Todos</option>
             {ESTADOS_FILTRO.map((value) => (
@@ -163,20 +175,19 @@ const MisActividadesPage = () => {
               </option>
             ))}
           </select>
-        </label>
-      </div>
-
-      {isLoading ? (
-        <ActivityFeedback variant="info" message="Consultando sus actividades…" />
-      ) : null}
+        </AdminFilterField>
+      </AdminFilters>
 
       {error ? (
-        <ActivityFeedback
-          variant="error"
-          message={error}
-          action={
-            <button
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{error}</p>
+            <Button
               type="button"
+              variant="secondary"
+              size="sm"
+              className="justify-self-start"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
               onClick={() => {
                 setIsLoading(true)
                 setError(null)
@@ -184,81 +195,98 @@ const MisActividadesPage = () => {
               }}
             >
               Reintentar
-            </button>
-          }
-        />
+            </Button>
+          </div>
+        </Alert>
       ) : null}
 
-      {!isLoading && !error && filtradas.length === 0 ? (
-        <ActivityFeedback
-          variant="info"
-          message={
-            actividades.length === 0
-              ? 'Todavía no ha registrado actividades.'
-              : 'No hay actividades con el estado seleccionado.'
-          }
-        />
-      ) : null}
+      <Card as="section" padded className="!gap-4">
+        {isLoading ? (
+          <Alert tone="info">Consultando sus actividades…</Alert>
+        ) : !error && filtradas.length === 0 ? (
+          <EmptyState
+            icon={<IconClipboardList size={28} aria-hidden="true" />}
+            title={
+              actividades.length === 0
+                ? 'Todavía no ha registrado actividades'
+                : 'Sin resultados para este estado'
+            }
+            description={
+              actividades.length === 0
+                ? 'Cuando registre actividades, aparecerán aquí con su estado de revisión.'
+                : 'Pruebe otro estado o limpie el filtro.'
+            }
+          />
+        ) : !error && visibles.length > 0 ? (
+          <>
+            <ul
+              className="actividades-fontanero-historial__list m-0 grid list-none gap-4 p-0"
+              data-testid="mis-actividades-lista"
+            >
+              {visibles.map((actividad) => (
+                <li key={actividad.id}>
+                  <HistorialActividadCard
+                    actividad={actividad}
+                    onVerDetalle={() => {
+                      void openDetail(actividad)
+                    }}
+                    extraFooter={
+                      actividad.estado === 'BORRADOR' ? (
+                        <Link
+                          to={ACTIVIDADES_FONTANERO_PATHS.editarBorrador(actividad.id)}
+                          className="actividad-historial-card__action"
+                        >
+                          Editar borrador
+                        </Link>
+                      ) : actividad.estado === 'REQUIERE_CORRECCION' ? (
+                        <Link
+                          to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}
+                          className="actividad-historial-card__action"
+                        >
+                          Corregir actividad
+                        </Link>
+                      ) : null
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
 
-      {!isLoading && !error && visibles.length > 0 ? (
-        <ul
-          className="actividades-fontanero-historial__list m-0 grid list-none gap-4 p-0"
-          data-testid="mis-actividades-lista"
-        >
-          {visibles.map((actividad) => (
-            <li key={actividad.id}>
-              <HistorialActividadCard
-                actividad={actividad}
-                onVerDetalle={() => {
-                  void openDetail(actividad)
-                }}
-                extraFooter={
-                  actividad.estado === 'BORRADOR' ? (
-                    <Link
-                      to={ACTIVIDADES_FONTANERO_PATHS.editarBorrador(actividad.id)}
-                      className="actividad-historial-card__action"
-                    >
-                      Editar borrador
-                    </Link>
-                  ) : actividad.estado === 'REQUIERE_CORRECCION' ? (
-                    <Link
-                      to={ACTIVIDADES_FONTANERO_PATHS.corregirActividad(actividad.id)}
-                      className="actividad-historial-card__action"
-                    >
-                      Corregir actividad
-                    </Link>
-                  ) : null
-                }
-              />
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {!isLoading && !error && totalPages > 1 ? (
-        <nav
-          aria-label="Paginación de mis actividades"
-          className="actividades-fontanero-historial__pagination"
-        >
-          <button
-            type="button"
-            disabled={currentPage <= 1}
-            onClick={() => setPage(currentPage - 1)}
-          >
-            Anterior
-          </button>
-          <p>
-            Página {currentPage} de {totalPages}
-          </p>
-          <button
-            type="button"
-            disabled={currentPage >= totalPages}
-            onClick={() => setPage(currentPage + 1)}
-          >
-            Siguiente
-          </button>
-        </nav>
-      ) : null}
+            {totalPages > 1 ? (
+              <nav
+                aria-label="Paginación de mis actividades"
+                className="flex flex-col items-center justify-between gap-3 border-t border-sigasj-border pt-4 text-sm text-sigasj-muted sm:flex-row"
+              >
+                <p className="m-0 font-semibold">
+                  Página {currentPage} de {totalPages}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
+                    disabled={currentPage <= 1}
+                    onClick={() => setPage(currentPage - 1)}
+                  >
+                    Anterior
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setPage(currentPage + 1)}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              </nav>
+            ) : null}
+          </>
+        ) : null}
+      </Card>
 
       {selected || detailLoading || detailError ? (
         <ActividadDetalleOverlay
@@ -271,7 +299,7 @@ const MisActividadesPage = () => {
           }}
         />
       ) : null}
-    </section>
+    </AdminShell>
   )
 }
 

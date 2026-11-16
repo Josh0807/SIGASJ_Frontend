@@ -7,6 +7,12 @@ import {
 import { useCallback, useEffect, useId, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  PageHeader,
+} from '../../../shared/ui'
 import { useAuth } from '../../auth/components/AuthContext'
 import {
   esNoAutenticado,
@@ -209,37 +215,83 @@ export default function SolicitudAusenciaDetallePage() {
   }
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-4xl gap-4 py-2 sm:gap-5 sm:py-4">
+    <AdminShell
+      className="mx-auto max-w-4xl gap-5 sm:gap-6"
+      aria-labelledby="solicitud-ausencia-admin-detalle-title"
+    >
       <RrhhSubnav />
-      <Link
-        to={SOLICITUDES_AUSENCIA_ADMIN_PATH}
-        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 font-extrabold text-blue-700 no-underline shadow-[0_6px_18px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(37,99,235,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-600 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
-      >
-        <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" /> Volver a solicitudes
-      </Link>
+
+      <PageHeader
+        id="solicitud-ausencia-admin-detalle-title"
+        eyebrow={
+          solicitud
+            ? `${RRHH_TITLE} · Solicitud de ausencia`
+            : `${RRHH_TITLE} · Solicitud`
+        }
+        title={
+          solicitud ? (
+            <span className="inline-flex flex-wrap items-center gap-3">
+              {tipoSolicitudAusenciaLabel(solicitud.tipo)}
+              <span
+                className={`inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-extrabold tracking-[0.01em] ${estadoSolicitudAusenciaClassName(solicitud.estado)}`}
+              >
+                <span
+                  className={`size-2 rounded-full ${
+                    solicitud.estado === 'PENDIENTE'
+                      ? 'bg-amber-500'
+                      : solicitud.estado === 'APROBADA'
+                        ? 'bg-emerald-500'
+                        : 'bg-rose-500'
+                  }`}
+                  aria-hidden="true"
+                />
+                {estadoSolicitudAusenciaLabel(solicitud.estado)}
+              </span>
+            </span>
+          ) : (
+            'Detalle de solicitud'
+          )
+        }
+        description={
+          solicitud
+            ? `Registrada el ${formatearFechaPermiso(solicitud.createdAt.slice(0, 10))}`
+            : 'Revise los datos y apruebe o rechace según corresponda.'
+        }
+        actions={
+          <Button
+            to={SOLICITUDES_AUSENCIA_ADMIN_PATH}
+            variant="secondary"
+            size="sm"
+            leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+          >
+            Volver a solicitudes
+          </Button>
+        }
+      />
 
       {!idValido || (!cargando && (carga.error || !solicitud)) ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6" role="alert">
-          <p className="m-0 font-semibold text-red-800">
-            {carga.error ?? 'No se encontró la solicitud.'}
-          </p>
-          {idValido ? (
-            <button
-              type="button"
-              className="mt-4 min-h-11 rounded-xl border border-blue-200 bg-white px-4 font-bold text-blue-800"
-              onClick={() => setRecarga((n) => n + 1)}
-            >
-              Reintentar
-            </button>
-          ) : null}
-        </div>
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">
+              {carga.error ?? 'No se encontró la solicitud.'}
+            </p>
+            {idValido ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                onClick={() => setRecarga((n) => n + 1)}
+              >
+                Reintentar
+              </Button>
+            ) : null}
+          </div>
+        </Alert>
       ) : cargando || !solicitud ? (
-        <div
-          className="rounded-2xl border border-sky-100 bg-white p-8 font-semibold text-slate-600"
-          role="status"
-        >
+        <Alert tone="info" role="status">
           Cargando solicitud…
-        </div>
+        </Alert>
       ) : (
         <>
           {aviso ? (
@@ -273,33 +325,7 @@ export default function SolicitudAusenciaDetallePage() {
           ) : null}
 
           <article className="min-w-0 overflow-hidden rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-white shadow-[0_12px_28px_rgba(18,63,112,0.07)] sm:rounded-3xl">
-            <header className="border-b border-[color:var(--asada-line,#d7e5f1)] px-4 py-4 sm:px-6 sm:py-5">
-              <p className="mb-0 text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-[color:var(--asada-navy,#1e5a9c)]">
-                {RRHH_TITLE} · Solicitud de ausencia
-              </p>
-              <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2.5">
-                <h1 className="m-0 text-[clamp(1.35rem,3vw,1.85rem)] font-black tracking-tight text-[color:var(--asada-ink,#123f70)]">
-                  {tipoSolicitudAusenciaLabel(solicitud.tipo)}
-                </h1>
-                <span
-                  className={`inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-extrabold tracking-[0.01em] ${estadoSolicitudAusenciaClassName(solicitud.estado)}`}
-                >
-                  <span
-                    className={`size-2 rounded-full ${
-                      solicitud.estado === 'PENDIENTE'
-                        ? 'bg-amber-500'
-                        : solicitud.estado === 'APROBADA'
-                          ? 'bg-emerald-500'
-                          : 'bg-rose-500'
-                    }`}
-                    aria-hidden="true"
-                  />
-                  {estadoSolicitudAusenciaLabel(solicitud.estado)}
-                </span>
-              </div>
-            </header>
-
-            <dl className="m-0 divide-y divide-[color:var(--asada-line,#d7e5f1)] px-4 sm:px-6">
+            <dl className="m-0 divide-y divide-[color:var(--asada-line,#d7e5f1)] px-4 pt-4 sm:px-6 sm:pt-5">
               <DetalleCampo label="Colaborador">
                 {solicitud.colaborador
                   ? nombreCompleto(solicitud.colaborador)
@@ -387,9 +413,10 @@ export default function SolicitudAusenciaDetallePage() {
                       <span className="min-w-0 break-words text-sm font-bold text-[color:var(--asada-ink,#123f70)]">
                         {doc.nombreOriginal}
                       </span>
-                      <button
+                      <Button
                         type="button"
-                        className="inline-flex min-h-10 items-center rounded-xl border border-[#bfe3fa] bg-white px-3 text-sm font-extrabold text-[color:var(--asada-navy,#1e5a9c)]"
+                        variant="secondary"
+                        size="sm"
                         onClick={() =>
                           void abrirEvidenciaSolicitudAusencia(
                             doc.rutaReferenciaArchivo,
@@ -398,7 +425,7 @@ export default function SolicitudAusenciaDetallePage() {
                         }
                       >
                         Ver documento
-                      </button>
+                      </Button>
                     </li>
                   ))}
                 </ul>
@@ -411,27 +438,32 @@ export default function SolicitudAusenciaDetallePage() {
 
             {solicitud.estado === 'PENDIENTE' ? (
               <div className="flex flex-col gap-3 border-t border-[color:var(--asada-line,#d7e5f1)] px-4 py-4 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto"
                   disabled={Boolean(busy)}
+                  loading={busy === 'aprobar'}
+                  leftIcon={<IconCheck size={18} aria-hidden="true" />}
                   onClick={() => setModalAprobar(true)}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border-0 bg-[color:var(--asada-navy,#1e5a9c)] px-5 font-extrabold text-white shadow-[0_8px_18px_rgba(30,90,156,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174a82] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
-                  <IconCheck size={18} aria-hidden="true" />
                   {busy === 'aprobar' ? 'Aprobando…' : 'Aprobar solicitud'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="danger"
+                  size="md"
+                  className="w-full sm:w-auto"
                   disabled={Boolean(busy)}
+                  leftIcon={<IconX size={18} aria-hidden="true" />}
                   onClick={() => {
                     setMotivoRechazo('')
                     setModalRechazo(true)
                   }}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-5 font-extrabold text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
-                  <IconX size={18} aria-hidden="true" />
                   Rechazar
-                </button>
+                </Button>
               </div>
             ) : null}
           </article>
@@ -457,23 +489,24 @@ export default function SolicitudAusenciaDetallePage() {
               . {mensajeAprobar}
             </p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-3">
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 font-extrabold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 disabled:opacity-60"
+                variant="secondary"
                 disabled={Boolean(busy)}
                 onClick={() => setModalAprobar(false)}
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-emerald-500 bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-500 px-6 py-3 font-extrabold text-white shadow-[0_11px_26px_rgba(16,185,129,0.28)] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none motion-reduce:transform-none"
+                variant="primary"
                 disabled={Boolean(busy)}
+                loading={busy === 'aprobar'}
+                leftIcon={<IconCheck size={18} aria-hidden="true" />}
                 onClick={() => void aprobar()}
               >
-                <IconCheck size={18} aria-hidden="true" />
                 {busy === 'aprobar' ? 'Aprobando…' : 'Confirmar aprobación'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -510,27 +543,28 @@ export default function SolicitudAusenciaDetallePage() {
               />
             </label>
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-3">
-                <button
+                <Button
                   type="button"
-                  className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 font-extrabold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 disabled:opacity-60"
+                  variant="secondary"
                   disabled={Boolean(busy)}
                   onClick={() => setModalRechazo(false)}
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-rose-500 bg-gradient-to-r from-rose-700 via-rose-600 to-red-500 px-6 py-3 font-extrabold text-white shadow-[0_11px_26px_rgba(225,29,72,0.28)] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none motion-reduce:transform-none"
+                  variant="danger"
                   disabled={Boolean(busy)}
+                  loading={busy === 'rechazar'}
+                  leftIcon={<IconX size={18} aria-hidden="true" />}
                   onClick={() => void confirmarRechazo()}
                 >
-                  <IconX size={18} aria-hidden="true" />
                   {busy === 'rechazar' ? 'Rechazando…' : 'Confirmar rechazo'}
-                </button>
+                </Button>
               </div>
           </div>
         </div>
       ) : null}
-    </div>
+    </AdminShell>
   )
 }

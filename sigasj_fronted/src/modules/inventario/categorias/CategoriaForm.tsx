@@ -7,7 +7,6 @@ import {
   IconDeviceFloppy,
   IconTag,
 } from '@tabler/icons-react'
-import { Link } from 'react-router-dom'
 import { Button } from '../../../shared/ui'
 import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 import { CATEGORIAS_PATH } from '../inventarioPaths'
@@ -86,21 +85,24 @@ export default function CategoriaForm({
           </div>
         ) : (
           <FormSuccessResult
-            className="category-admin__success !max-w-3xl !gap-3 !overflow-hidden !rounded-[24px] !border-emerald-200 !bg-[linear-gradient(135deg,#ecfdf5_0%,#ffffff_58%,#f0fdfa_100%)] !p-6 !shadow-[0_16px_40px_rgba(5,150,105,0.13)]"
+            className="category-admin__success !max-w-3xl !gap-3 !overflow-hidden !rounded-[13px] !border-sigasj-border !bg-white !p-6 !shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
             icon={<IconCircleCheckFilled size={30} />}
             title={message.text}
             description="La categoría ya está disponible para clasificar los materiales del inventario."
             actions={
-              <Link className="materials-admin__secondary group !inline-flex !min-h-11 !items-center !justify-center !gap-2 !rounded-xl !border-emerald-200 !bg-white !px-4 !font-extrabold !text-emerald-700 !no-underline !shadow-[0_7px_18px_rgba(5,150,105,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-emerald-400 hover:!bg-emerald-50 hover:!shadow-[0_11px_23px_rgba(5,150,105,0.18)] active:!translate-y-0 active:!scale-[0.98] motion-reduce:!transform-none motion-reduce:!transition-none" to={CATEGORIAS_PATH}>
-                <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />
+              <Button
+                to={CATEGORIAS_PATH}
+                variant="secondary"
+                leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
+              >
                 Volver al listado
-              </Link>
+              </Button>
             }
           />
         )
       ) : null}
       <form
-        className="materials-admin__form provider-admin__form category-admin__form w-full max-w-3xl"
+        className="materials-admin__form provider-admin__form category-admin__form w-full max-w-3xl !rounded-[13px] !border-sigasj-border !bg-white !shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
         noValidate
         onSubmit={submit}
       >

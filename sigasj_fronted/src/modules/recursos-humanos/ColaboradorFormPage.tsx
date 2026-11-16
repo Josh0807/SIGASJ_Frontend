@@ -13,8 +13,8 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '../../shared/ui'
+import { useNavigate, useParams } from 'react-router-dom'
+import { AdminShell, Button, PageHeader } from '../../shared/ui'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
 import {
@@ -205,18 +205,17 @@ export default function ColaboradorFormPage() {
   const titulo = modo === 'editar' ? 'Editar colaborador' : 'Registrar colaborador'
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8">
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-          Administración · {RRHH_TITLE}
-        </p>
-        <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">{titulo}</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">
-          {modo === 'editar'
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="colaborador-form-title">
+      <PageHeader
+        id="colaborador-form-title"
+        eyebrow={`Administración · ${RRHH_TITLE}`}
+        title={titulo}
+        description={
+          modo === 'editar'
             ? 'Actualice la información personal, el expediente laboral, el puesto o la cuenta vinculada del colaborador.'
-            : 'Ingrese la información personal, el expediente laboral y el puesto del nuevo colaborador.'}
-        </p>
-      </header>
+            : 'Ingrese la información personal, el expediente laboral y el puesto del nuevo colaborador.'
+        }
+      />
 
       {cargando ? (
         <div className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
@@ -230,22 +229,22 @@ export default function ColaboradorFormPage() {
           <p className="m-0 font-semibold text-red-800">{cargaError}</p>
           <div className="flex flex-wrap justify-center gap-3">
             {idValido && carga.reintentable ? (
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                variant="secondary"
+                leftIcon={<IconRefresh size={18} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
-              </button>
+              </Button>
             ) : null}
-            <Link
+            <Button
               to={RRHH_PATH}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 no-underline hover:no-underline"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
             >
-              <IconArrowLeft size={18} aria-hidden="true" />
               Volver al listado
-            </Link>
+            </Button>
           </div>
         </div>
       ) : (
@@ -514,6 +513,6 @@ export default function ColaboradorFormPage() {
           </form>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

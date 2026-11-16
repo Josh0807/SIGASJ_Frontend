@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { AdminShell, PageHeader } from '../../../shared/ui'
 import { PROVEEDORES_PATH } from '../inventarioPaths'
 import ProveedorForm from './ProveedorForm'
 import { createProveedor } from './proveedoresApi'
@@ -8,8 +9,29 @@ import type { ProveedorPayload } from './types'
 export default function ProveedorCreatePage() {
   const navigate = useNavigate()
   const save = async (payload: ProveedorPayload) => {
-    try { await createProveedor(payload); navigate(PROVEEDORES_PATH, { replace: true, state: { success: 'Proveedor registrado correctamente.' } }) }
-    catch (caught) { throw new Error(proveedorError(caught, 'No fue posible registrar el proveedor.'), { cause: caught }) }
+    try {
+      await createProveedor(payload)
+      navigate(PROVEEDORES_PATH, {
+        replace: true,
+        state: { success: 'Proveedor registrado correctamente.' },
+      })
+    } catch (caught) {
+      throw new Error(
+        proveedorError(caught, 'No fue posible registrar el proveedor.'),
+        { cause: caught },
+      )
+    }
   }
-  return <main className="materials-admin materials-admin--form provider-admin-page sigasj-stack"><header className="materials-admin__header"><div><p className="materials-admin__eyebrow">Inventario · Proveedores</p><h1>Registrar proveedor</h1><p>Complete el nombre y los datos de contacto disponibles.</p></div></header><ProveedorForm mode="create" onSubmit={save} /></main>
+
+  return (
+    <AdminShell aria-labelledby="proveedor-create-title">
+      <PageHeader
+        id="proveedor-create-title"
+        eyebrow="Inventario · Proveedores"
+        title="Registrar proveedor"
+        description="Complete el nombre y los datos de contacto disponibles."
+      />
+      <ProveedorForm mode="create" onSubmit={save} />
+    </AdminShell>
+  )
 }

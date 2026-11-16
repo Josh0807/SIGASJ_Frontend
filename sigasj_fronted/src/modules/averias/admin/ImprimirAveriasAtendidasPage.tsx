@@ -4,8 +4,15 @@ import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useSearchParams } from 'react-router-dom'
 import { IconArrowLeft, IconPrinter } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
-import { Button } from '../../../shared/ui/Button'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { getAveriasAtendidasParaImpresion } from '../services/averiasAdminApi'
 import { ESTADO_AVERIA_LABELS, isEstadoAveria } from './estadoAveria'
 import { formatAveriaAdminDateTime } from './formatAveriaAdminDate'
@@ -123,78 +130,93 @@ export default function ImprimirAveriasAtendidasPage() {
   }
 
   return (
-    <main className="gallery-admin averias-admin inventario-print w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack gap-4">
-        <PageHeader
-          className="inventario-print__controls"
-          title="Imprimir averías atendidas"
-          description="Listado de averías en proceso y reparadas para el archivo de la ASADA."
-          actions={
-            <Button
-              to={AVERIAS_ADMIN_REPORTE_PATH}
-              variant="secondary"
-              size="sm"
-              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
-            >
-              Volver al resumen
-            </Button>
-          }
-        />
-
-        <form
-          className="gallery-admin__filters averias-admin__filters inventario-print__controls"
-          aria-label="Rango del reporte"
-          onSubmit={aplicarRango}
-        >
-          <div className="averias-admin__filters-form">
-          <label className="gallery-admin__field" htmlFor="averias-imprimir-desde">
-            <span>Desde</span>
-            <input
-              id="averias-imprimir-desde"
-              name="fechaDesde"
-              type="date"
-              value={draftDesde}
-              onChange={(event) => setDraftDesde(event.target.value)}
-            />
-          </label>
-          <label className="gallery-admin__field" htmlFor="averias-imprimir-hasta">
-            <span>Hasta</span>
-            <input
-              id="averias-imprimir-hasta"
-              name="fechaHasta"
-              type="date"
-              value={draftHasta}
-              onChange={(event) => setDraftHasta(event.target.value)}
-            />
-          </label>
-          <button className="gallery-admin__button" type="submit" disabled={loading}>
-            Consultar
-          </button>
-          <button
-            className="gallery-admin__button inventario-print__action"
-            type="button"
-            onClick={imprimir}
-            disabled={loading || Boolean(error) || averias.length === 0}
+    <AdminShell
+      className="averias-admin inventario-print w-full min-w-0 gap-5 sm:gap-6"
+      aria-labelledby="averias-imprimir-atendidas-title"
+    >
+      <PageHeader
+        id="averias-imprimir-atendidas-title"
+        className="inventario-print__controls"
+        eyebrow="Operación · Averías"
+        title="Imprimir averías atendidas"
+        description="Listado de averías en proceso y reparadas para el archivo de la ASADA."
+        actions={
+          <Button
+            to={AVERIAS_ADMIN_REPORTE_PATH}
+            variant="secondary"
+            size="sm"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
           >
-            <IconPrinter size={18} aria-hidden="true" />
-            Imprimir
-          </button>
-          </div>
-        </form>
+            Volver al resumen
+          </Button>
+        }
+      />
 
-        {error ? (
-          <div className="gallery-admin__empty inventario-print__controls" role="alert">
-            <p>{error}</p>
-          </div>
-        ) : null}
+      <AdminFilters
+        className="inventario-print__controls"
+        aria-label="Rango del reporte"
+        summary={
+          <>
+            <Button
+              type="button"
+              size="sm"
+              disabled={loading}
+              onClick={(event) => aplicarRango(event as unknown as FormEvent)}
+            >
+              Consultar
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="inventario-print__action"
+              leftIcon={<IconPrinter size={18} aria-hidden="true" />}
+              onClick={imprimir}
+              disabled={loading || Boolean(error) || averias.length === 0}
+            >
+              Imprimir
+            </Button>
+          </>
+        }
+      >
+        <AdminFilterField label="Desde">
+          <input
+            id="averias-imprimir-desde"
+            name="fechaDesde"
+            type="date"
+            className={adminFilterControlClassName}
+            value={draftDesde}
+            onChange={(event) => setDraftDesde(event.target.value)}
+          />
+        </AdminFilterField>
+        <AdminFilterField label="Hasta">
+          <input
+            id="averias-imprimir-hasta"
+            name="fechaHasta"
+            type="date"
+            className={adminFilterControlClassName}
+            value={draftHasta}
+            onChange={(event) => setDraftHasta(event.target.value)}
+          />
+        </AdminFilterField>
+      </AdminFilters>
 
-        {loading ? (
-          <p className="gallery-admin__empty inventario-print__controls" role="status">
-            Cargando averías atendidas…
-          </p>
-        ) : null}
+      {error ? (
+        <EmptyState
+          className="inventario-print__controls"
+          role="alert"
+          title={error}
+        />
+      ) : null}
 
-        {!loading && !error ? (
+      {loading ? (
+        <EmptyState
+          className="inventario-print__controls"
+          role="status"
+          title="Cargando averías atendidas…"
+        />
+      ) : null}
+
+      {!loading && !error ? (
           <article className="inventario-print__sheet !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/40 !p-7 !shadow-[0_16px_40px_rgba(30, 90, 156,0.10)] md:!p-9">
             <header className="inventario-print__letterhead !gap-5 !border-blue-100 !pb-6">
               <img className="!h-16 !w-16 !rounded-2xl !border !border-blue-100 !bg-white !p-2 !object-contain !shadow-md" src={asadaLogo} alt="ASADA San Juan" />
@@ -250,7 +272,6 @@ export default function ImprimirAveriasAtendidasPage() {
             )}
           </article>
         ) : null}
-      </div>
-    </main>
+    </AdminShell>
   )
 }

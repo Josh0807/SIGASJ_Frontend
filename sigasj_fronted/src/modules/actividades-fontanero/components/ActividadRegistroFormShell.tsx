@@ -1,6 +1,6 @@
 import { type FormEvent, useCallback, useRef, useState } from 'react'
 import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { TipoActividadFontaneroCatalogo } from '../types/tipoActividadFontanero'
 import {
   createActividadRegistroFormInitial,
@@ -24,7 +24,7 @@ import {
 } from '../utils/actividadRegistroSubmitError'
 import { focusFirstActividadRegistroError } from '../utils/focusFirstActividadRegistroError'
 import { registrarActividad } from '../services/actividadesFontaneroApi'
-import { Button } from '../../../shared/ui'
+import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import ActivityFeedback from './ActivityFeedback'
 import ActividadRegistroFieldError from './ActividadRegistroFieldError'
 import ActividadRegistroValidationSummary from './ActividadRegistroValidationSummary'
@@ -81,7 +81,7 @@ const ActividadRegistroFormShell = ({
   const navigate = useNavigate()
   const { logout } = useAuth()
   const formRef = useRef<HTMLFormElement>(null)
-  const sectionRef = useRef<HTMLElement>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
   const intentRef = useRef<ActividadRegistroSubmitIntent>('registrar')
   const deleteButtonRef = useRef<HTMLButtonElement>(null)
   const hoyAsada = hoyEnAsada()
@@ -258,40 +258,39 @@ const ActividadRegistroFormShell = ({
           label: 'Cambiar tipo de actividad',
         }
 
+  const pageTitle = isCorregirMode
+    ? `Corregir: ${tipo.nombre}`
+    : isEditBorrador
+      ? `Editar borrador: ${tipo.nombre}`
+      : `Registrar: ${tipo.nombre}`
+
   return (
-    <section
-      ref={sectionRef}
-      className={`actividades-fontanero-registro !mx-0 !max-w-none !gap-7${
+    <AdminShell
+      className={`actividades-fontanero-registro gap-5 sm:gap-6${
         isCorregirMode ? ' actividades-fontanero-registro--corregir' : ''
       }`}
       aria-labelledby="actividad-registro-title"
     >
-      <header className="actividades-fontanero-registro__header !block !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 space-y-3">
-            <p className="actividades-fontanero-registro__eyebrow !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Registro de Actividades</p>
-            <h1 id="actividad-registro-title" className="!text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">
-          {isCorregirMode
-            ? `Corregir: ${tipo.nombre}`
-            : isEditBorrador
-              ? `Editar borrador: ${tipo.nombre}`
-              : `Registrar: ${tipo.nombre}`}
-        </h1>
-        <p className="actividades-fontanero-registro__intro !text-lg !leading-relaxed !text-slate-500">
-          {isCorregirMode
+      <div ref={sectionRef} className="sr-only" aria-hidden="true" />
+      <PageHeader
+        id="actividad-registro-title"
+        eyebrow="Registro de actividades"
+        title={pageTitle}
+        description={
+          isCorregirMode
             ? 'Revise el motivo de corrección, ajuste los campos permitidos y reenvíe la actividad.'
-            : 'Complete la información general y los campos del formulario correspondiente.'}
-            </p>
-          </div>
-          <Link
+            : 'Complete la información general y los campos del formulario correspondiente.'
+        }
+        actions={
+          <Button
             to={backLink.to}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-5 py-3 font-bold !no-underline text-[#1e5a9c] shadow-md transition hover:-translate-y-0.5 hover:bg-[#eaf6ff] hover:!no-underline focus:!no-underline"
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
           >
-            <IconArrowLeft size={20} aria-hidden="true" />
             {backLink.label}
-          </Link>
-        </div>
-      </header>
+          </Button>
+        }
+      />
 
       {isCorregirMode && observacionCorreccion ? (
         <div
@@ -332,7 +331,7 @@ const ActividadRegistroFormShell = ({
             </p>
           }
           action={
-            <Link
+            <Button
               to={
                 isCorregirMode
                   ? ACTIVIDADES_FONTANERO_PATHS.correcciones
@@ -340,19 +339,22 @@ const ActividadRegistroFormShell = ({
                     ? ACTIVIDADES_FONTANERO_PATHS.misActividades
                     : ACTIVIDADES_FONTANERO_PATHS.nueva
               }
-              className="actividades-fontanero-registro__link"
+              variant="secondary"
+              size="sm"
+              leftIcon={
+                isCorregirMode || isEditBorrador ? (
+                  <IconArrowLeft size={18} aria-hidden="true" />
+                ) : (
+                  <IconPlus size={19} aria-hidden="true" />
+                )
+              }
             >
-              {isCorregirMode || isEditBorrador ? (
-                <IconArrowLeft size={18} aria-hidden="true" />
-              ) : (
-                <IconPlus size={19} aria-hidden="true" />
-              )}
               {isCorregirMode
                 ? 'Volver a correcciones pendientes'
                 : isEditBorrador
                   ? 'Volver a mis actividades'
                   : 'Nueva actividad'}
-            </Link>
+            </Button>
           }
         />
       ) : (
@@ -375,7 +377,7 @@ const ActividadRegistroFormShell = ({
             />
           ) : null}
 
-          <fieldset className="actividad-registro-form__section !grid !grid-cols-1 !gap-5 !rounded-3xl !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/50 !p-5 md:!grid-cols-2 md:!p-7" disabled={isSubmitting}>
+          <fieldset className="actividad-registro-form__section !grid !grid-cols-1 !gap-5 !rounded-[13px] !border !border-sigasj-border !bg-white !p-5 md:!grid-cols-2 md:!p-7" disabled={isSubmitting}>
             <legend className="actividad-registro-form__legend">Información general</legend>
 
             <div
@@ -677,7 +679,7 @@ const ActividadRegistroFormShell = ({
           )}
 
           <fieldset
-            className="actividad-registro-form__section actividad-formulario-especifico !gap-5 !rounded-3xl !border !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-5 !shadow-sm md:!p-7"
+            className="actividad-registro-form__section actividad-formulario-especifico !gap-5 !rounded-[13px] !border !border-sigasj-border !bg-white !p-5 !shadow-sm md:!p-7"
             disabled={isSubmitting}
           >
             <legend className="actividad-registro-form__legend">Evidencia fotográfica</legend>
@@ -755,7 +757,7 @@ const ActividadRegistroFormShell = ({
                   Eliminar actividad
                 </button>
               ) : null}
-              <Link
+              <Button
                 to={
                   isCorregirMode
                     ? ACTIVIDADES_FONTANERO_PATHS.correcciones
@@ -763,11 +765,12 @@ const ActividadRegistroFormShell = ({
                       ? ACTIVIDADES_FONTANERO_PATHS.misActividades
                       : ACTIVIDADES_FONTANERO_PATHS.nueva
                 }
-                className="actividad-registro-form__button actividad-registro-form__button--secondary !gap-2 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md transition hover:!-translate-y-0.5 hover:!bg-[#eaf6ff]"
+                variant="secondary"
+                size="lg"
+                leftIcon={<IconArrowLeft size={20} aria-hidden="true" />}
               >
-                <IconArrowLeft size={20} aria-hidden="true" />
                 {isEditBorrador ? 'Cancelar edición' : 'Cancelar'}
-              </Link>
+              </Button>
             </div>
             <div className="actividad-registro-form__actions-group">
               {isCorregirMode ? null : (
@@ -813,13 +816,14 @@ const ActividadRegistroFormShell = ({
       )}
 
       {!isSuccess ? (
-        <Link
+        <Button
           to={backLink.to}
+          variant="secondary"
           className="actividades-fontanero-registro__back !hidden"
+          leftIcon={<IconArrowLeft size={20} aria-hidden="true" />}
         >
-          <IconArrowLeft size={20} aria-hidden="true" />
           {backLink.label}
-        </Link>
+        </Button>
       ) : null}
 
       <ConfirmDialog
@@ -851,7 +855,7 @@ const ActividadRegistroFormShell = ({
           })()
         }}
       />
-    </section>
+    </AdminShell>
   )
 }
 

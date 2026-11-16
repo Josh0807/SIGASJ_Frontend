@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Button } from '../../shared/ui'
+import { Button, PageHeader } from '../../shared/ui'
 import {
   IconAlertTriangle,
   IconBox,
@@ -330,14 +330,16 @@ export default function MaterialesPage() {
               {materialCode(selected.id)} · {selected.unidadMedida}
             </p>
           </div>
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             aria-label="Cerrar detalle"
             onClick={closeDetail}
+            leftIcon={<IconX size={18} aria-hidden="true" />}
           >
-            <IconX size={18} aria-hidden="true" />
-          </button>
+            Cerrar
+          </Button>
         </div>
         <span className={`inv-badge inv-badge--${stockTone(selected) === 'ok' ? 'ok' : stockTone(selected) === 'low' ? 'low' : stockTone(selected) === 'out' ? 'out' : 'inactive'}`}>
           {stockLabel(stockTone(selected))}
@@ -418,13 +420,12 @@ export default function MaterialesPage() {
 
         <div style={{ display: 'grid', gap: 8 }}>
           {canManage ? (
-            <Link
-              className="inv-btn inv-btn--primary"
+            <Button
               to={materialEditPath(selected.id)}
               state={{ material: selected }}
             >
               Ver detalle / Editar
-            </Link>
+            </Button>
           ) : (
             <p className="inv-detail__meta">Consulta en solo lectura.</p>
           )}
@@ -441,20 +442,22 @@ export default function MaterialesPage() {
 
   return (
     <main className="inv-catalog" style={{ display: 'grid', gap: 16 }}>
-      <header className="inv-header inv-card">
-        <div>
-          <h1>Inventario de bodega</h1>
-          <p>Control de materiales, existencias y movimientos.</p>
-        </div>
-        {canCreate ? (
-          <Button
-            to={MATERIAL_NEW_PATH}
-            leftIcon={<IconPlus size={18} aria-hidden="true" />}
-          >
-            Nuevo material
-          </Button>
-        ) : null}
-      </header>
+      <PageHeader
+        id="inventario-bodega-title"
+        title="Inventario de bodega"
+        description="Control de materiales, existencias y movimientos."
+        actions={
+          canCreate ? (
+            <Button
+              to={MATERIAL_NEW_PATH}
+              variant="primary"
+              leftIcon={<IconPlus size={18} aria-hidden="true" />}
+            >
+              Nuevo material
+            </Button>
+          ) : undefined
+        }
+      />
 
       {showKpis ? (
         <section className="inv-kpis" aria-label="Indicadores de inventario">
@@ -654,30 +657,33 @@ export default function MaterialesPage() {
               </label>
             ) : null}
             {filtered ? (
-              <button
-                type="button"
-                className="inv-btn inv-btn--secondary"
-                onClick={clearFilters}
-              >
-                Limpiar filtros
-              </button>
+              <div className="inv-filters__action">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={clearFilters}
+                >
+                  Limpiar filtros
+                </Button>
+              </div>
             ) : null}
           </div>
 
           {categoriasError ? (
             <div className="inv-error" role="alert">
               No fue posible cargar el filtro de categorías.{' '}
-              <button type="button" className="inv-btn inv-btn--secondary" onClick={refetchCategorias}>
+              <Button type="button" variant="secondary" size="sm" onClick={refetchCategorias}>
                 Reintentar
-              </button>
+              </Button>
             </div>
           ) : null}
           {canManage && proveedoresError ? (
             <div className="inv-error" role="alert">
               No fue posible cargar el filtro de proveedores.{' '}
-              <button type="button" className="inv-btn inv-btn--secondary" onClick={refetchProveedores}>
+              <Button type="button" variant="secondary" size="sm" onClick={refetchProveedores}>
                 Reintentar
-              </button>
+              </Button>
             </div>
           ) : null}
 
@@ -690,9 +696,9 @@ export default function MaterialesPage() {
           {!loading && error ? (
             <div className="inv-error" role="alert">
               <p>{error}</p>
-              <button type="button" className="inv-btn inv-btn--primary" onClick={refetch}>
+              <Button type="button" onClick={refetch}>
                 Reintentar
-              </button>
+              </Button>
             </div>
           ) : null}
 
@@ -707,18 +713,16 @@ export default function MaterialesPage() {
                   : 'Los materiales registrados aparecerán aquí.'}
               </p>
               {filtered ? (
-                <button
-                  type="button"
-                  className="inv-btn inv-btn--secondary"
-                  onClick={clearFilters}
-                >
+                <Button type="button" variant="secondary" onClick={clearFilters}>
                   Limpiar filtros
-                </button>
+                </Button>
               ) : canCreate ? (
-                <Link className="inv-btn inv-btn--primary" to={MATERIAL_NEW_PATH}>
-                  <IconPlus size={18} aria-hidden="true" />
+                <Button
+                  to={MATERIAL_NEW_PATH}
+                  leftIcon={<IconPlus size={18} aria-hidden="true" />}
+                >
                   Nuevo material
-                </Link>
+                </Button>
               ) : null}
             </div>
           ) : null}
@@ -829,13 +833,15 @@ export default function MaterialesPage() {
                           >
                             {canManage ? (
                               <div className="inv-row-actions">
-                                <Link
-                                  className="inv-btn inv-btn--secondary inv-row-action"
+                                <Button
+                                  className="inv-row-action"
                                   to={materialEditPath(material.id)}
                                   state={{ material }}
+                                  variant="secondary"
+                                  size="sm"
                                 >
                                   Editar
-                                </Link>
+                                </Button>
                                 <MaterialStateAction
                                   material={material}
                                   disabled={changingId !== null}
@@ -859,27 +865,29 @@ export default function MaterialesPage() {
                     Mostrando {from}–{to} de {result.total} materiales
                   </span>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button
+                    <Button
                       type="button"
-                      className="inv-btn inv-btn--secondary"
+                      variant="secondary"
+                      size="sm"
                       disabled={page <= 1}
                       onClick={() => setPage((value) => Math.max(1, value - 1))}
                     >
                       Anterior
-                    </button>
+                    </Button>
                     <span style={{ alignSelf: 'center' }}>
                       {page} / {result.totalPages}
                     </span>
-                    <button
+                    <Button
                       type="button"
-                      className="inv-btn inv-btn--secondary"
+                      variant="secondary"
+                      size="sm"
                       disabled={page >= result.totalPages}
                       onClick={() =>
                         setPage((value) => Math.min(result.totalPages, value + 1))
                       }
                     >
                       Siguiente
-                    </button>
+                    </Button>
                   </div>
                 </nav>
               ) : null}

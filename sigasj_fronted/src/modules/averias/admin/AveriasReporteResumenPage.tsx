@@ -6,7 +6,15 @@ import {
 } from '../../../app/router/routePaths'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
-import { AdminShell, Button, EmptyState, PageHeader } from '../../../shared/ui'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { useAdminAveriasReporteResumen } from '../hooks/useAdminAveriasReporteResumen'
 import { AVERIAS_ADMIN_IMPRIMIR_PATH, AVERIAS_ADMIN_PATH } from './averiasAdminPaths'
 import {
@@ -118,34 +126,35 @@ const AveriasReporteResumenPage = ({
         }
       />
 
-        <section
-          className="gallery-admin__filters averias-admin__filters"
-          aria-label="Rango del resumen"
-        >
-          <form className="averias-admin__filters-form" onSubmit={(e) => e.preventDefault()}>
-            <p className="averias-reporte__rango averias-admin__filters-note">{rango}</p>
-            <label className="gallery-admin__field" htmlFor="averias-reporte-desde">
-              <span>Desde</span>
-              <input
-                id="averias-reporte-desde"
-                name="fechaDesde"
-                type="date"
-                value={fechas.fechaDesde}
-                onChange={(event) => updateFecha('fechaDesde', event.target.value)}
-              />
-            </label>
-            <label className="gallery-admin__field" htmlFor="averias-reporte-hasta">
-              <span>Hasta</span>
-              <input
-                id="averias-reporte-hasta"
-                name="fechaHasta"
-                type="date"
-                value={fechas.fechaHasta}
-                onChange={(event) => updateFecha('fechaHasta', event.target.value)}
-              />
-            </label>
-          </form>
-        </section>
+      <AdminFilters
+        aria-label="Rango del resumen"
+        summary={
+          <p className="m-0 whitespace-nowrap text-sm font-semibold text-sigasj-muted">
+            {rango}
+          </p>
+        }
+      >
+        <AdminFilterField label="Desde">
+          <input
+            id="averias-reporte-desde"
+            name="fechaDesde"
+            type="date"
+            className={adminFilterControlClassName}
+            value={fechas.fechaDesde}
+            onChange={(event) => updateFecha('fechaDesde', event.target.value)}
+          />
+        </AdminFilterField>
+        <AdminFilterField label="Hasta">
+          <input
+            id="averias-reporte-hasta"
+            name="fechaHasta"
+            type="date"
+            className={adminFilterControlClassName}
+            value={fechas.fechaHasta}
+            onChange={(event) => updateFecha('fechaHasta', event.target.value)}
+          />
+        </AdminFilterField>
+      </AdminFilters>
 
         {errorMessage ? (
           <EmptyState

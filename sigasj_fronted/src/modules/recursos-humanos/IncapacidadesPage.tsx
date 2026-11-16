@@ -25,6 +25,7 @@ import {
   EmptyState,
   PageHeader,
   adminFilterControlClassName,
+  adminFilterSelectClassName,
 } from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import { getColaboradoresOpciones } from './colaboradoresApi'
@@ -238,7 +239,7 @@ export default function IncapacidadesPage() {
       >
         <AdminFilterField label="Colaborador">
           <select
-            className={adminFilterControlClassName}
+            className={adminFilterSelectClassName}
             value={colaboradorId}
             aria-label="Filtrar por colaborador"
             onChange={(event) =>

@@ -231,27 +231,29 @@ export default function ProveedoresPage() {
 
       {!loading && !error && result.totalPages > 1 ? (
         <nav className="inv-pagination" aria-label="Paginación de proveedores">
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             disabled={page <= 1}
             onClick={() => setPage((value) => Math.max(1, value - 1))}
           >
             Anterior
-          </button>
+          </Button>
           <span>
             Página {page} de {result.totalPages}
           </span>
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             disabled={page >= result.totalPages}
             onClick={() =>
               setPage((value) => Math.min(result.totalPages, value + 1))
             }
           >
             Siguiente
-          </button>
+          </Button>
         </nav>
       ) : null}
   </main>

@@ -4,12 +4,20 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconFilterOff,
-  IconHistory,
   IconRefresh,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Button,
+  PageHeader,
+  adminFilterControlClassName,
+  adminFilterSelectClassName,
+} from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import { esNoAutenticado, esReintentable } from './colaboradorForm'
 import {
@@ -50,9 +58,6 @@ const leerFiltros = (params: URLSearchParams): HistorialColaboradorFiltros => {
     page: Number.isInteger(page) && page > 0 ? page : 1,
   }
 }
-
-const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
 
 const badgeClass = (tipo: TipoEventoHistorialRrhh) => {
   if (tipo === 'PERMISO') {
@@ -211,15 +216,35 @@ export default function ColaboradorHistorialPage() {
   const desde = total ? (page - 1) * HISTORIAL_PAGE_SIZE + 1 : 0
   const hasta = Math.min(page * HISTORIAL_PAGE_SIZE, total)
 
+  const volverA = idValido ? colaboradorDetailPath(colaboradorId) : RRHH_PATH
+
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
-      <Link
-        to={idValido ? colaboradorDetailPath(colaboradorId) : RRHH_PATH}
-        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 font-extrabold text-[#1e5a9c] no-underline shadow-[0_6px_18px_rgba(30, 90, 156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(30, 90, 156,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
-      >
-        <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
-        {idValido ? 'Volver al colaborador' : `Volver a ${RRHH_TITLE}`}
-      </Link>
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="colaborador-historial-title">
+      <PageHeader
+        id="colaborador-historial-title"
+        eyebrow={`${RRHH_TITLE} · Historial`}
+        title="Historial administrativo"
+        description={
+          colaborador ? (
+            <>
+              {nombreColaboradorHistorial(colaborador)}
+              <span className="font-normal text-sigasj-muted"> · {colaborador.cargo}</span>
+            </>
+          ) : (
+            'Eventos de permisos, vacaciones e incapacidades del colaborador.'
+          )
+        }
+        actions={
+          <Button
+            to={volverA}
+            variant="secondary"
+            size="sm"
+            leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
+          >
+            {idValido ? 'Volver al colaborador' : `Volver a ${RRHH_TITLE}`}
+          </Button>
+        }
+      />
 
       {cargando && !respuesta ? (
         <div
@@ -243,59 +268,50 @@ export default function ColaboradorHistorialPage() {
           <p className="m-0 font-semibold text-red-800">{error}</p>
           <div className="flex flex-wrap justify-center gap-3">
             {idValido && resultado.reintentable && !es404 ? (
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                variant="secondary"
+                leftIcon={<IconRefresh size={18} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
-              </button>
+              </Button>
             ) : null}
-            <Link
+            <Button
               to={RRHH_PATH}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 no-underline hover:no-underline"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
             >
-              <IconArrowLeft size={18} aria-hidden="true" />
               Volver a colaboradores
-            </Link>
+            </Button>
           </div>
         </div>
       ) : (
         <>
-          <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex min-w-0 items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
-                <IconHistory size={28} aria-hidden="true" />
-              </span>
-              <div className="min-w-0">
-                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-                  {RRHH_TITLE} · Historial
-                </p>
-                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
-                  Historial administrativo
-                </h1>
-                {colaborador ? (
-                  <p className="mt-2 m-0 font-semibold text-slate-600">
-                    {nombreColaboradorHistorial(colaborador)}
-                    <span className="font-normal text-slate-500">
-                      {' '}
-                      · {colaborador.cargo}
-                    </span>
-                  </p>
-                ) : null}
-              </div>
-            </div>
-          </header>
-
-          <section
-            className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+          <AdminFilters
             aria-label="Filtros del historial"
+            summary={
+              <>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+                  onClick={limpiarFiltros}
+                  disabled={!hayFiltros}
+                >
+                  Limpiar filtros
+                </Button>
+                <span className="whitespace-nowrap text-sm font-semibold text-sigasj-muted">
+                  <strong className="text-sigasj-ink">{cargando ? '…' : total}</strong>{' '}
+                  evento{total === 1 ? '' : 's'}
+                </span>
+              </>
+            }
           >
-            <label className="grid min-w-0 gap-2">
-              <span className="text-sm font-bold text-[#163f6b]">Tipo</span>
+            <AdminFilterField label="Tipo">
               <select
-                className={inputClass}
+                className={adminFilterSelectClassName}
                 value={tipo}
                 onChange={(event) =>
                   actualizarFiltros({
@@ -308,39 +324,28 @@ export default function ColaboradorHistorialPage() {
                 <option value="VACACION">Vacaciones</option>
                 <option value="INCAPACIDAD">Incapacidad</option>
               </select>
-            </label>
-            <label className="grid min-w-0 gap-2">
-              <span className="text-sm font-bold text-[#163f6b]">Desde</span>
+            </AdminFilterField>
+            <AdminFilterField label="Desde">
               <input
                 type="date"
-                className={inputClass}
+                className={adminFilterControlClassName}
                 value={fechaDesde}
                 onChange={(event) =>
                   actualizarFiltros({ fechaDesde: event.target.value })
                 }
               />
-            </label>
-            <label className="grid min-w-0 gap-2">
-              <span className="text-sm font-bold text-[#163f6b]">Hasta</span>
+            </AdminFilterField>
+            <AdminFilterField label="Hasta">
               <input
                 type="date"
-                className={inputClass}
+                className={adminFilterControlClassName}
                 value={fechaHasta}
                 onChange={(event) =>
                   actualizarFiltros({ fechaHasta: event.target.value })
                 }
               />
-            </label>
-            <button
-              type="button"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2 xl:col-span-1"
-              onClick={limpiarFiltros}
-              disabled={!hayFiltros}
-            >
-              <IconFilterOff size={18} aria-hidden="true" />
-              Limpiar filtros
-            </button>
-          </section>
+            </AdminFilterField>
+          </AdminFilters>
 
           <section
             className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
@@ -443,33 +448,35 @@ export default function ColaboradorHistorialPage() {
                   {total === 1 ? '' : 's'}
                 </p>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     type="button"
-                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+                    variant="secondary"
+                    size="sm"
+                    leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
                     onClick={() => actualizarFiltros({ page: page - 1 })}
                     disabled={page <= 1 || cargando}
                   >
-                    <IconChevronLeft size={17} aria-hidden="true" />
                     Anterior
-                  </button>
+                  </Button>
                   <span className="px-2 font-semibold text-slate-600">
                     Página {page} de {Math.max(totalPages, 1)}
                   </span>
-                  <button
+                  <Button
                     type="button"
-                    className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+                    variant="secondary"
+                    size="sm"
+                    rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
                     onClick={() => actualizarFiltros({ page: page + 1 })}
                     disabled={page >= totalPages || cargando}
                   >
                     Siguiente
-                    <IconChevronRight size={17} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </div>
               </nav>
             ) : null}
           </section>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

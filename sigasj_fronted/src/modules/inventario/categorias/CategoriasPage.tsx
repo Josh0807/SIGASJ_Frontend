@@ -288,25 +288,27 @@ export default function CategoriasPage() {
 
       {!loading && !error && result.totalPages > 0 ? (
         <nav className="inv-pagination" aria-label="Paginación de categorías">
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             disabled={page <= 1}
             onClick={() => setPage((value) => value - 1)}
           >
             Anterior
-          </button>
+          </Button>
           <span>
             Página {page} de {result.totalPages}
           </span>
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             disabled={page >= result.totalPages}
             onClick={() => setPage((value) => value + 1)}
           >
             Siguiente
-          </button>
+          </Button>
         </nav>
       ) : null}
     </main>

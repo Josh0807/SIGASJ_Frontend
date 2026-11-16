@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { IconUserPlus } from '@tabler/icons-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
-import { Button } from '../../../shared/ui'
+import { Button, adminFilterSelectClassName } from '../../../shared/ui'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
 import { useAveriaAdminAsignacion } from '../hooks/useAveriaAdminAsignacion'
 import {
@@ -188,11 +188,17 @@ const AveriasAdminAsignacionControls = ({
 
       {!listError && fontaneros.length > 0 ? (
         <div className="averias-admin-asignacion__controls">
-          <label className="gallery-admin__field" htmlFor={FONTANERO_SELECT_ID}>
-            <span>Seleccionar fontanero</span>
+          <label
+            className="grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
+            htmlFor={FONTANERO_SELECT_ID}
+          >
+            <span className="text-sm font-semibold text-sigasj-ink">
+              Seleccionar fontanero
+            </span>
             <select
               id={FONTANERO_SELECT_ID}
               name="fontaneroId"
+              className={adminFilterSelectClassName}
               value={
                 selectedFontaneroId != null ? String(selectedFontaneroId) : ''
               }
@@ -213,11 +219,17 @@ const AveriasAdminAsignacionControls = ({
             </select>
           </label>
 
-          <label className="gallery-admin__field" htmlFor={AYUDANTE_SELECT_ID}>
-            <span>Ayudante del fontanero (opcional)</span>
+          <label
+            className="grid min-w-0 flex-1 gap-1.5 sm:min-w-[9rem]"
+            htmlFor={AYUDANTE_SELECT_ID}
+          >
+            <span className="text-sm font-semibold text-sigasj-ink">
+              Ayudante del fontanero (opcional)
+            </span>
             <select
               id={AYUDANTE_SELECT_ID}
               name="ayudanteId"
+              className={adminFilterSelectClassName}
               value={
                 selectedAyudanteId != null ? String(selectedAyudanteId) : ''
               }

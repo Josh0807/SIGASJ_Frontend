@@ -2,10 +2,7 @@ import { IconArrowLeft, IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
-import { Alert } from '../../../shared/ui/Alert'
-import { Button } from '../../../shared/ui/Button'
-import { Card } from '../../../shared/ui/Card'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import { AdminShell, Alert, Button, Card, PageHeader } from '../../../shared/ui'
 import { hoyEnAsada } from '../../../shared/utils/fechaAsada'
 import DocumentoActividadUploader from '../../actividades-fontanero/components/DocumentoActividadUploader'
 import { useAuth } from '../../auth/components/AuthContext'
@@ -295,8 +292,9 @@ export default function SolicitarAusenciaForm({
     'box-border min-h-11 w-full appearance-none rounded-xl border border-red-400 bg-white px-3.5 py-2.5 text-[0.95rem] leading-normal text-sigasj-ink shadow-none outline-none transition placeholder:text-sigasj-muted focus:border-red-500 focus:shadow-none focus:outline-none focus:ring-0 disabled:opacity-60'
 
   return (
-    <div className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="solicitar-ausencia-form-title">
       <PageHeader
+        id="solicitar-ausencia-form-title"
         title={titulo}
         description={
           esVacaciones
@@ -561,6 +559,6 @@ export default function SolicitarAusenciaForm({
           </Button>
         </div>
       </form>
-    </div>
+    </AdminShell>
   )
 }

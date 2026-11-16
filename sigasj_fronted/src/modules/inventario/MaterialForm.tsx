@@ -161,7 +161,11 @@ export default function MaterialForm({
           {submitError}
         </div>
       )}
-      <form className="materials-admin__form provider-admin__form w-full max-w-3xl" noValidate onSubmit={handleSubmit}>
+      <form
+        className="materials-admin__form provider-admin__form w-full max-w-3xl !rounded-[13px] !border-sigasj-border !bg-white !shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
+        noValidate
+        onSubmit={handleSubmit}
+      >
         <div className="provider-admin__form-heading">
           <span>
             <IconPackage size={25} aria-hidden="true" />
