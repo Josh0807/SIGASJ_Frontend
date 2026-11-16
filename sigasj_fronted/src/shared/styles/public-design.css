@@ -1438,41 +1438,47 @@ body.landing-page-white .public-hero__scrim {
 
 @media (max-width: 640px) {
   .announcement-lightbox {
-    padding: 10px;
+    padding: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
   .announcement-lightbox__dialog {
-    max-height: min(96vh, 920px);
-    border-radius: 14px;
+    max-height: min(94dvh, 920px);
+    border-radius: 13px;
   }
 
   .announcement-lightbox__media {
-    min-height: min(46vh, 360px);
-    max-height: min(58vh, 520px);
-    padding: 1rem 0.85rem 0.7rem;
+    min-height: min(42vh, 320px);
+    max-height: min(54vh, 480px);
+    padding: 0.85rem 0.7rem 0.6rem;
   }
 
   .announcement-lightbox__image {
-    max-height: min(52vh, 460px);
+    max-height: min(48vh, 420px);
   }
 
   .announcement-lightbox--media-only .announcement-lightbox__media {
-    min-height: min(70vh, 620px);
-    max-height: min(88vh, 780px);
+    min-height: min(58vh, 520px);
+    max-height: min(78dvh, 680px);
   }
 
   .announcement-lightbox--media-only .announcement-lightbox__image {
-    max-height: min(82vh, 720px);
+    max-height: min(72dvh, 620px);
+  }
+
+  .announcement-lightbox__zoom-btn {
+    width: 44px;
+    height: 44px;
   }
 
   .announcement-lightbox__details {
-    max-height: min(36vh, 280px);
+    max-height: min(34vh, 260px);
     padding: 1rem 1.1rem 1.2rem;
   }
 
   .announcement-lightbox__nav {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .announcement-lightbox__nav--prev {
@@ -1481,6 +1487,11 @@ body.landing-page-white .public-hero__scrim {
 
   .announcement-lightbox__nav--next {
     right: 8px;
+  }
+
+  .announcement-lightbox__close {
+    width: 44px;
+    height: 44px;
   }
 }
 

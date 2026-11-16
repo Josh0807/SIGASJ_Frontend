@@ -27,12 +27,12 @@ export function AdminListItem({
       lift
       data-admin-stagger
       className={cn(
-        'grid gap-4 !p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start',
+        'grid gap-4 !p-4 max-[760px]:!grid-cols-1 min-[761px]:grid-cols-[minmax(0,1fr)_auto] min-[761px]:items-start',
         className,
       )}
       {...rest}
     >
-      <div className="grid min-w-0 gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start">
+      <div className="grid min-w-0 gap-3 max-[760px]:grid-cols-1 min-[761px]:grid-cols-[auto_minmax(0,1fr)] min-[761px]:items-start">
         {media ? <div className="shrink-0">{media}</div> : null}
         <div className="min-w-0">
           <h2 className="public-card-title m-0 text-[1.125rem] font-bold tracking-[-0.02em] text-sigasj-text">
@@ -49,7 +49,9 @@ export function AdminListItem({
         </div>
       </div>
       {actions ? (
-        <div className="flex min-w-0 flex-wrap gap-2 sm:justify-end">{actions}</div>
+        <div className="flex min-w-0 flex-col gap-2 max-[760px]:[&_a]:w-full max-[760px]:[&_button]:w-full min-[761px]:flex-row min-[761px]:flex-wrap min-[761px]:justify-end">
+          {actions}
+        </div>
       ) : null}
     </Card>
   )

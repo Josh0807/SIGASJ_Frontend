@@ -94,11 +94,11 @@ describe('route configuration', () => {
         ADMIN_PROFILE_PATH,
       ]),
     )
-    // Usuarios/Reportes globales: sin UI real — no se publican como rutas funcionales.
-    expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/usuarios')
+    // Usuarios: solo Super Admin. Reportes globales: stub sin UI.
+    expect(PRIVATE_ROUTE_PATHS).toContain('/admin/usuarios')
     expect(PRIVATE_ROUTE_PATHS).not.toContain('/admin/reportes')
     expect(ADMIN_NAV_ITEMS.some((item) => item.path === '/admin/usuarios')).toBe(
-      false,
+      true,
     )
     expect(ADMIN_NAV_ITEMS.some((item) => item.path === '/admin/reportes')).toBe(
       false,
@@ -180,7 +180,11 @@ describe('route configuration', () => {
 
     expect(abonados).toBeDefined()
     expect(abonados?.path).toBe('/admin/abonados')
-    expect(abonados?.allowedRoles).toEqual(['Administradora', 'Secretaria'])
+    expect(abonados?.allowedRoles).toEqual([
+      'SuperAdmin',
+      'Administradora',
+      'Secretaria',
+    ])
     expect(abonados?.allowedRoles).not.toContain('Abonado')
     expect(abonados?.allowedRoles).not.toContain('Fontanero')
     expect(PUBLIC_ROUTE_PATHS).not.toContain('/admin/abonados')

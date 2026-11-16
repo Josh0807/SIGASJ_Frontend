@@ -279,9 +279,9 @@ export default function SolicitudesAdminListPage() {
             title={ADMIN_COPY.emptyFiltered('solicitudes')}
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[960px] border-collapse text-left">
-              <thead className="bg-[linear-gradient(180deg,#f1f8ff_0%,#eaf4fd_100%)] text-[0.72rem] font-black uppercase tracking-[0.09em] text-[#0a4d89]">
+          <div className="overflow-x-auto max-[760px]:overflow-visible">
+            <table className="w-full min-w-[960px] border-collapse text-left max-[760px]:block max-[760px]:min-w-0">
+              <thead className="bg-[linear-gradient(180deg,#f1f8ff_0%,#eaf4fd_100%)] text-[0.72rem] font-black uppercase tracking-[0.09em] text-[#0a4d89] max-[760px]:hidden">
                 <tr>
                   <th className="px-6 py-5">Código</th>
                   <th className="px-6 py-5">Tipo</th>
@@ -291,45 +291,64 @@ export default function SolicitudesAdminListPage() {
                   <th className="px-6 py-5 text-right">Acción</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 max-[760px]:block max-[760px]:divide-y-0">
                 {rows.map((row) => (
                   <tr
-                    className="group transition-colors duration-200 hover:bg-sky-50/70"
+                    className="group transition-colors duration-200 hover:bg-sky-50/70 max-[760px]:mb-3.5 max-[760px]:block max-[760px]:rounded-[14px] max-[760px]:border max-[760px]:border-[#d7e5f1] max-[760px]:bg-white max-[760px]:px-3.5 max-[760px]:py-2 max-[760px]:shadow-[0_4px_14px_rgba(18,63,112,0.05)] max-[760px]:hover:bg-white"
                     key={row.id}
                   >
-                    <td className="px-6 py-5">
-                      <span className="block whitespace-nowrap text-base font-black tracking-[0.01em] text-[#0561ad]">
+                    <td
+                      className="px-6 py-5 max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:whitespace-normal max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                      data-label="Código"
+                    >
+                      <span className="block whitespace-nowrap text-base font-black tracking-[0.01em] text-[#0561ad] max-[760px]:whitespace-normal">
                         {row.codigoSeguimiento}
                       </span>
                     </td>
-                    <td className="max-w-[320px] px-6 py-5">
+                    <td
+                      className="max-w-[320px] px-6 py-5 max-[760px]:grid max-[760px]:max-w-none max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                      data-label="Tipo"
+                    >
                       <span className="block text-[0.95rem] font-bold leading-6 text-[#123f70]">
                         {row.tipoSolicitud?.nombre ??
                           row.tipoSolicitud?.slug ??
                           'Sin tipo'}
                       </span>
                     </td>
-                    <td className="max-w-[230px] px-6 py-5">
+                    <td
+                      className="max-w-[230px] px-6 py-5 max-[760px]:grid max-[760px]:max-w-none max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                      data-label="Solicitante"
+                    >
                       <span
-                        className="block truncate text-[0.94rem] font-medium text-slate-600"
+                        className="block truncate text-[0.94rem] font-medium text-slate-600 max-[760px]:whitespace-normal max-[760px]:break-words"
                         title={applicantName(row)}
                       >
                         {applicantName(row)}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
-                      <span className="whitespace-nowrap text-[0.92rem] font-medium tabular-nums text-slate-500">
+                    <td
+                      className="px-6 py-5 max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                      data-label="Fecha"
+                    >
+                      <span className="whitespace-nowrap text-[0.92rem] font-medium tabular-nums text-slate-500 max-[760px]:whitespace-normal">
                         {formatearFechaHoraAsada(row.fechaIngreso)}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td
+                      className="px-6 py-5 max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                      data-label="Estado"
+                    >
                       <SolicitudEstadoBadge estado={row.estado} />
                     </td>
-                    <td className="px-6 py-5 text-right">
+                    <td
+                      className="px-6 py-5 text-right max-[760px]:grid max-[760px]:grid-cols-1 max-[760px]:border-b-0 max-[760px]:px-0 max-[760px]:pb-1 max-[760px]:pt-2 max-[760px]:text-left"
+                      data-label="Acción"
+                    >
                       <Button
                         to={solicitudAdminDetailPath(row.id)}
                         variant="primary"
                         size="sm"
+                        className="w-full min-[761px]:w-auto"
                         leftIcon={<IconEye size={16} aria-hidden="true" />}
                       >
                         Ver detalle

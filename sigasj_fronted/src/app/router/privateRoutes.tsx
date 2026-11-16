@@ -19,6 +19,7 @@ import ContactoAdminPage from '../../modules/contacto/admin/ContactoAdminPage'
 import TransparenciaAdminPage from '../../modules/transparencia/admin/TransparenciaAdminPage'
 import SolicitudesAdminRoutes from '../../modules/solicitudes-publicas/admin/SolicitudesAdminRoutes'
 import ActividadesAdminRoutes from '../../modules/actividades-fontanero/admin/ActividadesAdminRoutes'
+import UsuariosAdminPage from '../../modules/usuarios/UsuariosAdminPage'
 
 export type PrivateRouteDefinition = {
   segment: string
@@ -46,7 +47,7 @@ type AdminRoutableIconName = Exclude<AdminNavIconName, 'menu' | 'menuClose'>
  */
 const ADMIN_MODULE_ELEMENTS: Record<AdminRoutableIconName, ReactElement> = {
   dashboard: <AdminDashboard />,
-  usuarios: <PrivateModulePlaceholder title="Gestión de usuarios" />,
+  usuarios: <UsuariosAdminPage />,
   abonados: <AsociadosRoutes />,
   inventario: <InventarioRoutes />,
   solicitudes: <SolicitudesAdminRoutes />,

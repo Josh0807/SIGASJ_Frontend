@@ -96,8 +96,13 @@ export function userHasAllowedRole(
     return false
   }
 
-  const normalizedUserRole = user.role.trim().toLowerCase()
-  return allowedRoles.some((allowed) => allowed.trim().toLowerCase() === normalizedUserRole)
+  const normalizedUserRole =
+    normalizeInternalRole(user.role) ?? user.role.trim().toLowerCase()
+  return allowedRoles.some((allowed) => {
+    const normalizedAllowed =
+      normalizeInternalRole(allowed) ?? allowed.trim().toLowerCase()
+    return normalizedAllowed === normalizedUserRole
+  })
 }
 
 const normalizeAdminPath = (path: string): string =>
@@ -150,7 +155,11 @@ function resolveInventarioPathRoles(
   }
 
   if (normalized.startsWith(`${ADMIN_BASE_PATH}/inventario/salidas`)) {
-    return [InternalAdminRoleName.Administradora, InternalAdminRoleName.Fontanero]
+    return [
+      InternalAdminRoleName.SuperAdmin,
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.Fontanero,
+    ]
   }
 
   const adminOnlyPrefixes = [
@@ -175,10 +184,11 @@ function resolveInventarioPathRoles(
     /\/materiales\/\d+\/editar$/.test(normalized) ||
     /\/categorias\/\d+\/editar$/.test(normalized)
   ) {
-    return [InternalAdminRoleName.Administradora]
+    return [InternalAdminRoleName.SuperAdmin, InternalAdminRoleName.Administradora]
   }
 
   return [
+    InternalAdminRoleName.SuperAdmin,
     InternalAdminRoleName.Administradora,
     InternalAdminRoleName.Secretaria,
     InternalAdminRoleName.Fontanero,
@@ -194,6 +204,27 @@ export function canAccessAdminRoute(
   }
 
   const resolvedPath = normalizeRrhhAdminPath(path)
+  const isSuperAdmin =
+    normalizeInternalRole(user.role) === InternalAdminRoleName.SuperAdmin
+
+  // Super Admin de plataforma: acceso a rutas staff publicadas (no stubs).
+  if (isSuperAdmin) {
+    const module = resolveAdminModuleFromPath(resolvedPath)
+    if (module) {
+      return module.availableAsRoute !== false
+    }
+    if (
+      isFontaneroAveriasPath(resolvedPath) ||
+      isFontaneroSolicitarAusenciaPath(resolvedPath) ||
+      isFontaneroMisSolicitudesPath(resolvedPath) ||
+      isFontaneroMiSaldoPath(resolvedPath) ||
+      isSolicitudesAusenciaAdminPath(resolvedPath) ||
+      resolveInventarioPathRoles(resolvedPath)
+    ) {
+      return true
+    }
+    return false
+  }
 
   if (
     isFontaneroAveriasPath(resolvedPath) ||
@@ -205,7 +236,10 @@ export function canAccessAdminRoute(
   }
 
   if (isSolicitudesAusenciaAdminPath(resolvedPath)) {
-    return userHasAllowedRole(user, [InternalAdminRoleName.Administradora])
+    return userHasAllowedRole(user, [
+      InternalAdminRoleName.Administradora,
+      InternalAdminRoleName.SuperAdmin,
+    ])
   }
 
   const inventarioRoles = resolveInventarioPathRoles(resolvedPath)
@@ -239,7 +273,7 @@ export function getAllowedRolesForAdminPath(
   }
 
   if (isSolicitudesAusenciaAdminPath(resolvedPath)) {
-    return [InternalAdminRoleName.Administradora]
+    return [InternalAdminRoleName.SuperAdmin, InternalAdminRoleName.Administradora]
   }
 
   const inventarioRoles = resolveInventarioPathRoles(resolvedPath)

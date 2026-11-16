@@ -287,15 +287,6 @@ const AdminSidebar = ({
       })}
     </nav>
     <div className="admin-sidebar__footer">
-      {!collapsed ? (
-        <div className="admin-sidebar__system-status" role="status" aria-label="Estado del sistema: en línea">
-          <span className="admin-sidebar__status-dot" aria-hidden="true" />
-          <span className="admin-sidebar__status-copy">
-            <strong>Sistema en línea</strong>
-            <small>SIGASJ operativo</small>
-          </span>
-        </div>
-      ) : null}
       {!isDrawer && onToggleCollapsed ? (
         <button
           type="button"

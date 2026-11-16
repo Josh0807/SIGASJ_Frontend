@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { IconPhotoPlus } from '@tabler/icons-react'
+import { Button } from '../../../shared/ui/Button'
 import ActividadRegistroFieldError from './ActividadRegistroFieldError'
 import {
   DOCUMENTO_ACTIVIDAD_ACCEPT,
@@ -117,7 +118,13 @@ const DocumentoActividadUploader = ({
         className="documento-uploader__native"
         onChange={handleSelection}
         aria-invalid={Boolean(displayedError)}
-        aria-describedby={displayedError ? 'documentos-error' : 'documentos-help'}
+        aria-describedby={
+          displayedError
+            ? 'documentos-error'
+            : helpText.trim()
+              ? 'documentos-help'
+              : undefined
+        }
         disabled={disabled}
       />
       <div
@@ -133,18 +140,21 @@ const DocumentoActividadUploader = ({
         <p className="documento-uploader__drop-title">
           {isDragging ? 'Suelte las fotos aquí' : dropHint}
         </p>
-        <button
+        <Button
           type="button"
+          size="sm"
           className="documento-uploader__pick"
           onClick={() => inputRef.current?.click()}
           disabled={disabled}
         >
           {buttonLabel}
-        </button>
+        </Button>
       </div>
-      <p id="documentos-help" className="actividad-formulario-especifico__hint">
-        {helpText}
-      </p>
+      {helpText.trim() ? (
+        <p id="documentos-help" className="actividad-formulario-especifico__hint">
+          {helpText}
+        </p>
+      ) : null}
       {files.length > 0 ? (
         <ul className="documento-uploader__files" aria-label={listLabel}>
           {files.map((file) => (

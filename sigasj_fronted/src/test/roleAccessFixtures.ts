@@ -10,6 +10,7 @@ import {
 } from '../modules/solicitudes-ausencia/solicitudesAusenciaPaths'
 /** En SIGASJ el rol técnico es `Secretaria` (equivalente a “Secretaria Ejecutiva” en la tarea). */
 export const ROLE_TASK_LABELS: Record<InternalAdminRole, string> = {
+  SuperAdmin: 'Super Admin',
   Administradora: 'Administradora',
   Secretaria: 'Secretaria Ejecutiva',
   Fontanero: 'Fontanero',
@@ -27,6 +28,7 @@ const pathsForRoles = (...roles: InternalAdminRole[]) =>
   ).map((module) => `${ADMIN_BASE_PATH}/${module.segment}`)
 
 export const EXPECTED_NAV_PATHS: Record<InternalAdminRole, readonly string[]> = {
+  SuperAdmin: pathsForRoles('SuperAdmin'),
   Administradora: pathsForRoles('Administradora'),
   Secretaria: pathsForRoles('Secretaria'),
   Fontanero: [
@@ -43,6 +45,9 @@ export const EXPECTED_BLOCKED_PATHS: Record<
   InternalAdminRole,
   readonly string[]
 > = {
+  SuperAdmin: ALL_ADMIN_MODULE_PATHS.filter(
+    (path) => !EXPECTED_NAV_PATHS.SuperAdmin.includes(path),
+  ),
   Administradora: ALL_ADMIN_MODULE_PATHS.filter(
     (path) => !EXPECTED_NAV_PATHS.Administradora.includes(path),
   ),
@@ -55,6 +60,7 @@ export const EXPECTED_BLOCKED_PATHS: Record<
 }
 
 export const INTERNAL_ROLES_UNDER_TEST: InternalAdminRole[] = [
+  'SuperAdmin',
   'Administradora',
   'Secretaria',
   'Fontanero',

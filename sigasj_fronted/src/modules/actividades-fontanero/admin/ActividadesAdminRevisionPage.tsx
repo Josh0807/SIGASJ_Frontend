@@ -292,7 +292,7 @@ const ActividadesAdminRevisionPage = () => {
             onChange={(e) => setDraft({ ...draft, fechaFin: e.target.value })}
           />
         </AdminFilterField>
-        <div className="col-span-full flex flex-wrap gap-2">
+        <div className="col-span-full flex flex-wrap gap-2 max-[760px]:flex-col max-[760px]:[&>*]:w-full">
           <Button
             type="submit"
             variant="primary"
@@ -392,7 +392,6 @@ const ActividadesAdminRevisionPage = () => {
                     <MetaResumen actividad={actividad} />
                     <Button
                       to={actividadAdminDetallePath(actividad.id)}
-                      variant="secondary"
                       size="sm"
                       className="actividad-historial-card__action"
                     >

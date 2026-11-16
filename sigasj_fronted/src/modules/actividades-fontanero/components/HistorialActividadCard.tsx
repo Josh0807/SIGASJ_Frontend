@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Button } from '../../../shared/ui/Button'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
 import { formatActividadEstado } from '../utils/formatActividadEstado'
 import { formatPeriodoActividadPartes } from '../utils/formatActividadFecha'
@@ -58,14 +59,15 @@ const HistorialActividadCard = ({
 
       <footer className="actividad-historial-card__footer">
         {extraFooter}
-        <button
+        <Button
           type="button"
+          size="sm"
           className="actividad-historial-card__action"
           data-testid={`ver-historial-actividad-${actividad.id}`}
           onClick={onVerDetalle}
         >
           Ver detalle
-        </button>
+        </Button>
       </footer>
     </article>
   )

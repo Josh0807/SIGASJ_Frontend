@@ -26,18 +26,19 @@ describe('adminNavigation.config', () => {
       expect(ROLE_PERMISSIONS[role].length).toBeGreaterThan(0)
     }
 
-    expect(ROLE_PERMISSIONS.Administradora).toContain('users.manage')
+    expect(ROLE_PERMISSIONS.SuperAdmin).toContain('users.manage')
+    expect(ROLE_PERMISSIONS.Administradora).not.toContain('users.manage')
     expect(ROLE_PERMISSIONS.Administradora).toContain('audit.read')
     expect(ROLE_PERMISSIONS.Secretaria).not.toContain('roles.manage')
     expect(ROLE_PERMISSIONS.Fontanero).toContain('fault_reports.read')
     expect(
       ADMIN_MODULE_ACCESS.find((module) => module.segment === 'averias')
         ?.allowedRoles,
-    ).toEqual(['Administradora', 'Secretaria'])
+    ).toEqual(['SuperAdmin', 'Administradora', 'Secretaria'])
     expect(ROLE_PERMISSIONS.Fontanero).not.toContain('users.manage')
   })
 
-  it('restringe usuarios, reportes, proyectos y actividades-fontanero a Administradora', () => {
+  it('restringe usuarios a Super Admin; reportes/proyectos/actividades-fontanero a Super Admin + Administradora', () => {
     const usuarios = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'usuarios')
     const solicitudes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'solicitudes')
     const reportes = ADMIN_MODULE_ACCESS.find((module) => module.segment === 'reportes')
@@ -46,22 +47,28 @@ describe('adminNavigation.config', () => {
       (module) => module.segment === 'actividades-fontanero',
     )
 
-    expect(usuarios?.allowedRoles).toEqual(['Administradora'])
-    expect(solicitudes?.allowedRoles).toEqual(['Administradora', 'Secretaria'])
-    expect(reportes?.allowedRoles).toEqual(['Administradora'])
-    expect(proyectos?.allowedRoles).toEqual(['Administradora'])
+    expect(usuarios?.allowedRoles).toEqual(['SuperAdmin'])
+    expect(usuarios?.availableInNav).toBe(true)
+    expect(usuarios?.availableAsRoute).toBe(true)
+    expect(solicitudes?.allowedRoles).toEqual([
+      'SuperAdmin',
+      'Administradora',
+      'Secretaria',
+    ])
+    expect(reportes?.allowedRoles).toEqual(['SuperAdmin', 'Administradora'])
+    expect(proyectos?.allowedRoles).toEqual(['SuperAdmin', 'Administradora'])
     expect(proyectos?.requiredPermissions).toEqual(['projects.manage'])
-    expect(actividadesAdmin?.allowedRoles).toEqual(['Administradora'])
+    expect(actividadesAdmin?.allowedRoles).toEqual(['SuperAdmin', 'Administradora'])
     expect(actividadesAdmin?.requiredPermissions).toEqual(['activities.read_all'])
   })
 
 
-  it('restringe el registro operativo de actividades al Fontanero', () => {
+  it('restringe el registro operativo de actividades al Fontanero (Super Admin hereda)', () => {
     const actividades = ADMIN_MODULE_ACCESS.find(
       (module) => module.segment === 'actividades',
     )
 
-    expect(actividades?.allowedRoles).toEqual(['Fontanero'])
+    expect(actividades?.allowedRoles).toEqual(['SuperAdmin', 'Fontanero'])
     expect(actividades?.requiredPermissions).toEqual(['activities.register'])
     expect(ROLE_PERMISSIONS.Fontanero).toContain('activities.register')
     expect(ROLE_PERMISSIONS.Fontanero).toContain('activities.read_own')

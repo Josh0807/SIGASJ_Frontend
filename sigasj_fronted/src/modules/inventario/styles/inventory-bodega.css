@@ -4,7 +4,7 @@
  */
 
 .inventory-module-shell.inventory-bodega {
-  --inv-bg: var(--asada-ice, #eaf6ff);
+  --inv-bg: var(--admin-surface-bg, #ffffff);
   --inv-card: var(--asada-surface, #ffffff);
   --inv-primary: var(--asada-navy, #1e5a9c);
   --inv-primary-deep: var(--asada-ink, #123f70);
@@ -36,7 +36,7 @@
 }
 
 .admin-layout--panel:has(.inventory-bodega) .admin-main__content {
-  background: var(--asada-ice, #eaf6ff);
+  background: var(--admin-surface-bg, #ffffff);
 }
 
 .inventory-bodega .inv-tabs--sub {
@@ -405,18 +405,8 @@
 .inventory-bodega .inv-status-bar__filter select {
   min-height: 40px;
   min-width: 168px;
-  padding: 0 12px;
-  border: 1px solid var(--inv-border);
-  border-radius: 12px;
-  background: var(--asada-surface, #fff);
   color: var(--inv-ink);
-  font: inherit;
   font-weight: 700;
-}
-
-.inventory-bodega .inv-status-bar__filter select:focus {
-  outline: 2px solid color-mix(in srgb, var(--inv-primary) 30%, transparent);
-  border-color: var(--inv-primary);
 }
 
 .inventory-bodega .inv-status-bar__metric {
@@ -510,11 +500,9 @@
   justify-items: center;
   gap: 10px;
   padding: 36px 24px 32px;
-  border: 1px solid color-mix(in srgb, var(--inv-primary) 14%, var(--inv-border));
+  border: 1px solid var(--inv-border);
   border-radius: var(--inv-radius);
-  background:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--asada-mist, #bfe3fa) 45%, white), transparent 58%),
-    linear-gradient(180deg, #fff 0%, color-mix(in srgb, var(--asada-ice, #eaf6ff) 55%, white) 100%);
+  background: var(--asada-surface, #ffffff);
   box-shadow: var(--inv-shadow);
   text-align: center;
 }
@@ -643,22 +631,59 @@
 }
 
 .inventory-bodega .inv-filters input,
-.inventory-bodega .inv-filters select {
+.inventory-bodega .inv-filters select,
+.inventory-bodega .inv-status-bar__filter select,
+.inventory-bodega .materials-admin :is(input, select, textarea),
+.inventory-bodega .provider-admin__control > :is(input, select, textarea) {
   min-height: 44px;
-  width: 100%;
   padding: 0 12px;
   border: 1px solid var(--inv-border);
   border-radius: 12px;
-  background: var(--asada-ice, #eaf6ff);
+  background-color: var(--asada-surface, #ffffff);
   color: var(--inv-text);
   font: inherit;
+  box-shadow: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.inventory-bodega .inv-filters input,
+.inventory-bodega .inv-filters select,
+.inventory-bodega .materials-admin :is(input, select, textarea),
+.inventory-bodega .provider-admin__control > :is(input, select, textarea) {
+  width: 100%;
+}
+
+.inventory-bodega .materials-admin textarea,
+.inventory-bodega .provider-admin__control > textarea {
+  min-height: 100px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.inventory-bodega .inv-filters select,
+.inventory-bodega .inv-status-bar__filter select,
+.inventory-bodega .materials-admin select,
+.inventory-bodega .provider-admin__control > select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.5rem;
+  background-color: var(--asada-surface, #ffffff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b7390' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 1rem;
+  cursor: pointer;
 }
 
 .inventory-bodega .inv-filters input:focus,
-.inventory-bodega .inv-filters select:focus {
+.inventory-bodega .inv-filters select:focus,
+.inventory-bodega .inv-status-bar__filter select:focus,
+.inventory-bodega .materials-admin :is(input, select, textarea):focus,
+.inventory-bodega .provider-admin__control > :is(input, select, textarea):focus {
   outline: 2px solid color-mix(in srgb, var(--inv-primary) 30%, transparent);
+  outline-offset: 1px;
   border-color: var(--inv-primary);
-  background: var(--asada-surface, #fff);
+  background-color: var(--asada-surface, #ffffff);
 }
 
 .inventory-bodega .inv-table-wrap {
@@ -846,7 +871,7 @@
 }
 
 .inventory-bodega .inv-table th {
-  background: var(--asada-ice, #eaf6ff);
+  background: #f7fafc;
   color: var(--inv-muted);
   font-size: 0.72rem;
   font-weight: 750;
@@ -1241,8 +1266,9 @@
   justify-content: space-between;
   gap: 8px;
   padding: 10px 12px;
+  border: 1px solid var(--inv-border);
   border-radius: 12px;
-  background: var(--asada-ice, #eaf6ff);
+  background: var(--asada-surface, #ffffff);
   font-size: 0.86rem;
 }
 
@@ -1252,7 +1278,7 @@
   padding: 28px 20px;
   border: 1px dashed var(--inv-border);
   border-radius: 16px;
-  background: var(--asada-ice, #eaf6ff);
+  background: var(--asada-surface, #ffffff);
   text-align: center;
   color: var(--inv-muted);
 }
@@ -1389,7 +1415,7 @@
 }
 
 .inventory-bodega .materials-admin th {
-  background: var(--asada-ice, #eaf6ff) !important;
+  background: #f7fafc !important;
   color: var(--inv-muted) !important;
 }
 

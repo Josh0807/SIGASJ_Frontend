@@ -30,7 +30,7 @@
   --sage-radius-pill: 999px;
   --sage-shadow: 0 10px 28px rgba(18, 63, 112, 0.07);
   --sage-shadow-soft: 0 4px 14px rgba(18, 63, 112, 0.05);
-  --admin-sidebar-width: 268px;
+  --admin-sidebar-width: 292px;
   --admin-sidebar-collapsed-width: 76px;
   --admin-header-height: 72px;
   --admin-bg-body: var(--sage-bg);
@@ -49,19 +49,30 @@
   --vui-danger: var(--sage-danger);
 
   color: var(--sage-text);
-  background:
-    radial-gradient(ellipse 80% 50% at 0% 0%, color-mix(in srgb, var(--asada-mist, #bfe3fa) 28%, transparent), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, color-mix(in srgb, var(--asada-ice, #eaf6ff) 70%, transparent), transparent 50%),
-    #ffffff;
+  background: var(--admin-surface-bg, #ffffff);
   font-family: var(--font-body);
 }
 
+/* Canvas admin blanco: evita el ice del body público entre módulos. */
+html:has(.admin-layout--panel),
+body:has(.admin-layout--panel) {
+  --color-background: #ffffff;
+  background: var(--admin-surface-bg, #ffffff);
+}
+
 .admin-layout--panel .admin-main {
-  background: transparent;
+  background: var(--admin-surface-bg, #ffffff);
   min-width: 0;
 }
 
-/* —— Sidebar institucional (look landing, no píldora SaaS) —— */
+.admin-layout--panel .admin-shell-landing,
+.admin-layout--panel .admin-page-transition,
+.admin-layout--panel .admin-dashboard,
+.admin-layout--panel .inventory-module-shell {
+  background: transparent;
+}
+
+/* —— Sidebar institucional a altura completa (todos los roles) —— */
 .admin-layout--panel .admin-sidebar {
   display: flex;
   flex-direction: column;
@@ -72,11 +83,11 @@
   margin: 16px 0 16px 16px;
   width: var(--admin-sidebar-width);
   flex: 0 0 var(--admin-sidebar-width);
-  height: auto;
-  min-height: 0;
+  height: calc(100dvh - 32px);
+  min-height: calc(100dvh - 32px);
   max-height: calc(100dvh - 32px);
-  padding: 18px 12px 14px;
-  overflow-x: visible;
+  padding: 18px 14px 14px;
+  overflow-x: hidden;
   overflow-y: auto;
   border: 1px solid var(--sage-border);
   border-radius: 13px;
@@ -153,7 +164,6 @@
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__label,
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__submenu,
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__chevron,
-.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__system-status,
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__collapse-label {
   display: none;
 }
@@ -207,7 +217,20 @@
   overflow-y: auto;
   padding: 2px 0;
   scrollbar-width: thin;
-  scrollbar-color: var(--asada-mist, #bfe3fa) transparent;
+  scrollbar-color: color-mix(in srgb, var(--asada-mist, #bfe3fa) 55%, transparent) transparent;
+}
+
+.admin-layout--panel .admin-sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-layout--panel .admin-sidebar__nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--asada-mist, #bfe3fa) 70%, transparent);
+}
+
+.admin-layout--panel .admin-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__nav {
@@ -346,9 +369,10 @@
 
 .admin-layout--panel .admin-sidebar__label {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  line-height: 1.25;
   font-size: 0.88rem;
   color: inherit;
 }
@@ -360,11 +384,6 @@
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__link--active::before,
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__link.active::before {
   content: none;
-}
-
-.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__footer {
-  margin-top: auto;
-  padding-top: 14px;
 }
 
 .admin-layout--panel .admin-sidebar__submenu {
@@ -397,42 +416,19 @@
 
 .admin-layout--panel .admin-sidebar__footer {
   flex: 0 0 auto;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 0;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--sage-border);
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
-
-.admin-layout--panel:not(.admin-layout--sidebar-collapsed) .admin-sidebar__footer {
   align-items: stretch;
-  border-top: 1px solid var(--sage-border);
-  padding-top: 12px;
 }
 
-.admin-layout--panel .admin-sidebar__system-status {
-  display: flex;
+.admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__footer {
+  margin-top: auto;
   align-items: center;
-  gap: 10px;
-  padding: 8px 6px;
-}
-
-.admin-layout--panel .admin-sidebar__status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--sage-primary);
-  box-shadow: 0 0 0 4px var(--sage-primary-soft);
-}
-
-.admin-layout--panel .admin-sidebar__status-copy strong,
-.admin-layout--panel .admin-sidebar__status-copy small {
-  color: var(--sage-ink);
-}
-
-.admin-layout--panel .admin-sidebar__status-copy small {
-  color: var(--sage-muted);
+  border-top: 0;
+  padding-top: 8px;
 }
 
 .admin-layout--panel .admin-sidebar__close {
@@ -604,7 +600,7 @@
 .admin-layout--panel .admin-main__content {
   /* Espacio inferior para que la esfera Sage no tape paginación/acciones */
   padding: 20px 24px max(96px, calc(env(safe-area-inset-bottom) + 88px));
-  background: transparent;
+  background: var(--admin-surface-bg, #ffffff);
 }
 
 .admin-layout--panel .admin-page-transition {
@@ -624,9 +620,10 @@
     transform: translateY(12px) scale(0.985);
   }
   to {
+    /* none (not identity matrix / blur(0)) so position:fixed children aren't trapped */
     opacity: 1;
-    filter: blur(0);
-    transform: translateY(0) scale(1);
+    filter: none;
+    transform: none;
   }
 }
 
@@ -637,7 +634,7 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
@@ -667,9 +664,34 @@
     display: none;
   }
 
+  .admin-layout--panel .admin-header__brand-block {
+    min-width: 0;
+  }
+
+  .admin-layout--panel .admin-header__brand-title {
+    font-size: clamp(0.95rem, 3.6vw, 1.1rem);
+    letter-spacing: -0.02em;
+  }
+
   .admin-layout--panel .admin-header {
-    padding: 12px 14px;
-    min-height: 64px;
+    padding: 10px 12px;
+    min-height: 60px;
+    gap: 8px;
+  }
+
+  .admin-layout--panel .admin-page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .admin-layout--panel .admin-page-header > div:last-child {
+    width: 100%;
+  }
+
+  .admin-layout--panel .admin-page-header > div:last-child > * {
+    width: 100%;
   }
 
   .admin-layout--panel .admin-sidebar {
@@ -713,8 +735,7 @@
     border-bottom-color: var(--sage-border);
   }
 
-  .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__brand-text,
-  .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__system-status {
+  .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar__brand-text {
     display: grid;
   }
 
@@ -752,7 +773,32 @@
   }
 
   .admin-layout--panel .admin-main__content {
-    padding: 12px 12px 28px;
+    padding: 12px 12px max(88px, calc(env(safe-area-inset-bottom) + 72px));
+  }
+
+  .admin-layout--panel .admin-main__content > * {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .admin-layout--panel .admin-table-scroll,
+  .admin-layout--panel [data-admin-table-scroll],
+  .admin-layout--panel .averias-admin__historial-table,
+  .admin-layout--panel .gallery-admin__table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-layout--panel .admin-header__brand-text span {
+    display: none;
+  }
+
+  .admin-layout--panel .admin-header {
+    margin: 8px;
+    padding: 10px;
   }
 }
 

@@ -41,15 +41,24 @@ describe('contrato de autorización con Backend (11.4.5)', () => {
     expect(secretariaPermissions.has('institutional_content.manage')).toBe(true)
   })
 
-  it('Administradora posee permisos de administración completa', () => {
+  it('Administradora posee permisos operativos ASADA sin users/roles', () => {
     const adminPermissions = new Set(ROLE_PERMISSIONS.Administradora)
 
-    expect(adminPermissions.has('users.manage')).toBe(true)
-    expect(adminPermissions.has('roles.manage')).toBe(true)
+    expect(adminPermissions.has('users.manage')).toBe(false)
+    expect(adminPermissions.has('roles.manage')).toBe(false)
     expect(adminPermissions.has('audit.read')).toBe(true)
     expect(adminPermissions.has('subscribers.read')).toBe(true)
     expect(adminPermissions.has('subscribers.create')).toBe(true)
     expect(adminPermissions.has('subscribers.update')).toBe(true)
     expect(adminPermissions.has('subscribers.deactivate')).toBe(true)
+  })
+
+  it('Super Admin posee control de plataforma (users/roles)', () => {
+    const superPermissions = new Set(ROLE_PERMISSIONS.SuperAdmin)
+
+    expect(superPermissions.has('users.manage')).toBe(true)
+    expect(superPermissions.has('roles.manage')).toBe(true)
+    expect(superPermissions.has('audit.read')).toBe(true)
+    expect(superPermissions.has('subscribers.read')).toBe(true)
   })
 })

@@ -6,7 +6,6 @@ import { Alert } from '../../../shared/ui/Alert'
 import { Button } from '../../../shared/ui/Button'
 import { Card } from '../../../shared/ui/Card'
 import { AdminShell, PageHeader } from '../../../shared/ui'
-import AveriaStatusBadge from '../admin/AveriaStatusBadge'
 import { useFontaneroAveria } from '../hooks/useFontaneroAveria'
 import AveriasFontaneroDetailView from './AveriasFontaneroDetailView'
 import { FONTANERO_AVERIAS_PATH } from './averiasFontaneroPaths'
@@ -154,15 +153,9 @@ const AveriasFontaneroDetailPage = ({
     <AdminShell className="averias-fontanero" aria-labelledby="averia-fontanero-detail-title">
       <PageHeader
         id="averia-fontanero-detail-title"
+        className="actividades-admin-detalle__topbar"
         title="Avería asignada"
-        description={
-          <span className="inline-flex flex-wrap items-center gap-2">
-            <span className="inline-flex rounded-full border border-sigasj-border bg-sigasj-surface-soft px-3 py-1 text-sm font-bold text-sigasj-ink">
-              {averia.codigoSeguimiento}
-            </span>
-            <AveriaStatusBadge estado={averia.estado} />
-          </span>
-        }
+        description="Consulte la información y gestione la atención de esta avería."
         actions={<BackLink />}
       />
 

@@ -390,7 +390,7 @@ export default function SolicitudMaterialesPage() {
             const rowErrors = errors.rows[row.key] ?? {}
             return (
               <fieldset
-                className="material-request__row !grid !gap-4 !rounded-[1.25rem] !border !border-[#d7e8f7] !bg-gradient-to-br !from-white !to-[#f5faff] !p-4 !pt-[3.75rem] !shadow-[0_8px_22px_rgba(30,90,156,0.06)] sm:!grid-cols-[minmax(0,1.35fr)_minmax(11rem,0.7fr)_minmax(0,1fr)] sm:!gap-4 sm:!p-5 sm:!pt-[4rem]"
+                className="material-request__row !grid !gap-4 !rounded-[1.25rem] !border !border-[#d7e8f7] !bg-gradient-to-br !from-white !to-[#f5faff] !p-4 !pt-[3.75rem] !shadow-[0_8px_22px_rgba(30,90,156,0.06)] max-[760px]:!grid-cols-1 min-[761px]:!grid-cols-[minmax(0,1.35fr)_minmax(11rem,0.7fr)_minmax(0,1fr)] min-[761px]:!gap-4 min-[761px]:!p-5 min-[761px]:!pt-[4rem]"
                 key={row.key}
                 disabled={submitting || loading || Boolean(loadError)}
               >

@@ -30,16 +30,20 @@ describe('adminNavigation helpers', () => {
     expect(userHasAllowedRole(fontanero, ['Administradora', 'Secretaria'])).toBe(false)
     expect(userHasAllowedRole(abonado, ['Administradora', 'Secretaria'])).toBe(false)
     expect(getAllowedRolesForAdminPath('/admin/abonados')).toEqual([
+      'SuperAdmin',
       'Administradora',
       'Secretaria',
     ])
     expect(getAllowedRolesForAdminPath('/admin/abonados/11')).toEqual([
+      'SuperAdmin',
       'Administradora',
       'Secretaria',
     ])
   })
 
   it('identifica roles internos validos', () => {
+    expect(isInternalAdminRole('SuperAdmin')).toBe(true)
+    expect(isInternalAdminRole('SUPER_ADMIN')).toBe(true)
     expect(isInternalAdminRole('Administradora')).toBe(true)
     expect(isInternalAdminRole('Abonado')).toBe(false)
     expect(isAbonadoRole('Abonado')).toBe(true)
@@ -68,6 +72,18 @@ describe('adminNavigation helpers', () => {
       true,
     )
     expect(canAccessAdminRoute(administradora, '/admin/actividades')).toBe(false)
+  })
+
+  it('Super Admin ve Gestión de usuarios y hereda módulos del panel', () => {
+    const superAdmin = { role: 'SuperAdmin', id: '0' }
+    const paths = getAdminNavItemsForUser(superAdmin).map((item) => item.path)
+    expect(paths).toContain('/admin/usuarios')
+    expect(paths).toContain('/admin/dashboard')
+    expect(paths).toContain('/admin/proyectos')
+    expect(canAccessAdminRoute(superAdmin, '/admin/usuarios')).toBe(true)
+    expect(canAccessAdminRoute({ role: 'SUPER_ADMIN', id: '0' }, '/admin/usuarios')).toBe(
+      true,
+    )
   })
 
   it('Secretaria no ve usuarios ni reportes y sí Recursos Humanos', () => {
@@ -223,6 +239,7 @@ describe('adminNavigation helpers', () => {
 
   it('sigue resolviendo rutas administrativas después de cargar el árbol de pantallas', () => {
     expect(getAllowedRolesForAdminPath('/admin/dashboard')).toEqual([
+      'SuperAdmin',
       'Administradora',
       'Secretaria',
       'Fontanero',

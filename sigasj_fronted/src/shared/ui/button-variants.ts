@@ -17,7 +17,7 @@ export const buttonVariants = cva(
           'border border-transparent bg-transparent text-sigasj-muted hover:bg-sigasj-surface-soft hover:text-sigasj-ink',
       },
       size: {
-        sm: 'min-h-9 gap-1.5 px-3.5 text-[13px]',
+        sm: 'min-h-10 gap-1.5 px-3.5 text-[13px]',
         md: 'min-h-11 gap-2 px-4 text-sm',
         lg: 'min-h-12 gap-2.5 px-5 text-[15px]',
       },

@@ -43,6 +43,17 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(ALL_ADMIN_MODULE_PATHS).toHaveLength(14)
   })
 
+  it('Super Admin monopoliza Gestión de usuarios', () => {
+    expect(EXPECTED_NAV_PATHS.SuperAdmin).toContain('/admin/usuarios')
+    expect(EXPECTED_NAV_PATHS.Administradora).not.toContain('/admin/usuarios')
+    expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/usuarios')
+    expect(EXPECTED_NAV_PATHS.Fontanero).not.toContain('/admin/usuarios')
+    expect(canAccessAdminRoute(userFor('SuperAdmin'), '/admin/usuarios')).toBe(true)
+    expect(canAccessAdminRoute(userFor('Administradora'), '/admin/usuarios')).toBe(
+      false,
+    )
+  })
+
   it('Secretaria Ejecutiva no incluye usuarios ni reportes', () => {
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/usuarios')
     expect(EXPECTED_NAV_PATHS.Secretaria).not.toContain('/admin/reportes')
@@ -106,9 +117,12 @@ describe('matriz de acceso por rol interno (11.4.5)', () => {
     expect(ROLE_PERMISSIONS.Secretaria).not.toContain('roles.manage')
   })
 
-  it('permisos backend alineados: Administradora incluye control total', () => {
-    expect(ROLE_PERMISSIONS.Administradora).toContain('users.manage')
+  it('permisos: Administradora operativa sin users/roles; Super Admin con control de plataforma', () => {
+    expect(ROLE_PERMISSIONS.Administradora).not.toContain('users.manage')
+    expect(ROLE_PERMISSIONS.Administradora).not.toContain('roles.manage')
     expect(ROLE_PERMISSIONS.Administradora).toContain('audit.read')
-    expect(ROLE_PERMISSIONS.Administradora).toContain('roles.manage')
+    expect(ROLE_PERMISSIONS.SuperAdmin).toContain('users.manage')
+    expect(ROLE_PERMISSIONS.SuperAdmin).toContain('roles.manage')
+    expect(ROLE_PERMISSIONS.SuperAdmin).toContain('audit.read')
   })
 })

@@ -284,7 +284,7 @@ export default function SolicitudesAusenciaPage() {
                     to={solicitudAusenciaDetailPath(item.id)}
                     variant={item.estado === 'PENDIENTE' ? 'primary' : 'secondary'}
                     size="sm"
-                    className="w-fit"
+                    className="w-full max-[760px]:w-full min-[761px]:w-fit"
                     leftIcon={<IconEye size={16} aria-hidden="true" />}
                   >
                     {item.estado === 'PENDIENTE' ? 'Revisar' : 'Ver detalle'}

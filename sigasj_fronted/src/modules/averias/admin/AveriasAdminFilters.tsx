@@ -53,9 +53,8 @@ const AveriasAdminFilters = ({
 }: AveriasAdminFiltersProps) => (
   <AdminFilters
     aria-label="Búsqueda y filtros"
-    className="!block"
     summary={
-      <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+      <div className="flex w-full flex-col items-stretch gap-2 max-[760px]:text-left min-[761px]:w-auto min-[761px]:flex-row min-[761px]:items-center min-[761px]:justify-end">
         <span className="inline-flex items-center gap-1.5">
           <strong className="text-sigasj-ink">{loading ? '…' : total}</strong>
           <span>{total === 1 ? 'avería' : 'averías'}</span>
@@ -65,6 +64,7 @@ const AveriasAdminFilters = ({
             type="button"
             variant="secondary"
             size="sm"
+            className="w-full min-[761px]:w-auto"
             leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
             onClick={onClear}
           >
@@ -74,10 +74,10 @@ const AveriasAdminFilters = ({
       </div>
     }
   >
-    <div className="col-span-full grid min-w-0 gap-3 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))] xl:items-end">
+    <div className="col-span-full grid min-w-0 gap-3 max-[760px]:grid-cols-1 min-[761px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))] xl:items-end">
       <AdminFilterField
         label="Buscar"
-        className="sm:col-span-2 lg:col-span-3 xl:col-span-1"
+        className="max-[760px]:col-span-1 min-[761px]:col-span-2 lg:col-span-3 xl:col-span-1"
       >
         <span className="relative block">
           <IconSearch

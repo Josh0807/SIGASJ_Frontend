@@ -272,7 +272,7 @@ const ActividadesAdminReportesPage = () => {
             </select>
           </AdminFilterField>
 
-          <div className="col-span-full flex flex-wrap gap-2">
+          <div className="col-span-full flex flex-wrap gap-2 max-[760px]:flex-col max-[760px]:[&>*]:w-full">
             <Button
               type="submit"
               variant="primary"
@@ -373,9 +373,9 @@ const ActividadesAdminReportesPage = () => {
           ) : null}
 
           {!loading && !showEmpty && !filterError ? (
-            <div className="table-responsive actividades-admin-reportes__table-shell">
-              <table className="actividades-admin-reportes__table">
-                <thead>
+            <div className="table-responsive actividades-admin-reportes__table-shell max-[760px]:overflow-visible max-[760px]:border-0 max-[760px]:bg-transparent max-[760px]:shadow-none">
+              <table className="actividades-admin-reportes__table max-[760px]:block max-[760px]:min-w-0">
+                <thead className="max-[760px]:hidden">
                   <tr>
                     <th scope="col">Fecha</th>
                     <th scope="col">Fontanero</th>
@@ -386,13 +386,34 @@ const ActividadesAdminReportesPage = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="max-[760px]:block">
                   {reporte.actividades.map((actividad) => (
-                    <tr key={actividad.id}>
-                      <td>{formatActividadFecha(actividad.fechaActividad)}</td>
-                      <td>{actividad.fontaneroId}</td>
-                      <td>{actividad.tipoActividadNombre || 'Sin tipo'}</td>
-                      <td>
+                    <tr
+                      key={actividad.id}
+                      className="max-[760px]:mb-3.5 max-[760px]:block max-[760px]:rounded-[14px] max-[760px]:border max-[760px]:border-[#d7e5f1] max-[760px]:bg-white max-[760px]:px-3.5 max-[760px]:py-2 max-[760px]:shadow-[0_4px_14px_rgba(18,63,112,0.05)]"
+                    >
+                      <td
+                        className="max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                        data-label="Fecha"
+                      >
+                        {formatActividadFecha(actividad.fechaActividad)}
+                      </td>
+                      <td
+                        className="max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                        data-label="Fontanero"
+                      >
+                        {actividad.fontaneroId}
+                      </td>
+                      <td
+                        className="max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                        data-label="Tipo"
+                      >
+                        {actividad.tipoActividadNombre || 'Sin tipo'}
+                      </td>
+                      <td
+                        className="max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]"
+                        data-label="Estado"
+                      >
                         <span
                           className="actividades-admin-reportes__estado"
                           data-estado={actividad.estado}
@@ -400,11 +421,12 @@ const ActividadesAdminReportesPage = () => {
                           {formatActividadEstado(actividad.estado)}
                         </span>
                       </td>
-                      <td className="actividades-admin-reportes__row-action">
+                      <td className="actividades-admin-reportes__row-action max-[760px]:block max-[760px]:border-b-0 max-[760px]:px-0 max-[760px]:pb-1 max-[760px]:pt-2">
                         <Button
                           to={actividadAdminDetallePath(actividad.id)}
                           variant="secondary"
                           size="sm"
+                          className="w-full min-[761px]:w-auto"
                         >
                           Ver detalle
                         </Button>

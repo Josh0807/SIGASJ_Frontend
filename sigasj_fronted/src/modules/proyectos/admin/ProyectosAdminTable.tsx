@@ -22,7 +22,7 @@ const displayProyectoNombre = (nombre: string) => {
 }
 
 const mobileCellClass =
-  'max-[760px]:grid max-[760px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[760px]:items-center max-[760px]:gap-2.5 max-[760px]:whitespace-normal max-[760px]:px-0 max-[760px]:py-2.5 max-[760px]:before:text-xs max-[760px]:before:font-bold max-[760px]:before:uppercase max-[760px]:before:text-[#587187] max-[760px]:before:content-[attr(data-label)]'
+  'max-[1199px]:grid max-[1199px]:grid-cols-[minmax(105px,40%)_minmax(0,1fr)] max-[1199px]:items-center max-[1199px]:gap-2.5 max-[1199px]:whitespace-normal max-[1199px]:px-0 max-[1199px]:py-2.5 max-[1199px]:before:text-xs max-[1199px]:before:font-bold max-[1199px]:before:uppercase max-[1199px]:before:text-[#587187] max-[1199px]:before:content-[attr(data-label)]'
 
 const ProyectosAdminTable = ({
   proyectos,
@@ -49,10 +49,10 @@ const ProyectosAdminTable = ({
   }
 
   return (
-    <div className="table-responsive proyectos-admin__table overflow-x-auto max-[760px]:overflow-visible max-[760px]:border-0 max-[760px]:bg-transparent max-[760px]:shadow-none">
-      <table className="max-[760px]:block max-[760px]:min-w-0">
+    <div className="table-responsive proyectos-admin__table overflow-x-auto max-[1199px]:overflow-visible max-[1199px]:border-0 max-[1199px]:bg-transparent max-[1199px]:shadow-none">
+      <table className="max-[1199px]:block max-[1199px]:min-w-0">
         <caption className="visually-hidden">Listado de proyectos</caption>
-        <thead className="max-[760px]:hidden">
+        <thead className="max-[1199px]:hidden">
           <tr>
             <th scope="col">Proyecto</th>
             <th scope="col">Estado</th>
@@ -61,14 +61,14 @@ const ProyectosAdminTable = ({
             <th scope="col">Acciones</th>
           </tr>
         </thead>
-        <tbody className="max-[760px]:block">
+        <tbody className="max-[1199px]:block">
           {proyectos.map((proyecto) => {
             const duracion = proyecto.duracion?.trim()
             const nombreVisible = displayProyectoNombre(proyecto.nombre)
 
             return (
               <tr
-                className="max-[760px]:mb-3.5 max-[760px]:block max-[760px]:rounded-[14px] max-[760px]:border max-[760px]:border-[#d7e5f1] max-[760px]:bg-white max-[760px]:px-3.5 max-[760px]:py-2 max-[760px]:shadow-[0_4px_14px_rgba(18,63,112,0.05)]"
+                className="max-[1199px]:mb-3.5 max-[1199px]:block max-[1199px]:rounded-[14px] max-[1199px]:border max-[1199px]:border-[#d7e5f1] max-[1199px]:bg-white max-[1199px]:px-3.5 max-[1199px]:py-2 max-[1199px]:shadow-[0_4px_14px_rgba(18,63,112,0.05)]"
                 key={proyecto.id}
               >
                 <td
@@ -78,7 +78,7 @@ const ProyectosAdminTable = ({
                   {nombreVisible}
                 </td>
                 <td
-                  className={`${mobileCellClass} max-[760px]:[&_.proyectos-admin__estado-select]:min-w-0 max-[760px]:[&_.proyectos-admin__estado-select]:w-full`}
+                  className={`${mobileCellClass} max-[1199px]:[&_.proyectos-admin__estado-select]:min-w-0 max-[1199px]:[&_.proyectos-admin__estado-select]:w-full`}
                   data-label="Estado"
                 >
                   <div className="proyectos-admin__estado-cell">
@@ -116,7 +116,7 @@ const ProyectosAdminTable = ({
                   </ul>
                 </td>
                 <td
-                  className={`${mobileCellClass} max-[760px]:border-b-0 max-[760px]:[&_.gallery-admin__actions]:w-full max-[760px]:[&_.gallery-admin__actions]:min-w-0 max-[760px]:[&_.gallery-admin__actions]:flex-wrap`}
+                  className={`${mobileCellClass} max-[1199px]:border-b-0 max-[1199px]:[&_.gallery-admin__actions]:w-full max-[1199px]:[&_.gallery-admin__actions]:min-w-0 max-[1199px]:[&_.gallery-admin__actions]:flex-wrap`}
                   data-label="Acciones"
                 >
                   <ProyectosAdminRowActions

@@ -15,8 +15,13 @@ import { Button } from '../../../shared/ui/Button'
 import { Card } from '../../../shared/ui/Card'
 import { EmptyState } from '../../../shared/ui/EmptyState'
 import { PageHeader } from '../../../shared/ui/PageHeader'
+import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useAuth } from '../../auth/components/AuthContext'
-import { esNoAutenticado, esReintentable } from '../../recursos-humanos/colaboradorForm'
+import {
+  esNoAutenticado,
+  esReintentable,
+  getHttpStatus,
+} from '../../recursos-humanos/colaboradorForm'
 import { formatearFechaPermiso } from '../../recursos-humanos/permisoForm'
 import {
   estadoSolicitudAusenciaClassName,
@@ -55,6 +60,21 @@ const detalleSecundario = (item: SolicitudAusenciaFontanero): string => {
   return resumirMotivo(item.motivo)
 }
 
+const mensajeErrorListado = (error: unknown): string => {
+  const status = getHttpStatus(error)
+  if (status === 403) {
+    const detail =
+      error instanceof Error
+        ? error.message.replace(/^HTTP\s+\d{3}:\s*/i, '')
+        : ''
+    if (/colaborador/i.test(detail)) {
+      return 'No hay un colaborador activo vinculado a su cuenta. Pida a Administración que asocie su usuario.'
+    }
+    return 'No tiene permiso para consultar sus solicitudes.'
+  }
+  return 'No fue posible cargar sus solicitudes. Intente nuevamente.'
+}
+
 /**
  * PBI 6.5.6 — Listado de solicitudes propias (solo lectura, API 6.5.3).
  */
@@ -78,30 +98,35 @@ export default function MisSolicitudesAusenciaPage() {
 
   useEffect(() => {
     const controller = new AbortController()
-    getMisSolicitudesAusencia(controller.signal)
-      .then((respuesta) => {
-        if (controller.signal.aborted) return
-        setCarga({
-          clave,
-          data: respuesta,
-          error: null,
-          reintentable: true,
+    const cancelScheduled = runAfterEffect(() => {
+      getMisSolicitudesAusencia(controller.signal)
+        .then((respuesta) => {
+          if (controller.signal.aborted) return
+          setCarga({
+            clave,
+            data: Array.isArray(respuesta) ? respuesta : [],
+            error: null,
+            reintentable: true,
+          })
         })
-      })
-      .catch((err: unknown) => {
-        if (controller.signal.aborted) return
-        if (esNoAutenticado(err)) {
-          salirPorSesion()
-          return
-        }
-        setCarga({
-          clave,
-          data: [],
-          error: 'No fue posible cargar sus solicitudes. Intente nuevamente.',
-          reintentable: esReintentable(err),
+        .catch((err: unknown) => {
+          if (controller.signal.aborted) return
+          if (esNoAutenticado(err)) {
+            salirPorSesion()
+            return
+          }
+          setCarga({
+            clave,
+            data: [],
+            error: mensajeErrorListado(err),
+            reintentable: esReintentable(err),
+          })
         })
-      })
-    return () => controller.abort()
+    })
+    return () => {
+      cancelScheduled()
+      controller.abort()
+    }
   }, [clave, salirPorSesion])
 
   return (
@@ -191,7 +216,10 @@ export default function MisSolicitudesAusenciaPage() {
                     {formatearFechaPermiso(item.fechaInicio)} —{' '}
                     {formatearFechaPermiso(item.fechaFin)}
                   </p>
-                  <p className="m-0 text-sm font-semibold text-sigasj-ink">
+                  <p
+                    className="m-0 break-words text-sm font-semibold text-sigasj-ink [overflow-wrap:anywhere]"
+                    title={detalleSecundario(item)}
+                  >
                     {detalleSecundario(item)}
                   </p>
                   <Button
@@ -221,25 +249,25 @@ export default function MisSolicitudesAusenciaPage() {
               </Badge>
             </div>
 
-            <table className="w-full border-collapse text-left">
+            <table className="w-full table-fixed border-collapse text-left">
               <thead className="bg-[color-mix(in_srgb,var(--color-sigasj-ice)_70%,white)] text-[0.68rem] font-bold uppercase tracking-[0.08em] text-sigasj-muted">
                 <tr>
-                  <th scope="col" className="px-5 py-3">
+                  <th scope="col" className="w-[7.5rem] px-5 py-3">
                     Tipo
                   </th>
-                  <th scope="col" className="px-5 py-3">
+                  <th scope="col" className="w-[11.5rem] px-5 py-3">
                     Periodo
                   </th>
                   <th scope="col" className="px-5 py-3">
                     Detalle
                   </th>
-                  <th scope="col" className="px-5 py-3">
+                  <th scope="col" className="w-[7.5rem] px-5 py-3">
                     Estado
                   </th>
-                  <th scope="col" className="px-5 py-3">
+                  <th scope="col" className="w-[7.5rem] px-5 py-3">
                     Solicitud
                   </th>
-                  <th scope="col" className="px-5 py-3 text-right">
+                  <th scope="col" className="w-[6.5rem] px-5 py-3 text-right">
                     Acción
                   </th>
                 </tr>
@@ -250,29 +278,34 @@ export default function MisSolicitudesAusenciaPage() {
                     key={item.id}
                     className="transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--color-sigasj-ice)_55%,white)]"
                   >
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 align-middle">
                       <Badge tone={tonoTipo(item.tipo)}>
                         {tipoSolicitudAusenciaLabel(item.tipo)}
                       </Badge>
                     </td>
-                    <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
+                    <td className="px-5 py-3.5 align-middle text-sm font-semibold tabular-nums text-sigasj-muted">
                       {formatearFechaPermiso(item.fechaInicio)} —{' '}
                       {formatearFechaPermiso(item.fechaFin)}
                     </td>
-                    <td className="max-w-xs px-5 py-3.5 text-sm font-semibold text-sigasj-ink">
-                      {detalleSecundario(item)}
+                    <td className="px-5 py-3.5 align-middle text-sm font-semibold text-sigasj-ink">
+                      <span
+                        className="line-clamp-2 break-words [overflow-wrap:anywhere]"
+                        title={detalleSecundario(item)}
+                      >
+                        {detalleSecundario(item)}
+                      </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 align-middle">
                       <span
                         className={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-extrabold uppercase tracking-wide ${estadoSolicitudAusenciaClassName(item.estado)}`}
                       >
                         {estadoSolicitudAusenciaLabel(item.estado)}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-sm font-semibold tabular-nums text-sigasj-muted">
+                    <td className="px-5 py-3.5 align-middle text-sm font-semibold tabular-nums text-sigasj-muted">
                       {formatearFechaPermiso(item.createdAt.slice(0, 10))}
                     </td>
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-5 py-3.5 align-middle text-right">
                       <Button
                         to={misSolicitudAusenciaDetailPath(item.id)}
                         variant="secondary"

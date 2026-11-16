@@ -173,7 +173,7 @@ const ContactoAdminPage = () => {
               />
             </label>
 
-            <div className="gallery-admin__field-row">
+            <div className="gallery-admin__field-row max-[900px]:!grid-cols-1">
               <label className="gallery-admin__field">
                 <span>Latitud</span>
                 <input

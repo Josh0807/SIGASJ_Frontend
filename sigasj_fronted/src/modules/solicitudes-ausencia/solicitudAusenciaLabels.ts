@@ -25,10 +25,10 @@ export const estadoSolicitudAusenciaClassName = (
 
 export const resumirMotivo = (
   motivo: string | null | undefined,
-  max = 80,
+  max = 72,
 ): string => {
   const texto = motivo?.trim()
   if (!texto) return 'Sin motivo'
   if (texto.length <= max) return texto
-  return `${texto.slice(0, max - 1)}…`
+  return `${texto.slice(0, Math.max(1, max - 1))}…`
 }

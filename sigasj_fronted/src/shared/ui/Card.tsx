@@ -25,7 +25,7 @@ export function Card({
     <Component
       className={cn(
         'rounded-[13px] border border-sigasj-border bg-white shadow-[0_4px_14px_rgba(30,90,156,0.05)]',
-        padded && 'p-5',
+        padded && 'p-4 sm:p-5',
         useLift && 'landing-lift-card',
         interactive &&
           'transition-[border-color,box-shadow,transform] duration-[350ms] ease-out hover:border-[rgba(90,174,230,0.65)]',

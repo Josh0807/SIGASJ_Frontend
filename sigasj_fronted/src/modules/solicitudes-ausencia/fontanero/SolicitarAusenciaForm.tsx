@@ -289,12 +289,10 @@ export default function SolicitarAusenciaForm({
   }
 
   const labelClass = 'text-[0.78rem] font-bold text-sigasj-ink'
-  const fieldShell =
-    'flex min-h-11 items-center gap-2.5 rounded-xl border border-sigasj-border bg-white px-3.5 transition focus-within:border-sigasj-primary focus-within:ring-2 focus-within:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
-  const fieldShellError =
-    'flex min-h-11 items-center gap-2.5 rounded-xl border border-red-400 bg-white px-3.5 transition focus-within:ring-2 focus-within:ring-red-200'
-  const inputClass =
-    'min-w-0 flex-1 border-0 bg-transparent py-2.5 text-[0.95rem] text-sigasj-ink outline-none placeholder:text-sigasj-muted disabled:text-sigasj-muted'
+  const controlClass =
+    'box-border min-h-11 w-full appearance-none rounded-xl border border-sigasj-border bg-white px-3.5 py-2.5 text-[0.95rem] leading-normal text-sigasj-ink shadow-none outline-none transition placeholder:text-sigasj-muted focus:border-sigasj-primary focus:shadow-none focus:outline-none focus:ring-0 disabled:bg-sigasj-surface-soft disabled:text-sigasj-muted disabled:opacity-100'
+  const controlErrorClass =
+    'box-border min-h-11 w-full appearance-none rounded-xl border border-red-400 bg-white px-3.5 py-2.5 text-[0.95rem] leading-normal text-sigasj-ink shadow-none outline-none transition placeholder:text-sigasj-muted focus:border-red-500 focus:shadow-none focus:outline-none focus:ring-0 disabled:opacity-60'
 
   return (
     <div className="admin-content-modern grid w-full min-w-0 gap-4">
@@ -386,46 +384,52 @@ export default function SolicitarAusenciaForm({
             {esVacaciones ? 'Datos de vacaciones' : 'Datos del permiso'}
           </h2>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid items-start gap-4 md:grid-cols-2">
             <label className="grid min-w-0 gap-1.5">
               <span className={labelClass}>Solicitante</span>
-              <span className={`${fieldShell} bg-sigasj-surface-soft`}>
-                <input
-                  className={inputClass}
-                  value={nombre}
-                  readOnly
-                  disabled
-                  aria-label="Solicitante"
-                />
-              </span>
+              <input
+                className={controlClass}
+                value={nombre}
+                readOnly
+                disabled
+                aria-label="Solicitante"
+              />
             </label>
 
             <label className="grid min-w-0 gap-1.5">
               <span className={labelClass}>
                 Correos para aviso <span className="text-sigasj-error">*</span>
               </span>
-              <span className={errors.correo ? fieldShellError : fieldShell}>
-                <input
-                  id="correoAviso"
-                  name="correo"
-                  type="text"
-                  inputMode="email"
-                  autoComplete="off"
-                  className={inputClass}
-                  placeholder="uno@correo.cr, otro@correo.cr"
-                  value={values.correo}
-                  required
-                  disabled={saving}
-                  aria-invalid={Boolean(errors.correo)}
-                  onChange={(event) => update('correo', event.target.value)}
-                />
-              </span>
+              <input
+                id="correoAviso"
+                name="correo"
+                type="text"
+                autoComplete="off"
+                spellCheck={false}
+                className={errors.correo ? controlErrorClass : controlClass}
+                placeholder="Ej. administracion@asadasanjuan.cr"
+                value={values.correo}
+                required
+                disabled={saving}
+                aria-invalid={Boolean(errors.correo)}
+                aria-describedby={
+                  errors.correo ? 'correoAviso-error' : 'correoAviso-ayuda'
+                }
+                onChange={(event) => update('correo', event.target.value)}
+              />
               {errors.correo ? (
-                <small className="font-semibold text-sigasj-error" role="alert">
+                <small
+                  id="correoAviso-error"
+                  className="font-semibold text-sigasj-error"
+                  role="alert"
+                >
                   {errors.correo}
                 </small>
               ) : (
-                <small className="font-semibold text-sigasj-muted">
+                <small
+                  id="correoAviso-ayuda"
+                  className="font-semibold text-sigasj-muted"
+                >
                   El aviso se envía al aprobar. Separe varios correos con coma.
                 </small>
               )}
@@ -487,9 +491,7 @@ export default function SolicitarAusenciaForm({
               <textarea
                 id="motivoPermiso"
                 name="motivo"
-                className={`min-h-[6.5rem] w-full rounded-xl border bg-white px-3.5 py-2.5 text-[0.95rem] text-sigasj-ink outline-none transition placeholder:text-sigasj-muted focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)] disabled:opacity-60 ${
-                  errors.motivo ? 'border-red-400' : 'border-sigasj-border'
-                }`}
+                className={`min-h-[6.5rem] resize-y ${errors.motivo ? controlErrorClass : controlClass}`}
                 maxLength={500}
                 placeholder="Ej. Cita médica, trámite personal, asunto familiar"
                 value={values.motivo}
@@ -517,15 +519,15 @@ export default function SolicitarAusenciaForm({
               Respaldo (opcional)
             </h2>
             <p className="m-0 text-sm font-semibold text-sigasj-muted">
-              PDF, JPG o PNG · máximo 10 MB. Constancia médica, cita u otro
-              documento.
+              PDF, JPG, JPEG o PNG · máximo 10 MB por archivo. Constancia
+              médica, cita u otro documento.
             </p>
             <DocumentoActividadUploader
               files={documentos}
               onChange={setDocumentos}
               multiple
               buttonLabel="Adjuntar archivos"
-              helpText="Formatos: PDF, JPG, JPEG y PNG. Máximo 10 MB por archivo."
+              helpText=""
               listLabel="Archivos adjuntos"
               dropHint="Arrastre los archivos aquí o use el botón para seleccionarlos."
             />

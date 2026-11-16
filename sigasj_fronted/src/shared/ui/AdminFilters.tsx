@@ -20,16 +20,16 @@ export function AdminFilters({
       padded
       lift={false}
       className={cn(
-        'grid gap-3 !rounded-[13px] !p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end',
+        'grid gap-3 !rounded-[13px] !p-4 max-[760px]:!grid-cols-1 min-[761px]:grid-cols-[minmax(0,1fr)_auto] min-[761px]:items-end',
         className,
       )}
       {...rest}
     >
-      <div className="grid min-w-0 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
+      <div className="grid min-w-0 gap-3 max-[760px]:grid-cols-1 min-[761px]:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))] max-[760px]:[&_button]:w-full">
         {children}
       </div>
       {summary ? (
-        <div className="flex min-w-0 items-center gap-2 text-sm text-sigasj-muted sm:justify-end">
+        <div className="flex min-w-0 flex-col items-stretch gap-2 text-sm text-sigasj-muted max-[760px]:[&_button]:w-full min-[761px]:flex-row min-[761px]:items-center min-[761px]:justify-end">
           {summary}
         </div>
       ) : null}

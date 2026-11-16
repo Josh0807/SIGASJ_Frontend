@@ -13,26 +13,33 @@ import {
  * 2. Asigna permisos aquí
  * 3. Actualiza allowedRoles en ADMIN_MODULE_ACCESS
  */
+const ADMINISTRADORA_OPERATIVE_PERMISSIONS = [
+  'subscribers.read',
+  'subscribers.create',
+  'subscribers.update',
+  'subscribers.deactivate',
+  'announcements.manage',
+  'fault_reports.read',
+  'fault_reports.assign',
+  'fault_reports.update_status',
+  'institutional_content.manage',
+  'projects.manage',
+  'audit.read',
+  'activities.read_all',
+  'activities.review',
+  'inventory.read',
+  'staff.manage',
+] as const
+
 export const ROLE_PERMISSIONS: Record<InternalAdminRole, readonly string[]> = {
-  [InternalAdminRoleName.Administradora]: [
-    'subscribers.read',
-    'subscribers.create',
-    'subscribers.update',
-    'subscribers.deactivate',
-    'announcements.manage',
-    'fault_reports.read',
-    'fault_reports.assign',
-    'fault_reports.update_status',
-    'institutional_content.manage',
-    'projects.manage',
+  [InternalAdminRoleName.SuperAdmin]: [
+    ...ADMINISTRADORA_OPERATIVE_PERMISSIONS,
+    'activities.register',
+    'activities.read_own',
     'users.manage',
     'roles.manage',
-    'audit.read',
-    'activities.read_all',
-    'activities.review',
-    'inventory.read',
-    'staff.manage',
   ],
+  [InternalAdminRoleName.Administradora]: [...ADMINISTRADORA_OPERATIVE_PERMISSIONS],
   [InternalAdminRoleName.Secretaria]: [
     'subscribers.read',
     'subscribers.create',
@@ -66,6 +73,13 @@ export type AdminModuleAccessDefinition = {
   availableAsRoute?: boolean
 }
 
+const withSuperAdmin = (
+  roles: readonly InternalAdminRole[],
+): readonly InternalAdminRole[] =>
+  roles.includes(InternalAdminRoleName.SuperAdmin)
+    ? roles
+    : [InternalAdminRoleName.SuperAdmin, ...roles]
+
 /**
  * Configuración centralizada: segmento, título, icono (segment), roles y permisos.
  * Ampliar el menú agregando entradas aquí y el elemento en privateRoutes.tsx.
@@ -74,42 +88,41 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'dashboard',
     title: 'Dashboard',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
       InternalAdminRoleName.Fontanero,
-    ],
+    ]),
     requiredPermissions: [],
     availableInNav: true,
   },
   {
     segment: 'usuarios',
     title: 'Gestión de usuarios',
-    allowedRoles: [InternalAdminRoleName.Administradora],
+    allowedRoles: [InternalAdminRoleName.SuperAdmin],
     requiredPermissions: ['users.manage'],
-    // Stub sin UI: no se publica en menú ni como ruta funcional.
-    availableInNav: false,
-    availableAsRoute: false,
+    availableInNav: true,
+    availableAsRoute: true,
   },
   {
     segment: 'abonados',
     title: 'Gestión de asociados',
     // Abonado no está aquí: no ve el padrón ni entra por URL. No hay pantallas personales en este módulo.
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['subscribers.read'],
     availableInNav: true,
   },
   {
     segment: 'inventario',
     title: 'Inventario',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
       InternalAdminRoleName.Fontanero,
-    ],
+    ]),
     requiredPermissions: ['inventory.read'],
     availableInNav: true,
   },
@@ -117,40 +130,40 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
     segment: 'solicitudes',
     title: 'Gestión de solicitudes',
     // Alineado con BE: Admin + Sec mutan estado; Fontanero solo lectura vía API (sin nav).
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: [],
     availableInNav: true,
   },
   {
     segment: 'rrhh',
     title: 'Recursos Humanos',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['staff.manage'],
     availableInNav: true,
   },
   {
     segment: 'averias',
     title: 'Gestión de averías',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['fault_reports.read'],
     availableInNav: true,
   },
   {
     segment: 'mapa-red',
     title: 'Mapa de la red de agua',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['fault_reports.read'],
     // Vive embebido en el dashboard; no se publica como módulo del menú.
     availableInNav: false,
@@ -158,21 +171,21 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'actividades',
     title: 'Actividades',
-    allowedRoles: [InternalAdminRoleName.Fontanero],
+    allowedRoles: withSuperAdmin([InternalAdminRoleName.Fontanero]),
     requiredPermissions: ['activities.register'],
     availableInNav: true,
   },
   {
     segment: 'actividades-fontanero',
     title: 'Actividades del Fontanero',
-    allowedRoles: [InternalAdminRoleName.Administradora],
+    allowedRoles: withSuperAdmin([InternalAdminRoleName.Administradora]),
     requiredPermissions: ['activities.read_all'],
     availableInNav: true,
   },
   {
     segment: 'reportes',
     title: 'Gestión de reportes',
-    allowedRoles: [InternalAdminRoleName.Administradora],
+    allowedRoles: withSuperAdmin([InternalAdminRoleName.Administradora]),
     requiredPermissions: ['audit.read'],
     // Stub sin UI: no se publica en menú ni como ruta funcional.
     availableInNav: false,
@@ -181,58 +194,58 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   {
     segment: 'proyectos',
     title: 'Gestión de Proyectos',
-    allowedRoles: [InternalAdminRoleName.Administradora],
+    allowedRoles: withSuperAdmin([InternalAdminRoleName.Administradora]),
     requiredPermissions: ['projects.manage'],
     availableInNav: true,
   },
   {
     segment: 'galeria',
     title: 'Galería de fotografías',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['institutional_content.manage'],
     availableInNav: true,
   },
   {
     segment: 'comunicados',
     title: 'Gestión de Comunicados',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['announcements.manage'],
     availableInNav: true,
   },
   {
     segment: 'contacto',
     title: 'Información de Contacto y Ubicación',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['institutional_content.manage'],
     availableInNav: true,
   },
   {
     segment: 'transparencia',
     title: 'Transparencia y calidad del agua',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
-    ],
+    ]),
     requiredPermissions: ['institutional_content.manage'],
     availableInNav: true,
   },
   {
     segment: 'perfil',
     title: 'Mi perfil',
-    allowedRoles: [
+    allowedRoles: withSuperAdmin([
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
       InternalAdminRoleName.Fontanero,
-    ],
+    ]),
     requiredPermissions: [],
     availableInNav: false,
   },

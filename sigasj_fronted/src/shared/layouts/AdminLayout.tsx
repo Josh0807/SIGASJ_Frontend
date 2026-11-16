@@ -28,7 +28,7 @@ const AdminLayout = () => {
   const { pathname } = useLocation()
   const navItems = getAdminNavItemsForUser(user)
   const [isNavOpen, setIsNavOpen] = useState(false)
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const isMobileNav = useSyncExternalStore(
     subscribeToMobileNav,
     getMobileNavSnapshot,
