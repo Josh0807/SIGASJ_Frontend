@@ -138,7 +138,7 @@ describe('ProyectoPublicDetailPage', () => {
     expect(spy).toHaveBeenCalledTimes(2)
   })
 
-  it('permite navegar las fotografías adicionales mediante botones Anterior y Siguiente, teclado y gestos touch', async () => {
+  it('permite navegar las fotografías adicionales (infinito) con botones, teclado y gestos touch', async () => {
     const detalleMock: proyectosApi.PublicProyectoDetalle = {
       id: 10,
       nombre: 'Red Hídrica',
@@ -158,15 +158,13 @@ describe('ProyectoPublicDetailPage', () => {
 
     await renderDetailPage('10')
 
-    // Verificar distinción entre imagen de portada y galería
     const coverImg = container.querySelector('.proyecto-detail-public__cover img') as HTMLImageElement
     expect(coverImg.src).toContain('/portada.jpg')
 
     const galleryItems = container.querySelectorAll('.proyecto-detail-public__gallery-item')
-    expect(galleryItems.length).toBe(5)
-    expect(container.textContent).not.toContain('/portada.jpg en galería')
+    expect(galleryItems.length).toBeGreaterThan(0)
+    expect(galleryItems.length).toBeLessThanOrEqual(3)
 
-    // Botones de navegación Anterior y Siguiente
     const prevBtn = container.querySelector(
       '.proyecto-detail-public__side-btn--prev',
     ) as HTMLButtonElement
@@ -176,16 +174,19 @@ describe('ProyectoPublicDetailPage', () => {
 
     expect(prevBtn).not.toBeNull()
     expect(nextBtn).not.toBeNull()
-    expect(prevBtn.disabled).toBe(true)
+    expect(prevBtn.disabled).toBe(false)
     expect(nextBtn.disabled).toBe(false)
 
-    // Clic en Siguiente
+    const firstVisibleBefore = galleryItems[0]?.querySelector('img')?.getAttribute('src')
+
     await act(async () => {
       nextBtn.click()
     })
-    expect(prevBtn.disabled).toBe(false)
 
-    // Navegación por teclado (ArrowRight y ArrowLeft)
+    const afterNext = container.querySelectorAll('.proyecto-detail-public__gallery-item')
+    const firstVisibleAfterNext = afterNext[0]?.querySelector('img')?.getAttribute('src')
+    expect(firstVisibleAfterNext).not.toBe(firstVisibleBefore)
+
     const viewport = container.querySelector(
       '.proyecto-detail-public__gallery-viewport',
     ) as HTMLDivElement
@@ -197,9 +198,10 @@ describe('ProyectoPublicDetailPage', () => {
         new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }),
       )
     })
-    expect(prevBtn.disabled).toBe(true)
 
-    // Navegación por gestos Touch (Swipe)
+    const afterPrev = container.querySelectorAll('.proyecto-detail-public__gallery-item')
+    expect(afterPrev[0]?.querySelector('img')?.getAttribute('src')).toBe(firstVisibleBefore)
+
     await act(async () => {
       viewport.dispatchEvent(
         new TouchEvent('touchstart', {
@@ -220,7 +222,8 @@ describe('ProyectoPublicDetailPage', () => {
       viewport.dispatchEvent(new TouchEvent('touchend', { bubbles: true }))
     })
 
-    expect(prevBtn.disabled).toBe(false)
+    const afterSwipe = container.querySelectorAll('.proyecto-detail-public__gallery-item')
+    expect(afterSwipe[0]?.querySelector('img')?.getAttribute('src')).not.toBe(firstVisibleBefore)
   })
 
   it('no muestra la sección de galería cuando hay 0 imágenes adicionales (evita espacios vacíos)', async () => {

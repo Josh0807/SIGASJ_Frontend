@@ -1,7 +1,6 @@
-import { IconArrowRight } from '@tabler/icons-react'
-import { type FormEvent, useLayoutEffect, useRef, useState } from 'react'
+import { IconArrowRight, IconSearch } from '@tabler/icons-react'
+import { type FormEvent, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import SeguimientoPublicoResultado from '../../solicitudes-publicas/SeguimientoPublicoResultado'
 import { mensajeErrorSeguimientoPublico } from '../../solicitudes-publicas/seguimientoPublicoMessages'
 import type { SeguimientoSolicitudPublico } from '../../solicitudes-publicas/seguimientoPublicoTypes'
@@ -12,7 +11,10 @@ import {
 import { sanitizarSeguimientoPublico } from '../../solicitudes-publicas/seguimientoPublicoTimelineUtils'
 import { validarSeguimientoLocal } from '../../solicitudes-publicas/seguimientoPublicoValidation'
 import { consultarSeguimientoPublico } from '../../solicitudes-publicas/solicitudesPublicasApi'
-import Footer from '../components/Footer'
+import PublicFormPage from '../components/PublicFormPage'
+
+const fieldClass =
+  'min-h-12 w-full rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist aria-invalid:border-rose-300 aria-invalid:ring-rose-100'
 
 const RequestTrackingPage = () => {
   const [searchParams] = useSearchParams()
@@ -30,11 +32,6 @@ const RequestTrackingPage = () => {
   const codigoRef = useRef<HTMLInputElement>(null)
   const identificacionRef = useRef<HTMLInputElement>(null)
   const submittingRef = useRef(false)
-
-  useLayoutEffect(() => {
-    document.documentElement.scrollTop = 0
-    document.body.scrollTop = 0
-  }, [])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -82,150 +79,128 @@ const RequestTrackingPage = () => {
   }
 
   return (
-    <>
-      <PublicReceiptNavbar returnTo="/#solicitudes-servicio" />
-      <main
-        className="relative isolate min-h-[65vh] overflow-hidden bg-gradient-to-br from-sigasj-canvas via-sigasj-surface-soft to-sigasj-mist/40 px-6 py-14 max-[640px]:px-4 max-[640px]:py-10"
-        aria-label="Seguimiento público de solicitudes"
-        aria-labelledby="tracking-title"
-      >
-        <div
-          className="pointer-events-none absolute -left-48 top-16 -z-10 h-[430px] w-[390px] rotate-[-18deg] rounded-[45%] bg-sigasj-mist/35"
-          aria-hidden="true"
-        />
-        <div className="mx-auto w-full max-w-[900px]">
-          <header className="max-w-[760px]">
-            <p className="mb-2 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.28em] text-sigasj-primary before:h-0.5 before:w-9 before:bg-sigasj-primary">
-              Consulta pública
-            </p>
-            <h1
-              id="tracking-title"
-              className="m-0 text-[clamp(2.2rem,5vw,3.4rem)] font-extrabold leading-none tracking-[-0.04em] text-sigasj-ink"
-            >
-              Consultar estado de solicitud
-            </h1>
-            <p className="mb-0 mt-5 text-base leading-7 text-sigasj-muted">
-              Ingrese el código de seguimiento y la identificación del
-              solicitante registrados al crear la solicitud.
-            </p>
-          </header>
-
-          <section className="mt-9 rounded-[24px] border border-sigasj-border bg-sigasj-surface/90 p-8 shadow-[0_14px_32px_rgba(39,112,166,0.13)] max-[640px]:p-5">
-            <form className="grid gap-5" onSubmit={handleSubmit} noValidate>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label
-                  className="grid gap-2 font-bold text-sigasj-ink"
-                  htmlFor="tracking-code"
-                >
-                  Código de seguimiento
-                  <input
-                    ref={codigoRef}
-                    className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist aria-invalid:border-rose-300 aria-invalid:ring-rose-100"
-                    id="tracking-code"
-                    name="codigo"
-                    type="text"
-                    inputMode="text"
-                    value={codigo}
-                    maxLength={CODIGO_SEGUIMIENTO_MAX}
-                    autoComplete="off"
-                    spellCheck={false}
-                    disabled={loading}
-                    aria-invalid={Boolean(fieldErrors.codigo)}
-                    aria-describedby={
-                      fieldErrors.codigo ? 'tracking-code-error' : undefined
-                    }
-                    placeholder="Ej. SOL-2026-00001"
-                    onChange={(event) => setCodigo(event.target.value)}
-                  />
-                  {fieldErrors.codigo ? (
-                    <span
-                      id="tracking-code-error"
-                      className="text-sm font-semibold text-rose-700"
-                    >
-                      {fieldErrors.codigo}
-                    </span>
-                  ) : null}
-                </label>
-
-                <label
-                  className="grid gap-2 font-bold text-sigasj-ink"
-                  htmlFor="tracking-id"
-                >
-                  Identificación
-                  <input
-                    ref={identificacionRef}
-                    className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist aria-invalid:border-rose-300 aria-invalid:ring-rose-100"
-                    id="tracking-id"
-                    name="identificacion"
-                    type="text"
-                    inputMode="text"
-                    value={identificacion}
-                    maxLength={IDENTIFICACION_SEGUIMIENTO_MAX}
-                    autoComplete="off"
-                    spellCheck={false}
-                    disabled={loading}
-                    aria-invalid={Boolean(fieldErrors.identificacion)}
-                    aria-describedby={
-                      fieldErrors.identificacion
-                        ? 'tracking-id-error'
-                        : undefined
-                    }
-                    placeholder="Cédula o identificación del solicitante"
-                    onChange={(event) => setIdentificacion(event.target.value)}
-                  />
-                  {fieldErrors.identificacion ? (
-                    <span
-                      id="tracking-id-error"
-                      className="text-sm font-semibold text-rose-700"
-                    >
-                      {fieldErrors.identificacion}
-                    </span>
-                  ) : null}
-                </label>
-              </div>
-
-              <button
-                className="group requests-motion-button flex min-h-[58px] w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border-0 bg-gradient-to-r from-sigasj-navy via-sigasj-blue to-sigasj-sky px-7 text-base font-extrabold text-white shadow-[0_12px_26px_rgba(8,114,211,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_17px_34px_rgba(8,114,211,0.34)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-sigasj-sky disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 motion-reduce:transform-none motion-reduce:transition-none"
-                type="submit"
-                disabled={loading}
+    <PublicFormPage
+      returnTo="/#solicitudes-servicio"
+      eyebrow="Consulta pública"
+      title="Consultar estado de solicitud"
+      description="Ingrese el código de seguimiento y la identificación del solicitante registrados al crear la solicitud."
+      ariaLabel="Seguimiento público de solicitudes"
+      titleId="tracking-title"
+      icon={<IconSearch size={36} aria-hidden="true" />}
+      maxWidth="lg"
+      card
+    >
+      <form className="grid gap-5" onSubmit={handleSubmit} noValidate>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label
+            className="grid gap-2 font-bold text-sigasj-ink"
+            htmlFor="tracking-code"
+          >
+            Código de seguimiento
+            <input
+              ref={codigoRef}
+              className={fieldClass}
+              id="tracking-code"
+              name="codigo"
+              type="text"
+              inputMode="text"
+              value={codigo}
+              maxLength={CODIGO_SEGUIMIENTO_MAX}
+              autoComplete="off"
+              spellCheck={false}
+              disabled={loading}
+              aria-invalid={Boolean(fieldErrors.codigo)}
+              aria-describedby={
+                fieldErrors.codigo ? 'tracking-code-error' : undefined
+              }
+              placeholder="Ej. SOL-2026-00001"
+              onChange={(event) => setCodigo(event.target.value)}
+            />
+            {fieldErrors.codigo ? (
+              <span
+                id="tracking-code-error"
+                className="text-sm font-semibold text-rose-700"
               >
-                {loading ? 'Consultando…' : 'Consultar'}{' '}
-                <IconArrowRight
-                  className="shrink-0 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
-                  size={21}
-                  stroke={2.5}
-                  aria-hidden="true"
-                />
-              </button>
-            </form>
+                {fieldErrors.codigo}
+              </span>
+            ) : null}
+          </label>
 
-            {error ? (
-              <p
-                className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800"
-                id="tracking-error"
-                role="alert"
+          <label
+            className="grid gap-2 font-bold text-sigasj-ink"
+            htmlFor="tracking-id"
+          >
+            Identificación
+            <input
+              ref={identificacionRef}
+              className={fieldClass}
+              id="tracking-id"
+              name="identificacion"
+              type="text"
+              inputMode="text"
+              value={identificacion}
+              maxLength={IDENTIFICACION_SEGUIMIENTO_MAX}
+              autoComplete="off"
+              spellCheck={false}
+              disabled={loading}
+              aria-invalid={Boolean(fieldErrors.identificacion)}
+              aria-describedby={
+                fieldErrors.identificacion
+                  ? 'tracking-id-error'
+                  : undefined
+              }
+              placeholder="Cédula o identificación del solicitante"
+              onChange={(event) => setIdentificacion(event.target.value)}
+            />
+            {fieldErrors.identificacion ? (
+              <span
+                id="tracking-id-error"
+                className="text-sm font-semibold text-rose-700"
               >
-                {error}
-              </p>
+                {fieldErrors.identificacion}
+              </span>
             ) : null}
-
-            {loading ? (
-              <p className="mt-5 mb-0 font-semibold text-sigasj-muted" role="status">
-                Consultando…
-              </p>
-            ) : null}
-
-            {!loading && result ? (
-              <SeguimientoPublicoResultado
-                resultado={result}
-                onNuevaConsulta={nuevaConsulta}
-              />
-            ) : null}
-          </section>
+          </label>
         </div>
-      </main>
-      <Footer />
-    </>
+
+        <button
+          className="group landing-lift-button landing-lift-button--solid flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-3 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-7 text-base font-semibold text-white disabled:cursor-wait disabled:opacity-70"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Consultando…' : 'Consultar'}{' '}
+          <IconArrowRight
+            className="shrink-0 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
+            size={21}
+            stroke={2.5}
+            aria-hidden="true"
+          />
+        </button>
+      </form>
+
+      {error ? (
+        <p
+          className="mt-5 rounded-[12px] border border-sigasj-error/30 bg-red-50 p-4 font-semibold text-sigasj-error"
+          id="tracking-error"
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      {loading ? (
+        <p className="mt-5 mb-0 font-semibold text-sigasj-muted" role="status">
+          Consultando…
+        </p>
+      ) : null}
+
+      {!loading && result ? (
+        <SeguimientoPublicoResultado
+          resultado={result}
+          onNuevaConsulta={nuevaConsulta}
+        />
+      ) : null}
+    </PublicFormPage>
   )
 }
 

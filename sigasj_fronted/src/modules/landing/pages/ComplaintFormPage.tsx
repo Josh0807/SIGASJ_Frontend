@@ -1,21 +1,23 @@
 import { formatearFechaAsada } from '../../../shared/utils/fechaAsada'
-import { useId, useLayoutEffect, useRef, useState } from 'react'
-import { IconCalendar, IconMail, IconMessageCircle } from '@tabler/icons-react'
+import { useId, useRef, useState } from 'react'
+import { IconMail, IconMessageCircle } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
-import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
 import { submitPublicQueja } from '../../contacto/services/quejasApi'
 import FormSuccessResult from '../../../shared/components/FormSuccessResult'
+import PublicFormPage from '../components/PublicFormPage'
+import {
+  FieldCaption,
+  ReadonlyDateField,
+} from '../../solicitudes-publicas/PublicFormFieldChrome'
 
 const TARGET_EMAIL = 'jdasadasanjuan@gmail.com'
 
 const formatDateForDisplay = (date: Date) => formatearFechaAsada(date)
 
-const ComplaintFormPage = () => {
-  useLayoutEffect(() => {
-    document.documentElement.scrollTop = 0
-    document.body.scrollTop = 0
-  }, [])
+const fieldClass =
+  'mt-2 box-border min-h-12 w-full rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition [font-family:var(--font-body)] focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist'
 
+const ComplaintFormPage = () => {
   const currentDate = new Date()
   const dateDisplay = formatDateForDisplay(currentDate)
 
@@ -29,7 +31,6 @@ const ComplaintFormPage = () => {
   const submittingRef = useRef(false)
 
   const nombreId = useId()
-  const fechaId = useId()
   const descripcionId = useId()
   const nombreErrorId = `${nombreId}-error`
   const descripcionErrorId = `${descripcionId}-error`
@@ -80,150 +81,138 @@ const ComplaintFormPage = () => {
   }
 
   return (
-    <div className="complaint-form-page receipt-query-page sigasj-complaint-page min-h-screen bg-sigasj-surface" aria-label="Formulario público de sugerencias y quejas">
-      <PublicReceiptNavbar returnTo="/#quejas" />
+    <PublicFormPage
+      returnTo="/#quejas"
+      eyebrow="Atención al usuario"
+      title="Formulario de Sugerencias y Quejas"
+      description="Envíanos la información de tu consulta, sugerencia o queja para brindarle la atención correspondiente en la ASADA San Juan."
+      ariaLabel="Formulario público de sugerencias y quejas"
+      icon={<IconMessageCircle size={35} aria-hidden="true" />}
+      maxWidth="md"
+      card
+    >
+      {submitted ? (
+        <FormSuccessResult
+          title="Sugerencia o queja enviada exitosamente"
+          description={`Muchas gracias, ${nombre}. Tu mensaje registrado con la fecha de hoy (${dateDisplay}) ha sido enviado hacia la ASADA San Juan (${TARGET_EMAIL}).`}
+          meta={[
+            { label: 'Fecha', value: dateDisplay },
+            { label: 'Destino', value: TARGET_EMAIL },
+          ]}
+          hint="Le daremos el seguimiento correspondiente a tu solicitud."
+          actions={
+            <>
+              <Link
+                className="landing-lift-button landing-lift-button--solid inline-flex min-h-11 items-center justify-center rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-5 text-sm font-semibold text-white no-underline"
+                to="/#quejas"
+              >
+                Volver
+              </Link>
+              <button
+                type="button"
+                className="transparency-motion-button inline-flex min-h-11 items-center justify-center rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-5 text-sm font-semibold text-sigasj-primary-hover"
+                onClick={handleReset}
+              >
+                Enviar otra sugerencia
+              </button>
+            </>
+          }
+        />
+      ) : (
+        <form className="grid gap-5" noValidate onSubmit={handleFormSubmit}>
+          {errorMessage ? (
+            <div
+              className="rounded-[12px] border border-sigasj-error/30 bg-red-50 px-4 py-3 font-semibold text-sigasj-error"
+              role="alert"
+            >
+              {errorMessage}
+            </div>
+          ) : null}
 
-      <main className="receipt-query-page__main sigasj-complaint-main bg-sigasj-surface px-5 py-12 max-[640px]:px-4 max-[640px]:py-8">
-        <div className="receipt-query-page__container sigasj-complaint-container mx-auto w-full max-w-[850px]">
-          <header className="receipt-query-page__heading sigasj-complaint-heading text-center">
-            <span className="sigasj-complaint-heading-icon mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-sigasj-surface-soft text-sigasj-primary"><IconMessageCircle size={35} aria-hidden="true" /></span>
-            <p className="complaint-form-page__eyebrow">Atención al usuario</p>
-            <h1>Formulario de Sugerencias y Quejas</h1>
-            <p>
-              Envíanos la información de tu consulta, sugerencia o queja para brindarle la atención
-              correspondiente en la ASADA San Juan.
-            </p>
-          </header>
+          <div className="grid gap-1.5">
+            <ReadonlyDateField label="Fecha de la queja" value={dateDisplay} />
+            <span className="text-sm text-sigasj-muted">
+              Generada automáticamente (hoy). No se puede editar.
+            </span>
+          </div>
 
-          <section className="receipt-query-page__search-card sigasj-complaint-card mt-8 w-full rounded-[24px] border border-sigasj-border bg-sigasj-surface p-8 shadow-[0_18px_50px_rgba(39,112,166,0.13)] max-[640px]:p-5">
-            {submitted ? (
-              <FormSuccessResult
-                title="Sugerencia o queja enviada exitosamente"
-                description={`Muchas gracias, ${nombre}. Tu mensaje registrado con la fecha de hoy (${dateDisplay}) ha sido enviado hacia la ASADA San Juan (${TARGET_EMAIL}).`}
-                meta={[
-                  { label: 'Fecha', value: dateDisplay },
-                  { label: 'Destino', value: TARGET_EMAIL },
-                ]}
-                hint="Le daremos el seguimiento correspondiente a tu solicitud."
-                actions={
-                  <>
-                    <Link
-                      className="receipt-query-page__button receipt-query-page__button--primary"
-                      to="/#quejas"
-                    >
-                      Volver
-                    </Link>
-                    <button
-                      type="button"
-                      className="receipt-query-page__button receipt-query-page__button--secondary"
-                      onClick={handleReset}
-                    >
-                      Enviar otra sugerencia
-                    </button>
-                  </>
-                }
-              />
-            ) : (
-              <form className="complaint-form-page__form w-full" noValidate onSubmit={handleFormSubmit}>
-                {errorMessage ? (
-                  <div className="complaint-form-page__error" role="alert">
-                    {errorMessage}
-                  </div>
-                ) : null}
+          <div>
+            <label className="inline-flex flex-wrap items-baseline gap-x-1.5 font-bold text-sigasj-ink" htmlFor={nombreId}>
+              <FieldCaption label="Nombre completo" required />
+            </label>
+            <input
+              id={nombreId}
+              className={fieldClass}
+              type="text"
+              required
+              aria-required="true"
+              aria-invalid={Boolean(nombreError)}
+              aria-describedby={nombreError ? nombreErrorId : undefined}
+              value={nombre}
+              onChange={(e) => {
+                setNombre(e.target.value)
+                setNombreError(null)
+              }}
+              placeholder="Ej. María González Pérez"
+            />
+            {nombreError ? (
+              <small id={nombreErrorId} className="mt-1.5 block text-sm font-semibold text-sigasj-error" role="alert">
+                {nombreError}
+              </small>
+            ) : null}
+          </div>
 
-                <div className="complaint-form-page__field sigasj-complaint-date-field">
-                  <label htmlFor={fechaId}>Fecha de la queja (generada automáticamente)</label>
-                  <span className="sigasj-complaint-field-icon" aria-hidden="true"><IconCalendar size={19} /></span>
-                  <input
-                    id={fechaId}
-                    type="text"
-                    value={dateDisplay}
-                    readOnly
-                    disabled
-                    aria-readonly="true"
-                  />
-                  <span className="complaint-form-page__help">
-                    Fecha registrada automáticamente hoy: <strong>{dateDisplay}</strong>
-                  </span>
-                </div>
+          <div>
+            <label className="inline-flex flex-wrap items-baseline gap-x-1.5 font-bold text-sigasj-ink" htmlFor={descripcionId}>
+              <FieldCaption label="Descripción de la sugerencia o queja" required />
+            </label>
+            <textarea
+              id={descripcionId}
+              className={`${fieldClass} min-h-[140px] resize-y py-3`}
+              required
+              rows={5}
+              aria-required="true"
+              aria-invalid={Boolean(descripcionError)}
+              aria-describedby={descripcionError ? descripcionErrorId : undefined}
+              value={descripcion}
+              onChange={(e) => {
+                setDescripcion(e.target.value)
+                setDescripcionError(null)
+              }}
+              placeholder="Escribe en detalle tu sugerencia o el motivo de la queja..."
+            />
+            {descripcionError ? (
+              <small id={descripcionErrorId} className="mt-1.5 block text-sm font-semibold text-sigasj-error" role="alert">
+                {descripcionError}
+              </small>
+            ) : null}
+          </div>
 
-                <div className="complaint-form-page__field">
-                  <label htmlFor={nombreId}>
-                    Nombre completo <span className="public-averia-form__required" aria-hidden="true">*</span>
-                  </label>
-                  <input
-                    id={nombreId}
-                    type="text"
-                    required
-                    aria-required="true"
-                    aria-invalid={Boolean(nombreError)}
-                    aria-describedby={nombreError ? nombreErrorId : undefined}
-                    value={nombre}
-                    onChange={(e) => {
-                      setNombre(e.target.value)
-                      setNombreError(null)
-                    }}
-                    placeholder="Ej. María González Pérez"
-                  />
-                  {nombreError ? (
-                    <small id={nombreErrorId} className="complaint-form-page__field-error" role="alert">
-                      {nombreError}
-                    </small>
-                  ) : null}
-                </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="landing-lift-button landing-lift-button--solid inline-flex min-h-11 flex-1 items-center justify-center rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-5 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-70"
+            >
+              {isSubmitting ? 'Enviando...' : 'Enviar sugerencia o queja'}
+            </button>
+            <Link
+              to="/#quejas"
+              className="transparency-motion-button inline-flex min-h-11 items-center justify-center rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-5 text-sm font-semibold text-sigasj-primary-hover no-underline"
+            >
+              Cancelar y volver
+            </Link>
+          </div>
 
-                <div className="complaint-form-page__field">
-                  <label htmlFor={descripcionId}>
-                    Descripción de la sugerencia o queja{' '}
-                    <span className="public-averia-form__required" aria-hidden="true">*</span>
-                  </label>
-                  <textarea
-                    id={descripcionId}
-                    required
-                    rows={5}
-                    aria-required="true"
-                    aria-invalid={Boolean(descripcionError)}
-                    aria-describedby={descripcionError ? descripcionErrorId : undefined}
-                    value={descripcion}
-                    onChange={(e) => {
-                      setDescripcion(e.target.value)
-                      setDescripcionError(null)
-                    }}
-                    placeholder="Escribe en detalle tu sugerencia o el motivo de la queja..."
-                  />
-                  {descripcionError ? (
-                    <small id={descripcionErrorId} className="complaint-form-page__field-error" role="alert">
-                      {descripcionError}
-                    </small>
-                  ) : null}
-                </div>
-
-                <div className="complaint-form-page__actions">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="receipt-query-page__button receipt-query-page__button--primary"
-                  >
-                    {isSubmitting ? 'Enviando...' : 'Enviar sugerencia o queja'}
-                  </button>
-                  <Link
-                    to="/#quejas"
-                    className="receipt-query-page__button receipt-query-page__button--secondary"
-                  >
-                    Cancelar y volver
-                  </Link>
-                </div>
-
-                <p className="complaint-form-page__help sigasj-complaint-note">
-                  <IconMail size={18} aria-hidden="true" />
-                  Nota: La información ingresada se enviará directamente a <strong>{TARGET_EMAIL}</strong>.
-                </p>
-              </form>
-            )}
-          </section>
-        </div>
-      </main>
-    </div>
+          <p className="m-0 flex items-start gap-2 text-sm text-sigasj-muted">
+            <IconMail size={18} className="mt-0.5 shrink-0 text-sigasj-primary" aria-hidden="true" />
+            <span>
+              Nota: La información ingresada se enviará directamente a <strong>{TARGET_EMAIL}</strong>.
+            </span>
+          </p>
+        </form>
+      )}
+    </PublicFormPage>
   )
 }
 

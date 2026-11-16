@@ -238,7 +238,7 @@ export default function ReportarAveriaForm() {
         <div className="public-averia-form__actions">
           <button
             type="button"
-            className="receipt-query-page__button public-averia-form__submit public-averia-form__submit--again"
+            className="transparency-motion-button public-averia-form__submit public-averia-form__submit--again inline-flex min-h-11 items-center justify-center rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-5 text-sm font-semibold text-sigasj-primary-hover"
             onClick={() => {
               setSubmittedReport(null)
               setCedulaMensaje(null)
@@ -261,7 +261,7 @@ export default function ReportarAveriaForm() {
       data-submitting={isSubmitting ? 'true' : 'false'}
     >
       {formError ? (
-        <p id={formErrorId} className="receipt-query-page__error-alert public-averia-form__form-error" role="alert">
+        <p id={formErrorId} className="public-averia-form__form-error rounded-[12px] border border-sigasj-error/30 bg-red-50 px-4 py-3 font-semibold text-sigasj-error" role="alert">
           {formError}
         </p>
       ) : null}
@@ -493,14 +493,14 @@ export default function ReportarAveriaForm() {
         <div className="public-averia-form__actions">
           <button
             type="submit"
-            className="receipt-query-page__button receipt-query-page__button--primary public-averia-form__submit"
+            className="landing-lift-button landing-lift-button--solid public-averia-form__submit inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-5 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-70"
             disabled={isSubmitting}
             aria-busy={isSubmitting ? true : undefined}
           >
             {isSubmitting ? (
               <>
                 <span
-                  className="receipt-query-page__spinner public-averia-form__submit-spinner"
+                  className="public-averia-form__submit-spinner animate-spin rounded-full border-2 border-white/40 border-t-white"
                   aria-hidden="true"
                 />
                 Enviando reporte...

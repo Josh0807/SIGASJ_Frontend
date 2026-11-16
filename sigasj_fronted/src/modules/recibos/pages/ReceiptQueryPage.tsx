@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { IconArrowLeft, IconDropletDollar } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import PublicReceiptNavbar from '../components/PublicReceiptNavbar'
+import PublicFormPage from '../../landing/components/PublicFormPage'
 import ReceiptSearchForm from '../components/ReceiptSearchForm'
 import ReceiptDetails from '../components/ReceiptDetails'
 import NoPendingReceipts from '../components/NoPendingReceipts'
@@ -29,89 +29,82 @@ export const ReceiptQueryPage = () => {
     setSearchParams({})
     window.scrollTo({ top: 0, behavior: 'smooth' })
     setTimeout(() => {
-      const inputEl = document.getElementById('numeroPajaInput')
-      if (inputEl) {
-        inputEl.focus()
-      }
+      document.getElementById('numeroPajaInput')?.focus()
     }, 100)
   }
 
-
-  const handleGoHome = () => {
-    navigate('/#pagos')
-  }
-
   return (
-    <div className="receipt-query-page sigasj-receipt-query-page min-h-screen bg-white" aria-label="Consulta pública de recibos">
-      <PublicReceiptNavbar returnTo="/#pagos" />
+    <PublicFormPage
+      returnTo="/#pagos"
+      eyebrow="Recibos y pagos"
+      title="Consulta de recibo"
+      description="Revisa la información de tu recibo de agua ingresando tu número de paja."
+      ariaLabel="Consulta pública de recibos"
+      icon={<IconDropletDollar size={36} aria-hidden="true" />}
+      maxWidth="lg"
+    >
+      <section className="transparency-motion-card rounded-[16px] border border-sigasj-border bg-sigasj-surface p-7 shadow-[0_4px_14px_rgba(16,43,56,0.05)] max-[640px]:p-5">
+        <ReceiptSearchForm
+          initialValue={numeroPaja ?? ''}
+          onSearch={handleSearch}
+          loading={loading}
+        />
+      </section>
 
-      <main className="receipt-query-page__main sigasj-receipt-query-main bg-white px-5 py-12 max-[640px]:px-4 max-[640px]:py-8">
-        <div className="receipt-query-page__container sigasj-receipt-query-container mx-auto w-full max-w-[920px]">
-          <header className="receipt-query-page__heading sigasj-receipt-query-heading text-center">
-            <span className="sigasj-receipt-query-icon mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-sky-100 text-[#0872d3]"><IconDropletDollar size={36} aria-hidden="true" /></span>
-            <h1>Consulta de recibo</h1>
-            <p>Revisa la información de tu recibo de agua ingresando tu número de paja.</p>
-          </header>
+      <section className="mt-6" aria-live="polite">
+        {loading ? (
+          <div
+            className="rounded-[16px] border border-sigasj-border bg-sigasj-surface-soft px-6 py-8 text-center font-semibold text-sigasj-muted"
+            role="status"
+          >
+            Consultando recibo…
+          </div>
+        ) : null}
 
-          <section className="receipt-query-page__search-card sigasj-receipt-search-card mt-8 rounded-[22px] border border-sky-100 bg-white p-7 shadow-[0_16px_42px_rgba(39,112,166,0.12)]">
-            <ReceiptSearchForm
-              initialValue={numeroPaja ?? ''}
-              onSearch={handleSearch}
-              loading={loading}
-            />
-          </section>
+        {!loading && error ? (
+          <div
+            className="rounded-[16px] border border-sigasj-error/30 bg-red-50 px-6 py-5 font-semibold text-sigasj-error"
+            role="alert"
+          >
+            {error}
+          </div>
+        ) : null}
 
-          <section className="receipt-query-page__results sigasj-receipt-results mt-6" aria-live="polite">
-            {loading ? (
-              <div className="receipt-query-page__loading" role="status">
-                <span className="receipt-query-page__spinner" aria-hidden="true" />
-                <p>Consultando recibo...</p>
-              </div>
-            ) : null}
+        {!loading && !error && data ? (
+          data.tieneRecibosPendientes && data.recibos && data.recibos.length > 0 ? (
+            <ReceiptDetails data={data} />
+          ) : (
+            <NoPendingReceipts data={data} />
+          )
+        ) : null}
 
-            {!loading && error ? (
-              <div className="receipt-query-page__error-alert" role="alert">
-                <span className="receipt-query-page__error-icon" aria-hidden="true">
-                  ⚠️
-                </span>
-                <p>{error}</p>
-              </div>
-            ) : null}
+        {!loading && !error && !data && !numeroPaja && pajaParam ? (
+          <div
+            className="rounded-[16px] border border-sigasj-error/30 bg-red-50 px-6 py-5 font-semibold text-sigasj-error"
+            role="alert"
+          >
+            El número de paja ingresado no es válido.
+          </div>
+        ) : null}
+      </section>
 
-            {!loading && !error && data ? (
-              data.tieneRecibosPendientes && data.recibos && data.recibos.length > 0 ? (
-                <ReceiptDetails data={data} />
-              ) : (
-                <NoPendingReceipts data={data} />
-              )
-            ) : null}
-
-            {!loading && !error && !data && !numeroPaja && pajaParam ? (
-              <div className="receipt-query-page__error-alert" role="alert">
-                <p>El número de paja ingresado no es válido.</p>
-              </div>
-            ) : null}
-          </section>
-
-          <footer className="receipt-query-page__actions sigasj-receipt-query-actions mt-6 flex justify-center gap-3 max-[560px]:flex-col">
-            <button
-              type="button"
-              className="receipt-query-page__button receipt-query-page__button--secondary"
-              onClick={handleConsultAnother}
-            >
-              Consultar otra paja
-            </button>
-            <button
-              type="button"
-              className="receipt-query-page__button receipt-query-page__button--primary"
-              onClick={handleGoHome}
-            >
-              <IconArrowLeft size={18} aria-hidden="true" /> Volver
-            </button>
-          </footer>
-        </div>
-      </main>
-    </div>
+      <footer className="mt-6 flex justify-center gap-3 max-[560px]:flex-col max-[560px]:items-stretch">
+        <button
+          type="button"
+          className="transparency-motion-button inline-flex min-h-11 items-center justify-center rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-5 text-sm font-semibold text-sigasj-primary-hover"
+          onClick={handleConsultAnother}
+        >
+          Consultar otra paja
+        </button>
+        <button
+          type="button"
+          className="landing-lift-button landing-lift-button--solid inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-5 text-sm font-semibold text-white"
+          onClick={() => navigate('/#pagos')}
+        >
+          <IconArrowLeft size={18} aria-hidden="true" /> Volver
+        </button>
+      </footer>
+    </PublicFormPage>
   )
 }
 

@@ -35,6 +35,8 @@ const AnnouncementsCarousel = ({
   const [reducedMotion, setReducedMotion] = useState(false)
   const [cycleKey, setCycleKey] = useState(0)
   const [pageHidden, setPageHidden] = useState(false)
+  /** Evita pelear con AOS: animación de slide solo al navegar, no al montar. */
+  const [slideAnim, setSlideAnim] = useState(false)
   const touchStartXRef = useRef<number | null>(null)
   const touchEndXRef = useRef<number | null>(null)
   const touchStartYRef = useRef<number | null>(null)
@@ -80,6 +82,7 @@ const AnnouncementsCarousel = ({
   const goTo = useCallback(
     (index: number, fromUser = false) => {
       if (total <= 1) return
+      setSlideAnim(true)
       setActiveIndex(wrapIndex(index, total))
       if (fromUser) bumpCycle()
     },
@@ -100,6 +103,7 @@ const AnnouncementsCarousel = ({
   useEffect(() => {
     if (isAutoplayStopped) return
     const timer = window.setInterval(() => {
+      setSlideAnim(true)
       setActiveIndex((index) => wrapIndex(index + 1, total))
     }, AUTOPLAY_MS)
     return () => window.clearInterval(timer)
@@ -168,10 +172,6 @@ const AnnouncementsCarousel = ({
     }
   }
 
-  const transition = reducedMotion
-    ? 'none'
-    : 'transform 0.78s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease'
-
   return (
     <div
       className="mt-8 outline-none"
@@ -213,9 +213,8 @@ const AnnouncementsCarousel = ({
           <div
             key={activeIndex}
             className={`grid gap-4 ${visibleCount > 1 ? 'grid-cols-2 max-[640px]:grid-cols-1' : 'grid-cols-1'} ${
-              reducedMotion ? '' : 'announcements-carousel__pair'
+              !reducedMotion && slideAnim ? 'announcements-carousel__pair' : ''
             }`}
-            style={{ transition }}
           >
             {visibleAnnouncements.map(({ announcement, index }) => (
               <div key={`${announcement.id}-${index}`} className="min-w-0">
@@ -273,7 +272,7 @@ const AnnouncementsCarousel = ({
             ))}
           </div>
 
-          <p className="public-caption mt-3 text-center" aria-live="polite">
+          <p className="sr-only" aria-live="polite">
             {statusLabel}
           </p>
         </>

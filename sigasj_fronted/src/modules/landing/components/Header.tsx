@@ -69,7 +69,7 @@ const Header = () => {
         }`}
       >
         <a
-          className="flex min-w-0 shrink-0 items-center gap-3 rounded-[10px] no-underline"
+          className="flex min-w-0 items-center gap-3 rounded-[10px] no-underline"
           href="#inicio"
           aria-label="SIGASJ, ir al inicio"
         >
@@ -97,7 +97,7 @@ const Header = () => {
               SIGASJ
             </strong>
             <span
-              className={`truncate text-[12px] font-medium transition-[color,opacity,text-shadow] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] max-[520px]:max-w-[160px] ${
+              className={`truncate text-[12px] font-medium transition-[color,opacity,text-shadow] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] max-[520px]:max-w-[160px] max-[420px]:hidden ${
                 overHero
                   ? 'text-white/95 [text-shadow:0_1px_2px_rgba(0,0,0,0.8),0_2px_10px_rgba(0,0,0,0.45)]'
                   : 'text-sigasj-muted [text-shadow:none]'

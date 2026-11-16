@@ -6,14 +6,16 @@ const card = readFileSync('src/modules/galeria/public/GalleryCard.tsx', 'utf8')
 const css = readFileSync('src/index.css', 'utf8')
 
 describe('carrusel responsive de galería', () => {
-  it('dispone controles accesibles y desplazamiento suave', () => {
+  it('dispone controles accesibles y estilo infinito con flechas laterales', () => {
     expect(component).toContain('Ver fotografías anteriores')
     expect(component).toContain('Ver fotografías siguientes')
-    expect(component).toContain('transition-transform duration-500 ease-out')
+    expect(component).toContain('wrapIndex')
+    expect(component).toContain('announcements-carousel__pair')
     expect(component).toContain('AUTOPLAY_MS')
     expect(component).toContain('gallery-section__status')
     expect(component).toContain('gallery-section__dots')
     expect(component).toContain('tabIndex={canMove ? 0 : -1}')
+    expect(component).toContain('flex items-center justify-center gap-2')
   })
 
   it('prioriza la fotografía sin chrome de tarjeta', () => {

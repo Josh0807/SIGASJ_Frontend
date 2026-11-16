@@ -142,6 +142,14 @@ body.landing-page-white {
   font-family: var(--font-body);
 }
 
+/* Controles de formulario: misma Figtree que el resto del landing (evita fuente del sistema). */
+body.landing-page-white input,
+body.landing-page-white textarea,
+body.landing-page-white select,
+body.landing-page-white button {
+  font-family: var(--font-body);
+}
+
 body.landing-page-white .public-section-title,
 body.landing-page-white .public-hero__title {
   font-family: var(--font-display);
@@ -332,10 +340,18 @@ body.landing-page-white .public-section-intro {
 @media (max-width: 640px) {
   .transparency-coverflow {
     max-width: 100%;
+    /* Evita que las cartas laterales empujen scroll horizontal en móvil. */
+    overflow: hidden;
   }
 
   .transparency-coverflow__item {
     width: min(100%, 21.5rem) !important;
+  }
+
+  /* En pantallas angostas solo se prioriza la carta activa. */
+  .transparency-coverflow__item:not(.transparency-coverflow__item--active) {
+    opacity: 0.28;
+    pointer-events: none;
   }
 }
 
@@ -1059,8 +1075,8 @@ body.landing-page-white .public-hero__scrim {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(100%, 920px);
-  max-height: min(92vh, 900px);
+  width: min(100%, 960px);
+  max-height: min(96vh, 980px);
   overflow: hidden;
   border-radius: 16px;
   background: #fff;
@@ -1108,9 +1124,9 @@ body.landing-page-white .public-hero__scrim {
   flex: 1 1 auto;
   display: grid;
   place-items: center;
-  min-height: min(42vh, 360px);
-  max-height: min(58vh, 560px);
-  padding: 1.25rem 1.25rem 0.85rem;
+  min-height: min(54vh, 480px);
+  max-height: min(70vh, 700px);
+  padding: 1.35rem 1.35rem 1rem;
   overflow: hidden;
   touch-action: none;
   background:
@@ -1121,6 +1137,30 @@ body.landing-page-white .public-hero__scrim {
     );
 }
 
+/* Galería: misma estética, solo imagen (sin bloque informativo). */
+.announcement-lightbox--media-only .announcement-lightbox__dialog {
+  width: min(100%, 1040px);
+  max-height: min(96vh, 960px);
+  /* Mismo tono transparente del overlay: sin tarjeta clara alrededor. */
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.announcement-lightbox--media-only .announcement-lightbox__media {
+  min-height: min(72vh, 740px);
+  max-height: min(90vh, 900px);
+  padding: 1.4rem;
+  background: transparent;
+}
+
+.announcement-lightbox--media-only .announcement-lightbox__image {
+  max-height: min(84vh, 840px);
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .announcement-lightbox__media.is-zoomed {
   cursor: grab;
 }
@@ -1129,12 +1169,43 @@ body.landing-page-white .public-hero__scrim {
   cursor: grabbing;
 }
 
+.announcement-lightbox__stage {
+  display: flex;
+  max-width: 100%;
+  max-height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes announcement-lightbox-enter {
+  from {
+    opacity: 0.12;
+    transform: translate3d(0.9rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.announcement-lightbox__stage--enter,
+.announcement-lightbox__details--enter {
+  animation: announcement-lightbox-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-lightbox__stage--enter,
+  .announcement-lightbox__details--enter {
+    animation: none;
+  }
+}
+
 .announcement-lightbox__image {
   display: block;
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(52vh, 520px);
+  max-height: min(64vh, 640px);
   object-fit: contain;
   object-position: center;
   border-radius: 10px;
@@ -1279,8 +1350,10 @@ body.landing-page-white .public-hero__scrim {
 
 .announcement-lightbox__prioridad {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  /* Abajo a la derecha: no cubre la X (arriba) ni el zoom (abajo-izquierda). */
+  top: auto;
+  right: 12px;
+  bottom: 12px;
   z-index: 3;
   display: inline-flex;
   align-items: center;
@@ -1366,22 +1439,31 @@ body.landing-page-white .public-hero__scrim {
   }
 
   .announcement-lightbox__dialog {
-    max-height: min(94vh, 860px);
+    max-height: min(96vh, 920px);
     border-radius: 14px;
   }
 
   .announcement-lightbox__media {
-    min-height: min(36vh, 280px);
-    max-height: min(48vh, 420px);
+    min-height: min(46vh, 360px);
+    max-height: min(58vh, 520px);
     padding: 1rem 0.85rem 0.7rem;
   }
 
   .announcement-lightbox__image {
-    max-height: min(42vh, 360px);
+    max-height: min(52vh, 460px);
+  }
+
+  .announcement-lightbox--media-only .announcement-lightbox__media {
+    min-height: min(70vh, 620px);
+    max-height: min(88vh, 780px);
+  }
+
+  .announcement-lightbox--media-only .announcement-lightbox__image {
+    max-height: min(82vh, 720px);
   }
 
   .announcement-lightbox__details {
-    max-height: min(40vh, 300px);
+    max-height: min(36vh, 280px);
     padding: 1rem 1.1rem 1.2rem;
   }
 

@@ -150,6 +150,8 @@ const ProjectsPreview = ({
   const [paused, setPaused] = useState(false)
   const [pageHidden, setPageHidden] = useState(false)
   const [cycleKey, setCycleKey] = useState(0)
+  /** Evita pelear con AOS: transición del coverflow solo al navegar, no al montar. */
+  const [slideAnim, setSlideAnim] = useState(false)
   const touchStartXRef = useRef<number | null>(null)
   const touchEndXRef = useRef<number | null>(null)
   const touchStartYRef = useRef<number | null>(null)
@@ -182,6 +184,7 @@ const ProjectsPreview = ({
   const goTo = useCallback(
     (index: number, fromUser = false) => {
       if (total === 0) return
+      setSlideAnim(true)
       setActiveIndex(((index % total) + total) % total)
       if (fromUser) bumpCycle()
     },
@@ -199,6 +202,7 @@ const ProjectsPreview = ({
   useEffect(() => {
     if (!useCarousel || paused || reducedMotion || pageHidden || total < 2) return
     const timer = window.setInterval(() => {
+      setSlideAnim(true)
       setActiveIndex((index) => ((index + 1) % total + total) % total)
     }, AUTOPLAY_MS)
     return () => window.clearInterval(timer)
@@ -318,7 +322,7 @@ const ProjectsPreview = ({
             <div className="flex items-center justify-center gap-2 max-[640px]:gap-1">
               <button
                 type="button"
-                className="z-30 grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-sigasj-border bg-sigasj-surface text-sigasj-ink transition duration-200 hover:-translate-y-0.5 hover:border-sigasj-primary hover:text-sigasj-primary"
+                className="z-30 grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-sigasj-border bg-sigasj-surface text-sigasj-ink transition duration-200 hover:-translate-y-0.5 hover:border-sigasj-primary hover:text-sigasj-primary max-[640px]:size-9"
                 onClick={handlePrev}
                 aria-label="Proyecto anterior"
               >
@@ -356,11 +360,12 @@ const ProjectsPreview = ({
                   const scale = isCenter ? 1 : abs === 1 ? 0.9 : 0.8
                   const opacity = isCenter ? 1 : abs === 1 ? 0.78 : 0.42
                   const zIndex = isCenter ? 30 : abs === 1 ? 20 : 10
-                  const transition = reducedMotion
-                    ? 'none'
-                    : isCenter
-                      ? 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)'
-                      : 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease'
+                  const transition =
+                    reducedMotion || !slideAnim
+                      ? 'none'
+                      : isCenter
+                        ? 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)'
+                        : 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease'
 
                   return (
                     <div
@@ -408,7 +413,7 @@ const ProjectsPreview = ({
 
               <button
                 type="button"
-                className="z-30 grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-sigasj-border bg-sigasj-surface text-sigasj-ink transition duration-200 hover:-translate-y-0.5 hover:border-sigasj-primary hover:text-sigasj-primary"
+                className="z-30 grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border border-sigasj-border bg-sigasj-surface text-sigasj-ink transition duration-200 hover:-translate-y-0.5 hover:border-sigasj-primary hover:text-sigasj-primary max-[640px]:size-9"
                 onClick={handleNext}
                 aria-label="Siguiente proyecto"
               >
@@ -437,7 +442,7 @@ const ProjectsPreview = ({
             </div>
 
             <p
-              className="projects-preview__page-indicator public-caption mt-3 text-center"
+              className="projects-preview__page-indicator sr-only"
               aria-live="polite"
             >
               {activeIndex + 1} / {total}

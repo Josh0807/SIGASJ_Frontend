@@ -60,6 +60,9 @@ const formatLightboxDate = (value: string): string | undefined => {
 const clampZoom = (value: number) =>
   Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(value * 100) / 100))
 
+const wrapIndex = (index: number, total: number) =>
+  total <= 0 ? 0 : ((index % total) + total) % total
+
 const AnnouncementLightbox = ({
   items,
   activeIndex,
@@ -84,13 +87,12 @@ const AnnouncementLightbox = ({
   const titleId = useId()
   const descriptionId = useId()
   const item = items[activeIndex]
-  const hasPrev = activeIndex > 0
-  const hasNext = activeIndex < items.length - 1
   const hasMany = items.length > 1
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [zoom, setZoom] = useState(ZOOM_MIN)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
 
   const description = item?.description?.trim() ?? ''
   const canCollapseDescription = description.length > DESCRIPTION_COLLAPSE_CHARS
@@ -107,10 +109,19 @@ const AnnouncementLightbox = ({
   onCloseRef.current = onClose
   onNavigateRef.current = onNavigate
 
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setReducedMotion(media.matches)
+    sync()
+    media.addEventListener('change', sync)
+    return () => media.removeEventListener('change', sync)
+  }, [])
+
   const goTo = useCallback(
     (index: number) => {
-      if (index < 0 || index >= items.length) return
-      onNavigate(index)
+      if (items.length <= 1) return
+      onNavigate(wrapIndex(index, items.length))
     },
     [items.length, onNavigate],
   )
@@ -218,9 +229,9 @@ const AnnouncementLightbox = ({
         event.preventDefault()
         resetViewRef.current()
       }
-      if (zoomRef.current <= ZOOM_MIN + 0.01) {
-        if (event.key === 'ArrowLeft' && index > 0) onNavigateRef.current(index - 1)
-        if (event.key === 'ArrowRight' && index < length - 1) onNavigateRef.current(index + 1)
+      if (zoomRef.current <= ZOOM_MIN + 0.01 && length > 1) {
+        if (event.key === 'ArrowLeft') onNavigateRef.current(wrapIndex(index - 1, length))
+        if (event.key === 'ArrowRight') onNavigateRef.current(wrapIndex(index + 1, length))
       }
     }
 
@@ -335,18 +346,22 @@ const AnnouncementLightbox = ({
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
           >
-            <img
+            <div
               key={item.id}
-              src={item.imageUrl}
-              alt={item.altText}
-              className="announcement-lightbox__image"
-              decoding="async"
-              draggable={false}
-              onDoubleClick={handleImageDoubleClick}
-              style={{
-                transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
-              }}
-            />
+              className={`announcement-lightbox__stage${reducedMotion ? '' : ' announcement-lightbox__stage--enter'}`}
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.altText}
+                className="announcement-lightbox__image"
+                decoding="async"
+                draggable={false}
+                onDoubleClick={handleImageDoubleClick}
+                style={{
+                  transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
+                }}
+              />
+            </div>
 
             {prioridadLabel && !isZoomed ? (
               <span
@@ -404,7 +419,7 @@ const AnnouncementLightbox = ({
               </button>
             </div>
 
-            {!isZoomed && hasPrev ? (
+            {!isZoomed && hasMany ? (
               <button
                 type="button"
                 className="announcement-lightbox__nav announcement-lightbox__nav--prev"
@@ -415,7 +430,7 @@ const AnnouncementLightbox = ({
               </button>
             ) : null}
 
-            {!isZoomed && hasNext ? (
+            {!isZoomed && hasMany ? (
               <button
                 type="button"
                 className="announcement-lightbox__nav announcement-lightbox__nav--next"
@@ -427,13 +442,16 @@ const AnnouncementLightbox = ({
             ) : null}
 
             {hasMany && !isZoomed ? (
-              <p className="announcement-lightbox__counter" aria-live="polite">
+              <p className="sr-only" aria-live="polite">
                 {activeIndex + 1} / {items.length}
               </p>
             ) : null}
           </div>
 
-          <div className="announcement-lightbox__details">
+          <div
+            key={`details-${item.id}`}
+            className={`announcement-lightbox__details${reducedMotion ? '' : ' announcement-lightbox__details--enter'}`}
+          >
             {showMeta ? (
               <p className="announcement-lightbox__meta">
                 {typeLabel ? <span>{typeLabel}</span> : null}

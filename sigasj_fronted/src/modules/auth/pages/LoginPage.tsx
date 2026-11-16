@@ -1,4 +1,4 @@
-import { type FormEvent, useId, useRef, useState } from 'react'
+import { type FormEvent, useEffect, useId, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconEye, IconEyeOff } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
@@ -56,6 +56,13 @@ const LoginPage = () => {
     loginState?.message ??
     (sessionEndReason === 'expired' ? SESSION_EXPIRED_MESSAGE : undefined)
 
+  useEffect(() => {
+    document.body.classList.add('landing-page-white')
+    return () => {
+      document.body.classList.remove('landing-page-white')
+    }
+  }, [])
+
   if (isAuthLoading) {
     return null
   }
@@ -109,29 +116,34 @@ const LoginPage = () => {
 
   return (
     <main className="auth-page w-full min-w-0" aria-labelledby="login-title">
-      <div className="auth-page__glow" aria-hidden="true" />
       <div className="auth-page__card w-full max-w-md">
         <AuthPageBrand />
 
         <header className="auth-page__intro">
-          <h1 id="login-title">Iniciar sesión</h1>
-          <p className="auth-page__hint">
+          <p className="public-eyebrow inline-block">Acceso interno</p>
+          <h1 id="login-title" className="public-section-title mt-1 !text-[clamp(1.7rem,4vw,2.15rem)]">
+            Iniciar sesión
+          </h1>
+          <p className="auth-page__hint public-section-intro !mt-3 !max-w-none">
             Ingresa tus credenciales para acceder al sistema.
           </p>
         </header>
 
         {statusMessage ? (
-          <p
-            className="auth-page__notice"
-            role="status"
-          >
+          <p className="auth-page__notice" role="status">
             {statusMessage}
           </p>
         ) : null}
 
         <form className="auth-page__form" onSubmit={onSubmit} noValidate>
           <label className="auth-page__field" htmlFor="login-email">
-            Correo electrónico
+            <span className="auth-page__field-caption">
+              <span>Correo electrónico</span>
+              <span className="auth-page__required" aria-hidden="true">
+                *
+              </span>
+              <span className="sr-only">obligatorio</span>
+            </span>
             <input
               id="login-email"
               name="email"
@@ -148,6 +160,7 @@ const LoginPage = () => {
               }}
               aria-invalid={fieldErrors.email ? true : undefined}
               aria-describedby={fieldErrors.email ? emailErrorId : undefined}
+              aria-required="true"
               disabled={loading}
             />
             {fieldErrors.email ? (
@@ -158,7 +171,13 @@ const LoginPage = () => {
           </label>
 
           <label className="auth-page__field" htmlFor="login-password">
-            Contraseña
+            <span className="auth-page__field-caption">
+              <span>Contraseña</span>
+              <span className="auth-page__required" aria-hidden="true">
+                *
+              </span>
+              <span className="sr-only">obligatorio</span>
+            </span>
             <span className="auth-page__password-wrap">
               <input
                 id="login-password"
@@ -180,6 +199,7 @@ const LoginPage = () => {
                 aria-describedby={
                   fieldErrors.password ? passwordErrorId : undefined
                 }
+                aria-required="true"
                 disabled={loading}
               />
               <button
@@ -217,7 +237,7 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="auth-page__submit"
+            className="auth-page__submit landing-lift-button landing-lift-button--solid"
             disabled={loading}
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
