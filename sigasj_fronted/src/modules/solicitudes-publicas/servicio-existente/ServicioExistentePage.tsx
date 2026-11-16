@@ -81,7 +81,7 @@ const Select = ({ name, label, value, options, update, optional = false }: {
 
 const ServicioExistentePage = () => {
   const [values, setValues] = useState(initialValues)
-  const [result, setResult] = usePersistedSolicitudResult('servicio-existente')
+  const [result, setResult, resetResult] = usePersistedSolicitudResult('servicio-existente')
   const [submitError, setSubmitError] = useState('')
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -97,6 +97,12 @@ const ServicioExistentePage = () => {
     setSubmitError('')
     try { setResult(await registrarServicioExistente(values)); window.scrollTo({ top: 0, behavior: 'smooth' }) }
     catch (error) { setSubmitError(getServicioExistenteErrorMessage(error)) }
+  }
+
+  const handleNuevaSolicitud = () => {
+    setValues({ ...initialValues, documentos: [] })
+    setSubmitError('')
+    resetResult()
   }
 
   const field = (
@@ -167,7 +173,7 @@ const ServicioExistentePage = () => {
       ariaLabel="Formulario público de constancia de servicio existente"
       maxWidth="xl"
     >
-{result ? <FormSuccessResult className="mx-auto w-full !max-w-[760px] text-center [&_.form-success-result__actions]:justify-center" icon={<IconCircleCheckFilled size={42} />} title="Solicitud registrada correctamente" description="Guarda este código para consultar el avance del trámite." highlightLabel="Código de seguimiento" highlightValue={result.codigoSeguimiento} meta={[{ label: 'Estado', value: result.estado || 'PENDIENTE' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]} actions={<><Link className="landing-lift-button landing-lift-button--solid group inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-6 font-semibold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight size={19} /></Link><Link className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline sm:ml-2" to="/"><IconHome size={19} /> Volver al inicio</Link></>} /> : <>{submitError ? <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{submitError}</p> : null}<FormWizard steps={steps} completeLabel="Enviar solicitud" onComplete={handleSubmit} confirmation={{ title: 'Confirmar solicitud', message: 'Confirma que los datos, documentos y firma son correctos antes de registrar la solicitud.' }} /></>}</PublicFormPage>
+{result ? <FormSuccessResult className="mx-auto w-full !max-w-[760px] text-center [&_.form-success-result__actions]:justify-center" icon={<IconCircleCheckFilled size={42} />} title="Solicitud registrada correctamente" description="Guarda este código para consultar el avance del trámite." highlightLabel="Código de seguimiento" highlightValue={result.codigoSeguimiento} meta={[{ label: 'Estado', value: result.estado || 'PENDIENTE' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]} actions={<><Link className="landing-lift-button landing-lift-button--solid group inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-6 font-semibold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight size={19} /></Link><button className="transparency-motion-button inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover" type="button" onClick={handleNuevaSolicitud}>Realizar otra solicitud</button><Link className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline" to="/"><IconHome size={19} /> Volver al inicio</Link></>} /> : <>{submitError ? <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{submitError}</p> : null}<FormWizard steps={steps} completeLabel="Enviar solicitud" onComplete={handleSubmit} confirmation={{ title: 'Confirmar solicitud', message: 'Confirma que los datos, documentos y firma son correctos antes de registrar la solicitud.' }} /></>}</PublicFormPage>
   )
 }
 

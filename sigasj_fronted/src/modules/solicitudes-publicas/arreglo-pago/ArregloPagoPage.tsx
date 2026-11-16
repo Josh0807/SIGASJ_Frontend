@@ -105,7 +105,7 @@ const DocumentsAndSignatureFields = ({ values, update, onDocumentosChange }: { v
 
 const ArregloPagoPage = () => {
   const [values, setValues] = useState<ArregloPagoFormValues>(initialValues)
-  const [result, setResult] = usePersistedSolicitudResult('arreglo-pago')
+  const [result, setResult, resetResult] = usePersistedSolicitudResult('arreglo-pago')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -132,6 +132,12 @@ const ArregloPagoPage = () => {
     } catch (error) {
       setSubmitError(getArregloPagoErrorMessage(error))
     }
+  }
+
+  const handleNuevaSolicitud = () => {
+    setValues({ ...initialValues, documentos: [] })
+    setSubmitError(null)
+    resetResult()
   }
 
   const applicantStep = (
@@ -213,7 +219,7 @@ const ArregloPagoPage = () => {
               highlightLabel="Código de seguimiento"
               highlightValue={result.codigoSeguimiento}
               meta={[{ label: 'Estado', value: 'Pendiente' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]}
-              actions={<><Link className="landing-lift-button landing-lift-button--solid group inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-6 font-semibold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" /></Link><Link className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline sm:ml-2" to="/"><IconHome size={19} aria-hidden="true" /> Volver al inicio</Link></>}
+              actions={<><Link className="landing-lift-button landing-lift-button--solid group inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-6 font-semibold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" /></Link><button className="transparency-motion-button inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover" type="button" onClick={handleNuevaSolicitud}>Realizar otra solicitud</button><Link className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline" to="/"><IconHome size={19} aria-hidden="true" /> Volver al inicio</Link></>}
             />
           ) : (
             <>
