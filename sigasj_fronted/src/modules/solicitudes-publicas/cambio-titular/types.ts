@@ -1,4 +1,5 @@
 import type { SolicitudSeguimiento } from '../types'
+import type { DocumentoSolicitudAdjunto, DocumentoSolicitudReferencia } from '../solicitudDocumentos'
 
 /** Valores exactos del Backend (NaturalezaInmuebleCambioTitular). */
 export const NATURALEZAS_INMUEBLE = ['Inscrito', 'Sin inscribir'] as const
@@ -36,7 +37,7 @@ export type CambioTitularFormValues = {
   medioNotificacionPrincipal: '' | MedioNotificacion
   medioNotificacionSecundario: '' | MedioNotificacion
   firma: string
-  documentos: File[]
+  documentos: DocumentoSolicitudAdjunto[]
 }
 
 export type CambioTitularPayload = {
@@ -55,6 +56,7 @@ export type CambioTitularPayload = {
   medioNotificacionPrincipal: MedioNotificacion
   medioNotificacionSecundario?: MedioNotificacion
   firma?: string
+  documentos: DocumentoSolicitudReferencia[]
 }
 
 export type CambioTitularResponse = SolicitudSeguimiento & {

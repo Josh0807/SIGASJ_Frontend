@@ -69,14 +69,14 @@ export const servicioNotificacionesSchema = z.object({
 export const servicioDocumentosFirmaSchema = z.object({
   documentos: z.array(z.object({
     tipoDocumento: z.enum(['identificacion', 'poder']),
-    estado: z.enum(['subiendo', 'cargado', 'error']),
+    estado: z.enum(['pendiente', 'subiendo', 'cargado', 'error']),
     id: z.number().optional(),
     tokenReclamo: z.string().optional(),
   }).passthrough()),
   calidadTitular: z.string(),
   firma: z.string().min(1, 'Registra la firma del solicitante.'),
 }).superRefine((data, ctx) => {
-  if (data.documentos.some((doc) => doc.estado === 'subiendo')) {
+  if (data.documentos.some((doc) => doc.estado === 'pendiente' || doc.estado === 'subiendo')) {
     ctx.addIssue({ code: 'custom', path: ['documentos'], message: 'Espera a que terminen de cargarse los documentos.' })
     return
   }

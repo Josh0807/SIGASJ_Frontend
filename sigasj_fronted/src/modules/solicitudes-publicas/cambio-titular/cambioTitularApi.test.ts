@@ -6,6 +6,8 @@ import {
 } from './cambioTitularApi'
 import type { CambioTitularFormValues } from './types'
 
+const archivo = new File(['%PDF-contenido'], 'cedula.pdf', { type: 'application/pdf' })
+
 const values: CambioTitularFormValues = {
   nombreSolicitante: '  Ana Lucía Vargas Quirós ',
   identificacionSolicitante: ' 1-1234-0567 ',
@@ -22,9 +24,10 @@ const values: CambioTitularFormValues = {
   medioNotificacionPrincipal: 'Correo electrónico',
   medioNotificacionSecundario: '',
   firma: 'data:image/png;base64,abc',
-  documentos: [
-    new File(['contenido'], 'cedula.pdf', { type: 'application/pdf' }),
-  ],
+  documentos: [{
+    localId: 'doc-1', archivo, tipoDocumento: 'identificacion', nombreOriginal: archivo.name,
+    tamanio: archivo.size, tipoArchivo: archivo.type, estado: 'cargado', id: 21, tokenReclamo: 'token-21',
+  }],
 }
 
 describe('cambioTitularApi', () => {
@@ -45,8 +48,9 @@ describe('cambioTitularApi', () => {
       facturaANombreDe: 'Carlos Alberto Mora Jiménez',
       medioNotificacionPrincipal: 'Correo electrónico',
       firma: 'data:image/png;base64,abc',
+      documentos: [{ id: 21, tokenReclamo: 'token-21' }],
     })
-    expect(payload).not.toHaveProperty('documentos')
+    expect(payload.documentos).toEqual([{ id: 21, tokenReclamo: 'token-21' }])
     expect(payload).not.toHaveProperty('estado')
     expect(payload).not.toHaveProperty('solicitudId')
     expect(payload).not.toHaveProperty('medioNotificacionSecundario')

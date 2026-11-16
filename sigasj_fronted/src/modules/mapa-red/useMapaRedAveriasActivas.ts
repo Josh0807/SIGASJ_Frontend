@@ -67,7 +67,6 @@ export function useMapaRedAveriasActivas(
 
   useEffect(() => {
     if (!enabled) {
-      setLoading(false)
       return
     }
 
@@ -110,12 +109,12 @@ export function useMapaRedAveriasActivas(
         if (currentRequest !== requestId.current) return
 
         const parsed = parseAveriaAdminError(err)
-        if (parsed.unauthorized) {
+        if (parsed.kind === 'unauthorized') {
           clearAccessToken()
           setUnauthorized(true)
         }
-        if (parsed.forbidden) setForbidden(true)
-        setError(parsed.message || 'No se pudieron cargar las averías activas.')
+        if (parsed.kind === 'forbidden') setForbidden(true)
+        setError('No se pudieron cargar las averías activas.')
       } finally {
         if (currentRequest === requestId.current) {
           setLoading(false)
@@ -145,7 +144,7 @@ export function useMapaRedAveriasActivas(
 
   return {
     averias,
-    loading,
+    loading: enabled && loading,
     error,
     unauthorized,
     forbidden,

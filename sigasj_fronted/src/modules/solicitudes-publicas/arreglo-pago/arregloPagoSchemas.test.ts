@@ -21,7 +21,8 @@ describe('validación de arreglo de pago', () => {
 
   it('requiere al menos un documento y la firma del solicitante', () => {
     expect(arregloPagoDocumentsSchema.safeParse({ documentos: [], firma: '' }).success).toBe(false)
-    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [new File(['x'], 'documento.pdf')], firma: '' }).success).toBe(false)
-    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [new File(['x'], 'documento.pdf')], firma: 'data:image/png;base64,abc' }).success).toBe(true)
+    const documento = { tipoDocumento: 'identificacion', estado: 'cargado', id: 1, tokenReclamo: 'token' }
+    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [documento], firma: '' }).success).toBe(false)
+    expect(arregloPagoDocumentsSchema.safeParse({ documentos: [documento], firma: 'data:image/png;base64,abc' }).success).toBe(true)
   })
 })

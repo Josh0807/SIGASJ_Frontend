@@ -1,5 +1,6 @@
 import { fetchWithAuth } from '../../../services/http/httpClient'
 import type { ArregloPagoFormValues, ArregloPagoPayload, ArregloPagoResponse } from './types'
+import { referenciasDocumentosCargados } from '../solicitudDocumentos'
 
 export const toArregloPagoPayload = (values: ArregloPagoFormValues): ArregloPagoPayload => ({
   nombre: values.nombre.trim(),
@@ -10,6 +11,7 @@ export const toArregloPagoPayload = (values: ArregloPagoFormValues): ArregloPago
   montoPrimaInicial: Number(values.montoPrimaInicial.replace(',', '.')),
   plazoSeleccionado: values.plazoSeleccionado as ArregloPagoPayload['plazoSeleccionado'],
   ...(values.firma ? { firma: values.firma } : {}),
+  documentos: referenciasDocumentosCargados(values.documentos),
 })
 
 export async function registrarArregloPago(values: ArregloPagoFormValues) {

@@ -13,22 +13,26 @@ type Props = {
 }
 
 const newLocalId = () => `doc-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-const itemStatus = (estado: DocumentoAdjunto['estado']) => estado === 'subiendo' ? 'uploading' as const : estado === 'cargado' ? 'uploaded' as const : 'error' as const
+const itemStatus = (estado: DocumentoAdjunto['estado']) => estado === 'pendiente' || estado === 'subiendo' ? 'uploading' as const : estado === 'cargado' ? 'uploaded' as const : 'error' as const
 
 const InfraestructuraDocumentUpload = ({ proposito, documentos, onChange, error }: Props) => {
   const config = DOCUMENT_REQUIREMENTS['infraestructura-linderos']
   const requeridos = new Set(tiposRequeridosParaProposito(proposito))
 
-  const handleFile = async (file: File, tipoDocumento: TipoDocumentoInfra) => {
-    const localId = newLocalId()
-    const pending: DocumentoAdjunto = { localId, tipoDocumento, nombreOriginal: file.name, tamanio: file.size, tipoArchivo: file.type || 'application/octet-stream', estado: 'subiendo' }
-    onChange((prev) => [...prev, pending])
+  const upload = async (pending: DocumentoAdjunto) => {
+    if (!pending.archivo) return
+    onChange((prev) => prev.map((doc) => doc.localId === pending.localId ? { ...doc, estado: 'subiendo', errorMessage: undefined } : doc))
     try {
-      const uploaded = await subirDocumentoSolicitud(file, tipoDocumento)
-      onChange((prev) => prev.map((doc) => doc.localId === localId ? { ...doc, estado: 'cargado', id: uploaded.id, tokenReclamo: uploaded.tokenReclamo, nombreOriginal: uploaded.nombreOriginal, tamanio: uploaded.tamanio, tipoArchivo: uploaded.tipoArchivo } : doc))
+      const uploaded = await subirDocumentoSolicitud(pending.archivo, pending.tipoDocumento)
+      onChange((prev) => prev.map((doc) => doc.localId === pending.localId ? { ...doc, estado: 'cargado', id: uploaded.id, tokenReclamo: uploaded.tokenReclamo, nombreOriginal: uploaded.nombreOriginal, tamanio: uploaded.tamanio, tipoArchivo: uploaded.tipoArchivo } : doc))
     } catch (uploadError) {
-      onChange((prev) => prev.map((doc) => doc.localId === localId ? { ...doc, estado: 'error', errorMessage: getInfraestructuraLinderosErrorMessage(uploadError) } : doc))
+      onChange((prev) => prev.map((doc) => doc.localId === pending.localId ? { ...doc, estado: 'error', errorMessage: getInfraestructuraLinderosErrorMessage(uploadError) } : doc))
     }
+  }
+  const handleFile = async (file: File, tipoDocumento: TipoDocumentoInfra) => {
+    const pending: DocumentoAdjunto = { localId: newLocalId(), archivo: file, tipoDocumento, nombreOriginal: file.name, tamanio: file.size, tipoArchivo: file.type || 'application/octet-stream', estado: 'pendiente' }
+    onChange((prev) => [...prev, pending])
+    await upload(pending)
   }
 
   return (
@@ -51,6 +55,10 @@ const InfraestructuraDocumentUpload = ({ proposito, documentos, onChange, error 
                 items={related.map((doc) => ({ id: doc.localId, name: doc.nombreOriginal, size: doc.tamanio, mimeType: doc.tipoArchivo, status: itemStatus(doc.estado), errorMessage: doc.errorMessage }))}
                 onFilesSelected={(files) => Promise.all(files.map((file) => handleFile(file, tipo))).then(() => undefined)}
                 onRemove={(id) => onChange((prev) => prev.filter((item) => item.localId !== id))}
+                onRetry={(id) => {
+                  const documento = documentos.find((item) => item.localId === id)
+                  return documento ? upload(documento) : Promise.resolve()
+                }}
               />
             </article>
           )

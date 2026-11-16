@@ -26,6 +26,7 @@ const baseValues: AfiliacionFormValues = {
   recomendacion2Identificacion: ' 1-2345-6789 ',
   recomendacion2NumeroAbonado: ' 13088 ',
   recomendacion2Firma: ' data:image/png;base64,rec2 ',
+  documentos: [],
 }
 
 describe('toAfiliacionPayload', () => {
@@ -59,6 +60,29 @@ describe('toAfiliacionPayload', () => {
     expect(payload).not.toHaveProperty('numeroAcuerdo')
     expect(payload).not.toHaveProperty('revisadoPor')
     expect(payload).not.toHaveProperty('currentStep')
+    expect(payload).not.toHaveProperty('documentos')
+  })
+
+  it('incluye todas las referencias de documentos complementarios cargados', () => {
+    const archivo = new File(['%PDF-1.4'], 'complemento.pdf', { type: 'application/pdf' })
+    const payload = toAfiliacionPayload({
+      ...baseValues,
+      documentos: [1, 2].map((id) => ({
+        localId: `doc-${id}`,
+        archivo,
+        tipoDocumento: 'otro' as const,
+        nombreOriginal: archivo.name,
+        tamanio: archivo.size,
+        tipoArchivo: archivo.type,
+        estado: 'cargado' as const,
+        id,
+        tokenReclamo: `token-${id}`,
+      })),
+    })
+    expect(payload.documentos).toEqual([
+      { id: 1, tokenReclamo: 'token-1' },
+      { id: 2, tokenReclamo: 'token-2' },
+    ])
   })
 
   it('omite folio y firmas vacías', () => {

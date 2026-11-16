@@ -18,6 +18,17 @@ describe('cambioTitularSchemas', () => {
     ).toBe(false)
 
     expect(
+      cambioTitularDocumentosSchema.safeParse({
+        calidadTitular: 'Poseedor',
+        documentos: [
+          { tipoDocumento: 'identificacion', estado: 'cargado', id: 1, tokenReclamo: 'token-id' },
+          { tipoDocumento: 'otro', estado: 'cargado', id: 2, tokenReclamo: 'token-posesion' },
+        ],
+        firma: 'data:image/png;base64,abc',
+      }).success,
+    ).toBe(true)
+
+    expect(
       cambioTitularSolicitanteSchema.safeParse({
         nombreSolicitante: 'Ana Lucía Vargas',
         identificacionSolicitante: '1-1234-0567',
@@ -99,17 +110,25 @@ describe('cambioTitularSchemas', () => {
   it('exige al menos un documento y la firma del nuevo titular', () => {
     expect(
       cambioTitularDocumentosSchema.safeParse({
+        calidadTitular: 'Propietario',
         documentos: [],
         firma: '',
       }).success,
     ).toBe(false)
     expect(
       cambioTitularDocumentosSchema.safeParse({
-        documentos: [
-          new File(['x'], 'cedula.pdf', { type: 'application/pdf' }),
-        ],
+        calidadTitular: 'Propietario',
+        documentos: [{ tipoDocumento: 'identificacion', estado: 'cargado', id: 1, tokenReclamo: 'token' }],
         firma: 'data:image/png;base64,abc',
       }).success,
     ).toBe(true)
+
+    expect(
+      cambioTitularDocumentosSchema.safeParse({
+        calidadTitular: 'Representante legal',
+        documentos: [{ tipoDocumento: 'identificacion', estado: 'cargado', id: 1, tokenReclamo: 'token' }],
+        firma: 'data:image/png;base64,abc',
+      }).success,
+    ).toBe(false)
   })
 })

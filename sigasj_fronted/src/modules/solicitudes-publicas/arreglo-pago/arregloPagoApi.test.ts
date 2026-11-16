@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getArregloPagoErrorMessage, registrarArregloPago, toArregloPagoPayload } from './arregloPagoApi'
 import type { ArregloPagoFormValues } from './types'
 
+const archivo = new File(['%PDF-contenido'], 'cedula.pdf', { type: 'application/pdf' })
+
 const values: ArregloPagoFormValues = {
   nombre: '  Juan Carlos Rodríguez Mora ',
   cedula: ' 1-1234-0567 ',
@@ -11,7 +13,10 @@ const values: ArregloPagoFormValues = {
   montoPrimaInicial: '25000',
   plazoSeleccionado: '6 meses',
   firma: 'data:image/png;base64,abc',
-  documentos: [new File(['contenido'], 'cedula.pdf', { type: 'application/pdf' })],
+  documentos: [{
+    localId: 'doc-1', archivo, tipoDocumento: 'identificacion', nombreOriginal: archivo.name,
+    tamanio: archivo.size, tipoArchivo: archivo.type, estado: 'cargado', id: 10, tokenReclamo: 'token-10',
+  }],
 }
 
 describe('arregloPagoApi', () => {
@@ -27,6 +32,7 @@ describe('arregloPagoApi', () => {
       montoPrimaInicial: 25000,
       plazoSeleccionado: '6 meses',
       firma: 'data:image/png;base64,abc',
+      documentos: [{ id: 10, tokenReclamo: 'token-10' }],
     })
   })
 

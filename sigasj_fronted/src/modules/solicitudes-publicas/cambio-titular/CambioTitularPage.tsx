@@ -8,7 +8,7 @@ import FormWizardFieldError from '../../../shared/components/FormWizardFieldErro
 import { useFormWizardField } from '../../../shared/components/formWizardValidation'
 import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsada'
 import PublicFormPage from '../../landing/components/PublicFormPage'
-import DocumentRequirements from '../DocumentRequirements'
+import SolicitudDocumentUpload from '../SolicitudDocumentUpload'
 import SignaturePad from '../arreglo-pago/SignaturePad'
 import {
   CEDULA_FISICA_MAX_LENGTH,
@@ -112,18 +112,37 @@ const TextField = ({
 const DocumentsAndSignatureFields = ({
   values,
   update,
+  onDocumentosChange,
 }: {
   values: CambioTitularFormValues
   update: UpdateFormValue
+  onDocumentosChange: (next: CambioTitularFormValues['documentos'] | ((previous: CambioTitularFormValues['documentos']) => CambioTitularFormValues['documentos'])) => void
 }) => {
-  const documentos = useFormWizardField('documentos')
   return (
     <div className="grid gap-7">
-      <DocumentRequirements
-        slug="cambio-titular"
-        files={values.documentos}
-        onFilesChange={(files) => update('documentos', files)}
-        inputProps={documentos.inputProps}
+      <SolicitudDocumentUpload
+        documentos={values.documentos}
+        onChange={onDocumentosChange}
+        options={[
+          {
+            type: 'identificacion',
+            label: 'Documento de identificación vigente',
+            description: 'Cédula de identidad, residencia o pasaporte vigente del solicitante.',
+            required: true,
+          },
+          {
+            type: 'poder',
+            label: 'Poder o autorización',
+            description: 'Obligatorio cuando la solicitud la realiza una persona representante legal.',
+            required: values.calidadTitular === 'Representante legal',
+          },
+          {
+            type: 'otro',
+            label: 'Documento de posesión o titularidad',
+            description: 'Resolución, escritura u otro documento que acredite la posesión o titularidad cuando corresponda.',
+            required: false,
+          },
+        ]}
         error={<FormWizardFieldError name="documentos" />}
       />
       <SignaturePad
@@ -193,6 +212,13 @@ const CambioTitularPage = () => {
 
   const update: UpdateFormValue = (key, value) => {
     setValues((current) => ({ ...current, [key]: value }))
+  }
+
+  const onDocumentosChange = (next: CambioTitularFormValues['documentos'] | ((previous: CambioTitularFormValues['documentos']) => CambioTitularFormValues['documentos'])) => {
+    setValues((current) => ({
+      ...current,
+      documentos: typeof next === 'function' ? next(current.documentos) : next,
+    }))
   }
 
   const handleSubmit = async () => {
@@ -364,7 +390,7 @@ const CambioTitularPage = () => {
   )
 
   const documentosStep = (
-    <DocumentsAndSignatureFields values={values} update={update} />
+    <DocumentsAndSignatureFields values={values} update={update} onDocumentosChange={onDocumentosChange} />
   )
 
   const reviewStep = (
@@ -461,11 +487,11 @@ const CambioTitularPage = () => {
         },
       ]}
       documentsStepIndex={4}
-      documents={values.documentos.map((file, index) => ({
-        id: `${file.name}-${index}`,
-        name: file.name,
-        size: file.size,
-        type: file.type || 'Archivo',
+      documents={values.documentos.map((documento) => ({
+        id: documento.localId,
+        name: documento.nombreOriginal,
+        size: documento.tamanio,
+        type: documento.tipoArchivo || 'Archivo',
       }))}
     />
   )

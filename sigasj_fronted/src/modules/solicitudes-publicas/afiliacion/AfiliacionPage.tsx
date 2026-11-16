@@ -9,6 +9,7 @@ import { useFormWizardField } from '../../../shared/components/formWizardValidat
 import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsada'
 import PublicFormPage from '../../landing/components/PublicFormPage'
 import SignaturePad from '../arreglo-pago/SignaturePad'
+import SolicitudDocumentUpload from '../SolicitudDocumentUpload'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import {
   CEDULA_FISICA_MAX_LENGTH,
@@ -16,7 +17,7 @@ import {
   limitarCedulaFisica,
   limitarTelefonoCr,
 } from '../identificacionCostaRica'
-import { FieldCaption, ReadonlyDateField } from '../PublicFormFieldChrome'
+import { FieldCaption } from '../PublicFormFieldChrome'
 import {
   getAfiliacionErrorMessage,
   registrarAfiliacion,
@@ -50,6 +51,7 @@ const initialValues = (): AfiliacionFormValues => ({
   recomendacion2Identificacion: '',
   recomendacion2NumeroAbonado: '',
   recomendacion2Firma: '',
+  documentos: [],
 })
 
 type UpdateFormValue = <Key extends keyof AfiliacionFormValues>(
@@ -114,6 +116,13 @@ const AfiliacionPage = () => {
 
   const update: UpdateFormValue = (key, value) => {
     setValues((current) => ({ ...current, [key]: value }))
+  }
+
+  const onDocumentosChange = (next: AfiliacionFormValues['documentos'] | ((previous: AfiliacionFormValues['documentos']) => AfiliacionFormValues['documentos'])) => {
+    setValues((current) => ({
+      ...current,
+      documentos: typeof next === 'function' ? next(current.documentos) : next,
+    }))
   }
 
   const handleSubmit = async () => {
@@ -313,12 +322,25 @@ const AfiliacionPage = () => {
         value={values.firmaSolicitante}
         onChange={(value) => update('firmaSolicitante', value)}
       />
+      <SolicitudDocumentUpload
+        title="Documentos complementarios"
+        description="Opcional. Puede adjuntar documentos adicionales que ayuden a revisar la solicitud."
+        documentos={values.documentos}
+        onChange={onDocumentosChange}
+        options={[{
+          type: 'otro',
+          label: 'Documento complementario',
+          description: 'Información adicional relacionada con la solicitud de afiliación.',
+          required: false,
+        }]}
+        error={<FormWizardFieldError name="documentos" />}
+      />
     </div>
   )
 
   const reviewStep = (
     <FormReview
-      emptyDocumentsMessage="Este trámite no requiere adjuntar documentación adicional."
+      emptyDocumentsMessage="No se adjuntaron documentos complementarios."
       sections={[
         {
           id: 'personales',
@@ -405,6 +427,13 @@ const AfiliacionPage = () => {
           ],
         },
       ]}
+      documentsStepIndex={4}
+      documents={values.documentos.map((documento) => ({
+        id: documento.localId,
+        name: documento.nombreOriginal,
+        size: documento.tamanio,
+        type: documento.tipoArchivo || 'Archivo',
+      }))}
     />
   )
 
@@ -459,7 +488,7 @@ const AfiliacionPage = () => {
       content: firmaStep,
       validation: {
         schema: afiliacionFirmaSchema,
-        getValues: () => values,
+          getValues: () => ({ firmaSolicitante: values.firmaSolicitante, documentos: values.documentos }),
       },
     },
     {

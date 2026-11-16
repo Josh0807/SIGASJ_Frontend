@@ -29,6 +29,24 @@ export const arregloPagoServiceSchema = z.object({
 })
 
 export const arregloPagoDocumentsSchema = z.object({
-  documentos: z.array(z.instanceof(File)).min(1, 'Adjunta al menos un documento requerido.'),
+  documentos: z.array(z.object({
+    tipoDocumento: z.literal('identificacion'),
+    estado: z.enum(['pendiente', 'subiendo', 'cargado', 'error']),
+    id: z.number().optional(),
+    tokenReclamo: z.string().optional(),
+  })).superRefine((documentos, context) => {
+    if (!documentos.some((documento) => documento.tipoDocumento === 'identificacion')) {
+      context.addIssue({ code: 'custom', message: 'Adjunta el documento de identificación.' })
+    }
+    if (documentos.some((documento) => documento.estado === 'pendiente' || documento.estado === 'subiendo')) {
+      context.addIssue({ code: 'custom', message: 'Espera a que finalice la carga del documento.' })
+    }
+    if (documentos.some((documento) => documento.estado === 'error')) {
+      context.addIssue({ code: 'custom', message: 'Reintenta o elimina los documentos con error.' })
+    }
+    if (!documentos.some((documento) => documento.estado === 'cargado' && documento.id && documento.tokenReclamo)) {
+      context.addIssue({ code: 'custom', message: 'El documento obligatorio debe terminar de cargarse.' })
+    }
+  }),
   firma: z.string().trim().min(1, 'Registra la firma del solicitante.'),
 })

@@ -8,10 +8,11 @@ export const TIPOS_DOCUMENTO_DISP = [
 
 export type TipoDocumentoDisp = (typeof TIPOS_DOCUMENTO_DISP)[number]
 
-export type DocumentoAdjuntoEstado = 'subiendo' | 'cargado' | 'error'
+export type DocumentoAdjuntoEstado = 'pendiente' | 'subiendo' | 'cargado' | 'error'
 
 export type DocumentoAdjunto = {
   localId: string
+  archivo?: File
   tipoDocumento: TipoDocumentoDisp
   nombreOriginal: string
   tamanio: number

@@ -74,8 +74,28 @@ export const cambioTitularNotificacionesSchema = z.object({
 })
 
 export const cambioTitularDocumentosSchema = z.object({
-  documentos: z
-    .array(z.instanceof(File))
-    .min(1, 'Adjunta al menos un documento requerido.'),
+  calidadTitular: z.string(),
+  documentos: z.array(z.object({
+    tipoDocumento: z.enum(['identificacion', 'poder', 'otro']),
+    estado: z.enum(['pendiente', 'subiendo', 'cargado', 'error']),
+    id: z.number().optional(),
+    tokenReclamo: z.string().optional(),
+  })),
   firma: z.string().trim().min(1, 'Registra la firma del nuevo titular solicitante.'),
+}).superRefine((values, context) => {
+  const cargados = values.documentos.filter((documento) =>
+    documento.estado === 'cargado' && documento.id && documento.tokenReclamo,
+  )
+  if (!cargados.some((documento) => documento.tipoDocumento === 'identificacion')) {
+    context.addIssue({ code: 'custom', path: ['documentos'], message: 'Carga el documento de identificación obligatorio.' })
+  }
+  if (values.calidadTitular === 'Representante legal' && !cargados.some((documento) => documento.tipoDocumento === 'poder')) {
+    context.addIssue({ code: 'custom', path: ['documentos'], message: 'Carga el poder o autorización de la persona representante.' })
+  }
+  if (values.documentos.some((documento) => documento.estado === 'pendiente' || documento.estado === 'subiendo')) {
+    context.addIssue({ code: 'custom', path: ['documentos'], message: 'Espera a que finalicen todas las cargas.' })
+  }
+  if (values.documentos.some((documento) => documento.estado === 'error')) {
+    context.addIssue({ code: 'custom', path: ['documentos'], message: 'Reintenta o elimina los documentos con error.' })
+  }
 })
