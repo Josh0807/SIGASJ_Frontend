@@ -3,7 +3,7 @@ import heroImage from '../../../assets/Hero1.webp'
 import type { HeroSectionProps } from '../types/HeroSectionProps'
 import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
 import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
-import Button from '../../../shared/ui/Button'
+import { Button } from '../../../shared/ui'
 
 const REPORT_FAULTS_HREF = REPORTAR_AVERIA_ROUTE_PATH
 

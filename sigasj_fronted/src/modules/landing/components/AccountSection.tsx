@@ -1,9 +1,7 @@
 import { IconArrowRight, IconDropletExclamation } from '@tabler/icons-react'
 import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
 import type { AccountSectionProps } from '../types/AccountSectionProps'
-import Button from '../../../shared/ui/Button'
-import Card from '../../../shared/ui/Card'
-import SectionHeader from '../../../shared/ui/SectionHeader'
+import { Button, Card, SectionHeader } from '../../../shared/ui'
 
 const AccountSection = ({ formHref = REPORTAR_AVERIA_ROUTE_PATH }: AccountSectionProps) => (
   <section

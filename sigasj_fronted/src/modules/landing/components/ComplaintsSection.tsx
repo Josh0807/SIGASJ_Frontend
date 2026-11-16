@@ -1,7 +1,5 @@
 import { IconArrowRight, IconMail } from '@tabler/icons-react'
-import Button from '../../../shared/ui/Button'
-import Card from '../../../shared/ui/Card'
-import SectionHeader from '../../../shared/ui/SectionHeader'
+import { Button, Card, SectionHeader } from '../../../shared/ui'
 
 const ComplaintsSection = () => (
   <section

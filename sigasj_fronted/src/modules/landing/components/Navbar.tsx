@@ -7,7 +7,7 @@ import {
   TRANSPARENCY_HREF,
 } from '../config/landingAnchors'
 import { useLandingActiveNav } from '../hooks/useLandingActiveNav'
-import Button from '../../../shared/ui/Button'
+import { Button } from '../../../shared/ui'
 
 type NavigationItem = { label: string; href: `#${string}` }
 
