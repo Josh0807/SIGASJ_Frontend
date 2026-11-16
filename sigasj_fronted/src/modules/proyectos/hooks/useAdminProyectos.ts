@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   DEFAULT_PROYECTOS_LIMIT,
   DEFAULT_PROYECTOS_PAGE,
@@ -72,7 +73,7 @@ export function useAdminProyectos(
           setError(
             parsed.kind === 'unauthorized' || parsed.kind === 'forbidden'
               ? null
-              : 'No fue posible cargar los proyectos.',
+              : ADMIN_COPY.loadError('los proyectos'),
           )
           setListado({
             ...EMPTY_PROYECTOS_LISTADO,

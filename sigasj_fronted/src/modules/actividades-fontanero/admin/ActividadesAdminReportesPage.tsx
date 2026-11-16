@@ -1,13 +1,30 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { IconClipboardOff, IconSearch } from '@tabler/icons-react'
+import { Navigate } from 'react-router-dom'
+import {
+  IconChartBar,
+  IconClipboardOff,
+  IconFilterOff,
+  IconRefresh,
+  IconSearch,
+} from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
-import ActivityFeedback from '../components/ActivityFeedback'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { useAdminActividadesReportes } from '../hooks/useAdminActividadesReportes'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 import { getReportesAdmin } from '../services/actividadesFontaneroApi'
@@ -36,11 +53,7 @@ const EMPTY_DRAFT: DraftFilters = {
 }
 
 const INDICATOR_CLASS =
-  'activities-indicator-modern group !min-h-[168px] !overflow-hidden !rounded-[22px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/60 !p-5 !shadow-[0_10px_24px_rgba(30,90,156,0.08)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-[#bfe3fa] hover:!shadow-[0_16px_32px_rgba(30,90,156,0.14)]'
-
-const INDICATOR_TOTAL_CLASS =
-  INDICATOR_CLASS +
-  ' !border-[#93c5fd] !bg-linear-to-br !from-[#eff6ff] !via-white !to-[#e0f2fe]'
+  'activities-indicator-modern group min-h-[168px]'
 
 const toAppliedFilters = (draft: DraftFilters): ReporteActividadesFilters => {
   const tipoRaw = draft.tipoActividadId.trim()
@@ -163,46 +176,34 @@ const ActividadesAdminReportesPage = () => {
   }
 
   return (
-    <main className="gallery-admin admin-content-modern actividades-admin-reportes">
-      <div className="gallery-admin__shell sigasj-stack !gap-6">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-7 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
-          <div className="min-w-0 space-y-2">
-            <span className="gallery-admin__eyebrow">
-              Actividades del Fontanero · Administradora
-            </span>
-            <h1>Reporte de actividades del Fontanero</h1>
-            <p>
-              Consulte totales, cantidades por tipo y el detalle de actividades
-              registradas.
-            </p>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link
-              to={ACTIVIDADES_ADMIN_PATHS.home}
-              className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-[#eaf6ff]"
-            >
-              Volver al módulo
-            </Link>
-          </div>
-        </header>
+    <AdminShell
+      className="actividades-admin-reportes gap-5 sm:gap-6"
+      aria-labelledby="actividades-admin-reportes-title"
+    >
+      <PageHeader
+        id="actividades-admin-reportes-title"
+        eyebrow="Actividades del Fontanero · Administradora"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconChartBar size={22} aria-hidden="true" />
+            Reporte de actividades del Fontanero
+          </span>
+        }
+        description="Consulte totales, cantidades por tipo y el detalle de actividades registradas."
+        actions={
+          <Button to={ACTIVIDADES_ADMIN_PATHS.home} variant="secondary">
+            Volver al módulo
+          </Button>
+        }
+      />
 
-        <form
-          className="gallery-admin__filters actividades-admin-reportes__filters"
-          aria-label="Filtros del reporte"
-          onSubmit={handleConsultar}
-          noValidate
-        >
-          <div className="actividades-admin-reportes__section-head col-span-full">
-            <p className="actividades-admin-reportes__eyebrow">Consulta</p>
-            <h2>Filtrar actividades</h2>
-            <p>Defina el periodo, fontanero o tipo para generar el resumen.</p>
-          </div>
-
-          <label className="gallery-admin__field" htmlFor="reportes-fecha-inicio">
-            <span>Fecha inicial</span>
+      <form onSubmit={handleConsultar} noValidate>
+        <AdminFilters aria-label="Filtros del reporte">
+          <AdminFilterField label="Fecha inicial">
             <input
               id="reportes-fecha-inicio"
               type="date"
+              className={adminFilterControlClassName}
               value={draft.fechaInicio}
               onChange={(event) =>
                 setDraft((current) => ({
@@ -211,13 +212,13 @@ const ActividadesAdminReportesPage = () => {
                 }))
               }
             />
-          </label>
+          </AdminFilterField>
 
-          <label className="gallery-admin__field" htmlFor="reportes-fecha-fin">
-            <span>Fecha final</span>
+          <AdminFilterField label="Fecha final">
             <input
               id="reportes-fecha-fin"
               type="date"
+              className={adminFilterControlClassName}
               value={draft.fechaFin}
               onChange={(event) =>
                 setDraft((current) => ({
@@ -226,12 +227,12 @@ const ActividadesAdminReportesPage = () => {
                 }))
               }
             />
-          </label>
+          </AdminFilterField>
 
-          <label className="gallery-admin__field" htmlFor="reportes-fontanero">
-            <span>Fontanero</span>
+          <AdminFilterField label="Fontanero">
             <select
               id="reportes-fontanero"
+              className={adminFilterControlClassName}
               value={draft.fontaneroId}
               onChange={(event) =>
                 setDraft((current) => ({
@@ -247,12 +248,12 @@ const ActividadesAdminReportesPage = () => {
                 </option>
               ))}
             </select>
-          </label>
+          </AdminFilterField>
 
-          <label className="gallery-admin__field" htmlFor="reportes-tipo">
-            <span>Tipo de actividad</span>
+          <AdminFilterField label="Tipo de actividad">
             <select
               id="reportes-tipo"
+              className={adminFilterControlClassName}
               value={draft.tipoActividadId}
               disabled={tiposLoading}
               onChange={(event) =>
@@ -269,56 +270,60 @@ const ActividadesAdminReportesPage = () => {
                 </option>
               ))}
             </select>
-          </label>
+          </AdminFilterField>
 
-          <div className="actividades-admin-reportes__actions">
-            <button
+          <div className="col-span-full flex flex-wrap gap-2">
+            <Button
               type="submit"
-              className="gallery-admin__button gallery-admin__button--primary"
-              disabled={loading}
+              variant="primary"
+              leftIcon={<IconSearch size={17} aria-hidden="true" />}
+              loading={loading}
             >
-              <IconSearch size={18} aria-hidden="true" />
               {loading ? 'Consultando…' : 'Consultar'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="gallery-admin__button gallery-admin__filter-reset"
+              variant="secondary"
+              leftIcon={<IconFilterOff size={17} aria-hidden="true" />}
               onClick={handleLimpiar}
-              disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
+              disabled={
+                loading || (!hasActiveDraft && Object.keys(applied).length === 0)
+              }
             >
               Limpiar filtros
-            </button>
+            </Button>
           </div>
-        </form>
+        </AdminFilters>
+      </form>
 
-        {filterError ? (
-          <ActivityFeedback
-            variant="error"
-            message={filterError}
-            action={
-              <button
-                type="button"
-                className="activity-feedback__retry"
-                onClick={() => {
-                  setClientError(null)
-                  refetch()
-                }}
-              >
-                Reintentar
-              </button>
-            }
-          />
-        ) : null}
+      {filterError ? (
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{filterError}</p>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="justify-self-start"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+              onClick={() => {
+                setClientError(null)
+                refetch()
+              }}
+            >
+              {ADMIN_COPY.retry}
+            </Button>
+          </div>
+        </Alert>
+      ) : null}
 
         <section
-          className="actividades-admin-reportes__indicators"
+          className="actividades-admin-reportes__indicators grid gap-4"
           aria-label="Indicadores del reporte"
         >
-          <div className="actividades-admin-reportes__section-head">
-            <p className="actividades-admin-reportes__eyebrow">Resultados</p>
-            <h2>Indicadores de actividades</h2>
-            <p>Totales calculados según los filtros aplicados.</p>
-          </div>
+          <h2 className="m-0 text-lg font-extrabold text-sigasj-ink">
+            Indicadores de actividades
+          </h2>
           <div className="admin-dashboard__indicators-grid actividades-admin-reportes__indicators-grid">
             <IndicatorCard
               title="Total de actividades"
@@ -327,7 +332,7 @@ const ActividadesAdminReportesPage = () => {
               description="Según los filtros aplicados"
               badgeText="Total"
               badgeType="info"
-              className={INDICATOR_TOTAL_CLASS}
+              className={INDICATOR_CLASS}
             />
             {(loading ? [] : reporte.porTipo).map((item) => (
               <IndicatorCard
@@ -343,39 +348,28 @@ const ActividadesAdminReportesPage = () => {
           </div>
         </section>
 
-        <section
-          className="actividades-admin-reportes__listado"
+        <Card
+          as="section"
+          padded
+          className="actividades-admin-reportes__listado !gap-4"
           aria-labelledby="reportes-listado-title"
         >
-          <div className="actividades-admin-reportes__section-head">
-            <p className="actividades-admin-reportes__eyebrow">Detalle</p>
-            <h2 id="reportes-listado-title">Listado de actividades</h2>
-            <p>Fecha, responsable, tipo y estado de cada registro.</p>
-          </div>
+          <h2
+            id="reportes-listado-title"
+            className="m-0 text-lg font-extrabold text-sigasj-ink"
+          >
+            Listado de actividades
+          </h2>
 
           {loading ? (
-            <div
-              className="gallery-admin__skeleton"
-              aria-busy="true"
-              aria-label="Cargando reporte de actividades"
-            >
-              <div className="gallery-admin__skeleton-row" />
-              <div className="gallery-admin__skeleton-row" />
-              <div className="gallery-admin__skeleton-row" />
-            </div>
+            <Alert tone="info">{ADMIN_COPY.loading('el reporte')}</Alert>
           ) : null}
 
           {showEmpty ? (
-            <div
-              className="gallery-admin__empty actividades-admin-reportes__empty"
-              role="status"
-            >
-              <span className="actividades-admin-reportes__empty-icon" aria-hidden="true">
-                <IconClipboardOff size={28} />
-              </span>
-              <h3>Sin actividades encontradas</h3>
-              <p>No se encontraron actividades con los filtros seleccionados.</p>
-            </div>
+            <EmptyState
+              icon={<IconClipboardOff size={28} aria-hidden="true" />}
+              title={ADMIN_COPY.emptyFiltered('actividades')}
+            />
           ) : null}
 
           {!loading && !showEmpty && !filterError ? (
@@ -407,12 +401,13 @@ const ActividadesAdminReportesPage = () => {
                         </span>
                       </td>
                       <td className="actividades-admin-reportes__row-action">
-                        <Link
-                          className="actividades-admin-reportes__detail-link"
+                        <Button
                           to={actividadAdminDetallePath(actividad.id)}
+                          variant="secondary"
+                          size="sm"
                         >
                           Ver detalle
-                        </Link>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -420,9 +415,8 @@ const ActividadesAdminReportesPage = () => {
               </table>
             </div>
           ) : null}
-        </section>
-      </div>
-    </main>
+        </Card>
+    </AdminShell>
   )
 }
 

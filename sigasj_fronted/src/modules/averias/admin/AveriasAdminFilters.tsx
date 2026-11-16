@@ -1,4 +1,10 @@
 import { IconFilterOff, IconSearch } from '@tabler/icons-react'
+import {
+  AdminFilterField,
+  AdminFilters,
+  Button,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { ESTADO_AVERIA_OPTIONS } from './estadoAveria'
 import {
   EMPTY_FILTER,
@@ -12,6 +18,8 @@ type AveriasAdminFiltersProps = {
   prioridad: string
   fechaDesde: string
   fechaHasta: string
+  total: number
+  loading?: boolean
   onSearchChange: (value: string) => void
   onEstadoChange: (value: string) => void
   onPrioridadChange: (value: string) => void
@@ -27,16 +35,14 @@ const PRIORIDAD_FILTER_ID = 'averias-admin-prioridad'
 const FECHA_DESDE_ID = 'averias-admin-fecha-desde'
 const FECHA_HASTA_ID = 'averias-admin-fecha-hasta'
 
-const labelClass = 'text-[0.78rem] font-bold text-[#163f6b]'
-const inputClass =
-  'min-h-11 w-full rounded-2xl border border-[#d7e5f1] bg-[#fbfdff] px-3.5 text-sm text-[#1a2f42] outline-none transition placeholder:text-[#5b7390]/70 hover:border-[#b9d0e6] focus:border-[#1e5a9c] focus:bg-white focus:ring-2 focus:ring-[#bfe3fa]'
-
 const AveriasAdminFilters = ({
   search,
   estado,
   prioridad,
   fechaDesde,
   fechaHasta,
+  total,
+  loading = false,
   onSearchChange,
   onEstadoChange,
   onPrioridadChange,
@@ -45,58 +51,58 @@ const AveriasAdminFilters = ({
   onClear,
   hasActiveFilters,
 }: AveriasAdminFiltersProps) => (
-  <section
-    className="grid gap-3 rounded-3xl border border-[#d7e5f1] bg-white p-4 shadow-[0_4px_14px_rgba(30,90,156,0.05)] sm:p-5"
+  <AdminFilters
     aria-label="Búsqueda y filtros"
-  >
-    <div className="flex flex-wrap items-end justify-between gap-2">
-      <div className="min-w-0">
-        <p className="m-0 text-[0.72rem] font-bold uppercase tracking-[0.06em] text-slate-500">
-          Filtros
-        </p>
-        <p className="m-0 text-sm text-slate-500">
-          Busque por código o reportante y afine por estado, prioridad o fechas.
-        </p>
+    className="!block"
+    summary={
+      <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+        <span className="inline-flex items-center gap-1.5">
+          <strong className="text-sigasj-ink">{loading ? '…' : total}</strong>
+          <span>{total === 1 ? 'avería' : 'averías'}</span>
+        </span>
+        {hasActiveFilters ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+            onClick={onClear}
+          >
+            Limpiar filtros
+          </Button>
+        ) : null}
       </div>
-      <button
-        type="button"
-        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-3.5 text-sm font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-45"
-        onClick={onClear}
-        disabled={!hasActiveFilters}
+    }
+  >
+    <div className="col-span-full grid min-w-0 gap-3 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))] xl:items-end">
+      <AdminFilterField
+        label="Buscar"
+        className="sm:col-span-2 lg:col-span-3 xl:col-span-1"
       >
-        <IconFilterOff size={17} aria-hidden="true" />
-        Limpiar<span className="sr-only"> filtros</span>
-      </button>
-    </div>
-
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))] xl:items-end">
-      <label className="grid min-w-0 gap-1.5 sm:col-span-2 lg:col-span-3 xl:col-span-1" htmlFor={SEARCH_INPUT_ID}>
-        <span className={labelClass}>Buscar</span>
         <span className="relative block">
           <IconSearch
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-            size={18}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+            size={17}
             aria-hidden="true"
           />
           <input
             id={SEARCH_INPUT_ID}
             name="search"
             type="search"
-            className={`${inputClass} pl-10`}
+            className={`${adminFilterControlClassName} pl-9`}
             maxLength={150}
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Código o reportante..."
           />
         </span>
-      </label>
+      </AdminFilterField>
 
-      <label className="grid min-w-0 gap-1.5" htmlFor={ESTADO_FILTER_ID}>
-        <span className={labelClass}>Estado</span>
+      <AdminFilterField label="Estado">
         <select
           id={ESTADO_FILTER_ID}
           name="estado"
-          className={inputClass}
+          className={adminFilterControlClassName}
           value={estado}
           onChange={(event) => onEstadoChange(event.target.value)}
         >
@@ -107,14 +113,13 @@ const AveriasAdminFilters = ({
             </option>
           ))}
         </select>
-      </label>
+      </AdminFilterField>
 
-      <label className="grid min-w-0 gap-1.5" htmlFor={PRIORIDAD_FILTER_ID}>
-        <span className={labelClass}>Prioridad</span>
+      <AdminFilterField label="Prioridad">
         <select
           id={PRIORIDAD_FILTER_ID}
           name="prioridad"
-          className={inputClass}
+          className={adminFilterControlClassName}
           value={prioridad}
           onChange={(event) => onPrioridadChange(event.target.value)}
         >
@@ -126,41 +131,39 @@ const AveriasAdminFilters = ({
           ))}
           <option value={PRIORIDAD_FILTER_UNASSIGNED}>Sin asignar</option>
         </select>
-      </label>
+      </AdminFilterField>
 
-      <label className="grid min-w-0 gap-1.5" htmlFor={FECHA_DESDE_ID}>
-        <span className={labelClass}>Desde</span>
+      <AdminFilterField label="Desde">
         <input
           id={FECHA_DESDE_ID}
           name="fechaDesde"
           type="date"
-          className={inputClass}
+          className={adminFilterControlClassName}
           max={fechaHasta || undefined}
           value={fechaDesde}
           onChange={(event) => onFechaDesdeChange(event.target.value)}
         />
-      </label>
+      </AdminFilterField>
 
-      <label className="grid min-w-0 gap-1.5" htmlFor={FECHA_HASTA_ID}>
-        <span className={labelClass}>Hasta</span>
+      <AdminFilterField label="Hasta">
         <input
           id={FECHA_HASTA_ID}
           name="fechaHasta"
           type="date"
-          className={inputClass}
+          className={adminFilterControlClassName}
           min={fechaDesde || undefined}
           value={fechaHasta}
           onChange={(event) => onFechaHastaChange(event.target.value)}
         />
-      </label>
+      </AdminFilterField>
     </div>
 
     {fechaDesde && fechaHasta && fechaDesde > fechaHasta ? (
-      <p className="m-0 text-sm font-semibold text-red-700" role="alert">
+      <p className="col-span-full m-0 text-sm font-semibold text-red-700" role="alert">
         La fecha «Desde» no puede ser posterior a «Hasta».
       </p>
     ) : null}
-  </section>
+  </AdminFilters>
 )
 
 export default AveriasAdminFilters

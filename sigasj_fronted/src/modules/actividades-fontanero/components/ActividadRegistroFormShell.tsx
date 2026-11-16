@@ -24,6 +24,7 @@ import {
 } from '../utils/actividadRegistroSubmitError'
 import { focusFirstActividadRegistroError } from '../utils/focusFirstActividadRegistroError'
 import { registrarActividad } from '../services/actividadesFontaneroApi'
+import { Button } from '../../../shared/ui'
 import ActivityFeedback from './ActivityFeedback'
 import ActividadRegistroFieldError from './ActividadRegistroFieldError'
 import ActividadRegistroValidationSummary from './ActividadRegistroValidationSummary'
@@ -784,22 +785,20 @@ const ActividadRegistroFormShell = ({
                   {isSubmitting ? 'Guardando…' : 'Guardar borrador'}
                 </button>
               )}
-              <button
+              <Button
                 type="submit"
                 name="intent"
                 value="registrar"
-                className="actividad-registro-form__button actividad-registro-form__button--primary !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200 transition hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
+                variant="primary"
+                size="lg"
                 disabled={isSubmitting}
+                loading={isSubmitting}
                 aria-disabled={isSubmitting}
+                leftIcon={isSubmitting ? undefined : <IconCheck size={20} aria-hidden="true" />}
                 onClick={() => {
                   intentRef.current = 'registrar'
                 }}
               >
-                {isSubmitting ? null : isCorregirMode ? (
-                  <IconCheck size={20} aria-hidden="true" />
-                ) : (
-                  <IconCheck size={20} aria-hidden="true" />
-                )}
                 {isSubmitting
                   ? isCorregirMode
                     ? 'Reenviando…'
@@ -807,7 +806,7 @@ const ActividadRegistroFormShell = ({
                   : isCorregirMode
                     ? 'Reenviar actividad corregida'
                     : 'Registrar actividad'}
-              </button>
+              </Button>
             </div>
           </div>
         </form>

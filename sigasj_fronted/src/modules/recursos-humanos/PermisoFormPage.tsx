@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Button } from '../../shared/ui'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
 import { getColaboradoresOpciones } from './colaboradoresApi'
@@ -315,21 +316,26 @@ export default function PermisoFormPage() {
             </div>
 
             <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
-              <button
+              <Button
                 type="submit"
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#1e5a9c] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(30, 90, 156,0.3)] transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none"
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto"
                 disabled={saving}
+                loading={saving}
+                leftIcon={<IconDeviceFloppy size={20} aria-hidden="true" />}
               >
-                <IconDeviceFloppy size={20} aria-hidden="true" />
                 {saving ? 'Guardando permiso…' : 'Guardar permiso'}
-              </button>
-              <Link
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-6 py-3.5 font-extrabold text-blue-900 no-underline transition hover:-translate-y-1 hover:border-blue-400 hover:bg-[#eaf6ff] hover:no-underline sm:w-auto motion-reduce:transform-none"
+              </Button>
+              <Button
                 to={volverA}
+                variant="secondary"
+                size="lg"
+                className="w-full sm:w-auto"
+                leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
               >
-                <IconArrowLeft size={19} aria-hidden="true" />
                 Cancelar
-              </Link>
+              </Button>
             </div>
           </form>
         </>

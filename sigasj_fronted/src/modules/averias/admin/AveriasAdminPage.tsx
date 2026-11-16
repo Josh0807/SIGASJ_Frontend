@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useSearchParams } from 'react-router-dom'
-import { IconChartBar, IconChevronRight, IconHistory } from '@tabler/icons-react'
+import { Navigate, useSearchParams } from 'react-router-dom'
+import { IconChartBar, IconHistory, IconTool } from '@tabler/icons-react'
+import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -205,91 +206,87 @@ const AveriasAdminPage = ({
     !(isLoading && listItems.length === 0) && !errorMessage
 
   return (
-    <main className="gallery-admin admin-content-modern averias-admin min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div className="gallery-admin__header-copy min-w-0">
-            <div>
-              <nav aria-label="Ruta de navegación" className="mb-2">
-                <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-sm font-semibold text-slate-500">
-                  <li>Administración</li>
-                  <li aria-hidden="true" className="inline-flex items-center">
-                    <IconChevronRight size={16} />
-                  </li>
-                  <li aria-current="page" className="text-[#1e5a9c]">
-                    Averías
-                  </li>
-                </ol>
-              </nav>
-              <p className="gallery-admin__eyebrow">Operación</p>
-              <h1>Gestión de averías</h1>
-              <p>Revise reportes, asigne fontaneros y dé seguimiento hasta la resolución.</p>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link
+    <AdminShell
+      className="averias-admin min-w-0"
+      aria-labelledby="averias-admin-title"
+    >
+      <PageHeader
+        id="averias-admin-title"
+        eyebrow="Operación"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconTool size={22} aria-hidden="true" />
+            Gestión de averías
+          </span>
+        }
+        description="Revise reportes, asigne fontaneros y dé seguimiento hasta la resolución."
+        actions={
+          <>
+            <Button
               to={AVERIAS_ADMIN_HISTORIAL_PATH}
-              className="gallery-admin__button"
+              variant="secondary"
+              leftIcon={<IconHistory size={18} aria-hidden="true" />}
             >
-              <IconHistory size={18} aria-hidden="true" />
               Historial
-            </Link>
-            <Link
+            </Button>
+            <Button
               to={AVERIAS_ADMIN_REPORTE_PATH}
-              className="gallery-admin__button gallery-admin__button--primary"
+              variant="primary"
+              leftIcon={<IconChartBar size={18} aria-hidden="true" />}
             >
-              <IconChartBar size={18} aria-hidden="true" />
               Resumen
-            </Link>
-          </div>
-        </header>
+            </Button>
+          </>
+        }
+      />
 
-        <AveriasAdminFilters
-          search={searchInput}
-          estado={estado}
-          prioridad={prioridad}
-          fechaDesde={fechaDesde}
-          fechaHasta={fechaHasta}
-          onSearchChange={setSearchInput}
-          onEstadoChange={(value) => patchFilters({ estado: value })}
-          onPrioridadChange={(value) => patchFilters({ prioridad: value })}
-          onFechaDesdeChange={(value) => patchFilters({ fechaDesde: value })}
-          onFechaHastaChange={(value) => patchFilters({ fechaHasta: value })}
-          onClear={clearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
+      <AveriasAdminFilters
+        search={searchInput}
+        estado={estado}
+        prioridad={prioridad}
+        fechaDesde={fechaDesde}
+        fechaHasta={fechaHasta}
+        total={listTotal}
+        loading={isLoading}
+        onSearchChange={setSearchInput}
+        onEstadoChange={(value) => patchFilters({ estado: value })}
+        onPrioridadChange={(value) => patchFilters({ prioridad: value })}
+        onFechaDesdeChange={(value) => patchFilters({ fechaDesde: value })}
+        onFechaHastaChange={(value) => patchFilters({ fechaHasta: value })}
+        onClear={clearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
 
-        <section aria-label="Listado de averías" className="min-w-0">
-          <AveriasAdminQueryStates
-            loading={isLoading}
-            error={errorMessage}
-            hasResults={listItems.length > 0}
-            onRetry={onRetry ?? remote.refetch}
-          >
-            <AveriasAdminTable
-              items={listItems}
-              onViewDetail={onViewDetail}
-              footer={
-                showPagination ? (
-                  <AveriasAdminPagination
-                    page={page}
-                    totalPages={listTotalPages}
-                    total={listTotal}
-                    limit={limit}
-                    loading={isLoading}
-                    onPageChange={goToPage}
-                  />
-                ) : null
-              }
-            />
-          </AveriasAdminQueryStates>
-        </section>
+      <section aria-label="Listado de averías" className="min-w-0">
+        <AveriasAdminQueryStates
+          loading={isLoading}
+          error={errorMessage}
+          hasResults={listItems.length > 0}
+          onRetry={onRetry ?? remote.refetch}
+        >
+          <AveriasAdminTable
+            items={listItems}
+            onViewDetail={onViewDetail}
+            footer={
+              showPagination ? (
+                <AveriasAdminPagination
+                  page={page}
+                  totalPages={listTotalPages}
+                  total={listTotal}
+                  limit={limit}
+                  loading={isLoading}
+                  onPageChange={goToPage}
+                />
+              ) : null
+            }
+          />
+        </AveriasAdminQueryStates>
+      </section>
 
-        <p className="sr-only">
-          Límite de página preparado: {limit} registros.
-        </p>
-      </div>
-    </main>
+      <p className="sr-only">
+        Límite de página preparado: {limit} registros.
+      </p>
+    </AdminShell>
   )
 }
 

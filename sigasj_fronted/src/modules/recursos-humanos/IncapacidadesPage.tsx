@@ -13,12 +13,19 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
-import { Alert } from '../../shared/ui/Alert'
-import { Badge } from '../../shared/ui/Badge'
-import { Button } from '../../shared/ui/Button'
-import { Card } from '../../shared/ui/Card'
-import { EmptyState } from '../../shared/ui/EmptyState'
-import { PageHeader } from '../../shared/ui/PageHeader'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import { getColaboradoresOpciones } from './colaboradoresApi'
 import {
@@ -54,11 +61,6 @@ const leerFiltros = (params: URLSearchParams): IncapacidadesFiltros => {
     page: Number.isInteger(page) && page > 0 ? page : 1,
   }
 }
-
-const labelClass =
-  'text-[0.72rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted'
-const fieldClass =
-  'min-h-11 w-full rounded-xl border border-sigasj-border bg-white px-3.5 text-[0.95rem] font-semibold text-sigasj-ink outline-none transition focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
 
 export default function IncapacidadesPage() {
   const navigate = useNavigate()
@@ -192,16 +194,23 @@ export default function IncapacidadesPage() {
   const hasta = Math.min(page * INCAPACIDADES_PAGE_SIZE, total)
 
   return (
-    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="incapacidades-rrhh-title">
       <RrhhSubnav />
 
       <PageHeader
+        id="incapacidades-rrhh-title"
         eyebrow="Administración · Incapacidades"
-        title="Incapacidades del personal"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconFirstAidKit size={22} aria-hidden="true" />
+            Incapacidades del personal
+          </span>
+        }
         description="Registre y consulte los periodos de incapacidad administrativa de los colaboradores."
         actions={
           <Button
             to={INCAPACIDAD_NEW_PATH}
+            variant="primary"
             size="sm"
             leftIcon={<IconCalendarPlus size={16} aria-hidden="true" />}
           >
@@ -216,100 +225,88 @@ export default function IncapacidadesPage() {
         </Alert>
       ) : null}
 
-      <Card
-        as="section"
-        padded
-        className="!p-3.5"
+      <AdminFilters
         aria-label="Filtros de incapacidades"
+        summary={
+          <>
+            <strong className="text-sigasj-ink">{cargando ? '…' : total}</strong>
+            <span>
+              {total === 1 ? 'incapacidad' : 'incapacidades'}
+            </span>
+          </>
+        }
       >
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="grid min-w-0 flex-1 gap-1.5 sm:min-w-[14rem] sm:max-w-[18rem]">
-            <span className={labelClass}>Colaborador</span>
-            <select
-              className={fieldClass}
-              value={colaboradorId}
-              aria-label="Filtrar por colaborador"
-              onChange={(event) =>
-                actualizarFiltros({ colaboradorId: event.target.value })
-              }
-            >
-              <option value="">Todos los colaboradores</option>
-              {colaboradores.map((colaborador) => (
-                <option key={colaborador.id} value={String(colaborador.id)}>
-                  {nombreCompleto(colaborador)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[11rem]">
-            <span className={labelClass}>Desde</span>
-            <input
-              type="date"
-              className={fieldClass}
-              value={fechaInicio}
-              aria-label="Filtrar desde"
-              onChange={(event) =>
-                actualizarFiltros({ fechaInicio: event.target.value })
-              }
-            />
-          </label>
-          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[11rem]">
-            <span className={labelClass}>Hasta</span>
-            <input
-              type="date"
-              className={fieldClass}
-              value={fechaFin}
-              aria-label="Filtrar hasta"
-              onChange={(event) =>
-                actualizarFiltros({ fechaFin: event.target.value })
-              }
-            />
-          </label>
-          {hayFiltros ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
-              onClick={limpiarFiltros}
-            >
-              Limpiar filtros
-            </Button>
-          ) : null}
-        </div>
-      </Card>
+        <AdminFilterField label="Colaborador">
+          <select
+            className={adminFilterControlClassName}
+            value={colaboradorId}
+            aria-label="Filtrar por colaborador"
+            onChange={(event) =>
+              actualizarFiltros({ colaboradorId: event.target.value })
+            }
+          >
+            <option value="">Todos los colaboradores</option>
+            {colaboradores.map((colaborador) => (
+              <option key={colaborador.id} value={String(colaborador.id)}>
+                {nombreCompleto(colaborador)}
+              </option>
+            ))}
+          </select>
+        </AdminFilterField>
+        <AdminFilterField label="Desde">
+          <input
+            type="date"
+            className={adminFilterControlClassName}
+            value={fechaInicio}
+            aria-label="Filtrar desde"
+            onChange={(event) =>
+              actualizarFiltros({ fechaInicio: event.target.value })
+            }
+          />
+        </AdminFilterField>
+        <AdminFilterField label="Hasta">
+          <input
+            type="date"
+            className={adminFilterControlClassName}
+            value={fechaFin}
+            aria-label="Filtrar hasta"
+            onChange={(event) =>
+              actualizarFiltros({ fechaFin: event.target.value })
+            }
+          />
+        </AdminFilterField>
+        {hayFiltros ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+            onClick={limpiarFiltros}
+          >
+            Limpiar filtros
+          </Button>
+        ) : null}
+      </AdminFilters>
 
       {cargando && !listado ? (
-        <Card padded className="!p-5" role="status" aria-busy="true">
-          <span className="sr-only">Cargando incapacidades…</span>
-          <div className="grid gap-3">
-            {[0, 1, 2].map((fila) => (
-              <div
-                key={fila}
-                className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-            ))}
-          </div>
-        </Card>
+        <Alert tone="info">{ADMIN_COPY.loading('incapacidades')}</Alert>
       ) : error ? (
-        <Alert tone="danger">
-          <div className="grid gap-3">
-            <p className="m-0 font-semibold">{error}</p>
-            {resultado.reintentable ? (
+        <EmptyState
+          title={error}
+          actions={
+            resultado.reintentable ? (
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="justify-self-start"
                 leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                Reintentar
+                {ADMIN_COPY.retry}
               </Button>
-            ) : null}
-          </div>
-        </Alert>
+            ) : undefined
+          }
+        />
       ) : incapacidades.length === 0 ? (
         <EmptyState
           icon={<IconCalendarOff size={28} aria-hidden="true" />}
@@ -564,6 +561,6 @@ export default function IncapacidadesPage() {
           </nav>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { Navigate, useLocation, useParams } from 'react-router-dom'
 import { IconArrowLeft } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import { AdminShell, Alert, Button, EmptyState, PageHeader } from '../../../shared/ui'
 import { useAuthUser } from '../../auth/hooks/useAuthUser'
 import { useAdminAveria } from '../hooks/useAdminAveria'
 import AveriaStatusBadge from './AveriaStatusBadge'
@@ -74,89 +76,73 @@ const AveriasAdminDetailPage = ({
 
   if (loading) {
     return (
-      <main className="gallery-admin averias-admin">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div role="status" aria-live="polite" aria-busy="true">
-            <p>{AVERIAS_ADMIN_DETAIL_LOADING_MESSAGE}</p>
-            <div className="gallery-admin__skeleton" aria-hidden="true">
-              <div className="gallery-admin__skeleton-row">
-                <span className="indicator-card__skeleton" />
-                <span className="indicator-card__skeleton indicator-card__skeleton--badge" />
-              </div>
-              <div className="gallery-admin__skeleton-row">
-                <span className="indicator-card__skeleton" />
-                <span className="indicator-card__skeleton" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+      <AdminShell className="averias-admin">
+        <Alert tone="info">{AVERIAS_ADMIN_DETAIL_LOADING_MESSAGE}</Alert>
+      </AdminShell>
     )
   }
 
   if (error) {
     return (
-      <main className="gallery-admin averias-admin">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div className="gallery-admin__empty" role="alert">
-            <p>{AVERIAS_ADMIN_DETAIL_ERROR}</p>
-            <Link className="gallery-admin__button" to={listPath}>
+      <AdminShell className="averias-admin">
+        <EmptyState
+          title={AVERIAS_ADMIN_DETAIL_ERROR}
+          actions={
+            <Button to={listPath} variant="secondary">
               {backEmptyLabel}
-            </Link>
-          </div>
-        </div>
-      </main>
+            </Button>
+          }
+        />
+      </AdminShell>
     )
   }
 
   if (notFound || averia == null) {
     return (
-      <main className="gallery-admin averias-admin">
-        <div className="gallery-admin__shell sigasj-stack">
-          <div className="gallery-admin__empty" role="status">
-            <h1>{AVERIAS_ADMIN_DETAIL_NOT_FOUND}</h1>
-            <Link className="gallery-admin__button" to={listPath}>
+      <AdminShell className="averias-admin">
+        <EmptyState
+          title={AVERIAS_ADMIN_DETAIL_NOT_FOUND}
+          actions={
+            <Button to={listPath} variant="secondary">
               {backEmptyLabel}
-            </Link>
-          </div>
-        </div>
-      </main>
+            </Button>
+          }
+        />
+      </AdminShell>
     )
   }
 
   return (
-    <main className="gallery-admin admin-content-modern averias-admin min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header gallery-admin__header--editor">
-          <div>
-            <p className="gallery-admin__eyebrow">Gestión de averías</p>
-            <h1>Detalle de avería</h1>
-            <div className="averias-admin__header-meta">
-              <span className="averias-admin__codigo">
-                {averia.codigoSeguimiento}
-              </span>
-              <AveriaStatusBadge estado={averia.estado} />
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link
-              className="gallery-admin__button gallery-admin__back-btn inline-flex min-h-11 items-center gap-2 rounded-2xl"
-              to={listPath}
-            >
-              <IconArrowLeft size={18} aria-hidden="true" />
-              {backLabel}
-            </Link>
-          </div>
-        </header>
-        <AveriasAdminDetailView
-          averia={averia}
-          canAssignFontanero={canAssignFontanero}
-          onAveriaUpdated={setMutatedAveria}
-          onUnauthorized={() => setForceLogin(true)}
-          onForbidden={() => setForceForbidden(true)}
-        />
-      </div>
-    </main>
+    <AdminShell className="averias-admin min-w-0">
+      <PageHeader
+        eyebrow="Gestión de averías"
+        title="Detalle de avería"
+        description={
+          <span className="averias-admin__header-meta inline-flex flex-wrap items-center gap-2">
+            <span className="averias-admin__codigo font-semibold text-sigasj-ink">
+              {averia.codigoSeguimiento}
+            </span>
+            <AveriaStatusBadge estado={averia.estado} />
+          </span>
+        }
+        actions={
+          <Button
+            to={listPath}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            {backLabel || ADMIN_COPY.backToList}
+          </Button>
+        }
+      />
+      <AveriasAdminDetailView
+        averia={averia}
+        canAssignFontanero={canAssignFontanero}
+        onAveriaUpdated={setMutatedAveria}
+        onUnauthorized={() => setForceLogin(true)}
+        onForbidden={() => setForceForbidden(true)}
+      />
+    </AdminShell>
   )
 }
 

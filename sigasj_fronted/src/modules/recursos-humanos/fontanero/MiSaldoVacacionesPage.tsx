@@ -2,10 +2,14 @@ import { IconRefresh } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
-import { Alert } from '../../../shared/ui/Alert'
-import { Button } from '../../../shared/ui/Button'
-import { Card } from '../../../shared/ui/Card'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  PageHeader,
+} from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useAuth } from '../../auth/components/AuthContext'
 import { FONTANERO_SOLICITAR_VACACIONES_PATH } from '../../solicitudes-ausencia/solicitudesAusenciaPaths'
@@ -66,8 +70,10 @@ export default function MiSaldoVacacionesPage() {
   }, [recarga, salirPorSesion])
 
   return (
-    <div className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="mi-saldo-vacaciones-title">
       <PageHeader
+        id="mi-saldo-vacaciones-title"
+        eyebrow="Fontanero · Vacaciones"
         title={FONTANERO_MI_SALDO_TITLE}
         description={
           <>
@@ -112,7 +118,7 @@ export default function MiSaldoVacacionesPage() {
                 leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                 onClick={() => setRecarga((n) => n + 1)}
               >
-                Reintentar
+                {ADMIN_COPY.retry}
               </Button>
             ) : null}
           </div>
@@ -125,6 +131,6 @@ export default function MiSaldoVacacionesPage() {
           />
         ) : null}
       </Card>
-    </div>
+    </AdminShell>
   )
 }

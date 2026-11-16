@@ -9,10 +9,20 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
-import { Button } from '../../shared/ui/Button'
-import { PageHeader } from '../../shared/ui/PageHeader'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import CambiarEstadoColaborador from './CambiarEstadoColaborador'
 import { COLABORADORES_PAGE_SIZE, getColaboradores } from './colaboradoresApi'
@@ -44,12 +54,6 @@ const leerFiltros = (params: URLSearchParams): ColaboradoresFiltros => {
     page: Number.isInteger(page) && page > 0 ? page : 1,
   }
 }
-
-const inputClass =
-  'h-10 min-h-10 w-full rounded-[10px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3 text-sm text-[color:var(--asada-ink,#123f70)] outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[color:var(--asada-muted,#5b7390)] hover:border-[color:var(--asada-navy,#1e5a9c)] focus:border-[color:var(--asada-navy,#1e5a9c)] focus:ring-[3px] focus:ring-[color:color-mix(in_srgb,var(--asada-navy,#1e5a9c)_16%,transparent)]'
-
-const labelClass =
-  'text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[color:var(--asada-muted,#5b7390)]'
 
 export default function ColaboradoresPage() {
   const navigate = useNavigate()
@@ -171,15 +175,23 @@ export default function ColaboradoresPage() {
   const hasta = Math.min(page * COLABORADORES_PAGE_SIZE, total)
 
   return (
-    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="colaboradores-rrhh-title">
       <RrhhSubnav />
 
       <PageHeader
-        title="Colaboradores"
+        id="colaboradores-rrhh-title"
+        eyebrow="Administración · Recursos humanos"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconUsers size={22} aria-hidden="true" />
+            Colaboradores
+          </span>
+        }
         description="Consulte y administre el personal de la ASADA."
         actions={
           <Button
             to={COLABORADOR_NEW_PATH}
+            variant="primary"
             size="sm"
             leftIcon={<IconUserPlus size={16} aria-hidden="true" />}
           >
@@ -189,47 +201,43 @@ export default function ColaboradoresPage() {
       />
 
       {aviso ? (
-        <div
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
-          role="status"
-        >
+        <Alert tone="success" role="status">
           {aviso}
-        </div>
+        </Alert>
       ) : null}
-      {accionError ? (
-        <div
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
-          role="alert"
-        >
-          {accionError}
-        </div>
-      ) : null}
+      {accionError ? <Alert tone="danger">{accionError}</Alert> : null}
 
-      <section
-        className="grid gap-2.5 rounded-[14px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3.5 py-3 shadow-[0_4px_14px_rgba(30,90,156,0.05)] md:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-end"
+      <AdminFilters
         aria-label="Búsqueda y filtros"
+        className="!grid-cols-1 sm:!grid-cols-[minmax(0,1fr)_auto]"
+        summary={
+          <>
+            <strong className="text-sigasj-ink">{cargando ? '…' : total}</strong>
+            <span>
+              {total === 1 ? 'colaborador' : 'colaboradores'}
+            </span>
+          </>
+        }
       >
-        <label className="grid min-w-0 gap-1 md:col-span-2 xl:col-span-1">
-          <span className={labelClass}>Buscar</span>
+        <AdminFilterField label="Buscar">
           <span className="relative block">
             <IconSearch
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--asada-muted,#5b7390)]"
-              size={16}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+              size={17}
               aria-hidden="true"
             />
             <input
               type="search"
-              className={`${inputClass} pl-9`}
+              className={`${adminFilterControlClassName} pl-9`}
               placeholder="Nombre, apellidos o cédula"
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
             />
           </span>
-        </label>
-        <label className="grid min-w-0 gap-1">
-          <span className={labelClass}>Cargo</span>
+        </AdminFilterField>
+        <AdminFilterField label="Cargo">
           <input
-            className={inputClass}
+            className={adminFilterControlClassName}
             list="rrhh-cargos-filtro"
             placeholder="Todos los cargos"
             value={cargo}
@@ -240,76 +248,97 @@ export default function ColaboradoresPage() {
               <option key={opcion} value={opcion} />
             ))}
           </datalist>
-        </label>
-        <label className="grid min-w-0 gap-1">
-          <span className={labelClass}>Estado</span>
+        </AdminFilterField>
+        <AdminFilterField label="Estado">
           <select
-            className={inputClass}
+            className={adminFilterControlClassName}
             value={estado}
-            onChange={(event) => actualizarFiltros({ estado: event.target.value as EstadoFiltro })}
+            onChange={(event) =>
+              actualizarFiltros({ estado: event.target.value as EstadoFiltro })
+            }
           >
             <option value="todos">Todos</option>
             <option value="activos">Activos</option>
             <option value="inactivos">Inactivos</option>
           </select>
-        </label>
-        <button
+        </AdminFilterField>
+        <Button
           type="button"
-          className="rrhh-touch-target inline-flex h-10 min-h-10 items-center justify-center gap-2 rounded-[10px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] px-3 text-sm font-bold text-[color:var(--asada-muted,#5b7390)] transition-[border-color,color,background-color] duration-200 enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] enabled:hover:text-[color:var(--asada-navy,#1e5a9c)] disabled:cursor-not-allowed disabled:opacity-45 md:col-span-2 xl:col-span-1"
+          variant="secondary"
+          size="sm"
+          leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
           onClick={limpiarFiltros}
           disabled={!hayFiltros && !busqueda && !cargo}
         >
-          <IconFilterOff size={16} aria-hidden="true" />
           Limpiar
-        </button>
-      </section>
+        </Button>
+      </AdminFilters>
 
-      <section
-        className="min-w-0 overflow-hidden rounded-2xl border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] shadow-[0_12px_28px_rgba(18,63,112,0.07)]"
+      <Card
+        as="section"
+        className={`min-w-0 overflow-hidden !p-0 ${cargando && listado ? 'opacity-60' : ''}`}
         aria-busy={cargando}
         aria-label="Listado de colaboradores"
       >
         {cargando && !listado ? (
-          <div className="grid gap-2.5 p-5" role="status">
-            <span className="sr-only">Cargando colaboradores…</span>
-            {[0, 1, 2].map((fila) => (
-              <div
-                key={fila}
-                className="h-12 animate-pulse rounded-xl bg-[color:var(--asada-ice,#eaf6ff)] motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-            ))}
-          </div>
+          <Alert tone="info" className="m-0 rounded-none border-0">
+            {ADMIN_COPY.loading('colaboradores')}
+          </Alert>
         ) : error ? (
-          <div className="grid place-items-center gap-3 p-8 text-center" role="alert">
-            <p className="m-0 font-semibold text-red-700">{error}</p>
-            {resultado.reintentable ? (
-              <button
-                type="button"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[color:var(--asada-line,#d7e5f1)] bg-white px-4 text-sm font-bold text-[color:var(--asada-navy,#1e5a9c)] transition hover:bg-[color:var(--asada-ice,#eaf6ff)]"
-                onClick={() => setRecarga((n) => n + 1)}
-              >
-                <IconRefresh size={17} aria-hidden="true" />
-                Reintentar
-              </button>
-            ) : null}
-          </div>
+          <EmptyState
+            title={error}
+            actions={
+              resultado.reintentable ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+                  onClick={() => setRecarga((n) => n + 1)}
+                >
+                  {ADMIN_COPY.retry}
+                </Button>
+              ) : undefined
+            }
+          />
         ) : colaboradores.length === 0 ? (
-          <div className="grid place-items-center gap-2.5 p-8 text-center">
-            <span className="grid size-12 place-items-center rounded-2xl bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)]">
-              <IconUsers size={24} aria-hidden="true" />
-            </span>
-            <h2 className="m-0 text-base font-extrabold text-[color:var(--asada-ink,#123f70)]">
-              {hayFiltros ? 'Sin resultados' : 'Aún no hay colaboradores'}
-            </h2>
-            <p className="m-0 max-w-md text-sm text-[color:var(--asada-muted,#5b7390)]">
-              {hayFiltros
-                ? 'Ningún colaborador coincide con la búsqueda o los filtros aplicados.'
-                : 'Use “Registrar colaborador” para agregar al personal de la ASADA.'}
-            </p>
-          </div>
+          <EmptyState
+            icon={<IconUsers size={32} aria-hidden="true" />}
+            title={
+              hayFiltros
+                ? ADMIN_COPY.emptyFiltered('colaboradores')
+                : ADMIN_COPY.empty('colaboradores registrados')
+            }
+            description={
+              hayFiltros
+                ? undefined
+                : 'Use «Registrar colaborador» para agregar al personal de la ASADA.'
+            }
+            actions={
+              hayFiltros ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+                  onClick={limpiarFiltros}
+                >
+                  Limpiar filtros
+                </Button>
+              ) : (
+                <Button
+                  to={COLABORADOR_NEW_PATH}
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<IconUserPlus size={16} aria-hidden="true" />}
+                >
+                  Registrar colaborador
+                </Button>
+              )
+            }
+          />
         ) : (
-          <table className={`w-full border-collapse text-left transition-opacity ${cargando ? 'opacity-60' : ''}`}>
+          <table className="w-full border-collapse text-left">
             <thead className="hidden border-b border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-ice,#eaf6ff)] text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[color:var(--asada-muted,#5b7390)] xl:table-header-group">
               <tr>
                 <th scope="col" className="px-5 py-3">Cédula</th>
@@ -364,14 +393,15 @@ export default function ColaboradoresPage() {
                     </td>
                     <td className="pt-1 xl:table-cell xl:px-5 xl:py-3.5">
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-                        <Link
+                        <Button
                           to={colaboradorDetailPath(colaborador.id)}
-                          className="rrhh-touch-target inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3 py-1.5 text-sm font-bold text-[color:var(--asada-navy,#1e5a9c)] no-underline transition-[background-color,border-color] duration-150 hover:border-[color:var(--asada-navy,#1e5a9c)] hover:bg-[color:var(--asada-ice,#eaf6ff)] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--asada-navy,#1e5a9c)]"
+                          variant="secondary"
+                          size="sm"
+                          leftIcon={<IconEye size={16} aria-hidden="true" />}
                           aria-label={`Ver a ${nombre}`}
                         >
-                          <IconEye size={16} aria-hidden="true" />
                           Ver
-                        </Link>
+                        </Button>
                         <CambiarEstadoColaborador
                           colaborador={colaborador}
                           compacto
@@ -400,31 +430,33 @@ export default function ColaboradoresPage() {
               Mostrando {desde}–{hasta} de {total} colaborador{total === 1 ? '' : 'es'}
             </p>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
-                className="rrhh-touch-target inline-flex min-h-9 items-center gap-1 rounded-lg border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3 font-bold text-[color:var(--asada-ink,#123f70)] transition enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] disabled:cursor-not-allowed disabled:opacity-45"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
-                <IconChevronLeft size={16} aria-hidden="true" />
                 Anterior
-              </button>
+              </Button>
               <span className="px-1.5 font-semibold">
                 {page} / {Math.max(totalPages, 1)}
               </span>
-              <button
+              <Button
                 type="button"
-                className="rrhh-touch-target inline-flex min-h-9 items-center gap-1 rounded-lg border border-[color:var(--asada-line,#d7e5f1)] bg-white px-3 font-bold text-[color:var(--asada-ink,#123f70)] transition enabled:hover:border-[color:var(--asada-navy,#1e5a9c)] enabled:hover:bg-[color:var(--asada-ice,#eaf6ff)] disabled:cursor-not-allowed disabled:opacity-45"
+                variant="secondary"
+                size="sm"
+                rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >
                 Siguiente
-                <IconChevronRight size={16} aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           </nav>
         ) : null}
-      </section>
-    </main>
+      </Card>
+    </AdminShell>
   )
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import AdminListQueryStates from '../../../shared/components/AdminListQueryStates'
 
 type ProyectosAdminQueryStatesProps = {
@@ -22,11 +23,11 @@ const ProyectosAdminQueryStates = ({
     loading={loading}
     error={error}
     hasResults={hasResults}
-    loadingMessage="Cargando proyectos…"
+    loadingMessage={ADMIN_COPY.loading('proyectos')}
     emptyMessage={
       hasActiveFilters
-        ? 'No se encontraron proyectos con los filtros seleccionados.'
-        : 'No hay proyectos registrados.'
+        ? ADMIN_COPY.emptyFiltered('proyectos')
+        : ADMIN_COPY.empty('proyectos registrados')
     }
     keepPreviousResultsWhileLoading={false}
     onRetry={onRetry}

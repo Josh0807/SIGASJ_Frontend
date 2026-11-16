@@ -1,15 +1,25 @@
 import type { FormEvent } from 'react'
 import { useMemo, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { IconArrowLeft, IconRefresh } from '@tabler/icons-react'
+import { Navigate } from 'react-router-dom'
+import { IconActivity, IconFilterOff, IconRefresh } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
 import AdminNavIcon from '../../admin-panel/components/AdminNavIcon'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
 import QuickAccessCard from '../../../shared/components/QuickAccessCard'
-import ActivityFeedback from './ActivityFeedback'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import {
   useActividadesResumen,
   type ActividadesResumenScope,
@@ -30,8 +40,7 @@ type DateDraft = {
 
 const EMPTY_DRAFT: DateDraft = { fechaInicio: '', fechaFin: '' }
 
-const MODERN_INDICATOR_CLASS =
-  'activities-indicator-modern group !min-h-[270px] !overflow-hidden !rounded-[24px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/60 !p-6 !shadow-[0_12px_30px_rgba(30, 90, 156,0.09)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-[#bfe3fa] hover:!shadow-[0_18px_38px_rgba(30, 90, 156,0.16)]'
+const MODERN_INDICATOR_CLASS = 'activities-indicator-modern group min-h-[220px]'
 
 const toAppliedFilters = (draft: DateDraft): ResumenActividadesFilters => ({
   fechaInicio: draft.fechaInicio.trim() || undefined,
@@ -114,44 +123,45 @@ const ActividadesResumenDashboard = ({
   )
 
   return (
-    <main
-      className="gallery-admin actividades-resumen-dashboard !grid !w-full !gap-6"
+    <AdminShell
+      className="actividades-resumen-dashboard gap-5 sm:gap-6"
       aria-labelledby="actividades-resumen-title"
     >
-      <header className="actividades-fontanero-home__welcome !m-0 !flex !min-h-[220px] !w-full !items-center !justify-between !gap-8 !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] max-[760px]:!min-h-0 max-[760px]:!flex-col max-[760px]:!items-stretch">
-        <div className="actividades-fontanero-home__welcome-content !grid !min-w-0 !gap-3">
-          <span className="actividades-fontanero-home__eyebrow !m-0 !text-sm !font-extrabold !uppercase !tracking-[0.12em] !text-[#1e5a9c]">{eyebrow}</span>
-          <h1 className="!m-0 !text-[clamp(2.25rem,4vw,3rem)] !font-black !leading-[1.08] !tracking-[-0.035em] !text-[#1e5a9c]" id="actividades-resumen-title">{title}</h1>
-          <p className="actividades-fontanero-home__welcome-text !m-0 !max-w-3xl !text-lg !font-normal !leading-8 !text-slate-500">
-            {isFontanero
-              ? 'Resumen de sus actividades registradas y accesos rápidos al módulo.'
-              : 'Resumen general de actividades reportadas y accesos a revisión y reportes.'}
-          </p>
-        </div>
-        <Link
-          to={
-            isFontanero
-              ? ACTIVIDADES_FONTANERO_PATHS.home
-              : ACTIVIDADES_ADMIN_PATHS.revision
-          }
-          className="actividades-fontanero-home__back-link group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_8px_20px_rgba(30, 90, 156,0.13)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.22)] active:!translate-y-0 active:!scale-[0.97]"
-        >
-          <IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1" size={18} aria-hidden="true" />
-          {isFontanero ? 'Volver al inicio del módulo' : 'Ir a revisión'}
-        </Link>
-      </header>
+      <PageHeader
+        id="actividades-resumen-title"
+        eyebrow={eyebrow}
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconActivity size={22} aria-hidden="true" />
+            {title}
+          </span>
+        }
+        description={
+          isFontanero
+            ? 'Resumen de sus actividades registradas y accesos rápidos al módulo.'
+            : 'Resumen general de actividades reportadas y accesos a revisión y reportes.'
+        }
+        actions={
+          <Button
+            to={
+              isFontanero
+                ? ACTIVIDADES_FONTANERO_PATHS.home
+                : ACTIVIDADES_ADMIN_PATHS.revision
+            }
+            variant="secondary"
+          >
+            {isFontanero ? 'Volver al inicio del módulo' : 'Ir a revisión'}
+          </Button>
+        }
+      />
 
-      <section
-        className="actividades-resumen-dashboard__filters !m-0 !w-full !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)]"
-        aria-label="Filtros del resumen"
-      >
-        <form className="gallery-admin__filters !m-0 !grid !gap-5 !border-0 !bg-transparent !p-0 !shadow-none lg:!grid-cols-2" onSubmit={handleConsultar}>
-          <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor="resumen-fecha-inicio">
-            <span>Fecha inicial</span>
+      <form onSubmit={handleConsultar}>
+        <AdminFilters aria-label="Filtros del resumen">
+          <AdminFilterField label="Fecha inicial">
             <input
-              className="!box-border !min-h-14 !w-full !rounded-2xl !border !border-[#bfe3fa] !bg-slate-50/60 !px-4 !text-base !font-semibold !text-[#073b73] !shadow-sm !outline-none !transition-all hover:!border-blue-300 focus:!border-[#1e5a9c] focus:!bg-white focus:!ring-4 focus:!ring-blue-100"
               id="resumen-fecha-inicio"
               type="date"
+              className={adminFilterControlClassName}
               value={draft.fechaInicio}
               onChange={(event) =>
                 setDraft((current) => ({
@@ -160,14 +170,13 @@ const ActividadesResumenDashboard = ({
                 }))
               }
             />
-          </label>
+          </AdminFilterField>
 
-          <label className="gallery-admin__field !grid !min-w-0 !gap-2" htmlFor="resumen-fecha-fin">
-            <span>Fecha final</span>
+          <AdminFilterField label="Fecha final">
             <input
-              className="!box-border !min-h-14 !w-full !rounded-2xl !border !border-[#bfe3fa] !bg-slate-50/60 !px-4 !text-base !font-semibold !text-[#073b73] !shadow-sm !outline-none !transition-all hover:!border-blue-300 focus:!border-[#1e5a9c] focus:!bg-white focus:!ring-4 focus:!ring-blue-100"
               id="resumen-fecha-fin"
               type="date"
+              className={adminFilterControlClassName}
               value={draft.fechaFin}
               onChange={(event) =>
                 setDraft((current) => ({
@@ -176,19 +185,16 @@ const ActividadesResumenDashboard = ({
                 }))
               }
             />
-          </label>
+          </AdminFilterField>
 
-          <div className="actividades-admin-reportes__actions !col-span-full !flex !flex-wrap !gap-3 !border-t !border-blue-100 !pt-5">
-            <button
-              type="submit"
-              className="gallery-admin__button gallery-admin__button--primary !min-h-12 !rounded-2xl !border-0 !bg-linear-to-r !from-blue-600 !to-sky-500 !px-6 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(30, 90, 156,0.25)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_15px_30px_rgba(30, 90, 156,0.35)]"
-              disabled={loading}
-            >
+          <div className="col-span-full flex flex-wrap gap-2">
+            <Button type="submit" variant="primary" loading={loading}>
               {loading ? 'Consultando…' : 'Consultar'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="gallery-admin__button gallery-admin__filter-reset !min-h-12 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !font-extrabold !text-[#1e5a9c] !shadow-sm !transition-all hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-md"
+              variant="secondary"
+              leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
               onClick={handleLimpiar}
               disabled={
                 loading ||
@@ -199,45 +205,39 @@ const ActividadesResumenDashboard = ({
               }
             >
               Limpiar filtros
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="admin-dashboard__refresh-btn !min-h-12 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !font-extrabold !text-[#1e5a9c] !shadow-sm !transition-all hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-md"
+              variant="secondary"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
               onClick={() => refetch()}
               disabled={loading}
               aria-label="Actualizar resumen de actividades"
             >
-              <IconRefresh
-                className={`admin-dashboard__refresh-icon ${
-                  loading ? 'admin-dashboard__refresh-icon--loading' : ''
-                }`}
-                aria-hidden="true"
-                size={18}
-                stroke={2}
-              />
               Actualizar
-            </button>
+            </Button>
           </div>
-        </form>
-      </section>
+        </AdminFilters>
+      </form>
 
       {filterError ? (
-        <ActivityFeedback
-          variant="error"
-          message={filterError}
-          action={
-            <button
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{filterError}</p>
+            <Button
               type="button"
-              className="activity-feedback__retry"
+              variant="secondary"
+              size="sm"
+              className="justify-self-start"
               onClick={() => {
                 setClientError(null)
                 refetch()
               }}
             >
-              Reintentar
-            </button>
-          }
-        />
+              {ADMIN_COPY.retry}
+            </Button>
+          </div>
+        </Alert>
       ) : null}
 
       <section
@@ -345,11 +345,15 @@ const ActividadesResumenDashboard = ({
         </section>
       ) : null}
 
-      <section
-        className="actividades-resumen-dashboard__nav !m-0 !w-full !overflow-hidden !rounded-[28px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/55 !p-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)]"
+      <Card
+        as="section"
+        padded
+        className="actividades-resumen-dashboard__nav"
         aria-label="Accesos rápidos del módulo"
       >
-        <h2 className="!mb-6 !border-b !border-blue-100 !pb-4 !text-2xl !font-black !tracking-[-0.02em] !text-[#1e5a9c]">Accesos rápidos</h2>
+        <h2 className="m-0 mb-4 border-b border-sigasj-border pb-3 text-lg font-extrabold text-sigasj-ink">
+          Accesos rápidos
+        </h2>
         <div className="actividades-fontanero-home__actions" role="list">
           {isFontanero ? (
             <>
@@ -404,18 +408,14 @@ const ActividadesResumenDashboard = ({
             </>
           )}
         </div>
-      </section>
+      </Card>
 
       {!loading && !filterError && metricas.total === 0 ? (
-        <p
-          className="actividades-fontanero-home__corrections-status"
-          role="status"
-          data-testid="resumen-vacio"
-        >
+        <Alert tone="info" role="status" data-testid="resumen-vacio">
           No hay actividades registradas en el periodo consultado.
-        </p>
+        </Alert>
       ) : null}
-    </main>
+    </AdminShell>
   )
 }
 

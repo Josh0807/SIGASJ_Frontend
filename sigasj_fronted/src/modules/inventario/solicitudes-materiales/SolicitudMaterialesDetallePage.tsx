@@ -171,7 +171,7 @@ export default function SolicitudMaterialesDetallePage() {
 
             <div className="relative z-[1] flex flex-wrap items-start justify-between gap-5">
               <div className="grid min-w-0 max-w-[40rem] gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5">
-                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#38bdf8] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
                   <IconClipboardList size={30} stroke={2.2} aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
@@ -241,7 +241,7 @@ export default function SolicitudMaterialesDetallePage() {
 
           <div className="material-detail__materials !w-full !rounded-[1.5rem] !border !border-[#d7e8f7] !bg-white !p-5 !shadow-[0_12px_30px_rgba(30,90,156,0.08)] sm:!p-6">
             <div className="!mb-5 !flex !items-center !gap-3">
-              <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-2xl !bg-gradient-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_8px_18px_rgba(30,90,156,0.24)]">
+              <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-2xl !bg-[#1e5a9c] !text-white !shadow-[0_8px_18px_rgba(30,90,156,0.24)]">
                 <IconPackage size={22} aria-hidden="true" />
               </span>
               <div>
@@ -296,7 +296,7 @@ export default function SolicitudMaterialesDetallePage() {
 
           <div className="!flex !flex-col !gap-4 sm:!flex-row sm:!items-center sm:!justify-between">
             <aside className="material-detail__notice !flex !min-w-0 !flex-1 !flex-row !items-start !gap-3 !rounded-2xl !border !border-[#cfe4f7] !bg-gradient-to-r !from-[#f5faff] !to-[#eef7ff] !p-4 !shadow-sm sm:!items-center">
-              <span className="!grid !size-10 !shrink-0 !place-items-center !rounded-xl !bg-gradient-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-md">
+              <span className="!grid !size-10 !shrink-0 !place-items-center !rounded-xl !bg-[#1e5a9c] !text-white !shadow-md">
                 <IconInfoCircle size={20} aria-hidden="true" />
               </span>
               <span className="!grid !gap-0.5">

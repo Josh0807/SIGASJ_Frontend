@@ -10,8 +10,19 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import {
   asociadoConsultaError,
@@ -24,7 +35,6 @@ import { ASOCIADOS_PAGE_SIZE, getAsociados } from './asociadosApi'
 import { ASOCIADO_NEW_PATH, ASOCIADOS_HISTORIAL_PATH, ASOCIADOS_TITLE, asociadoDetailPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { Asociado, AsociadosFiltros, AsociadosListado, EstadoFiltro } from './types'
-import AsociadoFeedback from './AsociadoFeedback'
 import CambiarEstadoAsociado from './CambiarEstadoAsociado'
 
 const SEARCH_DEBOUNCE_MS = 350
@@ -39,9 +49,6 @@ const leerFiltros = (params: URLSearchParams): AsociadosFiltros => {
     page: Number.isInteger(page) && page > 0 ? page : 1,
   }
 }
-
-const inputClass =
-  'min-h-12 w-full rounded-xl border border-[#d7e5f1] bg-white px-4 text-[#1a2f42] outline-none transition placeholder:text-[#5b7390]/70 focus:border-[#1e5a9c] focus:ring-2 focus:ring-[#bfe3fa]'
 
 export default function AsociadosPage() {
   const navigate = useNavigate()
@@ -159,74 +166,92 @@ export default function AsociadosPage() {
   const hasta = Math.min(page * ASOCIADOS_PAGE_SIZE, total)
 
   return (
-    <main className="gallery-admin admin-content-modern grid w-full min-w-0 gap-5 sm:gap-6">
-      {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
-      {accionError ? <AsociadoFeedback variant="error">{accionError}</AsociadoFeedback> : null}
+    <AdminShell aria-labelledby="asociados-admin-title" className="gap-5 sm:gap-6">
+      {aviso ? <Alert tone="success">{aviso}</Alert> : null}
+      {accionError ? <Alert tone="danger">{accionError}</Alert> : null}
 
-      <header className="gallery-admin__header flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0">
-          <p className="gallery-admin__eyebrow mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-            Administración · Asociados
-          </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
+      <PageHeader
+        id="asociados-admin-title"
+        eyebrow="Administración · Asociados"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconUsers size={22} aria-hidden="true" />
             {ASOCIADOS_TITLE}
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-            Registre, consulte y busque la información de las personas asociadas.
-          </p>
-        </div>
-        <div className="gallery-admin__header-actions flex flex-col gap-3 sm:flex-row">
-          <Link to={ASOCIADOS_HISTORIAL_PATH} className="gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"><IconHistory size={20} aria-hidden="true" />Ver historial</Link>
-          <Link
-            to={ASOCIADO_NEW_PATH}
-            className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-6"
-          >
-            <IconUserPlus size={20} aria-hidden="true" />
-            Registrar asociado
-          </Link>
-        </div>
-      </header>
+          </span>
+        }
+        description="Registre, consulte y busque la información de las personas asociadas."
+        actions={
+          <>
+            <Button to="/admin/dashboard" variant="ghost">
+              {ADMIN_COPY.backHome}
+            </Button>
+            <Button
+              to={ASOCIADOS_HISTORIAL_PATH}
+              variant="secondary"
+              leftIcon={<IconHistory size={18} aria-hidden="true" />}
+            >
+              Ver historial
+            </Button>
+            <Button
+              to={ASOCIADO_NEW_PATH}
+              variant="primary"
+              leftIcon={<IconUserPlus size={18} aria-hidden="true" />}
+            >
+              Registrar asociado
+            </Button>
+          </>
+        }
+      />
 
-      <section
-        className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] md:items-end"
+      <AdminFilters
         aria-label="Búsqueda y filtros"
+        summary={
+          <>
+            <strong className="text-sigasj-ink">{cargando ? '…' : total}</strong>
+            <span>{total === 1 ? 'asociado' : 'asociados'}</span>
+          </>
+        }
       >
-        <label className="grid min-w-0 gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Buscar</span>
+        <AdminFilterField label="Buscar">
           <span className="relative block">
-            <IconSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={19} aria-hidden="true" />
+            <IconSearch
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+              size={17}
+              aria-hidden="true"
+            />
             <input
               type="search"
-              className={`${inputClass} pl-11`}
+              className={`${adminFilterControlClassName} pl-9`}
               placeholder="Nombre, apellidos o cédula"
               maxLength={100}
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
             />
           </span>
-        </label>
-        <label className="grid min-w-0 gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Estado</span>
+        </AdminFilterField>
+        <AdminFilterField label="Estado">
           <select
-            className={inputClass}
+            className={adminFilterControlClassName}
             value={estado}
-            onChange={(event) => actualizarFiltros({ estado: event.target.value as EstadoFiltro })}
+            onChange={(event) =>
+              actualizarFiltros({ estado: event.target.value as EstadoFiltro })
+            }
           >
             <option value="todos">Todos</option>
             <option value="activos">Activos</option>
             <option value="inactivos">Inactivos</option>
           </select>
-        </label>
-        <button
+        </AdminFilterField>
+        <Button
           type="button"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-50"
+          variant="secondary"
+          leftIcon={<IconFilterOff size={17} aria-hidden="true" />}
           onClick={limpiarFiltros}
           disabled={!hayFiltros && !busqueda}
         >
-          <IconFilterOff size={18} aria-hidden="true" />
           Limpiar filtros
-        </button>
-      </section>
+        </Button>
+      </AdminFilters>
 
       <section
         className="min-w-0 overflow-hidden rounded-2xl border border-[#d7e5f1] bg-white shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl"
@@ -234,40 +259,43 @@ export default function AsociadosPage() {
         aria-label="Listado de asociados"
       >
         {cargando && !listado ? (
-          <div className="grid gap-3 p-6" role="status">
-            <span className="sr-only">Cargando asociados…</span>
-            {[0, 1, 2].map((fila) => (
-              <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
-            ))}
-          </div>
+          <Alert tone="info">{ADMIN_COPY.loading('asociados')}</Alert>
         ) : error ? (
-          <div className="grid place-items-center gap-4 p-10 text-center" role="alert">
-            <p className="m-0 font-semibold text-red-700">{error}</p>
-            {resultado.reintentable ? (
-              <button
-                type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
-                onClick={() => setRecarga((n) => n + 1)}
-              >
-                <IconRefresh size={18} aria-hidden="true" />
-                Reintentar
-              </button>
-            ) : null}
-          </div>
+          <EmptyState
+            title={error}
+            actions={
+              resultado.reintentable ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  leftIcon={<IconRefresh size={17} aria-hidden="true" />}
+                  onClick={() => setRecarga((n) => n + 1)}
+                >
+                  {ADMIN_COPY.retry}
+                </Button>
+              ) : undefined
+            }
+          />
         ) : asociados.length === 0 ? (
-          <div className="grid place-items-center gap-3 p-10 text-center">
-            <span className="grid size-14 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
-              <IconUsers size={28} aria-hidden="true" />
-            </span>
-            <h2 className="m-0 text-lg font-extrabold text-[#073b73]">
-              {hayFiltros ? 'Sin resultados' : 'Aún no hay asociados'}
-            </h2>
-            <p className="m-0 max-w-md text-slate-500">
-              {hayFiltros
-                ? 'Ningún asociado coincide con la búsqueda o los filtros aplicados.'
-                : 'Use “Registrar asociado” para agregar una nueva persona al sistema.'}
-            </p>
-          </div>
+          <EmptyState
+            icon={<IconUsers size={32} aria-hidden="true" />}
+            title={
+              hayFiltros
+                ? ADMIN_COPY.emptyFiltered('asociados')
+                : ADMIN_COPY.empty('asociados registrados')
+            }
+            actions={
+              !hayFiltros ? (
+                <Button
+                  to={ASOCIADO_NEW_PATH}
+                  variant="primary"
+                  leftIcon={<IconUserPlus size={18} aria-hidden="true" />}
+                >
+                  Registrar asociado
+                </Button>
+              ) : undefined
+            }
+          />
         ) : (
           <table className={`w-full border-collapse text-left transition-opacity ${cargando ? 'opacity-60' : ''}`}>
             <thead className="hidden bg-slate-50 text-xs font-extrabold uppercase tracking-wider text-slate-500 xl:table-header-group">
@@ -305,15 +333,16 @@ export default function AsociadosPage() {
                     </td>
                     <td className="pt-2 xl:table-cell xl:px-6 xl:py-4">
                       <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-                        <Link
+                        <Button
                           to={asociadoDetailPath(asociado.id)}
                           state={{ from: `${location.pathname}${location.search}` }}
-                          className="group inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-gradient-to-br from-white to-[#eaf6ff] px-4 py-2 text-sm font-extrabold text-[#1e5a9c] no-underline shadow-[0_5px_14px_rgba(30, 90, 156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1e5a9c] hover:from-[#1e5a9c] hover:to-[#1e5a9c] hover:text-white hover:no-underline hover:shadow-[0_9px_20px_rgba(30, 90, 156,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
+                          variant="secondary"
+                          size="sm"
+                          leftIcon={<IconEye size={16} aria-hidden="true" />}
                           aria-label={`Ver a ${nombre}`}
                         >
-                          <IconEye className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none" size={17} aria-hidden="true" />
                           Ver
-                        </Link>
+                        </Button>
                         <CambiarEstadoAsociado
                           asociado={asociado}
                           compacto
@@ -342,31 +371,33 @@ export default function AsociadosPage() {
               Mostrando {desde}–{hasta} de {total} asociado{total === 1 ? '' : 's'}
             </p>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconChevronLeft size={17} aria-hidden="true" />}
                 onClick={() => actualizarFiltros({ page: page - 1 })}
                 disabled={page <= 1 || cargando}
               >
-                <IconChevronLeft size={17} aria-hidden="true" />
                 Anterior
-              </button>
+              </Button>
               <span className="px-2 font-semibold text-slate-600">
                 Página {page} de {Math.max(totalPages, 1)}
               </span>
-              <button
+              <Button
                 type="button"
-                className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+                variant="secondary"
+                size="sm"
+                rightIcon={<IconChevronRight size={17} aria-hidden="true" />}
                 onClick={() => actualizarFiltros({ page: page + 1 })}
                 disabled={page >= totalPages || cargando}
               >
                 Siguiente
-                <IconChevronRight size={17} aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           </nav>
         ) : null}
       </section>
-    </main>
+    </AdminShell>
   )
 }

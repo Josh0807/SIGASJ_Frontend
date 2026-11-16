@@ -1,14 +1,25 @@
 import {
-  IconArrowLeft,
   IconChevronLeft,
   IconChevronRight,
+  IconClipboardList,
   IconEye,
   IconFilterOff,
   IconRefresh,
   IconSearch,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 import SolicitudEstadoBadge from './SolicitudEstadoBadge'
 import {
@@ -76,9 +87,6 @@ const applicantName = (row: {
     .join(' ')
   return composed || 'No disponible'
 }
-
-const inputClass =
-  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 outline-none transition focus:border-[#1e5a9c] focus:ring-2 focus:ring-blue-200'
 
 export default function SolicitudesAdminListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -164,54 +172,55 @@ export default function SolicitudesAdminListPage() {
   const to = Math.min(page * (result?.limit ?? SOLICITUDES_ADMIN_PAGE_SIZE), total)
 
   return (
-    <main className="admin-content-modern grid min-w-0 gap-5 sm:gap-6">
-      <Link
-        className="group inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-[#bfe3fa] bg-white/80 px-4 font-extrabold text-[#075fae] no-underline shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:bg-white hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
-        to={SOLICITUDES_ADMIN_PATH}
-      >
-        <IconArrowLeft className="transition-transform group-hover:-translate-x-0.5 motion-reduce:transform-none" size={18} aria-hidden="true" />
-        Volver a Gestión de solicitudes
-      </Link>
-
-      <header className="flex flex-col gap-5 rounded-3xl border border-[#d7e5f1] bg-white p-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <p className="mb-3 mt-0 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-            Administración · Solicitudes
-          </p>
-          <h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">
+    <AdminShell
+      className="gap-5 sm:gap-6"
+      aria-labelledby="solicitudes-tramites-title"
+    >
+      <PageHeader
+        id="solicitudes-tramites-title"
+        eyebrow="Administración · Solicitudes"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconClipboardList size={22} aria-hidden="true" />
             Trámites digitales
-          </h1>
-          <p className="mb-0 mt-3 max-w-2xl text-base leading-7 text-slate-500">
-            Consulta, filtra y abre los trámites recibidos desde los formularios
-            ciudadanos.
-          </p>
-        </div>
-      </header>
+          </span>
+        }
+        description="Consulta, filtra y abre los trámites recibidos desde los formularios ciudadanos."
+        actions={
+          <Button to={SOLICITUDES_ADMIN_PATH} variant="secondary">
+            Volver a Gestión de solicitudes
+          </Button>
+        }
+      />
 
-      <section
-        className="grid gap-4 rounded-3xl border border-[#d7e5f1] bg-white p-5 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:p-6 lg:grid-cols-[minmax(240px,2fr)_minmax(180px,1fr)_minmax(190px,1fr)_auto] lg:items-end"
+      <AdminFilters
         aria-label="Búsqueda y filtros"
+        summary={
+          <>
+            <strong className="text-sigasj-ink">{loading ? '…' : total}</strong>
+            <span>{total === 1 ? 'solicitud' : 'solicitudes'}</span>
+          </>
+        }
       >
-        <label className="grid gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Buscar</span>
-          <span className="relative">
+        <AdminFilterField label="Buscar">
+          <span className="relative block">
             <IconSearch
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-              size={19}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+              size={17}
+              aria-hidden="true"
             />
             <input
-              className={`${inputClass} pl-11`}
+              className={`${adminFilterControlClassName} pl-9`}
               type="search"
               value={search}
               placeholder="Código o solicitante"
               onChange={(event) => setSearch(event.target.value)}
             />
           </span>
-        </label>
-        <label className="grid gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Estado</span>
+        </AdminFilterField>
+        <AdminFilterField label="Estado">
           <select
-            className={inputClass}
+            className={adminFilterControlClassName}
             value={estado}
             onChange={(event) => updateFilters({ estado: event.target.value })}
           >
@@ -222,11 +231,10 @@ export default function SolicitudesAdminListPage() {
               </option>
             ))}
           </select>
-        </label>
-        <label className="grid gap-2">
-          <span className="text-sm font-bold text-[#163f6b]">Tipo de trámite</span>
+        </AdminFilterField>
+        <AdminFilterField label="Tipo de trámite">
           <select
-            className={inputClass}
+            className={adminFilterControlClassName}
             value={tipo}
             onChange={(event) => updateFilters({ tipo: event.target.value })}
           >
@@ -237,55 +245,46 @@ export default function SolicitudesAdminListPage() {
               </option>
             ))}
           </select>
-        </label>
-        <button
-          className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 disabled:opacity-40"
+        </AdminFilterField>
+        <Button
           type="button"
+          variant="secondary"
+          leftIcon={<IconFilterOff size={17} aria-hidden="true" />}
           disabled={!hasFilters}
           onClick={() => {
             setSearch('')
             updateFilters({ search: '', estado: '', tipo: '', page: 1 })
           }}
         >
-          <IconFilterOff size={19} /> Limpiar
-        </button>
-      </section>
+          Limpiar
+        </Button>
+      </AdminFilters>
 
       <section
         className="overflow-hidden rounded-[28px] border border-[#d7e5f1]/90 bg-white shadow-[0_18px_45px_rgba(30, 90, 156,0.10)]"
         aria-label="Listado de solicitudes"
       >
         {loading ? (
-          <div className="grid min-h-64 place-items-center p-8" role="status">
-            <span className="text-center font-bold text-[#315d87]">
-              <span className="mx-auto mb-3 block size-9 animate-spin rounded-full border-4 border-[#d7e5f1] border-t-blue-600" />
-              Cargando solicitudes…
-            </span>
-          </div>
+          <Alert tone="info">{ADMIN_COPY.loading('solicitudes')}</Alert>
         ) : error ? (
-          <div className="grid min-h-64 place-items-center p-8 text-center" role="alert">
-            <div>
-              <p className="m-0 font-bold text-red-800">{error}</p>
-              <button
-                className="mt-4 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border-0 bg-red-700 px-5 font-bold text-white"
+          <EmptyState
+            title={error}
+            actions={
+              <Button
+                type="button"
+                variant="secondary"
+                leftIcon={<IconRefresh size={17} aria-hidden="true" />}
                 onClick={() => setRefresh((value) => value + 1)}
               >
-                <IconRefresh size={18} /> Reintentar
-              </button>
-            </div>
-          </div>
+                {ADMIN_COPY.retry}
+              </Button>
+            }
+          />
         ) : rows.length === 0 ? (
-          <div className="grid min-h-64 place-items-center p-8 text-center">
-            <div>
-              <IconSearch className="mx-auto text-sky-300" size={42} />
-              <h2 className="mb-0 mt-3 text-xl font-extrabold text-[#1e5a9c]">
-                No se encontraron solicitudes
-              </h2>
-              <p className="mb-0 mt-2 text-slate-500">
-                Prueba con otros criterios de búsqueda o filtros.
-              </p>
-            </div>
-          </div>
+          <EmptyState
+            icon={<IconSearch size={32} aria-hidden="true" />}
+            title={ADMIN_COPY.emptyFiltered('solicitudes')}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[960px] border-collapse text-left">
@@ -334,12 +333,14 @@ export default function SolicitudesAdminListPage() {
                       <SolicitudEstadoBadge estado={row.estado} />
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <Link
-                        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-[#0872d3] to-[#075fae] px-5 text-sm font-extrabold text-white no-underline shadow-[0_5px_12px_rgba(8,114,211,0.22)] transition duration-200 hover:-translate-y-0.5 hover:from-[#0767bd] hover:to-[#064f91] hover:shadow-[0_8px_18px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
+                      <Button
                         to={solicitudAdminDetailPath(row.id)}
+                        variant="primary"
+                        size="sm"
+                        leftIcon={<IconEye size={16} aria-hidden="true" />}
                       >
-                        <IconEye size={18} stroke={2.3} /> Ver detalle
-                      </Link>
+                        Ver detalle
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -360,29 +361,33 @@ export default function SolicitudesAdminListPage() {
               de <strong className="text-[#173f6e]">{total}</strong>
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <button
-                className="inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 shadow-sm transition hover:border-sky-300 hover:text-[#075fae] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-300 disabled:shadow-none"
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconChevronLeft size={17} aria-hidden="true" />}
                 disabled={page <= 1}
                 onClick={() => updateFilters({ page: page - 1 })}
               >
-                <IconChevronLeft size={17} />
                 Anterior
-              </button>
+              </Button>
               <span className="min-w-28 text-center font-extrabold text-[#315d87]">
                 Página {page} de {Math.max(totalPages, 1)}
               </span>
-              <button
-                className="inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-xl border border-slate-200 bg-white px-4 font-bold text-slate-600 shadow-sm transition hover:border-sky-300 hover:text-[#075fae] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-300 disabled:shadow-none"
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                rightIcon={<IconChevronRight size={17} aria-hidden="true" />}
                 disabled={page >= totalPages}
                 onClick={() => updateFilters({ page: page + 1 })}
               >
                 Siguiente
-                <IconChevronRight size={17} />
-              </button>
+              </Button>
             </div>
           </nav>
         ) : null}
       </section>
-    </main>
+    </AdminShell>
   )
 }

@@ -6,6 +6,7 @@ import {
   normalizeInternalRole,
 } from '../../auth/utils/internalRoles'
 import { IconEdit, IconPlus, IconRefresh } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   Alert,
   Badge,
@@ -177,7 +178,7 @@ export default function CategoriasPage() {
         <Alert tone="danger" title="No se pudieron cargar las categorías">
           <p className="m-0 mb-3">{error}</p>
           <Button size="sm" onClick={refetch}>
-            Reintentar
+            {ADMIN_COPY.retry}
           </Button>
         </Alert>
       ) : null}

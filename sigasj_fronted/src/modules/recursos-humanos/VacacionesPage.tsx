@@ -14,12 +14,16 @@ import {
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
-import { Alert } from '../../shared/ui/Alert'
-import { Badge } from '../../shared/ui/Badge'
-import { Button } from '../../shared/ui/Button'
-import { Card } from '../../shared/ui/Card'
-import { EmptyState } from '../../shared/ui/EmptyState'
-import { PageHeader } from '../../shared/ui/PageHeader'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import {
+  AdminShell,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+} from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import FechaFeriadoPicker from '../solicitudes-ausencia/FechaFeriadoPicker'
 import { esFeriadoCostaRica } from '../solicitudes-ausencia/feriadosCostaRica'
@@ -289,11 +293,18 @@ export default function VacacionesPage() {
   const hasta = Math.min(page * MOVIMIENTOS_VACACIONES_PAGE_SIZE, total)
 
   return (
-    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="vacaciones-rrhh-title">
       <RrhhSubnav />
 
       <PageHeader
-        title="Vacaciones del personal"
+        id="vacaciones-rrhh-title"
+        eyebrow="Administración · Vacaciones"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconBeach size={22} aria-hidden="true" />
+            Vacaciones del personal
+          </span>
+        }
         description="Consulte el saldo y registre adquisiciones, disfrutes o ajustes. El saldo se calcula desde el historial."
       />
 
@@ -372,7 +383,7 @@ export default function VacacionesPage() {
                       leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                       onClick={() => setRecarga((n) => n + 1)}
                     >
-                      Reintentar
+                      {ADMIN_COPY.retry}
                     </Button>
                   ) : null}
                 </div>
@@ -696,7 +707,7 @@ export default function VacacionesPage() {
                     leftIcon={<IconRefresh size={16} aria-hidden="true" />}
                     onClick={() => setRecarga((n) => n + 1)}
                   >
-                    Reintentar
+                    {ADMIN_COPY.retry}
                   </Button>
                 ) : null}
               </div>
@@ -820,6 +831,6 @@ export default function VacacionesPage() {
           </Card>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

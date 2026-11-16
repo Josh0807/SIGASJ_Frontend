@@ -1,4 +1,5 @@
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from 'react'
+import { Button } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import {
@@ -468,17 +469,18 @@ const ProyectosAdminForm = ({
       ) : null}
 
       <div className="gallery-admin__form-actions proyectos-admin__form-actions">
-        <button
+        <Button
           type="submit"
-          className="gallery-admin__button gallery-admin__button--primary"
+          variant="primary"
           disabled={isSubmitting}
+          loading={isSubmitting}
           aria-live="polite"
         >
           {submitLabel}
-        </button>
-        <button type="button" className="gallery-admin__button" onClick={onCancel}>
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

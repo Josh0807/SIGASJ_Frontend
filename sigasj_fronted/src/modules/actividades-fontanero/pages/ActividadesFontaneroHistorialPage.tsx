@@ -16,6 +16,7 @@ import {
 } from '../types/actividadHistorial'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { IconArrowLeft, IconCalendarSearch, IconEraser, IconSearch } from '@tabler/icons-react'
+import { Button } from '../../../shared/ui'
 
 type DraftFilters = {
   fechaInicio: string
@@ -218,20 +219,26 @@ const ActividadesFontaneroHistorialPage = () => {
         ) : null}
 
         <div className="actividades-fontanero-historial__filters-actions">
-          <button
+          <Button
             type="button"
-            className="actividades-fontanero-historial__secondary !order-2 !inline-flex !items-center !gap-2 !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md transition hover:!-translate-y-0.5 hover:!bg-[#eaf6ff]"
+            variant="secondary"
+            size="lg"
+            className="!order-2"
             onClick={handleLimpiar}
+            leftIcon={<IconEraser size={20} aria-hidden="true" />}
           >
-            <IconEraser size={20} aria-hidden="true" /> Limpiar
-          </button>
-          <button
+            Limpiar
+          </Button>
+          <Button
             type="submit"
-            className="actividades-fontanero-historial__primary !order-1 !inline-flex !items-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200 transition hover:-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
+            variant="primary"
+            size="lg"
+            className="!order-1"
             data-testid="historial-consultar"
+            leftIcon={<IconSearch size={20} aria-hidden="true" />}
           >
-            <IconSearch size={20} aria-hidden="true" /> Consultar
-          </button>
+            Consultar
+          </Button>
         </div>
       </form>
 

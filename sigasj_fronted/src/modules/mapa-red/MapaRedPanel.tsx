@@ -5,6 +5,8 @@ import {
   IconSearch,
 } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import { Alert, Button } from '../../shared/ui'
 import './mapa-red.css'
 import MapaRedMap from './MapaRedMap'
 import {
@@ -124,20 +126,24 @@ export default function MapaRedPanel({
             {updatedLabel ? (
               <span className="mapa-red__updated">{updatedLabel}</span>
             ) : null}
-            <button
+            <Button
               type="button"
               className="mapa-red__refresh-btn"
+              size="sm"
+              variant="secondary"
               onClick={() => refetch()}
               disabled={loading}
               aria-label="Actualizar averías activas"
+              leftIcon={
+                <IconRefresh
+                  size={16}
+                  className={loading ? 'mapa-red__spin' : undefined}
+                  aria-hidden="true"
+                />
+              }
             >
-              <IconRefresh
-                size={16}
-                className={loading ? 'mapa-red__spin' : undefined}
-                aria-hidden="true"
-              />
               Actualizar
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -175,18 +181,24 @@ export default function MapaRedPanel({
         </div>
 
         {error || unauthorized || forbidden ? (
-          <div className="mapa-red__error" role="alert">
-            <span>
+          <Alert tone="danger" className="mapa-red__error" role="alert">
+            <p className="m-0">
               {unauthorized || forbidden
                 ? 'No tiene permiso para consultar averías activas.'
                 : error}
-            </span>
+            </p>
             {!unauthorized && !forbidden ? (
-              <button type="button" onClick={() => refetch()}>
-                Reintentar
-              </button>
+              <Button
+                type="button"
+                className="mt-3"
+                size="sm"
+                onClick={() => refetch()}
+                leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+              >
+                {ADMIN_COPY.retry}
+              </Button>
             ) : null}
-          </div>
+          </Alert>
         ) : null}
 
         <div className="mapa-red__main">

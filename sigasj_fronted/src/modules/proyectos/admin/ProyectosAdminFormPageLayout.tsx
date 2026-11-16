@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import {
   IconArrowLeft,
   IconBuildingBridge,
   IconFolderPlus,
   IconPencil,
 } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import { PROYECTOS_ADMIN_PATH } from './proyectosAdminPaths'
 
 type ProyectosAdminFormPageLayoutProps = {
@@ -44,59 +45,48 @@ const ProyectosAdminFormPageLayout = ({
       : 'Complete los datos y asigne una portada para registrar el proyecto.'
     : undefined
 
+  const titleIcon =
+    mode === 'edit' ? (
+      <IconPencil size={22} aria-hidden="true" />
+    ) : mode === 'create' ? (
+      <IconFolderPlus size={22} aria-hidden="true" />
+    ) : (
+      <IconBuildingBridge size={22} aria-hidden="true" />
+    )
+
   return (
-    <main className="gallery-admin proyectos-admin sigasj-project-form-layout admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack sigasj-project-form-shell">
-        <header
-          className={`gallery-admin__header sigasj-project-form-header${
-            isEditor ? ' gallery-admin__header--editor' : ''
-          }`}
-        >
-          <div className="gallery-admin__header-copy">
-            <span
-              className={`gallery-admin__header-icon${
-                mode === 'edit' ? ' gallery-admin__header-icon--edit' : ''
-              }${mode === 'create' ? ' gallery-admin__header-icon--create' : ''}`}
-              aria-hidden="true"
+    <AdminShell
+      className="proyectos-admin sigasj-project-form-layout min-w-0"
+      aria-labelledby={isEditor ? 'proyecto-editor-title' : undefined}
+    >
+      <PageHeader
+        id={isEditor ? 'proyecto-editor-title' : undefined}
+        eyebrow={headerEyebrow}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {titleIcon}
+            {headerTitle}
+          </span>
+        }
+        description={headerLead}
+        actions={
+          isEditor ? (
+            <Button
+              to={PROYECTOS_ADMIN_PATH}
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={17} aria-hidden="true" />}
             >
-              {mode === 'edit' ? (
-                <IconPencil size={22} stroke={2.1} />
-              ) : mode === 'create' ? (
-                <IconFolderPlus size={22} stroke={2.1} />
-              ) : (
-                <IconBuildingBridge size={22} stroke={2.1} />
-              )}
-            </span>
-            <div>
-              <p className="gallery-admin__eyebrow">{headerEyebrow}</p>
-              <h1 id={isEditor ? 'proyecto-editor-title' : undefined}>
-                {headerTitle}
-              </h1>
-              {headerLead ? <p>{headerLead}</p> : null}
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            {isEditor ? (
-              <Link
-                className="gallery-admin__link admin-modern-home-link gallery-admin__back-btn"
-                to={PROYECTOS_ADMIN_PATH}
-              >
-                <IconArrowLeft size={17} aria-hidden="true" />
-                Volver al listado
-              </Link>
-            ) : (
-              <Link
-                className="gallery-admin__link admin-modern-home-link"
-                to="/admin/dashboard"
-              >
-                Volver inicio
-              </Link>
-            )}
-          </div>
-        </header>
-        {children}
-      </div>
-    </main>
+              {ADMIN_COPY.backToList}
+            </Button>
+          ) : (
+            <Button to="/admin/dashboard" variant="ghost">
+              {ADMIN_COPY.backHome}
+            </Button>
+          )
+        }
+      />
+      <div className="sigasj-project-form-shell min-w-0">{children}</div>
+    </AdminShell>
   )
 }
 

@@ -9,8 +9,20 @@ import {
   IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { Link } from 'react-router-dom'
+import {
+  Alert,
+  AdminFilterField,
+  AdminFilters,
+  AdminListItem,
+  AdminShell,
+  Badge,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import ComunicadosAdminForm from './ComunicadosAdminForm'
 import { emptyComunicadoFormValues, type ComunicadoFormValues } from './types'
 import {
@@ -26,7 +38,6 @@ const toDateInput = (value?: string | null) =>
   value ? value.slice(0, 10) : ''
 
 const toIsoDate = (value: string) =>
-  // Mediodía de Costa Rica (UTC-6): el día no cambia sea cual sea la zona del navegador.
   value ? new Date(`${value}T12:00:00-06:00`).toISOString() : ''
 
 const ComunicadosAdminPage = () => {
@@ -50,7 +61,7 @@ const ComunicadosAdminPage = () => {
     try {
       setItems(await getAdminComunicados())
     } catch {
-      setError('No fue posible cargar los comunicados.')
+      setError(ADMIN_COPY.loadError('los comunicados'))
     } finally {
       setLoading(false)
     }
@@ -124,11 +135,7 @@ const ComunicadosAdminPage = () => {
       closeForm()
       await loadItems()
     } catch {
-      setActionError(
-        formMode === 'edit'
-          ? 'No fue posible guardar los cambios del comunicado.'
-          : 'No fue posible crear el comunicado.',
-      )
+      setActionError(ADMIN_COPY.actionError('guardar', 'el comunicado'))
       throw new Error('comunicado-save-failed')
     } finally {
       setSubmitting(false)
@@ -137,44 +144,28 @@ const ComunicadosAdminPage = () => {
 
   const handleToggleEstado = async (item: AdminComunicado) => {
     setActionError(null)
-    const nextEstado = item.estado === 'Activo' ? 'Inactivo' : 'Activo'
     try {
-      const updated = await updateComunicadoEstado(item.id, nextEstado)
-      setItems((current) =>
-        current.map((row) =>
-          row.id === updated.id
-            ? {
-                ...row,
-                ...updated,
-                imagenUrl:
-                  resolveKeepImage(updated.imagenUrl, row.imagenUrl),
-              }
-            : row,
-        ),
+      await updateComunicadoEstado(
+        item.id,
+        item.estado === 'Activo' ? 'Inactivo' : 'Activo',
       )
+      await loadItems()
     } catch {
-      setActionError('No fue posible actualizar el estado del comunicado.')
+      setActionError(ADMIN_COPY.actionError('actualizar', 'el comunicado'))
     }
   }
 
   const handleDelete = async (item: AdminComunicado) => {
-    const confirmed = window.confirm(
-      `¿Eliminar el comunicado «${item.titulo}»? Esta acción no se puede deshacer.`,
-    )
-
-    if (!confirmed) {
-      return
-    }
+    const confirmed = window.confirm(ADMIN_COPY.deleteConfirm(item.titulo))
+    if (!confirmed) return
 
     setActionError(null)
     try {
       await deleteComunicado(item.id)
-      if (editingItem?.id === item.id) {
-        closeForm()
-      }
+      if (editingItem?.id === item.id) closeForm()
       await loadItems()
     } catch {
-      setActionError('No fue posible eliminar el comunicado. Intente nuevamente.')
+      setActionError(ADMIN_COPY.actionError('eliminar', 'el comunicado'))
     }
   }
 
@@ -216,199 +207,210 @@ const ComunicadosAdminPage = () => {
     : 'Cree, edite y active los avisos visibles en la landing pública.'
 
   return (
-    <main className="gallery-admin admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header
-          className={`gallery-admin__header${formOpen ? ' gallery-admin__header--editor' : ''}`}
-        >
-          <div className="gallery-admin__header-copy">
-            <span
-              className={`gallery-admin__header-icon${
-                formMode === 'edit' ? ' gallery-admin__header-icon--edit' : ''
-              }${formMode === 'create' ? ' gallery-admin__header-icon--create' : ''}`}
-              aria-hidden="true"
-            >
-              {formMode === 'edit' ? (
-                <IconPencil size={22} stroke={2.1} />
-              ) : formMode === 'create' ? (
-                <IconBellPlus size={22} stroke={2.1} />
-              ) : (
-                <IconBell size={22} stroke={2.1} />
-              )}
-            </span>
-            <div>
-              <p className="gallery-admin__eyebrow">{headerEyebrow}</p>
-              <h1 id={formOpen ? 'comunicado-editor-title' : undefined}>
-                {headerTitle}
-              </h1>
-              <p>{headerLead}</p>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            {formOpen ? (
-              <button
-                type="button"
-                className="gallery-admin__link admin-modern-home-link gallery-admin__back-btn"
-                onClick={closeForm}
-              >
-                <IconArrowLeft size={17} aria-hidden="true" />
-                Volver al listado
-              </button>
+    <AdminShell aria-labelledby="comunicados-admin-title">
+      <PageHeader
+        id="comunicados-admin-title"
+        eyebrow={headerEyebrow}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {formMode === 'edit' ? (
+              <IconPencil size={22} aria-hidden="true" />
+            ) : formMode === 'create' ? (
+              <IconBellPlus size={22} aria-hidden="true" />
             ) : (
-              <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
-                Volver inicio
-              </Link>
+              <IconBell size={22} aria-hidden="true" />
             )}
-            {!formOpen ? (
-              <button
+            {headerTitle}
+          </span>
+        }
+        description={headerLead}
+        actions={
+          formOpen ? (
+            <Button
+              type="button"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={17} aria-hidden="true" />}
+              onClick={closeForm}
+            >
+              {ADMIN_COPY.backToList}
+            </Button>
+          ) : (
+            <>
+              <Button to="/admin/dashboard" variant="ghost">
+                {ADMIN_COPY.backHome}
+              </Button>
+              <Button
                 type="button"
-                className="gallery-admin__button gallery-admin__button--primary"
+                variant="primary"
+                leftIcon={<IconBellPlus size={18} aria-hidden="true" />}
                 onClick={openCreateForm}
               >
-                <IconBellPlus size={18} aria-hidden="true" />
                 Nuevo comunicado
-              </button>
-            ) : null}
-          </div>
-        </header>
+              </Button>
+            </>
+          )
+        }
+      />
 
-        {actionError ? (
-          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
-            {actionError}
-          </p>
-        ) : null}
+      {actionError ? (
+        <Alert tone="danger">{actionError}</Alert>
+      ) : null}
 
-        {formOpen ? (
-          <section
-            ref={formSectionRef}
-            className="gallery-admin__editor"
-            aria-labelledby="comunicado-editor-title"
-          >
-            <ComunicadosAdminForm
-              mode={formMode}
-              initialValues={formInitialValues}
-              currentImageUrl={editingItem?.imagenUrl}
-              submitting={submitting}
-              onSubmit={handleSave}
-              onCancel={closeForm}
-            />
-          </section>
-        ) : (
-          <>
-            <section
-              className="gallery-admin__filters gallery-admin__filters--gallery"
-              aria-label="Filtros"
-            >
-              <label className="gallery-admin__field gallery-admin__field--search">
-                <span>Buscar por título</span>
-                <span className="gallery-admin__search-control">
-                  <IconSearch size={17} aria-hidden="true" />
-                  <input
-                    type="search"
-                    value={searchTitle}
-                    onChange={(event) => setSearchTitle(event.target.value)}
-                    placeholder="Ej. asamblea, mantenimiento…"
-                  />
-                </span>
-              </label>
-              <label className="gallery-admin__field gallery-admin__field--status">
-                <span>Estado</span>
-                <select
-                  value={statusFilter}
-                  onChange={(event) =>
-                    setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
-                  }
-                >
-                  <option value="all">Todos</option>
-                  <option value="active">Activos</option>
-                  <option value="inactive">Inactivos</option>
-                </select>
-              </label>
-              <div className="gallery-admin__filter-summary" aria-live="polite">
-                <strong>{loading ? '…' : visibleItems.length}</strong>
+      {formOpen ? (
+        <section
+          ref={formSectionRef}
+          className="min-w-0"
+          aria-labelledby="comunicado-editor-title"
+        >
+          <h2 id="comunicado-editor-title" className="sr-only">
+            {headerTitle}
+          </h2>
+          <ComunicadosAdminForm
+            mode={formMode}
+            initialValues={formInitialValues}
+            currentImageUrl={editingItem?.imagenUrl}
+            submitting={submitting}
+            onSubmit={handleSave}
+            onCancel={closeForm}
+          />
+        </section>
+      ) : (
+        <>
+          <AdminFilters
+            aria-label="Filtros"
+            summary={
+              <>
+                <strong className="text-sigasj-ink">
+                  {loading ? '…' : visibleItems.length}
+                </strong>
                 <span>
                   {visibleItems.length === 1 ? 'comunicado' : 'comunicados'}
                 </span>
-              </div>
-            </section>
+              </>
+            }
+          >
+            <AdminFilterField label="Buscar por título">
+              <span className="relative block">
+                <IconSearch
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+                  size={17}
+                  aria-hidden="true"
+                />
+                <input
+                  className={`${adminFilterControlClassName} pl-9`}
+                  type="search"
+                  value={searchTitle}
+                  onChange={(event) => setSearchTitle(event.target.value)}
+                  placeholder="Ej. asamblea, mantenimiento…"
+                />
+              </span>
+            </AdminFilterField>
+            <AdminFilterField label="Estado">
+              <select
+                className={adminFilterControlClassName}
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
+                }
+              >
+                <option value="all">Todos</option>
+                <option value="active">Activos</option>
+                <option value="inactive">Inactivos</option>
+              </select>
+            </AdminFilterField>
+          </AdminFilters>
 
-            {loading ? (
-              <p className="gallery-admin__empty" role="status">
-                Cargando comunicados…
-              </p>
-            ) : error ? (
-              <p className="gallery-admin__empty" role="alert">
-                {error}
-              </p>
-            ) : visibleItems.length === 0 ? (
-              <p className="gallery-admin__empty" role="status">
-                No hay comunicados registrados con los filtros actuales.
-              </p>
-            ) : (
-              <div className="gallery-admin__list">
-                {visibleItems.map((item) => (
-                  <article
-                    className="gallery-admin__item gallery-admin__item--text gallery-admin__item--comunicado"
-                    key={item.id}
-                  >
-                    <div className="gallery-admin__meta">
-                      <h2>{item.titulo}</h2>
-                      <p>{item.descripcion || 'Sin descripción'}</p>
-                      <ul className="gallery-admin__badges">
-                        <li
-                          className={
-                            item.estado === 'Activo' ? 'is-active' : 'is-inactive'
-                          }
-                        >
-                          {item.estado}
-                        </li>
-                        <li className="is-type">{item.tipo}</li>
-                        <li className={item.esPublico ? 'is-public' : 'is-private'}>
-                          {item.esPublico ? 'Público' : 'No público'}
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="gallery-admin__side">
-                      <div className="gallery-admin__actions">
-                        <button type="button" onClick={() => openEditForm(item)}>
-                          <IconPencil size={16} aria-hidden="true" />
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void handleToggleEstado(item)}
-                        >
-                          {item.estado === 'Activo' ? (
+          {loading ? (
+            <Alert tone="info">{ADMIN_COPY.loading('comunicados')}</Alert>
+          ) : error ? (
+            <EmptyState
+              title={error}
+              actions={
+                <Button type="button" variant="secondary" onClick={() => void loadItems()}>
+                  {ADMIN_COPY.retry}
+                </Button>
+              }
+            />
+          ) : visibleItems.length === 0 ? (
+            <EmptyState
+              icon={<IconBell size={32} aria-hidden="true" />}
+              title={ADMIN_COPY.emptyFiltered('comunicados')}
+              actions={
+                <Button
+                  type="button"
+                  variant="primary"
+                  leftIcon={<IconBellPlus size={18} aria-hidden="true" />}
+                  onClick={openCreateForm}
+                >
+                  Nuevo comunicado
+                </Button>
+              }
+            />
+          ) : (
+            <div className="grid gap-3">
+              {visibleItems.map((item) => (
+                <AdminListItem
+                  key={item.id}
+                  title={item.titulo}
+                  description={item.descripcion || 'Sin descripción'}
+                  badges={
+                    <>
+                      <Badge tone={item.estado === 'Activo' ? 'success' : 'neutral'}>
+                        {item.estado}
+                      </Badge>
+                      <Badge tone="info">{item.tipo}</Badge>
+                      <Badge tone={item.esPublico ? 'solid' : 'neutral'}>
+                        {item.esPublico ? 'Público' : 'No público'}
+                      </Badge>
+                    </>
+                  }
+                  actions={
+                    <>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={<IconPencil size={16} aria-hidden="true" />}
+                        onClick={() => openEditForm(item)}
+                      >
+                        {ADMIN_COPY.edit}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={
+                          item.estado === 'Activo' ? (
                             <IconPlayerPause size={16} aria-hidden="true" />
                           ) : (
                             <IconPlayerPlay size={16} aria-hidden="true" />
-                          )}
-                          {item.estado === 'Activo' ? 'Desactivar' : 'Activar'}
-                        </button>
-                        <button
-                          type="button"
-                          className="gallery-admin__danger"
-                          onClick={() => void handleDelete(item)}
-                        >
-                          <IconTrash size={16} aria-hidden="true" />
-                          Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </main>
+                          )
+                        }
+                        onClick={() => void handleToggleEstado(item)}
+                      >
+                        {item.estado === 'Activo'
+                          ? ADMIN_COPY.deactivate
+                          : ADMIN_COPY.activate}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        size="sm"
+                        leftIcon={<IconTrash size={16} aria-hidden="true" />}
+                        onClick={() => void handleDelete(item)}
+                      >
+                        {ADMIN_COPY.delete}
+                      </Button>
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </AdminShell>
   )
 }
-
-const resolveKeepImage = (
-  next: string | null | undefined,
-  current: string | null,
-) => next || current
 
 export default ComunicadosAdminPage

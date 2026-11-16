@@ -9,8 +9,17 @@ import {
   IconUserOff,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+} from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import {
   asociadoConsultaError,
@@ -23,7 +32,6 @@ import { getAsociado } from './asociadosApi'
 import { ASOCIADOS_PATH, ASOCIADOS_TITLE, asociadoEditPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { Asociado } from './types'
-import AsociadoFeedback from './AsociadoFeedback'
 import CambiarEstadoAsociado from './CambiarEstadoAsociado'
 
 function Dato({
@@ -107,96 +115,110 @@ export default function AsociadoDetallePage() {
   }, [clave, asociadoId, idValido, salirPorSesion])
 
   return (
-    <main className="asociado-detalle">
-      {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
-      {accionError ? <AsociadoFeedback variant="error">{accionError}</AsociadoFeedback> : null}
-
-      <Link to={volverA} className="asociado-detalle__back">
-        <IconArrowLeft size={18} aria-hidden="true" />
-        Volver a {volverLabel}
-      </Link>
+    <AdminShell
+      className="asociado-detalle gap-5"
+      aria-labelledby="asociado-detalle-title"
+    >
+      {aviso ? <Alert tone="success">{aviso}</Alert> : null}
+      {accionError ? <Alert tone="danger">{accionError}</Alert> : null}
 
       {cargando ? (
-        <div className="asociado-detalle__skeleton" role="status">
-          <span className="sr-only">Cargando asociado…</span>
-          {[0, 1, 2].map((fila) => (
-            <div key={fila} className="asociado-detalle__skeleton-bar" aria-hidden="true" />
-          ))}
-        </div>
+        <Alert tone="info">{ADMIN_COPY.loading('el asociado')}</Alert>
       ) : error || !asociado ? (
-        <div className="asociado-detalle__error" role="alert">
-          <p>{error ?? 'No fue posible cargar el asociado.'}</p>
-          <div className="asociado-detalle__error-actions">
-            {idValido && resultado.reintentable ? (
-              <button
-                type="button"
-                className="asociado-detalle__btn asociado-detalle__btn--ghost"
-                onClick={() => setRecarga((n) => n + 1)}
+        <EmptyState
+          title={error ?? ADMIN_COPY.loadError('el asociado')}
+          actions={
+            <>
+              {idValido && resultado.reintentable ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  leftIcon={<IconRefresh size={17} aria-hidden="true" />}
+                  onClick={() => setRecarga((n) => n + 1)}
+                >
+                  {ADMIN_COPY.retry}
+                </Button>
+              ) : null}
+              <Button
+                to={volverA}
+                variant="secondary"
+                leftIcon={<IconArrowLeft size={17} aria-hidden="true" />}
               >
-                <IconRefresh size={18} aria-hidden="true" />
-                Reintentar
-              </button>
-            ) : null}
-            <Link to={volverA} className="asociado-detalle__btn asociado-detalle__btn--ghost">
-              <IconArrowLeft size={18} aria-hidden="true" />
-              Volver al listado
-            </Link>
-          </div>
-        </div>
+                Volver a {volverLabel}
+              </Button>
+            </>
+          }
+        />
       ) : (
         <>
-          <header className="asociado-detalle__header">
-            <div className="asociado-detalle__identity">
-              <span className="asociado-detalle__avatar" aria-hidden="true">
-                <IconUser size={28} />
+          <PageHeader
+            id="asociado-detalle-title"
+            eyebrow="Asociados · Detalle"
+            title={
+              <span className="inline-flex flex-wrap items-center gap-2">
+                <IconUser size={20} aria-hidden="true" />
+                {nombreCompleto(asociado)}
               </span>
-              <div className="asociado-detalle__identity-copy">
-                <p className="asociado-detalle__eyebrow">Asociados · Detalle</p>
-                <h1>{nombreCompleto(asociado)}</h1>
-                <div className="asociado-detalle__meta">
-                  <span className="asociado-detalle__cedula">{asociado.cedula}</span>
-                  <EstadoAsociadoBadge activo={asociado.activo} />
-                </div>
-              </div>
-            </div>
-            <div className="asociado-detalle__actions">
-              <CambiarEstadoAsociado
-                asociado={asociado}
-                onCambiado={(actualizado) => {
-                  setAccionError(null)
-                  setAsociado(actualizado)
-                  setAviso(
-                    actualizado.activo
-                      ? 'El asociado fue reactivado correctamente.'
-                      : 'El asociado fue inactivado correctamente.',
-                  )
-                }}
-                onError={(mensaje) => {
-                  setAviso(null)
-                  setAccionError(mensaje)
-                }}
-                onNoAutenticado={salirPorSesion}
-              />
-              <Link
-                to={asociadoEditPath(asociado.id)}
-                state={{ from: volverA }}
-                className="asociado-detalle__btn asociado-detalle__btn--primary"
-              >
-                <IconEdit size={18} aria-hidden="true" />
-                Editar asociado
-              </Link>
-            </div>
-          </header>
+            }
+            description={
+              <span className="inline-flex flex-wrap items-center gap-2">
+                <span className="font-mono text-sm">{asociado.cedula}</span>
+                <EstadoAsociadoBadge activo={asociado.activo} />
+              </span>
+            }
+            actions={
+              <>
+                <Button
+                  to={volverA}
+                  variant="secondary"
+                  leftIcon={<IconArrowLeft size={17} aria-hidden="true" />}
+                >
+                  {ADMIN_COPY.backToList}
+                </Button>
+                <CambiarEstadoAsociado
+                  asociado={asociado}
+                  onCambiado={(actualizado) => {
+                    setAccionError(null)
+                    setAsociado(actualizado)
+                    setAviso(
+                      actualizado.activo
+                        ? 'El asociado fue reactivado correctamente.'
+                        : 'El asociado fue inactivado correctamente.',
+                    )
+                  }}
+                  onError={(mensaje) => {
+                    setAviso(null)
+                    setAccionError(mensaje)
+                  }}
+                  onNoAutenticado={salirPorSesion}
+                />
+                <Button
+                  to={asociadoEditPath(asociado.id)}
+                  state={{ from: volverA }}
+                  variant="primary"
+                  leftIcon={<IconEdit size={17} aria-hidden="true" />}
+                >
+                  {ADMIN_COPY.edit} asociado
+                </Button>
+              </>
+            }
+          />
 
-          <section
+          <Card
+            as="section"
+            padded
             className="asociado-detalle__panel"
             aria-labelledby="asociado-info-title"
           >
             <div className="asociado-detalle__panel-head">
-              <h2 id="asociado-info-title">Información del asociado</h2>
-              <p>Datos personales, contacto y estado del registro.</p>
+              <h2 id="asociado-info-title" className="m-0 text-lg font-extrabold text-sigasj-ink">
+                Información del asociado
+              </h2>
+              <p className="m-0 mt-1 text-sm text-sigasj-muted">
+                Datos personales, contacto y estado del registro.
+              </p>
             </div>
-            <dl className="asociado-detalle__grid">
+            <dl className="asociado-detalle__grid mt-5">
               <Dato label="Cédula" icon={<IconId size={15} />}>
                 {asociado.cedula}
               </Dato>
@@ -230,9 +252,9 @@ export default function AsociadoDetallePage() {
                 </Dato>
               ) : null}
             </dl>
-          </section>
+          </Card>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }

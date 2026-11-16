@@ -15,6 +15,7 @@ import {
 } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import { Button } from '../../../shared/ui'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
 import { getMateriales } from '../materialesApi'
@@ -192,36 +193,27 @@ export default function SolicitudMaterialesPage() {
           ) : null}
           <div className="material-request__success-actions">
             {returnToAveria ? (
-              <Link
-                className="material-request__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !to-sky-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(30,90,156,0.28)] !transition-all !duration-300 hover:!-translate-y-1 hover:!shadow-[0_16px_32px_rgba(30,90,156,0.38)] motion-reduce:!transform-none motion-reduce:!transition-none"
-                to={returnToAveria}
-              >
+              <Button to={returnToAveria} variant="primary">
                 Volver a la avería
-              </Link>
+              </Button>
             ) : null}
-            <Link
-              className="material-request__primary group !rounded-2xl !border-0 !bg-linear-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-6 !py-3.5 !font-extrabold !text-white !shadow-[0_10px_24px_rgba(30,90,156,0.28)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!shadow-[0_16px_32px_rgba(30,90,156,0.38)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none"
+            <Button
               to={SOLICITUDES_MATERIALES_PATH}
+              variant="primary"
+              rightIcon={
+                <IconArrowRight size={19} aria-hidden="true" />
+              }
             >
               Ver mis solicitudes
-              <IconArrowRight
-                className="!transition-transform !duration-300 group-hover:!translate-x-1"
-                size={19}
-                aria-hidden="true"
-              />
-            </Link>
-            <button
-              className="material-request__add group !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-extrabold !text-[#1e5a9c] !shadow-[0_8px_20px_rgba(30,90,156,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30,90,156,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none"
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => setCreated(null)}
+              leftIcon={<IconPlus size={19} aria-hidden="true" />}
             >
-              <IconPlus
-                className="!transition-transform !duration-300 group-hover:!rotate-90"
-                size={19}
-                aria-hidden="true"
-              />
               Crear otra solicitud
-            </button>
+            </Button>
           </div>
         </div>
       </section>
@@ -240,7 +232,7 @@ export default function SolicitudMaterialesPage() {
         />
 
         <div className="relative z-[1] grid max-w-[36rem] gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5">
-          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#38bdf8] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
+          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
             <IconPackage size={30} stroke={2.2} aria-hidden="true" />
           </span>
           <div className="min-w-0">
@@ -262,7 +254,7 @@ export default function SolicitudMaterialesPage() {
 
         <div className="material-request__right-rail !relative !z-[1] !mt-5 !grid !min-w-0 !gap-4 min-[900px]:!absolute min-[900px]:!top-8 min-[900px]:!right-8 min-[900px]:!mt-0 min-[900px]:!w-[320px]">
           <div className="material-request__identity material-request__identity--new-request !relative !inset-auto !m-0 !flex !w-full !min-w-0 !max-w-none !items-center !gap-3 !overflow-hidden !rounded-2xl !border !border-[#cfe4f7] !bg-white !p-3.5 !shadow-[0_8px_22px_rgba(30,90,156,0.1)]">
-            <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-xl !bg-gradient-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_8px_16px_rgba(30,90,156,0.25)]">
+            <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-xl !bg-[#1e5a9c] !text-white !shadow-[0_8px_16px_rgba(30,90,156,0.25)]">
               <IconUser size={20} stroke={2} aria-hidden="true" />
             </span>
             <div className="!min-w-0 !grid !gap-0.5">
@@ -318,7 +310,7 @@ export default function SolicitudMaterialesPage() {
         noValidate
       >
         <div className="provider-admin__form-heading !flex !items-start !gap-4 !border-b !border-slate-100 !pb-5">
-          <span className="!grid !size-12 !shrink-0 !place-items-center !rounded-2xl !bg-gradient-to-br !from-blue-600 !to-cyan-500 !text-white !shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:!size-14">
+          <span className="!grid !size-12 !shrink-0 !place-items-center !rounded-2xl !bg-[#1e5a9c] !text-white !shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:!size-14">
             <IconClipboardList size={24} aria-hidden="true" />
           </span>
           <div className="!min-w-0">
@@ -352,9 +344,10 @@ export default function SolicitudMaterialesPage() {
               Agregue uno o varios materiales y su cantidad.
             </p>
           </div>
-          <button
+          <Button
             type="button"
-            className="material-request__add !min-h-11 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-4 !font-extrabold !text-white !shadow-[0_9px_20px_rgba(30,90,156,0.24)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_14px_28px_rgba(30,90,156,0.34)] active:!translate-y-0 active:!scale-[0.98] motion-reduce:!transform-none motion-reduce:!transition-none"
+            variant="primary"
+            size="sm"
             onClick={() =>
               setRows((current) => [...current, createEmptyMaterialRow()])
             }
@@ -363,9 +356,10 @@ export default function SolicitudMaterialesPage() {
               materials.length === 0 ||
               selectedIds.size >= materials.length
             }
+            leftIcon={<IconPlus size={19} aria-hidden="true" />}
           >
-            <IconPlus size={19} aria-hidden="true" /> Agregar material
-          </button>
+            Agregar material
+          </Button>
         </div>
 
         {loading ? (
@@ -579,31 +573,24 @@ export default function SolicitudMaterialesPage() {
             <strong>Importante:</strong> enviar esta solicitud no modifica el stock.
           </p>
           <div className="!flex !flex-wrap !items-center !justify-end !gap-3 max-[700px]:!w-full max-[700px]:!flex-col [&>*]:max-[700px]:!w-full">
-            <button
-              className="material-request__primary materials-admin__primary group !rounded-2xl !bg-gradient-to-r !from-blue-600 !to-sky-500 !shadow-[0_10px_24px_rgba(30,90,156,0.28)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!scale-[1.02] hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_16px_32px_rgba(30,90,156,0.38)] active:!translate-y-0 active:!scale-[0.97] disabled:!translate-y-0 disabled:!scale-100 motion-reduce:!transform-none motion-reduce:!transition-none"
+            <Button
               type="submit"
+              variant="primary"
               disabled={
                 submitting || loading || Boolean(loadError) || materials.length === 0
               }
+              loading={submitting}
+              leftIcon={<IconDeviceFloppy size={19} aria-hidden="true" />}
             >
-              <IconDeviceFloppy
-                className="!transition-transform !duration-300 group-hover:!-rotate-6 group-hover:!scale-110 group-active:!rotate-0 motion-reduce:!transform-none"
-                size={19}
-                aria-hidden="true"
-              />
               {submitting ? 'Enviando…' : 'Enviar solicitud'}
-            </button>
-            <Link
-              className="materials-admin__secondary group !inline-flex !min-h-12 !items-center !justify-center !gap-2 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !py-3 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_8px_20px_rgba(30,90,156,0.12)] !transition-all !duration-300 hover:!-translate-y-1 hover:!scale-[1.02] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30,90,156,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none"
+            </Button>
+            <Button
               to={SOLICITUDES_MATERIALES_PATH}
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
             >
-              <IconArrowLeft
-                className="!transition-transform !duration-300 group-hover:!-translate-x-1.5 motion-reduce:!transform-none"
-                size={19}
-                aria-hidden="true"
-              />
               Volver a mis solicitudes
-            </Link>
+            </Button>
           </div>
         </footer>
       </form>

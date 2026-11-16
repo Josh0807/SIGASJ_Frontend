@@ -10,7 +10,19 @@ import {
   IconTrash,
 } from '@tabler/icons-react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { Link } from 'react-router-dom'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  Alert,
+  AdminFilterField,
+  AdminFilters,
+  AdminListItem,
+  AdminShell,
+  Badge,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import GalleryAdminForm from './GalleryAdminForm'
 import {
   emptyGalleryFormValues,
@@ -29,6 +41,9 @@ const displayTitle = (titulo: string | null | undefined) => {
   const raw = titulo?.trim() || 'Sin título'
   return raw.replace(/\s+\d{10,}\s*$/, '').trim() || raw
 }
+
+const galleryMediaClassName =
+  'h-20 w-20 rounded-[var(--radius-sigasj-card)] object-cover'
 
 const GalleryAdminPage = () => {
   const [photos, setPhotos] = useState<AdminGalleryPhoto[]>([])
@@ -51,7 +66,7 @@ const GalleryAdminPage = () => {
     try {
       setPhotos(await getAdminGaleria())
     } catch {
-      setError('No fue posible cargar la galería.')
+      setError(ADMIN_COPY.loadError('la galería'))
     } finally {
       setLoading(false)
     }
@@ -101,6 +116,7 @@ const GalleryAdminPage = () => {
   const closeForm = () => {
     setFormMode('hidden')
     setEditingPhoto(null)
+    setActionError(null)
   }
 
   const handleSave = async (values: GalleryFormValues, file: File | null) => {
@@ -120,11 +136,7 @@ const GalleryAdminPage = () => {
       closeForm()
       await loadPhotos()
     } catch {
-      setActionError(
-        formMode === 'edit'
-          ? 'No fue posible guardar los cambios de la fotografía.'
-          : 'No fue posible crear la fotografía.',
-      )
+      setActionError(ADMIN_COPY.actionError('guardar', 'la fotografía'))
       throw new Error('gallery-save-failed')
     } finally {
       setSubmitting(false)
@@ -139,15 +151,13 @@ const GalleryAdminPage = () => {
         current.map((item) => (item.id === updated.id ? updated : item)),
       )
     } catch {
-      setActionError('No fue posible actualizar el estado de la fotografía.')
+      setActionError(ADMIN_COPY.actionError('actualizar', 'la fotografía'))
     }
   }
 
   const handleDelete = async (photo: AdminGalleryPhoto) => {
-    const confirmed = window.confirm(
-      `¿Eliminar la fotografía${photo.titulo ? ` «${photo.titulo}»` : ''}? Esta acción no se puede deshacer.`,
-    )
-
+    const label = displayTitle(photo.titulo)
+    const confirmed = window.confirm(ADMIN_COPY.deleteConfirm(label))
     if (!confirmed) {
       return
     }
@@ -160,7 +170,7 @@ const GalleryAdminPage = () => {
       }
       await loadPhotos()
     } catch {
-      setActionError('No fue posible eliminar la fotografía. Intente nuevamente.')
+      setActionError(ADMIN_COPY.actionError('eliminar', 'la fotografía'))
     }
   }
 
@@ -198,188 +208,211 @@ const GalleryAdminPage = () => {
     : 'Administra las imágenes visibles en la landing pública.'
 
   return (
-    <main className="gallery-admin admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header
-          className={`gallery-admin__header${formOpen ? ' gallery-admin__header--editor' : ''}`}
-        >
-          <div className="gallery-admin__header-copy">
-            <span
-              className={`gallery-admin__header-icon${
-                formMode === 'edit' ? ' gallery-admin__header-icon--edit' : ''
-              }${formMode === 'create' ? ' gallery-admin__header-icon--create' : ''}`}
-              aria-hidden="true"
-            >
-              {formMode === 'edit' ? (
-                <IconPencil size={22} stroke={2.1} />
-              ) : formMode === 'create' ? (
-                <IconPhotoPlus size={22} stroke={2.1} />
-              ) : (
-                <IconPhoto size={22} stroke={2.1} />
-              )}
-            </span>
-            <div>
-              <p className="gallery-admin__eyebrow">{headerEyebrow}</p>
-              <h1 id={formOpen ? 'gallery-editor-title' : undefined}>{headerTitle}</h1>
-              <p>{headerLead}</p>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            {formOpen ? (
-              <button
-                type="button"
-                className="gallery-admin__link admin-modern-home-link gallery-admin__back-btn"
-                onClick={closeForm}
-              >
-                <IconArrowLeft size={17} aria-hidden="true" />
-                Volver al listado
-              </button>
+    <AdminShell aria-labelledby="gallery-admin-title">
+      <PageHeader
+        id="gallery-admin-title"
+        eyebrow={headerEyebrow}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {formMode === 'edit' ? (
+              <IconPencil size={22} aria-hidden="true" />
+            ) : formMode === 'create' ? (
+              <IconPhotoPlus size={22} aria-hidden="true" />
             ) : (
-              <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
-                Volver inicio
-              </Link>
+              <IconPhoto size={22} aria-hidden="true" />
             )}
-            {!formOpen ? (
-              <button
+            {headerTitle}
+          </span>
+        }
+        description={headerLead}
+        actions={
+          formOpen ? (
+            <Button
+              type="button"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={17} aria-hidden="true" />}
+              onClick={closeForm}
+            >
+              {ADMIN_COPY.backToList}
+            </Button>
+          ) : (
+            <>
+              <Button to="/admin/dashboard" variant="ghost">
+                {ADMIN_COPY.backHome}
+              </Button>
+              <Button
                 type="button"
-                className="gallery-admin__button gallery-admin__button--primary"
+                variant="primary"
+                leftIcon={<IconPhotoPlus size={18} aria-hidden="true" />}
                 onClick={openCreateForm}
               >
-                <IconPhotoPlus size={18} aria-hidden="true" />
                 Nueva fotografía
-              </button>
-            ) : null}
-          </div>
-        </header>
+              </Button>
+            </>
+          )
+        }
+      />
 
-        {actionError ? (
-          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
-            {actionError}
-          </p>
-        ) : null}
+      {actionError ? (
+        <Alert tone="danger">{actionError}</Alert>
+      ) : null}
 
-        {formOpen ? (
-          <section
-            ref={formSectionRef}
-            className="gallery-admin__editor"
-            aria-labelledby="gallery-editor-title"
-          >
-            <GalleryAdminForm
-              mode={formMode}
-              initialValues={formInitialValues}
-              currentImageUrl={editingPhoto?.imagenUrl}
-              submitting={submitting}
-              onSubmit={handleSave}
-              onCancel={closeForm}
-            />
-          </section>
-        ) : (
-          <>
-            <section className="gallery-admin__filters gallery-admin__filters--gallery" aria-label="Filtros">
-              <label className="gallery-admin__field gallery-admin__field--search">
-                <span>Buscar por título</span>
-                <span className="gallery-admin__search-control">
-                  <IconSearch size={17} aria-hidden="true" />
-                  <input
-                    type="search"
-                    value={searchTitle}
-                    onChange={(event) => setSearchTitle(event.target.value)}
-                    placeholder="Ej. asamblea, obra…"
-                  />
-                </span>
-              </label>
-
-              <label className="gallery-admin__field gallery-admin__field--status">
-                <span>Estado</span>
-                <select
-                  value={statusFilter}
-                  onChange={(event) =>
-                    setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
-                  }
-                >
-                  <option value="all">Todas</option>
-                  <option value="active">Activas</option>
-                  <option value="inactive">Inactivas</option>
-                </select>
-              </label>
-
-              <div className="gallery-admin__filter-summary" aria-live="polite">
-                <strong>{loading ? '…' : visiblePhotos.length}</strong>
+      {formOpen ? (
+        <section
+          ref={formSectionRef}
+          className="min-w-0"
+          aria-labelledby="gallery-editor-title"
+        >
+          <h2 id="gallery-editor-title" className="sr-only">
+            {headerTitle}
+          </h2>
+          <GalleryAdminForm
+            mode={formMode}
+            initialValues={formInitialValues}
+            currentImageUrl={editingPhoto?.imagenUrl}
+            submitting={submitting}
+            onSubmit={handleSave}
+            onCancel={closeForm}
+          />
+        </section>
+      ) : (
+        <>
+          <AdminFilters
+            aria-label="Filtros"
+            summary={
+              <>
+                <strong className="text-sigasj-ink">
+                  {loading ? '…' : visiblePhotos.length}
+                </strong>
                 <span>
                   {visiblePhotos.length === 1 ? 'fotografía' : 'fotografías'}
                 </span>
-              </div>
-            </section>
+              </>
+            }
+          >
+            <AdminFilterField label="Buscar por título">
+              <span className="relative block">
+                <IconSearch
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+                  size={17}
+                  aria-hidden="true"
+                />
+                <input
+                  className={`${adminFilterControlClassName} pl-9`}
+                  type="search"
+                  value={searchTitle}
+                  onChange={(event) => setSearchTitle(event.target.value)}
+                  placeholder="Ej. asamblea, obra…"
+                />
+              </span>
+            </AdminFilterField>
+            <AdminFilterField label="Estado">
+              <select
+                className={adminFilterControlClassName}
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
+                }
+              >
+                <option value="all">Todas</option>
+                <option value="active">Activas</option>
+                <option value="inactive">Inactivas</option>
+              </select>
+            </AdminFilterField>
+          </AdminFilters>
 
-            {loading ? (
-              <p className="gallery-admin__empty" role="status">
-                Cargando fotografías…
-              </p>
-            ) : error ? (
-              <p className="gallery-admin__empty" role="alert">
-                {error}
-              </p>
-            ) : visiblePhotos.length === 0 ? (
-              <p className="gallery-admin__empty" role="status">
-                No hay fotografías registradas con los filtros actuales.
-              </p>
-            ) : (
-              <div className="gallery-admin__list">
-                {visiblePhotos.map((photo) => (
-                  <article
-                    className="gallery-admin__item gallery-admin__item--photo"
-                    key={photo.id}
-                  >
-                    <div className="gallery-admin__thumb">
-                      <img src={photo.imagenUrl} alt={photo.textoAlternativo} />
-                    </div>
-
-                    <div className="gallery-admin__meta">
-                      <h2>{displayTitle(photo.titulo)}</h2>
-                      <p>{photo.descripcion?.trim() || 'Sin descripción'}</p>
-                      <ul className="gallery-admin__badges">
-                        <li className={photo.activo ? 'is-active' : 'is-inactive'}>
-                          {photo.activo ? 'Activa' : 'Inactiva'}
-                        </li>
-                        <li>Orden {photo.ordenVisualizacion + 1}</li>
-                      </ul>
-                    </div>
-
-                    <div className="gallery-admin__side">
-                      <div className="gallery-admin__actions">
-                        <button type="button" onClick={() => openEditForm(photo)}>
-                          <IconPencil size={16} aria-hidden="true" />
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void handleToggleEstado(photo)}
-                        >
-                          {photo.activo ? (
+          {loading ? (
+            <Alert tone="info">{ADMIN_COPY.loading('fotografías')}</Alert>
+          ) : error ? (
+            <EmptyState
+              title={error}
+              actions={
+                <Button type="button" variant="secondary" onClick={() => void loadPhotos()}>
+                  {ADMIN_COPY.retry}
+                </Button>
+              }
+            />
+          ) : visiblePhotos.length === 0 ? (
+            <EmptyState
+              icon={<IconPhoto size={32} aria-hidden="true" />}
+              title={ADMIN_COPY.emptyFiltered('fotografías')}
+              actions={
+                <Button
+                  type="button"
+                  variant="primary"
+                  leftIcon={<IconPhotoPlus size={18} aria-hidden="true" />}
+                  onClick={openCreateForm}
+                >
+                  Nueva fotografía
+                </Button>
+              }
+            />
+          ) : (
+            <div className="grid gap-3">
+              {visiblePhotos.map((photo) => (
+                <AdminListItem
+                  key={photo.id}
+                  title={displayTitle(photo.titulo)}
+                  description={photo.descripcion?.trim() || 'Sin descripción'}
+                  media={
+                    <img
+                      src={photo.imagenUrl}
+                      alt={photo.textoAlternativo}
+                      className={galleryMediaClassName}
+                    />
+                  }
+                  badges={
+                    <>
+                      <Badge tone={photo.activo ? 'success' : 'neutral'}>
+                        {photo.activo ? 'Activa' : 'Inactiva'}
+                      </Badge>
+                      <Badge tone="info">Orden {photo.ordenVisualizacion + 1}</Badge>
+                    </>
+                  }
+                  actions={
+                    <>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={<IconPencil size={16} aria-hidden="true" />}
+                        onClick={() => openEditForm(photo)}
+                      >
+                        {ADMIN_COPY.edit}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={
+                          photo.activo ? (
                             <IconPlayerPause size={16} aria-hidden="true" />
                           ) : (
                             <IconPlayerPlay size={16} aria-hidden="true" />
-                          )}
-                          {photo.activo ? 'Desactivar' : 'Activar'}
-                        </button>
-                        <button
-                          type="button"
-                          className="gallery-admin__danger"
-                          onClick={() => void handleDelete(photo)}
-                        >
-                          <IconTrash size={16} aria-hidden="true" />
-                          Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </main>
+                          )
+                        }
+                        onClick={() => void handleToggleEstado(photo)}
+                      >
+                        {photo.activo ? ADMIN_COPY.deactivate : ADMIN_COPY.activate}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        size="sm"
+                        leftIcon={<IconTrash size={16} aria-hidden="true" />}
+                        onClick={() => void handleDelete(photo)}
+                      >
+                        {ADMIN_COPY.delete}
+                      </Button>
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </AdminShell>
   )
 }
 

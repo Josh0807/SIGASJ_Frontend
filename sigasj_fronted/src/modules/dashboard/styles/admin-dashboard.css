@@ -4,21 +4,21 @@
  */
 
 .admin-dashboard {
-  --dash-bg: #eaf6ff;
-  --dash-card: #ffffff;
-  --dash-primary: #1e5a9c;
-  --dash-primary-deep: #123f70;
-  --dash-primary-soft: #eaf6ff;
-  --dash-text: #1a2f42;
-  --dash-ink: #123f70;
-  --dash-muted: #5b7390;
-  --dash-border: #d7e5f1;
-  --dash-success: #236c51;
-  --dash-warning: #b45309;
-  --dash-error: #b93638;
-  --dash-radius: 22px;
-  --dash-radius-sm: 14px;
-  --dash-shadow: 0 10px 28px rgba(18, 63, 112, 0.07);
+  --dash-bg: var(--asada-ice);
+  --dash-card: var(--asada-surface);
+  --dash-primary: var(--asada-navy);
+  --dash-primary-deep: var(--asada-ink);
+  --dash-primary-soft: var(--asada-surface-soft);
+  --dash-text: var(--asada-text);
+  --dash-ink: var(--asada-ink);
+  --dash-muted: var(--asada-muted);
+  --dash-border: var(--asada-border);
+  --dash-success: var(--asada-success);
+  --dash-warning: var(--asada-warning);
+  --dash-error: var(--asada-danger);
+  --dash-radius: var(--asada-radius);
+  --dash-radius-sm: var(--asada-radius-sm);
+  --dash-shadow: var(--asada-shadow);
 
   width: 100%;
   max-width: none;

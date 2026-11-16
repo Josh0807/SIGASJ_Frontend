@@ -1,11 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import {
   IconBuildingBridge,
+  IconFilterOff,
   IconFolderPlus,
   IconSearch,
 } from '@tabler/icons-react'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import {
   ESTADO_PROYECTO_OPTIONS,
   type EstadoProyecto,
@@ -77,12 +88,8 @@ const ProyectosAdminPage = () => {
     try {
       await updateProyectoVisibilidad(id, proximoActivo)
       await refetch()
-    } catch (err) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : 'No fue posible actualizar la visibilidad del proyecto.'
-      setActionError(msg)
+    } catch {
+      setActionError(ADMIN_COPY.actionError('actualizar', 'la visibilidad del proyecto'))
     }
   }
 
@@ -91,12 +98,8 @@ const ProyectosAdminPage = () => {
     try {
       await updateProyectoEstado(id, nuevoEstado)
       await refetch()
-    } catch (err) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : 'No fue posible actualizar el estado de ejecución.'
-      setActionError(msg)
+    } catch {
+      setActionError(ADMIN_COPY.actionError('actualizar', 'el estado del proyecto'))
     }
   }
 
@@ -118,166 +121,155 @@ const ProyectosAdminPage = () => {
   }
 
   return (
-    <main className="gallery-admin proyectos-admin admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div className="gallery-admin__header-copy">
-            <span className="gallery-admin__header-icon" aria-hidden="true">
-              <IconBuildingBridge size={22} stroke={2.1} />
-            </span>
-            <div>
-              <p className="gallery-admin__eyebrow">Inventario institucional · Administración</p>
-              <h1>Gestión de Proyectos</h1>
-              <p>
-                Administre obras y mejoras de la ASADA: estado de ejecución,
-                portada, galería y visibilidad en el sitio público.
-              </p>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
-              Volver inicio
-            </Link>
-            <Link
-              className="gallery-admin__button gallery-admin__button--primary"
+    <AdminShell
+      className="proyectos-admin min-w-0"
+      aria-labelledby="proyectos-admin-title"
+    >
+      <PageHeader
+        id="proyectos-admin-title"
+        eyebrow="Inventario institucional · Administración"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconBuildingBridge size={22} aria-hidden="true" />
+            Gestión de Proyectos
+          </span>
+        }
+        description="Administre obras y mejoras de la ASADA: estado de ejecución, portada, galería y visibilidad en el sitio público."
+        actions={
+          <>
+            <Button to="/admin/dashboard" variant="ghost">
+              {ADMIN_COPY.backHome}
+            </Button>
+            <Button
               to={PROYECTOS_ADMIN_NEW_PATH}
+              variant="primary"
+              leftIcon={<IconFolderPlus size={18} aria-hidden="true" />}
             >
-              <IconFolderPlus size={18} aria-hidden="true" />
               Nuevo proyecto
-            </Link>
-          </div>
-        </header>
+            </Button>
+          </>
+        }
+      />
 
-        <section
-          className="gallery-admin__filters gallery-admin__filters--gallery"
-          aria-label="Búsqueda y filtros"
-        >
-          <form
-            className="admin-compact-filters"
-            role="search"
-            onSubmit={(event) => {
-              event.preventDefault()
-              applyNombreSearch(nombreInput)
+      <AdminFilters
+        aria-label="Búsqueda y filtros"
+        summary={
+          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+            <span className="inline-flex items-center gap-1.5">
+              <strong className="text-sigasj-ink">
+                {loading ? '…' : listado.total}
+              </strong>
+              <span>{listado.total === 1 ? 'proyecto' : 'proyectos'}</span>
+            </span>
+            {hasActiveFilters ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+                onClick={clearFilters}
+              >
+                Limpiar filtros
+              </Button>
+            ) : null}
+          </div>
+        }
+      >
+        <AdminFilterField label="Buscar por nombre" className="sm:col-span-2">
+          <span className="relative block">
+            <IconSearch
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+              size={17}
+              aria-hidden="true"
+            />
+            <input
+              id={NOMBRE_SEARCH_INPUT_ID}
+              name="nombre"
+              type="search"
+              className={`${adminFilterControlClassName} pl-9`}
+              maxLength={200}
+              value={nombreInput}
+              onChange={(event) => setNombreInput(event.target.value)}
+              placeholder="Ej. acueducto, tanque…"
+            />
+          </span>
+        </AdminFilterField>
+        <AdminFilterField label="Estado">
+          <select
+            id={ESTADO_FILTER_ID}
+            name="estado"
+            className={adminFilterControlClassName}
+            value={estado}
+            onChange={(event) => {
+              setEstado(event.target.value)
+              setPage(DEFAULT_PROYECTOS_PAGE)
             }}
           >
-            <label
-              className="gallery-admin__field gallery-admin__field--search"
-              htmlFor={NOMBRE_SEARCH_INPUT_ID}
-            >
-              <span>Buscar por nombre</span>
-              <span className="gallery-admin__search-control">
-                <IconSearch size={17} aria-hidden="true" />
-                <input
-                  id={NOMBRE_SEARCH_INPUT_ID}
-                  name="nombre"
-                  type="search"
-                  maxLength={200}
-                  value={nombreInput}
-                  onChange={(event) => setNombreInput(event.target.value)}
-                  placeholder="Ej. acueducto, tanque…"
-                />
-              </span>
-            </label>
-            <label
-              className="gallery-admin__field gallery-admin__field--status"
-              htmlFor={ESTADO_FILTER_ID}
-            >
-              <span>Estado</span>
-              <select
-                id={ESTADO_FILTER_ID}
-                name="estado"
-                value={estado}
-                onChange={(event) => {
-                  setEstado(event.target.value)
-                  setPage(DEFAULT_PROYECTOS_PAGE)
-                }}
-              >
-                <option value={EMPTY_FILTER}>Todos los estados</option>
-                {ESTADO_PROYECTO_OPTIONS.map((estadoProyecto) => (
-                  <option value={estadoProyecto.value} key={estadoProyecto.value}>
-                    {estadoProyecto.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label
-              className="gallery-admin__field gallery-admin__field--status"
-              htmlFor={ACTIVO_FILTER_ID}
-            >
-              <span>Visibilidad</span>
-              <select
-                id={ACTIVO_FILTER_ID}
-                name="activo"
-                value={activo}
-                onChange={(event) => {
-                  setActivo(event.target.value)
-                  setPage(DEFAULT_PROYECTOS_PAGE)
-                }}
-              >
-                <option value={EMPTY_FILTER}>Todos</option>
-                <option value="true">Activos</option>
-                <option value="false">Inactivos</option>
-              </select>
-            </label>
-            <div className="gallery-admin__filter-summary" aria-live="polite">
-              <strong>{loading ? '…' : listado.total}</strong>
-              <span>{listado.total === 1 ? 'proyecto' : 'proyectos'}</span>
-            </div>
-            {hasActiveFilters ? (
-              <p className="gallery-admin__filter-reset">
-                <button
-                  type="button"
-                  className="gallery-admin__button"
-                  onClick={clearFilters}
-                >
-                  Limpiar filtros
-                </button>
-              </p>
-            ) : null}
-          </form>
-        </section>
-
-        {actionError ? (
-          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
-            {actionError}
-            {' '}
-            <button
-              type="button"
-              className="gallery-admin__button"
-              onClick={() => setActionError(null)}
-            >
-              Cerrar
-            </button>
-          </p>
-        ) : null}
-
-        <section aria-label="Listado de proyectos">
-          <ProyectosAdminQueryStates
-            loading={loading}
-            error={error}
-            hasResults={listado.data.length > 0}
-            hasActiveFilters={hasActiveFilters}
-            onRetry={refetch}
+            <option value={EMPTY_FILTER}>Todos los estados</option>
+            {ESTADO_PROYECTO_OPTIONS.map((estadoProyecto) => (
+              <option value={estadoProyecto.value} key={estadoProyecto.value}>
+                {estadoProyecto.label}
+              </option>
+            ))}
+          </select>
+        </AdminFilterField>
+        <AdminFilterField label="Visibilidad">
+          <select
+            id={ACTIVO_FILTER_ID}
+            name="activo"
+            className={adminFilterControlClassName}
+            value={activo}
+            onChange={(event) => {
+              setActivo(event.target.value)
+              setPage(DEFAULT_PROYECTOS_PAGE)
+            }}
           >
-            <ProyectosAdminTable
-              proyectos={listado.data}
-              onToggleVisibilidad={handleToggleVisibilidad}
-              onEstadoChange={handleEstadoChange}
-            />
-          </ProyectosAdminQueryStates>
-        </section>
+            <option value={EMPTY_FILTER}>Todos</option>
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+          </select>
+        </AdminFilterField>
+      </AdminFilters>
 
-        {loading || error ? null : (
-          <ProyectosAdminPagination
-            page={page}
-            totalPages={listado.totalPages}
-            total={listado.total}
-            loading={loading}
-            onPageChange={goToPage}
+      {actionError ? (
+        <Alert tone="danger" role="alert">
+          {actionError}{' '}
+          <button
+            type="button"
+            className="ml-1 font-semibold underline"
+            onClick={() => setActionError(null)}
+          >
+            Cerrar
+          </button>
+        </Alert>
+      ) : null}
+
+      <section aria-label="Listado de proyectos" className="min-w-0">
+        <ProyectosAdminQueryStates
+          loading={loading}
+          error={error}
+          hasResults={listado.data.length > 0}
+          hasActiveFilters={hasActiveFilters}
+          onRetry={refetch}
+        >
+          <ProyectosAdminTable
+            proyectos={listado.data}
+            onToggleVisibilidad={handleToggleVisibilidad}
+            onEstadoChange={handleEstadoChange}
           />
-        )}
-      </div>
-    </main>
+        </ProyectosAdminQueryStates>
+      </section>
+
+      {loading || error ? null : (
+        <ProyectosAdminPagination
+          page={page}
+          totalPages={listado.totalPages}
+          total={listado.total}
+          loading={loading}
+          onPageChange={goToPage}
+        />
+      )}
+    </AdminShell>
   )
 }
 

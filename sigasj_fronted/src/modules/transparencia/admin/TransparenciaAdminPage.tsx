@@ -10,7 +10,19 @@ import {
   IconTrash,
 } from '@tabler/icons-react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { Link } from 'react-router-dom'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  Alert,
+  AdminFilterField,
+  AdminFilters,
+  AdminListItem,
+  AdminShell,
+  Badge,
+  Button,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import TransparenciaAdminForm from './TransparenciaAdminForm'
 import {
   emptyTransparenciaFormValues,
@@ -30,6 +42,9 @@ import { toTransparenciaSubmitMessage } from './transparenciaSubmitError'
 const formatFileTypeLabel = (
   tipoArchivo: AdminTransparenciaPublication['tipoArchivo'],
 ) => tipoArchivo.toUpperCase()
+
+const transparenciaMediaClassName =
+  'h-20 w-20 rounded-[var(--radius-sigasj-card)] object-cover'
 
 const TransparenciaAdminPage = () => {
   const [publications, setPublications] = useState<AdminTransparenciaPublication[]>([])
@@ -53,7 +68,7 @@ const TransparenciaAdminPage = () => {
     try {
       setPublications(await getAdminTransparencia())
     } catch {
-      setError('No fue posible cargar las publicaciones de transparencia.')
+      setError(ADMIN_COPY.loadError('las publicaciones de transparencia'))
     } finally {
       setLoading(false)
     }
@@ -149,15 +164,12 @@ const TransparenciaAdminPage = () => {
       await loadPublications()
       showSuccess('Estado de la publicación actualizado.')
     } catch {
-      setError('No fue posible actualizar el estado de la publicación.')
+      setError(ADMIN_COPY.actionError('actualizar', 'la publicación'))
     }
   }
 
   const handleDelete = async (publication: AdminTransparenciaPublication) => {
-    const confirmed = window.confirm(
-      `¿Eliminar la publicación «${publication.nombre}»? Esta acción no se puede deshacer.`,
-    )
-
+    const confirmed = window.confirm(ADMIN_COPY.deleteConfirm(publication.nombre))
     if (!confirmed) {
       return
     }
@@ -171,7 +183,7 @@ const TransparenciaAdminPage = () => {
       await loadPublications()
       showSuccess('Publicación eliminada correctamente.')
     } catch {
-      setError('No fue posible eliminar la publicación. Intente nuevamente.')
+      setError(ADMIN_COPY.actionError('eliminar', 'la publicación'))
     }
   }
 
@@ -204,219 +216,243 @@ const TransparenciaAdminPage = () => {
       : 'Complete los datos y suba el documento o imagen para publicarlo en la landing.'
     : 'Administra documentos e imágenes visibles en la landing pública.'
 
+  const showListErrorBanner = Boolean(
+    error && (formOpen || publications.length > 0),
+  )
+
   return (
-    <main className="gallery-admin admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header
-          className={`gallery-admin__header${formOpen ? ' gallery-admin__header--editor' : ''}`}
-        >
-          <div className="gallery-admin__header-copy">
-            <span
-              className={`gallery-admin__header-icon${
-                formMode === 'edit' ? ' gallery-admin__header-icon--edit' : ''
-              }${formMode === 'create' ? ' gallery-admin__header-icon--create' : ''}`}
-              aria-hidden="true"
-            >
-              {formMode === 'edit' ? (
-                <IconPencil size={22} stroke={2.1} />
-              ) : formMode === 'create' ? (
-                <IconFilePlus size={22} stroke={2.1} />
-              ) : (
-                <IconFileText size={22} stroke={2.1} />
-              )}
-            </span>
-            <div>
-              <p className="gallery-admin__eyebrow">{headerEyebrow}</p>
-              <h1 id={formOpen ? 'transparencia-editor-title' : undefined}>
-                {headerTitle}
-              </h1>
-              <p>{headerLead}</p>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            {formOpen ? (
-              <button
-                type="button"
-                className="gallery-admin__link admin-modern-home-link gallery-admin__back-btn"
-                onClick={closeForm}
-              >
-                <IconArrowLeft size={17} aria-hidden="true" />
-                Volver al listado
-              </button>
+    <AdminShell aria-labelledby="transparencia-admin-title">
+      <PageHeader
+        id="transparencia-admin-title"
+        eyebrow={headerEyebrow}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {formMode === 'edit' ? (
+              <IconPencil size={22} aria-hidden="true" />
+            ) : formMode === 'create' ? (
+              <IconFilePlus size={22} aria-hidden="true" />
             ) : (
-              <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
-                Volver inicio
-              </Link>
+              <IconFileText size={22} aria-hidden="true" />
             )}
-            {!formOpen ? (
-              <button
+            {headerTitle}
+          </span>
+        }
+        description={headerLead}
+        actions={
+          formOpen ? (
+            <Button
+              type="button"
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={17} aria-hidden="true" />}
+              onClick={closeForm}
+            >
+              {ADMIN_COPY.backToList}
+            </Button>
+          ) : (
+            <>
+              <Button to="/admin/dashboard" variant="ghost">
+                {ADMIN_COPY.backHome}
+              </Button>
+              <Button
                 type="button"
-                className="gallery-admin__button gallery-admin__button--primary"
+                variant="primary"
+                leftIcon={<IconFilePlus size={18} aria-hidden="true" />}
                 onClick={openCreateForm}
               >
-                <IconFilePlus size={18} aria-hidden="true" />
                 Nueva publicación
-              </button>
-            ) : null}
-          </div>
-        </header>
+              </Button>
+            </>
+          )
+        }
+      />
 
-        {actionSuccess && !formOpen ? (
-          <p
-            className="gallery-admin__banner gallery-admin__banner--success"
-            role="status"
-          >
-            {actionSuccess}
-          </p>
-        ) : null}
+      {actionSuccess && !formOpen ? (
+        <Alert tone="success">{actionSuccess}</Alert>
+      ) : null}
 
-        {error ? (
-          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
-            {error}
-          </p>
-        ) : null}
+      {showListErrorBanner ? (
+        <Alert tone="danger">{error}</Alert>
+      ) : null}
 
-        {formOpen ? (
-          <section
-            ref={formSectionRef}
-            className="gallery-admin__editor"
-            aria-labelledby="transparencia-editor-title"
-          >
-            <TransparenciaAdminForm
-              mode={formMode}
-              initialValues={formInitialValues}
-              currentFileUrl={editingPublication?.archivoUrl}
-              currentFileType={editingPublication?.tipoArchivo}
-              submitting={submitting}
-              onSubmit={handleSave}
-              onCancel={closeForm}
-            />
-          </section>
-        ) : (
-          <>
-            <section
-              className="gallery-admin__filters gallery-admin__filters--gallery"
-              aria-label="Filtros"
-            >
-              <label className="gallery-admin__field gallery-admin__field--search">
-                <span>Buscar por nombre</span>
-                <span className="gallery-admin__search-control">
-                  <IconSearch size={17} aria-hidden="true" />
-                  <input
-                    type="search"
-                    value={searchName}
-                    onChange={(event) => setSearchName(event.target.value)}
-                    placeholder="Ej. informe, calidad…"
-                  />
-                </span>
-              </label>
-
-              <label className="gallery-admin__field gallery-admin__field--status">
-                <span>Estado</span>
-                <select
-                  value={statusFilter}
-                  onChange={(event) =>
-                    setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
-                  }
-                >
-                  <option value="all">Todas</option>
-                  <option value="active">Activas</option>
-                  <option value="inactive">Inactivas</option>
-                </select>
-              </label>
-
-              <div className="gallery-admin__filter-summary" aria-live="polite">
-                <strong>{loading ? '…' : visiblePublications.length}</strong>
+      {formOpen ? (
+        <section
+          ref={formSectionRef}
+          className="min-w-0"
+          aria-labelledby="transparencia-editor-title"
+        >
+          <h2 id="transparencia-editor-title" className="sr-only">
+            {headerTitle}
+          </h2>
+          <TransparenciaAdminForm
+            mode={formMode}
+            initialValues={formInitialValues}
+            currentFileUrl={editingPublication?.archivoUrl}
+            currentFileType={editingPublication?.tipoArchivo}
+            submitting={submitting}
+            onSubmit={handleSave}
+            onCancel={closeForm}
+          />
+        </section>
+      ) : (
+        <>
+          <AdminFilters
+            aria-label="Filtros"
+            summary={
+              <>
+                <strong className="text-sigasj-ink">
+                  {loading ? '…' : visiblePublications.length}
+                </strong>
                 <span>
                   {visiblePublications.length === 1
                     ? 'publicación'
                     : 'publicaciones'}
                 </span>
-              </div>
-            </section>
+              </>
+            }
+          >
+            <AdminFilterField label="Buscar por nombre">
+              <span className="relative block">
+                <IconSearch
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sigasj-muted"
+                  size={17}
+                  aria-hidden="true"
+                />
+                <input
+                  className={`${adminFilterControlClassName} pl-9`}
+                  type="search"
+                  value={searchName}
+                  onChange={(event) => setSearchName(event.target.value)}
+                  placeholder="Ej. informe, calidad…"
+                />
+              </span>
+            </AdminFilterField>
+            <AdminFilterField label="Estado">
+              <select
+                className={adminFilterControlClassName}
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
+                }
+              >
+                <option value="all">Todas</option>
+                <option value="active">Activas</option>
+                <option value="inactive">Inactivas</option>
+              </select>
+            </AdminFilterField>
+          </AdminFilters>
 
-            {loading ? (
-              <p className="gallery-admin__empty" role="status">
-                Cargando publicaciones…
-              </p>
-            ) : visiblePublications.length === 0 ? (
-              <p className="gallery-admin__empty" role="status">
-                No hay publicaciones registradas con los filtros actuales.
-              </p>
-            ) : (
-              <div className="gallery-admin__list">
-                {visiblePublications.map((publication) => (
-                  <article
-                    className="gallery-admin__item gallery-admin__item--photo"
-                    key={publication.id}
-                  >
-                    <div className="gallery-admin__thumb">
-                      {isTransparenciaImageType(publication.tipoArchivo) ? (
-                        <img
-                          src={publication.archivoUrl}
-                          alt={`Vista previa de ${publication.nombre}`}
-                        />
-                      ) : (
-                        <div className="gallery-admin__doc-thumb" aria-hidden="true">
-                          PDF
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="gallery-admin__meta">
-                      <h2>{publication.nombre}</h2>
-                      <p>{publication.descripcionBreve}</p>
-                      <ul className="gallery-admin__badges">
-                        <li
-                          className={
-                            publication.activo ? 'is-active' : 'is-inactive'
-                          }
-                        >
-                          {publication.activo ? 'Activa' : 'Inactiva'}
-                        </li>
-                        <li>{formatFileTypeLabel(publication.tipoArchivo)}</li>
-                        <li>Orden {publication.ordenVisualizacion}</li>
-                      </ul>
-                    </div>
-
-                    <div className="gallery-admin__side">
-                      <div className="gallery-admin__actions">
-                        <button
-                          type="button"
-                          onClick={() => openEditForm(publication)}
-                        >
-                          <IconPencil size={16} aria-hidden="true" />
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void handleToggleEstado(publication)}
-                        >
-                          {publication.activo ? (
+          {loading ? (
+            <Alert tone="info">{ADMIN_COPY.loading('publicaciones')}</Alert>
+          ) : error && publications.length === 0 ? (
+            <EmptyState
+              title={error}
+              actions={
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void loadPublications()}
+                >
+                  {ADMIN_COPY.retry}
+                </Button>
+              }
+            />
+          ) : visiblePublications.length === 0 ? (
+            <EmptyState
+              icon={<IconFileText size={32} aria-hidden="true" />}
+              title={ADMIN_COPY.emptyFiltered('publicaciones')}
+              actions={
+                <Button
+                  type="button"
+                  variant="primary"
+                  leftIcon={<IconFilePlus size={18} aria-hidden="true" />}
+                  onClick={openCreateForm}
+                >
+                  Nueva publicación
+                </Button>
+              }
+            />
+          ) : (
+            <div className="grid gap-3">
+              {visiblePublications.map((publication) => (
+                <AdminListItem
+                  key={publication.id}
+                  title={publication.nombre}
+                  description={publication.descripcionBreve}
+                  media={
+                    isTransparenciaImageType(publication.tipoArchivo) ? (
+                      <img
+                        src={publication.archivoUrl}
+                        alt={`Vista previa de ${publication.nombre}`}
+                        className={transparenciaMediaClassName}
+                      />
+                    ) : (
+                      <div
+                        className="flex h-20 w-20 items-center justify-center rounded-[var(--radius-sigasj-card)] border border-sigasj-border bg-sigasj-surface-soft text-xs font-bold text-sigasj-muted"
+                        aria-hidden="true"
+                      >
+                        PDF
+                      </div>
+                    )
+                  }
+                  badges={
+                    <>
+                      <Badge tone={publication.activo ? 'success' : 'neutral'}>
+                        {publication.activo ? 'Activa' : 'Inactiva'}
+                      </Badge>
+                      <Badge tone="info">
+                        {formatFileTypeLabel(publication.tipoArchivo)}
+                      </Badge>
+                      <Badge tone="neutral">
+                        Orden {publication.ordenVisualizacion}
+                      </Badge>
+                    </>
+                  }
+                  actions={
+                    <>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={<IconPencil size={16} aria-hidden="true" />}
+                        onClick={() => openEditForm(publication)}
+                      >
+                        {ADMIN_COPY.edit}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={
+                          publication.activo ? (
                             <IconPlayerPause size={16} aria-hidden="true" />
                           ) : (
                             <IconPlayerPlay size={16} aria-hidden="true" />
-                          )}
-                          {publication.activo ? 'Desactivar' : 'Activar'}
-                        </button>
-                        <button
-                          type="button"
-                          className="gallery-admin__danger"
-                          onClick={() => void handleDelete(publication)}
-                        >
-                          <IconTrash size={16} aria-hidden="true" />
-                          Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </main>
+                          )
+                        }
+                        onClick={() => void handleToggleEstado(publication)}
+                      >
+                        {publication.activo
+                          ? ADMIN_COPY.deactivate
+                          : ADMIN_COPY.activate}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        size="sm"
+                        leftIcon={<IconTrash size={16} aria-hidden="true" />}
+                        onClick={() => void handleDelete(publication)}
+                      >
+                        {ADMIN_COPY.delete}
+                      </Button>
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </AdminShell>
   )
 }
 

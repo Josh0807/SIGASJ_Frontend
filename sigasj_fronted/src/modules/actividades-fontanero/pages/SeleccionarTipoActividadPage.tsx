@@ -1,6 +1,13 @@
-import { Link } from 'react-router-dom'
-import { IconArrowLeft, IconArrowRight, IconClipboardCheck } from '@tabler/icons-react'
-import ActivityFeedback from '../components/ActivityFeedback'
+import { IconArrowLeft, IconArrowRight, IconClipboardCheck, IconClipboardPlus } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+} from '../../../shared/ui'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
@@ -8,100 +15,106 @@ import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 const SeleccionarTipoActividadPage = () => {
   const catalogo = useTiposActividadFontanero()
   return (
-    <section
-      className="actividades-fontanero-registro actividades-fontanero-registro--selector !mx-0 !max-w-none !gap-7"
+    <AdminShell
+      className="actividades-fontanero-registro actividades-fontanero-registro--selector gap-5 sm:gap-6"
       aria-labelledby="seleccion-tipo-actividad-title"
     >
-      <header className="actividades-fontanero-registro__header !block !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 space-y-3">
-            <p className="actividades-fontanero-registro__eyebrow !text-sm !font-black !tracking-[0.12em] !text-[#1e5a9c]">Registro de Actividades</p>
-            <h1 id="seleccion-tipo-actividad-title" className="!text-3xl !font-black !tracking-tight !text-[#07376f] md:!text-4xl">Registrar actividad</h1>
-            <p className="actividades-fontanero-registro__intro !text-lg !leading-relaxed !text-slate-500">
-              Seleccione el tipo de actividad que desea registrar. Cada tipo abre su formulario
-              correspondiente.
-            </p>
-          </div>
-          <Link to={ACTIVIDADES_FONTANERO_PATHS.home} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-5 py-3 font-bold !no-underline text-[#1e5a9c] shadow-md transition hover:-translate-y-0.5 hover:bg-[#eaf6ff] hover:!no-underline focus:!no-underline">
-            <IconArrowLeft size={20} aria-hidden="true" />
-            Volver al menú de actividades
-          </Link>
-        </div>
-      </header>
+      <PageHeader
+        id="seleccion-tipo-actividad-title"
+        eyebrow="Registro de actividades"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconClipboardPlus size={22} aria-hidden="true" />
+            Registrar actividad
+          </span>
+        }
+        description="Seleccione el tipo de actividad que desea registrar. Cada tipo abre su formulario correspondiente."
+        actions={
+          <Button
+            to={ACTIVIDADES_FONTANERO_PATHS.home}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            Volver al menú
+          </Button>
+        }
+      />
 
-      {catalogo.isLoading ? <p role="status">Cargando tipos de actividad…</p> : null}
+      {catalogo.isLoading ? (
+        <Alert tone="info" role="status">
+          {ADMIN_COPY.loading('tipos de actividad')}
+        </Alert>
+      ) : null}
       {catalogo.isUnauthorized ? (
-        <ActivityFeedback
-          variant="warning"
-          message={ACTIVITY_FEEDBACK_MESSAGES.unauthorized}
-        />
+        <Alert tone="warning">{ACTIVITY_FEEDBACK_MESSAGES.unauthorized}</Alert>
       ) : null}
       {catalogo.isForbidden ? (
-        <ActivityFeedback
-          variant="error"
-          message={ACTIVITY_FEEDBACK_MESSAGES.forbidden}
-        />
+        <Alert tone="danger">{ACTIVITY_FEEDBACK_MESSAGES.forbidden}</Alert>
       ) : null}
       {catalogo.isError ? (
-        <ActivityFeedback
-          variant="error"
-          message={ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}
-          action={
-            <button type="button" className="activity-feedback__retry" onClick={catalogo.refetch}>
-              Reintentar
-            </button>
-          }
-        />
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{ACTIVITY_FEEDBACK_MESSAGES.loadGeneric}</p>
+            <Button type="button" variant="secondary" size="sm" onClick={catalogo.refetch}>
+              {ADMIN_COPY.retry}
+            </Button>
+          </div>
+        </Alert>
       ) : null}
       {catalogo.isEmpty ? (
-        <ActivityFeedback
-          variant="info"
-          message="No hay tipos de actividad disponibles."
-        />
+        <EmptyState title="No hay tipos de actividad disponibles." />
       ) : null}
 
-      <div
-        className="actividad-tipo-selector !grid-cols-1 !gap-5 rounded-[28px] border border-blue-100 bg-white/80 p-5 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)] md:!grid-cols-2 md:p-7 xl:!grid-cols-3"
+      <Card
+        as="section"
+        padded
+        className="actividad-tipo-selector grid gap-4 md:grid-cols-2 xl:grid-cols-3"
         role="list"
         aria-label="Tipos de actividad disponibles"
       >
-        <div className="col-span-full border-b border-blue-100 pb-5" role="presentation">
-          <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Tipos disponibles</p>
-          <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Seleccione una actividad</h2>
-          <p className="mt-2 text-base text-slate-500">Elija una opción para abrir su formulario correspondiente.</p>
+        <div className="col-span-full border-b border-sigasj-border pb-4" role="presentation">
+          <h2 className="m-0 text-lg font-extrabold text-sigasj-ink">
+            Seleccione una actividad
+          </h2>
+          <p className="mt-1 text-sm text-sigasj-muted">
+            Elija una opción para abrir su formulario correspondiente.
+          </p>
         </div>
         {catalogo.tipos.map((tipo) => (
-          <article
+          <Card
             key={tipo.codigo}
-            className="actividad-tipo-selector__card group !gap-5 !rounded-3xl !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/60 !p-6 !shadow-[0_10px_28px_rgba(30, 90, 156,0.08)] transition duration-200 hover:-translate-y-1 hover:!border-blue-300 hover:!shadow-[0_18px_36px_rgba(30, 90, 156,0.14)]"
+            as="article"
+            padded
+            interactive
+            className="actividad-tipo-selector__card grid gap-4"
             role="listitem"
           >
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-lg shadow-blue-200">
-                <IconClipboardCheck size={24} stroke={1.9} aria-hidden="true" />
+            <div className="flex items-center gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-sigasj-primary text-white">
+                <IconClipboardCheck size={22} aria-hidden="true" />
               </span>
-              <h2 className="actividad-tipo-selector__title !text-xl !font-extrabold !text-[#07376f]">{tipo.nombre}</h2>
+              <h3 className="actividad-tipo-selector__title m-0 text-base font-extrabold text-sigasj-ink">
+                {tipo.nombre}
+              </h3>
             </div>
             {tipo.descripcion ? (
-              <p className="actividad-tipo-selector__description">{tipo.descripcion}</p>
+              <p className="actividad-tipo-selector__description m-0 text-sm text-sigasj-muted">
+                {tipo.descripcion}
+              </p>
             ) : null}
-            <Link
+            <Button
               to={ACTIVIDADES_FONTANERO_PATHS.registrarTipo(tipo.codigo)}
-              className="actividad-tipo-selector__link !mt-auto !flex !w-full !items-center !justify-between !rounded-2xl !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200/70 transition hover:!from-blue-700 hover:!to-sky-600 focus-visible:!ring-4 focus-visible:!ring-blue-200"
+              variant="primary"
+              className="actividad-tipo-selector__link mt-auto w-full justify-between"
+              rightIcon={<IconArrowRight size={18} aria-hidden="true" />}
               data-testid={`tipo-actividad-${tipo.codigo}`}
             >
-              <span>Continuar</span>
-              <IconArrowRight size={20} aria-hidden="true" />
-            </Link>
-          </article>
+              Continuar
+            </Button>
+          </Card>
         ))}
-      </div>
-
-      <Link to={ACTIVIDADES_FONTANERO_PATHS.home} className="actividades-fontanero-registro__back !hidden">
-        <IconArrowLeft size={20} aria-hidden="true" />
-        Volver al menú de actividades
-      </Link>
-    </section>
+      </Card>
+    </AdminShell>
   )
 }
 

@@ -10,6 +10,14 @@ import {
 } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  Alert,
+  Button,
+  EmptyState,
+  MetricPill,
+  PageHeader,
+} from '../../../shared/ui'
 import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
 import {
@@ -176,31 +184,27 @@ export default function AlertasReposicionPage() {
 
   return (
     <section
-      className="material-tracking material-tracking--alertas"
+      className="inv-alertas-reposicion"
+      style={{ display: 'grid', gap: 14 }}
       aria-labelledby="alertas-reposicion-title"
     >
-      <header className="material-tracking__header material-tracking__header--fontanero">
-        <div className="material-tracking__header-main">
-          <span className="material-tracking__header-icon material-tracking__header-icon--alert" aria-hidden="true">
-            <IconAlertTriangle size={28} stroke={2.2} />
-          </span>
-          <div className="material-tracking__header-copy">
-            <p className="material-request__eyebrow">Inventario · Administración</p>
-            <h1 id="alertas-reposicion-title">Alertas de reposición</h1>
-            <p>
-              Identifique los materiales que alcanzaron o quedaron por debajo de
-              su stock mínimo.
-            </p>
-          </div>
-        </div>
-        <Link className="material-tracking__back-link" to={MATERIALES_PATH}>
-          <IconArrowLeft size={18} aria-hidden="true" />
-          Volver al catálogo
-        </Link>
-      </header>
+      <PageHeader
+        eyebrow="Inventario · Administración"
+        title={<span id="alertas-reposicion-title">Alertas de reposición</span>}
+        description="Identifique los materiales que alcanzaron o quedaron por debajo de su stock mínimo."
+        actions={
+          <Button
+            to={MATERIALES_PATH}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            Volver al catálogo
+          </Button>
+        }
+      />
 
-      <div className="material-tracking__panel">
-        <div className="material-tracking__filters material-tracking__filters--panel">
+      <section className="inv-panel" aria-label="Filtros de alertas">
+        <div className="inv-filters inv-filters--wrap">
           <InventoryFormField
             label="Estado"
             icon={<IconFilter size={18} aria-hidden="true" />}
@@ -221,78 +225,75 @@ export default function AlertasReposicionPage() {
           </InventoryFormField>
 
           {!loading && !error ? (
-            <span className="material-tracking__count material-tracking__count--alert" role="status">
-              <IconAlertTriangle size={18} aria-hidden="true" />
-              {total} {total === 1 ? 'alerta' : 'alertas'}
-            </span>
+            <MetricPill
+              label={total === 1 ? 'alerta' : 'alertas'}
+              value={total}
+              tone={total === 0 ? 'quiet' : 'danger'}
+              role="status"
+            />
           ) : null}
         </div>
+      </section>
 
-        {notice ? (
-          <div className="material-tracking__state material-tracking__state--notice" role="status">
-            <p>
-              {notice}
-              {reposicionGeneradaId ? (
-                <>
-                  {' '}
-                  <Link to={reposicionDetailPath(reposicionGeneradaId)}>
-                    Ver reposición
-                  </Link>
-                </>
-              ) : null}
-            </p>
-          </div>
-        ) : null}
+      {notice ? (
+        <Alert tone="success" role="status">
+          {notice}
+          {reposicionGeneradaId ? (
+            <>
+              {' '}
+              <Link to={reposicionDetailPath(reposicionGeneradaId)}>
+                Ver reposición
+              </Link>
+            </>
+          ) : null}
+        </Alert>
+      ) : null}
 
-        {actionError ? (
-          <div
-            className="material-tracking__state material-tracking__state--error"
-            role="alert"
+      {actionError ? (
+        <Alert tone="danger" role="alert">
+          {actionError}
+        </Alert>
+      ) : null}
+
+      {loading ? (
+        <div className="inv-state" role="status">
+          Cargando alertas de reposición…
+        </div>
+      ) : null}
+
+      {error ? (
+        <Alert tone="danger" title="No se pudieron cargar las alertas">
+          <p className="m-0 mb-3">{error}</p>
+          <Button
+            size="sm"
+            onClick={retry}
+            leftIcon={<IconRefresh size={16} aria-hidden="true" />}
           >
-            {actionError}
-          </div>
-        ) : null}
+            {ADMIN_COPY.retry}
+          </Button>
+        </Alert>
+      ) : null}
 
-        {loading ? (
-          <div className="material-tracking__state" role="status">
-            <span className="material-request__spinner" />
-            Cargando alertas de reposición…
-          </div>
-        ) : null}
+      {!loading && !error && alertas.length === 0 ? (
+        <EmptyState
+          icon={<IconPackage size={30} aria-hidden="true" />}
+          title={
+            estado
+              ? 'No hay alertas con ese estado'
+              : 'No hay alertas de reposición'
+          }
+          description={
+            estado
+              ? 'Pruebe con otro estado o consulte todos los registros.'
+              : 'Cuando un material alcance su stock mínimo, la alerta aparecerá aquí.'
+          }
+        />
+      ) : null}
 
-        {error ? (
-          <div
-            className="material-tracking__state material-tracking__state--error"
-            role="alert"
-          >
-            <p>{error}</p>
-            <button type="button" onClick={retry}>
-              <IconRefresh size={18} aria-hidden="true" /> Reintentar
-            </button>
-          </div>
-        ) : null}
-
-        {!loading && !error && alertas.length === 0 ? (
-          <div className="material-tracking__empty">
-            <span className="material-tracking__empty-icon" aria-hidden="true">
-              <IconPackage size={28} />
-            </span>
-            <h2>
-              {estado
-                ? 'No hay alertas con ese estado'
-                : 'No hay alertas de reposición'}
-            </h2>
-            <p>
-              {estado
-                ? 'Pruebe con otro estado o consulte todos los registros.'
-                : 'Cuando un material alcance su stock mínimo, la alerta aparecerá aquí.'}
-            </p>
-          </div>
-        ) : null}
-
-        {!loading && !error && alertas.length > 0 ? (
-          <div className="material-tracking__table-wrap material-tracking__table-wrap--panel">
-            <table>
+      {!loading && !error && alertas.length > 0 ? (
+        <section className="inv-panel" aria-label="Listado de alertas">
+          <div className="inv-table-wrap">
+            <table className="inv-table">
               <thead>
                 <tr>
                   <th>Material</th>
@@ -320,9 +321,7 @@ export default function AlertasReposicionPage() {
                       <td data-label="Stock actual">
                         <span
                           className={
-                            bajoMinimo
-                              ? 'material-tracking__stock material-tracking__stock--low'
-                              : 'material-tracking__stock'
+                            bajoMinimo ? 'inv-badge inv-badge--low' : undefined
                           }
                         >
                           {alerta.stockActual}
@@ -333,45 +332,47 @@ export default function AlertasReposicionPage() {
                         {formatAlertaFecha(alerta.fechaGeneracion)}
                       </td>
                       <td data-label="Estado">
-                        <span
-                          className="material-tracking__badge"
-                          data-status={String(alerta.estado).toUpperCase()}
-                        >
+                        <span className="inv-badge inv-badge--low">
                           {formatAlertaEstado(String(alerta.estado))}
                         </span>
                       </td>
                       <td data-label="Responsable">
                         {getAlertaResponsable(alerta)}
                       </td>
-                      <td data-label="Acciones" className="material-tracking__row-actions">
+                      <td data-label="Acciones">
+                        <div className="inv-row-actions">
                         {accion ? (
-                          <button
+                          <Button
                             type="button"
-                            className="material-tracking__action-btn"
+                            className="inv-row-action"
+                            size="sm"
+                            variant="secondary"
                             disabled={managingId !== null || generatingId !== null}
                             onClick={() => requestEstadoChange(alerta)}
+                            leftIcon={<IconAlertTriangle size={16} aria-hidden="true" />}
                           >
-                            <IconAlertTriangle size={16} aria-hidden="true" />
                             {managingId === alerta.id ? 'Actualizando…' : accion}
-                          </button>
+                          </Button>
                         ) : null}
                         {puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? (
-                          <button
+                          <Button
                             type="button"
-                            className="material-tracking__action-btn material-tracking__action-btn--primary"
+                            className="inv-row-action"
+                            size="sm"
                             disabled={managingId !== null || generatingId !== null}
                             onClick={() => requestGenerarReposicion(alerta)}
+                            leftIcon={<IconShoppingCartPlus size={16} aria-hidden="true" />}
                           >
-                            <IconShoppingCartPlus size={16} aria-hidden="true" />
                             {generatingId === alerta.id
                               ? 'Generando…'
                               : 'Generar reposición'}
-                          </button>
+                          </Button>
                         ) : null}
                         {!accion &&
                         !puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? (
                           <span>—</span>
                         ) : null}
+                        </div>
                       </td>
                     </tr>
                   )
@@ -379,39 +380,41 @@ export default function AlertasReposicionPage() {
               </tbody>
             </table>
           </div>
-        ) : null}
+        </section>
+      ) : null}
 
-        {!loading && !error && totalPages > 1 ? (
-          <nav
-            className="material-tracking__pagination"
-            aria-label="Paginación de alertas de reposición"
+      {!loading && !error && totalPages > 1 ? (
+        <nav
+          className="inv-pagination"
+          aria-label="Paginación de alertas de reposición"
+        >
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            disabled={page <= 1}
+            onClick={() => {
+              setLoading(true)
+              setPage((value) => value - 1)
+            }}
           >
-            <button
-              type="button"
-              disabled={page <= 1}
-              onClick={() => {
-                setLoading(true)
-                setPage((value) => value - 1)
-              }}
-            >
-              Anterior
-            </button>
-            <span>
-              Página {page} de {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={page >= totalPages}
-              onClick={() => {
-                setLoading(true)
-                setPage((value) => value + 1)
-              }}
-            >
-              Siguiente
-            </button>
-          </nav>
-        ) : null}
-      </div>
+            Anterior
+          </button>
+          <span>
+            Página {page} de {totalPages}
+          </span>
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            disabled={page >= totalPages}
+            onClick={() => {
+              setLoading(true)
+              setPage((value) => value + 1)
+            }}
+          >
+            Siguiente
+          </button>
+        </nav>
+      ) : null}
 
       <ConfirmDialog
         isOpen={pendingAction !== null}

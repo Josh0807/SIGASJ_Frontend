@@ -1,6 +1,7 @@
 import { IconArrowLeft, IconAt, IconDeviceFloppy, IconId, IconUser, IconUsers } from '@tabler/icons-react'
 import { useRef, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '../../shared/ui'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
 import { asociadoBackendFieldErrors, asociadoSubmitError, toRegistrarAsociadoPayload, validateAsociado, type AsociadoFormErrors } from './asociadoForm'
@@ -86,8 +87,8 @@ export default function RegistrarAsociadoPage() {
         })}
       </div>
       <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
-        <button type="submit" className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#1e5a9c] bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 px-7 py-3.5 font-extrabold text-white shadow-[0_11px_26px_rgba(30, 90, 156,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] transition hover:-translate-y-1 hover:from-blue-800 hover:to-cyan-500 hover:shadow-[0_17px_34px_rgba(30, 90, 156,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none sm:w-auto motion-reduce:transform-none motion-reduce:transition-none" disabled={saving}><IconDeviceFloppy className="transition-transform group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transform-none" size={20} aria-hidden="true" />{saving ? 'Guardando asociado…' : 'Guardar asociado'}</button>
-        <Link className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#bfe3fa] bg-white px-6 py-3.5 font-extrabold text-blue-900 no-underline shadow-[0_8px_20px_rgba(30, 90, 156,0.12)] transition hover:-translate-y-1 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-[#1e5a9c] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] sm:w-auto motion-reduce:transform-none motion-reduce:transition-none" to={ASOCIADOS_PATH}><IconArrowLeft className="transition-transform group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />Cancelar</Link>
+        <Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto" disabled={saving} loading={saving} leftIcon={<IconDeviceFloppy size={20} aria-hidden="true" />}>{saving ? 'Guardando asociado…' : 'Guardar asociado'}</Button>
+        <Button to={ASOCIADOS_PATH} variant="secondary" size="lg" className="w-full sm:w-auto" leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}>Cancelar</Button>
       </div>
     </form>
   </main>

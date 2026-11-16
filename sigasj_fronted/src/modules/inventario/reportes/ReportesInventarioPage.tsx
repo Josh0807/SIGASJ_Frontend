@@ -1,7 +1,9 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { IconAlertTriangle, IconArrowsExchange, IconCalendar, IconCalendarX, IconCategory, IconEraser, IconPackage, IconSearch } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowsExchange, IconCalendar, IconCalendarX, IconCategory, IconEraser, IconPackage, IconRefresh, IconSearch } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
+import { Alert, Button, EmptyState, PageHeader } from '../../../shared/ui'
 import { InventoryFormField } from '../InventoryFormField'
 import {
   formatMovimientoCantidad,
@@ -107,20 +109,19 @@ export default function ReportesInventarioPage() {
     reporte.movimientos.length === 0
 
   return (
-    <main className="gallery-admin inventario-reportes">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="materials-admin__header">
-          <div>
-            <p className="materials-admin__eyebrow">Inventario · Administración</p>
-            <h1>Reportes de inventario</h1>
-            <p>
-              Consulte indicadores y movimientos del inventario. Los cálculos provienen del servidor.
-            </p>
-          </div>
-        </header>
+    <main
+      className="inv-reportes"
+      style={{ display: 'grid', gap: 14 }}
+      aria-labelledby="reportes-inventario-title"
+    >
+      <PageHeader
+        eyebrow="Inventario · Administración"
+        title={<span id="reportes-inventario-title">Reportes de inventario</span>}
+        description="Consulte indicadores y movimientos del inventario. Los cálculos provienen del servidor."
+      />
 
         <form
-          className="gallery-admin__filters"
+          className="inv-panel gallery-admin__filters"
           aria-label="Filtros del reporte de inventario"
           onSubmit={handleConsultar}
           noValidate
@@ -196,41 +197,40 @@ export default function ReportesInventarioPage() {
             </select>
           </InventoryFormField>
 
-          <div className="actividades-admin-reportes__actions [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:gap-2.5">
-            <button
+          <div className="actividades-admin-reportes__actions flex flex-wrap items-center gap-2">
+            <Button
               type="submit"
-              className="group relative isolate overflow-hidden gallery-admin__button gallery-admin__button--primary !min-h-14 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-700 !via-blue-600 !to-cyan-500 !px-7 !text-white !shadow-[0_10px_24px_rgba(29,78,216,0.25)] transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.015] hover:!shadow-[0_16px_30px_rgba(29,78,216,0.34)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 motion-reduce:transform-none motion-reduce:transition-none"
               disabled={loading}
+              leftIcon={<IconSearch size={18} aria-hidden="true" />}
             >
-              <span className="absolute inset-0 -translate-x-[140%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[140%] motion-reduce:hidden" aria-hidden="true" />
-              <IconSearch className="relative transition-transform duration-300 group-hover:scale-110" size={20} aria-hidden="true" />
-              <span className="relative">{loading ? 'Consultando…' : 'Consultar'}</span>
-            </button>
-            <button
+              {loading ? 'Consultando…' : 'Consultar'}
+            </Button>
+            <Button
               type="button"
-              className="group gallery-admin__button gallery-admin__filter-reset !min-h-14 !rounded-2xl !border !border-[#bfe3fa] !bg-white/90 !px-7 !text-[#1e5a9c] !shadow-[0_8px_20px_rgba(15,71,139,0.10)] backdrop-blur-sm transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.015] hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(15,71,139,0.18)] active:translate-y-0 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2 disabled:hover:translate-y-0 disabled:hover:scale-100 motion-reduce:transform-none motion-reduce:transition-none"
+              variant="secondary"
               onClick={handleLimpiar}
               disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
+              leftIcon={<IconEraser size={18} aria-hidden="true" />}
             >
-              <IconEraser className="transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110 motion-reduce:transform-none" size={20} aria-hidden="true" />
-              <span>Limpiar filtros</span>
-            </button>
+              Limpiar filtros
+            </Button>
           </div>
         </form>
 
         {filterError ? (
-          <div className="material-tracking__state material-tracking__state--error" role="alert">
-            <p>{filterError}</p>
-            <button
-              type="button"
+          <Alert tone="danger" title="No se pudo consultar el reporte">
+            <p className="m-0 mb-3">{filterError}</p>
+            <Button
+              size="sm"
               onClick={() => {
                 setClientError('')
                 refetch()
               }}
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
             >
-              Reintentar
-            </button>
-          </div>
+              {ADMIN_COPY.retry}
+            </Button>
+          </Alert>
         ) : null}
 
         <section className="actividades-admin-reportes__indicators" aria-label="Indicadores del reporte">
@@ -288,10 +288,11 @@ export default function ReportesInventarioPage() {
         </section>
 
         {showEmpty ? (
-          <div className="material-tracking__empty" role="status">
-            <h2>No se encontraron datos</h2>
-            <p>No hay información de inventario para los criterios seleccionados.</p>
-          </div>
+          <EmptyState
+            icon={<IconPackage size={30} aria-hidden="true" />}
+            title="No se encontraron datos"
+            description="No hay información de inventario para los criterios seleccionados."
+          />
         ) : null}
 
         {!loading && reporte.porCategoria.length > 0 ? (
@@ -377,43 +378,49 @@ export default function ReportesInventarioPage() {
         ) : null}
 
         {!loading && reporte.movimientos.length > 0 ? (
-          <section className="material-tracking !mx-0 !max-w-none space-y-5" aria-labelledby="reporte-movimientos-title">
-            <header className="material-tracking__header !items-center !rounded-3xl !border-blue-100 !bg-gradient-to-br !from-white !via-blue-50/70 !to-cyan-50/70 !p-7 !shadow-[0_14px_36px_rgba(18,63,112,0.10)]">
-              <div className="flex items-center gap-4">
-                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-lg shadow-blue-600/20" aria-hidden="true">
-                  <IconArrowsExchange size={28} />
-                </span>
-                <div>
-                  <h2 className="!m-0 !text-xl !font-extrabold !leading-[1.35] !tracking-[-0.015em] !text-[#1e5a9c]" id="reporte-movimientos-title">Movimientos del periodo</h2>
-                  <p className="!mt-1.5 !mb-0 !text-[0.9375rem] !font-normal !leading-6 !text-slate-500">Detalle de entradas y salidas según los filtros aplicados.</p>
-                </div>
+          <section className="inv-panel" aria-labelledby="reporte-movimientos-title">
+            <div className="inv-panel__heading">
+              <div>
+                <h2 id="reporte-movimientos-title">Movimientos del periodo</h2>
+                <p>Detalle de entradas y salidas según los filtros aplicados.</p>
               </div>
-            </header>
-            <div className="material-tracking__table-wrap !overflow-hidden !rounded-3xl !border-blue-100 !bg-white !shadow-[0_14px_36px_rgba(18,63,112,0.10)]">
-              <table className="w-full border-separate border-spacing-0">
+            </div>
+            <div className="inv-table-wrap">
+              <table className="inv-table">
                 <caption className="visually-hidden">Movimientos del reporte</caption>
                 <thead>
                   <tr>
-                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Fecha</th>
-                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Material</th>
-                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Tipo</th>
-                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Cantidad</th>
-                    <th className="!bg-slate-50/90 !px-5 !py-4 !text-xs !font-extrabold !tracking-wider !text-slate-600">Responsable</th>
+                    <th>Fecha</th>
+                    <th>Material</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Responsable</th>
                   </tr>
                 </thead>
                 <tbody>
                   {reporte.movimientos.map((movimiento) => (
-                  <tr className="group transition-colors duration-200 hover:!bg-[#eaf6ff]/60" key={movimiento.id}>
-                      <td className="!px-5 !py-4 text-slate-500" data-label="Fecha">{formatMovimientoFecha(movimiento.fechaMovimiento)}</td>
-                      <td className="!px-5 !py-4 !font-semibold !text-slate-800" data-label="Material">{getMovimientoMaterialNombre(movimiento)}</td>
+                    <tr key={movimiento.id}>
+                      <td data-label="Fecha">{formatMovimientoFecha(movimiento.fechaMovimiento)}</td>
+                      <td data-label="Material">
+                        <strong>{getMovimientoMaterialNombre(movimiento)}</strong>
+                      </td>
                       <td data-label="Tipo">
-                        <span className={`material-tracking__badge !inline-flex !items-center !gap-2 !px-3.5 !py-2 !shadow-sm ${movimiento.tipo === 'ENTRADA' ? '!border-emerald-200 !bg-emerald-50 !text-emerald-700' : '!border-rose-200 !bg-rose-50 !text-rose-700'}`} data-status={movimiento.tipo}>
-                          <span className={`size-2 rounded-full ${movimiento.tipo === 'ENTRADA' ? 'bg-emerald-500' : 'bg-rose-500'}`} aria-hidden="true" />
+                        <span
+                          className={
+                            movimiento.tipo === 'ENTRADA'
+                              ? 'inv-badge inv-badge--ok'
+                              : 'inv-badge inv-badge--low'
+                          }
+                        >
                           {formatMovimientoTipo(movimiento.tipo)}
                         </span>
                       </td>
-                      <td className="!px-5 !py-4 !font-bold !text-[#1e5a9c]" data-label="Cantidad">{formatMovimientoCantidad(movimiento)}</td>
-                      <td className="!px-5 !py-4 !text-slate-700" data-label="Responsable">{getMovimientoResponsable(movimiento)}</td>
+                      <td data-label="Cantidad">
+                        <strong>{formatMovimientoCantidad(movimiento)}</strong>
+                      </td>
+                      <td data-label="Responsable">
+                        {getMovimientoResponsable(movimiento)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -421,7 +428,6 @@ export default function ReportesInventarioPage() {
             </div>
           </section>
         ) : null}
-      </div>
     </main>
   )
 }

@@ -1,4 +1,5 @@
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
+import { Button } from '../../../shared/ui'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import ProyectosAdminDetailView from './ProyectosAdminDetailView'
 import ProyectosAdminFormPageLayout from './ProyectosAdminFormPageLayout'
@@ -37,9 +38,9 @@ const ProyectosAdminDetailPage = () => {
 
       {!sessionBlocked && missing ? (
         <ProyectosAdminMissingState>
-          <Link className="gallery-admin__button" to={PROYECTOS_ADMIN_PATH}>
+          <Button to={PROYECTOS_ADMIN_PATH} variant="secondary">
             Volver al listado
-          </Link>
+          </Button>
         </ProyectosAdminMissingState>
       ) : null}
 
@@ -55,27 +56,21 @@ const ProyectosAdminDetailPage = () => {
           >
             Reintentar
           </button>
-          <Link className="gallery-admin__button" to={PROYECTOS_ADMIN_PATH}>
+          <Button to={PROYECTOS_ADMIN_PATH} variant="secondary">
             Volver al listado
-          </Link>
+          </Button>
         </div>
       ) : null}
 
       {proyecto && !sessionBlocked && !missing ? (
         <div className="proyectos-admin__detail-page">
           <div className="proyectos-admin__detail-actions">
-            <Link
-              className="gallery-admin__button"
-              to={PROYECTOS_ADMIN_PATH}
-            >
+            <Button to={PROYECTOS_ADMIN_PATH} variant="secondary">
               Volver al listado
-            </Link>
-            <Link
-              className="gallery-admin__button gallery-admin__button--primary"
-              to={proyectosAdminEditPath(proyecto.id)}
-            >
+            </Button>
+            <Button to={proyectosAdminEditPath(proyecto.id)} variant="primary">
               Editar proyecto
-            </Link>
+            </Button>
           </div>
           <ProyectosAdminDetailView proyecto={proyecto} />
         </div>

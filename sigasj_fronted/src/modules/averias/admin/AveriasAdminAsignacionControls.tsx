@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { IconLoader2, IconUserPlus } from '@tabler/icons-react'
+import { IconUserPlus } from '@tabler/icons-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import { Button } from '../../../shared/ui'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
 import { useAveriaAdminAsignacion } from '../hooks/useAveriaAdminAsignacion'
 import {
@@ -234,25 +235,22 @@ const AveriasAdminAsignacionControls = ({
             </select>
           </label>
 
-          <button
+          <Button
             ref={assignButtonRef}
             type="button"
-            className="averias-admin-asignacion__submit group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 px-5 py-3 font-extrabold text-white shadow-[0_8px_18px_rgba(30,90,156,0.24)] transition-all duration-200 enabled:hover:-translate-y-0.5 enabled:hover:from-blue-800 enabled:hover:to-sky-600 enabled:hover:shadow-[0_11px_24px_rgba(30,90,156,0.32)] enabled:active:translate-y-0 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
+            variant="primary"
             disabled={busy || selectedFontaneroId == null}
+            loading={assigning}
             aria-busy={assigning}
             onClick={handleAssignClick}
+            leftIcon={
+              assigning ? undefined : (
+                <IconUserPlus size={19} aria-hidden="true" />
+              )
+            }
           >
-            {assigning ? (
-              <IconLoader2 className="animate-spin" size={19} aria-hidden="true" />
-            ) : (
-              <IconUserPlus
-                className="transition-transform duration-200 group-enabled:group-hover:scale-110"
-                size={19}
-                aria-hidden="true"
-              />
-            )}
             {assigning ? 'Asignando…' : 'Asignar fontanero'}
-          </button>
+          </Button>
         </div>
       ) : null}
 

@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import { IconPhoto, IconUpload } from '@tabler/icons-react'
+import { Button } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { validateGalleryImageFile } from '../../galeria/admin/validateGalleryImageFile'
 import type { ComunicadoFormValues } from './types'
@@ -307,20 +308,16 @@ const ComunicadosAdminForm = ({
       ) : null}
 
       <div className="gallery-admin__form-actions">
-        <button
-          type="submit"
-          className="gallery-admin__button gallery-admin__button--primary"
-          disabled={submitting}
-        >
+        <Button type="submit" variant="primary" disabled={submitting} loading={submitting}>
           {submitting
             ? 'Guardando…'
             : mode === 'create'
               ? 'Guardar comunicado'
               : 'Guardar cambios'}
-        </button>
-        <button type="button" className="gallery-admin__button" onClick={onCancel}>
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import { IconFileText, IconUpload } from '@tabler/icons-react'
+import { Button } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { TransparenciaFormValues } from './types'
 import {
@@ -257,20 +258,16 @@ const TransparenciaAdminForm = ({
       ) : null}
 
       <div className="gallery-admin__form-actions">
-        <button
-          type="submit"
-          className="gallery-admin__button gallery-admin__button--primary"
-          disabled={submitting}
-        >
+        <Button type="submit" variant="primary" disabled={submitting} loading={submitting}>
           {submitting
             ? 'Guardando…'
             : mode === 'create'
               ? 'Guardar publicación'
               : 'Guardar cambios'}
-        </button>
-        <button type="button" className="gallery-admin__button" onClick={onCancel}>
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

@@ -46,6 +46,17 @@ Inventario puede seguir usando clases `inv-*` como capa scoped; al tocar pantall
 - `@radix-ui/react-dialog` → `shared/ui/Dialog` (nuevo). `ConfirmDialog` legacy se mantiene por tests/a11y existentes.
 - `@playwright/test` → smoke visual (`npm run test:e2e`)
 
+## Checklist de estandarización admin (por módulo)
+
+- [ ] Cabecera con `PageHeader` (eyebrow / título / descripción / acciones)
+- [ ] Acciones con `Button` (primary / secondary / ghost / danger)
+- [ ] Contenedores con `Card` / `AdminFilters` / `AdminListItem`
+- [ ] Estados con `Alert` + `EmptyState` y copy de `shared/admin/adminCopy.ts`
+- [ ] Badges con `Badge` / `StatusBadge`
+- [ ] Sin hex/teal/gradientes fuera de tokens ASADA
+- [ ] Contenedor de página: `AdminShell`
+- [ ] Inventario: `inv-*` alineado a tokens/`PageHeader`/`Button` (no BEM nuevo en `index.css`)
+
 ## Qué evitar
 
 - Nuevos `!important` en `index.css`.

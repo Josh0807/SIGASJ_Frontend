@@ -14,6 +14,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import { Button } from '../../../shared/ui'
 import {
   deleteProyectoImagen,
   removeProyectoImagenPrincipal,
@@ -371,14 +372,14 @@ const ProyectoImagenesGaleria = ({
                 onChange={handleCoverChange}
                 style={{ display: 'none' }}
               />
-              <button
+              <Button
                 type="button"
-                className="gallery-admin__button gallery-admin__button--primary"
+                variant="primary"
                 disabled={loading}
                 onClick={() => coverInputRef.current?.click()}
               >
                 {proyecto.imagenPrincipal ? 'Cambiar imagen' : 'Asignar imagen'}
-              </button>
+              </Button>
 
               {proyecto.imagenPrincipal ? (
                 <button
@@ -414,14 +415,14 @@ const ProyectoImagenesGaleria = ({
               onChange={handleAddGalleryPhotos}
               style={{ display: 'none' }}
             />
-            <button
+            <Button
               type="button"
-              className="gallery-admin__button gallery-admin__button--primary"
+              variant="primary"
               disabled={loading}
               onClick={() => galleryInputRef.current?.click()}
             >
               + Agregar fotografías
-            </button>
+            </Button>
           </div>
         </header>
 

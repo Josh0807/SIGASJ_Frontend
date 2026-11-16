@@ -1,6 +1,4 @@
 import {
-  IconAlertCircle,
-  IconArrowLeft,
   IconBuilding,
   IconCalendar,
   IconClipboardText,
@@ -14,7 +12,16 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+} from '../../../shared/ui'
 import { formatearFechaHoraAsada } from '../../../shared/utils/fechaAsada'
 import { useAuth } from '../../auth/components/AuthContext'
 import { userHasAllowedRole } from '../../auth/utils/adminNavigation'
@@ -243,47 +250,38 @@ export default function SolicitudAdminDetailPage() {
 
   if (loading) {
     return (
-      <main className="admin-content-modern grid min-h-80 place-items-center" role="status">
-        <span className="font-bold text-[color:var(--asada-muted,#5b7390)]">
-          <span className="mx-auto mb-3 block size-10 animate-spin rounded-full border-4 border-[color:var(--asada-line,#d7e5f1)] border-t-[color:var(--asada-navy,#1e5a9c)]" />
-          Cargando detalle…
-        </span>
-      </main>
+      <AdminShell aria-labelledby="solicitud-detail-title">
+        <Alert tone="info">{ADMIN_COPY.loading('el detalle de la solicitud')}</Alert>
+      </AdminShell>
     )
   }
 
   if (error || !detail) {
     return (
-      <main className="admin-content-modern grid min-h-80 place-items-center">
-        <section
-          className="max-w-xl rounded-2xl border border-red-200 bg-white p-8 text-center shadow-sm"
-          role="alert"
-        >
-          <IconAlertCircle className="mx-auto text-red-600" size={42} />
-          <h1 className="mb-0 mt-3 text-2xl font-black text-red-900">
-            No se pudo abrir la solicitud
-          </h1>
-          <p className="mb-0 mt-3 text-red-800">{error}</p>
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <Link
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 font-bold text-slate-700 no-underline"
-              to={SOLICITUDES_ADMIN_TRAMITES_PATH}
-            >
-              <IconArrowLeft size={18} /> Volver
-            </Link>
-            <button
-              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border-0 bg-red-700 px-4 font-bold text-white"
-              onClick={() => {
-                setLoading(true)
-                setError('')
-                setRefresh((value) => value + 1)
-              }}
-            >
-              <IconRefresh size={18} /> Reintentar
-            </button>
-          </div>
-        </section>
-      </main>
+      <AdminShell aria-labelledby="solicitud-detail-title">
+        <EmptyState
+          title={error || ADMIN_COPY.loadError('la solicitud')}
+          actions={
+            <>
+              <Button to={SOLICITUDES_ADMIN_TRAMITES_PATH} variant="secondary">
+                {ADMIN_COPY.backToList}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                leftIcon={<IconRefresh size={17} aria-hidden="true" />}
+                onClick={() => {
+                  setLoading(true)
+                  setError('')
+                  setRefresh((value) => value + 1)
+                }}
+              >
+                {ADMIN_COPY.retry}
+              </Button>
+            </>
+          }
+        />
+      </AdminShell>
     )
   }
 
@@ -342,35 +340,27 @@ export default function SolicitudAdminDetailPage() {
   )
 
   return (
-    <main className="admin-content-modern grid min-w-0 gap-4 sm:gap-5">
-      <Link
-        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 text-sm font-extrabold text-[color:var(--asada-navy,#1e5a9c)] no-underline shadow-[0_6px_18px_rgba(30,90,156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[color:var(--asada-ice,#eaf6ff)] hover:no-underline"
-        to={SOLICITUDES_ADMIN_TRAMITES_PATH}
-      >
-        <IconArrowLeft
-          className="transition-transform group-hover:-translate-x-1"
-          size={17}
-        />{' '}
-        Volver a trámites
-      </Link>
+    <AdminShell
+      className="gap-4 sm:gap-5"
+      aria-labelledby="solicitud-detail-title"
+    >
+      <PageHeader
+        id="solicitud-detail-title"
+        eyebrow="Solicitudes · Detalle"
+        title={detail.codigoSeguimiento}
+        description={tipoNombre}
+        actions={
+          <>
+            <Button to={SOLICITUDES_ADMIN_TRAMITES_PATH} variant="secondary">
+              {ADMIN_COPY.backToList}
+            </Button>
+            <SolicitudEstadoBadge estado={detail.estado} />
+          </>
+        }
+      />
 
-      <header className={cardClass}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[color:var(--asada-navy,#1e5a9c)]">
-              Solicitudes · Detalle
-            </p>
-            <h1 className="m-0 break-all text-[clamp(1.45rem,3vw,2rem)] font-black tracking-[-0.03em] text-[color:var(--asada-ink,#123f70)]">
-              {detail.codigoSeguimiento}
-            </h1>
-            <p className="mb-0 mt-2 text-base font-semibold text-[color:var(--asada-muted,#5b7390)]">
-              {tipoNombre}
-            </p>
-          </div>
-          <SolicitudEstadoBadge estado={detail.estado} />
-        </div>
-
-        <dl className="mt-5 grid gap-3 border-t border-[color:var(--asada-line,#d7e5f1)] pt-5 sm:grid-cols-3">
+      <Card as="section" padded className={cardClass}>
+        <dl className="m-0 grid gap-3 sm:grid-cols-3">
           <div className="flex gap-3 rounded-xl bg-[#eaf6ff] p-3.5">
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white text-[color:var(--asada-navy,#1e5a9c)]">
               <IconCalendar size={18} aria-hidden="true" />
@@ -413,7 +403,7 @@ export default function SolicitudAdminDetailPage() {
             </span>
           </div>
         </dl>
-      </header>
+      </Card>
 
       {formSections.length || adminEntries.length ? (
         (() => {
@@ -539,12 +529,9 @@ export default function SolicitudAdminDetailPage() {
       {puedeCambiarEstado ? (
         <div>
           {exitoEstado ? (
-            <p
-              className="mb-4 mt-0 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
-              role="status"
-            >
+            <Alert tone="success" className="mb-4">
               {exitoEstado}
-            </p>
+            </Alert>
           ) : null}
           <CambiarEstadoSolicitudSection
             key={`${detail.id}-${detail.estado}`}
@@ -577,12 +564,7 @@ export default function SolicitudAdminDetailPage() {
       {!(formSections.length || adminEntries.length) ? documentosCard : null}
 
       {!puedeCambiarEstado && exitoEstado ? (
-        <p
-          className="m-0 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
-          role="status"
-        >
-          {exitoEstado}
-        </p>
+        <Alert tone="success">{exitoEstado}</Alert>
       ) : null}
 
       <SolicitudHistorialTimeline
@@ -591,6 +573,6 @@ export default function SolicitudAdminDetailPage() {
         error={historial.error}
         onRetry={() => setRecargaHistorial((value) => value + 1)}
       />
-    </main>
+    </AdminShell>
   )
 }

@@ -7,6 +7,7 @@ import {
   IconTruckDelivery,
 } from '@tabler/icons-react'
 import { useNavigate } from 'react-router-dom'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   Alert,
   Button,
@@ -158,7 +159,7 @@ export default function RecepcionesPage() {
             onClick={retry}
             leftIcon={<IconRefresh size={16} aria-hidden="true" />}
           >
-            Reintentar
+            {ADMIN_COPY.retry}
           </Button>
         </Alert>
       ) : null}

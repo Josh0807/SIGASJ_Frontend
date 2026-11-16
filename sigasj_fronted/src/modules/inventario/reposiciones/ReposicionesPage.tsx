@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { IconArrowLeft, IconBox, IconFilter, IconRefresh } from '@tabler/icons-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { IconArrowLeft, IconBox, IconEye, IconFilter, IconRefresh } from '@tabler/icons-react'
+import { useNavigate } from 'react-router-dom'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  Alert,
+  Button,
+  EmptyState,
+  MetricPill,
+  PageHeader,
+} from '../../../shared/ui'
 import { InventoryFormField } from '../InventoryFormField'
 import { MATERIALES_PATH, reposicionDetailPath } from '../inventarioPaths'
 import { getReposicionesAdmin } from './reposicionesApi'
@@ -100,18 +108,31 @@ export default function ReposicionesPage() {
     setPage(1)
   }
 
-  return (
-    <section className="material-tracking" aria-labelledby="reposiciones-title">
-      <header className="material-tracking__header">
-        <div>
-          <p className="material-request__eyebrow">Inventario · Administración</p>
-          <h1 id="reposiciones-title">Reposiciones de materiales</h1>
-          <p>Consulte y gestione las reposiciones generadas por alertas, solicitudes o acciones administrativas.</p>
-        </div>
-        <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !py-3 !font-extrabold !text-[#1e5a9c] !shadow-[0_8px_20px_rgba(30, 90, 156,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
-      </header>
+  const filtered = Boolean(estado || origen)
 
-      <div className="material-tracking__filters !flex !items-end !justify-between !gap-5 !overflow-hidden !rounded-3xl !border-blue-100 !bg-linear-to-r !from-white !via-blue-50/35 !to-sky-50/70 !p-6 !shadow-[0_12px_32px_rgba(30, 90, 156,0.09)] [&>label]:!w-full [&>label]:!max-w-[470px] [&>label]:!justify-items-start [&>label]:!text-left [&>label>span:first-child]:!ml-1 [&>label>span:first-child]:!w-auto [&>label>span:first-child]:!justify-self-start [&>label>span:first-child]:!text-left [&_.provider-admin__control]:!w-full [&_.provider-admin__control]:!rounded-2xl [&_.provider-admin__control]:!border [&_.provider-admin__control]:!border-blue-100 [&_.provider-admin__control]:!bg-white [&_.provider-admin__control]:!shadow-[0_7px_18px_rgba(30, 90, 156,0.08)] [&_.provider-admin__control]:!transition-all [&_.provider-admin__control]:!duration-300 hover:[&_.provider-admin__control]:!border-blue-300 hover:[&_.provider-admin__control]:!shadow-[0_10px_24px_rgba(30, 90, 156,0.14)] focus-within:[&_.provider-admin__control]:!border-blue-400 focus-within:[&_.provider-admin__control]:!ring-4 focus-within:[&_.provider-admin__control]:!ring-blue-100 max-[850px]:!grid max-[850px]:!grid-cols-1 max-[850px]:!items-stretch max-[850px]:[&>label]:!max-w-none">
+  return (
+    <section
+      className="inv-reposiciones"
+      style={{ display: 'grid', gap: 14 }}
+      aria-labelledby="reposiciones-title"
+    >
+      <PageHeader
+        eyebrow="Inventario · Administración"
+        title={<span id="reposiciones-title">Reposiciones de materiales</span>}
+        description="Consulte y gestione las reposiciones generadas por alertas, solicitudes o acciones administrativas."
+        actions={
+          <Button
+            to={MATERIALES_PATH}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            Volver al catálogo
+          </Button>
+        }
+      />
+
+      <section className="inv-panel" aria-label="Filtros de reposiciones">
+        <div className="inv-filters inv-filters--wrap">
         <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
         <select
           id="reposicion-estado-filtro"
@@ -135,37 +156,53 @@ export default function ReposicionesPage() {
         </select>
         </InventoryFormField>
         {!loading && !error ? (
-          <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-orange-200 !bg-linear-to-r !from-orange-50 !to-amber-50 !px-5 !py-3 !font-extrabold !text-orange-700 !shadow-[0_7px_18px_rgba(234,88,12,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(234,88,12,0.18)] motion-reduce:!transform-none motion-reduce:!transition-none max-[850px]:!w-fit" role="status"><IconBox size={19} aria-hidden="true" />{total} {total === 1 ? 'reposición' : 'reposiciones'}</span>
+          <MetricPill
+            label={total === 1 ? 'reposición' : 'reposiciones'}
+            value={total}
+            tone={total === 0 ? 'quiet' : 'primary'}
+            role="status"
+          />
         ) : null}
-      </div>
+        </div>
+      </section>
 
       {loading ? (
-        <div className="material-tracking__state" role="status">
-          <span className="material-request__spinner" />Cargando reposiciones…
+        <div className="inv-state" role="status">
+          Cargando reposiciones…
         </div>
       ) : null}
       {error ? (
-        <div className="material-tracking__state material-tracking__state--error" role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={retry}>
-            <IconRefresh size={18} aria-hidden="true" /> Reintentar
-          </button>
-        </div>
+        <Alert tone="danger" title="No se pudieron cargar las reposiciones">
+          <p className="m-0 mb-3">{error}</p>
+          <Button
+            size="sm"
+            onClick={retry}
+            leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+          >
+            {ADMIN_COPY.retry}
+          </Button>
+        </Alert>
       ) : null}
       {!loading && !error && reposiciones.length === 0 ? (
-        <div className="material-tracking__empty">
-          <h2>{estado || origen ? 'No hay reposiciones con esos filtros' : 'No hay reposiciones registradas'}</h2>
-          <p>
-            {estado || origen
+        <EmptyState
+          icon={<IconBox size={30} aria-hidden="true" />}
+          title={
+            filtered
+              ? 'No hay reposiciones con esos filtros'
+              : 'No hay reposiciones registradas'
+          }
+          description={
+            filtered
               ? 'Pruebe con otros filtros o consulte todos los registros.'
-              : 'Cuando se genere una reposición, aparecerá en este listado.'}
-          </p>
-        </div>
+              : 'Cuando se genere una reposición, aparecerá en este listado.'
+          }
+        />
       ) : null}
 
       {!loading && !error && reposiciones.length > 0 ? (
-        <div className="material-tracking__table-wrap">
-          <table>
+        <section className="inv-panel" aria-label="Listado de reposiciones">
+          <div className="inv-table-wrap">
+          <table className="inv-table">
             <thead>
               <tr>
                 <th>Código</th>
@@ -187,28 +224,56 @@ export default function ReposicionesPage() {
                   <td data-label="Proveedor">{getReposicionProveedorNombre(reposicion)}</td>
                   <td data-label="Materiales">{resumenMaterialesReposicion(reposicion.detalles ?? [])}</td>
                   <td data-label="Estado">
-                    <span className="material-tracking__badge" data-status={String(reposicion.estado).toUpperCase()}>
+                    <span className="inv-badge inv-badge--low">
                       {formatReposicionEstado(String(reposicion.estado))}
                     </span>
                   </td>
                   <td data-label="Responsable">{getReposicionResponsable(reposicion)}</td>
                   <td data-label="Detalle">
-                    <Link className="material-tracking__detail-link" to={reposicionDetailPath(reposicion.id)}>
+                    <Button
+                      className="inv-row-action"
+                      size="sm"
+                      to={reposicionDetailPath(reposicion.id)}
+                      leftIcon={<IconEye size={16} aria-hidden="true" />}
+                    >
                       Ver detalle
-                    </Link>
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        </section>
       ) : null}
 
       {!loading && !error && totalPages > 1 ? (
-        <nav className="material-tracking__pagination" aria-label="Paginación de reposiciones">
-          <button type="button" disabled={page <= 1} onClick={() => { setLoading(true); setPage((value) => value - 1) }}>Anterior</button>
-          <span>Página {page} de {totalPages}</span>
-          <button type="button" disabled={page >= totalPages} onClick={() => { setLoading(true); setPage((value) => value + 1) }}>Siguiente</button>
+        <nav className="inv-pagination" aria-label="Paginación de reposiciones">
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            disabled={page <= 1}
+            onClick={() => {
+              setLoading(true)
+              setPage((value) => value - 1)
+            }}
+          >
+            Anterior
+          </button>
+          <span>
+            Página {page} de {totalPages}
+          </span>
+          <button
+            type="button"
+            className="inv-btn inv-btn--secondary"
+            disabled={page >= totalPages}
+            onClick={() => {
+              setLoading(true)
+              setPage((value) => value + 1)
+            }}
+          >
+            Siguiente
+          </button>
         </nav>
       ) : null}
     </section>

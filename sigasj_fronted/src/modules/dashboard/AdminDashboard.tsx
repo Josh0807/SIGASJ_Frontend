@@ -17,6 +17,8 @@ import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
 import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
 import { IconRefresh } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../shared/admin/adminCopy'
+import { Button } from '../../shared/ui'
 import panelOperativoImage from '../../assets/Hero1.webp'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
@@ -169,7 +171,7 @@ const AdminDashboard = () => {
               <p>Refresque las cifras cuando necesite la lectura más reciente.</p>
             </div>
             {indicators.length > 0 ? (
-              <button
+              <Button
                 type="button"
                 className="admin-dashboard__refresh-btn"
                 onClick={() => {
@@ -177,17 +179,19 @@ const AdminDashboard = () => {
                 }}
                 disabled={isLoading}
                 aria-label="Actualizar datos del dashboard"
+                leftIcon={
+                  <IconRefresh
+                    className={
+                      isLoading ? 'admin-dashboard__refresh-icon--loading' : undefined
+                    }
+                    aria-hidden="true"
+                    size={18}
+                    stroke={2}
+                  />
+                }
               >
-                <IconRefresh
-                  className={`admin-dashboard__refresh-icon ${
-                    isLoading ? 'admin-dashboard__refresh-icon--loading' : ''
-                  }`}
-                  aria-hidden="true"
-                  size={18}
-                  stroke={2}
-                />
                 {isLoading ? 'Cargando...' : 'Actualizar datos'}
-              </button>
+              </Button>
             ) : null}
           </aside>
         </div>
@@ -203,9 +207,9 @@ const AdminDashboard = () => {
             {isError ? (
               <div className="admin-dashboard__global-error" role="alert">
                 <span>No se pudieron actualizar algunos indicadores del servidor.</span>
-                <button type="button" onClick={() => void refetch()}>
-                  Reintentar
-                </button>
+                <Button type="button" size="sm" onClick={() => void refetch()}>
+                  {ADMIN_COPY.retry}
+                </Button>
               </div>
             ) : null}
 

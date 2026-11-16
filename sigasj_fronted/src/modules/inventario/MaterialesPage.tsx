@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { Button } from '../../shared/ui'
 import {
   IconAlertTriangle,
   IconBox,
@@ -446,10 +447,12 @@ export default function MaterialesPage() {
           <p>Control de materiales, existencias y movimientos.</p>
         </div>
         {canCreate ? (
-          <Link className="inv-btn inv-btn--primary" to={MATERIAL_NEW_PATH}>
-            <IconPlus size={18} aria-hidden="true" />
+          <Button
+            to={MATERIAL_NEW_PATH}
+            leftIcon={<IconPlus size={18} aria-hidden="true" />}
+          >
             Nuevo material
-          </Link>
+          </Button>
         ) : null}
       </header>
 

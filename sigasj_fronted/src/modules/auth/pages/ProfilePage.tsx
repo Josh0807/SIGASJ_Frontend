@@ -1,4 +1,5 @@
 import { IconId, IconMail, IconShield, IconUserCircle } from '@tabler/icons-react'
+import { AdminShell, PageHeader } from '../../../shared/ui'
 import { useAuth } from '../components/AuthContext'
 import {
   getAuthUserDisplayName,
@@ -25,16 +26,12 @@ const ProfilePage = () => {
   const initials = initialsFromName(displayName)
 
   return (
-    <main className="admin-surface-page admin-profile" aria-labelledby="profile-page-title">
-      <header className="admin-profile__header">
-        <div className="admin-profile__header-copy">
-          <p className="admin-profile__eyebrow">Cuenta administrativa</p>
-          <h1 id="profile-page-title">Mi perfil</h1>
-          <p className="admin-profile__lead">
-            Datos de la sesión actual. La edición de cuenta se gestiona con la Administradora.
-          </p>
-        </div>
-      </header>
+    <AdminShell className="admin-profile gap-4" aria-labelledby="profile-page-title">
+      <PageHeader
+        eyebrow="Cuenta administrativa"
+        title={<span id="profile-page-title">Mi perfil</span>}
+        description="Datos de la sesión actual. La edición de cuenta se gestiona con la Administradora."
+      />
 
       <section className="admin-surface-card admin-profile__card" aria-label="Datos del perfil">
         <div className="admin-profile__identity">
@@ -79,7 +76,7 @@ const ProfilePage = () => {
           Solo lectura. Para cambios de correo, rol o acceso, solicítelo a la Administradora.
         </p>
       </section>
-    </main>
+    </AdminShell>
   )
 }
 

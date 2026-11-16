@@ -1,3 +1,4 @@
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import type { EstadoAveria } from './estadoAveria'
 import {
   PRIORIDAD_AVERIA_LABELS,
@@ -168,13 +169,11 @@ export const AVERIAS_ADMIN_DETAIL_ERROR =
 export const AVERIAS_ADMIN_DETAIL_NOT_FOUND =
   'No se encontró la avería solicitada.'
 
-export const AVERIAS_ADMIN_LOAD_ERROR =
-  'No fue posible cargar las averías. Intente nuevamente.'
+export const AVERIAS_ADMIN_LOAD_ERROR = ADMIN_COPY.loadError('las averías')
 
-export const AVERIAS_ADMIN_EMPTY_MESSAGE =
-  'No se encontraron averías con los criterios seleccionados.'
+export const AVERIAS_ADMIN_EMPTY_MESSAGE = ADMIN_COPY.emptyFiltered('averías')
 
-export const AVERIAS_ADMIN_LOADING_MESSAGE = 'Cargando averías...'
+export const AVERIAS_ADMIN_LOADING_MESSAGE = ADMIN_COPY.loading('averías')
 
 export type AveriaHistorialItem = {
   id: number
@@ -221,12 +220,13 @@ export const EMPTY_AVERIAS_HISTORIAL: AveriasHistorialListado = {
 }
 
 export const AVERIAS_HISTORIAL_LOAD_ERROR =
-  'No fue posible cargar el historial de averías. Intente nuevamente.'
+  ADMIN_COPY.loadError('el historial de averías')
 
 export const AVERIAS_HISTORIAL_EMPTY_MESSAGE =
-  'No se encontraron averías en el historial con los criterios seleccionados.'
+  ADMIN_COPY.emptyFiltered('averías en el historial')
 
-export const AVERIAS_HISTORIAL_LOADING_MESSAGE = 'Cargando historial de averías...'
+export const AVERIAS_HISTORIAL_LOADING_MESSAGE =
+  ADMIN_COPY.loading('el historial de averías')
 
 export const AVERIAS_HISTORIAL_RANGE_ERROR =
   'La fecha inicial no puede ser posterior a la fecha final.'

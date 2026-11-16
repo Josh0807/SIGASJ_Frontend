@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { ADMIN_COPY } from '../admin/adminCopy'
+import { Button, EmptyState } from '../ui'
 
 export type AdminListQueryStatesProps = {
   loading: boolean
@@ -51,22 +53,23 @@ const AdminListQueryStates = ({
 
   if (error) {
     return (
-      <div className="gallery-admin__empty" role="alert">
-        <p>{error}</p>
-        {onRetry ? (
-          <button type="button" className="gallery-admin__button gallery-admin__button--primary" onClick={onRetry}>
-            Reintentar
-          </button>
-        ) : null}
-      </div>
+      <EmptyState
+        role="alert"
+        title={error}
+        actions={
+          onRetry ? (
+            <Button type="button" variant="secondary" onClick={onRetry}>
+              {ADMIN_COPY.retry}
+            </Button>
+          ) : undefined
+        }
+      />
     )
   }
 
   if (!hasResults) {
     return (
-      <div className="gallery-admin__empty" role="status">
-        <p>{emptyMessage}</p>
-      </div>
+      <EmptyState role="status" title={emptyMessage} />
     )
   }
 

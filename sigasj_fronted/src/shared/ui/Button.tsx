@@ -1,7 +1,8 @@
-import type {
-  AnchorHTMLAttributes,
-  ButtonHTMLAttributes,
-  ReactNode,
+import {
+  forwardRef,
+  type AnchorHTMLAttributes,
+  type ButtonHTMLAttributes,
+  type ReactNode,
 } from 'react'
 import { Link, type LinkProps } from 'react-router-dom'
 import { buttonVariants, type ButtonVariantProps } from './button-variants'
@@ -35,7 +36,10 @@ type ButtonAsAnchor = CommonProps &
 
 export type ButtonProps = ButtonAsButton | ButtonAsLink | ButtonAsAnchor
 
-export function Button(props: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  props,
+  ref,
+) {
   const {
     variant = 'primary',
     size = 'md',
@@ -45,7 +49,7 @@ export function Button(props: ButtonProps) {
     className,
     children,
     ...rest
-  } = props
+  } = props as ButtonProps
 
   const composed = cn(buttonVariants({ variant, size }), className)
   const content = (
@@ -63,7 +67,7 @@ export function Button(props: ButtonProps) {
     </>
   )
 
-  if ('to' in props && props.to !== undefined) {
+  if ('to' in props && (props as ButtonAsLink).to !== undefined) {
     const { to, ...linkRest } = rest as Omit<
       LinkProps,
       'children' | 'className' | 'to'
@@ -81,7 +85,7 @@ export function Button(props: ButtonProps) {
     )
   }
 
-  if ('href' in props && props.href) {
+  if ('href' in props && (props as ButtonAsAnchor).href) {
     const { href, ...anchorRest } = rest as AnchorHTMLAttributes<HTMLAnchorElement>
     return (
       <a
@@ -99,6 +103,7 @@ export function Button(props: ButtonProps) {
   return (
     <button
       {...buttonRest}
+      ref={ref}
       type={buttonRest.type ?? 'button'}
       className={composed}
       disabled={buttonRest.disabled || loading}
@@ -107,6 +112,6 @@ export function Button(props: ButtonProps) {
       {content}
     </button>
   )
-}
+})
 
 export default Button

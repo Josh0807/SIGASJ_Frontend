@@ -8,6 +8,7 @@ import {
   IconRefresh,
 } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Button } from '../../../shared/ui'
 import { InventoryFormField } from '../InventoryFormField'
 import {
   SOLICITUD_MATERIALES_NEW_PATH,
@@ -32,9 +33,6 @@ const STATUS_OPTIONS = [
   'CANCELADA',
   'DESPACHADA',
 ] as const
-
-const requestButtonClasses =
-  'group relative isolate overflow-hidden !inline-flex !min-h-11 !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !via-blue-600 !to-sky-500 !px-5 !py-2.5 !font-extrabold !text-white !no-underline !shadow-[0_10px_24px_rgba(30,90,156,0.28)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:!from-blue-700 hover:!to-cyan-500 hover:!shadow-[0_16px_32px_rgba(30,90,156,0.36)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1e5a9c] motion-reduce:transform-none motion-reduce:transition-none'
 
 function statusTone(estado: string) {
   const value = estado.toUpperCase()
@@ -143,17 +141,13 @@ export default function SolicitudesMaterialesSeguimientoPage() {
           </div>
         </div>
 
-        <Link
-          className={`material-request__primary ${requestButtonClasses}`}
+        <Button
           to={SOLICITUD_MATERIALES_NEW_PATH}
+          variant="primary"
+          leftIcon={<IconPlus size={20} aria-hidden="true" />}
         >
-          <IconPlus
-            className="transition-transform duration-300 group-hover:rotate-90 motion-reduce:transform-none"
-            size={20}
-            aria-hidden="true"
-          />
           Nueva solicitud
-        </Link>
+        </Button>
       </header>
 
       <div className="material-tracking__panel">
@@ -210,17 +204,13 @@ export default function SolicitudesMaterialesSeguimientoPage() {
           <div className="material-tracking__empty">
             <h2>Aún no tiene solicitudes</h2>
             <p>Cuando registre una solicitud podrá consultar aquí su estado.</p>
-            <Link
-              className={`material-request__primary ${requestButtonClasses}`}
+            <Button
               to={SOLICITUD_MATERIALES_NEW_PATH}
+              variant="primary"
+              leftIcon={<IconPlus size={20} aria-hidden="true" />}
             >
-              <IconPlus
-                className="transition-transform duration-300 group-hover:rotate-90 motion-reduce:transform-none"
-                size={20}
-                aria-hidden="true"
-              />
               Crear primera solicitud
-            </Link>
+            </Button>
           </div>
         ) : null}
 

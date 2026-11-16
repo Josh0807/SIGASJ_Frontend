@@ -4,9 +4,9 @@ import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import IndicatorCard from '../../../shared/components/IndicatorCard'
-import { Button } from '../../../shared/ui/Button'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import { AdminShell, Button, EmptyState, PageHeader } from '../../../shared/ui'
 import { useAdminAveriasReporteResumen } from '../hooks/useAdminAveriasReporteResumen'
 import { AVERIAS_ADMIN_IMPRIMIR_PATH, AVERIAS_ADMIN_PATH } from './averiasAdminPaths'
 import {
@@ -89,30 +89,34 @@ const AveriasReporteResumenPage = ({
   }
 
   return (
-    <main className="gallery-admin averias-admin w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack gap-4">
-        <PageHeader
-          title="Resumen de averías"
-          description="Cantidad de averías registradas según su estado actual."
-          actions={
-            <>
-              <Button
-                to={`${AVERIAS_ADMIN_IMPRIMIR_PATH}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`}
-                size="sm"
-              >
-                Imprimir averías atendidas
-              </Button>
-              <Button
-                to={AVERIAS_ADMIN_PATH}
-                variant="secondary"
-                size="sm"
-                leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
-              >
-                Volver a gestión
-              </Button>
-            </>
-          }
-        />
+    <AdminShell
+      className="averias-admin w-full min-w-0"
+      aria-labelledby="averias-reporte-title"
+    >
+      <PageHeader
+        id="averias-reporte-title"
+        eyebrow="Operación · Averías"
+        title="Resumen de averías"
+        description="Cantidad de averías registradas según su estado actual."
+        actions={
+          <>
+            <Button
+              to={`${AVERIAS_ADMIN_IMPRIMIR_PATH}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`}
+              size="sm"
+            >
+              Imprimir averías atendidas
+            </Button>
+            <Button
+              to={AVERIAS_ADMIN_PATH}
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+            >
+              {ADMIN_COPY.backToList}
+            </Button>
+          </>
+        }
+      />
 
         <section
           className="gallery-admin__filters averias-admin__filters"
@@ -144,14 +148,21 @@ const AveriasReporteResumenPage = ({
         </section>
 
         {errorMessage ? (
-          <div className="gallery-admin__empty" role="alert">
-            <p>{errorMessage}</p>
-            {rangoInvalido ? null : (
-              <button type="button" onClick={onRetry ?? remote.refetch}>
-                Reintentar
-              </button>
-            )}
-          </div>
+          <EmptyState
+            role="alert"
+            title={errorMessage}
+            actions={
+              rangoInvalido ? undefined : (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onRetry ?? remote.refetch}
+                >
+                  {ADMIN_COPY.retry}
+                </Button>
+              )
+            }
+          />
         ) : (
           <section
             className="averias-summary-indicators"
@@ -180,14 +191,11 @@ const AveriasReporteResumenPage = ({
                   ))}
             </div>
             {!isLoading && resumen?.total === 0 ? (
-              <p className="gallery-admin__empty" role="status">
-                {AVERIAS_REPORTE_EMPTY_MESSAGE}
-              </p>
+              <EmptyState role="status" title={AVERIAS_REPORTE_EMPTY_MESSAGE} />
             ) : null}
           </section>
         )}
-      </div>
-    </main>
+    </AdminShell>
   )
 }
 

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useSearchParams } from 'react-router-dom'
-import { IconArrowLeft, IconChevronRight } from '@tabler/icons-react'
+import { Navigate, useSearchParams } from 'react-router-dom'
+import { IconArrowLeft, IconHistory } from '@tabler/icons-react'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -267,46 +269,32 @@ const AveriasHistorialPage = ({
     !(isLoading && listItems.length === 0) && !errorMessage
 
   return (
-    <main className="gallery-admin admin-content-modern averias-admin min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
-          <div className="gallery-admin__header-copy min-w-0">
-            <div>
-              <nav aria-label="Ruta de navegación" className="mb-2">
-                <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-sm font-semibold text-slate-500">
-                  <li>Administración</li>
-                  <li aria-hidden="true" className="inline-flex items-center">
-                    <IconChevronRight size={16} />
-                  </li>
-                  <li>
-                    <Link to={AVERIAS_ADMIN_PATH} className="text-[#1e5a9c] no-underline hover:underline">
-                      Averías
-                    </Link>
-                  </li>
-                  <li aria-hidden="true" className="inline-flex items-center">
-                    <IconChevronRight size={16} />
-                  </li>
-                  <li aria-current="page" className="text-[#1e5a9c]">
-                    Historial
-                  </li>
-                </ol>
-              </nav>
-              <p className="gallery-admin__eyebrow">Consulta</p>
-              <h1>Historial de averías</h1>
-              <p>
-                Consulte casos actuales y resueltos. Esta vista es de solo lectura.
-              </p>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link to={AVERIAS_ADMIN_PATH} className="gallery-admin__button">
-              <IconArrowLeft size={18} aria-hidden="true" />
-              Volver a gestión
-            </Link>
-          </div>
-        </header>
+    <AdminShell
+      className="averias-admin min-w-0"
+      aria-labelledby="averias-historial-title"
+    >
+      <PageHeader
+        id="averias-historial-title"
+        eyebrow="Consulta · Averías"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconHistory size={22} aria-hidden="true" />
+            Historial de averías
+          </span>
+        }
+        description="Consulte casos actuales y resueltos. Esta vista es de solo lectura."
+        actions={
+          <Button
+            to={AVERIAS_ADMIN_PATH}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            {ADMIN_COPY.backToList}
+          </Button>
+        }
+      />
 
-        <AveriasHistorialFilters
+      <AveriasHistorialFilters
           codigoSeguimiento={codigoInput}
           estado={parsed.estado}
           prioridad={parsed.prioridad}
@@ -353,8 +341,7 @@ const AveriasHistorialPage = ({
             />
           </AveriasAdminQueryStates>
         </section>
-      </div>
-    </main>
+    </AdminShell>
   )
 }
 

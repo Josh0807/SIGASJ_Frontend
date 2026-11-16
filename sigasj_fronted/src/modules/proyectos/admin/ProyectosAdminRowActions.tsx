@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
 import { IconPencil, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
+import { Button } from '../../../shared/ui'
 import { type AdminProyecto } from './types'
 
 type ProyectosAdminRowActionsProps = {
@@ -14,14 +14,15 @@ const ProyectosAdminRowActions = ({
   onToggleVisibilidad,
 }: ProyectosAdminRowActionsProps) => (
   <div className="gallery-admin__actions">
-    <Link
+    <Button
       to={editTo}
-      className="gallery-admin__button gallery-admin__button--primary"
+      variant="primary"
+      size="sm"
       aria-label={`Editar ${proyecto.nombre}`}
+      leftIcon={<IconPencil size={16} aria-hidden="true" />}
     >
-      <IconPencil size={16} aria-hidden="true" />
       Editar
-    </Link>
+    </Button>
     <button
       type="button"
       className={`gallery-admin__button${

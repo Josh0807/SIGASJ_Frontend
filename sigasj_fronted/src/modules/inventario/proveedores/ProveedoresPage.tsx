@@ -6,6 +6,7 @@ import {
   InternalAdminRoleName,
   normalizeInternalRole,
 } from '../../auth/utils/internalRoles'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   Alert,
   Badge,
@@ -189,7 +190,7 @@ export default function ProveedoresPage() {
         <Alert tone="danger" title="No se pudieron cargar los proveedores">
           <p className="m-0 mb-3">{error}</p>
           <Button size="sm" onClick={refetch}>
-            Reintentar
+            {ADMIN_COPY.retry}
           </Button>
         </Alert>
       ) : null}

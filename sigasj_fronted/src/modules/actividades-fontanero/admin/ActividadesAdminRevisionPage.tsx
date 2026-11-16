@@ -1,8 +1,27 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconClipboardList,
+  IconFilterOff,
+  IconRefresh,
+  IconSearch,
+} from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
-import ActivityFeedback from '../components/ActivityFeedback'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
+import {
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import { interpretActividadApiError } from '../utils/interpretActividadApiError'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
@@ -27,9 +46,6 @@ type DraftFilters = {
   fechaInicio: string
   fechaFin: string
 }
-
-const PRIMARY_ACTION_CLASS =
-  'gallery-admin__button gallery-admin__button--primary !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200'
 
 const EMPTY_FILTERS: DraftFilters = {
   fontaneroId: '',
@@ -100,17 +116,21 @@ const ActividadesAdminRevisionPage = () => {
 
   useEffect(() => {
     let active = true
-    void getReportesAdmin({}).then((reporte) => {
-      if (active) {
-        setFontaneros(
-          reporte.porFontanero
-            .map((item) => item.fontaneroId)
-            .filter(Boolean)
-            .sort((a, b) => a.localeCompare(b, 'es')),
-        )
-      }
-    }).catch(() => undefined)
-    return () => { active = false }
+    void getReportesAdmin({})
+      .then((reporte) => {
+        if (active) {
+          setFontaneros(
+            reporte.porFontanero
+              .map((item) => item.fontaneroId)
+              .filter(Boolean)
+              .sort((a, b) => a.localeCompare(b, 'es')),
+          )
+        }
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
+    }
   }, [])
 
   useEffect(() => {
@@ -121,6 +141,7 @@ const ActividadesAdminRevisionPage = () => {
         setActividades(result.data)
         setTotal(result.total)
         setTotalPages(result.totalPages ?? 1)
+        setError(null)
       })
       .catch((caught) => {
         if (!active) return
@@ -131,11 +152,18 @@ const ActividadesAdminRevisionPage = () => {
         } else if (interpreted.kind === 'forbidden') {
           setForbidden(true)
         } else {
-          setError(interpreted.message)
+          setError(
+            interpreted.message ||
+              ADMIN_COPY.loadError('las actividades registradas'),
+          )
         }
       })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
   }, [filters, reloadKey])
 
   const page = filters.page ?? 1
@@ -165,121 +193,232 @@ const ActividadesAdminRevisionPage = () => {
     setFilters(toFilters(EMPTY_FILTERS))
   }
 
+  const hayFiltros = Boolean(
+    draft.fontaneroId ||
+      draft.tipoActividadId ||
+      draft.estado ||
+      draft.fechaInicio ||
+      draft.fechaFin,
+  )
+
   return (
-    <main className="gallery-admin actividades-admin-revision">
-      <div className="gallery-admin__shell sigasj-stack !gap-7">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-          <div className="min-w-0 space-y-3">
-            <span className="gallery-admin__eyebrow">Actividades del Fontanero · Administradora</span>
-            <h1>Revisión de actividades</h1>
-            <p>Consulte la información reportada y confirme las actividades correctas.</p>
+    <AdminShell
+      className="actividades-admin-revision gap-5 sm:gap-6"
+      aria-labelledby="actividades-admin-revision-title"
+    >
+      <PageHeader
+        id="actividades-admin-revision-title"
+        eyebrow="Actividades del Fontanero · Administradora"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconClipboardList size={22} aria-hidden="true" />
+            Revisión de actividades
+          </span>
+        }
+        description="Consulte la información reportada y confirme las actividades correctas."
+        actions={
+          <Button to={ACTIVIDADES_ADMIN_PATHS.reportes} variant="secondary">
+            Ver reportes
+          </Button>
+        }
+      />
+
+      <form onSubmit={search}>
+      <AdminFilters
+        aria-label="Filtros de actividades"
+        summary={
+          !loading && !error ? (
+            <>
+              <strong className="text-sigasj-ink">{total}</strong>
+              <span>{total === 1 ? 'actividad' : 'actividades'}</span>
+            </>
+          ) : null
+        }
+      >
+        <AdminFilterField label="Fontanero">
+          <select
+            className={adminFilterControlClassName}
+            value={draft.fontaneroId}
+            onChange={(e) => setDraft({ ...draft, fontaneroId: e.target.value })}
+          >
+            <option value="">Todos</option>
+            {fontaneros.map((id) => (
+              <option key={id} value={id}>
+                {id}
+              </option>
+            ))}
+          </select>
+        </AdminFilterField>
+        <AdminFilterField label="Actividad">
+          <select
+            className={adminFilterControlClassName}
+            disabled={tiposLoading}
+            value={draft.tipoActividadId}
+            onChange={(e) => setDraft({ ...draft, tipoActividadId: e.target.value })}
+          >
+            <option value="">Todas</option>
+            {tipoOptions.map((tipo) => (
+              <option key={tipo.id} value={tipo.id}>
+                {tipo.nombre}
+              </option>
+            ))}
+          </select>
+        </AdminFilterField>
+        <AdminFilterField label="Estado">
+          <select
+            className={adminFilterControlClassName}
+            value={draft.estado}
+            onChange={(e) => setDraft({ ...draft, estado: e.target.value })}
+          >
+            <option value="">Todos</option>
+            <option value="REPORTADA">Pendiente</option>
+            <option value="REVISADA">Revisada</option>
+            <option value="REQUIERE_CORRECCION">Requiere corrección</option>
+          </select>
+        </AdminFilterField>
+        <AdminFilterField label="Desde">
+          <input
+            type="date"
+            className={adminFilterControlClassName}
+            value={draft.fechaInicio}
+            onChange={(e) => setDraft({ ...draft, fechaInicio: e.target.value })}
+          />
+        </AdminFilterField>
+        <AdminFilterField label="Hasta">
+          <input
+            type="date"
+            className={adminFilterControlClassName}
+            value={draft.fechaFin}
+            onChange={(e) => setDraft({ ...draft, fechaFin: e.target.value })}
+          />
+        </AdminFilterField>
+        <div className="col-span-full flex flex-wrap gap-2">
+          <Button
+            type="submit"
+            variant="primary"
+            leftIcon={<IconSearch size={17} aria-hidden="true" />}
+            loading={loading}
+          >
+            Buscar
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            leftIcon={<IconFilterOff size={17} aria-hidden="true" />}
+            onClick={clear}
+            disabled={loading || !hayFiltros}
+          >
+            Limpiar filtros
+          </Button>
+        </div>
+      </AdminFilters>
+      </form>
+
+      {error ? (
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{error}</p>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="justify-self-start"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+              onClick={() => {
+                setLoading(true)
+                setError(null)
+                setReloadKey((key) => key + 1)
+              }}
+            >
+              {ADMIN_COPY.retry}
+            </Button>
           </div>
-          <Link className="gallery-admin__link !inline-flex !items-center !justify-center !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !no-underline !shadow-md transition hover:-translate-y-0.5 hover:!bg-[#eaf6ff]" to={ACTIVIDADES_ADMIN_PATHS.reportes}>Ver reportes</Link>
-        </header>
+        </Alert>
+      ) : null}
 
-        <form className="gallery-admin__filters actividades-admin-revision__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]" onSubmit={search} aria-label="Filtros de actividades">
-          <div className="col-span-full border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta de actividades</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Buscar actividades registradas</h2><p className="mt-2 text-base text-slate-500">Seleccione los criterios para revisar los registros enviados.</p></div>
-          <label className="gallery-admin__field"><span>Fontanero</span><select value={draft.fontaneroId} onChange={(e) => setDraft({ ...draft, fontaneroId: e.target.value })}><option value="">Todos</option>{fontaneros.map((id) => <option key={id} value={id}>{id}</option>)}</select></label>
-          <label className="gallery-admin__field"><span>Actividad</span><select disabled={tiposLoading} value={draft.tipoActividadId} onChange={(e) => setDraft({ ...draft, tipoActividadId: e.target.value })}><option value="">Todas</option>{tipoOptions.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>)}</select></label>
-          <label className="gallery-admin__field"><span>Estado</span><select value={draft.estado} onChange={(e) => setDraft({ ...draft, estado: e.target.value })}><option value="">Todos</option><option value="REPORTADA">Pendiente</option><option value="REVISADA">Revisada</option><option value="REQUIERE_CORRECCION">Requiere corrección</option></select></label>
-          <label className="gallery-admin__field"><span>Desde</span><input type="date" value={draft.fechaInicio} onChange={(e) => setDraft({ ...draft, fechaInicio: e.target.value })} /></label>
-          <label className="gallery-admin__field"><span>Hasta</span><input type="date" value={draft.fechaFin} onChange={(e) => setDraft({ ...draft, fechaFin: e.target.value })} /></label>
-          <div className="actividades-admin-revision__filter-actions"><button className={PRIMARY_ACTION_CLASS} disabled={loading}>Buscar</button><button type="button" className="gallery-admin__button !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md" onClick={clear} disabled={loading}>Limpiar filtros</button></div>
-        </form>
-
-        {error ? (
-          <ActivityFeedback
-            variant="error"
-            message={error}
-            action={
-              <button
-                className="activity-feedback__retry"
-                type="button"
-                onClick={() => {
-                  setLoading(true)
-                  setError(null)
-                  setReloadKey((key) => key + 1)
-                }}
-              >
-                Reintentar
-              </button>
+      <Card
+        as="section"
+        padded
+        className="actividades-admin-revision__list !gap-4"
+        aria-label="Actividades registradas"
+      >
+        {loading ? (
+          <Alert tone="info">{ADMIN_COPY.loading('actividades')}</Alert>
+        ) : actividades.length === 0 ? (
+          <EmptyState
+            title={ADMIN_COPY.emptyFiltered('actividades')}
+            actions={
+              hayFiltros ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+                  onClick={clear}
+                >
+                  Limpiar filtros
+                </Button>
+              ) : undefined
             }
           />
-        ) : null}
-
-        <section
-          className="actividades-admin-revision__list !rounded-[28px] !border !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
-          aria-label="Actividades registradas"
-        >
-          {!loading && !error ? (
-            <div className="actividades-admin-revision__summary">
-              <strong>{total}</strong> actividades encontradas
-            </div>
-          ) : null}
-          {loading ? (
-            <div
-              className="gallery-admin__skeleton"
-              aria-busy="true"
-              aria-label="Cargando actividades"
-            >
-              <div className="gallery-admin__skeleton-row" />
-              <div className="gallery-admin__skeleton-row" />
-              <div className="gallery-admin__skeleton-row" />
-            </div>
-          ) : null}
-          {!loading && !error && actividades.length === 0 ? (
-            <div className="gallery-admin__empty" role="status">
-              <p>No se encontraron actividades con los filtros seleccionados.</p>
-            </div>
-          ) : null}
-          {!loading && !error && actividades.length > 0 ? (
-            <ul className="actividades-fontanero-historial__list m-0 list-none p-0">
-              {actividades.map((actividad) => (
-                <li key={actividad.id}>
-                  <article
-                    className="actividad-historial-card actividad-historial-card--admin"
-                    aria-labelledby={`admin-actividad-${actividad.id}`}
-                  >
-                    <header className="actividad-historial-card__header">
-                      <div className="actividad-historial-card__heading">
-                        <p className="actividad-historial-card__tipo">
-                          {actividad.tipoActividadNombre || 'Sin tipo'}
-                        </p>
-                        <h2
-                          id={`admin-actividad-${actividad.id}`}
-                          className="actividad-historial-card__titulo"
-                        >
-                          {actividad.titulo}
-                        </h2>
-                      </div>
-                      <span
-                        className="actividad-historial-card__estado"
-                        data-estado={actividad.estado}
+        ) : (
+          <ul className="actividades-fontanero-historial__list m-0 list-none gap-3 p-0 grid">
+            {actividades.map((actividad) => (
+              <li key={actividad.id}>
+                <article
+                  className="actividad-historial-card actividad-historial-card--admin"
+                  aria-labelledby={`admin-actividad-${actividad.id}`}
+                >
+                  <header className="actividad-historial-card__header">
+                    <div className="actividad-historial-card__heading">
+                      <p className="actividad-historial-card__tipo">
+                        {actividad.tipoActividadNombre || 'Sin tipo'}
+                      </p>
+                      <h2
+                        id={`admin-actividad-${actividad.id}`}
+                        className="actividad-historial-card__titulo"
                       >
-                        {displayEstado(actividad.estado)}
-                      </span>
-                    </header>
-                    <div className="actividad-historial-card__body">
-                      <MetaResumen actividad={actividad} />
-                      <Link
-                        className="actividad-historial-card__action"
-                        to={actividadAdminDetallePath(actividad.id)}
-                      >
-                        Ver detalle
-                      </Link>
+                        {actividad.titulo}
+                      </h2>
                     </div>
-                  </article>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {!loading && totalPages > 1 ? (
-            <nav
-              className="gallery-admin__pagination"
-              aria-label="Paginación de actividades"
-            >
-              <button
+                    <span
+                      className="actividad-historial-card__estado"
+                      data-estado={actividad.estado}
+                    >
+                      {displayEstado(actividad.estado)}
+                    </span>
+                  </header>
+                  <div className="actividad-historial-card__body">
+                    <MetaResumen actividad={actividad} />
+                    <Button
+                      to={actividadAdminDetallePath(actividad.id)}
+                      variant="secondary"
+                      size="sm"
+                      className="actividad-historial-card__action"
+                    >
+                      Ver detalle
+                    </Button>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {!loading && totalPages > 1 ? (
+          <nav
+            className="flex flex-col items-center justify-between gap-3 border-t border-sigasj-border pt-4 text-sm text-sigasj-muted sm:flex-row"
+            aria-label="Paginación de actividades"
+          >
+            <p className="m-0 font-semibold">
+              Página {page} de {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconChevronLeft size={16} aria-hidden="true" />}
                 disabled={page <= 1}
                 onClick={() => {
                   setLoading(true)
@@ -287,12 +426,12 @@ const ActividadesAdminRevisionPage = () => {
                 }}
               >
                 Anterior
-              </button>
-              <p>
-                Página {page} de {totalPages}
-              </p>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
+                rightIcon={<IconChevronRight size={16} aria-hidden="true" />}
                 disabled={page >= totalPages}
                 onClick={() => {
                   setLoading(true)
@@ -300,12 +439,12 @@ const ActividadesAdminRevisionPage = () => {
                 }}
               >
                 Siguiente
-              </button>
-            </nav>
-          ) : null}
-        </section>
-      </div>
-    </main>
+              </Button>
+            </div>
+          </nav>
+        ) : null}
+      </Card>
+    </AdminShell>
   )
 }
 

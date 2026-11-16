@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import {
   IconArrowLeft,
   IconCircleCheck,
@@ -9,7 +9,16 @@ import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
+import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import {
+  AdminFilterField,
+  AdminShell,
+  Alert,
+  Button,
+  PageHeader,
+  adminFilterControlClassName,
+} from '../../../shared/ui'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import ActivityFeedback from '../components/ActivityFeedback'
 import DetalleActividad from '../components/DetalleActividad'
@@ -168,61 +177,59 @@ const ActividadesAdminDetallePage = () => {
   }
 
   return (
-    <main className="gallery-admin admin-content-modern actividades-admin-revision min-w-0">
-      <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header gallery-admin__header--editor actividades-admin-detalle__topbar">
-          <div className="gallery-admin__header-copy min-w-0">
-            <div>
-              <p className="gallery-admin__eyebrow">Revisión de actividades</p>
-              <h1>Detalle de actividad</h1>
-            </div>
-          </div>
-          <div className="gallery-admin__header-actions">
-            <Link
-              to={ACTIVIDADES_ADMIN_PATHS.revision}
-              className="gallery-admin__button gallery-admin__back-btn inline-flex min-h-11 items-center gap-2 rounded-2xl"
-            >
-              <IconArrowLeft size={18} aria-hidden="true" />
-              Volver a la búsqueda
-            </Link>
-          </div>
-        </header>
+    <AdminShell
+      className="actividades-admin-revision min-w-0 gap-5 sm:gap-6"
+      aria-labelledby="actividades-admin-detalle-title"
+    >
+      <PageHeader
+        id="actividades-admin-detalle-title"
+        eyebrow="Revisión de actividades"
+        title="Detalle de actividad"
+        actions={
+          <Button
+            to={ACTIVIDADES_ADMIN_PATHS.revision}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            {ADMIN_COPY.backToList}
+          </Button>
+        }
+      />
 
-        {notice ? (
-          <ActivityFeedback
-            variant="success"
-            message={notice}
-            dismissible
-            onDismiss={() => setNotice(null)}
-            testId="admin-revision-exito"
-          />
-        ) : null}
+      {notice ? (
+        <Alert tone="success" role="status">
+          {notice}
+        </Alert>
+      ) : null}
 
-        {error && !loading ? (
-          <ActivityFeedback
-            variant="error"
-            message={error}
-            action={
-              idValido ? (
-                <button
-                  className="activity-feedback__retry"
-                  type="button"
-                  onClick={() => setReloadKey((key) => key + 1)}
-                >
-                  Reintentar
-                </button>
-              ) : (
-                <button
-                  className="activity-feedback__retry"
-                  type="button"
-                  onClick={() => navigate(ACTIVIDADES_ADMIN_PATHS.revision)}
-                >
-                  Volver a la búsqueda
-                </button>
-              )
-            }
-          />
-        ) : null}
+      {error && !loading ? (
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{error}</p>
+            {idValido ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                onClick={() => setReloadKey((key) => key + 1)}
+              >
+                {ADMIN_COPY.retry}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="justify-self-start"
+                onClick={() => navigate(ACTIVIDADES_ADMIN_PATHS.revision)}
+              >
+                Volver a la búsqueda
+              </Button>
+            )}
+          </div>
+        </Alert>
+      ) : null}
 
         <section
           className="actividades-admin-detalle"
@@ -270,21 +277,23 @@ const ActividadesAdminDetallePage = () => {
                           </p>
                         </div>
                       </div>
-                      <button
+                      <Button
                         type="button"
-                        className="gallery-admin__button gallery-admin__button--primary actividades-admin-revision__panel-cta"
+                        variant="primary"
+                        className="actividades-admin-revision__panel-cta w-full"
                         disabled={busy || !canReview}
+                        loading={reviewing}
+                        leftIcon={<IconCircleCheck size={18} aria-hidden="true" />}
                         onClick={() => {
                           if (canReview) setConfirmReview(true)
                         }}
                       >
-                        <IconCircleCheck size={18} aria-hidden="true" />
                         {!canReview
                           ? 'Actividad revisada'
                           : reviewing
                             ? 'Marcando…'
                             : 'Marcar como revisada'}
-                      </button>
+                      </Button>
                     </div>
 
                     {canRequestCorrection ? (
@@ -305,15 +314,12 @@ const ActividadesAdminDetallePage = () => {
                             </p>
                           </div>
                         </div>
-                        <label
-                          className="gallery-admin__field"
-                          htmlFor="admin-correction-note"
-                        >
-                          <span className="sr-only">Observación para corrección</span>
+                        <AdminFilterField label="Observación para corrección">
                           <textarea
                             id="admin-correction-note"
                             rows={3}
                             maxLength={2000}
+                            className={`${adminFilterControlClassName} min-h-[5.5rem] resize-y py-2`}
                             value={correctionNote}
                             disabled={busy}
                             placeholder="Ej.: completar hora de finalización y adjuntar foto del caudal"
@@ -322,25 +328,25 @@ const ActividadesAdminDetallePage = () => {
                               setCorrectionError(null)
                             }}
                           />
-                        </label>
+                        </AdminFilterField>
                         {correctionError ? (
-                          <ActivityFeedback
-                            variant="error"
-                            message={correctionError}
-                            testId="admin-correction-error"
-                          />
+                          <Alert tone="danger">{correctionError}</Alert>
                         ) : null}
-                        <button
+                        <Button
                           type="button"
-                          className="gallery-admin__button actividades-admin-revision__correction-button actividades-admin-revision__panel-cta"
+                          variant="secondary"
+                          className="actividades-admin-revision__panel-cta w-full"
                           disabled={busy || !correctionNote.trim()}
+                          loading={requestingCorrection}
+                          leftIcon={
+                            <IconMessageExclamation size={18} aria-hidden="true" />
+                          }
                           onClick={() => setConfirmCorrection(true)}
                         >
-                          <IconMessageExclamation size={18} aria-hidden="true" />
                           {requestingCorrection
                             ? 'Solicitando…'
                             : 'Solicitar corrección'}
-                        </button>
+                        </Button>
                       </div>
                     ) : null}
                   </div>
@@ -349,7 +355,6 @@ const ActividadesAdminDetallePage = () => {
             }
           />
         </section>
-      </div>
 
       <ConfirmDialog
         isOpen={confirmReview}
@@ -367,7 +372,7 @@ const ActividadesAdminDetallePage = () => {
         onCancel={() => setConfirmCorrection(false)}
         onConfirm={() => void requestCorrection()}
       />
-    </main>
+    </AdminShell>
   )
 }
 
