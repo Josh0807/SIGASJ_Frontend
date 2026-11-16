@@ -5,7 +5,6 @@ import {
   IconBuildingStore,
   IconClock,
   IconDeviceMobile,
-  IconMapPin,
   IconReceipt,
 } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
@@ -29,29 +28,38 @@ const PaymentFact = ({
   value: ReactNode
 }) => (
   <div className="min-w-0">
-    <p className="mb-1 flex items-center gap-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.11em] text-sigasj-muted">
-      <span className="text-sigasj-primary" aria-hidden="true">
+    <p className="mb-1 flex min-w-0 items-center gap-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.11em] text-sigasj-muted">
+      <span className="shrink-0 text-sigasj-primary" aria-hidden="true">
         {icon}
       </span>
-      {label}
+      <span className="min-w-0 break-words">{label}</span>
     </p>
-    <div className="text-[1.05rem] font-semibold leading-snug text-sigasj-text">{value}</div>
+    <div className="min-w-0 break-words text-[1.05rem] font-semibold leading-snug text-sigasj-text">
+      {value}
+    </div>
   </div>
 )
 
 const ReceiptPaymentSection = () => {
   const [sinpeTelefono, setSinpeTelefono] = useState(DEFAULT_CONTACTO_UBICACION.telefono)
+  const [horarioAtencion, setHorarioAtencion] = useState(
+    DEFAULT_CONTACTO_UBICACION.horarioAtencion,
+  )
 
   useEffect(() => {
     let cancelled = false
     void getPublicContacto()
       .then((contacto) => {
-        if (!cancelled && contacto.telefono.trim()) {
+        if (cancelled) return
+        if (contacto.telefono.trim()) {
           setSinpeTelefono(contacto.telefono.trim())
+        }
+        if (contacto.horarioAtencion.trim()) {
+          setHorarioAtencion(contacto.horarioAtencion.trim())
         }
       })
       .catch(() => {
-        /* Conserva el teléfono institucional por defecto. */
+        /* Conserva teléfono y horario institucionales por defecto. */
       })
     return () => {
       cancelled = true
@@ -66,7 +74,7 @@ const ReceiptPaymentSection = () => {
     >
       <div className="public-container">
         <div data-aos="fade-up">
-        <Card className="transparency-motion-card flex flex-wrap items-center gap-6 p-6 max-[640px]:flex-col max-[640px]:items-stretch">
+        <Card className="transparency-motion-card flex min-w-0 flex-wrap items-center gap-6 overflow-hidden p-6 max-[640px]:flex-col max-[640px]:items-stretch">
           <span
             className="grid size-12 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary"
             aria-hidden="true"
@@ -87,7 +95,7 @@ const ReceiptPaymentSection = () => {
             to="/consulta-recibo"
             variant="primary"
             rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
-            className="landing-lift-button landing-lift-button--solid shrink-0 max-[640px]:w-full"
+            className="landing-lift-button landing-lift-button--solid shrink-0 whitespace-normal max-[640px]:w-full"
             aria-describedby="receipt-payment-note"
           >
             Consultar recibo
@@ -107,8 +115,8 @@ const ReceiptPaymentSection = () => {
           />
 
           <div className="mt-6 grid grid-cols-3 items-stretch gap-3 max-[900px]:grid-cols-1">
-            <div data-aos="fade-up" data-aos-delay="40">
-            <Card className="transparency-motion-card flex h-full flex-col p-5">
+            <div className="min-w-0" data-aos="fade-up" data-aos-delay="40">
+            <Card className="transparency-motion-card flex h-full min-w-0 flex-col overflow-hidden p-5">
               <div className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
                 <IconDeviceMobile size={20} stroke={1.85} aria-hidden="true" />
               </div>
@@ -116,12 +124,12 @@ const ReceiptPaymentSection = () => {
               <p className="public-card-text mt-2">
                 Realiza el pago de tu recibo mediante SINPE Móvil al número indicado.
               </p>
-              <div className="mt-5">
+              <div className="mt-5 min-w-0">
                 <PaymentFact
                   icon={<IconBrandWhatsapp size={15} stroke={1.9} />}
                   label="WhatsApp ASADA (SINPE)"
                   value={
-                    <span className="text-[1.25rem] tracking-wide text-sigasj-primary">
+                    <span className="break-words text-[1.25rem] tracking-wide text-sigasj-primary">
                       {sinpeTelefono}
                     </span>
                   }
@@ -133,8 +141,8 @@ const ReceiptPaymentSection = () => {
             </Card>
             </div>
 
-            <div data-aos="fade-up" data-aos-delay="100">
-            <Card className="transparency-motion-card flex h-full flex-col p-5">
+            <div className="min-w-0" data-aos="fade-up" data-aos-delay="100">
+            <Card className="transparency-motion-card flex h-full min-w-0 flex-col overflow-hidden p-5">
               <div className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
                 <IconBuildingBank size={20} stroke={1.85} aria-hidden="true" />
               </div>
@@ -151,7 +159,7 @@ const ReceiptPaymentSection = () => {
                 href={BANCO_NACIONAL_URL}
                 variant="secondary"
                 size="sm"
-                className="transparency-motion-button mt-auto"
+                className="transparency-motion-button mt-auto w-full min-w-0 whitespace-normal"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Ir al Banco Nacional (abre una plataforma externa en una pestaña nueva)"
@@ -162,8 +170,8 @@ const ReceiptPaymentSection = () => {
             </Card>
             </div>
 
-            <div data-aos="fade-up" data-aos-delay="160">
-            <Card className="transparency-motion-card flex h-full flex-col p-5">
+            <div className="min-w-0" data-aos="fade-up" data-aos-delay="160">
+            <Card className="transparency-motion-card @container flex h-full min-w-0 flex-col overflow-hidden p-5">
               <div className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
                 <IconBuildingStore size={20} stroke={1.85} aria-hidden="true" />
               </div>
@@ -171,18 +179,11 @@ const ReceiptPaymentSection = () => {
               <p className="public-card-text mt-2">
                 Visita nuestra ventanilla para realizar el pago de forma presencial.
               </p>
-              <div className="mt-5 grid grid-cols-2 gap-4 max-[420px]:grid-cols-1">
+              <div className="mt-5">
                 <PaymentFact
                   icon={<IconClock size={15} stroke={1.9} />}
-                  label="Horario"
-                  value="Lunes a sábado"
-                />
-                <PaymentFact
-                  icon={<IconMapPin size={15} stroke={1.9} />}
-                  label="Atención"
-                  value={
-                    <span className="whitespace-nowrap">7:30 AM a 11:30 AM</span>
-                  }
+                  label="Horario de atención"
+                  value={horarioAtencion}
                 />
               </div>
             </Card>

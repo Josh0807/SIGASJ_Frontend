@@ -51,7 +51,7 @@ const ContactRow = ({
     </span>
     <div className="landing-contact-row__text min-w-0">
       <p className="landing-contact-row__label public-meta">{label}</p>
-      <div className="landing-contact-row__value mt-1.5 text-[0.9375rem] leading-6 text-sigasj-text">
+      <div className="landing-contact-row__value mt-1.5 min-w-0 break-words text-[0.9375rem] leading-6 text-sigasj-text">
         {children}
       </div>
     </div>
@@ -65,7 +65,7 @@ const ContactSection = ({
   phonePrimary = '8560-7584',
   phoneNumbers,
   email = 'asadasanjuan24@gmail.com',
-  attentionHours = 'Lunes a Sábado: 7:00 a.m. a 11:30 a.m.',
+  attentionHours = 'Lunes a sábado: 7:30 a.m. a 11:30 a.m.',
   address = 'Costado norte de la Plaza de Deportes, San Juan, Santa Cruz.',
   locationReference,
   mapUrl,

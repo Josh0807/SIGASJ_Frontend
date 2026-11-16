@@ -17,7 +17,7 @@ export const DEFAULT_CONTACTO_UBICACION: ContactoUbicacion = {
   telefono: '8560-7584',
   email: 'asadasanjuan24@gmail.com',
   direccion: 'Costado norte de la Plaza de Deportes, San Juan, Santa Cruz.',
-  horarioAtencion: 'Lunes a Sábado: 7:00 a.m. a 11:30 a.m.',
+  horarioAtencion: 'Lunes a sábado: 7:30 a.m. a 11:30 a.m.',
   referenciaUbicacion: '',
   mapaUrl: 'https://maps.app.goo.gl/2HtJjfvjTuLqVaFEA',
   latitud: 10.2188017,

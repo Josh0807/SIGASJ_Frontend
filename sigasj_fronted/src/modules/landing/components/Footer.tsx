@@ -76,13 +76,17 @@ const Footer = () => {
         <div data-aos="fade-up" data-aos-delay="140">
           <h2 className="public-card-title text-white">Contacto</h2>
           <address className="mt-4 grid gap-3 text-sm not-italic text-white/80">
-            <span className="flex items-start gap-2">
+            <span className="flex min-w-0 items-start gap-2">
               <IconMapPin className="mt-0.5 shrink-0" size={18} stroke={1.85} aria-hidden="true" />
-              {contacto.direccion || 'San Juan de Santa Cruz, Guanacaste'}
+              <span className="min-w-0 break-words">
+                {contacto.direccion || 'San Juan de Santa Cruz, Guanacaste'}
+              </span>
             </span>
-            <span className="flex items-start gap-2">
+            <span className="flex min-w-0 items-start gap-2">
               <IconClock className="mt-0.5 shrink-0" size={18} stroke={1.85} aria-hidden="true" />
-              {contacto.horarioAtencion || 'Lunes a sábado de 7:30 a.m. – 11:30 a.m.'}
+              <span className="min-w-0 break-words">
+                {contacto.horarioAtencion || 'Lunes a sábado de 7:30 a.m. – 11:30 a.m.'}
+              </span>
             </span>
           </address>
           <div className="mt-5 flex flex-wrap gap-3">

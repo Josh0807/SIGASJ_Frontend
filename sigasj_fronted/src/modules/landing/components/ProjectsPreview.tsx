@@ -122,9 +122,9 @@ const ProjectCard = ({ proyecto }: { proyecto: PublicProyecto }) => {
         <Link
           to={`/proyectos/${proyecto.id}`}
           className="projects-preview__more-btn transparency-motion-button mt-3 inline-flex min-h-11 w-fit items-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-xs font-semibold text-sigasj-primary-hover no-underline"
-          aria-label={`Ver más información sobre ${proyecto.nombre}`}
+          aria-label={`Ver proyecto: ${proyecto.nombre}`}
         >
-          <span>Ver más</span>
+          <span>Ver proyecto</span>
           <IconArrowRight size={18} aria-hidden="true" />
         </Link>
       </div>

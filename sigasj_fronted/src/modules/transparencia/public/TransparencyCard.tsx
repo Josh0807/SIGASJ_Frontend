@@ -39,16 +39,16 @@ const TransparencyCard = ({ id, name, description, fileUrl, fileType }: Transpar
         {safeDescription}
       </p>
 
-      <footer className="mt-auto pt-6">
+      <footer className="mt-auto pt-5">
         <a
-          className="transparency-motion-button inline-flex min-h-12 items-center gap-2 rounded-[11px] border border-sigasj-border-strong bg-sigasj-surface px-5 text-base font-semibold text-sigasj-primary-hover no-underline transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sigasj-sky"
+          className="transparency-motion-button inline-flex min-h-11 w-fit items-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-xs font-semibold text-sigasj-primary-hover no-underline transition-colors duration-150 hover:border-sigasj-primary hover:bg-sigasj-surface-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sigasj-sky"
           href={safeFileUrl}
           target={TRANSPARENCY_FILE_LINK_TARGET}
           rel={TRANSPARENCY_FILE_LINK_REL}
         >
-          {actionLabel} <IconArrowRight size={20} aria-hidden="true" />
+          {actionLabel} <IconArrowRight size={18} aria-hidden="true" />
         </a>
-        <p className="public-caption mb-0 mt-3.5 flex items-center gap-2 text-[0.9rem]">
+        <p className="public-caption mb-0 mt-3 flex items-center gap-2 text-[0.9rem]">
           {isDocument ? (
             <IconFileDescription size={18} aria-hidden="true" />
           ) : (

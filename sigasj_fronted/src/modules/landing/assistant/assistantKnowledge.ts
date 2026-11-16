@@ -123,7 +123,7 @@ export const ASSISTANT_TOPICS: AssistantTopic[] = [
       'cuando',
     ],
     reply: {
-      text: 'El horario de atención de la ASADA San Juan es de lunes a sábado, de 7:00 a.m. a 11:30 a.m. (confirme en Contacto si hay cambios temporales).',
+      text: 'El horario de atención de la ASADA San Juan es de lunes a sábado, de 7:30 a.m. a 11:30 a.m. (confirme en Contacto si hay cambios temporales).',
       links: [{ label: 'Ver contacto', href: '#contacto' }],
     },
   },

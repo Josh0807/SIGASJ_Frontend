@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-sigasj-button)] font-[inherit] font-semibold no-underline transition-[background-color,border-color,color,box-shadow,filter] duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/40',
+  'inline-flex min-w-0 items-center justify-center gap-2 rounded-[var(--radius-sigasj-button)] font-[inherit] font-semibold no-underline transition-[background-color,border-color,color,box-shadow,filter] duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/40',
   {
     variants: {
       variant: {

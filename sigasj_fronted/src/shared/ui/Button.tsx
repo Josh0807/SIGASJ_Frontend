@@ -58,7 +58,7 @@ export function Button(props: ButtonProps) {
       ) : (
         leftIcon
       )}
-      <span>{children}</span>
+      <span className="min-w-0 text-balance">{children}</span>
       {!loading ? rightIcon : null}
     </>
   )
