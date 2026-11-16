@@ -10,7 +10,7 @@ export type AdminListItemProps = HTMLAttributes<HTMLElement> & {
   media?: ReactNode
 }
 
-/** Fila/tarjeta de listado admin estandarizada. */
+/** Fila/tarjeta de listado admin con lift estilo landing. */
 export function AdminListItem({
   title,
   description,
@@ -24,6 +24,8 @@ export function AdminListItem({
     <Card
       as="article"
       padded
+      lift
+      data-admin-stagger
       className={cn(
         'grid gap-4 !p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start',
         className,
@@ -33,11 +35,11 @@ export function AdminListItem({
       <div className="grid min-w-0 gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start">
         {media ? <div className="shrink-0">{media}</div> : null}
         <div className="min-w-0">
-          <h2 className="m-0 text-[1.05rem] font-extrabold tracking-[-0.02em] text-sigasj-ink">
+          <h2 className="public-card-title m-0 text-[1.125rem] font-bold tracking-[-0.02em] text-sigasj-text">
             {title}
           </h2>
           {description ? (
-            <p className="m-0 mt-1 text-sm leading-snug text-sigasj-muted">
+            <p className="public-card-text m-0 mt-1.5 text-[0.875rem] leading-snug text-sigasj-muted">
               {description}
             </p>
           ) : null}

@@ -4,8 +4,14 @@
  */
 
 .admin-layout--panel {
-  --sage-bg: var(--asada-ice, #eaf6ff);
-  --sage-bg-soft: #f4f9fc;
+  /* Tipografía editorial alineada al landing */
+  --font-display: 'Times New Roman', Times, serif;
+  --font-body: 'Figtree', Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-sigasj-display: 'Times New Roman', Times, serif;
+  --font-sigasj-body: 'Figtree', Inter, ui-sans-serif, system-ui, sans-serif;
+
+  --sage-bg: #ffffff;
+  --sage-bg-soft: color-mix(in srgb, var(--asada-mist, #bfe3fa) 14%, #ffffff);
   --sage-primary: var(--asada-navy, #1e5a9c);
   --sage-primary-deep: var(--asada-ink, #123f70);
   --sage-primary-soft: var(--asada-ice, #eaf6ff);
@@ -13,14 +19,14 @@
   --sage-ink: var(--asada-ink, #123f70);
   --sage-text: var(--asada-text, #1a2f42);
   --sage-muted: var(--asada-muted, #5b7390);
-  --sage-card: var(--asada-surface, #ffffff);
+  --sage-card: #ffffff;
   --sage-border: var(--asada-border, #d7e5f1);
   --sage-border-strong: var(--asada-border-strong, #bfe3fa);
   --sage-success: var(--asada-success, #236c51);
   --sage-warning: #b45309;
   --sage-danger: #b93638;
-  --sage-radius: 22px;
-  --sage-radius-sm: 14px;
+  --sage-radius: 13px;
+  --sage-radius-sm: 10px;
   --sage-radius-pill: 999px;
   --sage-shadow: 0 10px 28px rgba(18, 63, 112, 0.07);
   --sage-shadow-soft: 0 4px 14px rgba(18, 63, 112, 0.05);
@@ -28,7 +34,7 @@
   --admin-sidebar-collapsed-width: 76px;
   --admin-header-height: 72px;
   --admin-bg-body: var(--sage-bg);
-  --vui-ice: var(--sage-bg);
+  --vui-ice: var(--asada-ice, #eaf6ff);
   --vui-mist: var(--sage-primary-mist);
   --vui-sky: var(--sage-primary);
   --vui-blue: var(--sage-primary);
@@ -43,8 +49,11 @@
   --vui-danger: var(--sage-danger);
 
   color: var(--sage-text);
-  background: var(--sage-bg);
-  font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse 80% 50% at 0% 0%, color-mix(in srgb, var(--asada-mist, #bfe3fa) 28%, transparent), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, color-mix(in srgb, var(--asada-ice, #eaf6ff) 70%, transparent), transparent 50%),
+    #ffffff;
+  font-family: var(--font-body);
 }
 
 .admin-layout--panel .admin-main {
@@ -52,7 +61,7 @@
   min-width: 0;
 }
 
-/* —— Sidebar flotante tipo rail (píldora) —— */
+/* —— Sidebar institucional (look landing, no píldora SaaS) —— */
 .admin-layout--panel .admin-sidebar {
   display: flex;
   flex-direction: column;
@@ -66,24 +75,22 @@
   height: auto;
   min-height: 0;
   max-height: calc(100dvh - 32px);
-  padding: 20px 14px 16px;
+  padding: 18px 12px 14px;
   overflow-x: visible;
   overflow-y: auto;
-  border: 0;
-  border-radius: 48px;
+  border: 1px solid var(--sage-border);
+  border-radius: 13px;
   background: #ffffff;
   color: var(--sage-text);
-  box-shadow:
-    0 22px 48px rgba(30, 90, 156, 0.12),
-    0 4px 14px rgba(30, 90, 156, 0.05);
+  box-shadow: 0 8px 24px rgba(16, 43, 56, 0.06);
   transition: width 180ms ease, flex-basis 180ms ease, padding 180ms ease, border-radius 180ms ease;
 }
 
 .admin-layout--panel.admin-layout--sidebar-collapsed .admin-sidebar {
   width: var(--admin-sidebar-collapsed-width);
   flex-basis: var(--admin-sidebar-collapsed-width);
-  padding: 18px 11px 14px;
-  border-radius: 999px;
+  padding: 16px 10px 12px;
+  border-radius: 13px;
 }
 
 .admin-layout--panel .admin-sidebar__brand {
@@ -131,8 +138,10 @@
 
 .admin-layout--panel .admin-sidebar__brand-text strong {
   color: var(--asada-navy, #1e5a9c);
-  font-size: 0.92rem;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .admin-layout--panel .admin-sidebar__brand-text span {
@@ -230,17 +239,17 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 46px;
+  min-height: 44px;
   padding: 0 10px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 10px;
   background: transparent;
-  color: #4a6f95;
+  color: var(--sage-muted);
   text-decoration: none;
   font: inherit;
-  font-weight: 650;
+  font-weight: 600;
   cursor: pointer;
-  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+  transition: color 200ms ease, background 200ms ease, transform 200ms ease;
 }
 
 .admin-layout--panel .admin-sidebar button.admin-sidebar__link {
@@ -441,13 +450,13 @@
 .admin-layout--panel .admin-header {
   margin: 16px 16px 0;
   width: auto;
-  min-height: 68px;
+  min-height: 64px;
   padding: 12px 20px;
   overflow: visible;
   border: 1px solid var(--sage-border);
-  border-radius: 18px;
+  border-radius: 13px;
   background: #ffffff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 14px rgba(30, 90, 156, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -499,9 +508,10 @@
 .admin-layout--panel .admin-header__brand-title {
   margin: 0;
   color: var(--asada-navy, #1e5a9c);
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.15;
 }
 
@@ -546,16 +556,49 @@
 .admin-layout--panel .admin-header__action--public,
 .admin-layout--panel .admin-account-menu__trigger--user {
   border: 1px solid var(--sage-border);
-  border-radius: 14px;
+  border-radius: 10px;
   color: var(--asada-navy, #1e5a9c);
   background: #fff;
   min-height: 44px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .admin-layout--panel .admin-header__action--public:hover,
 .admin-layout--panel .admin-account-menu__trigger--user:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(8, 100, 190, 0.12);
   background: var(--asada-ice, #eaf6ff);
   border-color: var(--asada-mist, #bfe3fa);
+}
+
+/* Escala tipográfica landing dentro del panel */
+.admin-layout--panel {
+  --landing-eyebrow-size: 0.8125rem;
+  --landing-intro-size: 1rem;
+  --landing-card-title-size: 1.125rem;
+  --landing-card-text-size: 0.875rem;
+  --landing-meta-size: 0.75rem;
+}
+
+.admin-layout--panel .admin-content-modern,
+.admin-layout--panel .admin-shell-landing {
+  font-family: var(--font-body);
+}
+
+.admin-layout--panel .admin-content-modern h1,
+.admin-layout--panel .admin-content-modern h2,
+.admin-layout--panel .admin-shell-landing h1,
+.admin-layout--panel .admin-shell-landing h2 {
+  font-family: var(--font-display);
+}
+
+.admin-layout--panel input,
+.admin-layout--panel textarea,
+.admin-layout--panel select,
+.admin-layout--panel button {
+  font-family: var(--font-body);
 }
 
 .admin-layout--panel .admin-main__content {

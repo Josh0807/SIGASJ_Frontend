@@ -86,7 +86,7 @@ const SolicitudesAdminHomePage = () => {
         id="solicitudes-admin-home-title"
         eyebrow="Panel administrativo"
         title="Gestión de solicitudes"
-        description="Trámites ciudadanos, formularios oficiales y descargas del sitio público."
+        description="Trámites de la comunidad, formularios oficiales y documentos descargables del sitio."
         actions={
           <Button to="/admin/dashboard" variant="ghost">
             {ADMIN_COPY.backHome}

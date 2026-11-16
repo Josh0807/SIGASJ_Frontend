@@ -30,7 +30,7 @@ const ProfilePage = () => {
       <PageHeader
         eyebrow="Cuenta administrativa"
         title={<span id="profile-page-title">Mi perfil</span>}
-        description="Datos de la sesión actual. La edición de cuenta se gestiona con la Administradora."
+        description="Su sesión actual en SIGASJ. Los cambios de cuenta los gestiona la Administradora."
       />
 
       <section className="admin-surface-card admin-profile__card" aria-label="Datos del perfil">

@@ -214,7 +214,7 @@ const TransparenciaAdminPage = () => {
         ? `Editando «${editingPublication.nombre}». Actualice datos, archivo o visibilidad.`
         : 'Actualice los datos de la publicación y guarde para volver al listado.'
       : 'Complete los datos y suba el documento o imagen para publicarlo en la landing.'
-    : 'Administra documentos e imágenes visibles en la landing pública.'
+    : 'Documentos e informes oficiales disponibles para consulta ciudadana.'
 
   const showListErrorBanner = Boolean(
     error && (formOpen || publications.length > 0),

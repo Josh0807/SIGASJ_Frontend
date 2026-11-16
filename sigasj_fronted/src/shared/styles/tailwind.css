@@ -52,13 +52,13 @@
   --font-sigasj-display: 'Manrope', Inter, ui-sans-serif, system-ui, sans-serif;
   --font-sigasj-body: Inter, ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sigasj: 0.875rem;
-  --radius-sigasj-input: 12px;
-  --radius-sigasj-button: 14px;
-  --radius-sigasj-card: 16px;
+  --radius-sigasj: 0.8125rem;
+  --radius-sigasj-input: 9px;
+  --radius-sigasj-button: 10px;
+  --radius-sigasj-card: 13px;
   --radius-sigasj-image: 18px;
-  --radius-asada: 22px;
-  --radius-asada-sm: 14px;
+  --radius-asada: 13px;
+  --radius-asada-sm: 10px;
 }
 
 @layer components {

@@ -9,7 +9,7 @@ export default function MapaRedPage() {
       <PageHeader
         eyebrow="Operación · Red de agua"
         title={<span id="mapa-red-title">{MAPA_RED_TITLE}</span>}
-        description="Consulte sectores, averías activas y estado operativo de la red en San Juan."
+        description="Sectores, averías activas y estado de la red de agua en San Juan de Santa Cruz."
       />
       <MapaRedPanel />
     </AdminShell>

@@ -189,7 +189,7 @@ const ActividadesAdminReportesPage = () => {
             Reporte de actividades del Fontanero
           </span>
         }
-        description="Consulte totales, cantidades por tipo y el detalle de actividades registradas."
+        description="Totales, cantidades por tipo y detalle de las actividades registradas en campo."
         actions={
           <Button to={ACTIVIDADES_ADMIN_PATHS.home} variant="secondary">
             Volver al módulo

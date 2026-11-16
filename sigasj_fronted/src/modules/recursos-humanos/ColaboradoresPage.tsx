@@ -187,7 +187,7 @@ export default function ColaboradoresPage() {
             Colaboradores
           </span>
         }
-        description="Consulte y administre el personal de la ASADA."
+        description="Personal de la ASADA: altas, estados y datos de colaboración."
         actions={
           <Button
             to={COLABORADOR_NEW_PATH}

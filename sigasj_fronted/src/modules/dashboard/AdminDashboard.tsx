@@ -18,7 +18,7 @@ import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
 import { IconRefresh } from '@tabler/icons-react'
 import { ADMIN_COPY } from '../../shared/admin/adminCopy'
-import { Button } from '../../shared/ui'
+import { AdminShell, Button } from '../../shared/ui'
 import panelOperativoImage from '../../assets/Hero1.webp'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
@@ -134,8 +134,8 @@ const AdminDashboard = () => {
   })
 
   return (
-    <section
-      className="admin-dashboard admin-content-modern w-full min-w-0"
+    <AdminShell
+      className="admin-dashboard w-full min-w-0"
       aria-labelledby="admin-dashboard-title"
     >
       <div className="admin-dashboard__shell">
@@ -261,7 +261,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-    </section>
+    </AdminShell>
   )
 }
 

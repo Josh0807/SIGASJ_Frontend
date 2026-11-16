@@ -1,0 +1,127 @@
+/**
+ * Capa visual admin → look landing (tipografía, cards, botones, lift).
+ * Se carga al final del chrome admin para que se note en todos los módulos.
+ */
+
+.admin-layout--panel .gallery-admin__header,
+.admin-layout--panel .materials-admin__header,
+.admin-layout--panel .admin-content-modern .gallery-admin__header {
+  border-radius: 13px !important;
+  border: 1px solid var(--asada-border, #d7e5f1);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(30, 90, 156, 0.05);
+}
+
+.admin-layout--panel .gallery-admin__header h1,
+.admin-layout--panel .materials-admin__header h1,
+.admin-layout--panel .admin-content-modern .gallery-admin__header h1 {
+  font-family: var(--font-display, 'Times New Roman', Times, serif) !important;
+  font-size: clamp(1.55rem, 2.6vw, 2.05rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--asada-text, #1a2f42) !important;
+}
+
+.admin-layout--panel .gallery-admin__eyebrow,
+.admin-layout--panel .materials-admin__eyebrow {
+  color: var(--asada-navy, #1e5a9c) !important;
+  font-family: var(--font-body, 'Figtree', Inter, sans-serif) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase;
+}
+
+.admin-layout--panel .gallery-admin__filters,
+.admin-layout--panel .materials-admin__filters,
+.admin-layout--panel .gallery-admin__item,
+.admin-layout--panel .materials-admin__card,
+.admin-layout--panel .gallery-admin__empty,
+.admin-layout--panel .materials-admin__empty,
+.admin-layout--panel .table-responsive {
+  border-radius: 13px !important;
+  border-color: var(--asada-border, #d7e5f1) !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(30, 90, 156, 0.05) !important;
+}
+
+.admin-layout--panel .gallery-admin__item,
+.admin-layout--panel .materials-admin__card,
+.admin-layout--panel .indicator-card,
+.admin-layout--panel .admin-dashboard__indicator-card {
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.admin-layout--panel .gallery-admin__item:hover,
+.admin-layout--panel .materials-admin__card:hover,
+.admin-layout--panel .indicator-card:hover,
+.admin-layout--panel .admin-dashboard__indicator-card:hover {
+  border-color: rgba(90, 174, 230, 0.65) !important;
+  transform: translateY(-5px) scale(1.004);
+  box-shadow: 0 14px 32px rgba(39, 112, 166, 0.14) !important;
+}
+
+.admin-layout--panel .gallery-admin__button,
+.admin-layout--panel .materials-admin__button,
+.admin-layout--panel .gallery-admin__filter-reset,
+.admin-layout--panel .gallery-admin__back-btn {
+  border-radius: 10px !important;
+  font-family: var(--font-body, 'Figtree', Inter, sans-serif) !important;
+  font-weight: 600 !important;
+  transition:
+    color 0.35s ease,
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    filter 0.35s ease !important;
+}
+
+.admin-layout--panel .gallery-admin__button:hover,
+.admin-layout--panel .materials-admin__button:hover,
+.admin-layout--panel .gallery-admin__filter-reset:hover,
+.admin-layout--panel .gallery-admin__back-btn:hover {
+  transform: translateY(-2px) scale(1.012);
+  box-shadow: 0 10px 20px rgba(8, 100, 190, 0.18);
+}
+
+.admin-layout--panel .gallery-admin__button--primary:hover,
+.admin-layout--panel .materials-admin__button--primary:hover {
+  filter: brightness(1.06);
+}
+
+.admin-layout--panel .inv-card,
+.admin-layout--panel .inv-panel,
+.admin-layout--panel .inv-kpi,
+.admin-layout--panel .inventory-bodega .card {
+  border-radius: 13px;
+}
+
+.admin-layout--panel .inv-btn,
+.admin-layout--panel .inventory-bodega button:not(.admin-sidebar__link) {
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-layout--panel .gallery-admin__item,
+  .admin-layout--panel .materials-admin__card,
+  .admin-layout--panel .indicator-card,
+  .admin-layout--panel .admin-dashboard__indicator-card,
+  .admin-layout--panel .gallery-admin__button,
+  .admin-layout--panel .materials-admin__button,
+  .admin-dashboard__welcome-card,
+  .admin-dashboard__focus-card {
+    transition: none !important;
+  }
+
+  .admin-layout--panel .gallery-admin__item:hover,
+  .admin-layout--panel .materials-admin__card:hover,
+  .admin-layout--panel .indicator-card:hover,
+  .admin-layout--panel .admin-dashboard__indicator-card:hover,
+  .admin-layout--panel .gallery-admin__button:hover,
+  .admin-layout--panel .materials-admin__button:hover,
+  .admin-dashboard__welcome-card:hover,
+  .admin-dashboard__focus-card:hover {
+    transform: none !important;
+  }
+}

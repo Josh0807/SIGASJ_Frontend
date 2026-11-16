@@ -179,7 +179,7 @@ export default function AsociadosPage() {
             {ASOCIADOS_TITLE}
           </span>
         }
-        description="Registre, consulte y busque la información de las personas asociadas."
+        description="Registro y consulta de personas asociadas al servicio de agua de la ASADA."
         actions={
           <>
             <Button to="/admin/dashboard" variant="ghost">

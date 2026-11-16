@@ -215,7 +215,7 @@ const ActividadesAdminRevisionPage = () => {
             Revisión de actividades
           </span>
         }
-        description="Consulte la información reportada y confirme las actividades correctas."
+        description="Revise lo reportado por el fontanero y confirme las actividades correctas."
         actions={
           <Button to={ACTIVIDADES_ADMIN_PATHS.reportes} variant="secondary">
             Ver reportes

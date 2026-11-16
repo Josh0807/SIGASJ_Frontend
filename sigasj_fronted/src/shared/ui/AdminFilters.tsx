@@ -18,8 +18,9 @@ export function AdminFilters({
     <Card
       as="section"
       padded
+      lift={false}
       className={cn(
-        'grid gap-3 !p-3.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end',
+        'grid gap-3 !rounded-[13px] !p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end',
         className,
       )}
       {...rest}
@@ -58,6 +59,6 @@ export function AdminFilterField({
 }
 
 export const adminFilterControlClassName =
-  'min-h-11 w-full min-w-0 rounded-[var(--radius-sigasj-button)] border border-sigasj-border bg-sigasj-surface px-3 text-sm text-sigasj-ink outline-none transition-[border-color,box-shadow] focus-visible:border-sigasj-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/30'
+  'min-h-11 w-full min-w-0 rounded-[10px] border border-sigasj-border bg-white px-3 text-sm text-sigasj-ink outline-none transition-[border-color,box-shadow] focus-visible:border-sigasj-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/30'
 
 export default AdminFilters

@@ -74,7 +74,7 @@ const ContactoAdminPage = () => {
             Información de Contacto y Ubicación
           </span>
         }
-        description="Actualice los datos que se muestran en la sección pública de contacto."
+        description="Teléfono, correo, horario y ubicación que aparecen en la sección de contacto del sitio."
         actions={
           <Button to="/admin/dashboard" variant="ghost">
             {ADMIN_COPY.backHome}

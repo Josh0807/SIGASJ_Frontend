@@ -4,8 +4,8 @@
  */
 
 .admin-layout--panel {
-  --admin-surface-bg: var(--asada-ice, #eaf6ff);
-  --admin-surface-card: var(--asada-surface, #ffffff);
+  --admin-surface-bg: #ffffff;
+  --admin-surface-card: #ffffff;
   --admin-surface-primary: var(--asada-navy, #1e5a9c);
   --admin-surface-primary-deep: var(--asada-ink, #123f70);
   --admin-surface-primary-soft: var(--asada-ice, #eaf6ff);
@@ -16,11 +16,11 @@
   --admin-surface-success: #3f6b52;
   --admin-surface-warning: #b45309;
   --admin-surface-danger: #b93638;
-  --admin-surface-radius: 24px;
-  --admin-surface-radius-sm: 16px;
-  --admin-surface-shadow: 0 10px 28px rgba(18, 63, 112, 0.07);
-  --admin-surface-shadow-soft: 0 4px 14px rgba(18, 63, 112, 0.05);
-  --admin-surface-transition: 150ms ease;
+  --admin-surface-radius: 13px;
+  --admin-surface-radius-sm: 10px;
+  --admin-surface-shadow: 0 4px 14px rgba(30, 90, 156, 0.05);
+  --admin-surface-shadow-soft: 0 4px 14px rgba(30, 90, 156, 0.05);
+  --admin-surface-transition: 350ms ease;
 }
 
 .admin-btn {
@@ -31,7 +31,7 @@
   gap: 0.5rem;
   padding: 10px 16px;
   border: 1px solid var(--admin-surface-primary, #1e5a9c);
-  border-radius: var(--asada-radius-control, 16px);
+  border-radius: var(--asada-radius-control, 10px);
   background: var(--asada-surface, #ffffff);
   color: var(--admin-surface-primary, #1e5a9c);
   font: inherit;
@@ -89,15 +89,15 @@
 .admin-surface-card {
   display: grid;
   gap: 1.25rem;
-  border-radius: var(--admin-surface-radius, 22px);
+  border-radius: var(--admin-surface-radius, 13px);
   border: 1px solid var(--admin-surface-border, #d7e5f1);
   background: var(--admin-surface-card, #ffffff);
   padding: 1.75rem;
-  box-shadow: var(--admin-surface-shadow, 0 10px 28px rgba(18, 63, 112, 0.07));
+  box-shadow: var(--admin-surface-shadow, 0 4px 14px rgba(30, 90, 156, 0.05));
 }
 
 .admin-surface-stat {
-  border-radius: var(--admin-surface-radius-sm, 14px);
+  border-radius: var(--admin-surface-radius-sm, 10px);
   border: 1px solid var(--admin-surface-border, #d7e5f1);
   background: #f7fbfe;
   padding: 1rem 1.25rem;

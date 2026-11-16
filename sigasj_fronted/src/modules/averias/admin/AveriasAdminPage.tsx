@@ -219,7 +219,7 @@ const AveriasAdminPage = ({
             Gestión de averías
           </span>
         }
-        description="Revise reportes, asigne fontaneros y dé seguimiento hasta la resolución."
+        description="Atención de fugas y fallas: asigne fontaneros y dé seguimiento hasta resolver cada reporte."
         actions={
           <>
             <Button

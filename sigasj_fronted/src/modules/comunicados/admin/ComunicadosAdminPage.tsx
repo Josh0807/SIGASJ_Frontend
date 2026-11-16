@@ -204,7 +204,7 @@ const ComunicadosAdminPage = () => {
         ? `Editando «${editingItem.titulo}». Actualice el contenido, estado o imagen del aviso.`
         : 'Actualice los datos del aviso y guarde para volver al listado.'
       : 'Complete el formulario y guarde para publicarlo en el listado.'
-    : 'Cree, edite y active los avisos visibles en la landing pública.'
+    : 'Publique y mantenga al día los avisos que la comunidad ve en el sitio de la ASADA.'
 
   return (
     <AdminShell aria-labelledby="comunicados-admin-title">

@@ -124,7 +124,7 @@ export default function MovimientosPage() {
       <PageHeader
         eyebrow="Inventario · Administración"
         title={<span id="movimientos-title">Historial de movimientos</span>}
-        description="Consulte las entradas y salidas registradas sobre los materiales de bodega."
+        description="Entradas y salidas de materiales en bodega, con trazabilidad por movimiento."
         actions={
           <Button
             to={MATERIALES_PATH}

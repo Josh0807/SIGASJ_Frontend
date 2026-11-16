@@ -5,8 +5,9 @@
  */
 
 :root {
-  --asada-radius-lg: 28px;
-  --asada-radius-control: 16px;
+  /* Alineado a radios del landing (card 13 / control 10) */
+  --asada-radius-lg: 13px;
+  --asada-radius-control: 10px;
 }
 
 /* —— Contenedores / cards / shells —— */
@@ -78,24 +79,24 @@
     .actividades-admin-reportes__table-shell,
     .actividades-admin-revision__detail-actions--panel
   ) {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius-lg, 13px) !important;
 }
 
 /* Shells de filtro / cabecera del gallery-admin (base) */
 .gallery-admin__shell > .gallery-admin__header,
 .gallery-admin__shell > .gallery-admin__filters {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius-lg, 13px) !important;
 }
 
 .admin-content-modern .gallery-admin__header,
 .admin-content-modern .gallery-admin__filters,
 .admin-content-modern .gallery-admin__item,
 .admin-content-modern .table-responsive {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius-lg, 13px) !important;
 }
 
 .admin-content-modern .gallery-admin__header--editor {
-  border-radius: var(--asada-radius-lg, 28px) !important;
+  border-radius: var(--asada-radius-lg, 13px) !important;
 }
 
 /* —— Controles: botones, inputs, selects, textareas —— */
@@ -150,7 +151,7 @@
     .public-averia-form textarea,
     .public-averia-form button
   ):not(.rounded-full):not([class*='rounded-full']):not([class*='rounded-pill']) {
-  border-radius: var(--asada-radius-control, 16px) !important;
+  border-radius: var(--asada-radius-control, 10px) !important;
 }
 
 /* Controles sueltos del sistema de diseño */
@@ -159,29 +160,29 @@
 .gallery-admin__field input,
 .gallery-admin__field select,
 .gallery-admin__field textarea {
-  border-radius: var(--asada-radius-control, 16px) !important;
+  border-radius: var(--asada-radius-control, 10px) !important;
 }
 
 .indicator-card,
 .admin-dashboard__indicator-card,
 .admin-surface-card,
 .admin-surface-stat {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius, 13px) !important;
 }
 
 .admin-surface-stat {
-  border-radius: var(--asada-radius-sm, 16px) !important;
+  border-radius: var(--asada-radius-sm, 10px) !important;
 }
 
 /* Tablas envueltas */
 .table-responsive {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius, 13px) !important;
 }
 
 /* Formularios públicos / legacy */
 .form-success-result,
 .public-averia-form__success {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius, 13px) !important;
 }
 
 /**
@@ -191,19 +192,19 @@
 .admin-layout--panel :is(.rounded-sm, .rounded, .rounded-md, .rounded-lg),
 .gallery-admin :is(.rounded-sm, .rounded, .rounded-md, .rounded-lg),
 .admin-content-modern :is(.rounded-sm, .rounded, .rounded-md, .rounded-lg) {
-  border-radius: var(--asada-radius-control, 16px) !important;
+  border-radius: var(--asada-radius-control, 10px) !important;
 }
 
 .admin-layout--panel :is(.rounded-xl, .rounded-2xl),
 .gallery-admin :is(.rounded-xl, .rounded-2xl),
 .admin-content-modern :is(.rounded-xl, .rounded-2xl) {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius, 13px) !important;
 }
 
 .admin-layout--panel .rounded-3xl,
 .gallery-admin .rounded-3xl,
 .admin-content-modern .rounded-3xl {
-  border-radius: var(--asada-radius-lg, 28px) !important;
+  border-radius: var(--asada-radius-lg, 13px) !important;
 }
 
 .admin-layout--panel .rounded-\[10px\],
@@ -215,7 +216,7 @@
 .admin-layout--panel .rounded-\[14px\],
 .gallery-admin .rounded-\[14px\],
 .admin-content-modern .rounded-\[14px\] {
-  border-radius: var(--asada-radius-control, 16px) !important;
+  border-radius: var(--asada-radius-control, 10px) !important;
 }
 
 .admin-layout--panel .rounded-\[16px\],
@@ -230,5 +231,5 @@
 .admin-layout--panel .rounded-\[22px\],
 .gallery-admin .rounded-\[22px\],
 .admin-content-modern .rounded-\[22px\] {
-  border-radius: var(--asada-radius, 24px) !important;
+  border-radius: var(--asada-radius, 13px) !important;
 }

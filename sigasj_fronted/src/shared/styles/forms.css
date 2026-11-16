@@ -60,7 +60,7 @@
 
 .form-success-result__highlight {
   padding: 14px 16px;
-  border-radius: var(--asada-radius-sm, 16px);
+  border-radius: var(--asada-radius-sm, 10px);
   background: var(--asada-surface, #ffffff);
   border: 1px solid #cde6d4;
 }

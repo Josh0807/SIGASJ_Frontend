@@ -134,7 +134,7 @@ const ProyectosAdminPage = () => {
             Gestión de Proyectos
           </span>
         }
-        description="Administre obras y mejoras de la ASADA: estado de ejecución, portada, galería y visibilidad en el sitio público."
+        description="Obras y mejoras en curso: estado, portada, galería y visibilidad en el sitio de la comunidad."
         actions={
           <>
             <Button to="/admin/dashboard" variant="ghost">

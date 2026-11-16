@@ -18,10 +18,10 @@
   --asada-success: #236c51;
   --asada-warning: #b45309;
   --asada-danger: #b93638;
-  --asada-radius: 24px;
-  --asada-radius-sm: 16px;
-  --asada-radius-lg: 28px;
-  --asada-radius-control: 16px;
+  --asada-radius: 13px;
+  --asada-radius-sm: 10px;
+  --asada-radius-lg: 13px;
+  --asada-radius-control: 10px;
   --asada-shadow: 0 10px 28px rgba(30, 90, 156, 0.08);
   --asada-shadow-soft: 0 4px 14px rgba(30, 90, 156, 0.05);
   --asada-primary: var(--asada-navy);

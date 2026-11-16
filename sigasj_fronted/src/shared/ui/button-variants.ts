@@ -1,14 +1,14 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 export const buttonVariants = cva(
-  'inline-flex min-w-0 items-center justify-center gap-2 rounded-[var(--radius-sigasj-button)] font-[inherit] font-semibold no-underline transition-[background-color,border-color,color,box-shadow,filter] duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/40',
+  'landing-lift-button inline-flex min-w-0 items-center justify-center gap-2 rounded-[10px] font-[inherit] font-semibold no-underline disabled:cursor-not-allowed disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/40',
   {
     variants: {
       variant: {
         primary:
-          'border border-sigasj-primary bg-sigasj-primary text-white shadow-[0_8px_18px_rgba(30,90,156,0.22)] hover:bg-sigasj-primary-hover hover:border-sigasj-primary-hover',
+          'landing-lift-button--solid border border-sigasj-primary bg-sigasj-primary text-white shadow-[0_8px_18px_rgba(30,90,156,0.22)] hover:bg-sigasj-primary-hover hover:border-sigasj-primary-hover',
         secondary:
-          'border border-sigasj-border-strong bg-sigasj-surface text-sigasj-ink hover:border-sigasj-primary hover:bg-sigasj-surface-soft',
+          'border border-sigasj-border-strong bg-white text-sigasj-ink hover:border-sigasj-primary hover:bg-sigasj-surface-soft',
         tertiary:
           'border border-transparent bg-transparent text-sigasj-primary hover:bg-sigasj-surface-soft',
         danger:

@@ -12,6 +12,11 @@ export { SectionHeader } from './SectionHeader'
 export { StatusBadge } from './StatusBadge'
 export { AdminShell, type AdminShellProps } from './AdminShell'
 export {
+  prefersReducedMotion,
+  runAdminPageEnter,
+  useAdminPageEnter,
+} from './adminMotion'
+export {
   AdminFilters,
   AdminFilterField,
   adminFilterControlClassName,

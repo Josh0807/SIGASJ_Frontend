@@ -205,7 +205,7 @@ const GalleryAdminPage = () => {
         ? `Editando «${editingTitle}». Actualice datos, visibilidad u orden, o reemplace la imagen.`
         : 'Actualice título, descripción, visibilidad u orden. Puede reemplazar la imagen si lo necesita.'
       : 'Complete los datos y suba la imagen para publicarla en la galería.'
-    : 'Administra las imágenes visibles en la landing pública.'
+    : 'Curaduría de fotografías de la comunidad y de la ASADA en el sitio público.'
 
   return (
     <AdminShell aria-labelledby="gallery-admin-title">

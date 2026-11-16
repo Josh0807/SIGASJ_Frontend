@@ -11,6 +11,8 @@ import './modules/dashboard/styles/vision-ui.css'
 import './modules/dashboard/styles/admin-dashboard.css'
 /* Bordes redondos globales (todos los módulos). */
 import './shared/styles/asada-rounded.css'
+/* Look landing en superficies admin (cards/botones/lift). */
+import './shared/styles/admin-landing.css'
 import App from './app/App.tsx'
 
 createRoot(document.getElementById('root')!).render(

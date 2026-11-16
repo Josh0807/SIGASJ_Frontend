@@ -4,8 +4,8 @@
  */
 
 .admin-dashboard {
-  --dash-bg: var(--asada-ice);
-  --dash-card: var(--asada-surface);
+  --dash-bg: #ffffff;
+  --dash-card: #ffffff;
   --dash-primary: var(--asada-navy);
   --dash-primary-deep: var(--asada-ink);
   --dash-primary-soft: var(--asada-surface-soft);
@@ -16,9 +16,9 @@
   --dash-success: var(--asada-success);
   --dash-warning: var(--asada-warning);
   --dash-error: var(--asada-danger);
-  --dash-radius: var(--asada-radius);
-  --dash-radius-sm: var(--asada-radius-sm);
-  --dash-shadow: var(--asada-shadow);
+  --dash-radius: 13px;
+  --dash-radius-sm: 10px;
+  --dash-shadow: 0 4px 14px rgba(30, 90, 156, 0.05);
 
   width: 100%;
   max-width: none;
@@ -27,6 +27,7 @@
   padding: 0;
   color: var(--dash-text);
   background: transparent;
+  font-family: var(--font-body, 'Figtree', Inter, sans-serif);
 }
 
 .admin-dashboard__shell {
@@ -48,9 +49,17 @@
 .admin-dashboard__focus-card {
   min-width: 0;
   border: 1px solid var(--dash-border);
-  border-radius: var(--dash-radius);
+  border-radius: 13px;
   background: var(--dash-card);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--dash-shadow);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.admin-dashboard__welcome-card:hover,
+.admin-dashboard__focus-card:hover {
+  border-color: rgba(90, 174, 230, 0.65);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(39, 112, 166, 0.12);
 }
 
 .admin-dashboard__welcome-card {
@@ -61,9 +70,9 @@
   min-height: 200px;
   padding: 0;
   overflow: hidden;
-  border-radius: var(--asada-radius, 24px);
+  border-radius: 13px;
   background: var(--dash-card);
-  box-shadow: 0 8px 24px rgba(30, 90, 156, 0.08);
+  box-shadow: var(--dash-shadow);
 }
 
 .admin-dashboard__welcome-media {
@@ -135,12 +144,13 @@
   display: inline-flex;
   align-items: center;
   margin: 0 0 12px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(30, 90, 156, 0.1);
-  font-size: 0.7rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-body, 'Figtree', Inter, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--dash-primary);
 }
@@ -189,10 +199,11 @@
 .admin-dashboard .admin-dashboard__welcome-card #admin-dashboard-title {
   margin: 0 0 0.4rem;
   color: var(--dash-ink) !important;
-  font-size: clamp(1.55rem, 2.3vw, 1.9rem);
-  font-weight: 850;
+  font-family: var(--font-display, 'Times New Roman', Times, serif);
+  font-size: clamp(1.7rem, 2.8vw, 2.25rem);
+  font-weight: 700;
   line-height: 1.14;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 

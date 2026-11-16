@@ -185,7 +185,7 @@ export default function SolicitudesAdminListPage() {
             Trámites digitales
           </span>
         }
-        description="Consulta, filtra y abre los trámites recibidos desde los formularios ciudadanos."
+        description="Trámites recibidos desde los formularios ciudadanos: filtre, abra y dé seguimiento."
         actions={
           <Button to={SOLICITUDES_ADMIN_PATH} variant="secondary">
             Volver a Gestión de solicitudes
