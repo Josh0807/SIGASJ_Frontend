@@ -78,9 +78,6 @@ const ContactoAdminPage = () => {
             className="admin-modern-form grid w-full gap-4 !max-w-none"
             onSubmit={handleSubmit}
           >
-            <p className="admin-modern-form__eyebrow m-0">
-              Formulario de contacto y ubicación
-            </p>
             <h2 className="m-0 text-lg font-extrabold text-sigasj-ink">Contacto</h2>
 
             <label className="gallery-admin__field">

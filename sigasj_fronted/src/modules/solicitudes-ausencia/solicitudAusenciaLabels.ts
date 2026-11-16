@@ -11,16 +11,17 @@ export const estadoSolicitudAusenciaLabel = (
   return 'Rechazada'
 }
 
+/** Colores ASADA: tipo ≠ estado (evita dos naranjas parecidos). */
 export const estadoSolicitudAusenciaClassName = (
   estado: EstadoSolicitudAusencia,
 ): string => {
   if (estado === 'PENDIENTE') {
-    return 'border-amber-200 bg-amber-50 text-amber-900'
+    return 'border-[color:var(--asada-border-strong,#bfe3fa)] bg-[color:var(--asada-ice,#eaf6ff)] text-[color:var(--asada-navy,#1e5a9c)]'
   }
   if (estado === 'APROBADA') {
-    return 'border-emerald-200 bg-emerald-50 text-emerald-900'
+    return 'border-[color-mix(in_srgb,var(--color-sigasj-success)_28%,white)] bg-[color-mix(in_srgb,var(--color-sigasj-success)_14%,white)] text-sigasj-success'
   }
-  return 'border-rose-200 bg-rose-50 text-rose-900'
+  return 'border-[color-mix(in_srgb,var(--color-sigasj-error)_28%,white)] bg-[color-mix(in_srgb,var(--color-sigasj-error)_12%,white)] text-sigasj-error'
 }
 
 export const resumirMotivo = (

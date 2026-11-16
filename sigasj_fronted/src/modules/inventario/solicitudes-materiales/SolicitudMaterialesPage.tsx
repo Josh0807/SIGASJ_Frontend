@@ -14,8 +14,7 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import { Button } from '../../../shared/ui'
+import { AdminShell, Alert, Button, Card, PageHeader } from '../../../shared/ui'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
 import { getMateriales } from '../materialesApi'
@@ -159,127 +158,108 @@ export default function SolicitudMaterialesPage() {
 
   if (created) {
     return (
-      <section
-        className="material-request material-request--success !mx-auto !w-full !max-w-4xl"
+      <AdminShell
+        className="material-request material-request--success mx-auto max-w-4xl gap-5 sm:gap-6"
         aria-labelledby="solicitud-title"
       >
-        <div
-          className="material-request__success !relative !isolate !overflow-hidden !rounded-[28px] !border-emerald-100 !bg-linear-to-br !from-white !via-emerald-50/45 !to-cyan-50/70 !p-10 !shadow-[0_20px_50px_rgba(15,118,110,0.14)] before:!absolute before:!-right-20 before:!-top-20 before:!-z-10 before:!size-64 before:!rounded-full before:!bg-emerald-200/25 max-[640px]:!p-6"
-          role="status"
+        <PageHeader
+          id="solicitud-title"
+          eyebrow="Solicitud registrada"
+          title={created.codigo}
+          description="El inventario no fue modificado."
+        />
+        <Alert
+          tone="success"
+          icon={<IconCircleCheck size={22} aria-hidden="true" />}
+          title="Solicitud enviada"
         >
-          <span className="!grid !size-16 !place-items-center !rounded-2xl !bg-linear-to-br !from-emerald-500 !to-teal-600 !text-white !shadow-[0_12px_28px_rgba(5,150,105,0.3)]">
-            <IconCircleCheck size={34} stroke={2.2} aria-hidden="true" />
-          </span>
-          <span className="material-request__eyebrow !mb-0 !mt-2 !text-emerald-700">
-            Solicitud registrada
-          </span>
-          <h1
-            className="!text-[clamp(2rem,5vw,3rem)] !font-black !tracking-[-0.035em] !text-[#1e5a9c]"
-            id="solicitud-title"
-          >
-            {created.codigo}
-          </h1>
-          <p className="!text-lg !text-slate-600">
-            La solicitud quedó en estado{' '}
-            <strong className="!inline-flex !rounded-full !border !border-amber-200 !bg-amber-50 !px-3 !py-1 !text-sm !font-extrabold !text-amber-700 !shadow-sm">
-              {created.estado}
-            </strong>
-            . El inventario no fue modificado.
-          </p>
+          La solicitud quedó en estado{' '}
+          <strong className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-extrabold text-amber-700">
+            {created.estado}
+          </strong>
+          .
           {created.idAveria ? (
-            <p>
+            <p className="m-0 mt-2">
               Avería relacionada: <strong>#{created.idAveria}</strong>
             </p>
           ) : null}
-          <div className="material-request__success-actions">
-            {returnToAveria ? (
-              <Button to={returnToAveria} variant="primary">
-                Volver a la avería
-              </Button>
-            ) : null}
-            <Button
-              to={SOLICITUDES_MATERIALES_PATH}
-              variant="primary"
-              rightIcon={
-                <IconArrowRight size={19} aria-hidden="true" />
-              }
-            >
-              Ver mis solicitudes
+        </Alert>
+        <div className="material-request__success-actions flex flex-wrap gap-2">
+          {returnToAveria ? (
+            <Button to={returnToAveria} variant="primary">
+              Volver a la avería
             </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setCreated(null)}
-              leftIcon={<IconPlus size={19} aria-hidden="true" />}
-            >
-              Crear otra solicitud
-            </Button>
-          </div>
+          ) : null}
+          <Button
+            to={SOLICITUDES_MATERIALES_PATH}
+            variant="primary"
+            rightIcon={<IconArrowRight size={19} aria-hidden="true" />}
+          >
+            Ver mis solicitudes
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setCreated(null)}
+            leftIcon={<IconPlus size={19} aria-hidden="true" />}
+          >
+            Crear otra solicitud
+          </Button>
         </div>
-      </section>
+      </AdminShell>
     )
   }
 
   return (
-    <section
-      className="material-request !max-w-none !gap-6"
+    <AdminShell
+      className="material-request gap-5 sm:gap-6"
       aria-labelledby="solicitud-title"
     >
-      <header className="material-request__header material-request__header--new-request material-request__header--rail-fixed !relative !block !overflow-hidden !rounded-[1.5rem] !border-[#d7e8f7] !bg-gradient-to-br !from-white !via-[#f7fbff] !to-[#eaf4ff] !p-6 !shadow-[0_14px_32px_rgba(30,90,156,0.1)] min-[900px]:!min-h-[17rem] min-[900px]:!p-8 min-[900px]:!pr-[384px] max-[899px]:!p-5">
-        <div
-          className="pointer-events-none absolute -left-10 top-[-20%] hidden size-52 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.28)_0%,transparent_70%)] min-[900px]:block"
-          aria-hidden="true"
-        />
-
-        <div className="relative z-[1] grid max-w-[36rem] gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5">
-          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
-            <IconPackage size={30} stroke={2.2} aria-hidden="true" />
+      <PageHeader
+        id="solicitud-title"
+        eyebrow="Inventario · Fontanero"
+        title={
+          <span className="inline-flex items-center gap-2">
+            <IconPackage size={22} aria-hidden="true" />
+            Nueva solicitud de materiales
           </span>
-          <div className="min-w-0">
-            <p className="material-request__eyebrow inventory-page-eyebrow !mb-1 !text-[0.72rem] !font-bold !tracking-[0.08em] !text-sigasj-primary">
-              Inventario · Fontanero
-            </p>
-            <h1
-              className="inventory-page-title !m-0 !text-[clamp(1.45rem,2.6vw,1.85rem)] !font-black !tracking-[-0.03em] !text-sigasj-ink"
-              id="solicitud-title"
-            >
-              Nueva solicitud de materiales
-            </h1>
-            <p className="inventory-page-subtitle !mt-2 !max-w-[34rem] !text-[0.95rem] !leading-relaxed !text-slate-600">
-              Seleccione los materiales requeridos. Esta solicitud no descuenta ni
-              reserva existencias.
-            </p>
-          </div>
-        </div>
+        }
+        description="Seleccione los materiales requeridos. Esta solicitud no descuenta ni reserva existencias."
+        actions={
+          <Button
+            to={SOLICITUDES_MATERIALES_PATH}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            Mis solicitudes
+          </Button>
+        }
+      />
 
-        <div className="material-request__right-rail !relative !z-[1] !mt-5 !grid !min-w-0 !gap-4 min-[900px]:!absolute min-[900px]:!top-8 min-[900px]:!right-8 min-[900px]:!mt-0 min-[900px]:!w-[320px]">
-          <div className="material-request__identity material-request__identity--new-request !relative !inset-auto !m-0 !flex !w-full !min-w-0 !max-w-none !items-center !gap-3 !overflow-hidden !rounded-2xl !border !border-[#cfe4f7] !bg-white !p-3.5 !shadow-[0_8px_22px_rgba(30,90,156,0.1)]">
-            <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-xl !bg-[#1e5a9c] !text-white !shadow-[0_8px_16px_rgba(30,90,156,0.25)]">
-              <IconUser size={20} stroke={2} aria-hidden="true" />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <Card padded className="material-request__identity flex items-center gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-sigasj-primary text-white">
+            <IconUser size={20} stroke={2} aria-hidden="true" />
+          </span>
+          <div className="min-w-0 grid gap-0.5">
+            <span className="text-[0.68rem] font-extrabold uppercase tracking-[0.06em] text-sigasj-muted">
+              Solicitante
             </span>
-            <div className="!min-w-0 !grid !gap-0.5">
-              <span className="!text-[0.68rem] !font-extrabold !uppercase !tracking-[0.06em] !text-[#1e5a9c]">
-                Solicitante
-              </span>
-              <strong className="!truncate !text-base !font-black !tracking-[-0.015em] !text-[#1e5a9c]">
-                {resolveAuthUserDisplayName(user)}
-              </strong>
-              <small className="!flex !items-center !gap-1.5 !text-xs !font-medium !text-slate-500">
-                <span
-                  className="!size-1.5 !rounded-full !bg-emerald-500 !shadow-[0_0_0_3px_rgba(16,185,129,0.15)]"
-                  aria-hidden="true"
-                />
-                Obtenido de la sesión activa
-              </small>
-            </div>
+            <strong className="truncate text-base font-extrabold text-sigasj-ink">
+              {resolveAuthUserDisplayName(user)}
+            </strong>
+            <small className="text-xs font-medium text-sigasj-muted">
+              Obtenido de la sesión activa
+            </small>
           </div>
-          <InventarioModuleMenu inline />
-        </div>
-      </header>
+        </Card>
+        <InventarioModuleMenu inline />
+      </div>
 
       {idAveria ? (
-        <aside
-          className="material-request__averia !grid !grid-cols-1 !gap-3 !overflow-hidden !rounded-[1.25rem] !border !border-[#cfe4f7] !bg-gradient-to-br !from-white !via-[#f5faff] !to-[#e8f4ff] !p-5 !shadow-[0_10px_26px_rgba(30,90,156,0.08)] md:!grid-cols-[minmax(0,1fr)_auto] md:!items-center"
+        <Card
+          padded
+          className="material-request__averia grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
           aria-label="Avería relacionada"
         >
           <div className="!grid !gap-1">
@@ -294,30 +274,28 @@ export default function SolicitudMaterialesPage() {
             </small>
           </div>
           {returnToAveria ? (
-            <Link
-              className="material-request__add group !inline-flex !min-h-11 !items-center !justify-center !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-sm !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!bg-[#eaf6ff]"
-              to={returnToAveria}
-            >
+            <Button to={returnToAveria} variant="secondary">
               Volver a la avería
-            </Link>
+            </Button>
           ) : null}
-        </aside>
+        </Card>
       ) : null}
 
-      <form
-        className="material-request__form provider-admin__form !w-full !max-w-none !gap-6 !rounded-[1.5rem] !border-[#d7e8f7] !bg-white !p-6 !shadow-[0_14px_34px_rgba(30,90,156,0.09)] sm:!p-7"
-        onSubmit={submit}
-        noValidate
-      >
-        <div className="provider-admin__form-heading !flex !items-start !gap-4 !border-b !border-slate-100 !pb-5">
-          <span className="!grid !size-12 !shrink-0 !place-items-center !rounded-2xl !bg-[#1e5a9c] !text-white !shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:!size-14">
+      <Card padded className="material-request__form provider-admin__form w-full max-w-none">
+        <form
+          className="grid gap-6"
+          onSubmit={submit}
+          noValidate
+        >
+        <div className="provider-admin__form-heading flex items-start gap-4 border-b border-sigasj-border pb-5">
+          <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-sigasj-primary text-white sm:size-14">
             <IconClipboardList size={24} aria-hidden="true" />
           </span>
-          <div className="!min-w-0">
-            <h2 className="!m-0 !text-[1.15rem] !font-extrabold !tracking-tight !text-[#1e5a9c]">
+          <div className="min-w-0">
+            <h2 className="m-0 text-lg font-extrabold text-sigasj-ink">
               Detalle de la solicitud
             </h2>
-            <p className="!m-0 !mt-1 !text-sm !leading-relaxed !text-slate-600">
+            <p className="m-0 mt-1 text-sm leading-relaxed text-sigasj-muted">
               Agregue materiales y una observación. Enviar no modifica el stock.
             </p>
           </div>
@@ -544,7 +522,7 @@ export default function SolicitudMaterialesPage() {
           </button>
         ) : null}
 
-        <label className="material-request__motive materials-admin__form-full !grid !gap-2 !rounded-2xl !border !border-[#e8f1f8] !bg-[#f7fbff] !p-4 sm:!p-5">
+        <label className="material-request__motive col-span-full !grid !gap-2 !rounded-2xl !border !border-[#e8f1f8] !bg-[#f7fbff] !p-4 sm:!p-5">
           <span className="!inline-flex !items-baseline !gap-2 !text-sm !font-bold !text-[#1e5a9c]">
             Observación general{' '}
             <small className="!font-medium !text-slate-500">(opcional)</small>
@@ -568,7 +546,7 @@ export default function SolicitudMaterialesPage() {
           ) : null}
         </label>
 
-        <footer className="material-request__actions materials-admin__form-actions !flex !flex-col !gap-4 !border-t !border-slate-100 !pt-5 sm:!flex-row sm:!items-center sm:!justify-between">
+        <footer className="material-request__actions col-span-full !flex !flex-col !gap-4 !border-t !border-slate-100 !pt-5 sm:!flex-row sm:!items-center sm:!justify-between">
           <p className="!m-0 !rounded-xl !border !border-amber-100 !bg-amber-50/80 !px-3.5 !py-2.5 !text-sm !text-amber-900">
             <strong>Importante:</strong> enviar esta solicitud no modifica el stock.
           </p>
@@ -593,7 +571,8 @@ export default function SolicitudMaterialesPage() {
             </Button>
           </div>
         </footer>
-      </form>
-    </section>
+        </form>
+      </Card>
+    </AdminShell>
   )
 }

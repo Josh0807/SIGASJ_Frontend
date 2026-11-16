@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Alert, Button } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { useAdminAveriaEventosHistorial } from '../hooks/useAdminAveriaEventosHistorial'
 import {
@@ -72,25 +73,23 @@ const AveriasAdminEventosHistorial = ({
       {historial.loading ? (
         <div role="status" aria-live="polite">
           <span className="visually-hidden">{AVERIAS_EVENTOS_LOADING_MESSAGE}</span>
-          <div className="gallery-admin__skeleton" aria-hidden="true">
-            <div className="gallery-admin__skeleton-row">
-              <span className="indicator-card__skeleton" />
-              <span className="indicator-card__skeleton" />
-            </div>
-            <div className="gallery-admin__skeleton-row">
-              <span className="indicator-card__skeleton" />
-              <span className="indicator-card__skeleton" />
-            </div>
+          <div className="mt-1 grid gap-3" aria-hidden="true">
+            <div className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none" />
+            <div className="h-12 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none" />
           </div>
         </div>
       ) : null}
       {historial.error ? (
-        <div className="gallery-admin__empty" role="alert">
-          <p>{historial.error}</p>
-          <button type="button" onClick={historial.refetch}>
-            Reintentar
-          </button>
-        </div>
+        <Alert tone="danger" role="alert">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{historial.error}</p>
+            <div>
+              <Button type="button" variant="secondary" size="sm" onClick={historial.refetch}>
+                Reintentar
+              </Button>
+            </div>
+          </div>
+        </Alert>
       ) : null}
       {!historial.loading && !historial.error && historial.eventos.length === 0 ? (
         <p className="averias-admin__prewrap" role="status">

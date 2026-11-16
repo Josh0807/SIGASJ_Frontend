@@ -12,6 +12,7 @@ import {
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
+  AdminFilterAction,
   AdminFilterField,
   AdminFilters,
   AdminShell,
@@ -21,6 +22,7 @@ import {
   EmptyState,
   PageHeader,
   adminFilterControlClassName,
+  adminFilterSelectClassName,
 } from '../../../shared/ui'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import { interpretActividadApiError } from '../utils/interpretActividadApiError'
@@ -237,7 +239,7 @@ const ActividadesAdminRevisionPage = () => {
       >
         <AdminFilterField label="Fontanero">
           <select
-            className={adminFilterControlClassName}
+            className={adminFilterSelectClassName}
             value={draft.fontaneroId}
             onChange={(e) => setDraft({ ...draft, fontaneroId: e.target.value })}
           >
@@ -251,7 +253,7 @@ const ActividadesAdminRevisionPage = () => {
         </AdminFilterField>
         <AdminFilterField label="Actividad">
           <select
-            className={adminFilterControlClassName}
+            className={adminFilterSelectClassName}
             disabled={tiposLoading}
             value={draft.tipoActividadId}
             onChange={(e) => setDraft({ ...draft, tipoActividadId: e.target.value })}
@@ -266,7 +268,7 @@ const ActividadesAdminRevisionPage = () => {
         </AdminFilterField>
         <AdminFilterField label="Estado">
           <select
-            className={adminFilterControlClassName}
+            className={adminFilterSelectClassName}
             value={draft.estado}
             onChange={(e) => setDraft({ ...draft, estado: e.target.value })}
           >
@@ -292,25 +294,27 @@ const ActividadesAdminRevisionPage = () => {
             onChange={(e) => setDraft({ ...draft, fechaFin: e.target.value })}
           />
         </AdminFilterField>
-        <div className="col-span-full flex flex-wrap gap-2 max-[760px]:flex-col max-[760px]:[&>*]:w-full">
-          <Button
-            type="submit"
-            variant="primary"
-            leftIcon={<IconSearch size={17} aria-hidden="true" />}
-            loading={loading}
-          >
-            Buscar
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            leftIcon={<IconFilterOff size={17} aria-hidden="true" />}
-            onClick={clear}
-            disabled={loading || !hayFiltros}
-          >
-            Limpiar filtros
-          </Button>
-        </div>
+        <AdminFilterAction className="col-span-full min-[761px]:col-auto">
+          <div className="flex flex-wrap gap-2 max-[760px]:flex-col max-[760px]:[&>*]:w-full">
+            <Button
+              type="submit"
+              variant="primary"
+              leftIcon={<IconSearch size={17} aria-hidden="true" />}
+              loading={loading}
+            >
+              Buscar
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              leftIcon={<IconFilterOff size={17} aria-hidden="true" />}
+              onClick={clear}
+              disabled={loading || !hayFiltros}
+            >
+              Limpiar filtros
+            </Button>
+          </div>
+        </AdminFilterAction>
       </AdminFilters>
       </form>
 

@@ -81,8 +81,16 @@ const AveriasFontaneroDetailPage = ({
 
   if (loading) {
     return (
-      <main className="admin-content-modern grid w-full min-w-0 gap-4">
-        <BackLink />
+      <AdminShell
+        className="averias-fontanero"
+        aria-labelledby="averia-fontanero-detail-title"
+      >
+        <PageHeader
+          id="averia-fontanero-detail-title"
+          title="Avería asignada"
+          description="Consulte la información y gestione la atención de esta avería."
+          actions={<BackLink />}
+        />
         <Card padded className="!p-5" role="status" aria-live="polite" aria-busy="true">
           <p className="m-0 font-semibold text-sigasj-muted">
             {AVERIAS_FONTANERO_DETAIL_LOADING_MESSAGE}
@@ -92,32 +100,43 @@ const AveriasFontaneroDetailPage = ({
             <div className="h-24 animate-pulse rounded-xl bg-sigasj-surface-soft motion-reduce:animate-none" />
           </div>
         </Card>
-      </main>
+      </AdminShell>
     )
   }
 
   if (forbidden) {
     return (
-      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+      <AdminShell
+        className="averias-fontanero"
+        aria-labelledby="averia-fontanero-detail-title"
+      >
+        <PageHeader
+          id="averia-fontanero-detail-title"
+          title="Avería asignada"
+          actions={<BackLink />}
+        />
         <Alert tone="danger" role="alert">
-          <div className="grid gap-3">
-            <h1 className="m-0 text-base font-extrabold">
-              {AVERIAS_FONTANERO_DETAIL_FORBIDDEN}
-            </h1>
-            <BackLink />
-          </div>
+          <p className="m-0 font-semibold">{AVERIAS_FONTANERO_DETAIL_FORBIDDEN}</p>
         </Alert>
-      </main>
+      </AdminShell>
     )
   }
 
   if (error) {
     return (
-      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+      <AdminShell
+        className="averias-fontanero"
+        aria-labelledby="averia-fontanero-detail-title"
+      >
+        <PageHeader
+          id="averia-fontanero-detail-title"
+          title="Avería asignada"
+          actions={<BackLink />}
+        />
         <Alert tone="danger" role="alert">
           <div className="grid gap-3">
             <p className="m-0 font-semibold">{AVERIAS_FONTANERO_DETAIL_ERROR}</p>
-            <div className="flex flex-wrap gap-2">
+            <div>
               <Button
                 type="button"
                 variant="secondary"
@@ -126,26 +145,28 @@ const AveriasFontaneroDetailPage = ({
               >
                 Intentar nuevamente
               </Button>
-              <BackLink />
             </div>
           </div>
         </Alert>
-      </main>
+      </AdminShell>
     )
   }
 
   if (notFound || averia == null) {
     return (
-      <main className="admin-content-modern grid w-full min-w-0 gap-4">
+      <AdminShell
+        className="averias-fontanero"
+        aria-labelledby="averia-fontanero-detail-title"
+      >
+        <PageHeader
+          id="averia-fontanero-detail-title"
+          title="Avería asignada"
+          actions={<BackLink />}
+        />
         <Alert tone="info" role="status">
-          <div className="grid gap-3">
-            <h1 className="m-0 text-base font-extrabold">
-              {AVERIAS_FONTANERO_DETAIL_NOT_FOUND}
-            </h1>
-            <BackLink />
-          </div>
+          <p className="m-0 font-semibold">{AVERIAS_FONTANERO_DETAIL_NOT_FOUND}</p>
         </Alert>
-      </main>
+      </AdminShell>
     )
   }
 

@@ -11,6 +11,7 @@ import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { clearAccessToken } from '../../auth/utils/authStorage'
 import { extractHttpErrorMessage, getHttpErrorStatus } from '../../actividades-fontanero/utils/httpErrorStatus'
 import ActivityFeedback from '../../actividades-fontanero/components/ActivityFeedback'
+import { Button } from '../../../shared/ui'
 import { isAbortError } from '../admin/averiaAdminError'
 import { resolverFontaneroAveria } from '../services/averiasFontaneroApi'
 import {
@@ -233,24 +234,25 @@ const AveriasFontaneroResolverDialog = ({
               {AVERIAS_FONTANERO_RESOLVER_LOADING}
             </p>
           ) : null}
-          <div className="confirm-dialog__actions w-full">
-            <button
+          <div className="confirm-dialog__actions flex w-full flex-wrap justify-end gap-2">
+            <Button
               ref={cancelRef}
               type="button"
-              className="confirm-dialog__button confirm-dialog__button--secondary"
+              variant="secondary"
               onClick={onCancel}
               disabled={submitting}
             >
               {AVERIAS_FONTANERO_RESOLVER_CANCEL}
-            </button>
-            <button
+            </Button>
+            <Button
               ref={confirmRef}
               type="submit"
-              className="confirm-dialog__button confirm-dialog__button--danger"
+              variant="danger"
               disabled={submitting}
+              loading={submitting}
             >
               {AVERIAS_FONTANERO_RESOLVER_CONFIRM}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

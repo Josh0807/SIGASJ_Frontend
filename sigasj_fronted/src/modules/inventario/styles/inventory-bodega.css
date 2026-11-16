@@ -70,10 +70,15 @@
 .inventory-bodega .inv-header h1 {
   margin: 0 0 3px;
   color: var(--inv-ink);
-  font-size: clamp(1.2rem, 2vw, 1.35rem);
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: clamp(1.35rem, 4.5vw, 2.05rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.15;
+}
+
+.inventory-bodega .inv-header .landing-lift-button {
+  box-shadow: 0 8px 18px rgba(30, 90, 156, 0.22);
 }
 
 .inventory-bodega .inv-header p {
@@ -91,13 +96,19 @@
   gap: 8px;
   min-height: 44px;
   padding: 0 16px;
-  border-radius: 14px;
+  border-radius: 10px;
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: filter 150ms ease, background 150ms ease;
+  transition:
+    color 0.35s ease,
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    filter 0.35s ease;
 }
 
 .inventory-bodega .inv-btn--primary {
@@ -108,9 +119,15 @@
 }
 
 .inventory-bodega .inv-btn--primary:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.06);
   color: #fff;
   text-decoration: none;
+  transform: translateY(-2px) scale(1.012);
+  box-shadow: 0 10px 20px rgba(8, 100, 190, 0.22);
+}
+
+.inventory-bodega .inv-btn--primary:active {
+  transform: translateY(-1px) scale(0.995);
 }
 
 .inventory-bodega .inv-btn--secondary {
@@ -122,6 +139,35 @@
 .inventory-bodega .inv-btn--secondary:hover {
   background: var(--inv-primary-soft);
   border-color: var(--asada-border-strong, #bfe3fa);
+  transform: translateY(-2px) scale(1.012);
+  box-shadow: 0 10px 20px rgba(8, 100, 190, 0.12);
+}
+
+.inventory-bodega .inv-btn--secondary:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inventory-bodega .inv-btn,
+  .inventory-bodega .inv-btn:hover,
+  .inventory-bodega .inv-btn:active {
+    transition: none;
+    transform: none;
+  }
+}
+
+.inventory-bodega .inv-filters__action {
+  display: grid;
+  gap: 6px;
+  align-self: end;
+}
+
+.inventory-bodega .inv-filters__action::before {
+  content: 'Acción';
+  visibility: hidden;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .inventory-bodega .inv-tabs {

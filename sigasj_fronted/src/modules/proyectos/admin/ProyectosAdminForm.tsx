@@ -1,5 +1,5 @@
-import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from 'react'
-import { Button } from '../../../shared/ui'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { AdminFileControl, Button, Card } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import {
@@ -37,7 +37,6 @@ const DESCRIPCION_INPUT_ID = 'proyectos-form-descripcion'
 const ENCARGADO_INPUT_ID = 'proyectos-form-encargado'
 const DURACION_INPUT_ID = 'proyectos-form-duracion'
 const ESTADO_INPUT_ID = 'proyectos-form-estado'
-const IMAGEN_INPUT_ID = 'proyectos-form-imagen-principal'
 const ESTADO_PENDING_HINT_ID = 'proyectos-form-estado-pending'
 const FORM_ERROR_ID = 'proyectos-form-error'
 
@@ -61,7 +60,6 @@ const ProyectosAdminForm = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [removeImagen, setRemoveImagen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<
@@ -100,13 +98,9 @@ const ProyectosAdminForm = ({
 
   const estadoLocked = mode === 'edit' && PROYECTO_ESTADO_UPDATE_PENDING
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files || files.length === 0) {
-      return
-    }
+  const handleFileChange = (file: File | null) => {
+    if (!file) return
 
-    const file = files[0]
     const imageError = validateProyectoImagenFile(file)
     if (imageError) {
       setSelectedFile(null)
@@ -114,9 +108,6 @@ const ProyectosAdminForm = ({
         ...current,
         imagenPrincipal: imageError,
       }))
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
       return
     }
 
@@ -132,9 +123,6 @@ const ProyectosAdminForm = ({
   const handleRemoveImage = () => {
     setSelectedFile(null)
     setRemoveImagen(true)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
     setFieldErrors((current) => {
       const next = { ...current }
       delete next.imagenPrincipal
@@ -153,9 +141,8 @@ const ProyectosAdminForm = ({
       return
     }
 
-    const currentFileInput = fileInputRef.current?.files?.[0]
-    if (currentFileInput) {
-      const imageError = validateProyectoImagenFile(currentFileInput)
+    if (selectedFile) {
+      const imageError = validateProyectoImagenFile(selectedFile)
       if (imageError) {
         setFieldErrors((current) => ({ ...current, imagenPrincipal: imageError }))
         return
@@ -254,6 +241,7 @@ const ProyectosAdminForm = ({
   }
 
   return (
+    <Card as="div" padded className="min-w-0 w-full">
     <form
       className="gallery-admin__form gallery-admin__form--editor proyectos-admin__form sigasj-project-form admin-modern-form w-full !max-w-none"
       onSubmit={handleSubmit}
@@ -430,22 +418,13 @@ const ProyectosAdminForm = ({
             )}
           </div>
 
-          <label className="gallery-admin__field gallery-admin__field--file" htmlFor={IMAGEN_INPUT_ID}>
-            <span>Fotografía de portada (Imagen principal)</span>
-            <span className="gallery-admin__file-control">
-              <input
-                ref={fileInputRef}
-                id={IMAGEN_INPUT_ID}
-                name="imagenPrincipal"
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-                className="proyectos-admin__file-input"
-                aria-invalid={fieldErrors.imagenPrincipal ? true : undefined}
-                aria-describedby={describedBy('imagenPrincipal')}
-                onChange={handleFileChange}
-              />
-            </span>
-          </label>
+          <AdminFileControl
+            accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+            label="Fotografía de portada (Imagen principal)"
+            fileName={selectedFile?.name}
+            hint="JPG, PNG, WEBP o GIF (Máx. 5 MB)"
+            onFileChange={handleFileChange}
+          />
 
           {selectedFile || (!removeImagen && values.imagenPrincipalUrl) ? (
             <div className="proyectos-admin__cover-controls">
@@ -483,6 +462,7 @@ const ProyectosAdminForm = ({
         </Button>
       </div>
     </form>
+    </Card>
   )
 }
 

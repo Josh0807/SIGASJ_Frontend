@@ -17,7 +17,7 @@ import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryFi
 import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
-import { Alert, Badge, Button, PageHeader } from '../../../shared/ui'
+import { AdminShell, Alert, Badge, Button, PageHeader } from '../../../shared/ui'
 import { MATERIALES_PATH } from '../inventarioPaths'
 import { readSafeAveriaReturnPath } from '../../averias/inventario/averiaInventarioPaths'
 import { useMateriales } from '../useMateriales'
@@ -215,11 +215,13 @@ export default function SalidaCreatePage() {
   }
 
   return (
-    <main
-      className="inv-salida materials-admin materials-admin--form"
-      style={{ display: 'grid', gap: 14 }}
+    <AdminShell
+      className="inv-salida inventory-module-shell inventory-bodega gap-5 sm:gap-6"
+      aria-labelledby="salida-create-title"
     >
       <PageHeader
+        id="salida-create-title"
+        eyebrow="Inventario · Fontanero"
         title="Registrar salida de materiales"
         description="Indique el material retirado de bodega. El servidor validará y actualizará las existencias al confirmar."
         actions={
@@ -279,7 +281,7 @@ export default function SalidaCreatePage() {
       ) : null}
 
       <form
-        className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-3xl"
+        className="provider-admin__form admin-modern-form inventory-entry__form grid w-full max-w-3xl grid-cols-1 gap-[18px] md:grid-cols-2"
         noValidate
         onSubmit={submit}
       >
@@ -318,7 +320,7 @@ export default function SalidaCreatePage() {
 
         {error ? (
           <Alert
-            className="materials-admin__form-full"
+            className="col-span-full"
             tone="danger"
             title="No fue posible cargar los materiales"
           >
@@ -330,14 +332,14 @@ export default function SalidaCreatePage() {
         ) : null}
 
         {!loading && !error && availableMaterials.length === 0 ? (
-          <Alert className="materials-admin__form-full" tone="warning">
+          <Alert className="col-span-full" tone="warning">
             No hay materiales activos con existencias disponibles para retirar.
           </Alert>
         ) : null}
 
         {materialListTruncated ? (
           <p
-            className="provider-admin__form-note materials-admin__form-full"
+            className="provider-admin__form-note col-span-full"
             role="note"
           >
             Se muestran los primeros {materiales.data.length} materiales. Si no
@@ -345,7 +347,7 @@ export default function SalidaCreatePage() {
           </p>
         ) : null}
 
-        <div className="materials-admin__form-full inv-stats-row">
+        <div className="col-span-full inv-stats-row">
           <div className="inv-stat">
             <p className="inv-stat__label">Unidad de medida</p>
             <p className="inv-stat__value">
@@ -381,20 +383,18 @@ export default function SalidaCreatePage() {
         </InventoryFormField>
 
         {availability?.kind === 'checking' ? (
-          <div className="inv-state materials-admin__form-full" role="status">
+          <div className="inv-state col-span-full" role="status">
             Verificando disponibilidad…
           </div>
         ) : null}
 
         {availability?.kind === 'invalid' ? (
-          <div className="inv-error materials-admin__form-full" role="alert">
-            <span
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-            >
+          <Alert className="col-span-full" tone="danger">
+            <span className="inline-flex items-center gap-2">
               <IconAlertTriangle size={18} aria-hidden="true" />
               {availability.message}
             </span>
-          </div>
+          </Alert>
         ) : null}
 
         {availability?.kind === 'valid'
@@ -404,7 +404,7 @@ export default function SalidaCreatePage() {
                 availability.data.esBajoMinimo
               return (
                 <div
-                  className="materials-admin__form-full inv-note"
+                  className="col-span-full inv-note"
                   role="status"
                   style={
                     warning
@@ -451,7 +451,7 @@ export default function SalidaCreatePage() {
 
         {idAveria || idSolicitud ? (
           <section
-            className="inventory-exit__relations materials-admin__form-full inv-note"
+            className="inventory-exit__relations col-span-full inv-note"
             aria-label="Registros relacionados"
           >
             <strong>Origen de la salida</strong>
@@ -483,7 +483,7 @@ export default function SalidaCreatePage() {
           />
         </InventoryFormField>
 
-        <div className="materials-admin__form-full inv-actor" role="note">
+        <div className="col-span-full inv-actor" role="note">
           <span className="inv-actor__icon">
             <IconUser size={20} aria-hidden="true" />
           </span>
@@ -500,7 +500,7 @@ export default function SalidaCreatePage() {
           </Badge>
         </div>
 
-        <div className="materials-admin__form-actions">
+        <div className="col-span-full flex flex-wrap justify-end gap-2 border-t border-[#e0edf6] pt-5">
           <Button
             type="submit"
             leftIcon={<IconDeviceFloppy size={18} aria-hidden="true" />}
@@ -523,6 +523,6 @@ export default function SalidaCreatePage() {
           </Button>
         </div>
     </form>
-  </main>
+    </AdminShell>
   )
 }

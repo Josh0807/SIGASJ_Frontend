@@ -347,9 +347,10 @@ export default function MovimientosPage() {
 
       {!loading && !error && totalPages > 1 ? (
         <nav className="inv-pagination" aria-label="Paginación del historial">
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             disabled={page <= 1}
             onClick={() => {
               setLoading(true)
@@ -357,13 +358,14 @@ export default function MovimientosPage() {
             }}
           >
             Anterior
-          </button>
+          </Button>
           <span>
             Página {page} de {totalPages}
           </span>
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
+            size="sm"
             disabled={page >= totalPages}
             onClick={() => {
               setLoading(true)
@@ -371,7 +373,7 @@ export default function MovimientosPage() {
             }}
           >
             Siguiente
-          </button>
+          </Button>
         </nav>
       ) : null}
     </section>

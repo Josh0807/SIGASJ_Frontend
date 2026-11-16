@@ -22,6 +22,7 @@ import {
   EmptyState,
   PageHeader,
   adminFilterControlClassName,
+  adminFilterSelectClassName,
 } from '../../shared/ui'
 import { useAuth } from '../auth/components/AuthContext'
 import CambiarEstadoColaborador from './CambiarEstadoColaborador'
@@ -203,11 +204,20 @@ export default function ColaboradoresPage() {
 
       <AdminFilters
         aria-label="Búsqueda y filtros"
-        className="!grid-cols-1 sm:!grid-cols-[minmax(0,1fr)_auto]"
         summary={
           <>
-            <strong className="text-sigasj-ink">{cargando ? '…' : total}</strong>
-            <span>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
+              onClick={limpiarFiltros}
+              disabled={!hayFiltros && !busqueda && !cargo}
+            >
+              Limpiar
+            </Button>
+            <span className="whitespace-nowrap text-sm text-sigasj-muted">
+              <strong className="text-sigasj-ink">{cargando ? '…' : total}</strong>{' '}
               {total === 1 ? 'colaborador' : 'colaboradores'}
             </span>
           </>
@@ -245,7 +255,7 @@ export default function ColaboradoresPage() {
         </AdminFilterField>
         <AdminFilterField label="Estado">
           <select
-            className={adminFilterControlClassName}
+            className={adminFilterSelectClassName}
             value={estado}
             onChange={(event) =>
               actualizarFiltros({ estado: event.target.value as EstadoFiltro })
@@ -256,16 +266,6 @@ export default function ColaboradoresPage() {
             <option value="inactivos">Inactivos</option>
           </select>
         </AdminFilterField>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
-          onClick={limpiarFiltros}
-          disabled={!hayFiltros && !busqueda && !cargo}
-        >
-          Limpiar
-        </Button>
       </AdminFilters>
 
       <Card
@@ -333,7 +333,7 @@ export default function ColaboradoresPage() {
           />
         ) : (
           <table className="w-full border-collapse text-left">
-            <thead className="hidden border-b border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-ice,#eaf6ff)] text-[0.7rem] font-bold uppercase tracking-[0.08em] text-[color:var(--asada-muted,#5b7390)] xl:table-header-group">
+            <thead className="hidden border-b border-sigasj-border bg-white text-[0.7rem] font-bold uppercase tracking-[0.08em] text-sigasj-muted xl:table-header-group">
               <tr>
                 <th scope="col" className="px-5 py-3">Cédula</th>
                 <th scope="col" className="px-5 py-3">Colaborador</th>
@@ -369,6 +369,11 @@ export default function ColaboradoresPage() {
                         <span className="block truncate text-sm text-[color:var(--asada-muted,#5b7390)]">
                           {colaborador.correoElectronico}
                         </span>
+                        {colaborador.usuario ? (
+                          <span className="mt-1 inline-flex items-center rounded-full bg-[color:var(--asada-ice,#eaf6ff)] px-2 py-0.5 text-[0.7rem] font-bold text-[color:var(--asada-navy,#1e5a9c)]">
+                            Usuario: {colaborador.usuario.nombre}
+                          </span>
+                        ) : null}
                       </span>
                     </td>
                     <td className="flex items-center justify-between gap-3 xl:table-cell xl:px-5 xl:py-3.5">

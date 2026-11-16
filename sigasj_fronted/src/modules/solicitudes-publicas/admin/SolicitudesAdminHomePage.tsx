@@ -96,7 +96,7 @@ const SolicitudesAdminHomePage = () => {
         </h2>
 
         <Link
-          className="group relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[22px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] p-7 text-inherit no-underline shadow-[0_12px_28px_rgba(18,63,112,0.08)] transition-[transform,border-color,box-shadow] duration-250 hover:-translate-y-1 hover:border-[color:var(--asada-navy,#1e5a9c)] hover:shadow-[0_18px_36px_rgba(18,63,112,0.14)] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[color:var(--asada-navy,#1e5a9c)] motion-reduce:transform-none motion-reduce:transition-none max-[640px]:min-h-0 max-[640px]:p-6"
+          className="landing-lift-card group relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[13px] border border-sigasj-border bg-white p-7 text-inherit no-underline shadow-[0_4px_14px_rgba(30,90,156,0.05)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/40 motion-reduce:transform-none motion-reduce:transition-none max-[640px]:min-h-0 max-[640px]:p-6"
           to={SOLICITUDES_ADMIN_TRAMITES_PATH}
         >
           <div
@@ -120,13 +120,9 @@ const SolicitudesAdminHomePage = () => {
               trámite.
             </p>
           </div>
-          <span className="relative mt-8 inline-flex min-h-12 w-fit items-center gap-2 rounded-2xl bg-[color:var(--asada-navy,#1e5a9c)] px-5 font-extrabold text-white shadow-[0_10px_22px_rgba(30,90,156,0.22)]">
+          <span className="landing-lift-button landing-lift-button--solid relative mt-8 inline-flex min-h-11 w-fit items-center gap-2 rounded-[10px] bg-sigasj-primary px-5 font-semibold text-white shadow-[0_8px_18px_rgba(30,90,156,0.22)]">
             Gestionar solicitudes
-            <IconArrowRight
-              className="transition-transform duration-250 group-hover:translate-x-1 motion-reduce:transform-none"
-              size={18}
-              aria-hidden="true"
-            />
+            <IconArrowRight size={18} aria-hidden="true" />
           </span>
         </Link>
 
@@ -134,7 +130,7 @@ const SolicitudesAdminHomePage = () => {
           {secondarySections.map(
             ({ title, description, action, path, icon: SectionIcon }) => (
               <Link
-                className="group flex min-h-[180px] flex-col rounded-[20px] border border-[color:var(--asada-line,#d7e5f1)] bg-[color:var(--asada-surface,#fff)] p-6 text-inherit no-underline shadow-[0_10px_24px_rgba(18,63,112,0.06)] transition-[transform,border-color,box-shadow] duration-250 hover:-translate-y-1 hover:border-[color:var(--asada-navy,#1e5a9c)] hover:shadow-[0_16px_32px_rgba(18,63,112,0.12)] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[color:var(--asada-navy,#1e5a9c)] motion-reduce:transform-none motion-reduce:transition-none"
+                className="landing-lift-card group flex min-h-[180px] flex-col rounded-[13px] border border-sigasj-border bg-white p-6 text-inherit no-underline shadow-[0_4px_14px_rgba(30,90,156,0.05)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sigasj-primary/40 motion-reduce:transform-none motion-reduce:transition-none"
                 key={path}
                 to={path}
               >
@@ -147,10 +143,10 @@ const SolicitudesAdminHomePage = () => {
                 <p className="mb-5 mt-2 flex-1 text-sm leading-6 text-[color:var(--asada-muted,#5b7390)]">
                   {description}
                 </p>
-                <span className="inline-flex items-center gap-2 text-sm font-extrabold text-[color:var(--asada-navy,#1e5a9c)]">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-sigasj-primary">
                   {action}
                   <IconArrowRight
-                    className="transition-transform duration-250 group-hover:translate-x-1 motion-reduce:transform-none"
+                    className="transition-transform duration-350 group-hover:translate-x-1 motion-reduce:transform-none"
                     size={16}
                     aria-hidden="true"
                   />

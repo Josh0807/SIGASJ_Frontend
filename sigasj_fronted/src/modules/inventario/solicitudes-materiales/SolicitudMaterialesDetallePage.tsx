@@ -7,8 +7,15 @@ import {
   IconRefresh,
   IconX,
 } from '@tabler/icons-react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  PageHeader,
+} from '../../../shared/ui'
 import { SOLICITUDES_MATERIALES_PATH } from '../inventarioPaths'
 import {
   cancelarMiSolicitudMateriales,
@@ -108,14 +115,14 @@ export default function SolicitudMaterialesDetallePage() {
     requestStatus === 'CANCELADA' || requestStatus === 'CANCELADO'
 
   const statusBadgeClass = pending
-    ? '!border-amber-200 !bg-gradient-to-r !from-amber-50 !to-orange-50 !text-amber-700 !shadow-[0_7px_18px_rgba(217,119,6,0.14)]'
+    ? 'border-amber-200 bg-amber-50 text-amber-700'
     : approved
-      ? '!border-emerald-200 !bg-gradient-to-r !from-emerald-50 !to-teal-50 !text-emerald-700 !shadow-[0_7px_18px_rgba(5,150,105,0.14)]'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
       : rejected
-        ? '!border-rose-200 !bg-gradient-to-r !from-rose-50 !to-red-50 !text-rose-700 !shadow-[0_7px_18px_rgba(225,29,72,0.14)]'
+        ? 'border-rose-200 bg-rose-50 text-rose-700'
         : cancelled
-          ? '!border-slate-200 !bg-slate-50 !text-slate-600 !shadow-[0_7px_18px_rgba(100,116,139,0.12)]'
-          : '!border-[#cfe4f7] !bg-[#f3f9ff] !text-[#1e5a9c]'
+          ? 'border-slate-200 bg-slate-50 text-slate-600'
+          : 'border-sigasj-border bg-sigasj-surface-soft text-sigasj-primary'
 
   const statusDotClass = pending
     ? '!bg-amber-500 !shadow-[0_0_0_5px_rgba(245,158,11,0.12)]'
@@ -138,87 +145,69 @@ export default function SolicitudMaterialesDetallePage() {
     0
 
   return (
-    <section
-      className="material-detail !mx-0 !w-full !max-w-none !gap-5"
+    <AdminShell
+      className="material-detail gap-5 sm:gap-6"
       aria-labelledby="material-detail-title"
     >
       {loading ? (
-        <div className="material-tracking__state !rounded-2xl" role="status">
-          <span className="material-request__spinner" />
-          Cargando detalle…
-        </div>
+        <Alert tone="info">Cargando detalle…</Alert>
       ) : null}
 
       {error ? (
-        <div
-          className="material-tracking__state material-tracking__state--error !rounded-2xl"
-          role="alert"
-        >
-          <p>{error}</p>
-          <button type="button" onClick={retry}>
-            <IconRefresh size={18} aria-hidden="true" /> Reintentar
-          </button>
-        </div>
+        <Alert tone="danger">
+          <div className="grid gap-3">
+            <p className="m-0 font-semibold">{error}</p>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="justify-self-start"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+              onClick={retry}
+            >
+              Reintentar
+            </Button>
+          </div>
+        </Alert>
       ) : null}
 
       {!loading && !error && request ? (
         <>
-          <header className="material-detail__header !relative !block !overflow-hidden !rounded-[1.5rem] !border-[#d7e8f7] !bg-gradient-to-br !from-white !via-[#f7fbff] !to-[#eaf4ff] !p-6 !shadow-[0_14px_32px_rgba(30,90,156,0.1)] sm:!p-7">
-            <div
-              className="pointer-events-none absolute -right-8 -top-10 hidden size-48 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.32)_0%,transparent_70%)] sm:block"
-              aria-hidden="true"
-            />
-
-            <div className="relative z-[1] flex flex-wrap items-start justify-between gap-5">
-              <div className="grid min-w-0 max-w-[40rem] gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5">
-                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
-                  <IconClipboardList size={30} stroke={2.2} aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <p className="material-request__eyebrow !mb-1 !text-[0.72rem] !font-bold !tracking-[0.08em] !text-sigasj-primary">
-                    Solicitud de materiales
-                  </p>
-                  <h1
-                    className="!m-0 !text-[clamp(1.45rem,2.6vw,1.85rem)] !font-black !tracking-[-0.03em] !text-sigasj-ink"
-                    id="material-detail-title"
-                  >
-                    {request.codigo || `Solicitud #${request.id}`}
-                  </h1>
-                  <p className="!mt-2 !text-[0.95rem] !leading-relaxed !text-slate-600">
-                    Registrada el {formatSolicitudDate(request.fechaSolicitud)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="!flex !shrink-0 !flex-col !items-end !gap-3 max-[700px]:!w-full max-[700px]:!items-stretch">
+          <PageHeader
+            id="material-detail-title"
+            eyebrow="Solicitud de materiales"
+            title={
+              <span className="inline-flex flex-wrap items-center gap-3">
+                <IconClipboardList size={22} aria-hidden="true" />
+                {request.codigo || `Solicitud #${request.id}`}
                 <span
-                  className={`material-tracking__badge !inline-flex !items-center !gap-2 !self-end !rounded-full !border !px-4 !py-2.5 !font-extrabold ${statusBadgeClass}`}
+                  className={`material-tracking__badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-extrabold ${statusBadgeClass}`}
                   data-status={request.estado.toUpperCase()}
                 >
                   {pending || approved || rejected || cancelled ? (
                     <span
-                      className={`!size-2 !rounded-full ${statusDotClass}`}
+                      className={`size-2 rounded-full ${statusDotClass}`}
                       aria-hidden="true"
                     />
                   ) : null}
                   {formatSolicitudStatus(request.estado)}
                 </span>
-                <Link
-                  className="material-detail__back group !inline-flex !w-fit !min-h-11 !items-center !gap-2 !self-end !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-4 !py-2.5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_8px_20px_rgba(30,90,156,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30,90,156,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none max-[700px]:!w-full max-[700px]:!justify-center max-[700px]:!self-stretch"
-                  to={SOLICITUDES_MATERIALES_PATH}
-                >
-                  <IconArrowLeft
-                    className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none"
-                    size={18}
-                    aria-hidden="true"
-                  />{' '}
-                  Volver a mis solicitudes
-                </Link>
-              </div>
-            </div>
-          </header>
+              </span>
+            }
+            description={`Registrada el ${formatSolicitudDate(request.fechaSolicitud)}`}
+            actions={
+              <Button
+                to={SOLICITUDES_MATERIALES_PATH}
+                variant="secondary"
+                leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+              >
+                Mis solicitudes
+              </Button>
+            }
+          />
 
-          <dl className="material-detail__summary !grid !w-full !grid-cols-1 !gap-3 !rounded-[1.5rem] !border !border-[#d7e8f7] !bg-gradient-to-br !from-white !via-[#f7fbff] !to-[#eef7ff] !p-5 !shadow-[0_12px_30px_rgba(30,90,156,0.08)] sm:!grid-cols-3 sm:!gap-4 sm:!p-6 [&>div]:!rounded-2xl [&>div]:!border [&>div]:!border-[#e2eef8] [&>div]:!bg-white [&>div]:!p-4 [&>div]:!shadow-sm [&_dt]:!mb-1 [&_dt]:!text-[0.7rem] [&_dt]:!font-extrabold [&_dt]:!tracking-[0.07em] [&_dt]:!text-slate-500 [&_dd]:!m-0 [&_dd]:!text-base [&_dd]:!font-extrabold [&_dd]:!leading-snug [&_dd]:!text-[#073b73] sm:[&_dd]:!text-lg">
+          <Card padded className="material-detail__summary w-full">
+            <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 [&>div]:rounded-[10px] [&>div]:border [&>div]:border-sigasj-border [&>div]:bg-sigasj-surface-soft/40 [&>div]:p-4 [&_dt]:mb-1 [&_dt]:text-[0.7rem] [&_dt]:font-extrabold [&_dt]:tracking-[0.07em] [&_dt]:text-sigasj-muted [&_dd]:m-0 [&_dd]:text-base [&_dd]:font-extrabold [&_dd]:text-sigasj-ink">
             <div>
               <dt>Avería relacionada</dt>
               <dd>{averiaLabel}</dd>
@@ -237,9 +226,10 @@ export default function SolicitudMaterialesDetallePage() {
                 {request.observacion || 'Sin observación'}
               </dd>
             </div>
-          </dl>
+            </dl>
+          </Card>
 
-          <div className="material-detail__materials !w-full !rounded-[1.5rem] !border !border-[#d7e8f7] !bg-white !p-5 !shadow-[0_12px_30px_rgba(30,90,156,0.08)] sm:!p-6">
+          <Card padded className="material-detail__materials !gap-4">
             <div className="!mb-5 !flex !items-center !gap-3">
               <span className="!grid !size-11 !shrink-0 !place-items-center !rounded-2xl !bg-[#1e5a9c] !text-white !shadow-[0_8px_18px_rgba(30,90,156,0.24)]">
                 <IconPackage size={22} aria-hidden="true" />
@@ -292,44 +282,33 @@ export default function SolicitudMaterialesDetallePage() {
                 No se recibió información de materiales para esta solicitud.
               </p>
             ) : null}
-          </div>
+          </Card>
 
-          <div className="!flex !flex-col !gap-4 sm:!flex-row sm:!items-center sm:!justify-between">
-            <aside className="material-detail__notice !flex !min-w-0 !flex-1 !flex-row !items-start !gap-3 !rounded-2xl !border !border-[#cfe4f7] !bg-gradient-to-r !from-[#f5faff] !to-[#eef7ff] !p-4 !shadow-sm sm:!items-center">
-              <span className="!grid !size-10 !shrink-0 !place-items-center !rounded-xl !bg-[#1e5a9c] !text-white !shadow-md">
-                <IconInfoCircle size={20} aria-hidden="true" />
-              </span>
-              <span className="!grid !gap-0.5">
-                <strong className="!text-sm !font-extrabold !text-[#073b73]">
-                  Consulta de seguimiento
-                </strong>
-                <span className="!text-sm !leading-relaxed !text-slate-600">
-                  Desde esta pantalla no se aprueban, rechazan ni despachan
-                  solicitudes.
-                </span>
-              </span>
-            </aside>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <Alert
+              tone="info"
+              className="material-detail__notice min-w-0 flex-1"
+              title="Consulta de seguimiento"
+              icon={<IconInfoCircle size={20} aria-hidden="true" />}
+            >
+              Desde esta pantalla no se aprueban, rechazan ni despachan solicitudes.
+            </Alert>
 
             {pending ? (
-              <button
+              <Button
                 type="button"
-                className="material-review__reject group !inline-flex !min-h-11 !shrink-0 !items-center !justify-center !gap-2 !rounded-2xl !border !border-rose-200 !bg-white !px-5 !font-extrabold !text-rose-700 !shadow-[0_8px_20px_rgba(225,29,72,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-rose-400 hover:!bg-rose-50 disabled:!opacity-60 max-[640px]:!w-full"
+                variant="danger"
                 disabled={cancelBusy}
                 onClick={() => setConfirmCancel(true)}
+                leftIcon={<IconX size={18} aria-hidden="true" />}
               >
-                <IconX size={18} aria-hidden="true" />
                 {cancelBusy ? 'Cancelando…' : 'Cancelar solicitud'}
-              </button>
+              </Button>
             ) : null}
           </div>
 
           {cancelError ? (
-            <div
-              className="material-tracking__state material-tracking__state--error !rounded-2xl"
-              role="alert"
-            >
-              {cancelError}
-            </div>
+            <Alert tone="danger">{cancelError}</Alert>
           ) : null}
         </>
       ) : null}
@@ -346,6 +325,6 @@ export default function SolicitudMaterialesDetallePage() {
           void handleCancelar()
         }}
       />
-    </section>
+    </AdminShell>
   )
 }

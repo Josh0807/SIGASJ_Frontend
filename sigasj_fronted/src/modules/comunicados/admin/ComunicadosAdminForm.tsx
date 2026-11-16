@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from 'react'
-import { IconPhoto, IconUpload } from '@tabler/icons-react'
-import { Button } from '../../../shared/ui'
+import { IconPhoto } from '@tabler/icons-react'
+import { AdminFileControl, Button, Card } from '../../../shared/ui'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import { validateGalleryImageFile } from '../../galeria/admin/validateGalleryImageFile'
 import type { ComunicadoFormValues } from './types'
@@ -106,6 +106,7 @@ const ComunicadosAdminForm = ({
   }
 
   return (
+    <Card as="div" padded className="min-w-0 w-full">
     <form
       className="gallery-admin__form gallery-admin__form--editor admin-modern-form w-full !max-w-none"
       onSubmit={handleSubmit}
@@ -280,24 +281,15 @@ const ComunicadosAdminForm = ({
             )}
           </div>
 
-          <label className="gallery-admin__field gallery-admin__field--file">
-            <span>
-              {mode === 'create' ? 'Imagen (opcional)' : 'Reemplazar imagen (opcional)'}
-            </span>
-            <span className="gallery-admin__file-control">
-              <IconUpload size={18} aria-hidden="true" />
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
-                onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
-              />
-            </span>
-            <small>
-              {selectedFileLabel
-                ? selectedFileLabel
-                : 'Formatos: JPG, PNG o WebP. Máximo según política de la galería.'}
-            </small>
-          </label>
+          <AdminFileControl
+            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+            label={
+              mode === 'create' ? 'Imagen (opcional)' : 'Reemplazar imagen (opcional)'
+            }
+            fileName={selectedFileLabel}
+            hint="Formatos: JPG, PNG o WebP. Máximo según política de la galería."
+            onFileChange={onFileChange}
+          />
         </aside>
       </div>
 
@@ -320,6 +312,7 @@ const ComunicadosAdminForm = ({
         </Button>
       </div>
     </form>
+    </Card>
   )
 }
 

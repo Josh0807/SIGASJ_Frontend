@@ -6,8 +6,7 @@ import {
   extractHttpErrorMessage,
   getHttpErrorStatus,
 } from '../../actividades-fontanero/utils/httpErrorStatus'
-import { buttonVariants } from '../../../shared/ui/button-variants'
-import { cn } from '../../../shared/ui/cn'
+import { Button } from '../../../shared/ui'
 import { isAbortError } from '../admin/averiaAdminError'
 import { createFontaneroObservacion } from '../services/averiasFontaneroApi'
 import {
@@ -138,18 +137,20 @@ const AveriasFontaneroObservacionForm = ({
         >
           {observacion.length}/{OBSERVACION_AVERIA_MAX_LENGTH}
         </p>
-        <button
-          className={cn(buttonVariants({ variant: 'primary', size: 'sm' }))}
+        <Button
           type="submit"
+          variant="primary"
+          size="sm"
           disabled={submitting}
+          loading={submitting}
+          leftIcon={
+            submitting ? undefined : <IconPlus size={16} aria-hidden="true" />
+          }
         >
-          <IconPlus size={16} aria-hidden="true" />
-          <span>
-            {submitting
-              ? AVERIAS_FONTANERO_OBSERVACION_LOADING
-              : AVERIAS_FONTANERO_OBSERVACION_GUARDAR}
-          </span>
-        </button>
+          {submitting
+            ? AVERIAS_FONTANERO_OBSERVACION_LOADING
+            : AVERIAS_FONTANERO_OBSERVACION_GUARDAR}
+        </Button>
       </div>
       {fieldError ? (
         <p id={errorId} className="averias-fontanero__resolver-error" role="alert">

@@ -10,6 +10,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
+import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import { getMaterialesParaImpresion } from '../materialesApi'
 import type { Material, MaterialesQuery } from '../types'
 import { useCategorias } from '../categorias/useCategorias'
@@ -178,25 +179,27 @@ export default function ImprimirInventarioPage() {
   ].filter(Boolean)
 
   return (
-    <main className="inventario-print" style={{ display: 'grid', gap: 14 }}>
-      <header className="inv-header inv-card inventario-print__controls">
-        <div>
-          <h1>Imprimir inventario</h1>
-          <p>
-            Genere un listado imprimible de materiales, existencias y ubicación
-            para archivo de la ASADA.
-          </p>
-        </div>
-        <button
-          type="button"
-          className="inv-btn inv-btn--primary inventario-print__action"
-          onClick={handleImprimir}
-          disabled={loading || Boolean(error) || materials.length === 0}
-        >
-          <IconPrinter size={18} aria-hidden="true" />
-          Imprimir
-        </button>
-      </header>
+    <AdminShell
+      className="inventario-print inventory-bodega"
+      aria-labelledby="imprimir-inventario-title"
+    >
+      <PageHeader
+        id="imprimir-inventario-title"
+        className="inventario-print__controls"
+        title="Imprimir inventario"
+        description="Genere un listado imprimible de materiales, existencias y ubicación para archivo de la ASADA."
+        actions={
+          <Button
+            type="button"
+            className="inventario-print__action"
+            onClick={handleImprimir}
+            disabled={loading || Boolean(error) || materials.length === 0}
+            leftIcon={<IconPrinter size={18} aria-hidden="true" />}
+          >
+            Imprimir
+          </Button>
+        }
+      />
 
       <form
         className="inv-panel inventario-print__controls"
@@ -280,36 +283,34 @@ export default function ImprimirInventarioPage() {
         </div>
 
         <div className="inv-panel__toolbar" style={{ marginTop: 4 }}>
-          <button
+          <Button
             type="submit"
-            className="inv-btn inv-btn--primary"
             disabled={loading}
+            leftIcon={<IconSearch size={18} aria-hidden="true" />}
           >
-            <IconSearch size={18} aria-hidden="true" />
             {loading ? 'Consultando…' : 'Consultar'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="inv-btn inv-btn--secondary"
+            variant="secondary"
             onClick={handleLimpiar}
             disabled={loading || (!hasActiveDraft && !hasAppliedFilters)}
+            leftIcon={<IconX size={18} aria-hidden="true" />}
           >
-            <IconX size={18} aria-hidden="true" />
             Limpiar filtros
-          </button>
+          </Button>
         </div>
       </form>
 
       {error ? (
         <div className="inv-error inventario-print__controls" role="alert">
           <p>{error}</p>
-          <button
+          <Button
             type="button"
-            className="inv-btn inv-btn--primary"
             onClick={() => setApplied((current) => ({ ...current }))}
           >
             Reintentar
-          </button>
+          </Button>
         </div>
       ) : null}
 
@@ -482,6 +483,6 @@ export default function ImprimirInventarioPage() {
           </footer>
         </section>
       ) : null}
-    </main>
+    </AdminShell>
   )
 }

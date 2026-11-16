@@ -1,6 +1,5 @@
 import {
   IconArrowLeft,
-  IconCircleCheckFilled,
   IconDeviceFloppy,
   IconFileTypePdf,
   IconUpload,
@@ -8,6 +7,13 @@ import {
 } from '@tabler/icons-react'
 import { type FormEvent, useRef, useState } from 'react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
+import {
+  AdminShell,
+  Alert,
+  Button,
+  Card,
+  PageHeader,
+} from '../../../shared/ui'
 import type {
   FormularioDescargableAdmin,
   UpdateFormularioDescargableInput,
@@ -120,216 +126,192 @@ const FormularioDescargableEditPage = ({
   }
 
   return (
-    <main className="admin-content-modern min-w-0">
-      <div className="mx-auto grid w-full max-w-[960px] gap-6">
-        <header className="flex flex-wrap items-start justify-between gap-4 rounded-[24px] border border-sky-100 bg-white p-7 shadow-[0_12px_32px_rgba(39,112,166,0.08)] max-[640px]:p-5">
-          <div className="min-w-0">
-            <h1
-              className="m-0 text-[clamp(1.75rem,3.5vw,2.35rem)] font-black leading-tight tracking-[-0.03em] text-[#062e63]"
-              id="formulario-descargable-edit-title"
-            >
-              Editar formulario
-            </h1>
-            <p className="mb-0 mt-3 max-w-2xl text-base leading-7 text-slate-500">
-              Primero edite la información del formulario. Si necesita cambiar el
-              archivo, use la sección de PDF al final de esta página.
-            </p>
-          </div>
-          <button
-            className="inline-flex min-h-[48px] cursor-pointer items-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 font-extrabold text-[#0b65b5] shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50 disabled:cursor-wait disabled:opacity-60"
+    <AdminShell
+      className="mx-auto w-full max-w-[960px] gap-5 sm:gap-6"
+      aria-labelledby="formulario-descargable-edit-title"
+    >
+      <PageHeader
+        id="formulario-descargable-edit-title"
+        eyebrow="Solicitudes · Formularios descargables"
+        title="Editar formulario"
+        description="Primero edite la información del formulario. Si necesita cambiar el archivo, use la sección de PDF al final de esta página."
+        actions={
+          <Button
             type="button"
+            variant="secondary"
             disabled={submitting}
+            leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
             onClick={onBack}
           >
-            <IconArrowLeft size={19} aria-hidden="true" />
             Volver al listado
-          </button>
-        </header>
+          </Button>
+        }
+      />
 
-        {success ? (
-          <div
-            className="relative flex items-center gap-4 overflow-hidden rounded-2xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50 via-white to-cyan-50 px-5 py-4 shadow-[0_12px_30px_rgba(5,150,105,0.12)]"
-            role="status"
+      {success ? (
+        <div className="flex items-start gap-2">
+          <Alert tone="success" title="Operación exitosa" className="min-w-0 flex-1">
+            {success}
+          </Alert>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="shrink-0"
+            aria-label="Cerrar notificación"
+            onClick={onDismissSuccess}
           >
-            <span
-              className="grid size-11 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-600 shadow-inner"
-              aria-hidden="true"
-            >
-              <IconCircleCheckFilled size={27} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <strong className="block text-base font-extrabold text-emerald-950">
-                Operación exitosa
-              </strong>
-              <span className="mt-0.5 block text-sm font-medium text-emerald-800">
-                {success}
-              </span>
-            </div>
-            <button
-              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-emerald-700 transition hover:bg-emerald-100"
-              type="button"
-              aria-label="Cerrar notificación"
-              onClick={onDismissSuccess}
-            >
-              <IconX size={19} aria-hidden="true" />
-            </button>
-          </div>
-        ) : null}
+            <IconX size={19} aria-hidden="true" />
+          </Button>
+        </div>
+      ) : null}
 
-        {error ? (
-          <div
-            className="rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800"
-            role="alert"
-          >
-            {error}
-          </div>
-        ) : null}
+      {error ? <Alert tone="danger">{error}</Alert> : null}
 
-        <section
-          className="rounded-[24px] border border-sky-100 bg-white p-7 shadow-[0_10px_28px_rgba(39,112,166,0.08)] max-[640px]:p-5"
-          aria-labelledby="formulario-descargable-edit-title"
+      <Card
+        as="section"
+        padded
+        aria-labelledby="formulario-descargable-edit-title"
+      >
+        <form
+          className="grid gap-6"
+          onSubmit={(event) => void handleSubmit(event)}
         >
-          <form
-            className="grid gap-6"
-            onSubmit={(event) => void handleSubmit(event)}
-          >
-            <label className="grid gap-2 font-bold text-[#173f6e]">
-              Nombre
-              <input
-                className="w-full rounded-xl border border-sky-200 bg-white px-4 py-3.5 text-base font-semibold text-[#173f6e] outline-none transition focus:border-[#1476cf] focus:ring-4 focus:ring-sky-100"
-                value={nombre}
-                maxLength={FORMULARIO_DESCARGABLE_NOMBRE_MAX}
-                disabled={submitting}
-                required
-                onChange={(event) => setNombre(event.target.value)}
-              />
-            </label>
-
-            <label className="grid gap-2 font-bold text-[#173f6e]">
-              Descripción
-              <textarea
-                className="min-h-40 w-full resize-y rounded-xl border border-sky-200 bg-white px-4 py-3.5 text-base font-semibold leading-7 text-[#173f6e] outline-none transition focus:border-[#1476cf] focus:ring-4 focus:ring-sky-100"
-                value={descripcion}
-                maxLength={FORMULARIO_DESCARGABLE_DESCRIPCION_MAX}
-                disabled={submitting}
-                onChange={(event) => setDescripcion(event.target.value)}
-              />
-              <small className="font-medium text-[#607a98]">
-                {descripcion.length}/{FORMULARIO_DESCARGABLE_DESCRIPCION_MAX}{' '}
-                caracteres
-              </small>
-            </label>
-
-            <label className="grid max-w-sm gap-2 font-bold text-[#173f6e]">
-              Fecha de publicación
-              <input
-                className="w-full rounded-xl border border-sky-200 bg-white px-4 py-3.5 text-base font-semibold text-[#173f6e] outline-none transition focus:border-[#1476cf] focus:ring-4 focus:ring-sky-100"
-                type="date"
-                value={fechaPublicacion}
-                disabled={submitting}
-                onChange={(event) => setFechaPublicacion(event.target.value)}
-              />
-              <small className="font-medium text-[#607a98]">
-                Deje vacío para marcar como no publicada.
-              </small>
-            </label>
-
-            <p className="m-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              Archivo vigente:{' '}
-              <strong className="break-all font-semibold text-[#173f6e]">
-                {formulario.nombreArchivoOriginal}
-              </strong>
-            </p>
-
-            {fieldError ? (
-              <p
-                className="m-0 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"
-                role="alert"
-              >
-                {fieldError}
-              </p>
-            ) : null}
-
-            <footer className="flex flex-wrap justify-end gap-3 border-t border-sky-100 pt-6">
-              <button
-                className="min-h-12 cursor-pointer rounded-xl border-2 border-[#1476cf] bg-white px-6 font-bold text-[#0b65b5] disabled:opacity-60"
-                type="button"
-                disabled={submitting}
-                onClick={onBack}
-              >
-                Cancelar
-              </button>
-              <button
-                className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl !border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-7 font-extrabold text-white shadow-md disabled:opacity-60"
-                type="submit"
-                disabled={submitting}
-              >
-                <IconDeviceFloppy size={19} aria-hidden="true" />
-                {submitting ? 'Guardando…' : 'Guardar cambios'}
-              </button>
-            </footer>
-          </form>
-        </section>
-
-        <section
-          className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-6 max-[640px]:p-5"
-          aria-labelledby="formulario-descargable-pdf-title"
-        >
-          <div className="flex flex-wrap items-start gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white text-slate-500 shadow-sm">
-              <IconFileTypePdf size={22} aria-hidden="true" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2
-                className="m-0 text-lg font-extrabold text-[#173f6e]"
-                id="formulario-descargable-pdf-title"
-              >
-                Cambiar PDF (opcional)
-              </h2>
-              <p className="mb-0 mt-1 text-sm leading-6 text-slate-500">
-                Solo si necesita sustituir el archivo. No afecta el resto de la
-                información.
-              </p>
-            </div>
-          </div>
-
-          <label className="mt-5 grid gap-2 text-sm font-bold text-[#173f6e]">
-            Nuevo archivo
+          <label className="grid gap-2 font-bold text-[#173f6e]">
+            Nombre
             <input
-              className="w-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-[#173f6e] file:mr-4 file:rounded-lg file:border-0 file:bg-slate-700 file:px-4 file:py-2 file:font-bold file:text-white"
-              type="file"
-              accept="application/pdf,.pdf"
+              className="w-full rounded-xl border border-sky-200 bg-white px-4 py-3.5 text-base font-semibold text-[#173f6e] outline-none transition focus:border-[#1476cf] focus:ring-4 focus:ring-sky-100"
+              value={nombre}
+              maxLength={FORMULARIO_DESCARGABLE_NOMBRE_MAX}
               disabled={submitting}
-              onChange={(event) => {
-                void selectPdf(event.target.files?.[0] ?? null)
-                event.target.value = ''
-              }}
+              required
+              onChange={(event) => setNombre(event.target.value)}
             />
-            {pdfFile ? (
-              <span className="text-sm font-semibold text-emerald-800">
-                Listo para subir: {pdfFile.name}
-              </span>
-            ) : null}
-            {pdfError ? (
-              <span className="text-sm font-semibold text-red-800" role="alert">
-                {pdfError}
-              </span>
-            ) : null}
           </label>
 
-          <div className="mt-4 flex justify-end">
-            <button
-              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-extrabold text-slate-700 disabled:opacity-60"
+          <label className="grid gap-2 font-bold text-[#173f6e]">
+            Descripción
+            <textarea
+              className="min-h-40 w-full resize-y rounded-xl border border-sky-200 bg-white px-4 py-3.5 text-base font-semibold leading-7 text-[#173f6e] outline-none transition focus:border-[#1476cf] focus:ring-4 focus:ring-sky-100"
+              value={descripcion}
+              maxLength={FORMULARIO_DESCARGABLE_DESCRIPCION_MAX}
+              disabled={submitting}
+              onChange={(event) => setDescripcion(event.target.value)}
+            />
+            <small className="font-medium text-[#607a98]">
+              {descripcion.length}/{FORMULARIO_DESCARGABLE_DESCRIPCION_MAX}{' '}
+              caracteres
+            </small>
+          </label>
+
+          <label className="grid max-w-sm gap-2 font-bold text-[#173f6e]">
+            Fecha de publicación
+            <input
+              className="w-full rounded-xl border border-sky-200 bg-white px-4 py-3.5 text-base font-semibold text-[#173f6e] outline-none transition focus:border-[#1476cf] focus:ring-4 focus:ring-sky-100"
+              type="date"
+              value={fechaPublicacion}
+              disabled={submitting}
+              onChange={(event) => setFechaPublicacion(event.target.value)}
+            />
+            <small className="font-medium text-[#607a98]">
+              Deje vacío para marcar como no publicada.
+            </small>
+          </label>
+
+          <p className="m-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            Archivo vigente:{' '}
+            <strong className="break-all font-semibold text-[#173f6e]">
+              {formulario.nombreArchivoOriginal}
+            </strong>
+          </p>
+
+          {fieldError ? (
+            <Alert tone="danger">{fieldError}</Alert>
+          ) : null}
+
+          <footer className="flex flex-wrap justify-end gap-3 border-t border-sigasj-border pt-6">
+            <Button
               type="button"
-              disabled={submitting || !pdfFile}
-              onClick={() => setConfirmReplace(true)}
+              variant="secondary"
+              disabled={submitting}
+              onClick={onBack}
             >
-              <IconUpload size={17} aria-hidden="true" />
-              Reemplazar PDF
-            </button>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={submitting}
+              loading={submitting}
+              leftIcon={<IconDeviceFloppy size={19} aria-hidden="true" />}
+            >
+              {submitting ? 'Guardando…' : 'Guardar cambios'}
+            </Button>
+          </footer>
+        </form>
+      </Card>
+
+      <Card
+        as="section"
+        padded
+        className="bg-slate-50/80"
+        aria-labelledby="formulario-descargable-pdf-title"
+      >
+        <div className="flex flex-wrap items-start gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-white text-slate-500 shadow-sm">
+            <IconFileTypePdf size={22} aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2
+              className="m-0 text-lg font-extrabold text-[#173f6e]"
+              id="formulario-descargable-pdf-title"
+            >
+              Cambiar PDF (opcional)
+            </h2>
+            <p className="mb-0 mt-1 text-sm leading-6 text-slate-500">
+              Solo si necesita sustituir el archivo. No afecta el resto de la
+              información.
+            </p>
           </div>
-        </section>
-      </div>
+        </div>
+
+        <label className="mt-5 grid gap-2 text-sm font-bold text-[#173f6e]">
+          Nuevo archivo
+          <input
+            className="w-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-[#173f6e] file:mr-4 file:rounded-lg file:border-0 file:bg-slate-700 file:px-4 file:py-2 file:font-bold file:text-white"
+            type="file"
+            accept="application/pdf,.pdf"
+            disabled={submitting}
+            onChange={(event) => {
+              void selectPdf(event.target.files?.[0] ?? null)
+              event.target.value = ''
+            }}
+          />
+          {pdfFile ? (
+            <span className="text-sm font-semibold text-emerald-800">
+              Listo para subir: {pdfFile.name}
+            </span>
+          ) : null}
+          {pdfError ? (
+            <span className="text-sm font-semibold text-red-800" role="alert">
+              {pdfError}
+            </span>
+          ) : null}
+        </label>
+
+        <div className="mt-4 flex justify-end">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={submitting || !pdfFile}
+            leftIcon={<IconUpload size={17} aria-hidden="true" />}
+            onClick={() => setConfirmReplace(true)}
+          >
+            Reemplazar PDF
+          </Button>
+        </div>
+      </Card>
 
       <ConfirmDialog
         isOpen={confirmReplace}
@@ -345,7 +327,7 @@ const FormularioDescargableEditPage = ({
           void replacePdf()
         }}
       />
-    </main>
+    </AdminShell>
   )
 }
 

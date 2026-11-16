@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { IconArrowLeft } from '@tabler/icons-react'
+import { AdminShell, Alert, Button, PageHeader } from '../../../shared/ui'
 import { useAuth } from '../../auth/components/AuthContext'
 import { ACTIVIDADES_FONTANERO_PATHS } from '../actividadesFontaneroPaths'
 import ActivityFeedback from '../components/ActivityFeedback'
@@ -83,21 +85,28 @@ const HistorialActividadDetallePage = () => {
   const resolvedLoading = isInvalidId ? false : isLoading
 
   return (
-    <section
-      className="actividades-fontanero-historial-detalle"
+    <AdminShell
+      className="actividades-fontanero-historial-detalle gap-5 sm:gap-6"
       aria-labelledby="historial-detalle-title"
     >
-      <header className="actividades-fontanero-historial-detalle__header">
-        <p className="actividades-fontanero-historial-detalle__eyebrow">
-          Historial de actividades
-        </p>
-        <h1 id="historial-detalle-title">Detalle de actividad</h1>
-      </header>
+      <PageHeader
+        id="historial-detalle-title"
+        eyebrow="Historial de actividades"
+        title="Detalle de actividad"
+        description="Consulta de solo lectura del registro seleccionado."
+        actions={
+          <Button
+            to={ACTIVIDADES_FONTANERO_PATHS.historial}
+            variant="secondary"
+            leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+          >
+            Volver al historial
+          </Button>
+        }
+      />
 
       {resolvedLoading ? (
-        <p className="actividades-fontanero-historial-detalle__state" role="status">
-          Cargando detalle…
-        </p>
+        <Alert tone="info">Cargando detalle…</Alert>
       ) : null}
 
       {!resolvedLoading && resolvedLoadError === 'not-found' ? (
@@ -129,14 +138,7 @@ const HistorialActividadDetallePage = () => {
       ) : null}
 
       {actividad ? <DetalleActividad actividad={actividad} /> : null}
-
-      <Link
-        to={ACTIVIDADES_FONTANERO_PATHS.historial}
-        className="actividades-fontanero-historial-detalle__back"
-      >
-        Volver al historial
-      </Link>
-    </section>
+    </AdminShell>
   )
 }
 

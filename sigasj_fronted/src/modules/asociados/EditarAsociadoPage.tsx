@@ -1,7 +1,7 @@
 import { IconArrowLeft, IconAt, IconDeviceFloppy, IconId, IconRefresh, IconUser, IconUsers } from '@tabler/icons-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '../../shared/ui'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { AdminShell, Button, Card, PageHeader } from '../../shared/ui'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
 import { useAuth } from '../auth/components/AuthContext'
 import {
@@ -107,15 +107,67 @@ export default function EditarAsociadoPage() {
   }
 
   if (loading) return <div className="grid gap-4 rounded-3xl border border-[#d7e5f1] bg-white p-8" role="status"><p className="font-bold text-blue-800">Cargando información del asociado…</p>{[0, 1, 2].map((item) => <div key={item} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" />)}</div>
-  if (loadError || !values || !asociado) return <div className="grid place-items-center gap-4 rounded-3xl border border-red-200 bg-red-50 p-8 text-center" role="alert"><p className="font-semibold text-red-800">{loadError ?? 'Asociado no encontrado.'}</p><div className="flex flex-wrap justify-center gap-3">{idValido ? <button type="button" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800" onClick={() => { setLoading(true); setLoadError(null); setReload((value) => value + 1) }}><IconRefresh size={18} />Reintentar</button> : null}<Link className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 no-underline" to={ASOCIADOS_PATH}><IconArrowLeft size={18} />Volver al listado</Link></div></div>
+  if (loadError || !values || !asociado) {
+    return (
+      <AdminShell className="gap-5 sm:gap-6">
+        <Card as="section" padded className="grid place-items-center gap-4 text-center" role="alert">
+          <p className="m-0 font-semibold text-red-800">
+            {loadError ?? 'Asociado no encontrado.'}
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {idValido ? (
+              <Button
+                type="button"
+                variant="secondary"
+                leftIcon={<IconRefresh size={18} aria-hidden="true" />}
+                onClick={() => {
+                  setLoading(true)
+                  setLoadError(null)
+                  setReload((value) => value + 1)
+                }}
+              >
+                Reintentar
+              </Button>
+            ) : null}
+            <Button
+              to={ASOCIADOS_PATH}
+              variant="secondary"
+              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
+            >
+              Volver al listado
+            </Button>
+          </div>
+        </Card>
+      </AdminShell>
+    )
+  }
 
-  return <main className="grid w-full gap-5 sm:gap-6">
-    <header className="rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:rounded-3xl sm:p-8"><p className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">Administración · Asociados</p><h1 className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c] sm:text-4xl">Editar asociado</h1><p className="mt-3 max-w-3xl text-base leading-7 text-slate-500 sm:text-lg">Actualice la información personal y de contacto. El estado no se modifica desde este formulario.</p></header>
-    {submitError ? <AsociadoFeedback variant="error">{submitError}</AsociadoFeedback> : null}
-    <form className="grid w-full gap-7 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8 lg:gap-8 lg:p-10" noValidate onSubmit={submit} aria-busy={saving}>
+  return (
+    <AdminShell
+      className="gap-5 sm:gap-6"
+      aria-labelledby="editar-asociado-title"
+    >
+      <PageHeader
+        id="editar-asociado-title"
+        eyebrow="Administración · Asociados"
+        title="Editar asociado"
+        description="Actualice la información personal y de contacto. El estado no se modifica desde este formulario."
+      />
+      {submitError ? (
+        <AsociadoFeedback variant="error">{submitError}</AsociadoFeedback>
+      ) : null}
+      <Card as="section" padded className="!p-5 sm:!p-6 lg:!p-8">
+        <form
+          className="grid w-full gap-7 lg:gap-8"
+          noValidate
+          onSubmit={submit}
+          aria-busy={saving}
+        >
       <div className="flex items-start gap-3 border-b border-slate-100 pb-6 sm:gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c] sm:size-12"><IconUser size={25} /></span><div><h2 className="text-lg font-extrabold text-[#073b73] sm:text-xl">Información del asociado</h2><p className="mt-2 text-sm leading-6 text-slate-500">Edite únicamente los datos que desea actualizar. Todos los campos son obligatorios.</p></div></div>
       <div className="grid gap-x-7 gap-y-6 lg:grid-cols-2 lg:gap-y-7">{fields.map(({ name, label, icon: Icon, ...input }) => { const errorId = `${name}-error`; return <label className="grid min-w-0 gap-2.5" key={name}><span className="text-sm font-bold text-[#163f6b]">{label} <span className="text-red-600">*</span></span><span className={`flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-blue-200 sm:px-5 ${errors[name] ? 'border-red-400' : 'border-slate-200 focus-within:border-[#1e5a9c]'}`}><Icon className={errors[name] ? 'text-red-500' : 'text-slate-400'} size={20} /><input className="min-w-0 flex-1 border-0 bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400" {...input} value={values[name]} required aria-invalid={Boolean(errors[name])} aria-describedby={errors[name] ? errorId : undefined} onChange={(event) => update(name, event.target.value)} /></span>{errors[name] ? <small id={errorId} className="font-semibold text-red-600" role="alert">{errors[name]}</small> : null}</label> })}</div>
       <div className="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:gap-4"><Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto" disabled={saving} loading={saving} leftIcon={<IconDeviceFloppy size={20} aria-hidden="true" />}>{saving ? 'Guardando cambios…' : 'Guardar cambios'}</Button><Button to={volverA} variant="secondary" size="lg" className="w-full sm:w-auto" leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}>Cancelar</Button></div>
-    </form>
-  </main>
+        </form>
+      </Card>
+    </AdminShell>
+  )
 }

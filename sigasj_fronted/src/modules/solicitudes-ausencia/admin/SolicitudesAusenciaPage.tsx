@@ -11,12 +11,19 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
-import { Alert } from '../../../shared/ui/Alert'
-import { Badge } from '../../../shared/ui/Badge'
-import { Button } from '../../../shared/ui/Button'
-import { Card } from '../../../shared/ui/Card'
-import { EmptyState } from '../../../shared/ui/EmptyState'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import {
+  AdminFilterAction,
+  AdminFilterField,
+  AdminFilters,
+  AdminShell,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  adminFilterSelectClassName,
+} from '../../../shared/ui'
 import { useAuth } from '../../auth/components/AuthContext'
 import {
   esNoAutenticado,
@@ -47,12 +54,8 @@ type Carga = {
   reintentable: boolean
 }
 
-const labelClass = 'text-[0.72rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted'
-const selectClass =
-  'min-h-11 w-full min-w-[10rem] rounded-xl border border-sigasj-border bg-white px-3.5 text-[0.95rem] font-semibold text-sigasj-ink outline-none transition focus:border-sigasj-primary focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-sigasj-primary)_22%,transparent)]'
-
-const tonoTipo = (tipo: TipoSolicitudAusencia): 'info' | 'warning' =>
-  tipo === 'VACACIONES' ? 'info' : 'warning'
+const tonoTipo = (tipo: TipoSolicitudAusencia): 'info' | 'solid' =>
+  tipo === 'VACACIONES' ? 'info' : 'solid'
 
 /**
  * PBI 6.5.7 — Cola administrativa de solicitudes (solo lectura + enlace a detalle).
@@ -134,61 +137,63 @@ export default function SolicitudesAusenciaPage() {
   }
 
   return (
-    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="solicitudes-ausencia-admin-title">
       <RrhhSubnav />
 
       <PageHeader
+        id="solicitudes-ausencia-admin-title"
         title="Solicitudes a revisar"
         description="Permisos y vacaciones enviados por el personal. Al aprobar un permiso queda en Permisos otorgados; al aprobar vacaciones se descuenta el saldo."
       />
 
-      <Card
-        as="section"
-        padded
-        className="!p-3.5"
+      <AdminFilters
         aria-label="Filtros de solicitudes"
+        summary={
+          <span className="text-sm font-semibold text-sigasj-muted">
+            {cargando ? '…' : `${carga.total} solicitud${carga.total === 1 ? '' : 'es'}`}
+          </span>
+        }
       >
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[14rem]">
-            <span className={labelClass}>Estado</span>
-            <select
-              className={selectClass}
-              value={estado}
-              aria-label="Filtrar por estado"
-              onChange={(e) => actualizar({ estado: e.target.value })}
-            >
-              <option value="">Todos</option>
-              <option value="PENDIENTE">Pendiente</option>
-              <option value="APROBADA">Aprobada</option>
-              <option value="RECHAZADA">Rechazada</option>
-            </select>
-          </label>
-          <label className="grid min-w-0 flex-1 gap-1.5 sm:max-w-[14rem]">
-            <span className={labelClass}>Tipo</span>
-            <select
-              className={selectClass}
-              value={tipo}
-              aria-label="Filtrar por tipo"
-              onChange={(e) => actualizar({ tipo: e.target.value })}
-            >
-              <option value="">Todos</option>
-              <option value="PERMISO">Permiso</option>
-              <option value="VACACIONES">Vacaciones</option>
-            </select>
-          </label>
-          {hayFiltro ? (
+        <AdminFilterField label="Estado">
+          <select
+            className={adminFilterSelectClassName}
+            value={estado}
+            aria-label="Filtrar por estado"
+            onChange={(e) => actualizar({ estado: e.target.value })}
+          >
+            <option value="">Todos</option>
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="APROBADA">Aprobada</option>
+            <option value="RECHAZADA">Rechazada</option>
+          </select>
+        </AdminFilterField>
+        <AdminFilterField label="Tipo">
+          <select
+            className={adminFilterSelectClassName}
+            value={tipo}
+            aria-label="Filtrar por tipo"
+            onChange={(e) => actualizar({ tipo: e.target.value })}
+          >
+            <option value="">Todos</option>
+            <option value="PERMISO">Permiso</option>
+            <option value="VACACIONES">Vacaciones</option>
+          </select>
+        </AdminFilterField>
+        {hayFiltro ? (
+          <AdminFilterAction>
             <Button
               type="button"
               variant="secondary"
-              size="sm"
+              size="md"
+              className="w-full min-[761px]:w-auto"
               leftIcon={<IconFilterOff size={16} aria-hidden="true" />}
               onClick={limpiarFiltros}
             >
-              Limpiar
+              Limpiar filtros
             </Button>
-          ) : null}
-        </div>
-      </Card>
+          </AdminFilterAction>
+        ) : null}
+      </AdminFilters>
 
       {cargando ? (
         <Card padded className="!p-5" role="status" aria-busy="true">
@@ -443,6 +448,6 @@ export default function SolicitudesAusenciaPage() {
           </nav>
         </>
       )}
-    </main>
+    </AdminShell>
   )
 }
