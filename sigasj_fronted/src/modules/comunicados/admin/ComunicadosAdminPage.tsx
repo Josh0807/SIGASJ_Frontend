@@ -188,41 +188,24 @@ const ComunicadosAdminPage = () => {
       : emptyComunicadoFormValues()
 
   const formOpen = formMode !== 'hidden'
-  const headerEyebrow = formOpen
-    ? formMode === 'edit'
-      ? 'Comunicados · Edición'
-      : 'Comunicados · Alta'
-    : 'Panel administrativo'
   const headerTitle = formOpen
     ? formMode === 'edit'
       ? 'Editar comunicado'
       : 'Nuevo comunicado'
-    : 'Gestión de Comunicados'
+    : 'Comunicados'
   const headerLead = formOpen
     ? formMode === 'edit'
       ? editingItem
         ? `Editando «${editingItem.titulo}». Actualice el contenido, estado o imagen del aviso.`
         : 'Actualice los datos del aviso y guarde para volver al listado.'
       : 'Complete el formulario y guarde para publicarlo en el listado.'
-    : 'Publique y mantenga al día los avisos que la comunidad ve en el sitio de la ASADA.'
+    : 'Avisos oficiales visibles en el sitio de la ASADA.'
 
   return (
     <AdminShell aria-labelledby="comunicados-admin-title">
       <PageHeader
         id="comunicados-admin-title"
-        eyebrow={headerEyebrow}
-        title={
-          <span className="inline-flex items-center gap-2">
-            {formMode === 'edit' ? (
-              <IconPencil size={22} aria-hidden="true" />
-            ) : formMode === 'create' ? (
-              <IconBellPlus size={22} aria-hidden="true" />
-            ) : (
-              <IconBell size={22} aria-hidden="true" />
-            )}
-            {headerTitle}
-          </span>
-        }
+        title={headerTitle}
         description={headerLead}
         actions={
           formOpen ? (
@@ -235,19 +218,14 @@ const ComunicadosAdminPage = () => {
               {ADMIN_COPY.backToList}
             </Button>
           ) : (
-            <>
-              <Button to="/admin/dashboard" variant="ghost">
-                {ADMIN_COPY.backHome}
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                leftIcon={<IconBellPlus size={18} aria-hidden="true" />}
-                onClick={openCreateForm}
-              >
-                Nuevo comunicado
-              </Button>
-            </>
+            <Button
+              type="button"
+              variant="primary"
+              leftIcon={<IconBellPlus size={18} aria-hidden="true" />}
+              onClick={openCreateForm}
+            >
+              Nuevo comunicado
+            </Button>
           )
         }
       />

@@ -28,9 +28,9 @@ const ProfilePage = () => {
   return (
     <AdminShell className="admin-profile gap-4" aria-labelledby="profile-page-title">
       <PageHeader
-        eyebrow="Cuenta administrativa"
-        title={<span id="profile-page-title">Mi perfil</span>}
-        description="Su sesión actual en SIGASJ. Los cambios de cuenta los gestiona la Administradora."
+        id="profile-page-title"
+        title="Mi perfil"
+        description="Su sesión en SIGASJ. Los cambios de cuenta los gestiona la Administradora."
       />
 
       <section className="admin-surface-card admin-profile__card" aria-label="Datos del perfil">

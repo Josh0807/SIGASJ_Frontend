@@ -26,12 +26,15 @@ import { useMapaRedAveriasActivas } from './useMapaRedAveriasActivas'
 export type MapaRedPanelProps = {
   showPageTitle?: boolean
   compact?: boolean
+  /** Oculta el h2 interno (p. ej. cuando el dashboard ya titula la sección). */
+  hideShellTitle?: boolean
   className?: string
 }
 
 export default function MapaRedPanel({
   showPageTitle = false,
   compact = false,
+  hideShellTitle = false,
   className = '',
 }: MapaRedPanelProps) {
   const [selectedId, setSelectedId] = useState<SectorId>('centro')
@@ -107,7 +110,7 @@ export default function MapaRedPanel({
         aria-label={MAPA_RED_TITLE}
       >
         <div className="mapa-red__shell-head">
-          {!showPageTitle ? (
+          {!showPageTitle && !hideShellTitle ? (
             <h2 className="mapa-red__shell-title">
               {MAPA_RED_TITLE} – San Juan
             </h2>
@@ -218,7 +221,6 @@ export default function MapaRedPanel({
           >
             <div className="mapa-red__info-head">
               <div>
-                <p className="mapa-red__info-kicker">Panel operativo</p>
                 <h3 className="mapa-red__info-title">{selected.nombre}</h3>
               </div>
               {hasAlert ? (

@@ -1,7 +1,6 @@
 import {
   IconChevronLeft,
   IconChevronRight,
-  IconClipboardList,
   IconEye,
   IconFilterOff,
   IconRefresh,
@@ -178,17 +177,11 @@ export default function SolicitudesAdminListPage() {
     >
       <PageHeader
         id="solicitudes-tramites-title"
-        eyebrow="Administración · Solicitudes"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconClipboardList size={22} aria-hidden="true" />
-            Trámites digitales
-          </span>
-        }
-        description="Trámites recibidos desde los formularios ciudadanos: filtre, abra y dé seguimiento."
+        title="Trámites digitales"
+        description="Trámites ciudadanos: filtre, abra y dé seguimiento."
         actions={
           <Button to={SOLICITUDES_ADMIN_PATH} variant="secondary">
-            Volver a Gestión de solicitudes
+            Volver a solicitudes
           </Button>
         }
       />

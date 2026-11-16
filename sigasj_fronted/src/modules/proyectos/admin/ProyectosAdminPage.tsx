@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import {
-  IconBuildingBridge,
-  IconFilterOff,
-  IconFolderPlus,
-  IconSearch,
-} from '@tabler/icons-react'
+import { IconFilterOff, IconFolderPlus, IconSearch } from '@tabler/icons-react'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
@@ -127,27 +122,16 @@ const ProyectosAdminPage = () => {
     >
       <PageHeader
         id="proyectos-admin-title"
-        eyebrow="Inventario institucional · Administración"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconBuildingBridge size={22} aria-hidden="true" />
-            Gestión de Proyectos
-          </span>
-        }
-        description="Obras y mejoras en curso: estado, portada, galería y visibilidad en el sitio de la comunidad."
+        title="Proyectos"
+        description="Obras y mejoras: estado, portada, galería y visibilidad en el sitio."
         actions={
-          <>
-            <Button to="/admin/dashboard" variant="ghost">
-              {ADMIN_COPY.backHome}
-            </Button>
-            <Button
-              to={PROYECTOS_ADMIN_NEW_PATH}
-              variant="primary"
-              leftIcon={<IconFolderPlus size={18} aria-hidden="true" />}
-            >
-              Nuevo proyecto
-            </Button>
-          </>
+          <Button
+            to={PROYECTOS_ADMIN_NEW_PATH}
+            variant="primary"
+            leftIcon={<IconFolderPlus size={18} aria-hidden="true" />}
+          >
+            Nuevo proyecto
+          </Button>
         }
       />
 

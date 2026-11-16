@@ -189,41 +189,24 @@ const GalleryAdminPage = () => {
   const editingTitle = editingPhoto
     ? displayTitle(editingPhoto.titulo)
     : null
-  const headerEyebrow = formOpen
-    ? formMode === 'edit'
-      ? 'Galería · Edición'
-      : 'Galería · Alta'
-    : 'Panel administrativo'
   const headerTitle = formOpen
     ? formMode === 'edit'
       ? 'Editar fotografía'
       : 'Nueva fotografía'
-    : 'Galería de fotografías'
+    : 'Galería'
   const headerLead = formOpen
     ? formMode === 'edit'
       ? editingTitle
         ? `Editando «${editingTitle}». Actualice datos, visibilidad u orden, o reemplace la imagen.`
         : 'Actualice título, descripción, visibilidad u orden. Puede reemplazar la imagen si lo necesita.'
       : 'Complete los datos y suba la imagen para publicarla en la galería.'
-    : 'Curaduría de fotografías de la comunidad y de la ASADA en el sitio público.'
+    : 'Fotografías visibles en el sitio de la ASADA.'
 
   return (
     <AdminShell aria-labelledby="gallery-admin-title">
       <PageHeader
         id="gallery-admin-title"
-        eyebrow={headerEyebrow}
-        title={
-          <span className="inline-flex items-center gap-2">
-            {formMode === 'edit' ? (
-              <IconPencil size={22} aria-hidden="true" />
-            ) : formMode === 'create' ? (
-              <IconPhotoPlus size={22} aria-hidden="true" />
-            ) : (
-              <IconPhoto size={22} aria-hidden="true" />
-            )}
-            {headerTitle}
-          </span>
-        }
+        title={headerTitle}
         description={headerLead}
         actions={
           formOpen ? (
@@ -236,19 +219,14 @@ const GalleryAdminPage = () => {
               {ADMIN_COPY.backToList}
             </Button>
           ) : (
-            <>
-              <Button to="/admin/dashboard" variant="ghost">
-                {ADMIN_COPY.backHome}
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                leftIcon={<IconPhotoPlus size={18} aria-hidden="true" />}
-                onClick={openCreateForm}
-              >
-                Nueva fotografía
-              </Button>
-            </>
+            <Button
+              type="button"
+              variant="primary"
+              leftIcon={<IconPhotoPlus size={18} aria-hidden="true" />}
+              onClick={openCreateForm}
+            >
+              Nueva fotografía
+            </Button>
           )
         }
       />

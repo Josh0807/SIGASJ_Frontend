@@ -1,5 +1,4 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react'
-import { IconMapPin } from '@tabler/icons-react'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import { Alert, AdminShell, Button, Card, PageHeader } from '../../../shared/ui'
 import {
@@ -67,19 +66,8 @@ const ContactoAdminPage = () => {
     <AdminShell aria-labelledby="contacto-admin-title">
       <PageHeader
         id="contacto-admin-title"
-        eyebrow="Panel administrativo"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconMapPin size={22} aria-hidden="true" />
-            Información de Contacto y Ubicación
-          </span>
-        }
-        description="Teléfono, correo, horario y ubicación que aparecen en la sección de contacto del sitio."
-        actions={
-          <Button to="/admin/dashboard" variant="ghost">
-            {ADMIN_COPY.backHome}
-          </Button>
-        }
+        title="Contacto y ubicación"
+        description="Teléfono, correo, horario y ubicación en el sitio público."
       />
 
       {loading ? (

@@ -198,23 +198,18 @@ const TransparenciaAdminPage = () => {
       : emptyTransparenciaFormValues()
 
   const formOpen = formMode !== 'hidden'
-  const headerEyebrow = formOpen
-    ? formMode === 'edit'
-      ? 'Transparencia · Edición'
-      : 'Transparencia · Alta'
-    : 'Panel administrativo'
   const headerTitle = formOpen
     ? formMode === 'edit'
       ? 'Editar publicación'
       : 'Nueva publicación'
-    : 'Transparencia y calidad del agua'
+    : 'Transparencia'
   const headerLead = formOpen
     ? formMode === 'edit'
       ? editingPublication
         ? `Editando «${editingPublication.nombre}». Actualice datos, archivo o visibilidad.`
         : 'Actualice los datos de la publicación y guarde para volver al listado.'
       : 'Complete los datos y suba el documento o imagen para publicarlo en la landing.'
-    : 'Documentos e informes oficiales disponibles para consulta ciudadana.'
+    : 'Documentos e informes oficiales en el sitio público.'
 
   const showListErrorBanner = Boolean(
     error && (formOpen || publications.length > 0),
@@ -224,19 +219,7 @@ const TransparenciaAdminPage = () => {
     <AdminShell aria-labelledby="transparencia-admin-title">
       <PageHeader
         id="transparencia-admin-title"
-        eyebrow={headerEyebrow}
-        title={
-          <span className="inline-flex items-center gap-2">
-            {formMode === 'edit' ? (
-              <IconPencil size={22} aria-hidden="true" />
-            ) : formMode === 'create' ? (
-              <IconFilePlus size={22} aria-hidden="true" />
-            ) : (
-              <IconFileText size={22} aria-hidden="true" />
-            )}
-            {headerTitle}
-          </span>
-        }
+        title={headerTitle}
         description={headerLead}
         actions={
           formOpen ? (
@@ -249,19 +232,14 @@ const TransparenciaAdminPage = () => {
               {ADMIN_COPY.backToList}
             </Button>
           ) : (
-            <>
-              <Button to="/admin/dashboard" variant="ghost">
-                {ADMIN_COPY.backHome}
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                leftIcon={<IconFilePlus size={18} aria-hidden="true" />}
-                onClick={openCreateForm}
-              >
-                Nueva publicación
-              </Button>
-            </>
+            <Button
+              type="button"
+              variant="primary"
+              leftIcon={<IconFilePlus size={18} aria-hidden="true" />}
+              onClick={openCreateForm}
+            >
+              Nueva publicación
+            </Button>
           )
         }
       />

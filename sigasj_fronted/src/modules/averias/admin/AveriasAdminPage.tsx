@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
-import { IconChartBar, IconHistory, IconTool } from '@tabler/icons-react'
+import { IconChartBar, IconHistory } from '@tabler/icons-react'
 import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import {
   LOGIN_ROUTE_PATH,
@@ -212,14 +212,8 @@ const AveriasAdminPage = ({
     >
       <PageHeader
         id="averias-admin-title"
-        eyebrow="Operación"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconTool size={22} aria-hidden="true" />
-            Gestión de averías
-          </span>
-        }
-        description="Atención de fugas y fallas: asigne fontaneros y dé seguimiento hasta resolver cada reporte."
+        title="Averías"
+        description="Fugas y fallas: asigne fontaneros y dé seguimiento hasta resolver cada reporte."
         actions={
           <>
             <Button

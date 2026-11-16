@@ -112,7 +112,7 @@ const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
             <AdminNavIcon name="reportes" />
           </span>
           <div>
-            <h3 className="dashboard-widget__title">Actividad reciente</h3>
+            <h3 className="dashboard-widget__title">Bitácora del sistema</h3>
           </div>
         </div>
         {!isLoading && activities.length > 0 ? (

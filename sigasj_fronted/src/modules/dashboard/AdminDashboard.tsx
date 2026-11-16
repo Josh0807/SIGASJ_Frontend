@@ -26,7 +26,7 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     id: 'abonados',
     label: 'Asociados activos',
     value: null,
-    detail: 'Padrón actualizado',
+    detail: 'Personas en el padrón',
     badgeText: 'Activos',
     badgeType: 'success',
     icon: 'abonados',
@@ -34,10 +34,10 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   },
   {
     id: 'averias',
-    label: 'Averías reportadas',
+    label: 'Averías abiertas',
     value: null,
-    detail: 'Requieren atención',
-    badgeText: 'Pendientes',
+    detail: 'Pendientes de resolución',
+    badgeText: 'Abiertas',
     badgeType: 'info',
     icon: 'averias',
     link: '/admin/averias',
@@ -46,7 +46,7 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     id: 'solicitudes',
     label: 'Solicitudes en trámite',
     value: null,
-    detail: 'Nuevos servicios',
+    detail: 'Trámites ciudadanos',
     badgeText: 'En revisión',
     badgeType: 'info',
     icon: 'solicitudes',
@@ -57,7 +57,7 @@ const DASHBOARD_INDICATORS: DashboardIndicator[] = [
     label: 'Alertas de reposición',
     value: null,
     detail: 'Stock bajo el mínimo',
-    badgeText: 'Pendientes',
+    badgeText: 'Bodega',
     badgeType: 'warning',
     icon: 'inventario',
     link: ALERTAS_REPOSICION_PATH,
@@ -139,74 +139,68 @@ const AdminDashboard = () => {
       aria-labelledby="admin-dashboard-title"
     >
       <div className="admin-dashboard__shell">
-        {/* Hero + control del día */}
-        <div className="admin-dashboard__top-grid">
-          <header className="admin-dashboard__welcome-card">
-            <div className="admin-dashboard__welcome-media" aria-hidden="true">
-              <img
-                src={panelOperativoImage}
-                alt=""
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <div className="admin-dashboard__welcome-copy">
-              <span className="admin-dashboard__eyebrow">Panel operativo</span>
-              {displayName ? (
-                <p className="admin-dashboard__greeting">
-                  {greeting}, <strong>{displayName}</strong>
-                </p>
-              ) : null}
-              <h1 id="admin-dashboard-title">Dashboard Administrativo</h1>
-              <p className="admin-dashboard__lead">
-                Resumen del estado del acueducto según su rol: asociados, averías,
-                solicitudes y alertas.
+        <header className="admin-dashboard__welcome-card">
+          <div className="admin-dashboard__welcome-media" aria-hidden="true">
+            <img
+              src={panelOperativoImage}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div className="admin-dashboard__welcome-copy">
+            {displayName ? (
+              <p className="admin-dashboard__greeting">
+                {greeting}, <strong>{displayName}</strong>
               </p>
-            </div>
-          </header>
+            ) : (
+              <p className="admin-dashboard__greeting">{greeting}</p>
+            )}
+            <h1 id="admin-dashboard-title">Resumen del acueducto</h1>
+            <p className="admin-dashboard__lead">
+              Indicadores, mapa de red y actividad reciente según su rol en SIGASJ.
+            </p>
+          </div>
+        </header>
 
-          <aside className="admin-dashboard__focus-card" aria-label="Acciones del panel">
-            <div className="admin-dashboard__focus-copy">
-              <h2>Control del día</h2>
-              <p>Refresque las cifras cuando necesite la lectura más reciente.</p>
-            </div>
-            {indicators.length > 0 ? (
+        {indicators.length > 0 ? (
+          <section
+            className="admin-dashboard__section admin-dashboard__section--kpis"
+            aria-labelledby="admin-dashboard-kpis-title"
+          >
+            <div className="admin-dashboard__section-header admin-dashboard__section-header--with-action">
+              <div>
+                <h2 id="admin-dashboard-kpis-title">Indicadores</h2>
+                <p>Cifras actuales de los módulos a su cargo.</p>
+              </div>
               <Button
                 type="button"
+                variant="secondary"
+                size="sm"
                 className="admin-dashboard__refresh-btn"
                 onClick={() => {
                   void refetch()
                 }}
                 disabled={isLoading}
-                aria-label="Actualizar datos del dashboard"
+                aria-label="Actualizar indicadores del dashboard"
                 leftIcon={
                   <IconRefresh
                     className={
                       isLoading ? 'admin-dashboard__refresh-icon--loading' : undefined
                     }
                     aria-hidden="true"
-                    size={18}
+                    size={17}
                     stroke={2}
                   />
                 }
               >
-                {isLoading ? 'Cargando...' : 'Actualizar datos'}
+                {isLoading ? 'Actualizando…' : 'Actualizar'}
               </Button>
-            ) : null}
-          </aside>
-        </div>
-
-        {/* KPIs */}
-        {indicators.length > 0 ? (
-          <div className="admin-dashboard__section admin-dashboard__section--kpis">
-            <div className="admin-dashboard__section-header admin-dashboard__section-header--inline">
-              <h2>Indicadores principales</h2>
-              <p>Resumen actual de los módulos disponibles para su cuenta.</p>
             </div>
 
             {isError ? (
               <div className="admin-dashboard__global-error" role="alert">
-                <span>No se pudieron actualizar algunos indicadores del servidor.</span>
+                <span>{ADMIN_COPY.loadError('indicadores')}</span>
                 <Button type="button" size="sm" onClick={() => void refetch()}>
                   {ADMIN_COPY.retry}
                 </Button>
@@ -230,26 +224,35 @@ const AdminDashboard = () => {
                 />
               ))}
             </div>
-          </div>
+          </section>
         ) : null}
 
-        {/* Mapa protagonista + analítica inferior */}
         {canSeeMapa ? (
-          <div className="admin-dashboard__section admin-dashboard__section--mapa">
+          <section
+            className="admin-dashboard__section admin-dashboard__section--mapa"
+            aria-labelledby="admin-dashboard-mapa-title"
+          >
+            <div className="admin-dashboard__section-header">
+              <h2 id="admin-dashboard-mapa-title">Mapa de la red</h2>
+              <p>Sectores, averías activas y detalle operativo.</p>
+            </div>
             <ErrorBoundary>
               <MapaRedPanel
                 compact
+                hideShellTitle
                 className="admin-dashboard__mapa"
               />
             </ErrorBoundary>
-          </div>
+          </section>
         ) : null}
 
-        {/* Widgets reales de operación */}
-        <div className="admin-dashboard__section">
+        <section
+          className="admin-dashboard__section"
+          aria-labelledby="admin-dashboard-live-title"
+        >
           <div className="admin-dashboard__section-header">
-            <h2>Operación en vivo</h2>
-            <p>Alertas y actividad reales del sistema.</p>
+            <h2 id="admin-dashboard-live-title">Seguimiento</h2>
+            <p>Averías abiertas y movimientos recientes del sistema.</p>
           </div>
           <div className="admin-dashboard__widgets-grid">
             <ErrorBoundary>
@@ -259,7 +262,7 @@ const AdminDashboard = () => {
               <RecentActivityWidget />
             </ErrorBoundary>
           </div>
-        </div>
+        </section>
       </div>
     </AdminShell>
   )

@@ -7,9 +7,9 @@ export default function MapaRedPage() {
   return (
     <AdminShell className="gap-4" aria-labelledby="mapa-red-title">
       <PageHeader
-        eyebrow="Operación · Red de agua"
-        title={<span id="mapa-red-title">{MAPA_RED_TITLE}</span>}
-        description="Sectores, averías activas y estado de la red de agua en San Juan de Santa Cruz."
+        id="mapa-red-title"
+        title={MAPA_RED_TITLE}
+        description="Sectores, averías activas y estado de la red en San Juan de Santa Cruz."
       />
       <MapaRedPanel />
     </AdminShell>

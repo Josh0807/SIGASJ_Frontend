@@ -32,7 +32,7 @@ import {
   nombreCompleto,
 } from './asociadoForm'
 import { ASOCIADOS_PAGE_SIZE, getAsociados } from './asociadosApi'
-import { ASOCIADO_NEW_PATH, ASOCIADOS_HISTORIAL_PATH, ASOCIADOS_TITLE, asociadoDetailPath } from './asociadosPaths'
+import { ASOCIADO_NEW_PATH, ASOCIADOS_HISTORIAL_PATH, asociadoDetailPath } from './asociadosPaths'
 import EstadoAsociadoBadge from './EstadoAsociadoBadge'
 import type { Asociado, AsociadosFiltros, AsociadosListado, EstadoFiltro } from './types'
 import CambiarEstadoAsociado from './CambiarEstadoAsociado'
@@ -172,19 +172,10 @@ export default function AsociadosPage() {
 
       <PageHeader
         id="asociados-admin-title"
-        eyebrow="Administración · Asociados"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconUsers size={22} aria-hidden="true" />
-            {ASOCIADOS_TITLE}
-          </span>
-        }
-        description="Registro y consulta de personas asociadas al servicio de agua de la ASADA."
+        title="Asociados"
+        description="Personas asociadas al servicio de agua de la ASADA."
         actions={
           <>
-            <Button to="/admin/dashboard" variant="ghost">
-              {ADMIN_COPY.backHome}
-            </Button>
             <Button
               to={ASOCIADOS_HISTORIAL_PATH}
               variant="secondary"

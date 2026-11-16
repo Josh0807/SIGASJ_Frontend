@@ -7,7 +7,6 @@ import {
   type Icon,
 } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
-import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import { AdminShell, Button, PageHeader } from '../../../shared/ui'
 import { getSolicitudesAdmin } from './solicitudesAdminApi'
 import {
@@ -84,14 +83,8 @@ const SolicitudesAdminHomePage = () => {
     >
       <PageHeader
         id="solicitudes-admin-home-title"
-        eyebrow="Panel administrativo"
-        title="Gestión de solicitudes"
-        description="Trámites de la comunidad, formularios oficiales y documentos descargables del sitio."
-        actions={
-          <Button to="/admin/dashboard" variant="ghost">
-            {ADMIN_COPY.backHome}
-          </Button>
-        }
+        title="Solicitudes"
+        description="Trámites, formularios oficiales y documentos descargables del sitio."
       />
 
       <section

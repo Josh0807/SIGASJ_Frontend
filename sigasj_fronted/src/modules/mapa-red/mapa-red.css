@@ -54,8 +54,8 @@
   min-height: 2.55rem;
   padding: 0 0.9rem;
   border: 1px solid var(--mr-border);
-  border-radius: 999px;
-  background: #f8fafc;
+  border-radius: 10px;
+  background: #fff;
 }
 
 .mapa-red__page-search {

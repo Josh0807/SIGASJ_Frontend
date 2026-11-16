@@ -180,13 +180,7 @@ export default function ColaboradoresPage() {
 
       <PageHeader
         id="colaboradores-rrhh-title"
-        eyebrow="Administración · Recursos humanos"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconUsers size={22} aria-hidden="true" />
-            Colaboradores
-          </span>
-        }
+        title="Colaboradores"
         description="Personal de la ASADA: altas, estados y datos de colaboración."
         actions={
           <Button
