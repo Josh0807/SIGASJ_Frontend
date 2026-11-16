@@ -446,6 +446,21 @@
   }
 }
 
+/* Wizard público: columnas en desktop; una sola columna en móvil (inline style no gana). */
+.form-wizard__steps {
+  grid-template-columns: repeat(var(--form-wizard-steps, 1), minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .form-wizard__steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-wizard__steps > li:not([aria-current='step']) {
+    display: none;
+  }
+}
+
 /* Elevación suave compartida (landing). Menos lift, misma duración. */
 .landing-lift-card,
 .requests-motion-card,
@@ -516,21 +531,24 @@
   filter: brightness(1.06);
 }
 
-.landing-contact-row {
-  margin-inline: -0.65rem;
-  padding-inline: 0.65rem;
-  border-radius: 12px;
-  transition: background-color .35s ease, box-shadow .35s ease, transform .35s ease;
+/* Mismo lift de las cards, pero solo en el bloque de texto (no la fila/card). */
+.landing-contact-row__text {
+  display: block;
+  transform-origin: left center;
+  transition: transform .35s ease, color .35s ease, text-shadow .35s ease;
 }
 
-.landing-contact-row:hover {
-  background-color: color-mix(in srgb, var(--asada-ice, #eaf6ff) 72%, white);
-  box-shadow: 0 8px 20px rgba(39, 112, 166, .08);
-  transform: translateY(-2px);
+.landing-contact-row:hover .landing-contact-row__text {
+  transform: translateY(-5px) scale(1.004);
+  text-shadow: 0 10px 22px rgba(39, 112, 166, .16);
 }
 
-.landing-contact-row:hover > span:first-child {
-  background-color: color-mix(in srgb, var(--asada-primary, #1e5a9c) 12%, white);
+.landing-contact-row:hover .landing-contact-row__label {
+  color: var(--asada-primary, #1e5a9c);
+}
+
+.landing-contact-row:hover .landing-contact-row__value,
+.landing-contact-row:hover .landing-contact-row__value a {
   color: var(--asada-primary-hover, #0f3260);
 }
 
@@ -538,7 +556,7 @@
   .landing-lift-card,
   .landing-lift-button,
   .landing-lift-button svg,
-  .landing-contact-row,
+  .landing-contact-row__text,
   .requests-motion-card,
   .requests-motion-button,
   .requests-motion-button svg,
@@ -552,7 +570,7 @@
   .landing-lift-button:hover,
   .landing-lift-button:active,
   .landing-lift-button:hover > svg:last-child,
-  .landing-contact-row:hover,
+  .landing-contact-row:hover .landing-contact-row__text,
   .requests-motion-card:hover,
   .requests-motion-button:hover,
   .requests-motion-button:active,

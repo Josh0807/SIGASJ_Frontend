@@ -75,9 +75,9 @@ const AnnouncementCard = ({
 
   const titleId = `announcement-title-${id}`
   const showMeta = Boolean(safeType || formattedDate)
-  const isHighPriority = resolvedPrioridad === 'Alta'
 
-  const cardClassName = `announcement-motion-card transparency-motion-card flex h-full min-h-[320px] flex-col overflow-hidden rounded-[13px] border bg-white shadow-[0_4px_14px_rgba(16,43,56,0.05)] ${isHighPriority ? 'border-sigasj-error/40' : 'border-sigasj-border'}`
+  const cardClassName =
+    'announcement-motion-card transparency-motion-card flex h-full min-h-[320px] flex-col overflow-hidden rounded-[13px] border border-sigasj-border bg-white shadow-[0_4px_14px_rgba(16,43,56,0.05)]'
 
   const imageAlt = `Ilustración del comunicado: ${safeTitle}`
 
@@ -144,7 +144,7 @@ const AnnouncementCard = ({
               className="transparency-motion-button inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-white px-4 text-xs font-semibold text-sigasj-primary-hover"
               onClick={onImageClick}
             >
-              Ver imagen <IconArrowRight size={18} aria-hidden="true" />
+              Ver comunicado <IconArrowRight size={18} aria-hidden="true" />
             </button>
           ) : null}
 

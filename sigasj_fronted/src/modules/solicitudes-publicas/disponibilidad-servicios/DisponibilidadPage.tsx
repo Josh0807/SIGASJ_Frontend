@@ -7,8 +7,7 @@ import FormWizard from '../../../shared/components/FormWizard'
 import FormWizardFieldError from '../../../shared/components/FormWizardFieldError'
 import { useFormWizardField } from '../../../shared/components/formWizardValidation'
 import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsada'
-import Footer from '../../landing/components/Footer'
-import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
+import PublicFormPage from '../../landing/components/PublicFormPage'
 import SignaturePad from '../arreglo-pago/SignaturePad'
 import {
   CEDULA_FISICA_MAX_LENGTH,
@@ -16,6 +15,7 @@ import {
   limitarCedulaFisica,
   limitarTelefonoCr,
 } from '../identificacionCostaRica'
+import { FieldCaption, ReadonlyDateField } from '../PublicFormFieldChrome'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import DisponibilidadDocumentUpload from './DisponibilidadDocumentUpload'
 import type { DocumentoAdjunto } from './documentoAdjunto'
@@ -119,23 +119,14 @@ const TextField = ({
 }: TextFieldProps) => {
   const field = useFormWizardField(name)
   return (
-    <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
-      {label}{' '}
-      {required ? (
-        <>
-          <span className="text-rose-600" aria-hidden="true">
-            *
-          </span>
-          <span className="sr-only">obligatorio</span>
-        </>
-      ) : (
-        <span className="font-medium text-[#607a98]">(opcional)</span>
-      )}
-      {hint ? (
-        <span className="text-sm font-medium text-[#607a98]">{hint}</span>
-      ) : null}
+    <label className="grid min-w-0 gap-2 font-bold text-sigasj-ink">
+      <FieldCaption
+        label={label}
+        required={required}
+        hint={hint}
+      />
       <input
-        className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none transition focus:border-sky-500 focus:ring-3 focus:ring-sky-200"
+        className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist"
         name={name}
         type={type}
         value={value}
@@ -169,23 +160,14 @@ const TextAreaField = ({
 }) => {
   const field = useFormWizardField(name)
   return (
-    <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
-      {label}{' '}
-      {required ? (
-        <>
-          <span className="text-rose-600" aria-hidden="true">
-            *
-          </span>
-          <span className="sr-only">obligatorio</span>
-        </>
-      ) : (
-        <span className="font-medium text-[#607a98]">(opcional)</span>
-      )}
-      {hint ? (
-        <span className="text-sm font-medium text-[#607a98]">{hint}</span>
-      ) : null}
+    <label className="grid min-w-0 gap-2 font-bold text-sigasj-ink">
+      <FieldCaption
+        label={label}
+        required={required}
+        hint={hint}
+      />
       <textarea
-        className="min-h-28 w-full rounded-xl border border-sky-200 bg-white px-4 py-3 font-medium text-slate-800 outline-none transition focus:border-sky-500 focus:ring-3 focus:ring-sky-200"
+        className="min-h-28 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 py-3 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist"
         name={name}
         value={value}
         maxLength={maxLength}
@@ -218,23 +200,14 @@ const SelectField = <T extends string>({
 }) => {
   const field = useFormWizardField(name)
   return (
-    <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">
-      {label}{' '}
-      {required ? (
-        <>
-          <span className="text-rose-600" aria-hidden="true">
-            *
-          </span>
-          <span className="sr-only">obligatorio</span>
-        </>
-      ) : (
-        <span className="font-medium text-[#607a98]">(opcional)</span>
-      )}
-      {hint ? (
-        <span className="text-sm font-medium text-[#607a98]">{hint}</span>
-      ) : null}
+    <label className="grid min-w-0 gap-2 font-bold text-sigasj-ink">
+      <FieldCaption
+        label={label}
+        required={required}
+        hint={hint}
+      />
       <select
-        className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none transition focus:border-sky-500 focus:ring-3 focus:ring-sky-200"
+        className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none transition focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist"
         name={name}
         value={value}
         onChange={(event) => onChange(event.target.value as T | '')}
@@ -322,7 +295,7 @@ const DocumentsAndAuthorizationFields = ({
           </span>
         </label>
         <FormWizardFieldError name="autorizacionInspeccion" />
-        <p className="mb-0 mt-3 text-xs font-semibold text-[#607a98]">
+        <p className="mb-0 mt-3 text-xs font-semibold text-sigasj-muted">
           Debe indicar Sí o No (checkbox marcado = Sí). El Backend acepta ambos
           valores booleanos.
         </p>
@@ -429,15 +402,7 @@ const DisponibilidadPage = () => {
         placeholder="Seleccione el tipo…"
         onChange={(value) => setTipoPersona(value as '' | TipoPersona)}
       />
-      <label className="grid gap-2 font-bold text-[#173f6e]">
-        Fecha de solicitud
-        <input
-          className="min-h-12 rounded-xl border border-sky-100 bg-slate-50 px-4 font-semibold text-slate-600"
-          value={formatearFechaAsada(requestDate)}
-          readOnly
-          aria-readonly="true"
-        />
-      </label>
+      <ReadonlyDateField value={formatearFechaAsada(requestDate)} />
 
       {values.tipoPersona === 'Persona física' ? (
         <>
@@ -1163,32 +1128,19 @@ const DisponibilidadPage = () => {
   ]
 
   return (
-    <>
-      <PublicReceiptNavbar returnTo="/#solicitudes-servicio" />
-      <main
-        className="min-h-[65vh] bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-12 max-[640px]:px-4 max-[640px]:py-8"
-        aria-label="Formulario público de constancia de disponibilidad de servicios"
-      >
-        <div className="mx-auto w-full max-w-[1050px]">
-          <header className="mx-auto mb-10 max-w-[920px] text-center">
-            <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.25em] text-[#1476cf]">
-              Trámite digital
-            </p>
-            <h1 className="m-0 text-[clamp(2rem,5vw,3.2rem)] font-extrabold leading-tight tracking-[-0.04em] text-[#092e67]">
-              Constancia de Disponibilidad de Servicios
-            </h1>
-            <p className="mb-0 mt-4 leading-7 text-[#526d8c]">
-              Completa los nueve pasos para solicitar la constancia ante la
-              ASADA. Los campos se muestran u ocultan según las reglas oficiales
-              confirmadas.
-            </p>
-          </header>
-
-          {result ? (
+    <PublicFormPage
+      returnTo="/#solicitudes-servicio"
+      eyebrow="Trámite digital"
+      title="Constancia de Disponibilidad de Servicios"
+      description="Completa los nueve pasos para solicitar la constancia ante la ASADA. Los campos se muestran u ocultan según las reglas oficiales confirmadas."
+      ariaLabel="Formulario público de constancia de disponibilidad de servicios"
+      maxWidth="xl"
+    >
+{result ? (
             <FormSuccessResult
               icon={<IconCircleCheckFilled size={42} />}
               className="mx-auto !max-w-[720px] !gap-5 !rounded-[28px] !border-emerald-200 !bg-[linear-gradient(145deg,#ffffff_0%,#f0fdf8_100%)] !p-8 text-center shadow-[0_24px_60px_rgba(15,118,110,0.15)] max-[560px]:!p-5 [&_.form-success-result__description]:mx-auto [&_.form-success-result__description]:max-w-xl [&_.form-success-result__highlight]:!rounded-2xl [&_.form-success-result__highlight]:!border-emerald-200 [&_.form-success-result__highlight]:!bg-white [&_.form-success-result__highlight]:!px-6 [&_.form-success-result__highlight]:!py-5 [&_.form-success-result__highlight-value]:!text-[clamp(1.55rem,5vw,2.15rem)] [&_.form-success-result__meta-item]:!rounded-2xl [&_.form-success-result__meta-item]:!p-4 [&_.form-success-result__actions]:!mt-1 [&_.form-success-result__actions]:!justify-center"
-              titleClassName="!text-2xl !font-black !text-[#073b79]"
+              titleClassName="!text-2xl !font-bold !text-sigasj-ink"
               title="Solicitud registrada correctamente"
               description="Guarda este código para consultar posteriormente el avance del trámite."
               highlightLabel="Código de seguimiento"
@@ -1203,7 +1155,7 @@ const DisponibilidadPage = () => {
               actions={
                 <>
                   <Link
-                    className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-6 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(8,114,211,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none"
+                    className="landing-lift-button landing-lift-button--solid group inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-6 font-semibold text-white no-underline"
                     to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}
                   >
                     Consultar seguimiento{' '}
@@ -1214,7 +1166,7 @@ const DisponibilidadPage = () => {
                     />
                   </Link>
                   <Link
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] bg-white px-6 font-extrabold text-[#0b65b5] no-underline transition hover:-translate-y-0.5 hover:bg-blue-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 motion-reduce:transform-none sm:ml-2"
+                    className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline sm:ml-2"
                     to="/"
                   >
                     <IconHome size={19} aria-hidden="true" /> Volver al inicio
@@ -1244,10 +1196,7 @@ const DisponibilidadPage = () => {
               />
             </>
           )}
-        </div>
-      </main>
-      <Footer />
-    </>
+    </PublicFormPage>
   )
 }
 

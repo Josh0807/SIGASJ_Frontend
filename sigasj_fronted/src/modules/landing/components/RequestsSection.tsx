@@ -130,16 +130,17 @@ const RequestsSection = ({
           return (
           <div
             key={serviceId}
+            className="h-full"
             data-aos="fade-up"
             data-aos-delay={String(Math.min(index * 70, 280))}
           >
-          <article className="transparency-motion-card relative flex min-h-[240px] flex-col rounded-[13px] border border-sigasj-border bg-sigasj-surface px-6 py-5 shadow-[0_4px_14px_rgba(16,43,56,0.05)] max-[640px]:min-h-0">
+          <article className="transparency-motion-card relative flex h-full min-h-[240px] flex-col rounded-[13px] border border-sigasj-border bg-sigasj-surface px-6 py-5 shadow-[0_4px_14px_rgba(16,43,56,0.05)] max-[640px]:min-h-0">
             <div className="relative z-10 grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
               <ServiceIcon type={icon} name={name} />
             </div>
             <h3 className="public-card-title relative z-10 mt-4">{name}</h3>
             {badge ? <span className="public-meta relative z-10 mt-3 w-fit rounded-md bg-sigasj-surface-soft px-2 py-1 !normal-case !tracking-normal text-sigasj-primary-hover">{badge}</span> : null}
-            <p className="public-card-text relative z-10 mb-5 mt-2 max-w-[430px]">{serviceDescription}</p>
+            <p className="public-card-text relative z-10 mb-5 mt-2 max-w-[430px] flex-1">{serviceDescription}</p>
             {viewHref ? (
               <Link className="transparency-motion-button relative z-10 mt-auto flex min-h-11 w-full items-center justify-center gap-3 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-4 text-center text-sm font-semibold text-sigasj-primary-hover no-underline" to={viewHref}>
                 {serviceId === 'seguimiento' ? 'Consultar solicitud' : 'Ver formularios'}

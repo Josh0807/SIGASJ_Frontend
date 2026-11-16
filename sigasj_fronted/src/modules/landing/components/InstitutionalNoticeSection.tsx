@@ -38,39 +38,41 @@ const InstitutionalNoticeSection = () => {
       aria-labelledby="aviso-institucional-title"
     >
       <div
-        className="public-container flex flex-wrap items-start gap-4 py-4 max-[640px]:gap-3"
+        className="public-container flex flex-wrap items-center gap-4 py-4 max-[640px]:flex-col max-[640px]:items-stretch max-[640px]:gap-3"
         data-aos="fade-up"
       >
-        <span
-          className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface text-sigasj-primary"
-          aria-hidden="true"
-        >
-          {isUrgent ? (
-            <IconAlertCircle size={20} stroke={1.85} />
-          ) : (
-            <IconInfoCircle size={20} stroke={1.85} />
-          )}
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <p className="public-eyebrow mb-0">
-            {isUrgent ? 'Aviso importante' : 'Aviso institucional'}
-          </p>
-          <h2
-            id="aviso-institucional-title"
-            className="public-card-title mt-1"
+        <div className="flex min-w-0 flex-1 items-start gap-4 max-[640px]:w-full">
+          <span
+            className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-sigasj-surface text-sigasj-primary"
+            aria-hidden="true"
           >
-            {featured.title.trim()}
-          </h2>
-          <p className="public-card-text mt-1 line-clamp-2">
-            {summary}
-          </p>
+            {isUrgent ? (
+              <IconAlertCircle size={20} stroke={1.85} />
+            ) : (
+              <IconInfoCircle size={20} stroke={1.85} />
+            )}
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <p className="public-eyebrow mb-0">
+              {isUrgent ? 'Aviso importante' : 'Aviso institucional'}
+            </p>
+            <h2
+              id="aviso-institucional-title"
+              className="public-card-title mt-1"
+            >
+              {featured.title.trim()}
+            </h2>
+            <p className="public-card-text mt-1 line-clamp-2">
+              {summary}
+            </p>
+          </div>
         </div>
 
         {isInternalPath ? (
           <Link
             to={detailHref}
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-sigasj-primary no-underline transition-colors duration-150 hover:bg-sigasj-surface"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-sigasj-primary no-underline transition-colors duration-150 hover:bg-sigasj-surface max-[640px]:w-full max-[640px]:border max-[640px]:border-sigasj-border"
           >
             Ver detalle
             <IconArrowRight size={18} stroke={1.9} aria-hidden="true" />
@@ -78,7 +80,7 @@ const InstitutionalNoticeSection = () => {
         ) : (
           <a
             href={isInternalHash ? detailHref : detailHref}
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-sigasj-primary no-underline transition-colors duration-150 hover:bg-sigasj-surface"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-sigasj-primary no-underline transition-colors duration-150 hover:bg-sigasj-surface max-[640px]:w-full max-[640px]:border max-[640px]:border-sigasj-border"
             {...(!isInternalHash
               ? { target: '_blank', rel: 'noopener noreferrer' }
               : {})}

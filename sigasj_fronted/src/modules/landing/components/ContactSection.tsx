@@ -46,12 +46,14 @@ const ContactRow = ({
   children: ReactNode
 }) => (
   <div className="landing-contact-row grid grid-cols-[2.75rem_minmax(0,1fr)] items-start gap-4 py-5 first:pt-0 last:pb-0">
-    <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary transition-[background-color,color] duration-300">
+    <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
       <ContactIcon type={icon} />
     </span>
-    <div className="min-w-0">
-      <p className="public-meta">{label}</p>
-      <div className="mt-1.5 text-[0.9375rem] leading-6 text-sigasj-text">{children}</div>
+    <div className="landing-contact-row__text min-w-0">
+      <p className="landing-contact-row__label public-meta">{label}</p>
+      <div className="landing-contact-row__value mt-1.5 text-[0.9375rem] leading-6 text-sigasj-text">
+        {children}
+      </div>
     </div>
   </div>
 )

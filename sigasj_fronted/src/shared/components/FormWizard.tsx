@@ -135,18 +135,19 @@ const FormWizard = ({
     <section
       ref={wizardRef}
       className={[
-        'form-wizard overflow-hidden rounded-[24px] border border-sigasj-border bg-sigasj-surface shadow-[0_16px_42px_rgba(31,105,165,0.13)]',
+        'form-wizard transparency-motion-card overflow-hidden rounded-[16px] border border-sigasj-border bg-sigasj-surface shadow-[0_4px_14px_rgba(16,43,56,0.05)]',
         className,
       ].filter(Boolean).join(' ')}
       aria-label="Formulario por pasos"
+      style={{ ['--form-wizard-steps' as string]: String(steps.length) }}
     >
-      <header className="border-b border-sigasj-border bg-gradient-to-br from-sigasj-surface-soft to-sigasj-canvas px-7 py-6 max-[640px]:px-5">
+      <header className="border-b border-sigasj-border bg-white px-7 py-6 max-[640px]:px-5">
         <div className="flex items-center justify-between gap-4 text-sm font-bold text-sigasj-muted">
           <span aria-live="polite">Paso {safeStepIndex + 1} de {steps.length}</span>
           <span aria-hidden="true">{progress}%</span>
         </div>
         <div
-          className="mt-3 h-2 overflow-hidden rounded-full bg-sky-100"
+          className="mt-3 h-2 overflow-hidden rounded-full bg-sigasj-mist/50"
           role="progressbar"
           aria-label="Progreso del formulario"
           aria-valuemin={0}
@@ -154,10 +155,13 @@ const FormWizard = ({
           aria-valuenow={progress}
           aria-valuetext={`Paso ${safeStepIndex + 1} de ${steps.length}`}
         >
-          <span className="block h-full rounded-full bg-gradient-to-r from-[#0872d3] to-[#42a5e8] transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${progress}%` }} />
+          <span className="block h-full rounded-full bg-sigasj-primary transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${progress}%` }} />
         </div>
 
-        <ol className="mt-5 grid list-none gap-2 p-0 max-[700px]:grid-cols-1" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }} aria-label="Pasos del formulario">
+        <ol
+          className="form-wizard__steps mt-5 grid list-none gap-2 p-0"
+          aria-label="Pasos del formulario"
+        >
           {steps.map((step, index) => {
             const isCurrent = index === safeStepIndex
             const isComplete = index < safeStepIndex
@@ -192,7 +196,7 @@ const FormWizard = ({
               data-wizard-step={step.id}
             >
               <h2
-                className="m-0 text-[clamp(1.5rem,3vw,2rem)] font-extrabold leading-tight text-sigasj-ink focus:outline-none"
+                className="public-section-title m-0 !text-[clamp(1.5rem,3vw,2rem)] focus:outline-none"
                 id={titleId}
                 ref={(node) => { titleRefs.current[index] = node }}
                 tabIndex={-1}
@@ -213,7 +217,7 @@ const FormWizard = ({
 
         <footer className="mt-8 flex items-center justify-between gap-4 border-t border-sigasj-border pt-6 max-[480px]:flex-col-reverse max-[480px]:items-stretch">
           <button
-            className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-sigasj-primary bg-sigasj-surface px-6 font-bold text-sigasj-primary transition hover:-translate-y-0.5 hover:bg-sigasj-surface-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:border-sigasj-border disabled:text-sigasj-muted disabled:hover:translate-y-0 disabled:hover:bg-sigasj-surface"
+            className="transparency-motion-button flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover disabled:cursor-not-allowed disabled:border-sigasj-border disabled:text-sigasj-muted max-[480px]:w-full"
             type="button"
             disabled={isFirstStep || busy}
             onClick={() => moveTo(safeStepIndex - 1)}
@@ -224,7 +228,7 @@ const FormWizard = ({
           {isLastStep ? (
             <button
               ref={completeButtonRef}
-              className="flex min-h-[54px] min-w-[240px] cursor-pointer items-center justify-center gap-4 rounded-xl !border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-8 text-base font-extrabold text-white shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 max-[480px]:w-full max-[480px]:min-w-0"
+              className="landing-lift-button landing-lift-button--solid flex min-h-[52px] min-w-[220px] cursor-pointer items-center justify-center gap-3 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-8 text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 max-[480px]:w-full max-[480px]:min-w-0"
               type="button"
               disabled={!canAdvance}
               aria-describedby={currentStep.canAdvance === false && currentStep.validationMessage ? `${wizardId}-validation-message` : undefined}
@@ -234,7 +238,7 @@ const FormWizard = ({
             </button>
           ) : (
             <button
-              className="flex min-h-[54px] min-w-[240px] cursor-pointer items-center justify-center gap-4 rounded-xl !border-0 bg-gradient-to-r from-[#0872d3] to-[#3298dc] px-8 text-base font-extrabold text-white shadow-[0_10px_22px_rgba(8,114,211,0.22)] transition hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 max-[480px]:w-full max-[480px]:min-w-0"
+              className="landing-lift-button landing-lift-button--solid flex min-h-[52px] min-w-[220px] cursor-pointer items-center justify-center gap-3 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-8 text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 max-[480px]:w-full max-[480px]:min-w-0"
               type="button"
               disabled={!canAdvance}
               aria-describedby={currentStep.canAdvance === false && currentStep.validationMessage ? `${wizardId}-validation-message` : undefined}

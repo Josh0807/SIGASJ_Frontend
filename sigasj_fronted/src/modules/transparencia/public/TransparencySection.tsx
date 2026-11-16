@@ -46,6 +46,8 @@ const TransparencySection = ({
   const [paused, setPaused] = useState(false)
   const [pageHidden, setPageHidden] = useState(false)
   const [cycleKey, setCycleKey] = useState(0)
+  /** Evita pelear con AOS: transición del coverflow solo al navegar, no al montar. */
+  const [slideAnim, setSlideAnim] = useState(false)
   const touchStartXRef = useRef<number | null>(null)
   const touchEndXRef = useRef<number | null>(null)
   const touchStartYRef = useRef<number | null>(null)
@@ -78,6 +80,7 @@ const TransparencySection = ({
   const goTo = useCallback(
     (index: number, fromUser = false) => {
       if (total === 0) return
+      setSlideAnim(true)
       setActiveIndex(((index % total) + total) % total)
       if (fromUser) bumpCycle()
     },
@@ -95,6 +98,7 @@ const TransparencySection = ({
   useEffect(() => {
     if (!useCarousel || paused || reducedMotion || pageHidden || total < 2) return
     const timer = window.setInterval(() => {
+      setSlideAnim(true)
       setActiveIndex((index) => ((index + 1) % total + total) % total)
     }, AUTOPLAY_MS)
     return () => window.clearInterval(timer)
@@ -257,11 +261,12 @@ const TransparencySection = ({
                   const scale = isCenter ? 1 : abs === 1 ? 0.9 : 0.8
                   const opacity = isCenter ? 1 : abs === 1 ? 0.78 : 0.42
                   const zIndex = isCenter ? 30 : abs === 1 ? 20 : 10
-                  const transition = reducedMotion
-                    ? 'none'
-                    : isCenter
-                      ? 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)'
-                      : 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease'
+                  const transition =
+                    reducedMotion || !slideAnim
+                      ? 'none'
+                      : isCenter
+                        ? 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)'
+                        : 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease'
 
                   return (
                     <div
@@ -345,7 +350,7 @@ const TransparencySection = ({
               ))}
             </div>
 
-            <p className="public-caption mt-3 text-center" aria-live="polite">
+            <p className="sr-only" aria-live="polite">
               {activeIndex + 1} / {total}
             </p>
           </div>

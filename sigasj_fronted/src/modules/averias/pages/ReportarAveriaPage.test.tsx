@@ -73,8 +73,29 @@ const fillRequired = (container: HTMLElement) => {
   )
 }
 
-const readPayload = (fetchMock: ReturnType<typeof vi.fn>) =>
-  JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)) as Record<string, unknown>
+/** El Footer del shell público también consulta contacto; aislamos solo POSTs de avería. */
+const isAveriaSubmit = (url: unknown, init?: RequestInit) =>
+  String(url).includes('/public/averias') &&
+  String(init?.method ?? 'GET').toUpperCase() === 'POST'
+
+const averiaSubmitCalls = (fetchMock: ReturnType<typeof vi.fn>) =>
+  fetchMock.mock.calls.filter(([url, init]) => isAveriaSubmit(url, init as RequestInit | undefined))
+
+const readPayload = (fetchMock: ReturnType<typeof vi.fn>) => {
+  const call = averiaSubmitCalls(fetchMock)[0]
+  if (!call) throw new Error('No se encontró POST a /public/averias')
+  return JSON.parse(String((call[1] as RequestInit).body)) as Record<string, unknown>
+}
+
+const stubFetchWithFooter = (
+  averiaHandler: (url: string, init?: RequestInit) => Promise<Response> | Response,
+) =>
+  vi.fn((url: string, init?: RequestInit) => {
+    if (!isAveriaSubmit(url, init)) {
+      return Promise.resolve(jsonResponse(200, { data: {} }))
+    }
+    return averiaHandler(url, init)
+  })
 
 describe('Pantalla pública Reportar avería', () => {
   beforeEach(() => {
@@ -140,7 +161,7 @@ describe('Pantalla pública Reportar avería', () => {
   })
 
   it('muestra errores inline en vacíos obligatorios y no llama al Backend', async () => {
-    const fetchMock = vi.fn()
+    const fetchMock = stubFetchWithFooter(async () => jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -157,14 +178,14 @@ describe('Pantalla pública Reportar avería', () => {
       expect(alerts).toContain('Indique el sector o comunidad.')
       expect(alerts).toContain('Describa el problema reportado.')
       expect(alerts.join(' ')).not.toContain('correo electrónico válido')
-      expect(fetchMock).not.toHaveBeenCalled()
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(0)
     } finally {
       await app.cleanup()
     }
   })
 
   it('trata espacios como vacíos en campos obligatorios', async () => {
-    const fetchMock = vi.fn()
+    const fetchMock = stubFetchWithFooter(async () => jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -179,7 +200,7 @@ describe('Pantalla pública Reportar avería', () => {
         form.requestSubmit()
       })
 
-      expect(fetchMock).not.toHaveBeenCalled()
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(0)
       expect(app.container.innerHTML).toContain('Ingrese su nombre completo.')
     } finally {
       await app.cleanup()
@@ -187,7 +208,7 @@ describe('Pantalla pública Reportar avería', () => {
   })
 
   it('rechaza correo inválido sin enviar request', async () => {
-    const fetchMock = vi.fn()
+    const fetchMock = stubFetchWithFooter(async () => jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -203,14 +224,14 @@ describe('Pantalla pública Reportar avería', () => {
       })
 
       expect(app.container.innerHTML).toContain('Ingrese un correo electrónico válido.')
-      expect(fetchMock).not.toHaveBeenCalled()
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(0)
     } finally {
       await app.cleanup()
     }
   })
 
   it('envía POST público sin JWT e incluye cédula; omite correo vacío y campos administrativos', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(201, successBody))
+    const fetchMock = stubFetchWithFooter(async () => jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -221,8 +242,8 @@ describe('Pantalla pública Reportar avería', () => {
         form.requestSubmit()
       })
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit]
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(1)
+      const [url, options] = averiaSubmitCalls(fetchMock)[0] as [string, RequestInit]
       const headers = options.headers as Record<string, string>
       const body = readPayload(fetchMock)
 
@@ -249,7 +270,7 @@ describe('Pantalla pública Reportar avería', () => {
 
   it('muestra loading, evita doble submit y conserva valores mientras el POST está pendiente', async () => {
     let resolveFetch: ((value: Response) => void) | undefined
-    const fetchMock = vi.fn(
+    const fetchMock = stubFetchWithFooter(
       () =>
         new Promise<Response>((resolve) => {
           resolveFetch = resolve
@@ -269,7 +290,7 @@ describe('Pantalla pública Reportar avería', () => {
         form.requestSubmit()
       })
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(1)
       expect(submit.disabled).toBe(true)
       expect(submit.textContent).toContain('Enviando reporte...')
       expect(form.getAttribute('aria-busy')).toBe('true')
@@ -281,7 +302,7 @@ describe('Pantalla pública Reportar avería', () => {
       await act(async () => {
         resolveFetch?.(jsonResponse(201, successBody))
       })
-      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(1)
     } finally {
       await app.cleanup()
     }
@@ -289,7 +310,7 @@ describe('Pantalla pública Reportar avería', () => {
 
   it('un Enter adicional durante el envío no dispara un segundo POST', async () => {
     let resolveFetch: ((value: Response) => void) | undefined
-    const fetchMock = vi.fn(
+    const fetchMock = stubFetchWithFooter(
       () =>
         new Promise<Response>((resolve) => {
           resolveFetch = resolve
@@ -307,19 +328,19 @@ describe('Pantalla pública Reportar avería', () => {
         form.requestSubmit()
       })
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(1)
 
       await act(async () => {
         resolveFetch?.(jsonResponse(201, successBody))
       })
-      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(1)
     } finally {
       await app.cleanup()
     }
   })
 
   it('incluye correo opcional en el payload cuando tiene valor', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(201, successBody))
+    const fetchMock = stubFetchWithFooter(async () => jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -346,7 +367,7 @@ describe('Pantalla pública Reportar avería', () => {
   })
 
   it('tras el éxito solo muestra la confirmación (sin formulario)', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(201, successBody))
+    const fetchMock = stubFetchWithFooter(async () => jsonResponse(201, successBody))
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -372,7 +393,7 @@ describe('Pantalla pública Reportar avería', () => {
   })
 
   it('mapea 400 a campos, conserva valores y no muestra código', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
+    const fetchMock = stubFetchWithFooter(async () =>
       jsonResponse(400, {
         statusCode: 400,
         message: ['El correo electrónico no es válido'],
@@ -406,10 +427,12 @@ describe('Pantalla pública Reportar avería', () => {
   })
 
   it('muestra error de conexión y permite reintentar hasta el éxito', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
-      .mockResolvedValueOnce(jsonResponse(201, successBody))
+    let averiaAttempts = 0
+    const fetchMock = stubFetchWithFooter(async () => {
+      averiaAttempts += 1
+      if (averiaAttempts === 1) throw new TypeError('Failed to fetch')
+      return jsonResponse(201, successBody)
+    })
     vi.stubGlobal('fetch', fetchMock)
     const app = await mountAppRoutes(REPORTAR_AVERIA_ROUTE_PATH)
 
@@ -431,7 +454,7 @@ describe('Pantalla pública Reportar avería', () => {
         form.requestSubmit()
       })
 
-      expect(fetchMock).toHaveBeenCalledTimes(2)
+      expect(averiaSubmitCalls(fetchMock)).toHaveLength(2)
       expect(app.container.innerHTML).toContain('AV-2026-0001')
       expect(app.container.innerHTML).toContain('Avería registrada correctamente.')
       expect(app.container.querySelector('[name="nombreReportante"]')).toBeNull()
@@ -441,7 +464,7 @@ describe('Pantalla pública Reportar avería', () => {
   })
 
   it('oculta detalles técnicos de un 500 y conserva el formulario', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
+    const fetchMock = stubFetchWithFooter(async () =>
       jsonResponse(500, {
         statusCode: 500,
         message: 'QueryFailedError TypeORM SQL Exception stack INSERT INTO Averia',

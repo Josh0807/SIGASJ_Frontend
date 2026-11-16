@@ -7,8 +7,8 @@ import FormWizard from '../../../shared/components/FormWizard'
 import FormWizardFieldError from '../../../shared/components/FormWizardFieldError'
 import { useFormWizardField } from '../../../shared/components/formWizardValidation'
 import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsada'
-import Footer from '../../landing/components/Footer'
-import PublicReceiptNavbar from '../../recibos/components/PublicReceiptNavbar'
+import PublicFormPage from '../../landing/components/PublicFormPage'
+import { FieldCaption } from '../PublicFormFieldChrome'
 import SignaturePad from '../arreglo-pago/SignaturePad'
 import {
   CEDULA_FISICA_MAX_LENGTH,
@@ -53,15 +53,30 @@ const Field = ({ name, label, value, update, type = 'text', optional = false, mu
   type?: 'text' | 'email' | 'tel'; optional?: boolean; multiline?: boolean; maxLength?: number; placeholder?: string
 }) => {
   const field = useFormWizardField(name)
-  const common = { name, value, maxLength, placeholder, onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => update(event.target.value), className: 'min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 py-3 font-medium text-slate-800 outline-none focus:border-sky-500 focus:ring-3 focus:ring-sky-200', ...field.inputProps }
-  return <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">{label} {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <><span className="text-rose-600" aria-hidden="true"> *</span><span className="sr-only">obligatorio</span></>}{multiline ? <textarea {...common} rows={4} /> : <input {...common} type={type} />}<FormWizardFieldError name={name} /></label>
+  const common = { name, value, maxLength, placeholder, onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => update(event.target.value), className: 'min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 py-3 font-medium text-sigasj-text outline-none focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist', ...field.inputProps }
+  return (
+    <label className="grid min-w-0 gap-2 font-bold text-sigasj-ink">
+      <FieldCaption label={label} required={!optional} />
+      {multiline ? <textarea {...common} rows={4} /> : <input {...common} type={type} />}
+      <FormWizardFieldError name={name} />
+    </label>
+  )
 }
 
 const Select = ({ name, label, value, options, update, optional = false }: {
   name: keyof ServicioExistenteFormValues; label: string; value: string; options: readonly string[]; update: (value: string) => void; optional?: boolean
 }) => {
   const field = useFormWizardField(name)
-  return <label className="grid min-w-0 gap-2 font-bold text-[#173f6e]">{label} {optional ? <span className="font-medium text-[#607a98]">(opcional)</span> : <><span className="text-rose-600" aria-hidden="true"> *</span><span className="sr-only">obligatorio</span></>}<select className="min-h-12 w-full rounded-xl border border-sky-200 bg-white px-4 font-medium text-slate-800 outline-none focus:border-sky-500 focus:ring-3 focus:ring-sky-200" name={name} value={value} onChange={(event) => update(event.target.value)} {...field.inputProps}><option value="">Seleccione una opción…</option>{options.map((option) => <option key={option}>{option}</option>)}</select><FormWizardFieldError name={name} /></label>
+  return (
+    <label className="grid min-w-0 gap-2 font-bold text-sigasj-ink">
+      <FieldCaption label={label} required={!optional} />
+      <select className="min-h-12 w-full rounded-xl border border-sigasj-border-strong bg-sigasj-surface px-4 font-medium text-sigasj-text outline-none focus:border-sigasj-primary focus:ring-3 focus:ring-sigasj-mist" name={name} value={value} onChange={(event) => update(event.target.value)} {...field.inputProps}>
+        <option value="">Seleccione una opción…</option>
+        {options.map((option) => <option key={option}>{option}</option>)}
+      </select>
+      <FormWizardFieldError name={name} />
+    </label>
+  )
 }
 
 const ServicioExistentePage = () => {
@@ -143,7 +158,17 @@ const ServicioExistentePage = () => {
     { id: 'revision', title: 'Revisión', description: 'Verifica toda la información antes de enviar.', content: review },
   ]
 
-  return <><PublicReceiptNavbar returnTo="/#solicitudes-servicio" /><main className="min-h-[65vh] bg-[linear-gradient(135deg,#fbfdff_0%,#edf8ff_55%,#e4f5ff_100%)] px-6 py-12 max-[640px]:px-4 max-[640px]:py-8" aria-label="Formulario público de constancia de servicio existente"><div className="mx-auto w-full max-w-[1050px]"><header className="mx-auto mb-10 max-w-[850px] text-center"><p className="mb-2 text-xs font-extrabold uppercase tracking-[0.25em] text-[#1476cf]">Trámite digital</p><h1 className="m-0 text-[clamp(2rem,5vw,3.2rem)] font-extrabold leading-tight tracking-[-0.04em] text-[#092e67]">Constancia de Servicio Existente</h1><p className="mb-0 mt-4 leading-7 text-[#526d8c]">Completa los siete pasos para solicitar una constancia que acredite la existencia del servicio.</p></header>{result ? <FormSuccessResult className="mx-auto w-full !max-w-[760px] text-center [&_.form-success-result__actions]:justify-center" icon={<IconCircleCheckFilled size={42} />} title="Solicitud registrada correctamente" description="Guarda este código para consultar el avance del trámite." highlightLabel="Código de seguimiento" highlightValue={result.codigoSeguimiento} meta={[{ label: 'Estado', value: result.estado || 'PENDIENTE' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]} actions={<><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#1476cf] px-6 font-extrabold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight size={19} /></Link><Link className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#1476cf] px-6 font-extrabold text-[#0b65b5] no-underline" to="/"><IconHome size={19} /> Volver al inicio</Link></>} /> : <>{submitError ? <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{submitError}</p> : null}<FormWizard steps={steps} completeLabel="Enviar solicitud" onComplete={handleSubmit} confirmation={{ title: 'Confirmar solicitud', message: 'Confirma que los datos, documentos y firma son correctos antes de registrar la solicitud.' }} /></>}</div></main><Footer /></>
+  return (
+    <PublicFormPage
+      returnTo="/#solicitudes-servicio"
+      eyebrow="Trámite digital"
+      title="Constancia de Servicio Existente"
+      description="Completa los siete pasos para solicitar una constancia que acredite la existencia del servicio."
+      ariaLabel="Formulario público de constancia de servicio existente"
+      maxWidth="xl"
+    >
+{result ? <FormSuccessResult className="mx-auto w-full !max-w-[760px] text-center [&_.form-success-result__actions]:justify-center" icon={<IconCircleCheckFilled size={42} />} title="Solicitud registrada correctamente" description="Guarda este código para consultar el avance del trámite." highlightLabel="Código de seguimiento" highlightValue={result.codigoSeguimiento} meta={[{ label: 'Estado', value: result.estado || 'PENDIENTE' }, { label: 'Fecha de ingreso', value: formatearFechaAsada(result.fechaIngreso) }]} actions={<><Link className="landing-lift-button landing-lift-button--solid group inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-primary bg-sigasj-primary px-6 font-semibold text-white no-underline" to={`/solicitudes/seguimiento?codigo=${encodeURIComponent(result.codigoSeguimiento)}`}>Consultar seguimiento <IconArrowRight size={19} /></Link><Link className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline sm:ml-2" to="/"><IconHome size={19} /> Volver al inicio</Link></>} /> : <>{submitError ? <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 font-semibold text-red-800" role="alert">{submitError}</p> : null}<FormWizard steps={steps} completeLabel="Enviar solicitud" onComplete={handleSubmit} confirmation={{ title: 'Confirmar solicitud', message: 'Confirma que los datos, documentos y firma son correctos antes de registrar la solicitud.' }} /></>}</PublicFormPage>
+  )
 }
 
 const DocumentError = () => {
