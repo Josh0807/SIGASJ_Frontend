@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, useSearchParams } from 'react-router-dom'
-import { IconArrowLeft } from '@tabler/icons-react'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { IconArrowLeft, IconChevronRight } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
 } from '../../../app/router/routePaths'
-import { Button } from '../../../shared/ui/Button'
-import { PageHeader } from '../../../shared/ui/PageHeader'
 import { useAdminAveriasHistorial } from '../hooks/useAdminAveriasHistorial'
 import { getAdminAveriaFontaneros } from '../services/averiasAdminApi'
 import AveriasAdminPagination from './AveriasAdminPagination'
@@ -265,23 +263,48 @@ const AveriasHistorialPage = ({
     })
   }
 
+  const showPagination =
+    !(isLoading && listItems.length === 0) && !errorMessage
+
   return (
-    <main className="gallery-admin averias-admin w-full min-w-0">
-      <div className="gallery-admin__shell sigasj-stack gap-4">
-        <PageHeader
-          title="Historial de averías"
-          description="Consulte averías actuales y resueltas. Esta vista no modifica los casos."
-          actions={
-            <Button
-              to={AVERIAS_ADMIN_PATH}
-              variant="secondary"
-              size="sm"
-              leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
-            >
+    <main className="gallery-admin admin-content-modern averias-admin min-w-0">
+      <div className="gallery-admin__shell sigasj-stack">
+        <header className="gallery-admin__header">
+          <div className="gallery-admin__header-copy min-w-0">
+            <div>
+              <nav aria-label="Ruta de navegación" className="mb-2">
+                <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-sm font-semibold text-slate-500">
+                  <li>Administración</li>
+                  <li aria-hidden="true" className="inline-flex items-center">
+                    <IconChevronRight size={16} />
+                  </li>
+                  <li>
+                    <Link to={AVERIAS_ADMIN_PATH} className="text-[#1e5a9c] no-underline hover:underline">
+                      Averías
+                    </Link>
+                  </li>
+                  <li aria-hidden="true" className="inline-flex items-center">
+                    <IconChevronRight size={16} />
+                  </li>
+                  <li aria-current="page" className="text-[#1e5a9c]">
+                    Historial
+                  </li>
+                </ol>
+              </nav>
+              <p className="gallery-admin__eyebrow">Consulta</p>
+              <h1>Historial de averías</h1>
+              <p>
+                Consulte casos actuales y resueltos. Esta vista es de solo lectura.
+              </p>
+            </div>
+          </div>
+          <div className="gallery-admin__header-actions">
+            <Link to={AVERIAS_ADMIN_PATH} className="gallery-admin__button">
+              <IconArrowLeft size={18} aria-hidden="true" />
               Volver a gestión
-            </Button>
-          }
-        />
+            </Link>
+          </div>
+        </header>
 
         <AveriasHistorialFilters
           codigoSeguimiento={codigoInput}
@@ -305,7 +328,7 @@ const AveriasHistorialPage = ({
           hasActiveFilters={hasActiveFilters}
         />
 
-        <section aria-label="Historial de averías">
+        <section aria-label="Historial de averías" className="min-w-0">
           <AveriasAdminQueryStates
             loading={isLoading}
             error={errorMessage}
@@ -314,19 +337,22 @@ const AveriasHistorialPage = ({
             emptyMessage={AVERIAS_HISTORIAL_EMPTY_MESSAGE}
             onRetry={rangoInvalido ? undefined : (onRetry ?? remote.refetch)}
           >
-            <AveriasHistorialTable items={listItems} />
+            <AveriasHistorialTable
+              items={listItems}
+              footer={
+                showPagination ? (
+                  <AveriasAdminPagination
+                    page={page}
+                    totalPages={listTotalPages}
+                    total={listTotal}
+                    loading={isLoading}
+                    onPageChange={goToPage}
+                  />
+                ) : null
+              }
+            />
           </AveriasAdminQueryStates>
         </section>
-
-        {isLoading && listItems.length === 0 ? null : errorMessage ? null : (
-          <AveriasAdminPagination
-            page={page}
-            totalPages={listTotalPages}
-            total={listTotal}
-            loading={isLoading}
-            onPageChange={goToPage}
-          />
-        )}
       </div>
     </main>
   )

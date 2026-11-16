@@ -75,14 +75,14 @@ export const siguienteEstadoReposicion = (
   estado: string,
 ): EstadoReposicion | null => {
   const normalized = normalizeReposicionEstado(estado)
-  if (normalized === 'PENDIENTE') return 'EN_GESTION'
+  // PENDIENTE → EN_GESTION exists in backend, but the real next step in UI
+  // is "Registrar compra" (already allowed from PENDIENTE). No orphan CTA.
   if (normalized === 'RECIBIDA') return 'COMPLETADA'
   return null
 }
 
 export const etiquetaAccionReposicion = (estado: string) => {
   const siguiente = siguienteEstadoReposicion(estado)
-  if (siguiente === 'EN_GESTION') return 'Poner en gestión'
   if (siguiente === 'COMPLETADA') return 'Completar reposición'
   return null
 }

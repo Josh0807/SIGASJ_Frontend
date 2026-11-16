@@ -5,6 +5,16 @@ import {
   resolveAuthUserDisplayName,
 } from '../utils/authUserDisplay'
 
+const initialsFromName = (name: string) => {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+  if (parts.length === 0) return 'U'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
+}
+
 const ProfilePage = () => {
   const { user } = useAuth()
   const displayName = resolveAuthUserDisplayName(user)
@@ -12,67 +22,62 @@ const ProfilePage = () => {
   const email = user?.email?.trim() || 'No registrado'
   const role = user?.role?.trim() || 'Sin rol asignado'
   const userId = user?.id?.trim()
+  const initials = initialsFromName(displayName)
 
   return (
-    <main className="admin-surface-page" aria-labelledby="profile-page-title">
-      <header className="grid gap-2">
-        <p className="m-0 text-xs font-extrabold uppercase tracking-[0.22em] text-[#1e5a9c]">
-          Cuenta administrativa
-        </p>
-        <h1 id="profile-page-title" className="m-0 text-3xl font-black tracking-tight text-[#1e5a9c]">
-          Mi perfil
-        </h1>
-        <p className="m-0 text-[#5b7390]">
-          Datos de la sesión actual. La edición de cuenta se gestiona con la Administradora.
-        </p>
+    <main className="admin-surface-page admin-profile" aria-labelledby="profile-page-title">
+      <header className="admin-profile__header">
+        <div className="admin-profile__header-copy">
+          <p className="admin-profile__eyebrow">Cuenta administrativa</p>
+          <h1 id="profile-page-title">Mi perfil</h1>
+          <p className="admin-profile__lead">
+            Datos de la sesión actual. La edición de cuenta se gestiona con la Administradora.
+          </p>
+        </div>
       </header>
 
-      <section className="admin-surface-card" aria-label="Datos del perfil">
-        <div className="flex items-start gap-4">
-          <span
-            className="grid size-14 place-items-center rounded-2xl border border-white/70 bg-linear-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]"
-            aria-hidden="true"
-          >
-            <IconUserCircle size={30} />
+      <section className="admin-surface-card admin-profile__card" aria-label="Datos del perfil">
+        <div className="admin-profile__identity">
+          <span className="admin-profile__avatar" aria-hidden="true">
+            {hasNamedIdentity ? initials : <IconUserCircle size={28} stroke={1.8} />}
           </span>
-          <div className="min-w-0">
-            <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-[#1e5a9c]">
-              Usuario en sesión
-            </p>
-            <h2 className="m-0 truncate text-2xl font-black text-[#1e5a9c]">{displayName}</h2>
+          <div className="admin-profile__identity-copy">
+            <p className="admin-profile__kicker">Usuario en sesión</p>
+            <h2>{displayName}</h2>
             {!hasNamedIdentity ? (
-              <p className="mb-0 mt-1 text-sm text-[#5b7390]">
+              <p className="admin-profile__hint">
                 Nombre no disponible en el perfil; se muestra el correo o un valor por defecto.
               </p>
             ) : null}
+            <span className="admin-profile__role-badge">
+              <IconShield size={14} aria-hidden="true" />
+              {role}
+            </span>
           </div>
         </div>
 
-        <dl className="m-0 grid gap-3 sm:grid-cols-2">
-          <div className="admin-surface-stat">
-            <dt className="flex items-center gap-2">
+        <dl className="admin-profile__facts">
+          <div className="admin-profile__fact">
+            <dt>
               <IconMail size={16} aria-hidden="true" />
               Correo
             </dt>
             <dd>{email}</dd>
           </div>
-          <div className="admin-surface-stat">
-            <dt className="flex items-center gap-2">
-              <IconShield size={16} aria-hidden="true" />
-              Rol
-            </dt>
-            <dd>{role}</dd>
-          </div>
           {userId ? (
-            <div className="admin-surface-stat sm:col-span-2">
-              <dt className="flex items-center gap-2">
+            <div className="admin-profile__fact">
+              <dt>
                 <IconId size={16} aria-hidden="true" />
                 Identificador
               </dt>
-              <dd className="font-mono text-sm">{userId}</dd>
+              <dd className="admin-profile__id">{userId}</dd>
             </div>
           ) : null}
         </dl>
+
+        <p className="admin-profile__note" role="note">
+          Solo lectura. Para cambios de correo, rol o acceso, solicítelo a la Administradora.
+        </p>
       </section>
     </main>
   )

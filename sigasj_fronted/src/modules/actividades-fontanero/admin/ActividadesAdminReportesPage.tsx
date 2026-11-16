@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { IconClipboardOff } from '@tabler/icons-react'
+import { IconClipboardOff, IconSearch } from '@tabler/icons-react'
 import {
   LOGIN_ROUTE_PATH,
   UNAUTHORIZED_ROUTE_PATH,
@@ -12,8 +12,12 @@ import { useAdminActividadesReportes } from '../hooks/useAdminActividadesReporte
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 import { getReportesAdmin } from '../services/actividadesFontaneroApi'
 import type { ReporteActividadesFilters } from '../types/actividadReportes'
+import { formatActividadEstado } from '../utils/formatActividadEstado'
 import { formatActividadFecha } from '../utils/formatActividadFecha'
-import { ACTIVIDADES_ADMIN_PATHS } from './actividadesAdminPaths'
+import {
+  ACTIVIDADES_ADMIN_PATHS,
+  actividadAdminDetallePath,
+} from './actividadesAdminPaths'
 
 const EMPTY = ''
 
@@ -30,6 +34,13 @@ const EMPTY_DRAFT: DraftFilters = {
   fontaneroId: EMPTY,
   tipoActividadId: EMPTY,
 }
+
+const INDICATOR_CLASS =
+  'activities-indicator-modern group !min-h-[168px] !overflow-hidden !rounded-[22px] !border !border-blue-100 !bg-linear-to-br !from-white !via-white !to-sky-50/60 !p-5 !shadow-[0_10px_24px_rgba(30,90,156,0.08)] !transition-all !duration-300 hover:!-translate-y-1 hover:!border-[#bfe3fa] hover:!shadow-[0_16px_32px_rgba(30,90,156,0.14)]'
+
+const INDICATOR_TOTAL_CLASS =
+  INDICATOR_CLASS +
+  ' !border-[#93c5fd] !bg-linear-to-br !from-[#eff6ff] !via-white !to-[#e0f2fe]'
 
 const toAppliedFilters = (draft: DraftFilters): ReporteActividadesFilters => {
   const tipoRaw = draft.tipoActividadId.trim()
@@ -152,17 +163,17 @@ const ActividadesAdminReportesPage = () => {
   }
 
   return (
-    <main className="gallery-admin actividades-admin-reportes">
-      <div className="gallery-admin__shell sigasj-stack !gap-7">
-        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-8 !shadow-[0_14px_38px_rgba(30, 90, 156,0.10)] md:!px-10">
-          <div className="min-w-0 space-y-3">
+    <main className="gallery-admin admin-content-modern actividades-admin-reportes">
+      <div className="gallery-admin__shell sigasj-stack !gap-6">
+        <header className="gallery-admin__header !rounded-[28px] !border-blue-100 !bg-gradient-to-br !from-white !to-sky-50/70 !px-8 !py-7 !shadow-[0_14px_38px_rgba(30,90,156,0.10)] md:!px-10">
+          <div className="min-w-0 space-y-2">
             <span className="gallery-admin__eyebrow">
               Actividades del Fontanero · Administradora
             </span>
             <h1>Reporte de actividades del Fontanero</h1>
             <p>
               Consulte totales, cantidades por tipo y el detalle de actividades
-              registradas. Los cálculos provienen del servidor.
+              registradas.
             </p>
           </div>
           <div className="gallery-admin__header-actions">
@@ -176,12 +187,17 @@ const ActividadesAdminReportesPage = () => {
         </header>
 
         <form
-          className="gallery-admin__filters !rounded-[28px] !border-blue-100 !bg-white/90 !p-7 !shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
+          className="gallery-admin__filters actividades-admin-reportes__filters"
           aria-label="Filtros del reporte"
           onSubmit={handleConsultar}
           noValidate
         >
-          <div className="col-span-full border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Consulta del reporte</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Filtrar actividades</h2><p className="mt-2 text-base text-slate-500">Defina los criterios para generar el resumen de actividades.</p></div>
+          <div className="actividades-admin-reportes__section-head col-span-full">
+            <p className="actividades-admin-reportes__eyebrow">Consulta</p>
+            <h2>Filtrar actividades</h2>
+            <p>Defina el periodo, fontanero o tipo para generar el resumen.</p>
+          </div>
+
           <label className="gallery-admin__field" htmlFor="reportes-fecha-inicio">
             <span>Fecha inicial</span>
             <input
@@ -258,14 +274,15 @@ const ActividadesAdminReportesPage = () => {
           <div className="actividades-admin-reportes__actions">
             <button
               type="submit"
-              className="gallery-admin__button gallery-admin__button--primary !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-7 !py-3.5 !font-bold !text-white !shadow-lg !shadow-blue-200"
+              className="gallery-admin__button gallery-admin__button--primary"
               disabled={loading}
             >
+              <IconSearch size={18} aria-hidden="true" />
               {loading ? 'Consultando…' : 'Consultar'}
             </button>
             <button
               type="button"
-              className="gallery-admin__button gallery-admin__filter-reset !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md"
+              className="gallery-admin__button gallery-admin__filter-reset"
               onClick={handleLimpiar}
               disabled={loading || (!hasActiveDraft && Object.keys(applied).length === 0)}
             >
@@ -294,11 +311,15 @@ const ActividadesAdminReportesPage = () => {
         ) : null}
 
         <section
-          className="actividades-admin-reportes__indicators rounded-[28px] border border-blue-100 bg-white/90 p-7 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
+          className="actividades-admin-reportes__indicators"
           aria-label="Indicadores del reporte"
         >
-          <div className="mb-6 border-b border-blue-100 pb-5"><p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Resultados del reporte</p><h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]">Indicadores de actividades</h2><p className="mt-2 text-base text-slate-500">Totales calculados según los filtros aplicados.</p></div>
-          <div className="admin-dashboard__indicators-grid">
+          <div className="actividades-admin-reportes__section-head">
+            <p className="actividades-admin-reportes__eyebrow">Resultados</p>
+            <h2>Indicadores de actividades</h2>
+            <p>Totales calculados según los filtros aplicados.</p>
+          </div>
+          <div className="admin-dashboard__indicators-grid actividades-admin-reportes__indicators-grid">
             <IndicatorCard
               title="Total de actividades"
               value={loading ? null : reporte.total}
@@ -306,30 +327,30 @@ const ActividadesAdminReportesPage = () => {
               description="Según los filtros aplicados"
               badgeText="Total"
               badgeType="info"
-              className="activities-indicator-modern"
+              className={INDICATOR_TOTAL_CLASS}
             />
             {(loading ? [] : reporte.porTipo).map((item) => (
               <IndicatorCard
-                key={`${item.tipoActividadId ?? 'sin-tipo'}-${item.tipoActividadNombre}`}
+                key={[item.tipoActividadId ?? 'sin-tipo', item.tipoActividadNombre].join('-')}
                 title={item.tipoActividadNombre || 'Sin tipo'}
                 value={item.cantidad}
                 description="Actividades por tipo"
                 badgeText="Tipo"
                 badgeType="default"
-                className="activities-indicator-modern"
+                className={INDICATOR_CLASS}
               />
             ))}
           </div>
         </section>
 
         <section
-          className="actividades-admin-reportes__listado rounded-[28px] border border-blue-100 bg-white/90 p-7 shadow-[0_14px_38px_rgba(30, 90, 156,0.08)]"
+          className="actividades-admin-reportes__listado"
           aria-labelledby="reportes-listado-title"
         >
-          <div className="mb-6 border-b border-blue-100 pb-5">
-            <p className="mb-1 text-sm font-black uppercase tracking-[0.12em] text-[#1e5a9c]">Detalle del reporte</p>
-            <h2 className="m-0 text-2xl font-black tracking-tight text-[#07376f]" id="reportes-listado-title">Listado de actividades</h2>
-            <p className="mt-2 text-base text-slate-500">Fecha, fontanero responsable y tipo de actividad.</p>
+          <div className="actividades-admin-reportes__section-head">
+            <p className="actividades-admin-reportes__eyebrow">Detalle</p>
+            <h2 id="reportes-listado-title">Listado de actividades</h2>
+            <p>Fecha, responsable, tipo y estado de cada registro.</p>
           </div>
 
           {loading ? (
@@ -345,21 +366,30 @@ const ActividadesAdminReportesPage = () => {
           ) : null}
 
           {showEmpty ? (
-            <div className="gallery-admin__empty !flex !min-h-[180px] !flex-col !items-center !justify-center !rounded-3xl !border !border-dashed !border-[#bfe3fa] !bg-gradient-to-br !from-white !to-sky-50/70 !px-6 !py-10 !text-center !shadow-inner" role="status">
-              <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]"><IconClipboardOff size={28} aria-hidden="true" /></span>
-              <h3 className="m-0 text-lg font-black text-[#07376f]">Sin actividades encontradas</h3>
-              <p className="mb-0 mt-2 text-base text-slate-500">No se encontraron actividades con los filtros seleccionados.</p>
+            <div
+              className="gallery-admin__empty actividades-admin-reportes__empty"
+              role="status"
+            >
+              <span className="actividades-admin-reportes__empty-icon" aria-hidden="true">
+                <IconClipboardOff size={28} />
+              </span>
+              <h3>Sin actividades encontradas</h3>
+              <p>No se encontraron actividades con los filtros seleccionados.</p>
             </div>
           ) : null}
 
           {!loading && !showEmpty && !filterError ? (
-            <div className="table-responsive">
+            <div className="table-responsive actividades-admin-reportes__table-shell">
               <table className="actividades-admin-reportes__table">
                 <thead>
                   <tr>
                     <th scope="col">Fecha</th>
                     <th scope="col">Fontanero</th>
                     <th scope="col">Tipo de actividad</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">
+                      <span className="sr-only">Acciones</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -368,6 +398,22 @@ const ActividadesAdminReportesPage = () => {
                       <td>{formatActividadFecha(actividad.fechaActividad)}</td>
                       <td>{actividad.fontaneroId}</td>
                       <td>{actividad.tipoActividadNombre || 'Sin tipo'}</td>
+                      <td>
+                        <span
+                          className="actividades-admin-reportes__estado"
+                          data-estado={actividad.estado}
+                        >
+                          {formatActividadEstado(actividad.estado)}
+                        </span>
+                      </td>
+                      <td className="actividades-admin-reportes__row-action">
+                        <Link
+                          className="actividades-admin-reportes__detail-link"
+                          to={actividadAdminDetallePath(actividad.id)}
+                        >
+                          Ver detalle
+                        </Link>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

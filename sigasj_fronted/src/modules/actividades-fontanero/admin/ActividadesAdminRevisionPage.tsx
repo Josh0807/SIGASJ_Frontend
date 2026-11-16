@@ -1,27 +1,22 @@
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { IconMessageExclamation } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH, UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
-import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import ActivityFeedback from '../components/ActivityFeedback'
-import ActividadDetalleOverlay from '../components/ActividadDetalleOverlay'
 import { clearAccessToken } from '../../auth/utils/authStorage'
-import { ACTIVITY_FEEDBACK_MESSAGES } from '../utils/activityFeedbackMessages'
 import { interpretActividadApiError } from '../utils/interpretActividadApiError'
 import { useTiposActividadFontanero } from '../hooks/useTiposActividadFontanero'
 import {
   getActividadesAdmin,
-  getActividadAdminDetalle,
   getReportesAdmin,
-  revisarActividadAdmin,
-  solicitarCorreccionAdmin,
   type AdminActividadesFilters,
 } from '../services/actividadesFontaneroApi'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
-import { mergeActividadFontanero } from '../utils/normalizeActividadFontanero'
 import { formatPeriodoActividadPartes } from '../utils/formatActividadFecha'
-import { ACTIVIDADES_ADMIN_PATHS } from './actividadesAdminPaths'
+import {
+  ACTIVIDADES_ADMIN_PATHS,
+  actividadAdminDetallePath,
+} from './actividadesAdminPaths'
 
 const PAGE_SIZE = 10
 
@@ -47,21 +42,23 @@ const EMPTY_FILTERS: DraftFilters = {
 const displayFontanero = (actividad: ActividadFontaneroRegistrada) =>
   actividad.fontaneroNombre || actividad.fontaneroId || 'Sin identificar'
 
-const FechaHoraResumen = ({ actividad }: { actividad: ActividadFontaneroRegistrada }) => {
+const MetaResumen = ({ actividad }: { actividad: ActividadFontaneroRegistrada }) => {
   const periodo = formatPeriodoActividadPartes(actividad)
   return (
-    <div className="actividad-historial-card__fecha-hora">
-      <div className="actividad-historial-card__fecha-hora-col">
-        <span className="actividad-historial-card__fecha-hora-label">Fecha</span>
-        <span className="actividad-historial-card__fecha-hora-valor">{periodo.fecha}</span>
+    <dl className="actividad-historial-card__meta actividad-historial-card__meta--admin">
+      <div className="actividad-historial-card__meta-item">
+        <dt>Fecha</dt>
+        <dd>{periodo.fecha}</dd>
       </div>
-      <div className="actividad-historial-card__fecha-hora-col actividad-historial-card__fecha-hora-col--hora">
-        <span className="actividad-historial-card__fecha-hora-label">Hora</span>
-        <span className="actividad-historial-card__fecha-hora-valor actividad-historial-card__fecha-hora-valor--hora">
-          {periodo.hora}
-        </span>
+      <div className="actividad-historial-card__meta-item">
+        <dt>Hora</dt>
+        <dd>{periodo.hora}</dd>
       </div>
-    </div>
+      <div className="actividad-historial-card__meta-item">
+        <dt>Fontanero</dt>
+        <dd>{displayFontanero(actividad)}</dd>
+      </div>
+    </dl>
   )
 }
 
@@ -98,20 +95,8 @@ const ActividadesAdminRevisionPage = () => {
   const [unauthorized, setUnauthorized] = useState(false)
   const [forbidden, setForbidden] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
-  const [selected, setSelected] = useState<ActividadFontaneroRegistrada | null>(null)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detailError, setDetailError] = useState<string | null>(null)
-  const [confirmReview, setConfirmReview] = useState(false)
-  const [confirmCorrection, setConfirmCorrection] = useState(false)
-  const [reviewing, setReviewing] = useState(false)
-  const [requestingCorrection, setRequestingCorrection] = useState(false)
-  const [correctionNote, setCorrectionNote] = useState('')
-  const [correctionError, setCorrectionError] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
   const [fontaneros, setFontaneros] = useState<string[]>([])
   const { tipos, isLoading: tiposLoading } = useTiposActividadFontanero()
-
-  const busy = reviewing || requestingCorrection
 
   useEffect(() => {
     let active = true
@@ -164,7 +149,6 @@ const ActividadesAdminRevisionPage = () => {
 
   const search = (event: FormEvent) => {
     event.preventDefault()
-    setNotice(null)
     if (draft.fechaInicio && draft.fechaFin && draft.fechaInicio > draft.fechaFin) {
       setError('La fecha inicial no puede ser posterior a la fecha final.')
       return
@@ -177,123 +161,9 @@ const ActividadesAdminRevisionPage = () => {
   const clear = () => {
     setDraft(EMPTY_FILTERS)
     setError(null)
-    setNotice(null)
     setLoading(true)
     setFilters(toFilters(EMPTY_FILTERS))
   }
-
-  const markReviewed = async () => {
-    if (!selected || selected.estado === 'REVISADA' || busy) return
-    setReviewing(true)
-    setConfirmReview(false)
-    setError(null)
-    try {
-      const updated = await revisarActividadAdmin(selected.id)
-      setActividades((current) =>
-        current.map((item) =>
-          item.id === updated.id ? mergeActividadFontanero(item, updated) : item,
-        ),
-      )
-      setSelected((current) => mergeActividadFontanero(current, updated))
-      setNotice(ACTIVITY_FEEDBACK_MESSAGES.successReview)
-    } catch (caught) {
-      const interpreted = interpretActividadApiError(caught)
-      if (interpreted.kind === 'unauthorized') {
-        clearAccessToken()
-        setUnauthorized(true)
-      } else if (interpreted.kind === 'forbidden') {
-        setForbidden(true)
-      } else {
-        setError(interpreted.message)
-      }
-    } finally {
-      setReviewing(false)
-    }
-  }
-
-  const requestCorrection = async () => {
-    if (!selected || busy) return
-    const observacion = correctionNote.trim()
-    if (!observacion) {
-      setCorrectionError('Indique la observación de corrección.')
-      setConfirmCorrection(false)
-      return
-    }
-    if (observacion.length > 2000) {
-      setCorrectionError('La observación no puede superar 2000 caracteres.')
-      setConfirmCorrection(false)
-      return
-    }
-    setRequestingCorrection(true)
-    setConfirmCorrection(false)
-    setCorrectionError(null)
-    setError(null)
-    try {
-      const updated = await solicitarCorreccionAdmin(selected.id, observacion)
-      setActividades((current) =>
-        current.map((item) =>
-          item.id === updated.id ? mergeActividadFontanero(item, updated) : item,
-        ),
-      )
-      setSelected((current) => mergeActividadFontanero(current, updated))
-      setCorrectionNote('')
-      setNotice(ACTIVITY_FEEDBACK_MESSAGES.successCorrectionRequest)
-    } catch (caught) {
-      const interpreted = interpretActividadApiError(caught)
-      if (interpreted.kind === 'unauthorized') {
-        clearAccessToken()
-        setUnauthorized(true)
-      } else if (interpreted.kind === 'forbidden') {
-        setForbidden(true)
-      } else {
-        setCorrectionError(interpreted.message)
-      }
-    } finally {
-      setRequestingCorrection(false)
-    }
-  }
-
-  const openDetail = async (actividad: ActividadFontaneroRegistrada) => {
-    setSelected(actividad)
-    setDetailLoading(true)
-    setDetailError(null)
-    setNotice(null)
-    setCorrectionNote('')
-    setCorrectionError(null)
-    setConfirmCorrection(false)
-    try {
-      const detalle = await getActividadAdminDetalle(actividad.id)
-      setSelected(detalle)
-    } catch (caught) {
-      const interpreted = interpretActividadApiError(caught, {
-        notFoundMessage: ACTIVITY_FEEDBACK_MESSAGES.notFound,
-      })
-      if (interpreted.kind === 'unauthorized') {
-        clearAccessToken()
-        setUnauthorized(true)
-      } else if (interpreted.kind === 'forbidden') {
-        setForbidden(true)
-      } else {
-        setDetailError(interpreted.message)
-      }
-    } finally {
-      setDetailLoading(false)
-    }
-  }
-
-  const canReview =
-    !detailLoading &&
-    !detailError &&
-    selected != null &&
-    selected.estadoRevision !== 'REVISADA' &&
-    selected.estado !== 'REVISADA'
-
-  const canRequestCorrection =
-    !detailLoading &&
-    !detailError &&
-    selected != null &&
-    selected.estado !== 'REQUIERE_CORRECCION' &&
-    selected.estado !== 'REVISADA'
 
   return (
     <main className="gallery-admin actividades-admin-revision">
@@ -317,15 +187,6 @@ const ActividadesAdminRevisionPage = () => {
           <div className="actividades-admin-revision__filter-actions"><button className={PRIMARY_ACTION_CLASS} disabled={loading}>Buscar</button><button type="button" className="gallery-admin__button !rounded-2xl !border-[#bfe3fa] !bg-white !px-6 !py-3.5 !font-bold !text-[#1e5a9c] !shadow-md" onClick={clear} disabled={loading}>Limpiar filtros</button></div>
         </form>
 
-        {notice ? (
-          <ActivityFeedback
-            variant="success"
-            message={notice || ACTIVITY_FEEDBACK_MESSAGES.successReview}
-            dismissible
-            onDismiss={() => setNotice(null)}
-            testId="admin-revision-exito"
-          />
-        ) : null}
         {error ? (
           <ActivityFeedback
             variant="error"
@@ -376,7 +237,7 @@ const ActividadesAdminRevisionPage = () => {
               {actividades.map((actividad) => (
                 <li key={actividad.id}>
                   <article
-                    className="actividad-historial-card"
+                    className="actividad-historial-card actividad-historial-card--admin"
                     aria-labelledby={`admin-actividad-${actividad.id}`}
                   >
                     <header className="actividad-historial-card__header">
@@ -398,24 +259,15 @@ const ActividadesAdminRevisionPage = () => {
                         {displayEstado(actividad.estado)}
                       </span>
                     </header>
-                    <dl className="actividad-historial-card__meta actividad-historial-card__meta--compact">
-                      <div className="actividad-historial-card__meta-item">
-                        <FechaHoraResumen actividad={actividad} />
-                      </div>
-                      <div className="actividad-historial-card__meta-item">
-                        <dt>Fontanero</dt>
-                        <dd>{displayFontanero(actividad)}</dd>
-                      </div>
-                    </dl>
-                    <footer className="actividad-historial-card__footer">
-                      <button
-                        type="button"
+                    <div className="actividad-historial-card__body">
+                      <MetaResumen actividad={actividad} />
+                      <Link
                         className="actividad-historial-card__action"
-                        onClick={() => void openDetail(actividad)}
+                        to={actividadAdminDetallePath(actividad.id)}
                       >
                         Ver detalle
-                      </button>
-                    </footer>
+                      </Link>
+                    </div>
                   </article>
                 </li>
               ))}
@@ -453,97 +305,6 @@ const ActividadesAdminRevisionPage = () => {
           ) : null}
         </section>
       </div>
-
-      {selected ? (
-        <ActividadDetalleOverlay
-          actividad={selected}
-          loading={detailLoading}
-          error={detailError}
-          showFontanero
-          closeDisabled={busy}
-          onClose={() => setSelected(null)}
-          actions={
-            <div className="actividades-admin-revision__detail-actions">
-              {!canReview ? (
-                <ActivityFeedback
-                  variant="info"
-                  message="Esta actividad ya fue revisada; no es necesario procesarla nuevamente."
-                  className="actividades-admin-revision__already-reviewed"
-                />
-              ) : null}
-              <div className="actividades-admin-revision__detail-toolbar">
-                <button
-                  type="button"
-                  className="gallery-admin__button gallery-admin__button--primary"
-                  disabled={busy || !canReview}
-                  onClick={() => {
-                    if (canReview) setConfirmReview(true)
-                  }}
-                >
-                  {!canReview
-                    ? 'Actividad revisada'
-                    : reviewing
-                      ? 'Marcando…'
-                      : 'Marcar como revisada'}
-                </button>
-              </div>
-                  {canRequestCorrection ? (
-                    <div className="actividades-admin-revision__correction">
-                      <label className="gallery-admin__field" htmlFor="admin-correction-note">
-                        <span>Observación para corrección</span>
-                        <textarea
-                          id="admin-correction-note"
-                          rows={3}
-                          maxLength={2000}
-                          value={correctionNote}
-                          disabled={busy}
-                          placeholder="Indique qué debe corregir el fontanero"
-                          onChange={(event) => {
-                            setCorrectionNote(event.target.value)
-                            setCorrectionError(null)
-                          }}
-                        />
-                      </label>
-                      {correctionError ? (
-                        <ActivityFeedback
-                          variant="error"
-                          message={correctionError}
-                          testId="admin-correction-error"
-                        />
-                      ) : null}
-                      <button
-                        type="button"
-                        className="gallery-admin__button actividades-admin-revision__correction-button"
-                        disabled={busy || !correctionNote.trim()}
-                        onClick={() => setConfirmCorrection(true)}
-                      >
-                        <IconMessageExclamation size={19} aria-hidden="true" />
-                        {requestingCorrection
-                          ? 'Solicitando…'
-                          : 'Solicitar corrección'}
-                      </button>
-                    </div>
-                  ) : null}
-            </div>
-          }
-        />
-      ) : null}
-      <ConfirmDialog
-        isOpen={confirmReview}
-        title="Confirmar revisión"
-        message="¿Confirma que verificó la información y desea marcar esta actividad como revisada? Esta acción no modifica los datos reportados por el Fontanero."
-        confirmLabel="Sí, marcar como revisada"
-        onCancel={() => setConfirmReview(false)}
-        onConfirm={() => void markReviewed()}
-      />
-      <ConfirmDialog
-        isOpen={confirmCorrection}
-        title="Solicitar corrección"
-        message="¿Confirma que desea solicitar la corrección de esta actividad? El fontanero deberá corregirla con la observación indicada."
-        confirmLabel="Sí, solicitar corrección"
-        onCancel={() => setConfirmCorrection(false)}
-        onConfirm={() => void requestCorrection()}
-      />
     </main>
   )
 }

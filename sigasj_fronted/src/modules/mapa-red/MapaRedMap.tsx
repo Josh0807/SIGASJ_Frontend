@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   GeoJSON,
@@ -46,6 +46,7 @@ import {
 } from './mapaRedGeo'
 import {
   formatFechaReporte,
+  getDemoSectorCenter,
   type AveriaMapaItem,
 } from './mapaRedAverias'
 
@@ -124,17 +125,78 @@ function MapResizeSync() {
   return null
 }
 
-function FlyToSector({ sector }: { sector: SectorCatalogo }) {
+function AveriasMapCamera({
+  sector,
+  averias,
+}: {
+  sector: SectorCatalogo
+  averias: AveriaMapaItem[]
+}) {
   const map = useMap()
+  const prevSectorId = useRef<SectorId | null>(null)
+  const prevAveriasKey = useRef('')
+
+  // Carga / Actualizar: encuadrar TODOS los pines para que se vean.
   useEffect(() => {
-    if (!sector.limiteGeoJson) return
-    const layer = L.geoJSON(sector.limiteGeoJson as never)
-    map.flyToBounds(layer.getBounds(), {
-      padding: [36, 36],
-      maxZoom: 16,
-      duration: 0.75,
-    })
-  }, [map, sector])
+    const key = averias
+      .map((item) => item.id)
+      .sort((a, b) => a - b)
+      .join(',')
+    if (!key || key === prevAveriasKey.current) return
+    prevAveriasKey.current = key
+
+    const points = averias
+      .filter((item) => item.coords)
+      .map((item) => L.latLng(item.coords!.lat, item.coords!.lng))
+    if (points.length >= 2) {
+      map.fitBounds(L.latLngBounds(points), {
+        padding: [48, 48],
+        maxZoom: 17,
+        animate: true,
+      })
+      return
+    }
+    if (points.length === 1) {
+      map.flyTo(points[0], 17, { duration: 0.6 })
+    }
+  }, [map, averias])
+
+  // Chip de sector: enfocar ese grupo (sin ocultar el overview en el primer render).
+  useEffect(() => {
+    if (prevSectorId.current === null) {
+      prevSectorId.current = sector.id
+      return
+    }
+    if (prevSectorId.current === sector.id) return
+    prevSectorId.current = sector.id
+
+    if (sector.limiteGeoJson) {
+      const layer = L.geoJSON(sector.limiteGeoJson as never)
+      map.flyToBounds(layer.getBounds(), {
+        padding: [36, 36],
+        maxZoom: 16,
+        duration: 0.75,
+      })
+      return
+    }
+
+    const inSector = averias.filter(
+      (item) => item.sectorId === sector.id && item.coords,
+    )
+    if (inSector.length >= 2) {
+      map.fitBounds(
+        L.latLngBounds(
+          inSector.map((item) => L.latLng(item.coords!.lat, item.coords!.lng)),
+        ),
+        { padding: [40, 40], maxZoom: 18, animate: true },
+      )
+      return
+    }
+
+    const center = getDemoSectorCenter(sector.id)
+    map.flyTo([center.lat, center.lng], 17.5, { duration: 0.7 })
+  }, [map, sector, averias])
+
   return null
 }
 
@@ -165,7 +227,7 @@ function MapToolbar({
         aria-label="Centrar en San Juan"
         title="Centrar en San Juan"
         onClick={() => {
-          map.flyTo(MAPA_RED_CENTER, MAPA_RED_DEFAULT_ZOOM, { duration: 0.7 })
+          map.flyTo(MAPA_RED_CENTER, 17, { duration: 0.7 })
         }}
       >
         <IconCurrentLocation size={17} aria-hidden="true" stroke={2} />
@@ -369,7 +431,7 @@ export default function MapaRedMap({
         )}
         <ZoomControl position="topleft" />
         <MapResizeSync />
-        <FlyToSector sector={selected} />
+        <AveriasMapCamera sector={selected} averias={geoAverias} />
         <MapToolbar
           layersOpen={layersOpen}
           onToggleLayers={() => setLayersOpen((open) => !open)}

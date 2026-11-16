@@ -11,7 +11,6 @@ export type AveriasAdminListSearch = {
   search: string
   estado: string
   prioridad: string
-  tipo: string
   fechaDesde: string
   fechaHasta: string
 }
@@ -45,7 +44,6 @@ export function parseAveriasAdminListSearch(
     search: params.get('search')?.trim() ?? EMPTY_FILTER,
     estado: params.get('estado')?.trim() ?? EMPTY_FILTER,
     prioridad: params.get('prioridad')?.trim() ?? EMPTY_FILTER,
-    tipo: params.get('tipo')?.trim() ?? EMPTY_FILTER,
     fechaDesde: toIsoDate(params.get('fechaDesde')),
     fechaHasta: toIsoDate(params.get('fechaHasta')),
   }
@@ -71,11 +69,6 @@ export function buildAveriasAdminListSearch(
 
   if (query.prioridad) {
     params.set('prioridad', query.prioridad)
-  }
-
-  const tipo = query.tipo.trim()
-  if (tipo) {
-    params.set('tipo', tipo)
   }
 
   if (toIsoDate(query.fechaDesde)) {

@@ -38,13 +38,18 @@ const ProyectosAdminCreatePage = () => {
   }
 
   return (
-    <ProyectosAdminFormPageLayout>
-      <ProyectosAdminForm
-        mode="create"
-        initialValues={initialValues}
-        onSubmit={handleSave}
-        onCancel={closeForm}
-      />
+    <ProyectosAdminFormPageLayout mode="create">
+      <section
+        className="gallery-admin__editor"
+        aria-labelledby="proyecto-editor-title"
+      >
+        <ProyectosAdminForm
+          mode="create"
+          initialValues={initialValues}
+          onSubmit={handleSave}
+          onCancel={closeForm}
+        />
+      </section>
     </ProyectosAdminFormPageLayout>
   )
 }

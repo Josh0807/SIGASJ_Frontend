@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { IconPencil, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
 import { type AdminProyecto } from './types'
 
 type ProyectosAdminRowActionsProps = {
@@ -12,29 +13,30 @@ const ProyectosAdminRowActions = ({
   editTo,
   onToggleVisibilidad,
 }: ProyectosAdminRowActionsProps) => (
-  <div className="gallery-admin__actions !flex !items-center !gap-2.5">
+  <div className="gallery-admin__actions">
     <Link
       to={editTo}
-      className="gallery-admin__button gallery-admin__button--primary !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-5"
+      className="gallery-admin__button gallery-admin__button--primary"
       aria-label={`Editar ${proyecto.nombre}`}
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="!h-5 !w-5 !fill-none !stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
-      </svg>
+      <IconPencil size={16} aria-hidden="true" />
       Editar
     </Link>
     <button
       type="button"
-      className={`gallery-admin__button !inline-flex !min-h-12 !items-center !justify-center !gap-2 !px-5 ${
+      className={`gallery-admin__button${
         proyecto.activo
-          ? '!border-amber-300 !bg-amber-50 !text-amber-800 hover:!bg-amber-100'
-          : '!border-emerald-300 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100'
+          ? ' proyectos-admin__action--pause'
+          : ' proyectos-admin__action--play'
       }`}
       aria-label={`${proyecto.activo ? 'Inactivar' : 'Activar'} visibilidad de ${proyecto.nombre}`}
       onClick={() => onToggleVisibilidad(proyecto)}
     >
-      <span aria-hidden="true" className={`!h-2.5 !w-2.5 !rounded-full ${proyecto.activo ? '!bg-amber-500' : '!bg-emerald-500'}`} />
+      {proyecto.activo ? (
+        <IconPlayerPause size={16} aria-hidden="true" />
+      ) : (
+        <IconPlayerPlay size={16} aria-hidden="true" />
+      )}
       {proyecto.activo ? 'Inactivar' : 'Activar'}
     </button>
   </div>

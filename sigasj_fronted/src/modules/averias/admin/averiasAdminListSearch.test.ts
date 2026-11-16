@@ -13,20 +13,18 @@ describe('averiasAdminListSearch', () => {
       search: 'Juan',
       estado: 'RECIBIDA',
       prioridad: 'ALTA',
-      tipo: 'TUBERIA',
       fechaDesde: '2026-09-01',
       fechaHasta: '2026-09-12',
     })
 
     expect(search).toBe(
-      '?page=2&search=Juan&estado=RECIBIDA&prioridad=ALTA&tipo=TUBERIA&fechaDesde=2026-09-01&fechaHasta=2026-09-12',
+      '?page=2&search=Juan&estado=RECIBIDA&prioridad=ALTA&fechaDesde=2026-09-01&fechaHasta=2026-09-12',
     )
     expect(parseAveriasAdminListSearch(search)).toEqual({
       page: 2,
       search: 'Juan',
       estado: 'RECIBIDA',
       prioridad: 'ALTA',
-      tipo: 'TUBERIA',
       fechaDesde: '2026-09-01',
       fechaHasta: '2026-09-12',
     })
@@ -39,7 +37,6 @@ describe('averiasAdminListSearch', () => {
         search: '',
         estado: '',
         prioridad: '',
-        tipo: '',
         fechaDesde: '',
         fechaHasta: '',
       }),

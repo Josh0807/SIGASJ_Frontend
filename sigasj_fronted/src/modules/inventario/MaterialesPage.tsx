@@ -111,6 +111,8 @@ export default function MaterialesPage() {
   const { user, logout } = useAuth()
   const currentRole = normalizeInternalRole(user?.role)
   const canManage = currentRole === InternalAdminRoleName.Administradora
+  const isFontanero = currentRole === InternalAdminRoleName.Fontanero
+  const canFilterActivo = !isFontanero
   const canViewMoves =
     currentRole === InternalAdminRoleName.Administradora ||
     currentRole === InternalAdminRoleName.Secretaria
@@ -141,7 +143,12 @@ export default function MaterialesPage() {
 
   const { result, loading, error, refetch } = useMateriales({
     nombre: nombre || undefined,
-    activo: activo === '' ? undefined : activo === 'true',
+    // Fontanero solo consulta materiales activos (sin filtro Activo/Inactivo).
+    activo: isFontanero
+      ? true
+      : activo === ''
+        ? undefined
+        : activo === 'true',
     idCategoria: categoriaId ? Number(categoriaId) : undefined,
     idProveedor: proveedorId ? Number(proveedorId) : undefined,
     page,
@@ -163,7 +170,10 @@ export default function MaterialesPage() {
   } = useProveedores({ page: 1, limit: 100 })
 
   const filtered = Boolean(
-    searchInput.trim() || activo || categoriaId || proveedorId,
+    searchInput.trim() ||
+      (canFilterActivo && activo) ||
+      categoriaId ||
+      proveedorId,
   )
 
   useEffect(() => {
@@ -593,28 +603,32 @@ export default function MaterialesPage() {
                 }}
               >
                 <option value="">Todas las categorías</option>
-                {categorias.data.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {displayLabel(item.nombre, item.nombre)}
-                    {item.activo ? '' : ' (inactiva)'}
-                  </option>
-                ))}
+                {categorias.data
+                  .filter((item) => (isFontanero ? item.activo : true))
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {displayLabel(item.nombre, item.nombre)}
+                      {!isFontanero && !item.activo ? ' (inactiva)' : ''}
+                    </option>
+                  ))}
               </select>
             </label>
-            <label>
-              Estado
-              <select
-                value={activo}
-                onChange={(event) => {
-                  setActivo(event.target.value)
-                  setPage(1)
-                }}
-              >
-                <option value="">Todos los estados</option>
-                <option value="true">Activos</option>
-                <option value="false">Inactivos</option>
-              </select>
-            </label>
+            {canFilterActivo ? (
+              <label>
+                Estado
+                <select
+                  value={activo}
+                  onChange={(event) => {
+                    setActivo(event.target.value)
+                    setPage(1)
+                  }}
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="true">Activos</option>
+                  <option value="false">Inactivos</option>
+                </select>
+              </label>
+            ) : null}
             {canManage ? (
               <label>
                 Proveedor

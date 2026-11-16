@@ -1,0 +1,234 @@
+/**
+ * Bordes redondos institucionales (ASADA).
+ * Capa final: suaviza containers y controles en todos los módulos.
+ * No aplica a píldoras/avatares circulares (999px / rounded-full).
+ */
+
+:root {
+  --asada-radius-lg: 28px;
+  --asada-radius-control: 16px;
+}
+
+/* —— Contenedores / cards / shells —— */
+:is(
+  .gallery-admin,
+  .admin-content-modern,
+  .admin-layout--panel,
+  .materials-admin,
+  .providers-admin,
+  .inventario-reportes,
+  .inventory-module-shell,
+  .category-admin,
+  .rrhh-admin,
+  .colaborador-detalle,
+  .actividades-admin-revision,
+  .actividades-admin-reportes,
+  .actividades-admin-detalle,
+  .averias-admin,
+  .averias-fontanero,
+  .averias-evento,
+  .proyectos-admin,
+  .comunicados-admin,
+  .transparencia-admin,
+  .auth-page,
+  .admin-dashboard,
+  .sage-ia,
+  .mapa-red-page
+)
+  :is(
+    .gallery-admin__header,
+    .gallery-admin__filters,
+    .gallery-admin__empty,
+    .gallery-admin__item,
+    .gallery-admin__editor,
+    .gallery-admin__media-empty,
+    .gallery-admin__skeleton,
+    .materials-admin__header,
+    .materials-admin__filters,
+    .materials-admin__empty,
+    .materials-admin__state,
+    .materials-admin__error,
+    .materials-admin__success,
+    .materials-admin__card,
+    .material-tracking__header,
+    .material-tracking__filters,
+    .material-tracking__empty,
+    .material-tracking__state,
+    .material-detail__header,
+    .material-detail__summary,
+    .material-detail__materials,
+    .material-request__header,
+    .material-request__form,
+    .material-request__success,
+    .indicator-card,
+    .admin-dashboard__indicator-card,
+    .admin-dashboard__section,
+    .admin-surface-card,
+    .table-responsive,
+    .actividad-historial-card,
+    .quick-access-card,
+    .auth-page__card,
+    .providers-admin__empty,
+    .averias-admin__section,
+    .averias-admin__empty-note--banner,
+    .detalle-actividad__apartado,
+    .detalle-actividad__header,
+    .actividades-admin-reportes__indicators,
+    .actividades-admin-reportes__listado,
+    .actividades-admin-reportes__table-shell,
+    .actividades-admin-revision__detail-actions--panel
+  ) {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+/* Shells de filtro / cabecera del gallery-admin (base) */
+.gallery-admin__shell > .gallery-admin__header,
+.gallery-admin__shell > .gallery-admin__filters {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+.admin-content-modern .gallery-admin__header,
+.admin-content-modern .gallery-admin__filters,
+.admin-content-modern .gallery-admin__item,
+.admin-content-modern .table-responsive {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+.admin-content-modern .gallery-admin__header--editor {
+  border-radius: var(--asada-radius-lg, 28px) !important;
+}
+
+/* —— Controles: botones, inputs, selects, textareas —— */
+:is(
+  .gallery-admin,
+  .admin-content-modern,
+  .admin-layout--panel,
+  .materials-admin,
+  .providers-admin,
+  .inventario-reportes,
+  .inventory-module-shell,
+  .category-admin,
+  .rrhh-admin,
+  .actividades-admin-revision,
+  .actividades-admin-reportes,
+  .averias-admin,
+  .averias-fontanero,
+  .proyectos-admin,
+  .comunicados-admin,
+  .transparencia-admin,
+  .auth-page,
+  .admin-dashboard,
+  .form-shell,
+  .public-averia-form
+)
+  :is(
+    .gallery-admin__button,
+    .gallery-admin__filter-reset,
+    .gallery-admin__back-btn,
+    .admin-btn,
+    .admin-btn--primary,
+    .materials-admin__primary,
+    .materials-admin__secondary,
+    .materials-admin__action,
+    .materials-admin__pagination button,
+    .material-request__add,
+    .material-request__empty-add,
+    .material-request__primary,
+    .gallery-admin__pagination button,
+    .gallery-admin__field input,
+    .gallery-admin__field select,
+    .gallery-admin__field textarea,
+    .auth-page__form input,
+    .auth-page__select,
+    .auth-page__submit,
+    .auth-page__error,
+    .form-field input,
+    .form-field select,
+    .form-field textarea,
+    .public-averia-form input,
+    .public-averia-form select,
+    .public-averia-form textarea,
+    .public-averia-form button
+  ):not(.rounded-full):not([class*='rounded-full']):not([class*='rounded-pill']) {
+  border-radius: var(--asada-radius-control, 16px) !important;
+}
+
+/* Controles sueltos del sistema de diseño */
+.gallery-admin__button:not(.rounded-full):not([class*='rounded-full']),
+.admin-btn:not(.rounded-full):not([class*='rounded-full']),
+.gallery-admin__field input,
+.gallery-admin__field select,
+.gallery-admin__field textarea {
+  border-radius: var(--asada-radius-control, 16px) !important;
+}
+
+.indicator-card,
+.admin-dashboard__indicator-card,
+.admin-surface-card,
+.admin-surface-stat {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+.admin-surface-stat {
+  border-radius: var(--asada-radius-sm, 16px) !important;
+}
+
+/* Tablas envueltas */
+.table-responsive {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+/* Formularios públicos / legacy */
+.form-success-result,
+.public-averia-form__success {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+/**
+ * Tailwind utilities demasiado “cuadradas” dentro del panel admin.
+ * No tocamos rounded-full / píldoras.
+ */
+.admin-layout--panel :is(.rounded-sm, .rounded, .rounded-md, .rounded-lg),
+.gallery-admin :is(.rounded-sm, .rounded, .rounded-md, .rounded-lg),
+.admin-content-modern :is(.rounded-sm, .rounded, .rounded-md, .rounded-lg) {
+  border-radius: var(--asada-radius-control, 16px) !important;
+}
+
+.admin-layout--panel :is(.rounded-xl, .rounded-2xl),
+.gallery-admin :is(.rounded-xl, .rounded-2xl),
+.admin-content-modern :is(.rounded-xl, .rounded-2xl) {
+  border-radius: var(--asada-radius, 24px) !important;
+}
+
+.admin-layout--panel .rounded-3xl,
+.gallery-admin .rounded-3xl,
+.admin-content-modern .rounded-3xl {
+  border-radius: var(--asada-radius-lg, 28px) !important;
+}
+
+.admin-layout--panel .rounded-\[10px\],
+.gallery-admin .rounded-\[10px\],
+.admin-content-modern .rounded-\[10px\],
+.admin-layout--panel .rounded-\[12px\],
+.gallery-admin .rounded-\[12px\],
+.admin-content-modern .rounded-\[12px\],
+.admin-layout--panel .rounded-\[14px\],
+.gallery-admin .rounded-\[14px\],
+.admin-content-modern .rounded-\[14px\] {
+  border-radius: var(--asada-radius-control, 16px) !important;
+}
+
+.admin-layout--panel .rounded-\[16px\],
+.gallery-admin .rounded-\[16px\],
+.admin-content-modern .rounded-\[16px\],
+.admin-layout--panel .rounded-\[18px\],
+.gallery-admin .rounded-\[18px\],
+.admin-content-modern .rounded-\[18px\],
+.admin-layout--panel .rounded-\[20px\],
+.gallery-admin .rounded-\[20px\],
+.admin-content-modern .rounded-\[20px\],
+.admin-layout--panel .rounded-\[22px\],
+.gallery-admin .rounded-\[22px\],
+.admin-content-modern .rounded-\[22px\] {
+  border-radius: var(--asada-radius, 24px) !important;
+}

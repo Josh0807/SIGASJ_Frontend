@@ -246,11 +246,7 @@ export default function ReposicionDetallePage() {
         siguienteEstado as EstadoReposicion,
       )
       setReposicion(updated)
-      setSuccess(
-        siguienteEstado === 'EN_GESTION'
-          ? 'La reposición quedó en gestión.'
-          : 'La reposición se marcó como completada.',
-      )
+      setSuccess('La reposición se marcó como completada.')
     } catch (requestError) {
       if (getHttpErrorStatus(requestError) === 401) {
         navigate('/login', { replace: true })
@@ -269,7 +265,7 @@ export default function ReposicionDetallePage() {
   }
 
   return (
-    <section className="material-detail" aria-labelledby="reposicion-detail-title">
+    <section className="material-detail material-detail--reposicion" aria-labelledby="reposicion-detail-title">
       <Link className="material-detail__back" to={REPOSICIONES_PATH}>
         <IconArrowLeft size={18} aria-hidden="true" /> Volver a reposiciones
       </Link>
@@ -286,19 +282,39 @@ export default function ReposicionDetallePage() {
           </button>
         </div>
       ) : null}
-      {success ? <div className="material-tracking__state" role="status">{success}</div> : null}
+      {success ? (
+        <div className="material-tracking__state material-tracking__state--notice" role="status">
+          {success}
+        </div>
+      ) : null}
       {!loading && reposicion ? (
         <>
-          <header className="material-detail__header">
-            <div>
+          <header className="material-detail__header material-detail__header--reposicion">
+            <div className="material-detail__header-copy">
               <p className="material-request__eyebrow">Inventario · Reposición</p>
               <h1 id="reposicion-detail-title">{getReposicionCodigo(reposicion)}</h1>
               <p>Generada el {formatReposicionFecha(reposicion.fechaGeneracion)}</p>
             </div>
-            <span className="material-tracking__badge" data-status={String(reposicion.estado).toUpperCase()}>
-              {formatReposicionEstado(String(reposicion.estado))}
-            </span>
+            <div className="material-detail__header-aside">
+              <span
+                className="material-tracking__badge"
+                data-status={String(reposicion.estado).toUpperCase()}
+              >
+                {formatReposicionEstado(String(reposicion.estado))}
+              </span>
+              {accionEstado ? (
+                <button
+                  type="button"
+                  className="material-detail__workflow-btn"
+                  disabled={busy}
+                  onClick={() => setConfirmAction('estado')}
+                >
+                  {busy ? 'Procesando…' : accionEstado}
+                </button>
+              ) : null}
+            </div>
           </header>
+
           <dl className="material-detail__summary">
             <div><dt>Origen</dt><dd>{formatReposicionOrigen(String(reposicion.origen))}</dd></div>
             <div><dt>Responsable</dt><dd>{getReposicionResponsable(reposicion)}</dd></div>
@@ -319,21 +335,13 @@ export default function ReposicionDetallePage() {
               <div className="material-detail__summary-wide"><dt>Observación</dt><dd>{reposicion.observacion}</dd></div>
             ) : null}
           </dl>
-          {accionEstado ? (
-            <div className="material-review__actions">
-              <button
-                type="button"
-                className="material-review__approve"
-                disabled={busy}
-                onClick={() => setConfirmAction('estado')}
-              >
-                {busy ? 'Procesando…' : accionEstado}
-              </button>
-            </div>
-          ) : null}
+
           <div className="material-detail__materials">
-            <h2>Materiales a reponer</h2>
-            <div className="material-tracking__table-wrap">
+            <div className="material-detail__section-head">
+              <h2>Materiales a reponer</h2>
+              <p>Cantidades solicitadas y existencia actual en bodega.</p>
+            </div>
+            <div className="material-tracking__table-wrap material-tracking__table-wrap--embedded">
               <table>
                 <thead>
                   <tr>
@@ -363,16 +371,23 @@ export default function ReposicionDetallePage() {
               <p className="material-detail__no-materials">No se recibió información de materiales para esta reposición.</p>
             ) : null}
           </div>
+
           {mostrarCompra ? (
-            <section className="material-detail__materials provider-admin__form" aria-labelledby="reposicion-compra-title">
+            <section
+              className="material-detail__materials material-detail__workflow provider-admin__form"
+              aria-labelledby="reposicion-compra-title"
+            >
               <div className="provider-admin__form-heading">
-                <span><IconDeviceFloppy size={25} aria-hidden="true" /></span>
+                <span><IconDeviceFloppy size={24} aria-hidden="true" /></span>
                 <div>
                   <h2 id="reposicion-compra-title">Registrar compra</h2>
-                  <p>Complete los datos de la compra. El registro no modificará las existencias del inventario.</p>
+                  <p>
+                    Complete los datos de la compra. El registro no modificará las
+                    existencias del inventario.
+                  </p>
                 </div>
               </div>
-              <div className="material-tracking__filters">
+              <div className="material-detail__compra-grid">
                 <label htmlFor="reposicion-proveedor">
                   <span>Proveedor</span>
                   <span className="provider-admin__control">
@@ -421,7 +436,7 @@ export default function ReposicionDetallePage() {
               {proveedoresError ? (
                 <div className="material-tracking__state material-tracking__state--error" role="alert">{proveedoresError}</div>
               ) : null}
-              <div className="material-tracking__table-wrap">
+              <div className="material-tracking__table-wrap material-tracking__table-wrap--embedded">
                 <table>
                   <thead>
                     <tr>
@@ -477,7 +492,7 @@ export default function ReposicionDetallePage() {
               <div className="material-review__actions">
                 <button
                   type="button"
-                  className="material-review__approve"
+                  className="material-review__approve material-detail__primary-btn"
                   disabled={busy || !compraValida}
                   onClick={() => setConfirmAction('compra')}
                 >
@@ -487,15 +502,21 @@ export default function ReposicionDetallePage() {
             </section>
           ) : null}
           {mostrarRecepcion ? (
-            <section className="material-detail__materials provider-admin__form" aria-labelledby="reposicion-recepcion-title">
+            <section
+              className="material-detail__materials material-detail__workflow provider-admin__form"
+              aria-labelledby="reposicion-recepcion-title"
+            >
               <div className="provider-admin__form-heading">
-                <span><IconTruckDelivery size={25} aria-hidden="true" /></span>
+                <span><IconTruckDelivery size={24} aria-hidden="true" /></span>
                 <div>
                   <h2 id="reposicion-recepcion-title">Confirmar recepción</h2>
-                  <p>Indique las cantidades recibidas. El backend registrará entradas y actualizará existencias.</p>
+                  <p>
+                    Indique las cantidades recibidas. El backend registrará entradas y
+                    actualizará existencias.
+                  </p>
                 </div>
               </div>
-              <div className="material-tracking__table-wrap">
+              <div className="material-tracking__table-wrap material-tracking__table-wrap--embedded">
                 <table>
                   <thead>
                     <tr>
@@ -524,11 +545,11 @@ export default function ReposicionDetallePage() {
                               aria-invalid={item.cantidad !== detalle?.cantidad}
                               onChange={(event) => updateCantidadRecepcion(item.idMaterial, Number(event.target.value))}
                             />
-                            {item.cantidad !== detalle?.cantidad && (
-                              <small style={{ color: '#b45309', display: 'block', marginTop: 4 }}>
+                            {item.cantidad !== detalle?.cantidad ? (
+                              <small className="material-detail__hint">
                                 Debe coincidir con la cantidad comprada ({detalle?.cantidad}).
                               </small>
-                            )}
+                            ) : null}
                           </td>
                         </tr>
                       )
@@ -551,7 +572,7 @@ export default function ReposicionDetallePage() {
               <div className="material-review__actions">
                 <button
                   type="button"
-                  className="material-review__approve"
+                  className="material-review__approve material-detail__primary-btn"
                   disabled={busy || !recepcionValida}
                   onClick={() => setConfirmAction('recepcion')}
                 >
@@ -586,12 +607,8 @@ export default function ReposicionDetallePage() {
       />
       <ConfirmDialog
         isOpen={confirmAction === 'estado'}
-        title={siguienteEstado === 'COMPLETADA' ? 'Completar reposición' : 'Actualizar reposición'}
-        message={
-          siguienteEstado === 'COMPLETADA'
-            ? '¿Marca esta reposición como completada?'
-            : '¿Pone esta reposición en gestión?'
-        }
+        title="Completar reposición"
+        message="¿Marca esta reposición como completada?"
         confirmLabel={accionEstado ?? 'Confirmar'}
         onCancel={() => setConfirmAction(null)}
         onConfirm={onConfirmDialog}

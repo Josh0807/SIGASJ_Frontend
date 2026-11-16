@@ -12,6 +12,7 @@ import {
   getAuthUserInitials,
   resolveAuthUserHeaderName,
 } from '../../auth/utils/authUserDisplay'
+import asadaLogo from '../../../assets/ASADA LOGO.jpeg'
 
 export type { AdminHeaderProps }
 
@@ -72,10 +73,13 @@ const AdminHeader = ({
         />
 
         <div className="admin-header__brand-block">
-          <p className="admin-header__brand-title">SIGASJ</p>
-          <p className="admin-header__brand-subtitle">
-            ASADA San Juan
-          </p>
+          <span className="admin-header__brand-logo" aria-hidden="true">
+            <img src={asadaLogo} alt="" />
+          </span>
+          <div className="admin-header__brand-text">
+            <p className="admin-header__brand-title">SIGASJ</p>
+            <p className="admin-header__brand-subtitle">ASADA San Juan</p>
+          </div>
         </div>
       </div>
 

@@ -59,9 +59,6 @@ describe('accesibilidad del listado administrativo de averías', () => {
       container.querySelector('label[for="averias-admin-prioridad"]'),
     ).toBeTruthy()
     expect(
-      container.querySelector('label[for="averias-admin-tipo"]'),
-    ).toBeTruthy()
-    expect(
       container.querySelector('label[for="averias-admin-fecha-desde"]'),
     ).toBeTruthy()
     expect(

@@ -900,56 +900,31 @@
   .sigasj-receipt-results .no-pending-receipts__icon-wrap { animation: none; }
 }
 
-/* Administrative project create/edit form. */
-.sigasj-project-form-layout { min-height: 100%; background: #f5f9fc; }
-.sigasj-project-form-shell { width: min(100%,1040px); margin-inline: auto; padding: 34px 28px 54px; }
-.sigasj-project-form-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 28px; border: 1px solid #dceafa; border-radius: 20px; background: linear-gradient(135deg,#fff,#f5faff); box-shadow: 0 12px 32px rgba(39,112,166,.09); }
-.sigasj-project-form-header .gallery-admin__eyebrow { margin: 0 0 7px; color: #0872d3; font-size: .68rem; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
-.sigasj-project-form-header h1 { margin: 0; color: #082f6b; font-size: clamp(1.8rem,3vw,2.35rem); font-weight: 800; line-height: 1.1; }
-.sigasj-project-form-header .gallery-admin__link { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 18px; border: 1px solid #9bc9e8; border-radius: 12px; color: #1768ac; background: var(--asada-surface, #fff); font-size: .8rem; font-weight: 800; text-decoration: none; transition: transform .22s ease, box-shadow .22s ease, background-color .22s ease; }
-.sigasj-project-form-header .gallery-admin__link:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(39,112,166,.15); background: #f3faff; }
-.sigasj-project-form { display: grid; width: 100%; max-width: none; gap: 20px; margin: 0; padding: 30px; border: 1px solid #dceafa; border-radius: 22px; background: var(--asada-surface, #fff); box-shadow: 0 16px 42px rgba(39,112,166,.11); }
-.sigasj-project-form > h2 { display: flex; align-items: center; gap: 12px; margin: 0 0 2px; color: #082f6b; font-size: 1.4rem; font-weight: 800; }
-.sigasj-project-form > h2::before { width: 5px; height: 28px; border-radius: 999px; content: ''; background: linear-gradient(#21a1ef,#0872d3); }
-.sigasj-project-form .gallery-admin__field { display: grid; gap: 8px; min-width: 0; }
-.sigasj-project-form .gallery-admin__field > span, .sigasj-project-form .gallery-admin__field > label > span { color: #173f70; font-size: .84rem; font-weight: 750; }
-.sigasj-project-form .gallery-admin__field input:not([type='file']), .sigasj-project-form .gallery-admin__field textarea, .sigasj-project-form .gallery-admin__field select { width: 100%; border: 1px solid #cfe2f1; border-radius: 12px; outline: none; color: #153c68; background: #fafdff; font: inherit; transition: border-color .2s ease, box-shadow .2s ease; }
-.sigasj-project-form .gallery-admin__field input:not([type='file']), .sigasj-project-form .gallery-admin__field select { min-height: 48px; padding: 0 14px; }
-.sigasj-project-form .gallery-admin__field textarea { min-height: 130px; padding: 13px 14px; resize: vertical; }
-.sigasj-project-form .gallery-admin__field input:focus, .sigasj-project-form .gallery-admin__field textarea:focus, .sigasj-project-form .gallery-admin__field select:focus { border-color: #218fde; box-shadow: 0 0 0 4px rgba(33,143,222,.13); }
-.sigasj-project-form .gallery-admin__field input[aria-invalid='true'], .sigasj-project-form .gallery-admin__field textarea[aria-invalid='true'], .sigasj-project-form .gallery-admin__field select[aria-invalid='true'] { border-color: #dc3545; box-shadow: 0 0 0 3px rgba(220,53,69,.09); }
-.sigasj-project-form .proyectos-admin__form-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
-.sigasj-project-form .proyectos-admin__cover-field { padding: 20px; border: 1px solid #dceafa; border-radius: 17px; background: linear-gradient(145deg,#fbfdff,#f5faff); }
-.sigasj-project-form .proyectos-admin__cover-container { display: grid; gap: 14px; margin-top: 4px; }
-.sigasj-project-form .proyectos-admin__cover-preview-wrapper, .sigasj-project-form .proyectos-admin__cover-empty { position: relative; display: grid; min-height: 190px; place-items: center; overflow: hidden; border: 2px dashed #bddcf0; border-radius: 15px; color: #66809a; background: #eef7fd; text-align: center; }
-.sigasj-project-form .proyectos-admin__cover-preview { width: 100%; max-height: 300px; object-fit: cover; }
-.sigasj-project-form .proyectos-admin__cover-badge { position: absolute; right: 12px; bottom: 12px; padding: 6px 10px; border-radius: 999px; color: #fff; background: rgba(7,73,139,.88); font-size: .68rem; font-weight: 800; }
-.sigasj-project-form .proyectos-admin__cover-badge--new { background: #138755; }
-.sigasj-project-form .proyectos-admin__cover-empty p { margin: 8px 0 3px; color: #375f84; font-weight: 750; }
-.sigasj-project-form .proyectos-admin__cover-empty small { color: #6d849a; }
-.sigasj-project-form .proyectos-admin__cover-icon { color: #3293d7; }
-.sigasj-project-form .proyectos-admin__file-input { width: 100%; padding: 10px; border: 1px solid #cfe2f1; border-radius: 12px; color: #526d8c; background: var(--asada-surface, #fff); }
-.sigasj-project-form .proyectos-admin__file-input::file-selector-button { margin-right: 12px; padding: 9px 14px; border: 0; border-radius: 9px; color: #0a5ea9; background: #e4f4fe; font-weight: 750; cursor: pointer; }
-.sigasj-project-form .proyectos-admin__cover-controls { display: flex; align-items: center; gap: 12px; }
-.sigasj-project-form .gallery-admin__form-error { margin: 0; color: #c52636; font-size: .74rem; font-weight: 650; }
-.sigasj-project-form .proyectos-admin__form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 6px; }
-.sigasj-project-form .gallery-admin__button { display: inline-flex; min-width: 130px; min-height: 48px; align-items: center; justify-content: center; padding: 0 22px; border: 1px solid #9bc9e8; border-radius: 12px; color: #1768ac; background: var(--asada-surface, #fff); font-size: .82rem; font-weight: 800; cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, filter .22s ease; }
-.sigasj-project-form .gallery-admin__button--primary { border: 0; color: #fff; background: linear-gradient(90deg,#0872d3,#2594df); box-shadow: 0 10px 23px rgba(8,114,211,.24); }
-.sigasj-project-form .gallery-admin__button--danger { border-color: #edb3b9; color: #b82433; background: #fff7f8; }
-.sigasj-project-form .gallery-admin__button:hover:not(:disabled) { filter: brightness(1.04); transform: translateY(-3px); box-shadow: 0 13px 25px rgba(39,112,166,.18); }
-.sigasj-project-form .gallery-admin__button:disabled { cursor: wait; opacity: .7; }
-@media (max-width: 680px) {
-  .sigasj-project-form-shell { padding: 22px 14px 40px; }
-  .sigasj-project-form-header { align-items: flex-start; flex-direction: column; padding: 20px; }
-  .sigasj-project-form-header .gallery-admin__header-actions, .sigasj-project-form-header .gallery-admin__link { width: 100%; }
-  .sigasj-project-form { padding: 19px 15px; border-radius: 18px; }
-  .sigasj-project-form .proyectos-admin__form-row { grid-template-columns: 1fr; }
-  .sigasj-project-form .proyectos-admin__cover-controls, .sigasj-project-form .proyectos-admin__form-actions { align-items: stretch; flex-direction: column; }
-  .sigasj-project-form .gallery-admin__button { width: 100%; }
+/* Administrative project create/edit — alineado al editor de galería */
+.sigasj-project-form-layout { min-height: 100%; }
+.sigasj-project-form-shell { width: 100%; max-width: none; margin-inline: 0; padding: 0; }
+.sigasj-project-form-header { margin-bottom: 0; }
+.sigasj-project-form {
+  display: grid;
+  width: 100%;
+  max-width: none;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
-@media (prefers-reduced-motion: reduce) {
-  .sigasj-project-form-header .gallery-admin__link, .sigasj-project-form .gallery-admin__field input, .sigasj-project-form .gallery-admin__field textarea, .sigasj-project-form .gallery-admin__field select, .sigasj-project-form .gallery-admin__button { transition: none; }
-  .sigasj-project-form-header .gallery-admin__link:hover, .sigasj-project-form .gallery-admin__button:hover:not(:disabled) { transform: none; }
+.sigasj-project-form .gallery-admin__field { display: grid; gap: 8px; min-width: 0; }
+.sigasj-project-form .proyectos-admin__form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.sigasj-project-form .proyectos-admin__cover-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.sigasj-project-form .proyectos-admin__form-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 10px; }
+@media (max-width: 680px) {
+  .sigasj-project-form .proyectos-admin__form-row { grid-template-columns: 1fr; }
+  .sigasj-project-form .proyectos-admin__cover-controls,
+  .sigasj-project-form .proyectos-admin__form-actions { flex-direction: column; align-items: stretch; }
+  .sigasj-project-form .gallery-admin__button { width: 100%; }
 }
 
 /* Public project detail actions. */

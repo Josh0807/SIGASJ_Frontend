@@ -56,7 +56,7 @@ describe('pantalla de alertas de reposición', () => {
     document.body.innerHTML = ''
   })
 
-  it('muestra carga y luego material, stocks, estado, fecha y acción de gestionar', async () => {
+  it('muestra carga y luego material, stocks, estado, fecha y acción de reposición', async () => {
     loginAsRole('Administradora')
     let resolveFetch!: (value: Response) => void
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((resolve) => { resolveFetch = resolve })))
@@ -68,7 +68,8 @@ describe('pantalla de alertas de reposición', () => {
     expect(view.container.textContent).toContain('8')
     expect(view.container.textContent).toContain('10')
     expect(view.container.textContent).toContain('Pendiente')
-    expect(view.container.textContent).toContain('Poner en gestión')
+    expect(view.container.textContent).toContain('Generar reposición')
+    expect(view.container.textContent).not.toContain('Poner en gestión')
     await view.cleanup()
   })
 
@@ -89,19 +90,24 @@ describe('pantalla de alertas de reposición', () => {
     await view.cleanup()
   })
 
-  it('confirma y actualiza el estado de la alerta, luego recarga el listado', async () => {
+  it('confirma y marca como resuelta una alerta en gestión, luego recarga el listado', async () => {
     loginAsRole('Administradora')
+    const enGestion = {
+      ...alerta,
+      estado: 'EN_GESTION',
+      usuarioGestiona: { id: 1, nombre: 'Ana' },
+    }
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(response({ data: [alerta], total: 1, page: 1, limit: 10, totalPages: 1 }))
-      .mockResolvedValueOnce(response({ id: 3, estado: 'EN_GESTION', usuarioGestiona: { id: 1, nombre: 'Ana' } }))
-      .mockResolvedValueOnce(response({ data: [{ ...alerta, estado: 'EN_GESTION', usuarioGestiona: { id: 1, nombre: 'Ana' } }], total: 1, page: 1, limit: 10, totalPages: 1 }))
+      .mockResolvedValueOnce(response({ data: [enGestion], total: 1, page: 1, limit: 10, totalPages: 1 }))
+      .mockResolvedValueOnce(response({ id: 3, estado: 'RESUELTA', usuarioGestiona: { id: 1, nombre: 'Ana' } }))
+      .mockResolvedValueOnce(response({ data: [{ ...enGestion, estado: 'RESUELTA' }], total: 1, page: 1, limit: 10, totalPages: 1 }))
     vi.stubGlobal('fetch', fetchMock)
     const view = await mount()
-    const gestionar = Array.from(view.container.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Poner en gestión'),
+    const resolver = Array.from(view.container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Marcar resuelta'),
     )
-    expect(gestionar).toBeTruthy()
-    await act(async () => gestionar?.click())
+    expect(resolver).toBeTruthy()
+    await act(async () => resolver?.click())
     expect(view.container.textContent).toContain('Cambiar estado')
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const accept = Array.from(view.container.querySelectorAll('button')).find(
@@ -109,7 +115,7 @@ describe('pantalla de alertas de reposición', () => {
     )
     await act(async () => accept?.click())
     expect(fetchMock.mock.calls[1][0]).toContain('/admin/inventario/alertas-reposicion/3/estado')
-    expect(view.container.textContent).toContain('La alerta quedó en gestión.')
+    expect(view.container.textContent).toContain('La alerta se marcó como resuelta.')
     await view.cleanup()
   })
 
@@ -118,10 +124,10 @@ describe('pantalla de alertas de reposición', () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(response({ data: [alerta], total: 1, page: 1, limit: 10, totalPages: 1 }))
     vi.stubGlobal('fetch', fetchMock)
     const view = await mount()
-    const gestionar = Array.from(view.container.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Poner en gestión'),
+    const generar = Array.from(view.container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Generar reposición'),
     )
-    await act(async () => gestionar?.click())
+    await act(async () => generar?.click())
     const cancel = Array.from(view.container.querySelectorAll('button')).find(
       (button) => button.textContent === 'Cancelar',
     )

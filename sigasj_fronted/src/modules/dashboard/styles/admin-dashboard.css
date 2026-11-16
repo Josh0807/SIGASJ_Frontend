@@ -54,7 +54,70 @@
 }
 
 .admin-dashboard__welcome-card {
-  padding: 22px 24px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: center;
+  min-height: 200px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--asada-radius, 24px);
+  background: var(--dash-card);
+  box-shadow: 0 8px 24px rgba(30, 90, 156, 0.08);
+}
+
+.admin-dashboard__welcome-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #eaf6ff;
+}
+
+.admin-dashboard__welcome-media::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      102deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(234, 246, 255, 0.78) 32%,
+      rgba(234, 246, 255, 0.42) 58%,
+      rgba(234, 246, 255, 0.12) 82%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+  content: '';
+}
+
+.admin-dashboard__welcome-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  opacity: 1;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.admin-dashboard__welcome-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.2rem;
+  max-width: 34rem;
+  min-width: 0;
+  margin: 0;
+  padding: 26px 28px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .admin-dashboard__focus-card {
@@ -105,6 +168,43 @@
   color: var(--dash-ink);
 }
 
+.admin-dashboard__welcome-card .admin-dashboard__eyebrow {
+  margin: 0 0 0.7rem;
+  border: 1px solid #d7e5f1;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--dash-primary);
+  box-shadow: 0 2px 8px rgba(30, 90, 156, 0.06);
+}
+
+.admin-dashboard__welcome-card .admin-dashboard__greeting {
+  margin: 0 0 0.15rem;
+  color: var(--dash-muted);
+}
+
+.admin-dashboard__welcome-card .admin-dashboard__greeting strong {
+  color: var(--dash-ink);
+  font-weight: 800;
+}
+
+.admin-dashboard .admin-dashboard__welcome-card #admin-dashboard-title {
+  margin: 0 0 0.4rem;
+  color: var(--dash-ink) !important;
+  font-size: clamp(1.55rem, 2.3vw, 1.9rem);
+  font-weight: 850;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.admin-dashboard__welcome-card .admin-dashboard__lead {
+  margin: 0;
+  max-width: 32rem;
+  color: #4f6b86;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
 .admin-dashboard__lead {
   margin: 0;
   max-width: 38rem;
@@ -135,7 +235,7 @@
   min-height: 44px;
   padding: 0 16px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--asada-radius-control, 16px);
   background: var(--dash-primary);
   color: #fff;
   font: inherit;
@@ -529,7 +629,7 @@
   min-height: 180px;
   padding: 24px 16px;
   border: 1px solid color-mix(in srgb, var(--dash-border) 80%, white);
-  border-radius: 14px;
+  border-radius: var(--asada-radius, 24px);
   background: linear-gradient(180deg, #f7fbfe 0%, #ffffff 100%);
   color: var(--dash-muted);
   text-align: center;
@@ -560,7 +660,7 @@
   align-items: center;
   gap: 10px;
   padding: 20px;
-  border-radius: 14px;
+  border-radius: var(--asada-radius, 24px);
   border: 1px solid color-mix(in srgb, var(--dash-error) 25%, var(--dash-border));
   background: color-mix(in srgb, var(--dash-error) 6%, white);
   color: var(--dash-text);
@@ -651,6 +751,10 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-dashboard__welcome-card {
+    min-height: 200px;
+  }
+
   .admin-dashboard__indicators-grid,
   .admin-dashboard__indicators-grid:has(> :nth-child(3):last-child),
   .admin-dashboard__indicators-grid:has(> :nth-child(2):last-child) {
@@ -659,6 +763,14 @@
 }
 
 @media (max-width: 760px) {
+  .admin-dashboard__welcome-card {
+    min-height: 200px;
+  }
+
+  .admin-dashboard__welcome-copy {
+    padding: 20px 18px;
+  }
+
   .admin-dashboard__indicators-grid,
   .admin-dashboard__indicators-grid:has(> :nth-child(3):last-child),
   .admin-dashboard__indicators-grid:has(> :nth-child(2):last-child),
