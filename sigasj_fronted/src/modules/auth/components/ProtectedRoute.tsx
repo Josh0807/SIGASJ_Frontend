@@ -3,25 +3,19 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { useAuth } from './AuthContext'
 
-type ProtectedRouteProps = {
-  children: ReactNode
-}
+type ProtectedRouteProps = { children: ReactNode }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
 
-  // Sesión local ya presente: render optimista mientras se valida con el backend.
-  if (isLoading && !isAuthenticated) {
-    return null
-  }
+  // A local token does not prove the session is still valid. Keep the private
+  // tree unmounted until /auth/me confirms the session.
+  if (isLoading) return null
 
   if (!isAuthenticated) {
     const requestedPath = `${location.pathname}${location.search}${location.hash}`
-
-    return (
-      <Navigate to={LOGIN_ROUTE_PATH} replace state={{ from: requestedPath }} />
-    )
+    return <Navigate to={LOGIN_ROUTE_PATH} replace state={{ from: requestedPath }} />
   }
 
   return children

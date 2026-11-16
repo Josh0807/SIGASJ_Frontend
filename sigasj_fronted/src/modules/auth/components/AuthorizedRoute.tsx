@@ -1,40 +1,25 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import {
-  evaluateAdminAreaAccess,
-  evaluateDirectRouteAccess,
-} from '../utils/adminAccess'
+import { evaluateAdminAreaAccess, evaluateDirectRouteAccess } from '../utils/adminAccess'
 import { useAuth } from './AuthContext'
 
 type AuthorizedRouteProps = {
   children: ReactNode
-  /** Ruta canónica del grupo (p. ej. `/admin/abonados`). */
+  /** Canonical group path (for example, `/admin/abonados`). */
   requiredPath?: string
-  /** Roles que pueden ver este grupo. Si se omite, se leen de la config por ruta. */
+  /** Roles allowed to view the group. Route config is used when omitted. */
   allowedRoles?: readonly string[]
 }
 
-const AuthorizedRoute = ({
-  children,
-  requiredPath,
-  allowedRoles,
-}: AuthorizedRouteProps) => {
+const AuthorizedRoute = ({ children, requiredPath, allowedRoles }: AuthorizedRouteProps) => {
   const location = useLocation()
   const { isAuthenticated, isLoading, user } = useAuth()
 
-  // Misma política optimista que ProtectedRoute: con sesión local ya presente
-  // se renderiza mientras se valida contra el backend.
-  if (isLoading && !isAuthenticated) {
-    return null
-  }
+  // Do not authorize local data until /auth/me confirms the user and role.
+  if (isLoading) return null
 
   const path = requiredPath ?? location.pathname
-  const decision = evaluateDirectRouteAccess(
-    isAuthenticated,
-    user,
-    path,
-    allowedRoles,
-  )
+  const decision = evaluateDirectRouteAccess(isAuthenticated, user, path, allowedRoles)
 
   if (decision !== 'allow') {
     return <Navigate to={decision.to} replace state={decision.state} />
@@ -46,9 +31,11 @@ const AuthorizedRoute = ({
 export default AuthorizedRoute
 
 export function AdminAreaGate({ children }: { children: ReactNode }) {
-  const { isAuthenticated, user } = useAuth()
-  const decision = evaluateAdminAreaAccess(isAuthenticated, user)
+  const { isAuthenticated, isLoading, user } = useAuth()
 
+  if (isLoading) return null
+
+  const decision = evaluateAdminAreaAccess(isAuthenticated, user)
   if (decision !== 'allow') {
     return <Navigate to={decision.to} replace state={decision.state} />
   }
