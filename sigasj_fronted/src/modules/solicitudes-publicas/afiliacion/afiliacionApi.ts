@@ -4,6 +4,7 @@ import type {
   AfiliacionPayload,
   AfiliacionResponse,
 } from './types'
+import { referenciasDocumentosCargados } from '../solicitudDocumentos'
 
 export const toAfiliacionPayload = (
   values: AfiliacionFormValues,
@@ -12,6 +13,7 @@ export const toAfiliacionPayload = (
   const firmaSolicitante = values.firmaSolicitante.trim()
   const recomendacion1Firma = values.recomendacion1Firma.trim()
   const recomendacion2Firma = values.recomendacion2Firma.trim()
+  const documentos = referenciasDocumentosCargados(values.documentos)
 
   return {
     fechaSolicitud: values.fechaSolicitud.trim(),
@@ -33,6 +35,7 @@ export const toAfiliacionPayload = (
     recomendacion2Identificacion: values.recomendacion2Identificacion.trim(),
     recomendacion2NumeroAbonado: values.recomendacion2NumeroAbonado.trim(),
     ...(recomendacion2Firma ? { recomendacion2Firma } : {}),
+    ...(documentos.length ? { documentos } : {}),
   }
 }
 

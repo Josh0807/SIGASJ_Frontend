@@ -7,6 +7,7 @@ import type {
   MedioNotificacion,
   NaturalezaInmueble,
 } from './types'
+import { referenciasDocumentosCargados } from '../solicitudDocumentos'
 
 export const toCambioTitularPayload = (
   values: CambioTitularFormValues,
@@ -35,6 +36,7 @@ export const toCambioTitularPayload = (
       ? { medioNotificacionSecundario: medioSecundario as MedioNotificacion }
       : {}),
     ...(values.firma.trim() ? { firma: values.firma.trim() } : {}),
+    documentos: referenciasDocumentosCargados(values.documentos),
   }
 }
 

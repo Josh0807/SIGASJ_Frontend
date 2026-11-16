@@ -3,6 +3,7 @@ import {
   IconCheck,
   IconFileUpload,
   IconLoader2,
+  IconRefresh,
   IconTrash,
 } from '@tabler/icons-react'
 import { useId, useState, type InputHTMLAttributes, type ReactNode } from 'react'
@@ -21,6 +22,7 @@ type Props = {
   items: DocumentFileItem[]
   onFilesSelected: (files: File[]) => void | Promise<void>
   onRemove: (id: string) => void
+  onRetry?: (id: string) => void | Promise<void>
   multiple?: boolean
   label?: string
   inputProps?: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'multiple' | 'accept' | 'onChange'>
@@ -38,6 +40,7 @@ export default function DocumentFileSelector({
   items,
   onFilesSelected,
   onRemove,
+  onRetry,
   multiple = false,
   label = multiple ? 'Elegir archivos' : 'Elegir archivo',
   inputProps,
@@ -108,9 +111,16 @@ export default function DocumentFileSelector({
                     {formatDocumentSize(item.size)} · {statusText(item)}
                   </small>
                 </span>
-                <button className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-red-600 transition hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-500" type="button" aria-label={`Quitar ${item.name}`} onClick={() => onRemove(item.id)}>
-                  <IconTrash size={18} aria-hidden="true" />
-                </button>
+                <span className="flex shrink-0 gap-1">
+                  {hasError && onRetry ? (
+                    <button className="grid size-9 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-blue-700 transition hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-500" type="button" aria-label={`Reintentar ${item.name}`} onClick={() => void onRetry(item.id)}>
+                      <IconRefresh size={18} aria-hidden="true" />
+                    </button>
+                  ) : null}
+                  <button className="grid size-9 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-red-600 transition hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-500" type="button" aria-label={`Quitar ${item.name}`} onClick={() => onRemove(item.id)}>
+                    <IconTrash size={18} aria-hidden="true" />
+                  </button>
+                </span>
               </li>
             )
           })}

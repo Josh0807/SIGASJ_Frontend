@@ -8,7 +8,7 @@ import FormWizardFieldError from '../../../shared/components/FormWizardFieldErro
 import { useFormWizardField } from '../../../shared/components/formWizardValidation'
 import { formatearFechaAsada, hoyEnAsada } from '../../../shared/utils/fechaAsada'
 import PublicFormPage from '../../landing/components/PublicFormPage'
-import DocumentRequirements from '../DocumentRequirements'
+import SolicitudDocumentUpload from '../SolicitudDocumentUpload'
 import { usePersistedSolicitudResult } from '../usePersistedSolicitudResult'
 import { getArregloPagoErrorMessage, registrarArregloPago } from './arregloPagoApi'
 import {
@@ -84,11 +84,20 @@ const ServiceFields = ({ values, update }: { values: ArregloPagoFormValues; upda
   )
 }
 
-const DocumentsAndSignatureFields = ({ values, update }: { values: ArregloPagoFormValues; update: UpdateFormValue }) => {
-  const documentos = useFormWizardField('documentos')
+const DocumentsAndSignatureFields = ({ values, update, onDocumentosChange }: { values: ArregloPagoFormValues; update: UpdateFormValue; onDocumentosChange: (next: ArregloPagoFormValues['documentos'] | ((previous: ArregloPagoFormValues['documentos']) => ArregloPagoFormValues['documentos'])) => void }) => {
   return (
     <div className="grid gap-7">
-      <DocumentRequirements slug="arreglo-pago" files={values.documentos} onFilesChange={(files) => update('documentos', files)} inputProps={documentos.inputProps} error={<FormWizardFieldError name="documentos" />} />
+      <SolicitudDocumentUpload
+        documentos={values.documentos}
+        onChange={onDocumentosChange}
+        options={[{
+          type: 'identificacion',
+          label: 'Copia de la cédula del propietario',
+          description: 'Adjunta una copia o fotografía legible de la cédula de identidad del propietario del servicio.',
+          required: true,
+        }]}
+        error={<FormWizardFieldError name="documentos" />}
+      />
       <SignaturePad value={values.firma} onChange={(value) => update('firma', value)} />
     </div>
   )
@@ -107,6 +116,13 @@ const ArregloPagoPage = () => {
 
   const update = <Key extends keyof ArregloPagoFormValues>(key: Key, value: ArregloPagoFormValues[Key]) => {
     setValues((current) => ({ ...current, [key]: value }))
+  }
+
+  const onDocumentosChange = (next: ArregloPagoFormValues['documentos'] | ((previous: ArregloPagoFormValues['documentos']) => ArregloPagoFormValues['documentos'])) => {
+    setValues((current) => ({
+      ...current,
+      documentos: typeof next === 'function' ? next(current.documentos) : next,
+    }))
   }
 
   const handleSubmit = async () => {
@@ -132,7 +148,7 @@ const ArregloPagoPage = () => {
 
   const serviceStep = <ServiceFields values={values} update={update} />
 
-  const documentsStep = <DocumentsAndSignatureFields values={values} update={update} />
+  const documentsStep = <DocumentsAndSignatureFields values={values} update={update} onDocumentosChange={onDocumentosChange} />
 
   const reviewStep = (
     <FormReview
@@ -167,7 +183,7 @@ const ArregloPagoPage = () => {
         },
       ]}
       documentsStepIndex={2}
-      documents={values.documentos.map((file, index) => ({ id: `${file.name}-${index}`, name: file.name, size: file.size, type: file.type || 'Archivo' }))}
+      documents={values.documentos.map((documento) => ({ id: documento.localId, name: documento.nombreOriginal, size: documento.tamanio, type: documento.tipoArchivo || 'Archivo' }))}
     />
   )
 

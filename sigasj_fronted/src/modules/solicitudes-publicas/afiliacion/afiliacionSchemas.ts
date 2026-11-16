@@ -75,4 +75,17 @@ export const afiliacionRecomendacion2Schema = z.object({
 
 export const afiliacionFirmaSchema = z.object({
   firmaSolicitante: z.string().trim().min(1, 'Registra la firma del solicitante.'),
+  documentos: z.array(z.object({
+    tipoDocumento: z.literal('otro'),
+    estado: z.enum(['pendiente', 'subiendo', 'cargado', 'error']),
+    id: z.number().optional(),
+    tokenReclamo: z.string().optional(),
+  })),
+}).superRefine((values, context) => {
+  if (values.documentos.some((documento) => documento.estado === 'pendiente' || documento.estado === 'subiendo')) {
+    context.addIssue({ code: 'custom', path: ['documentos'], message: 'Espera a que finalicen todas las cargas.' })
+  }
+  if (values.documentos.some((documento) => documento.estado === 'error')) {
+    context.addIssue({ code: 'custom', path: ['documentos'], message: 'Reintenta o elimina los documentos con error.' })
+  }
 })

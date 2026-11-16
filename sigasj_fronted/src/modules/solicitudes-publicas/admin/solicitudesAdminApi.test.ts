@@ -34,6 +34,13 @@ describe('solicitudesAdminApi', () => {
     expect(normalized.detalleFormulario).toEqual({ nombreSolicitante: 'Ana' })
   })
 
+  it('no confunde una ruptura del contrato de documentos con una lista vacía', () => {
+    expect(() => normalizeSolicitudAdminDetail({
+      id: 15, codigoSeguimiento: 'SOL-2026-X8K91B', estado: 'PENDIENTE', fechaIngreso: '2026-10-24',
+      detalleFormulario: {}, historial: [], camposAdministrativos: {},
+    } as never)).toThrow('arreglo de documentos válido')
+  })
+
   it('consume listado y alias protegido de detalle', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(new Response(JSON.stringify({ data: [], total: 0, page: 1, limit: 10, totalPages: 0 }), { status: 200 }))

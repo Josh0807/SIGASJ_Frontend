@@ -18,16 +18,20 @@ const documentTypes: Array<{ type: TipoDocumento; label: string; description: st
 const newLocalId = () => `doc-${Date.now()}-${Math.random().toString(36).slice(2)}`
 
 const ServicioExistenteDocumentUpload = ({ calidadTitular, documentos, onChange, error }: Props) => {
-  const handleFile = async (file: File, tipoDocumento: TipoDocumento) => {
-    const localId = newLocalId()
-    const pending: DocumentoAdjunto = { localId, tipoDocumento, nombreOriginal: file.name, tamanio: file.size, tipoArchivo: file.type || 'application/octet-stream', estado: 'subiendo' }
-    onChange((previous) => [...previous, pending])
+  const upload = async (pending: DocumentoAdjunto) => {
+    if (!pending.archivo) return
+    onChange((previous) => previous.map((doc) => doc.localId === pending.localId ? { ...doc, estado: 'subiendo', errorMessage: undefined } : doc))
     try {
-      const uploaded = await subirDocumentoServicioExistente(file, tipoDocumento)
-      onChange((previous) => previous.map((doc) => doc.localId === localId ? { ...doc, ...uploaded, estado: 'cargado' } : doc))
+      const uploaded = await subirDocumentoServicioExistente(pending.archivo, pending.tipoDocumento)
+      onChange((previous) => previous.map((doc) => doc.localId === pending.localId ? { ...doc, ...uploaded, estado: 'cargado' } : doc))
     } catch (uploadError) {
-      onChange((previous) => previous.map((doc) => doc.localId === localId ? { ...doc, estado: 'error', errorMessage: getServicioExistenteErrorMessage(uploadError) } : doc))
+      onChange((previous) => previous.map((doc) => doc.localId === pending.localId ? { ...doc, estado: 'error', errorMessage: getServicioExistenteErrorMessage(uploadError) } : doc))
     }
+  }
+  const handleFile = async (file: File, tipoDocumento: TipoDocumento) => {
+    const pending: DocumentoAdjunto = { localId: newLocalId(), archivo: file, tipoDocumento, nombreOriginal: file.name, tamanio: file.size, tipoArchivo: file.type || 'application/octet-stream', estado: 'pendiente' }
+    onChange((previous) => [...previous, pending])
+    await upload(pending)
   }
 
   return (
@@ -47,9 +51,13 @@ const ServicioExistenteDocumentUpload = ({ calidadTitular, documentos, onChange,
             <DocumentFileSelector
               multiple
               label={`Adjuntar ${label.toLowerCase()}`}
-              items={related.map((document) => ({ id: document.localId, name: document.nombreOriginal, size: document.tamanio, mimeType: document.tipoArchivo, status: document.estado === 'subiendo' ? 'uploading' : document.estado === 'cargado' ? 'uploaded' : 'error', errorMessage: document.errorMessage }))}
+              items={related.map((document) => ({ id: document.localId, name: document.nombreOriginal, size: document.tamanio, mimeType: document.tipoArchivo, status: document.estado === 'pendiente' || document.estado === 'subiendo' ? 'uploading' : document.estado === 'cargado' ? 'uploaded' : 'error', errorMessage: document.errorMessage }))}
               onFilesSelected={(files) => Promise.all(files.map((file) => handleFile(file, type))).then(() => undefined)}
               onRemove={(id) => onChange((previous) => previous.filter((item) => item.localId !== id))}
+              onRetry={(id) => {
+                const documento = documentos.find((item) => item.localId === id)
+                return documento ? upload(documento) : Promise.resolve()
+              }}
             />
           </article>
         )

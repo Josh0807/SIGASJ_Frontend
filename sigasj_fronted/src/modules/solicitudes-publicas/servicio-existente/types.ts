@@ -24,11 +24,12 @@ export type TipoDocumento = (typeof TIPOS_DOCUMENTO)[number]
 
 export type DocumentoAdjunto = {
   localId: string
+  archivo?: File
   tipoDocumento: TipoDocumento
   nombreOriginal: string
   tamanio: number
   tipoArchivo: string
-  estado: 'subiendo' | 'cargado' | 'error'
+  estado: 'pendiente' | 'subiendo' | 'cargado' | 'error'
   id?: number
   tokenReclamo?: string
   errorMessage?: string

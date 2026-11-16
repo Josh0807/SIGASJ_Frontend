@@ -242,7 +242,7 @@ const documentoAdjuntoSchema = z.object({
   nombreOriginal: z.string(),
   tamanio: z.number(),
   tipoArchivo: z.string(),
-  estado: z.enum(['subiendo', 'cargado', 'error']),
+  estado: z.enum(['pendiente', 'subiendo', 'cargado', 'error']),
   id: z.number().optional(),
   tokenReclamo: z.string().optional(),
   errorMessage: z.string().optional(),
@@ -255,7 +255,7 @@ export const infraestructuraDocumentosSchema = z
     firma: z.string().trim().min(1, 'Registre la firma del solicitante o representante legal.'),
   })
   .superRefine((data, ctx) => {
-    if (data.documentos.some((doc) => doc.estado === 'subiendo')) {
+    if (data.documentos.some((doc) => doc.estado === 'pendiente' || doc.estado === 'subiendo')) {
       ctx.addIssue({
         code: 'custom',
         path: ['documentos'],

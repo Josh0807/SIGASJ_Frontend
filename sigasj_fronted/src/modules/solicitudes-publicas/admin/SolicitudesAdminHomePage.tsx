@@ -7,7 +7,7 @@ import {
   type Icon,
 } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
-import { AdminShell, Button, PageHeader } from '../../../shared/ui'
+import { AdminShell, PageHeader } from '../../../shared/ui'
 import { getSolicitudesAdmin } from './solicitudesAdminApi'
 import {
   FORMULARIOS_DESCARGABLES_ADMIN_PATH,

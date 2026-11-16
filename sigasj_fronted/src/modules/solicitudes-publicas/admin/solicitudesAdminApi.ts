@@ -57,13 +57,16 @@ const detailRelationKeys = [
 ] as const
 
 export const normalizeSolicitudAdminDetail = (raw: SolicitudAdminDetail & Record<string, unknown>): SolicitudAdminDetail => {
+  if (!Array.isArray(raw.documentos)) {
+    throw new Error('La respuesta del detalle no contiene un arreglo de documentos válido.')
+  }
   const relatedDetail = detailRelationKeys
     .map((key) => raw[key])
     .find((value): value is Record<string, unknown> => Boolean(value) && typeof value === 'object' && !Array.isArray(value))
   return {
     ...raw,
     detalleFormulario: raw.detalleFormulario ?? relatedDetail ?? null,
-    documentos: Array.isArray(raw.documentos) ? raw.documentos : [],
+    documentos: raw.documentos,
     historial: Array.isArray(raw.historial) ? raw.historial : [],
     camposAdministrativos: raw.camposAdministrativos ?? null,
   }

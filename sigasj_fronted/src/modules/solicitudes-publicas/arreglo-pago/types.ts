@@ -1,4 +1,5 @@
 import type { SolicitudSeguimiento } from '../types'
+import type { DocumentoSolicitudAdjunto, DocumentoSolicitudReferencia } from '../solicitudDocumentos'
 
 export const PLAZOS_ARREGLO_PAGO = [
   '1 mes',
@@ -22,7 +23,7 @@ export type ArregloPagoFormValues = {
   montoPrimaInicial: string
   plazoSeleccionado: '' | PlazoArregloPago
   firma: string
-  documentos: File[]
+  documentos: DocumentoSolicitudAdjunto[]
 }
 
 export type ArregloPagoPayload = {
@@ -34,6 +35,7 @@ export type ArregloPagoPayload = {
   montoPrimaInicial: number
   plazoSeleccionado: PlazoArregloPago
   firma?: string
+  documentos: DocumentoSolicitudReferencia[]
 }
 
 export type ArregloPagoResponse = SolicitudSeguimiento & {

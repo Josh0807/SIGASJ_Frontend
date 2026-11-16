@@ -9,12 +9,14 @@ export const TIPOS_DOCUMENTO_INFRA = [
 export type TipoDocumentoInfra = (typeof TIPOS_DOCUMENTO_INFRA)[number]
 
 export type DocumentoAdjuntoEstado =
+  | 'pendiente'
   | 'subiendo'
   | 'cargado'
   | 'error'
 
 export type DocumentoAdjunto = {
   localId: string
+  archivo?: File
   tipoDocumento: TipoDocumentoInfra
   nombreOriginal: string
   tamanio: number

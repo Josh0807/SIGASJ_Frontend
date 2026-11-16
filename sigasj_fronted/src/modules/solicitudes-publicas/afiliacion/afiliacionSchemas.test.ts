@@ -97,10 +97,17 @@ describe('afiliacionSchemas', () => {
 
   it('exige la firma del solicitante', () => {
     expect(
-      afiliacionFirmaSchema.safeParse({ firmaSolicitante: '' }).success,
+      afiliacionFirmaSchema.safeParse({ firmaSolicitante: '', documentos: [] }).success,
     ).toBe(false)
     expect(
-      afiliacionFirmaSchema.safeParse({ firmaSolicitante: 'data:image/png;base64,abc' }).success,
+      afiliacionFirmaSchema.safeParse({ firmaSolicitante: 'data:image/png;base64,abc', documentos: [] }).success,
     ).toBe(true)
+
+    expect(
+      afiliacionFirmaSchema.safeParse({
+        firmaSolicitante: 'data:image/png;base64,abc',
+        documentos: [{ tipoDocumento: 'otro', estado: 'error' }],
+      }).success,
+    ).toBe(false)
   })
 })

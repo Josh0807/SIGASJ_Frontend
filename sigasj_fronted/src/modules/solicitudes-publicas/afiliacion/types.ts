@@ -1,4 +1,5 @@
 import type { SolicitudSeguimiento } from '../types'
+import type { DocumentoSolicitudAdjunto, DocumentoSolicitudReferencia } from '../solicitudDocumentos'
 
 /**
  * Valores del formulario alineados a CreateSolicitudAfiliacionDto (Backend 4.7.2).
@@ -25,6 +26,7 @@ export type AfiliacionFormValues = {
   recomendacion2Identificacion: string
   recomendacion2NumeroAbonado: string
   recomendacion2Firma: string
+  documentos: DocumentoSolicitudAdjunto[]
 }
 
 export type AfiliacionPayload = {
@@ -47,6 +49,7 @@ export type AfiliacionPayload = {
   recomendacion2Identificacion: string
   recomendacion2NumeroAbonado: string
   recomendacion2Firma?: string
+  documentos?: DocumentoSolicitudReferencia[]
 }
 
 export type AfiliacionResponse = SolicitudSeguimiento & {
