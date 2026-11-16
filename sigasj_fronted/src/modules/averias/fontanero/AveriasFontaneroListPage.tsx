@@ -1,19 +1,17 @@
 import { Navigate } from 'react-router-dom'
 import {
-  IconArrowLeft,
   IconArrowRight,
   IconMapPin,
   IconRefresh,
   IconTool,
 } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
-import { ADMIN_BASE_PATH } from '../../../app/router/adminPaths'
 import { Alert } from '../../../shared/ui/Alert'
 import { Badge } from '../../../shared/ui/Badge'
 import { Button } from '../../../shared/ui/Button'
 import { Card } from '../../../shared/ui/Card'
 import { EmptyState } from '../../../shared/ui/EmptyState'
-import { PageHeader } from '../../../shared/ui/PageHeader'
+import { AdminShell, PageHeader } from '../../../shared/ui'
 import AveriaStatusBadge from '../admin/AveriaStatusBadge'
 import { formatAveriaAdminDateTime } from '../admin/formatAveriaAdminDate'
 import { useFontaneroAverias } from '../hooks/useFontaneroAverias'
@@ -55,7 +53,7 @@ const tonoIconoGrupo = (
 ): string => {
   if (grupoId === 'EN_ATENCION') return 'bg-emerald-100 text-emerald-800'
   if (grupoId === 'ASIGNADA') return 'bg-amber-100 text-amber-900'
-  return 'bg-sky-100 text-sky-900'
+  return 'bg-[color-mix(in_srgb,var(--color-sigasj-ice)_80%,white)] text-sigasj-ink'
 }
 
 export type AveriasFontaneroListPageProps = {
@@ -96,20 +94,24 @@ const AveriasFontaneroListPage = ({
   const forbidden = forbiddenProp ?? remote.forbidden
 
   return (
-    <main className="admin-content-modern grid w-full min-w-0 gap-4">
+    <AdminShell aria-labelledby="averias-fontanero-title">
       <PageHeader
-        eyebrow="Atención de campo"
+        id="averias-fontanero-title"
         title={FONTANERO_AVERIAS_TITLE}
-        description="Cola de averías asignadas a usted. Abra el detalle para iniciar o continuar la atención."
+        description="Cola asignada a usted. Abra el detalle para iniciar o continuar la atención."
         actions={
-          <Button
-            to={`${ADMIN_BASE_PATH}/dashboard`}
-            variant="secondary"
-            size="sm"
-            leftIcon={<IconArrowLeft size={16} aria-hidden="true" />}
-          >
-            Volver al dashboard
-          </Button>
+          remoteEnabled ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<IconRefresh size={16} aria-hidden="true" />}
+              onClick={() => remote.refetch()}
+              disabled={loading}
+            >
+              Actualizar
+            </Button>
+          ) : null
         }
       />
 
@@ -288,7 +290,7 @@ const AveriasFontaneroListPage = ({
           </div>
         )}
       </Card>
-    </main>
+    </AdminShell>
   )
 }
 

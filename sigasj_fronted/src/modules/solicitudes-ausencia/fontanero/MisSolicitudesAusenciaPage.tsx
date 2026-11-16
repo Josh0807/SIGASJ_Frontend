@@ -26,7 +26,6 @@ import {
 } from '../solicitudAusenciaLabels'
 import { getMisSolicitudesAusencia } from '../solicitudesAusenciaApi'
 import {
-  FONTANERO_MIS_SOLICITUDES_TITLE,
   FONTANERO_SOLICITAR_AUSENCIA_PATH,
   misSolicitudAusenciaDetailPath,
 } from '../solicitudesAusenciaPaths'
@@ -108,8 +107,8 @@ export default function MisSolicitudesAusenciaPage() {
   return (
     <div className="admin-content-modern grid w-full min-w-0 gap-4">
       <PageHeader
-        title={FONTANERO_MIS_SOLICITUDES_TITLE}
-        description="Consulte el historial y el estado de sus permisos y vacaciones."
+        title="Mis solicitudes"
+        description="Historial y estado de permisos y vacaciones."
         actions={
           <Button
             to={FONTANERO_SOLICITAR_AUSENCIA_PATH}

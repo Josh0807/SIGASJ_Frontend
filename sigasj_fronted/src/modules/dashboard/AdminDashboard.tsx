@@ -16,10 +16,13 @@ import {
 import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
 import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
-import { IconRefresh } from '@tabler/icons-react'
+import { IconArrowRight, IconRefresh } from '@tabler/icons-react'
+import { Link } from 'react-router-dom'
 import { ADMIN_COPY } from '../../shared/admin/adminCopy'
-import { AdminShell, Button } from '../../shared/ui'
+import { AdminShell, Button, Card } from '../../shared/ui'
 import panelOperativoImage from '../../assets/Hero1.webp'
+import { FONTANERO_AVERIAS_PATH } from '../averias/fontanero/averiasFontaneroPaths'
+import { ACTIVIDADES_FONTANERO_BASE_PATH } from '../actividades-fontanero/actividadesFontaneroPaths'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   {
@@ -115,7 +118,36 @@ const AdminDashboard = () => {
   )
   const displayName = resolveAuthUserHeaderName(user)
   const greeting = resolveGreeting()
+  const role = normalizeInternalRole(user?.role)
+  const isFontanero = role === InternalAdminRoleName.Fontanero
   const canSeeMapa = canAccessAdminRoute(user, MAPA_RED_PATH)
+
+  const fontaneroLinks = [
+    {
+      title: 'Mis averías',
+      description: 'Cola asignada y atención en campo.',
+      path: FONTANERO_AVERIAS_PATH,
+      icon: 'averias' as const,
+    },
+    {
+      title: 'Actividades',
+      description: 'Registrar y consultar trabajo realizado.',
+      path: ACTIVIDADES_FONTANERO_BASE_PATH,
+      icon: 'actividades' as const,
+    },
+    {
+      title: 'Inventario',
+      description: 'Consulta de materiales y salidas.',
+      path: '/admin/inventario',
+      icon: 'inventario' as const,
+    },
+    {
+      title: 'Permisos y vacaciones',
+      description: 'Solicitudes propias y saldo.',
+      path: '/fontanero/mis-solicitudes',
+      icon: 'solicitudes' as const,
+    },
+  ]
 
   const indicators: DashboardIndicator[] = visibleDefinitions.map((indicator) => {
     if (indicator.id === 'abonados') {
@@ -156,14 +188,55 @@ const AdminDashboard = () => {
             ) : (
               <p className="admin-dashboard__greeting">{greeting}</p>
             )}
-            <h1 id="admin-dashboard-title">Resumen del acueducto</h1>
+            <h1 id="admin-dashboard-title">
+              {isFontanero ? 'Operación de campo' : 'Resumen del acueducto'}
+            </h1>
             <p className="admin-dashboard__lead">
-              Indicadores, mapa de red y actividad reciente según su rol en SIGASJ.
+              {isFontanero
+                ? 'Averías asignadas, actividades e inventario a su cargo.'
+                : 'Indicadores, mapa de red y actividad reciente según su rol en SIGASJ.'}
             </p>
           </div>
         </header>
 
-        {indicators.length > 0 ? (
+        {isFontanero ? (
+          <section
+            className="admin-dashboard__section"
+            aria-labelledby="admin-dashboard-fontanero-links"
+          >
+            <div className="admin-dashboard__section-header">
+              <h2 id="admin-dashboard-fontanero-links">Accesos rápidos</h2>
+              <p>Atajos a las tareas del día.</p>
+            </div>
+            <div className="admin-dashboard__indicators-grid">
+              {fontaneroLinks.map((item) => (
+                <Card key={item.path} as="article" lift interactive className="min-w-0">
+                  <Link
+                    to={item.path}
+                    className="flex h-full min-h-[7rem] flex-col gap-3 p-4 text-inherit no-underline"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="grid size-11 place-items-center rounded-[10px] bg-sigasj-surface-soft text-sigasj-primary">
+                        <AdminNavIcon name={item.icon} />
+                      </span>
+                      <IconArrowRight
+                        size={18}
+                        className="text-sigasj-primary"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="public-card-title m-0 text-[1.05rem]">{item.title}</h3>
+                      <p className="public-card-text m-0 mt-1">{item.description}</p>
+                    </div>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {!isFontanero && indicators.length > 0 ? (
           <section
             className="admin-dashboard__section admin-dashboard__section--kpis"
             aria-labelledby="admin-dashboard-kpis-title"

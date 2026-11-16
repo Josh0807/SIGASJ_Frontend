@@ -73,7 +73,6 @@ export default function MiSaldoVacacionesPage() {
     <AdminShell className="gap-5 sm:gap-6" aria-labelledby="mi-saldo-vacaciones-title">
       <PageHeader
         id="mi-saldo-vacaciones-title"
-        eyebrow="Fontanero · Vacaciones"
         title={FONTANERO_MI_SALDO_TITLE}
         description={
           <>

@@ -68,12 +68,16 @@
   inset: 0;
   background:
     linear-gradient(
-      102deg,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(234, 246, 255, 0.78) 32%,
-      rgba(234, 246, 255, 0.42) 58%,
-      rgba(234, 246, 255, 0.12) 82%,
-      rgba(255, 255, 255, 0.04) 100%
+      105deg,
+      rgba(10, 28, 48, 0.78) 0%,
+      rgba(12, 36, 62, 0.55) 38%,
+      rgba(18, 50, 86, 0.28) 68%,
+      rgba(18, 50, 86, 0.08) 100%
+    ),
+    radial-gradient(
+      ellipse 70% 90% at 12% 50%,
+      rgba(8, 22, 40, 0.45),
+      transparent 70%
     );
   content: '';
 }
@@ -108,12 +112,13 @@
 .admin-dashboard__greeting {
   margin: 0;
   font-size: 0.95rem;
-  color: var(--dash-muted);
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .admin-dashboard__greeting strong {
   font-weight: 700;
-  color: var(--dash-ink);
+  color: #ffffff;
 }
 
 .admin-dashboard #admin-dashboard-title {
@@ -125,28 +130,31 @@
 }
 
 .admin-dashboard__welcome-card .admin-dashboard__greeting strong {
-  color: var(--dash-ink);
+  color: #ffffff;
   font-weight: 700;
 }
 
 .admin-dashboard .admin-dashboard__welcome-card #admin-dashboard-title {
   margin: 0;
-  color: var(--dash-ink) !important;
+  color: #ffffff !important;
   font-family: var(--font-display, 'Times New Roman', Times, serif);
   font-size: clamp(1.75rem, 2.8vw, 2.35rem);
   font-weight: 700;
   line-height: 1.14;
   letter-spacing: -0.02em;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 2px 14px rgba(0, 0, 0, 0.28);
 }
 
 .admin-dashboard__welcome-card .admin-dashboard__lead {
   margin: 0.15rem 0 0;
   max-width: 36rem;
-  color: #4f6b86;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
   line-height: 1.55;
   text-wrap: pretty;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .admin-dashboard__lead {

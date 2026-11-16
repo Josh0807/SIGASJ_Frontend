@@ -221,7 +221,7 @@ const AveriasFontaneroDetailView = ({
           id="averia-fontanero-gestion-heading"
           icon={<IconSettings size={18} aria-hidden="true" />}
         >
-          Gestión de la avería
+          Datos de atención
         </SectionTitle>
 
         <dl className="averias-fontanero__resumen averia-management-fields m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">

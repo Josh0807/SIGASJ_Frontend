@@ -1,4 +1,4 @@
-import { IconArrowLeft, IconArrowRight, IconClipboardCheck, IconClipboardPlus } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowRight, IconClipboardCheck } from '@tabler/icons-react'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   AdminShell,
@@ -21,21 +21,15 @@ const SeleccionarTipoActividadPage = () => {
     >
       <PageHeader
         id="seleccion-tipo-actividad-title"
-        eyebrow="Registro de actividades"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconClipboardPlus size={22} aria-hidden="true" />
-            Registrar actividad
-          </span>
-        }
-        description="Seleccione el tipo de actividad que desea registrar. Cada tipo abre su formulario correspondiente."
+        title="Registrar actividad"
+        description="Seleccione el tipo. Cada opción abre su formulario."
         actions={
           <Button
             to={ACTIVIDADES_FONTANERO_PATHS.home}
             variant="secondary"
             leftIcon={<IconArrowLeft size={18} aria-hidden="true" />}
           >
-            Volver al menú
+            Volver
           </Button>
         }
       />

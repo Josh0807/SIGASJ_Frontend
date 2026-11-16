@@ -104,7 +104,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   },
   {
     segment: 'inventario',
-    title: 'Gestión de inventario',
+    title: 'Inventario',
     allowedRoles: [
       InternalAdminRoleName.Administradora,
       InternalAdminRoleName.Secretaria,
@@ -157,7 +157,7 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
   },
   {
     segment: 'actividades',
-    title: 'Registro de Actividades',
+    title: 'Actividades',
     allowedRoles: [InternalAdminRoleName.Fontanero],
     requiredPermissions: ['activities.register'],
     availableInNav: true,

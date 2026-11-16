@@ -1,13 +1,13 @@
 import { Navigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
-import { IconArrowLeft, IconTool } from '@tabler/icons-react'
+import { IconArrowLeft } from '@tabler/icons-react'
 import { LOGIN_ROUTE_PATH } from '../../../app/router/routePaths'
 import { Alert } from '../../../shared/ui/Alert'
 import { Button } from '../../../shared/ui/Button'
 import { Card } from '../../../shared/ui/Card'
+import { AdminShell, PageHeader } from '../../../shared/ui'
 import AveriaStatusBadge from '../admin/AveriaStatusBadge'
 import { useFontaneroAveria } from '../hooks/useFontaneroAveria'
-import AveriaFaucetIllustration from './AveriaFaucetIllustration'
 import AveriasFontaneroDetailView from './AveriasFontaneroDetailView'
 import { FONTANERO_AVERIAS_PATH } from './averiasFontaneroPaths'
 import {
@@ -151,43 +151,20 @@ const AveriasFontaneroDetailPage = ({
   }
 
   return (
-    <main className="averias-fontanero admin-content-modern grid w-full min-w-0 gap-4">
-      <div className="justify-self-start">
-        <BackLink />
-      </div>
-
-      <header className="gallery-admin__header relative overflow-hidden rounded-[1.5rem] border border-[#d7e8f7] bg-gradient-to-br from-white via-[#f7fbff] to-[#eaf4ff] px-5 py-5 shadow-[0_14px_32px_rgba(30,90,156,0.1)] sm:min-h-[8.5rem] sm:px-7 sm:py-6">
-        <div
-          className="pointer-events-none absolute -right-2 -bottom-6 hidden size-52 rounded-full bg-[radial-gradient(circle,rgba(186,230,253,0.55)_0%,rgba(224,242,254,0.2)_48%,transparent_72%)] sm:block"
-          aria-hidden="true"
-        />
-
-        {/* Tubo + llave bajados: manija visible, codo recortado abajo */}
-        <AveriaFaucetIllustration className="pointer-events-none absolute -bottom-3 -right-1 z-[1] hidden h-[11.5rem] w-[15rem] sm:block lg:-bottom-4 lg:right-0 lg:h-[12.5rem] lg:w-[16.5rem]" />
-
-        <div className="relative z-[2] grid max-w-[34rem] items-center gap-4 pr-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-5 sm:pr-40">
-          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#38bdf8] text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] sm:size-[4.25rem]">
-            <IconTool size={30} stroke={2.2} aria-hidden="true" />
+    <AdminShell className="averias-fontanero" aria-labelledby="averia-fontanero-detail-title">
+      <PageHeader
+        id="averia-fontanero-detail-title"
+        title="Avería asignada"
+        description={
+          <span className="inline-flex flex-wrap items-center gap-2">
+            <span className="inline-flex rounded-full border border-sigasj-border bg-sigasj-surface-soft px-3 py-1 text-sm font-bold text-sigasj-ink">
+              {averia.codigoSeguimiento}
+            </span>
+            <AveriaStatusBadge estado={averia.estado} />
           </span>
-
-          <div className="min-w-0">
-            <p className="gallery-admin__eyebrow m-0 mb-1 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-sigasj-primary">
-              Atención de campo
-            </p>
-            <h1 className="m-0 text-[clamp(1.45rem,2.6vw,1.85rem)] font-black tracking-[-0.03em] text-sigasj-ink">
-              Avería asignada
-            </h1>
-            <div className="averias-fontanero__header-meta mt-3 flex flex-wrap items-center gap-2">
-              <p className="averias-admin__codigo m-0 inline-flex rounded-full border border-[#cfe4f7] bg-[#f3f9ff] px-3.5 py-1.5 text-sm font-extrabold text-sigasj-ink shadow-sm">
-                {averia.codigoSeguimiento}
-              </p>
-              <p className="averias-admin__header-badge m-0">
-                <AveriaStatusBadge estado={averia.estado} />
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+        }
+        actions={<BackLink />}
+      />
 
       <AveriasFontaneroDetailView
         averia={averia}
@@ -219,7 +196,7 @@ const AveriasFontaneroDetailPage = ({
         }}
         onUnauthorized={() => setForceLogin(true)}
       />
-    </main>
+    </AdminShell>
   )
 }
 
