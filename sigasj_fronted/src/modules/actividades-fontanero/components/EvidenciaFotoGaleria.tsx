@@ -99,7 +99,11 @@ const EvidenciaFotoGaleria = ({
   }, [selected])
 
   if (!documentos.length) {
-    return <p>{emptyLabel}</p>
+    return (
+      <p className="detalle-actividad__evidence-empty" role="status">
+        {emptyLabel}
+      </p>
+    )
   }
 
   const selectedUrl = selected

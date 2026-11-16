@@ -23,7 +23,7 @@ import {
 const AuthPageBrand = () => (
   <div className="auth-page__brand">
     <span className="auth-page__brand-logo">
-      <img src={asadaLogo} alt="" />
+      <img src={asadaLogo} alt="Logo ASADA San Juan de Santa Cruz" />
     </span>
     <span className="auth-page__brand-text">
       <strong>SIGASJ</strong>
@@ -135,7 +135,12 @@ const LoginPage = () => {
           </p>
         ) : null}
 
-        <form className="auth-page__form" onSubmit={onSubmit} noValidate>
+        <form
+          className="auth-page__form"
+          onSubmit={onSubmit}
+          noValidate
+          aria-busy={loading || undefined}
+        >
           <label className="auth-page__field" htmlFor="login-email">
             <span className="auth-page__field-caption">
               <span>Correo electrónico</span>
@@ -210,11 +215,12 @@ const LoginPage = () => {
                   showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                 }
                 aria-pressed={showPassword}
+                disabled={loading}
               >
                 {showPassword ? (
-                  <IconEyeOff size={20} aria-hidden="true" />
+                  <IconEyeOff size={18} aria-hidden="true" />
                 ) : (
-                  <IconEye size={20} aria-hidden="true" />
+                  <IconEye size={18} aria-hidden="true" />
                 )}
               </button>
             </span>
@@ -239,6 +245,7 @@ const LoginPage = () => {
             type="submit"
             className="auth-page__submit landing-lift-button landing-lift-button--solid"
             disabled={loading}
+            aria-busy={loading || undefined}
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
@@ -251,7 +258,7 @@ const LoginPage = () => {
         ) : null}
 
         <Link className="auth-page__back" to={LANDING_ROUTE_PATH}>
-          <IconArrowLeft size={18} stroke={1.9} aria-hidden="true" />
+          <IconArrowLeft size={16} stroke={1.8} aria-hidden="true" />
           Volver al inicio
         </Link>
       </div>

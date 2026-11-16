@@ -9,7 +9,7 @@
   --form-muted: var(--asada-muted, #5b7390);
   --form-danger: var(--asada-danger, #9b1c1c);
   --form-success: var(--asada-success, #136734);
-  --form-radius: 12px;
+  --form-radius: 16px;
   --form-control-height: 44px;
 }
 
@@ -60,7 +60,7 @@
 
 .form-success-result__highlight {
   padding: 14px 16px;
-  border-radius: 10px;
+  border-radius: var(--asada-radius-sm, 16px);
   background: var(--asada-surface, #ffffff);
   border: 1px solid #cde6d4;
 }
@@ -121,10 +121,14 @@
 
 .gallery-admin__form,
 .materials-admin__form,
-.auth-page__form,
 .actividad-registro-form,
 .inventory-entry__form,
 .public-averia-form {
+  width: 100%;
+  max-width: none;
+}
+
+.auth-page__form {
   width: 100%;
   max-width: none;
 }
@@ -142,7 +146,6 @@
 .gallery-admin__field span,
 .materials-admin label span,
 .public-averia-form__field label,
-.auth-page__form label,
 .complaint-form-page label {
   color: var(--form-ink);
   font-size: 0.9rem;
@@ -157,8 +160,6 @@
 .materials-admin textarea,
 .public-averia-form input,
 .public-averia-form textarea,
-.auth-page__form input,
-.auth-page__form select,
 .complaint-form-page input,
 .complaint-form-page textarea,
 .material-request__form input,
@@ -198,8 +199,6 @@
 .materials-admin textarea:focus,
 .public-averia-form input:focus,
 .public-averia-form textarea:focus,
-.auth-page__form input:focus,
-.auth-page__form select:focus,
 .complaint-form-page input:focus,
 .complaint-form-page textarea:focus,
 .gallery-admin__filters input:focus,
@@ -253,8 +252,7 @@
 .gallery-admin__form button[type='submit'],
 .materials-admin__primary,
 .public-averia-form__submit,
-.receipt-query-page__button--primary,
-.auth-page__submit {
+.receipt-query-page__button--primary {
   min-height: var(--form-control-height);
   border: 0;
   border-radius: 10px;
@@ -319,11 +317,6 @@
 
 .receipt-search-form__input,
 .receipt-search-form__button {
-  min-height: var(--form-control-height);
-}
-
-.auth-page__select,
-.auth-page__submit {
   min-height: var(--form-control-height);
 }
 

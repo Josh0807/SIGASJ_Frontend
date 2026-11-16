@@ -35,13 +35,6 @@ export const ALL_QUICK_ACCESS_ITEMS: QuickAccessConfigItem[] = [
     icon: 'averias',
   },
   {
-    id: 'mapa-red',
-    title: 'Mapa de la red de agua',
-    description: 'Consultar sectores, tubería e infraestructura del acueducto.',
-    path: '/admin/mapa-red',
-    icon: 'mapa-red',
-  },
-  {
     id: 'comunicados',
     title: 'Gestión de comunicados',
     description: 'Publicar y actualizar avisos oficiales de la ASADA.',

@@ -62,17 +62,23 @@ const ProyectosAdminDetailPage = () => {
       ) : null}
 
       {proyecto && !sessionBlocked && !missing ? (
-        <>
-          <p className="gallery-admin__header-actions">
+        <div className="proyectos-admin__detail-page">
+          <div className="proyectos-admin__detail-actions">
+            <Link
+              className="gallery-admin__button"
+              to={PROYECTOS_ADMIN_PATH}
+            >
+              Volver al listado
+            </Link>
             <Link
               className="gallery-admin__button gallery-admin__button--primary"
               to={proyectosAdminEditPath(proyecto.id)}
             >
-              Editar
+              Editar proyecto
             </Link>
-          </p>
+          </div>
           <ProyectosAdminDetailView proyecto={proyecto} />
-        </>
+        </div>
       ) : null}
     </ProyectosAdminFormPageLayout>
   )

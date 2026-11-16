@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { IconFileText, IconUpload } from '@tabler/icons-react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { TransparenciaFormValues } from './types'
 import {
@@ -67,11 +68,16 @@ const TransparenciaAdminForm = ({
     }
   }, [file])
 
-  const previewSource =
+  const imagePreview =
     previewUrl ??
     (currentFileUrl && currentFileType && isTransparenciaImageType(currentFileType)
       ? currentFileUrl
       : null)
+
+  const showPdfPlaceholder =
+    !imagePreview &&
+    ((file && file.type === 'application/pdf') ||
+      (!file && currentFileType === 'pdf' && Boolean(currentFileUrl)))
 
   const onFileChange = (nextFile: File | null) => {
     if (!nextFile) {
@@ -128,105 +134,121 @@ const TransparenciaAdminForm = ({
   }
 
   return (
-    <form className="gallery-admin__form admin-modern-form w-full !max-w-none" onSubmit={handleSubmit}>
-      <p className="admin-modern-form__eyebrow">Formulario de transparencia</p>
-      <h2>{mode === 'create' ? 'Nueva publicación' : 'Editar publicación'}</h2>
-
-      <label className="gallery-admin__field">
-        <span>Nombre *</span>
-        <input
-          type="text"
-          maxLength={200}
-          required
-          value={values.nombre}
-          onChange={(event) =>
-            setValues((current) => ({ ...current, nombre: event.target.value }))
-          }
-        />
-      </label>
-
-      <label className="gallery-admin__field">
-        <span>Descripción breve *</span>
-        <textarea
-          maxLength={500}
-          rows={3}
-          required
-          value={values.descripcionBreve}
-          onChange={(event) =>
-            setValues((current) => ({
-              ...current,
-              descripcionBreve: event.target.value,
-            }))
-          }
-        />
-      </label>
-
-      {mode === 'create' ? (
-        <div className="gallery-admin__field-row">
+    <form
+      className="gallery-admin__form gallery-admin__form--editor admin-modern-form w-full !max-w-none"
+      onSubmit={handleSubmit}
+    >
+      <div className="gallery-admin__form-grid">
+        <div className="gallery-admin__form-fields">
           <label className="gallery-admin__field">
-            <span>Orden</span>
+            <span>Nombre *</span>
             <input
-              type="number"
-              min={0}
-              value={values.ordenVisualizacion}
+              type="text"
+              maxLength={200}
+              required
+              value={values.nombre}
+              placeholder="Ej. Informe de calidad del agua"
+              onChange={(event) =>
+                setValues((current) => ({ ...current, nombre: event.target.value }))
+              }
+            />
+          </label>
+
+          <label className="gallery-admin__field">
+            <span>Descripción breve *</span>
+            <textarea
+              maxLength={500}
+              rows={4}
+              required
+              value={values.descripcionBreve}
+              placeholder="Resumen visible en la sección pública"
               onChange={(event) =>
                 setValues((current) => ({
                   ...current,
-                  ordenVisualizacion: Number(event.target.value) || 0,
+                  descripcionBreve: event.target.value,
                 }))
               }
             />
           </label>
 
-          <label className="gallery-admin__checkbox">
-            <input
-              type="checkbox"
-              checked={values.activo}
-              onChange={(event) =>
-                setValues((current) => ({
-                  ...current,
-                  activo: event.target.checked,
-                }))
-              }
-            />
-            <span>Visible en la sección pública</span>
+          <div className="gallery-admin__field-row gallery-admin__field-row--meta">
+            <label className="gallery-admin__field gallery-admin__field--orden">
+              <span>Orden</span>
+              <input
+                type="number"
+                min={0}
+                value={values.ordenVisualizacion}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    ordenVisualizacion: Number(event.target.value) || 0,
+                  }))
+                }
+              />
+            </label>
+
+            <label className="gallery-admin__checkbox gallery-admin__checkbox--card">
+              <input
+                type="checkbox"
+                checked={values.activo}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    activo: event.target.checked,
+                  }))
+                }
+              />
+              <span>
+                <strong>Visible en la sección pública</strong>
+                <small>Si se desactiva, no se muestra en la landing.</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <aside className="gallery-admin__media-card" aria-label="Archivo de la publicación">
+          <div className="gallery-admin__media-preview">
+            {imagePreview ? (
+              <img src={imagePreview} alt="Vista previa del archivo" />
+            ) : showPdfPlaceholder ? (
+              <div className="gallery-admin__media-empty">
+                <IconFileText size={34} aria-hidden="true" />
+                <span>Documento PDF</span>
+              </div>
+            ) : (
+              <div className="gallery-admin__media-empty">
+                <IconFileText size={34} aria-hidden="true" />
+                <span>Sin archivo seleccionado</span>
+              </div>
+            )}
+          </div>
+
+          <label className="gallery-admin__field gallery-admin__field--file">
+            <span>
+              {mode === 'create' ? 'Archivo *' : 'Reemplazar archivo (opcional)'}
+            </span>
+            <span className="gallery-admin__file-control">
+              <IconUpload size={18} aria-hidden="true" />
+              <input
+                type="file"
+                accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"
+                onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+              />
+            </span>
+            <small>
+              {selectedFileLabel
+                ? selectedFileLabel
+                : `Máximo ${formatTransparenciaMaxSizeLabel()}. Formatos: PDF, JPG, JPEG, PNG.`}
+            </small>
           </label>
-        </div>
-      ) : null}
 
-      <label className="gallery-admin__field">
-        <span>
-          {mode === 'create' ? 'Archivo *' : 'Reemplazar archivo (opcional)'}
-        </span>
-        <input
-          type="file"
-          accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"
-          onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
-        />
-        <small>
-          Máximo {formatTransparenciaMaxSizeLabel()}. Formatos: PDF, JPG, JPEG,
-          PNG.
-        </small>
-      </label>
-
-      {selectedFileLabel ? (
-        <p className="gallery-admin__field">
-          <span>Archivo seleccionado</span>
-          <strong>{selectedFileLabel}</strong>
-        </p>
-      ) : null}
-
-      {fileError ? (
-        <p className="gallery-admin__form-error" role="alert">
-          {fileError}
-        </p>
-      ) : null}
-
-      {previewSource ? (
-        <div className="gallery-admin__preview">
-          <img src={previewSource} alt="Vista previa del archivo" />
-        </div>
-      ) : null}
+          {fileError ? (
+            <p className="gallery-admin__form-error" role="alert">
+              {fileError}
+            </p>
+          ) : null}
+        </aside>
+      </div>
 
       {formError ? (
         <p className="gallery-admin__form-error" role="alert">
@@ -235,15 +257,19 @@ const TransparenciaAdminForm = ({
       ) : null}
 
       <div className="gallery-admin__form-actions">
-        <button type="button" className="gallery-admin__button" onClick={onCancel}>
-          Cancelar
-        </button>
         <button
           type="submit"
           className="gallery-admin__button gallery-admin__button--primary"
           disabled={submitting}
         >
-          {submitting ? 'Guardando…' : 'Guardar'}
+          {submitting
+            ? 'Guardando…'
+            : mode === 'create'
+              ? 'Guardar publicación'
+              : 'Guardar cambios'}
+        </button>
+        <button type="button" className="gallery-admin__button" onClick={onCancel}>
+          Cancelar
         </button>
       </div>
     </form>

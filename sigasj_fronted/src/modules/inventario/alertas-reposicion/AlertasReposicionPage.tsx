@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
-import { IconAlertTriangle, IconArrowLeft, IconFilter, IconRefresh } from '@tabler/icons-react'
+import {
+  IconAlertTriangle,
+  IconArrowLeft,
+  IconFilter,
+  IconPackage,
+  IconRefresh,
+  IconShoppingCartPlus,
+} from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { InventoryFormField } from '../InventoryFormField'
@@ -56,31 +63,31 @@ export default function AlertasReposicionPage() {
   useEffect(() => {
     let active = true
     const cancelScheduled = runAfterEffect(() => {
-    setLoading(true)
-    void getAlertasReposicionAdmin({
-      ...(estado ? { estado } : {}),
-      page,
-      limit: 10,
-    })
-      .then((response) => {
-        if (!active) return
-        const items = normalizeAlertasReposicionList(response)
-        setAlertas(items)
-        setTotal(Array.isArray(response) ? items.length : response.total ?? items.length)
-        setTotalPages(Array.isArray(response) ? 1 : Math.max(response.totalPages ?? 1, 1))
-        setError('')
+      setLoading(true)
+      void getAlertasReposicionAdmin({
+        ...(estado ? { estado } : {}),
+        page,
+        limit: 10,
       })
-      .catch((requestError) => {
-        if (!active) return
-        if (getHttpErrorStatus(requestError) === 401) {
-          navigate('/login', { replace: true })
-          return
-        }
-        setError(alertaReposicionErrorMessage(requestError))
-      })
-      .finally(() => {
-        if (active) setLoading(false)
-      })
+        .then((response) => {
+          if (!active) return
+          const items = normalizeAlertasReposicionList(response)
+          setAlertas(items)
+          setTotal(Array.isArray(response) ? items.length : response.total ?? items.length)
+          setTotalPages(Array.isArray(response) ? 1 : Math.max(response.totalPages ?? 1, 1))
+          setError('')
+        })
+        .catch((requestError) => {
+          if (!active) return
+          if (getHttpErrorStatus(requestError) === 401) {
+            navigate('/login', { replace: true })
+            return
+          }
+          setError(alertaReposicionErrorMessage(requestError))
+        })
+        .finally(() => {
+          if (active) setLoading(false)
+        })
     })
     return () => {
       active = false
@@ -117,11 +124,7 @@ export default function AlertasReposicionPage() {
     setNotice('')
     try {
       await patchAlertaReposicionEstado(alerta.id, siguiente)
-      setNotice(
-        siguiente === 'EN_GESTION'
-          ? 'La alerta quedó en gestión.'
-          : 'La alerta se marcó como resuelta.',
-      )
+      setNotice('La alerta se marcó como resuelta.')
       setReloadKey((value) => value + 1)
     } catch (requestError) {
       if (getHttpErrorStatus(requestError) === 401) {
@@ -172,149 +175,254 @@ export default function AlertasReposicionPage() {
   }
 
   return (
-    <section className="material-tracking" aria-labelledby="alertas-reposicion-title">
-      <header className="material-tracking__header">
-        <div>
-          <p className="material-request__eyebrow">Inventario · Administración</p>
-          <h1 id="alertas-reposicion-title">Alertas de reposición</h1>
-          <p>Identifique los materiales que alcanzaron o quedaron por debajo de su stock mínimo.</p>
+    <section
+      className="material-tracking material-tracking--alertas"
+      aria-labelledby="alertas-reposicion-title"
+    >
+      <header className="material-tracking__header material-tracking__header--fontanero">
+        <div className="material-tracking__header-main">
+          <span className="material-tracking__header-icon material-tracking__header-icon--alert" aria-hidden="true">
+            <IconAlertTriangle size={28} stroke={2.2} />
+          </span>
+          <div className="material-tracking__header-copy">
+            <p className="material-request__eyebrow">Inventario · Administración</p>
+            <h1 id="alertas-reposicion-title">Alertas de reposición</h1>
+            <p>
+              Identifique los materiales que alcanzaron o quedaron por debajo de
+              su stock mínimo.
+            </p>
+          </div>
         </div>
-        <Link className="material-tracking__detail-link group !inline-flex !items-center !gap-2.5 !rounded-2xl !border !border-[#bfe3fa] !bg-white !px-5 !py-3 !font-extrabold !text-[#1e5a9c] !shadow-[0_8px_20px_rgba(30, 90, 156,0.12)] !transition-all !duration-300 !ease-out hover:!-translate-y-1 hover:!border-blue-400 hover:!bg-[#eaf6ff] hover:!shadow-[0_14px_28px_rgba(30, 90, 156,0.2)] active:!translate-y-0 active:!scale-[0.97] motion-reduce:!transform-none motion-reduce:!transition-none" to={MATERIALES_PATH}><IconArrowLeft className="!transition-transform !duration-300 group-hover:!-translate-x-1 motion-reduce:!transform-none" size={19} aria-hidden="true" />Volver al catálogo</Link>
+        <Link className="material-tracking__back-link" to={MATERIALES_PATH}>
+          <IconArrowLeft size={18} aria-hidden="true" />
+          Volver al catálogo
+        </Link>
       </header>
 
-      <div className="material-tracking__filters !flex !items-end !justify-between !gap-6 !overflow-hidden !rounded-3xl !border-blue-100 !bg-linear-to-r !from-white !via-blue-50/40 !to-sky-50/70 !p-6 !shadow-[0_12px_32px_rgba(30, 90, 156,0.09)] [&>label]:!w-full [&>label]:!max-w-2xl [&>label]:!justify-items-start [&>label]:!text-left [&>label>span:first-child]:!ml-1 [&>label>span:first-child]:!w-auto [&>label>span:first-child]:!justify-self-start [&>label>span:first-child]:!text-left [&_.provider-admin__control]:!w-full [&_.provider-admin__control]:!rounded-2xl [&_.provider-admin__control]:!border [&_.provider-admin__control]:!border-blue-100 [&_.provider-admin__control]:!bg-white [&_.provider-admin__control]:!shadow-[0_7px_18px_rgba(30, 90, 156,0.08)] [&_.provider-admin__control]:!transition-all [&_.provider-admin__control]:!duration-300 hover:[&_.provider-admin__control]:!border-blue-300 hover:[&_.provider-admin__control]:!shadow-[0_10px_24px_rgba(30, 90, 156,0.14)] focus-within:[&_.provider-admin__control]:!border-blue-400 focus-within:[&_.provider-admin__control]:!ring-4 focus-within:[&_.provider-admin__control]:!ring-blue-100 max-[700px]:!flex-col max-[700px]:!items-stretch">
-        <InventoryFormField label="Estado" icon={<IconFilter size={20} aria-hidden="true" />}>
-        <select
-          id="alerta-estado-filtro"
-          value={estado}
-          onChange={(event) => changeEstado(event.target.value as EstadoAlertaReposicion | '')}
-        >
-          {ESTADOS_FILTRO.map((option) => (
-            <option key={option.label} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-        </InventoryFormField>
-        {!loading && !error ? (
-          <span className="!m-0 !inline-flex !min-h-12 !shrink-0 !items-center !gap-2.5 !rounded-2xl !border !border-amber-200 !bg-linear-to-r !from-amber-50 !to-orange-50 !px-5 !py-3 !font-extrabold !text-amber-700 !shadow-[0_7px_18px_rgba(217,119,6,0.12)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!shadow-[0_11px_24px_rgba(217,119,6,0.18)] motion-reduce:!transform-none motion-reduce:!transition-none" role="status"><IconAlertTriangle size={19} aria-hidden="true" />{total} {total === 1 ? 'alerta' : 'alertas'}</span>
+      <div className="material-tracking__panel">
+        <div className="material-tracking__filters material-tracking__filters--panel">
+          <InventoryFormField
+            label="Estado"
+            icon={<IconFilter size={18} aria-hidden="true" />}
+          >
+            <select
+              id="alerta-estado-filtro"
+              value={estado}
+              onChange={(event) =>
+                changeEstado(event.target.value as EstadoAlertaReposicion | '')
+              }
+            >
+              {ESTADOS_FILTRO.map((option) => (
+                <option key={option.label} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </InventoryFormField>
+
+          {!loading && !error ? (
+            <span className="material-tracking__count material-tracking__count--alert" role="status">
+              <IconAlertTriangle size={18} aria-hidden="true" />
+              {total} {total === 1 ? 'alerta' : 'alertas'}
+            </span>
+          ) : null}
+        </div>
+
+        {notice ? (
+          <div className="material-tracking__state material-tracking__state--notice" role="status">
+            <p>
+              {notice}
+              {reposicionGeneradaId ? (
+                <>
+                  {' '}
+                  <Link to={reposicionDetailPath(reposicionGeneradaId)}>
+                    Ver reposición
+                  </Link>
+                </>
+              ) : null}
+            </p>
+          </div>
+        ) : null}
+
+        {actionError ? (
+          <div
+            className="material-tracking__state material-tracking__state--error"
+            role="alert"
+          >
+            {actionError}
+          </div>
+        ) : null}
+
+        {loading ? (
+          <div className="material-tracking__state" role="status">
+            <span className="material-request__spinner" />
+            Cargando alertas de reposición…
+          </div>
+        ) : null}
+
+        {error ? (
+          <div
+            className="material-tracking__state material-tracking__state--error"
+            role="alert"
+          >
+            <p>{error}</p>
+            <button type="button" onClick={retry}>
+              <IconRefresh size={18} aria-hidden="true" /> Reintentar
+            </button>
+          </div>
+        ) : null}
+
+        {!loading && !error && alertas.length === 0 ? (
+          <div className="material-tracking__empty">
+            <span className="material-tracking__empty-icon" aria-hidden="true">
+              <IconPackage size={28} />
+            </span>
+            <h2>
+              {estado
+                ? 'No hay alertas con ese estado'
+                : 'No hay alertas de reposición'}
+            </h2>
+            <p>
+              {estado
+                ? 'Pruebe con otro estado o consulte todos los registros.'
+                : 'Cuando un material alcance su stock mínimo, la alerta aparecerá aquí.'}
+            </p>
+          </div>
+        ) : null}
+
+        {!loading && !error && alertas.length > 0 ? (
+          <div className="material-tracking__table-wrap material-tracking__table-wrap--panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Unidad</th>
+                  <th>Stock actual</th>
+                  <th>Stock mínimo</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Responsable</th>
+                  <th>
+                    <span className="visually-hidden">Acciones</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {alertas.map((alerta) => {
+                  const accion = etiquetaAccionAlerta(String(alerta.estado))
+                  const bajoMinimo = Number(alerta.stockActual) <= Number(alerta.stockMinimo)
+                  return (
+                    <tr key={alerta.id}>
+                      <td data-label="Material">
+                        <strong>{getAlertaMaterialNombre(alerta)}</strong>
+                      </td>
+                      <td data-label="Unidad">{getAlertaUnidadMedida(alerta)}</td>
+                      <td data-label="Stock actual">
+                        <span
+                          className={
+                            bajoMinimo
+                              ? 'material-tracking__stock material-tracking__stock--low'
+                              : 'material-tracking__stock'
+                          }
+                        >
+                          {alerta.stockActual}
+                        </span>
+                      </td>
+                      <td data-label="Stock mínimo">{alerta.stockMinimo}</td>
+                      <td data-label="Fecha">
+                        {formatAlertaFecha(alerta.fechaGeneracion)}
+                      </td>
+                      <td data-label="Estado">
+                        <span
+                          className="material-tracking__badge"
+                          data-status={String(alerta.estado).toUpperCase()}
+                        >
+                          {formatAlertaEstado(String(alerta.estado))}
+                        </span>
+                      </td>
+                      <td data-label="Responsable">
+                        {getAlertaResponsable(alerta)}
+                      </td>
+                      <td data-label="Acciones" className="material-tracking__row-actions">
+                        {accion ? (
+                          <button
+                            type="button"
+                            className="material-tracking__action-btn"
+                            disabled={managingId !== null || generatingId !== null}
+                            onClick={() => requestEstadoChange(alerta)}
+                          >
+                            <IconAlertTriangle size={16} aria-hidden="true" />
+                            {managingId === alerta.id ? 'Actualizando…' : accion}
+                          </button>
+                        ) : null}
+                        {puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? (
+                          <button
+                            type="button"
+                            className="material-tracking__action-btn material-tracking__action-btn--primary"
+                            disabled={managingId !== null || generatingId !== null}
+                            onClick={() => requestGenerarReposicion(alerta)}
+                          >
+                            <IconShoppingCartPlus size={16} aria-hidden="true" />
+                            {generatingId === alerta.id
+                              ? 'Generando…'
+                              : 'Generar reposición'}
+                          </button>
+                        ) : null}
+                        {!accion &&
+                        !puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? (
+                          <span>—</span>
+                        ) : null}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+
+        {!loading && !error && totalPages > 1 ? (
+          <nav
+            className="material-tracking__pagination"
+            aria-label="Paginación de alertas de reposición"
+          >
+            <button
+              type="button"
+              disabled={page <= 1}
+              onClick={() => {
+                setLoading(true)
+                setPage((value) => value - 1)
+              }}
+            >
+              Anterior
+            </button>
+            <span>
+              Página {page} de {totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={page >= totalPages}
+              onClick={() => {
+                setLoading(true)
+                setPage((value) => value + 1)
+              }}
+            >
+              Siguiente
+            </button>
+          </nav>
         ) : null}
       </div>
 
-      {notice ? (
-        <div className="material-tracking__state" role="status">
-          {notice}
-          {reposicionGeneradaId ? (
-            <> <Link to={reposicionDetailPath(reposicionGeneradaId)}>Ver reposición</Link></>
-          ) : null}
-        </div>
-      ) : null}
-      {actionError ? (
-        <div className="material-tracking__state material-tracking__state--error" role="alert">
-          {actionError}
-        </div>
-      ) : null}
-
-      {loading ? (
-        <div className="material-tracking__state" role="status">
-          <span className="material-request__spinner" />Cargando alertas de reposición…
-        </div>
-      ) : null}
-      {error ? (
-        <div className="material-tracking__state material-tracking__state--error" role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={retry}>
-            <IconRefresh size={18} aria-hidden="true" /> Reintentar
-          </button>
-        </div>
-      ) : null}
-      {!loading && !error && alertas.length === 0 ? (
-        <div className="material-tracking__empty">
-          <h2>{estado ? 'No hay alertas con ese estado' : 'No hay alertas de reposición'}</h2>
-          <p>
-            {estado
-              ? 'Pruebe con otro estado o consulte todos los registros.'
-              : 'Cuando un material alcance su stock mínimo, la alerta aparecerá aquí.'}
-          </p>
-        </div>
-      ) : null}
-
-      {!loading && !error && alertas.length > 0 ? (
-        <div className="material-tracking__table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Material</th>
-                <th>Unidad</th>
-                <th>Stock actual</th>
-                <th>Stock mínimo</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Responsable</th>
-                <th><span className="visually-hidden">Acciones</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {alertas.map((alerta) => {
-                const accion = etiquetaAccionAlerta(String(alerta.estado))
-                return (
-                  <tr key={alerta.id}>
-                    <td data-label="Material"><strong>{getAlertaMaterialNombre(alerta)}</strong></td>
-                    <td data-label="Unidad">{getAlertaUnidadMedida(alerta)}</td>
-                    <td data-label="Stock actual">{alerta.stockActual}</td>
-                    <td data-label="Stock mínimo">{alerta.stockMinimo}</td>
-                    <td data-label="Fecha">{formatAlertaFecha(alerta.fechaGeneracion)}</td>
-                    <td data-label="Estado">
-                      <span className="material-tracking__badge" data-status={String(alerta.estado).toUpperCase()}>
-                        {formatAlertaEstado(String(alerta.estado))}
-                      </span>
-                    </td>
-                    <td data-label="Responsable">{getAlertaResponsable(alerta)}</td>
-                    <td data-label="Acciones">
-                      {accion ? (
-                        <button
-                          type="button"
-                          className="material-tracking__detail-link"
-                          disabled={managingId !== null || generatingId !== null}
-                          onClick={() => requestEstadoChange(alerta)}
-                        >
-                          <IconAlertTriangle size={18} aria-hidden="true" /> {managingId === alerta.id ? 'Actualizando…' : accion}
-                        </button>
-                      ) : null}
-                      {puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? (
-                        <button
-                          type="button"
-                          className="material-tracking__detail-link"
-                          disabled={managingId !== null || generatingId !== null}
-                          onClick={() => requestGenerarReposicion(alerta)}
-                        >
-                          {generatingId === alerta.id ? 'Generando…' : 'Generar reposición'}
-                        </button>
-                      ) : null}
-                      {!accion && !puedeGenerarReposicionDesdeAlerta(String(alerta.estado)) ? <span>—</span> : null}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      ) : null}
-
-      {!loading && !error && totalPages > 1 ? (
-        <nav className="material-tracking__pagination" aria-label="Paginación de alertas de reposición">
-          <button type="button" disabled={page <= 1} onClick={() => { setLoading(true); setPage((value) => value - 1) }}>Anterior</button>
-          <span>Página {page} de {totalPages}</span>
-          <button type="button" disabled={page >= totalPages} onClick={() => { setLoading(true); setPage((value) => value + 1) }}>Siguiente</button>
-        </nav>
-      ) : null}
-
       <ConfirmDialog
         isOpen={pendingAction !== null}
-        title={pendingAction?.type === 'reposicion' ? 'Generar reposición' : 'Cambiar estado'}
+        title={
+          pendingAction?.type === 'reposicion'
+            ? 'Generar reposición'
+            : 'Cambiar estado'
+        }
         message={
           pendingAction?.type === 'estado'
-            ? pendingAction.siguiente === 'EN_GESTION'
-              ? `¿Poner en gestión la alerta de ${getAlertaMaterialNombre(pendingAction.alerta)}? Confirme para aplicar el cambio o cancele para dejarlo igual.`
-              : `¿Marcar como resuelta la alerta de ${getAlertaMaterialNombre(pendingAction.alerta)}? Confirme para aplicar el cambio o cancele para dejarlo igual.`
+            ? `¿Marcar como resuelta la alerta de ${getAlertaMaterialNombre(pendingAction.alerta)}? Confirme para aplicar el cambio o cancele para dejarlo igual.`
             : pendingAction?.type === 'reposicion'
               ? `¿Generar una reposición para ${getAlertaMaterialNombre(pendingAction.alerta)}? No se modificarán las existencias.`
               : ''

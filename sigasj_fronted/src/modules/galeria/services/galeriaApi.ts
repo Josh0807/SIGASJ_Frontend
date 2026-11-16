@@ -93,7 +93,7 @@ export async function updateGaleriaEstado(
 ): Promise<AdminGalleryPhoto> {
   const updated = await fetchWithAuth<BackendGaleriaFoto>(`${ADMIN_PATHS[0]}/${id}/estado`, {
     method: 'PATCH',
-    body: JSON.stringify({ activa, activo: activa }),
+    body: JSON.stringify({ activa }),
   })
   return mapAdminGalleryPhoto(updated)
 }

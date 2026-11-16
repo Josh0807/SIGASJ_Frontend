@@ -17,6 +17,7 @@ import { resolveAuthUserHeaderName } from '../auth/utils/authUserDisplay'
 import { ALERTAS_REPOSICION_PATH } from '../inventario/inventarioPaths'
 import type { DashboardIndicator } from './props'
 import { IconRefresh } from '@tabler/icons-react'
+import panelOperativoImage from '../../assets/Hero1.webp'
 
 const DASHBOARD_INDICATORS: DashboardIndicator[] = [
   {
@@ -139,17 +140,27 @@ const AdminDashboard = () => {
         {/* Hero + control del día */}
         <div className="admin-dashboard__top-grid">
           <header className="admin-dashboard__welcome-card">
-            <span className="admin-dashboard__eyebrow">Panel operativo</span>
-            {displayName ? (
-              <p className="admin-dashboard__greeting">
-                {greeting}, <strong>{displayName}</strong>
+            <div className="admin-dashboard__welcome-media" aria-hidden="true">
+              <img
+                src={panelOperativoImage}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="admin-dashboard__welcome-copy">
+              <span className="admin-dashboard__eyebrow">Panel operativo</span>
+              {displayName ? (
+                <p className="admin-dashboard__greeting">
+                  {greeting}, <strong>{displayName}</strong>
+                </p>
+              ) : null}
+              <h1 id="admin-dashboard-title">Dashboard Administrativo</h1>
+              <p className="admin-dashboard__lead">
+                Resumen del estado del acueducto según su rol: asociados, averías,
+                solicitudes y alertas.
               </p>
-            ) : null}
-            <h1 id="admin-dashboard-title">Dashboard Administrativo</h1>
-            <p className="admin-dashboard__lead">
-              Resumen del estado del acueducto según su rol: asociados, averías,
-              solicitudes y alertas.
-            </p>
+            </div>
           </header>
 
           <aside className="admin-dashboard__focus-card" aria-label="Acciones del panel">
@@ -224,7 +235,6 @@ const AdminDashboard = () => {
             <ErrorBoundary>
               <MapaRedPanel
                 compact
-                detailHref={MAPA_RED_PATH}
                 className="admin-dashboard__mapa"
               />
             </ErrorBoundary>

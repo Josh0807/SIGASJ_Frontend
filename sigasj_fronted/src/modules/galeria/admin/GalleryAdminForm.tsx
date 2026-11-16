@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { IconPhoto, IconUpload } from '@tabler/icons-react'
 import { runAfterEffect } from '../../../shared/utils/yieldToEffect'
 import type { GalleryFormValues } from './types'
 import {
@@ -109,115 +110,139 @@ const GalleryAdminForm = ({
   }
 
   return (
-    <form className="gallery-admin__form admin-modern-form w-full !max-w-none" onSubmit={handleSubmit}>
-      <p className="admin-modern-form__eyebrow">Formulario de galería</p>
-      <h2>{mode === 'create' ? 'Nueva fotografía' : 'Editar fotografía'}</h2>
+    <form
+      className="gallery-admin__form gallery-admin__form--editor admin-modern-form w-full !max-w-none"
+      onSubmit={handleSubmit}
+    >
+      <div className="gallery-admin__form-grid">
+        <div className="gallery-admin__form-fields">
+          <label className="gallery-admin__field">
+            <span>Título (opcional)</span>
+            <input
+              type="text"
+              maxLength={150}
+              value={values.titulo}
+              placeholder="Ej. Asamblea ordinaria 2026"
+              onChange={(event) =>
+                setValues((current) => ({ ...current, titulo: event.target.value }))
+              }
+            />
+          </label>
 
-      <label className="gallery-admin__field">
-        <span>Título (opcional)</span>
-        <input
-          type="text"
-          maxLength={150}
-          value={values.titulo}
-          onChange={(event) =>
-            setValues((current) => ({ ...current, titulo: event.target.value }))
-          }
-        />
-      </label>
+          <label className="gallery-admin__field">
+            <span>Descripción (opcional)</span>
+            <textarea
+              maxLength={500}
+              rows={4}
+              value={values.descripcion}
+              placeholder="Breve contexto de la fotografía"
+              onChange={(event) =>
+                setValues((current) => ({
+                  ...current,
+                  descripcion: event.target.value,
+                }))
+              }
+            />
+          </label>
 
-      <label className="gallery-admin__field">
-        <span>Descripción (opcional)</span>
-        <textarea
-          maxLength={500}
-          rows={3}
-          value={values.descripcion}
-          onChange={(event) =>
-            setValues((current) => ({
-              ...current,
-              descripcion: event.target.value,
-            }))
-          }
-        />
-      </label>
+          <label className="gallery-admin__field">
+            <span>Texto alternativo *</span>
+            <input
+              type="text"
+              maxLength={255}
+              required
+              aria-invalid={Boolean(altError)}
+              aria-describedby={altError ? 'gallery-alt-error' : undefined}
+              value={values.textoAlternativo}
+              placeholder="Describe la imagen para accesibilidad"
+              onChange={(event) => {
+                setAltError(null)
+                setValues((current) => ({
+                  ...current,
+                  textoAlternativo: event.target.value,
+                }))
+              }}
+            />
+            {altError ? (
+              <small id="gallery-alt-error" className="gallery-admin__form-error" role="alert">
+                {altError}
+              </small>
+            ) : null}
+          </label>
 
-      <label className="gallery-admin__field">
-        <span>Texto alternativo *</span>
-        <input
-          type="text"
-          maxLength={255}
-          required
-          aria-invalid={Boolean(altError)}
-          aria-describedby={altError ? 'gallery-alt-error' : undefined}
-          value={values.textoAlternativo}
-          onChange={(event) => {
-            setAltError(null)
-            setValues((current) => ({
-              ...current,
-              textoAlternativo: event.target.value,
-            }))
-          }}
-        />
-        {altError ? (
-          <small id="gallery-alt-error" className="gallery-admin__form-error" role="alert">
-            {altError}
-          </small>
-        ) : null}
-      </label>
+          <div className="gallery-admin__field-row gallery-admin__field-row--meta">
+            <label className="gallery-admin__field gallery-admin__field--orden">
+              <span>Orden</span>
+              <input
+                type="number"
+                min={0}
+                value={values.ordenVisualizacion}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    ordenVisualizacion: Number(event.target.value) || 0,
+                  }))
+                }
+              />
+            </label>
 
-      <div className="gallery-admin__field-row">
-        <label className="gallery-admin__field">
-          <span>Orden</span>
-          <input
-            type="number"
-            min={0}
-            value={values.ordenVisualizacion}
-            onChange={(event) =>
-              setValues((current) => ({
-                ...current,
-                ordenVisualizacion: Number(event.target.value) || 0,
-              }))
-            }
-          />
-        </label>
-
-        <label className="gallery-admin__checkbox">
-          <input
-            type="checkbox"
-            checked={values.activo}
-            onChange={(event) =>
-              setValues((current) => ({
-                ...current,
-                activo: event.target.checked,
-              }))
-            }
-          />
-          <span>Visible en la galería pública</span>
-        </label>
-      </div>
-
-      <label className="gallery-admin__field">
-        <span>
-          {mode === 'create' ? 'Imagen *' : 'Reemplazar imagen (opcional)'}
-        </span>
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
-          onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
-        />
-        <small>Máximo {formatGalleryMaxSizeLabel()}. Formatos: JPG, PNG, WebP.</small>
-      </label>
-
-      {fileError ? (
-        <p className="gallery-admin__form-error" role="alert">
-          {fileError}
-        </p>
-      ) : null}
-
-      {previewSource ? (
-        <div className="gallery-admin__preview">
-          <img src={previewSource} alt="Vista previa de la fotografía" />
+            <label className="gallery-admin__checkbox gallery-admin__checkbox--card">
+              <input
+                type="checkbox"
+                checked={values.activo}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    activo: event.target.checked,
+                  }))
+                }
+              />
+              <span>
+                <strong>Visible en la galería pública</strong>
+                <small>Si se desactiva, no se muestra en la landing.</small>
+              </span>
+            </label>
+          </div>
         </div>
-      ) : null}
+
+        <aside className="gallery-admin__media-card" aria-label="Imagen de la fotografía">
+          <div className="gallery-admin__media-preview">
+            {previewSource ? (
+              <img src={previewSource} alt="Vista previa de la fotografía" />
+            ) : (
+              <div className="gallery-admin__media-empty">
+                <IconPhoto size={34} aria-hidden="true" />
+                <span>Sin imagen seleccionada</span>
+              </div>
+            )}
+          </div>
+
+          <label className="gallery-admin__field gallery-admin__field--file">
+            <span>
+              {mode === 'create' ? 'Imagen *' : 'Reemplazar imagen (opcional)'}
+            </span>
+            <span className="gallery-admin__file-control">
+              <IconUpload size={18} aria-hidden="true" />
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+              />
+            </span>
+            <small>
+              {file
+                ? file.name
+                : `Máximo ${formatGalleryMaxSizeLabel()}. Formatos: JPG, PNG, WebP.`}
+            </small>
+          </label>
+
+          {fileError ? (
+            <p className="gallery-admin__form-error" role="alert">
+              {fileError}
+            </p>
+          ) : null}
+        </aside>
+      </div>
 
       {formError ? (
         <p className="gallery-admin__form-error" role="alert">
@@ -226,15 +251,19 @@ const GalleryAdminForm = ({
       ) : null}
 
       <div className="gallery-admin__form-actions">
-        <button type="button" className="gallery-admin__button" onClick={onCancel}>
-          Cancelar
-        </button>
         <button
           type="submit"
           className="gallery-admin__button gallery-admin__button--primary"
           disabled={submitting}
         >
-          {submitting ? 'Guardando…' : mode === 'create' ? 'Guardar fotografía' : 'Guardar cambios'}
+          {submitting
+            ? 'Guardando…'
+            : mode === 'create'
+              ? 'Guardar fotografía'
+              : 'Guardar cambios'}
+        </button>
+        <button type="button" className="gallery-admin__button" onClick={onCancel}>
+          Cancelar
         </button>
       </div>
     </form>

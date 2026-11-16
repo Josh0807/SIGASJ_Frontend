@@ -69,7 +69,7 @@ describe('AveriasAdminPage', () => {
     await renderPage()
     expect(container.querySelector('h1')?.textContent).toBe('Gestión de averías')
     expect(container.textContent).toContain(
-      'Consulte y dé seguimiento a las averías reportadas.',
+      'Revise reportes, asigne fontaneros y dé seguimiento hasta la resolución.',
     )
     expect(container.querySelector('table')).toBeTruthy()
     expect(container.textContent).toContain('AV-2026-0001')
@@ -586,13 +586,10 @@ describe('AveriasAdminPage', () => {
     )
   })
 
-  it('envía tipo y rango de fechas reales al Backend', async () => {
+  it('envía rango de fechas reales al Backend', async () => {
     await renderPage()
     vi.mocked(averiasAdminApi.getAdminAverias).mockClear()
 
-    const tipo = container.querySelector(
-      '#averias-admin-tipo',
-    ) as HTMLInputElement
     const desde = container.querySelector(
       '#averias-admin-fecha-desde',
     ) as HTMLInputElement
@@ -620,25 +617,6 @@ describe('AveriasAdminPage', () => {
         fechaDesde: '2026-09-01',
         fechaHasta: '2026-09-12',
         page: 1,
-      }),
-      expect.any(AbortSignal),
-    )
-
-    vi.useFakeTimers()
-    vi.mocked(averiasAdminApi.getAdminAverias).mockClear()
-    await act(async () => {
-      setInputValue(tipo, 'TUBERIA')
-    })
-    await act(async () => {
-      vi.advanceTimersByTime(400)
-    })
-    await flush()
-
-    expect(averiasAdminApi.getAdminAverias).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tipo: 'TUBERIA',
-        fechaDesde: '2026-09-01',
-        fechaHasta: '2026-09-12',
       }),
       expect.any(AbortSignal),
     )

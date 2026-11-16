@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import type { ActividadFontaneroRegistrada } from '../types/actividadFontaneroApi'
 import { listDatosEspecificosDetalle } from '../utils/formatDatosEspecificosDetalle'
 import { formatActividadEstado } from '../utils/formatActividadEstado'
@@ -19,12 +19,27 @@ type DetalleActividadProps = {
   onBack?: () => void
   backLabel?: string
   actions?: ReactNode
+  /** `page` muestra cada bloque como apartado propio (sin modal). */
+  variant?: 'overlay' | 'page'
 }
 
 const revisionLabel = (actividad: ActividadFontaneroRegistrada) =>
   actividad.estadoRevision === 'REVISADA' || actividad.estado === 'REVISADA'
     ? 'Revisada'
     : 'Pendiente'
+
+const ContentWrap = ({
+  isPage,
+  children,
+}: {
+  isPage: boolean
+  children: ReactNode
+}) =>
+  isPage ? (
+    <div className="detalle-actividad__page-grid">{children}</div>
+  ) : (
+    <Fragment>{children}</Fragment>
+  )
 
 const DetalleActividad = ({
   actividad,
@@ -34,8 +49,10 @@ const DetalleActividad = ({
   onBack,
   backLabel = 'Volver',
   actions,
+  variant = 'overlay',
 }: DetalleActividadProps) => {
   const datos = listDatosEspecificosDetalle(actividad?.datosEspecificos)
+  const isPage = variant === 'page'
 
   if (loading) {
     return (
@@ -65,10 +82,15 @@ const DetalleActividad = ({
   const estadoLabel = formatActividadEstado(actividad.estado)
   const estadoRevisionLabel = revisionLabel(actividad)
   const estadosDuplicados = estadoLabel.toLocaleLowerCase('es') === estadoRevisionLabel.toLocaleLowerCase('es')
+  const documentos = actividad.documentos ?? []
+  const sinEvidencia = documentos.length === 0
+  const [datoPrincipal, ...datosRestantes] = datos
 
   return (
     <article
-      className="detalle-actividad actividades-fontanero-historial-detalle__panel"
+      className={`detalle-actividad actividades-fontanero-historial-detalle__panel${
+        isPage ? ' detalle-actividad--page' : ''
+      }`}
       aria-labelledby="detalle-actividad-title"
     >
       <header className="detalle-actividad__header">
@@ -87,99 +109,103 @@ const DetalleActividad = ({
         </div>
       </header>
 
-      <section className="detalle-actividad__section">
-        <h3>Información general</h3>
-        <dl className="detalle-actividad__grid">
-          <div>
-            <dt>Tipo</dt>
-            <dd>{actividad.tipoActividadNombre || '—'}</dd>
-          </div>
-          <div>
-            <dt>Fecha de inicio</dt>
-            <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
-          </div>
-          <div>
-            <dt>Hora de inicio</dt>
-            <dd>{formatHoraActividad(actividad.horaInicio)}</dd>
-          </div>
-          <div>
-            <dt>Fecha de finalización</dt>
-            <dd>
-              {actividad.fechaFin
-                ? formatActividadFecha(actividad.fechaFin)
-                : '—'}
-            </dd>
-          </div>
-          <div>
-            <dt>Hora de finalización</dt>
-            <dd>{formatHoraActividad(actividad.horaFin)}</dd>
-          </div>
-          {showFontanero ? (
+      <ContentWrap isPage={isPage}>
+        <section
+          className="detalle-actividad__section detalle-actividad__apartado"
+          aria-labelledby="detalle-info-general"
+        >
+          <h3 id="detalle-info-general">Información general</h3>
+          <dl className={`detalle-actividad__grid${isPage ? ' detalle-actividad__grid--dense' : ''}`}>
             <div>
-              <dt>Fontanero</dt>
+              <dt>Tipo</dt>
+              <dd>{actividad.tipoActividadNombre || '—'}</dd>
+            </div>
+            <div>
+              <dt>Fecha de inicio</dt>
+              <dd>{formatActividadFecha(actividad.fechaActividad)}</dd>
+            </div>
+            <div>
+              <dt>Hora de inicio</dt>
+              <dd>{formatHoraActividad(actividad.horaInicio)}</dd>
+            </div>
+            <div>
+              <dt>Fecha de finalización</dt>
               <dd>
-                {actividad.fontaneroNombre || actividad.fontaneroId || 'Sin identificar'}
+                {actividad.fechaFin
+                  ? formatActividadFecha(actividad.fechaFin)
+                  : '—'}
               </dd>
             </div>
-          ) : null}
-          <div>
-            <dt>Estado operativo</dt>
-            <dd>{formatActividadEstado(actividad.estado)}</dd>
-          </div>
-          <div>
-            <dt>Estado de revisión</dt>
-            <dd>{revisionLabel(actividad)}</dd>
-          </div>
-          {actividad.fechaRegistro || actividad.createdAt ? (
             <div>
-              <dt>Fecha de registro</dt>
-              <dd>
-                {formatearFechaHoraAsada(
-                  actividad.fechaRegistro || actividad.createdAt,
-                )}
-              </dd>
+              <dt>Hora de finalización</dt>
+              <dd>{formatHoraActividad(actividad.horaFin)}</dd>
             </div>
-          ) : null}
-          {revisada && actividad.fechaRevision ? (
-            <div>
-              <dt>Fecha de revisión</dt>
-              <dd>{formatearFechaHoraAsada(actividad.fechaRevision)}</dd>
-            </div>
-          ) : null}
-          {revisada && actividad.revisadoPorId ? (
-            <div>
-              <dt>Revisada por</dt>
-              <dd>{actividad.revisadoPorId}</dd>
-            </div>
-          ) : null}
-        </dl>
-      </section>
-
-      {actividad.descripcion || actividad.ubicacion ? (
-        <section className="detalle-actividad__section">
-          <h3>Datos de la actividad</h3>
-          <dl className="detalle-actividad__grid">
-            {actividad.descripcion ? (
+            {showFontanero ? (
               <div>
-                <dt>Descripción</dt>
-                <dd>{actividad.descripcion}</dd>
+                <dt>Fontanero</dt>
+                <dd>
+                  {actividad.fontaneroNombre || actividad.fontaneroId || 'Sin identificar'}
+                </dd>
               </div>
             ) : null}
-            {actividad.ubicacion ? (
+            <div>
+              <dt>Estado operativo</dt>
+              <dd>{formatActividadEstado(actividad.estado)}</dd>
+            </div>
+            <div>
+              <dt>Estado de revisión</dt>
+              <dd>{revisionLabel(actividad)}</dd>
+            </div>
+            {actividad.fechaRegistro || actividad.createdAt ? (
               <div>
-                <dt>Ubicación</dt>
-                <dd>{actividad.ubicacion}</dd>
+                <dt>Fecha de registro</dt>
+                <dd>
+                  {formatearFechaHoraAsada(
+                    actividad.fechaRegistro || actividad.createdAt,
+                  )}
+                </dd>
+              </div>
+            ) : null}
+            {revisada && actividad.fechaRevision ? (
+              <div>
+                <dt>Fecha de revisión</dt>
+                <dd>{formatearFechaHoraAsada(actividad.fechaRevision)}</dd>
+              </div>
+            ) : null}
+            {revisada && actividad.revisadoPorId ? (
+              <div>
+                <dt>Revisada por</dt>
+                <dd>{actividad.revisadoPorId}</dd>
               </div>
             ) : null}
           </dl>
         </section>
-      ) : null}
 
-      {datos.length ? (
-        <section className="detalle-actividad__section">
-          <h3>Datos específicos</h3>
-          <dl className="detalle-actividad__grid">
-            {datos.map((dato) => (
+        <section
+          className="detalle-actividad__section detalle-actividad__apartado"
+          aria-labelledby="detalle-contexto"
+        >
+          <h3 id="detalle-contexto">Contexto del reporte</h3>
+          <dl className="detalle-actividad__grid detalle-actividad__grid--contexto">
+            <div className="is-wide">
+              <dt>Descripción</dt>
+              <dd>{actividad.descripcion || 'Sin descripción.'}</dd>
+            </div>
+            <div className={datoPrincipal ? undefined : 'is-wide'}>
+              <dt>Ubicación</dt>
+              <dd>{actividad.ubicacion || '—'}</dd>
+            </div>
+            {datoPrincipal ? (
+              <div>
+                <dt>{datoPrincipal.label}</dt>
+                <dd>{datoPrincipal.value}</dd>
+              </div>
+            ) : null}
+            <div className="is-wide">
+              <dt>Observaciones</dt>
+              <dd>{actividad.observaciones || 'Sin observaciones.'}</dd>
+            </div>
+            {datosRestantes.map((dato) => (
               <div key={dato.label}>
                 <dt>{dato.label}</dt>
                 <dd>{dato.value}</dd>
@@ -187,30 +213,31 @@ const DetalleActividad = ({
             ))}
           </dl>
         </section>
-      ) : null}
 
-      <section className="detalle-actividad__section">
-        <h3>Observaciones</h3>
-        <p>{actividad.observaciones || 'Sin observaciones.'}</p>
-      </section>
+        {actividad.observacionCorreccion ? (
+          <section
+            className="detalle-actividad__section detalle-actividad__apartado detalle-actividad__correction"
+            role="note"
+            aria-labelledby="detalle-correccion"
+          >
+            <h3 id="detalle-correccion">Corrección solicitada</h3>
+            <p>{actividad.observacionCorreccion}</p>
+          </section>
+        ) : null}
 
-      {actividad.observacionCorreccion ? (
         <section
-          className="detalle-actividad__section detalle-actividad__correction"
-          role="note"
+          className={`detalle-actividad__section detalle-actividad__apartado${
+            sinEvidencia ? ' detalle-actividad__apartado--empty' : ''
+          }`}
+          aria-labelledby="detalle-evidencia"
         >
-          <h3>Corrección solicitada</h3>
-          <p>{actividad.observacionCorreccion}</p>
+          <h3 id="detalle-evidencia">Evidencia fotográfica</h3>
+          <EvidenciaFotoGaleria
+            documentos={documentos}
+            actividadId={actividad.id}
+          />
         </section>
-      ) : null}
-
-      <section className="detalle-actividad__section">
-        <h3>Evidencia fotográfica</h3>
-        <EvidenciaFotoGaleria
-          documentos={actividad.documentos ?? []}
-          actividadId={actividad.id}
-        />
-      </section>
+      </ContentWrap>
 
       {onBack || actions ? (
         <footer className="detalle-actividad__actions">

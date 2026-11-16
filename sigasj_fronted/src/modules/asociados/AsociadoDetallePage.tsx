@@ -1,4 +1,13 @@
-import { IconArrowLeft, IconEdit, IconRefresh, IconUser } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconCalendar,
+  IconEdit,
+  IconId,
+  IconMail,
+  IconRefresh,
+  IconUser,
+  IconUserOff,
+} from '@tabler/icons-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LOGIN_ROUTE_PATH } from '../../app/router/routePaths'
@@ -17,11 +26,24 @@ import type { Asociado } from './types'
 import AsociadoFeedback from './AsociadoFeedback'
 import CambiarEstadoAsociado from './CambiarEstadoAsociado'
 
-function Dato({ label, children }: { label: string; children: ReactNode }) {
+function Dato({
+  label,
+  children,
+  icon,
+  wide = false,
+}: {
+  label: string
+  children: ReactNode
+  icon?: ReactNode
+  wide?: boolean
+}) {
   return (
-    <div className="grid min-w-0 gap-1 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3">
-      <dt className="text-xs font-extrabold uppercase tracking-wider text-slate-500">{label}</dt>
-      <dd className="m-0 break-words font-semibold text-slate-800">{children}</dd>
+    <div className={`asociado-detalle__dato${wide ? ' asociado-detalle__dato--wide' : ''}`}>
+      <dt>
+        {icon ? <span className="asociado-detalle__dato-icon" aria-hidden="true">{icon}</span> : null}
+        {label}
+      </dt>
+      <dd>{children}</dd>
     </div>
   )
 }
@@ -85,42 +107,37 @@ export default function AsociadoDetallePage() {
   }, [clave, asociadoId, idValido, salirPorSesion])
 
   return (
-    <main className="grid w-full min-w-0 gap-5 sm:gap-6">
+    <main className="asociado-detalle">
       {aviso ? <AsociadoFeedback variant="success">{aviso}</AsociadoFeedback> : null}
       {accionError ? <AsociadoFeedback variant="error">{accionError}</AsociadoFeedback> : null}
-      <Link
-        to={volverA}
-        className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-2xl border border-[#bfe3fa] bg-white px-4 py-2.5 font-extrabold text-[#1e5a9c] no-underline shadow-[0_6px_18px_rgba(30, 90, 156,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:text-blue-800 hover:no-underline hover:shadow-[0_10px_24px_rgba(30, 90, 156,0.18)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
-      >
-        <IconArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none" size={19} aria-hidden="true" />
+
+      <Link to={volverA} className="asociado-detalle__back">
+        <IconArrowLeft size={18} aria-hidden="true" />
         Volver a {volverLabel}
       </Link>
 
       {cargando ? (
-        <div className="grid gap-4 rounded-2xl border border-[#d7e5f1] bg-white p-6 sm:rounded-3xl sm:p-8" role="status">
+        <div className="asociado-detalle__skeleton" role="status">
           <span className="sr-only">Cargando asociado…</span>
           {[0, 1, 2].map((fila) => (
-            <div key={fila} className="h-14 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none" aria-hidden="true" />
+            <div key={fila} className="asociado-detalle__skeleton-bar" aria-hidden="true" />
           ))}
         </div>
       ) : error || !asociado ? (
-        <div className="grid place-items-center gap-4 rounded-2xl border border-red-200 bg-red-50 p-8 text-center sm:rounded-3xl" role="alert">
-          <p className="m-0 font-semibold text-red-800">{error ?? 'No fue posible cargar el asociado.'}</p>
-          <div className="flex flex-wrap justify-center gap-3">
+        <div className="asociado-detalle__error" role="alert">
+          <p>{error ?? 'No fue posible cargar el asociado.'}</p>
+          <div className="asociado-detalle__error-actions">
             {idValido && resultado.reintentable ? (
               <button
                 type="button"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 font-bold text-blue-800 transition hover:bg-[#eaf6ff]"
+                className="asociado-detalle__btn asociado-detalle__btn--ghost"
                 onClick={() => setRecarga((n) => n + 1)}
               >
                 <IconRefresh size={18} aria-hidden="true" />
                 Reintentar
               </button>
             ) : null}
-            <Link
-              to={volverA}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 no-underline hover:no-underline"
-            >
+            <Link to={volverA} className="asociado-detalle__btn asociado-detalle__btn--ghost">
               <IconArrowLeft size={18} aria-hidden="true" />
               Volver al listado
             </Link>
@@ -128,25 +145,21 @@ export default function AsociadoDetallePage() {
         </div>
       ) : (
         <>
-          <header className="flex flex-col gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_34px_rgba(30, 90, 156,0.08)] sm:flex-row sm:items-center sm:justify-between sm:rounded-3xl sm:p-8">
-            <div className="flex min-w-0 items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-[#1e5a9c] text-white shadow-[0_10px_22px_rgba(30, 90, 156,0.28)]">
-                <IconUser size={28} aria-hidden="true" />
+          <header className="asociado-detalle__header">
+            <div className="asociado-detalle__identity">
+              <span className="asociado-detalle__avatar" aria-hidden="true">
+                <IconUser size={28} />
               </span>
-              <div className="min-w-0">
-                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
-                  Asociados · Detalle
-                </p>
-                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
-                  {nombreCompleto(asociado)}
-                </h1>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-slate-500">
-                  <span className="font-mono font-semibold">{asociado.cedula}</span>
+              <div className="asociado-detalle__identity-copy">
+                <p className="asociado-detalle__eyebrow">Asociados · Detalle</p>
+                <h1>{nombreCompleto(asociado)}</h1>
+                <div className="asociado-detalle__meta">
+                  <span className="asociado-detalle__cedula">{asociado.cedula}</span>
                   <EstadoAsociadoBadge activo={asociado.activo} />
                 </div>
               </div>
             </div>
-            <div className="flex w-full shrink-0 flex-col gap-3 sm:ml-auto sm:w-fit sm:flex-row">
+            <div className="asociado-detalle__actions">
               <CambiarEstadoAsociado
                 asociado={asociado}
                 onCambiado={(actualizado) => {
@@ -167,30 +180,54 @@ export default function AsociadoDetallePage() {
               <Link
                 to={asociadoEditPath(asociado.id)}
                 state={{ from: volverA }}
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-700 to-sky-500 px-6 font-extrabold text-white no-underline shadow-[0_10px_24px_rgba(30, 90, 156,0.28)] transition hover:-translate-y-0.5 hover:text-white hover:no-underline sm:w-fit"
+                className="asociado-detalle__btn asociado-detalle__btn--primary"
               >
-                <IconEdit size={19} aria-hidden="true" />
+                <IconEdit size={18} aria-hidden="true" />
                 Editar asociado
               </Link>
             </div>
           </header>
 
-          <section className="grid gap-5 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(30, 90, 156,0.07)] sm:rounded-3xl sm:p-8">
-            <h2 className="m-0 text-lg font-extrabold text-[#073b73]">Información del asociado</h2>
-            <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <Dato label="Cédula">{asociado.cedula}</Dato>
-              <Dato label="Nombre">{asociado.nombre}</Dato>
-              <Dato label="Apellidos">{asociado.apellidos}</Dato>
-              <Dato label="Correo electrónico">{asociado.correoElectronico}</Dato>
-              <Dato label="Estado">{asociado.activo ? 'Activo' : 'Inactivo'}</Dato>
-              <Dato label="Fecha de registro">{formatearFecha(asociado.fechaRegistro)}</Dato>
+          <section
+            className="asociado-detalle__panel"
+            aria-labelledby="asociado-info-title"
+          >
+            <div className="asociado-detalle__panel-head">
+              <h2 id="asociado-info-title">Información del asociado</h2>
+              <p>Datos personales, contacto y estado del registro.</p>
+            </div>
+            <dl className="asociado-detalle__grid">
+              <Dato label="Cédula" icon={<IconId size={15} />}>
+                {asociado.cedula}
+              </Dato>
+              <Dato label="Nombre" icon={<IconUser size={15} />}>
+                {asociado.nombre}
+              </Dato>
+              <Dato label="Apellidos" icon={<IconUser size={15} />}>
+                {asociado.apellidos}
+              </Dato>
+              <Dato label="Correo electrónico" icon={<IconMail size={15} />}>
+                {asociado.correoElectronico}
+              </Dato>
+              <Dato label="Estado">
+                {asociado.activo ? 'Activo' : 'Inactivo'}
+              </Dato>
+              <Dato label="Fecha de registro" icon={<IconCalendar size={15} />}>
+                {formatearFecha(asociado.fechaRegistro)}
+              </Dato>
               {asociado.fechaInactivacion ? (
-                <Dato label="Fecha de inactivación">{formatearFecha(asociado.fechaInactivacion)}</Dato>
+                <Dato label="Fecha de inactivación" icon={<IconCalendar size={15} />}>
+                  {formatearFecha(asociado.fechaInactivacion)}
+                </Dato>
               ) : null}
               {!asociado.activo && asociado.motivoInactivacion ? (
-                <div className="sm:col-span-2 xl:col-span-3">
-                  <Dato label="Motivo de la inactivación">{asociado.motivoInactivacion}</Dato>
-                </div>
+                <Dato
+                  label="Motivo de la inactivación"
+                  icon={<IconUserOff size={15} />}
+                  wide
+                >
+                  {asociado.motivoInactivacion}
+                </Dato>
               ) : null}
             </dl>
           </section>

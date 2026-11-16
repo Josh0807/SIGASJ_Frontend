@@ -34,14 +34,14 @@ export const siguienteEstadoAlerta = (
   estado: string,
 ): EstadoAlertaReposicion | null => {
   const normalized = estado.trim().toUpperCase().replace(/\s+/g, '_')
-  if (normalized === 'PENDIENTE') return 'EN_GESTION'
+  // PENDIENTE → EN_GESTION exists in backend, but UI skips it: next step is
+  // "Generar reposición". Only keep closing the alert when already in gestión.
   if (normalized === 'EN_GESTION') return 'RESUELTA'
   return null
 }
 
 export const etiquetaAccionAlerta = (estado: string) => {
   const siguiente = siguienteEstadoAlerta(estado)
-  if (siguiente === 'EN_GESTION') return 'Poner en gestión'
   if (siguiente === 'RESUELTA') return 'Marcar resuelta'
   return null
 }

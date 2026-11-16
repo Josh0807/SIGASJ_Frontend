@@ -19,7 +19,9 @@ const SageIaPanel = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [input, setInput] = useState('')
   const demoMode = !status.enabled || status.mode === 'demo'
-  const showSuggestions = messages.length <= 2 && !busy
+  const hasUserMessage = messages.some((message) => message.role === 'user')
+  const showSuggestions = !busy && !hasUserMessage
+  const onlyGreeting = messages.length === 1 && messages[0]?.role === 'assistant'
 
   useEffect(() => {
     if (!open) return
@@ -107,6 +109,15 @@ const SageIaPanel = () => {
           aria-live="polite"
           aria-relevant="additions"
         >
+          {onlyGreeting ? (
+            <div className="sage-ia__intro" aria-hidden="true">
+              <p className="sage-ia__intro-title">¿En qué te oriento?</p>
+              <p className="sage-ia__intro-text">
+                Pregúntame cómo usar Averías, Asociados, Inventario, Proyectos y más.
+                Te indico los pasos de la interfaz.
+              </p>
+            </div>
+          ) : null}
           {messages.map((message) => (
             <div
               key={message.id}

@@ -146,20 +146,21 @@
 .mapa-red__map-card {
   position: relative;
   overflow: hidden;
-  min-height: 20rem;
-  max-height: 24rem;
+  height: 100%;
+  min-height: 24rem;
+  max-height: 28rem;
   border-radius: var(--mr-radius);
 }
 
 .mapa-red--compact .mapa-red__map-card {
-  min-height: 17rem;
-  max-height: 20rem;
+  min-height: 20rem;
+  max-height: 24rem;
 }
 
 .mapa-red__map-card .mapa-red__leaflet-host,
 .mapa-red__map-card .mapa-red__leaflet {
   height: 100%;
-  min-height: 17rem;
+  min-height: 20rem;
 }
 
 .mapa-red__map-card--alert {
@@ -597,14 +598,19 @@
 .mapa-red__stat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.55rem;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.75rem;
+  min-height: 0;
+  height: 100%;
 }
 
 .mapa-red__stat {
   display: grid;
-  gap: 0.15rem;
-  padding: 0.65rem 0.7rem;
-  border-radius: 12px;
+  align-content: space-between;
+  gap: 0.45rem;
+  min-height: 0;
+  padding: 1rem 1.05rem;
+  border-radius: 14px;
   border: 1px solid var(--mr-border);
   background: #f8fafc;
 }
@@ -615,14 +621,15 @@
 }
 
 .mapa-red__stat span {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--mr-muted);
 }
 
 .mapa-red__stat strong {
-  font-size: 1.15rem;
+  font-size: 1.85rem;
   font-weight: 800;
+  line-height: 1;
   color: #0f172a;
   font-variant-numeric: tabular-nums;
 }
@@ -691,6 +698,16 @@
 .mapa-red__detail-card--alert {
   border-color: #fecaca;
   box-shadow: 0 8px 24px rgba(185, 28, 28, 0.08);
+}
+
+.mapa-red__alert-banner--ok {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.mapa-red__alert-banner--ok strong {
+  color: #14532d;
 }
 
 .mapa-red__alert-banner {
@@ -979,16 +996,20 @@
 /* —— Panel detalle —— */
 .mapa-red__detail-card {
   display: grid;
-  align-content: start;
-  gap: 0.85rem;
-  padding: 0.9rem;
-  max-height: 24rem;
+  grid-template-rows: auto 1fr;
+  align-content: stretch;
+  gap: 1rem;
+  padding: 1rem;
+  height: 100%;
+  min-height: 24rem;
+  max-height: 28rem;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
 .mapa-red--compact .mapa-red__detail-card {
-  max-height: 20rem;
+  min-height: 20rem;
+  max-height: 24rem;
 }
 
 .mapa-red__photo {
@@ -1249,7 +1270,7 @@
   .mapa-red__map-card,
   .mapa-red__leaflet-host,
   .mapa-red__leaflet {
-    min-height: 18rem;
+    min-height: 22rem;
     max-height: none;
   }
 

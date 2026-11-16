@@ -254,95 +254,200 @@ const ProyectosAdminForm = ({
 
   return (
     <form
-      className="gallery-admin__form proyectos-admin__form sigasj-project-form admin-modern-form w-full !max-w-none"
+      className="gallery-admin__form gallery-admin__form--editor proyectos-admin__form sigasj-project-form admin-modern-form w-full !max-w-none"
       onSubmit={handleSubmit}
       noValidate
       aria-busy={isSubmitting ? true : undefined}
       aria-describedby={formError ? FORM_ERROR_ID : undefined}
     >
-      <p className="admin-modern-form__eyebrow">Formulario de proyectos</p>
-      <h2>{mode === 'create' ? 'Nuevo proyecto' : 'Editar proyecto'}</h2>
+      <p className="admin-modern-form__eyebrow visually-hidden">
+        Formulario de proyectos
+      </p>
+      <h2 className="visually-hidden">
+        {mode === 'create' ? 'Nuevo proyecto' : 'Editar proyecto'}
+      </h2>
 
-      <label className="gallery-admin__field md:!col-span-2" htmlFor={NOMBRE_INPUT_ID}>
-        <span>Nombre del proyecto *</span>
-        <input
-          id={NOMBRE_INPUT_ID}
-          name="nombre"
-          type="text"
-          autoComplete="off"
-          maxLength={PROYECTO_NOMBRE_MAX_LENGTH}
-          required
-          aria-required="true"
-          aria-invalid={fieldErrors.nombre ? true : undefined}
-          aria-describedby={describedBy('nombre')}
-          value={values.nombre}
-          onChange={(event) => updateField('nombre', event.target.value)}
-        />
-        {fieldAlert('nombre')}
-      </label>
-
-      <div className="gallery-admin__field proyectos-admin__cover-field md:!col-span-2">
-        <label htmlFor={IMAGEN_INPUT_ID}>
-          <span>Fotografía de portada (Imagen principal)</span>
-        </label>
-        <div className="proyectos-admin__cover-container">
-          {previewUrl ? (
-            <div className="proyectos-admin__cover-preview-wrapper">
-              <img
-                src={previewUrl}
-                alt="Vista previa de portada seleccionada"
-                className="proyectos-admin__cover-preview"
-              />
-              <span className="proyectos-admin__cover-badge proyectos-admin__cover-badge--new !absolute !inset-auto !left-3 !top-3 !h-auto !min-h-0 !w-auto !max-w-[calc(100%-1.5rem)] !rounded-xl !bg-emerald-50/95 !px-3 !py-1.5 !text-xs !font-extrabold !leading-tight !text-emerald-700 !shadow-md">
-                Nueva portada (sin guardar)
-              </span>
-            </div>
-          ) : !removeImagen && values.imagenPrincipalUrl ? (
-            <div className="proyectos-admin__cover-preview-wrapper">
-              <img
-                src={resolveBackendAssetUrl(values.imagenPrincipalUrl) ?? values.imagenPrincipalUrl ?? undefined}
-                alt="Portada actual del proyecto"
-                className="proyectos-admin__cover-preview"
-              />
-              <span className="proyectos-admin__cover-badge !absolute !inset-auto !left-3 !top-3 !h-auto !min-h-0 !w-auto !max-w-[calc(100%-1.5rem)] !rounded-xl !bg-white/95 !px-3 !py-1.5 !text-xs !font-extrabold !leading-tight !text-[#1e5a9c] !shadow-md">
-                Portada actual
-              </span>
-            </div>
-          ) : (
-            <div className="proyectos-admin__cover-empty">
-              <svg
-                className="proyectos-admin__cover-icon"
-                aria-hidden="true"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-              <p>No se ha asignado una imagen de portada</p>
-              <small>JPG, PNG, WEBP o GIF (Máx. 5 MB)</small>
-            </div>
-          )}
-
-          <div className="proyectos-admin__cover-controls">
+      <div className="gallery-admin__form-grid">
+        <div className="gallery-admin__form-fields">
+          <label className="gallery-admin__field" htmlFor={NOMBRE_INPUT_ID}>
+            <span>Nombre del proyecto *</span>
             <input
-              ref={fileInputRef}
-              id={IMAGEN_INPUT_ID}
-              name="imagenPrincipal"
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-              className="proyectos-admin__file-input"
-              aria-invalid={fieldErrors.imagenPrincipal ? true : undefined}
-              aria-describedby={describedBy('imagenPrincipal')}
-              onChange={handleFileChange}
+              id={NOMBRE_INPUT_ID}
+              name="nombre"
+              type="text"
+              autoComplete="off"
+              maxLength={PROYECTO_NOMBRE_MAX_LENGTH}
+              required
+              aria-required="true"
+              aria-invalid={fieldErrors.nombre ? true : undefined}
+              aria-describedby={describedBy('nombre')}
+              value={values.nombre}
+              onChange={(event) => updateField('nombre', event.target.value)}
             />
+            {fieldAlert('nombre')}
+          </label>
 
-            {selectedFile || (!removeImagen && values.imagenPrincipalUrl) ? (
+          <label className="gallery-admin__field" htmlFor={DESCRIPCION_INPUT_ID}>
+            <span>Descripción</span>
+            <textarea
+              id={DESCRIPCION_INPUT_ID}
+              name="descripcion"
+              rows={6}
+              value={values.descripcion}
+              aria-invalid={fieldErrors.descripcion ? true : undefined}
+              aria-describedby={describedBy('descripcion')}
+              onChange={(event) => updateField('descripcion', event.target.value)}
+            />
+            {fieldAlert('descripcion')}
+          </label>
+
+          <label className="gallery-admin__field" htmlFor={ENCARGADO_INPUT_ID}>
+            <span>Encargado de realización *</span>
+            <input
+              id={ENCARGADO_INPUT_ID}
+              name="encargadoRealizacion"
+              type="text"
+              autoComplete="off"
+              maxLength={PROYECTO_ENCARGADO_MAX_LENGTH}
+              required
+              aria-required="true"
+              aria-invalid={fieldErrors.encargadoRealizacion ? true : undefined}
+              aria-describedby={describedBy('encargadoRealizacion')}
+              value={values.encargadoRealizacion}
+              onChange={(event) =>
+                updateField('encargadoRealizacion', event.target.value)
+              }
+            />
+            {fieldAlert('encargadoRealizacion')}
+          </label>
+
+          <div className="gallery-admin__field-row proyectos-admin__form-row">
+            <label className="gallery-admin__field" htmlFor={DURACION_INPUT_ID}>
+              <span>Duración *</span>
+              <input
+                id={DURACION_INPUT_ID}
+                name="duracion"
+                type="text"
+                autoComplete="off"
+                maxLength={PROYECTO_DURACION_MAX_LENGTH}
+                placeholder="Ej. 8 meses"
+                required
+                aria-required="true"
+                aria-invalid={fieldErrors.duracion ? true : undefined}
+                aria-describedby={describedBy('duracion')}
+                value={values.duracion}
+                onChange={(event) => updateField('duracion', event.target.value)}
+              />
+              {fieldAlert('duracion')}
+            </label>
+
+            <label className="gallery-admin__field" htmlFor={ESTADO_INPUT_ID}>
+              <span>Estado *</span>
+              <select
+                id={ESTADO_INPUT_ID}
+                name="estado"
+                required
+                aria-required="true"
+                disabled={estadoLocked}
+                aria-invalid={fieldErrors.estado ? true : undefined}
+                aria-describedby={describedBy(
+                  'estado',
+                  estadoLocked ? ESTADO_PENDING_HINT_ID : undefined,
+                )}
+                value={values.estado}
+                onChange={(event) =>
+                  updateField('estado', event.target.value as EstadoProyecto | '')
+                }
+              >
+                {mode === 'create' ? (
+                  <option value="">Seleccione un estado</option>
+                ) : null}
+                {ESTADO_PROYECTO_OPTIONS.map((estado) => (
+                  <option value={estado.value} key={estado.value}>
+                    {estado.label}
+                  </option>
+                ))}
+              </select>
+              {estadoLocked ? (
+                <small id={ESTADO_PENDING_HINT_ID}>
+                  El cambio de estado de ejecución todavía no está disponible.
+                </small>
+              ) : null}
+              {fieldAlert('estado')}
+            </label>
+          </div>
+        </div>
+
+        <aside
+          className="gallery-admin__media-card proyectos-admin__cover-field"
+          aria-label="Fotografía de portada"
+        >
+          <div className="gallery-admin__media-preview">
+            {previewUrl ? (
+              <>
+                <img
+                  src={previewUrl}
+                  alt="Vista previa de portada seleccionada"
+                  className="proyectos-admin__cover-preview"
+                />
+                <span className="proyectos-admin__cover-badge proyectos-admin__cover-badge--new">
+                  Nueva portada (sin guardar)
+                </span>
+              </>
+            ) : !removeImagen && values.imagenPrincipalUrl ? (
+              <>
+                <img
+                  src={
+                    resolveBackendAssetUrl(values.imagenPrincipalUrl) ??
+                    values.imagenPrincipalUrl ??
+                    undefined
+                  }
+                  alt="Portada actual del proyecto"
+                  className="proyectos-admin__cover-preview"
+                />
+                <span className="proyectos-admin__cover-badge">Portada actual</span>
+              </>
+            ) : (
+              <div className="gallery-admin__media-empty proyectos-admin__cover-empty">
+                <svg
+                  className="proyectos-admin__cover-icon"
+                  aria-hidden="true"
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <p>No se ha asignado una imagen de portada</p>
+                <small>JPG, PNG, WEBP o GIF (Máx. 5 MB)</small>
+              </div>
+            )}
+          </div>
+
+          <label className="gallery-admin__field gallery-admin__field--file" htmlFor={IMAGEN_INPUT_ID}>
+            <span>Fotografía de portada (Imagen principal)</span>
+            <span className="gallery-admin__file-control">
+              <input
+                ref={fileInputRef}
+                id={IMAGEN_INPUT_ID}
+                name="imagenPrincipal"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                className="proyectos-admin__file-input"
+                aria-invalid={fieldErrors.imagenPrincipal ? true : undefined}
+                aria-describedby={describedBy('imagenPrincipal')}
+                onChange={handleFileChange}
+              />
+            </span>
+          </label>
+
+          {selectedFile || (!removeImagen && values.imagenPrincipalUrl) ? (
+            <div className="proyectos-admin__cover-controls">
               <button
                 type="button"
                 className="gallery-admin__button gallery-admin__button--danger proyectos-admin__remove-cover-btn"
@@ -350,100 +455,10 @@ const ProyectosAdminForm = ({
               >
                 Quitar portada
               </button>
-            ) : null}
-          </div>
-        </div>
-        {fieldAlert('imagenPrincipal')}
-      </div>
-
-      <label className="gallery-admin__field md:!col-span-2" htmlFor={DESCRIPCION_INPUT_ID}>
-        <span>Descripción</span>
-        <textarea
-          id={DESCRIPCION_INPUT_ID}
-          name="descripcion"
-          rows={6}
-          value={values.descripcion}
-          aria-invalid={fieldErrors.descripcion ? true : undefined}
-          aria-describedby={describedBy('descripcion')}
-          onChange={(event) => updateField('descripcion', event.target.value)}
-        />
-        {fieldAlert('descripcion')}
-      </label>
-
-      <label className="gallery-admin__field" htmlFor={ENCARGADO_INPUT_ID}>
-        <span>Encargado de realización *</span>
-        <input
-          id={ENCARGADO_INPUT_ID}
-          name="encargadoRealizacion"
-          type="text"
-          autoComplete="off"
-          maxLength={PROYECTO_ENCARGADO_MAX_LENGTH}
-          required
-          aria-required="true"
-          aria-invalid={fieldErrors.encargadoRealizacion ? true : undefined}
-          aria-describedby={describedBy('encargadoRealizacion')}
-          value={values.encargadoRealizacion}
-          onChange={(event) =>
-            updateField('encargadoRealizacion', event.target.value)
-          }
-        />
-        {fieldAlert('encargadoRealizacion')}
-      </label>
-
-      <div className="gallery-admin__field-row proyectos-admin__form-row">
-        <label className="gallery-admin__field" htmlFor={DURACION_INPUT_ID}>
-          <span>Duración *</span>
-          <input
-            id={DURACION_INPUT_ID}
-            name="duracion"
-            type="text"
-            autoComplete="off"
-            maxLength={PROYECTO_DURACION_MAX_LENGTH}
-            placeholder="Ej. 8 meses"
-            required
-            aria-required="true"
-            aria-invalid={fieldErrors.duracion ? true : undefined}
-            aria-describedby={describedBy('duracion')}
-            value={values.duracion}
-            onChange={(event) => updateField('duracion', event.target.value)}
-          />
-          {fieldAlert('duracion')}
-        </label>
-
-        <label className="gallery-admin__field" htmlFor={ESTADO_INPUT_ID}>
-          <span>Estado *</span>
-          <select
-            id={ESTADO_INPUT_ID}
-            name="estado"
-            required
-            aria-required="true"
-            disabled={estadoLocked}
-            aria-invalid={fieldErrors.estado ? true : undefined}
-            aria-describedby={describedBy(
-              'estado',
-              estadoLocked ? ESTADO_PENDING_HINT_ID : undefined,
-            )}
-            value={values.estado}
-            onChange={(event) =>
-              updateField('estado', event.target.value as EstadoProyecto | '')
-            }
-          >
-            {mode === 'create' ? (
-              <option value="">Seleccione un estado</option>
-            ) : null}
-            {ESTADO_PROYECTO_OPTIONS.map((estado) => (
-              <option value={estado.value} key={estado.value}>
-                {estado.label}
-              </option>
-            ))}
-          </select>
-          {estadoLocked ? (
-            <small id={ESTADO_PENDING_HINT_ID}>
-              El cambio de estado de ejecución todavía no está disponible.
-            </small>
+            </div>
           ) : null}
-          {fieldAlert('estado')}
-        </label>
+          {fieldAlert('imagenPrincipal')}
+        </aside>
       </div>
 
       {formError ? (
@@ -453,9 +468,6 @@ const ProyectosAdminForm = ({
       ) : null}
 
       <div className="gallery-admin__form-actions proyectos-admin__form-actions">
-        <button type="button" className="gallery-admin__button" onClick={onCancel}>
-          Cancelar
-        </button>
         <button
           type="submit"
           className="gallery-admin__button gallery-admin__button--primary"
@@ -463,6 +475,9 @@ const ProyectosAdminForm = ({
           aria-live="polite"
         >
           {submitLabel}
+        </button>
+        <button type="button" className="gallery-admin__button" onClick={onCancel}>
+          Cancelar
         </button>
       </div>
     </form>

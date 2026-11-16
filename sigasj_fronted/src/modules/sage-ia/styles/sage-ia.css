@@ -284,36 +284,57 @@
   position: absolute;
   inset: 0;
   border: 0;
-  background: rgba(18, 63, 112, 0.22);
+  background: rgba(18, 63, 112, 0.12);
   pointer-events: auto;
   cursor: pointer;
 }
 
 .admin-layout--panel .sage-ia__panel {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  bottom: 12px;
-  width: min(400px, calc(100vw - 24px));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  top: auto;
+  width: min(360px, calc(100vw - 32px));
+  height: min(520px, calc(100dvh - 96px));
+  max-height: min(520px, calc(100vh - 96px));
   display: flex;
   flex-direction: column;
   gap: 0;
   overflow: hidden;
   border: 1px solid var(--sage-ia-border);
   border-radius: var(--sage-ia-radius);
-  background: var(--sage-ia-bg);
+  background: linear-gradient(180deg, #f7fbfe 0%, var(--sage-ia-bg) 28%, #e8f4fc 100%);
   box-shadow: var(--sage-ia-shadow);
   pointer-events: auto;
+  animation: sage-ia-panel-in 180ms ease-out;
+}
+
+@keyframes sage-ia-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-layout--panel .sage-ia__panel {
+    animation: none;
+  }
 }
 
 .admin-layout--panel .sage-ia__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 16px 14px;
+  gap: 10px;
+  padding: 12px 12px 10px;
   border-bottom: 1px solid var(--sage-ia-border);
   background: var(--sage-ia-card);
+  flex-shrink: 0;
 }
 
 .admin-layout--panel .sage-ia__brand {
@@ -383,11 +404,33 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: var(--sage-ia-bg);
+  gap: 10px;
+  background: transparent;
+}
+
+.admin-layout--panel .sage-ia__intro {
+  margin: 0 0 2px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--sage-ia-border) 85%, white);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.admin-layout--panel .sage-ia__intro-title {
+  margin: 0 0 4px;
+  color: var(--sage-ia-ink);
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+.admin-layout--panel .sage-ia__intro-text {
+  margin: 0;
+  color: var(--sage-ia-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .admin-layout--panel .sage-ia__row {
@@ -401,11 +444,11 @@
 }
 
 .admin-layout--panel .sage-ia__bubble {
-  max-width: min(100%, 320px);
-  padding: 12px 14px;
-  border-radius: 16px;
-  font-size: 0.9rem;
-  line-height: 1.45;
+  max-width: min(100%, 280px);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 0.84rem;
+  line-height: 1.4;
   white-space: pre-wrap;
 }
 
@@ -430,14 +473,16 @@
 }
 
 .admin-layout--panel .sage-ia__suggestions {
-  padding: 0 16px 12px;
-  background: var(--sage-ia-bg);
+  padding: 6px 12px 8px;
+  border-top: 1px solid color-mix(in srgb, var(--sage-ia-border) 70%, transparent);
+  background: rgba(255, 255, 255, 0.55);
+  flex-shrink: 0;
 }
 
 .admin-layout--panel .sage-ia__suggestions-label {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: var(--sage-ia-muted);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 750;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -445,27 +490,38 @@
 
 .admin-layout--panel .sage-ia__chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
 }
 
 .admin-layout--panel .sage-ia__chip {
-  min-height: 36px;
-  padding: 6px 12px;
-  border: 1px solid var(--sage-ia-border);
+  flex: 0 0 auto;
+  max-width: 11.5rem;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid #cfe0f0;
   border-radius: 999px;
-  background: var(--sage-ia-card);
-  color: var(--sage-ia-ink);
+  background: #fff;
+  color: var(--sage-ia-primary);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 650;
+  line-height: 1.25;
   cursor: pointer;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
 }
 
 .admin-layout--panel .sage-ia__chip:hover:not(:disabled) {
-  border-color: #bfe3fa;
-  background: #fff;
+  border-color: var(--sage-ia-primary);
+  background: #f3f9fd;
+  box-shadow: 0 4px 10px rgba(30, 90, 156, 0.08);
 }
 
 .admin-layout--panel .sage-ia__chip:disabled {
@@ -476,10 +532,11 @@
 .admin-layout--panel .sage-ia__form {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px 16px;
+  gap: 8px;
+  padding: 10px 12px 12px;
   border-top: 1px solid var(--sage-ia-border);
   background: var(--sage-ia-card);
+  flex-shrink: 0;
 }
 
 .admin-layout--panel .sage-ia__form input {
@@ -507,10 +564,11 @@
   flex: 0 0 auto;
   border: 0;
   border-radius: 50%;
-  background: #3b82c4;
+  background: var(--sage-ia-primary);
   color: #fff;
   cursor: pointer;
   box-shadow: 0 8px 16px rgba(30, 90, 156, 0.22);
+  transition: filter 140ms ease, transform 140ms ease;
 }
 
 .admin-layout--panel .sage-ia__send:hover:not(:disabled) {
@@ -524,11 +582,13 @@
 
 @media (max-width: 760px) {
   .admin-layout--panel .sage-ia__panel {
-    top: 8px;
-    right: 8px;
-    bottom: 8px;
-    left: 8px;
+    top: auto;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
     width: auto;
+    height: min(480px, calc(100dvh - 72px));
+    max-height: min(480px, calc(100vh - 72px));
     border-radius: 18px;
   }
 

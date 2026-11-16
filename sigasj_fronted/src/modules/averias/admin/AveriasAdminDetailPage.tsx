@@ -125,9 +125,9 @@ const AveriasAdminDetailPage = ({
   }
 
   return (
-    <main className="gallery-admin averias-admin w-full min-w-0">
+    <main className="gallery-admin admin-content-modern averias-admin min-w-0">
       <div className="gallery-admin__shell sigasj-stack">
-        <header className="gallery-admin__header">
+        <header className="gallery-admin__header gallery-admin__header--editor">
           <div>
             <p className="gallery-admin__eyebrow">Gestión de averías</p>
             <h1>Detalle de avería</h1>
@@ -140,14 +140,10 @@ const AveriasAdminDetailPage = ({
           </div>
           <div className="gallery-admin__header-actions">
             <Link
-              className="gallery-admin__button group !inline-flex !min-h-12 !items-center !gap-2.5 !rounded-xl !border !border-[#bfe3fa] !bg-gradient-to-br !from-white !to-[#eaf6ff] !px-5 !font-extrabold !text-[#1e5a9c] !no-underline !shadow-[0_6px_18px_rgba(30,90,156,0.1)] !transition-all !duration-300 hover:!-translate-y-0.5 hover:!border-blue-400 hover:!from-blue-50 hover:!to-sky-100 hover:!shadow-[0_10px_24px_rgba(30,90,156,0.18)] active:!translate-y-0 active:!scale-[0.98]"
+              className="gallery-admin__button gallery-admin__back-btn inline-flex min-h-11 items-center gap-2 rounded-2xl"
               to={listPath}
             >
-              <IconArrowLeft
-                className="!transition-transform !duration-300 group-hover:!-translate-x-1"
-                size={19}
-                aria-hidden="true"
-              />
+              <IconArrowLeft size={18} aria-hidden="true" />
               {backLabel}
             </Link>
           </div>

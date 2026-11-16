@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { IconArrowRight } from '@tabler/icons-react'
+import { IconEye } from '@tabler/icons-react'
 import AveriaStatusBadge from './AveriaStatusBadge'
 import { AVERIAS_ADMIN_HISTORIAL_PATH, averiasAdminDetailPath } from './averiasAdminPaths'
 import { formatAveriaAdminDateTimeOrUnavailable } from './formatAveriaAdminDate'
@@ -13,21 +14,24 @@ import {
 
 type AveriasHistorialTableProps = {
   items: AveriaHistorialItem[]
+  footer?: ReactNode
 }
 
-const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
+const AveriasHistorialTable = ({ items, footer }: AveriasHistorialTableProps) => {
   const location = useLocation()
+  const listState = {
+    listSearch: location.search,
+    listBase: AVERIAS_ADMIN_HISTORIAL_PATH,
+  }
 
   const detailAction = (id: number) => (
     <Link
-      className="gallery-admin__button !inline-flex !items-center !justify-center !gap-2 !rounded-2xl !border-0 !bg-gradient-to-r !from-blue-600 !to-sky-500 !px-5 !py-3 !font-bold !text-white !no-underline !shadow-lg !shadow-blue-200 transition hover:-translate-y-0.5 hover:!from-blue-700 hover:!to-sky-600"
+      className="averias-admin__ver-btn inline-flex min-h-10 items-center gap-2 rounded-2xl border border-[#c5daf0] bg-white px-3.5 text-sm font-bold text-[#1e5a9c] no-underline transition hover:border-[#1e5a9c] hover:bg-[#f3f9fd] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c]"
       to={averiasAdminDetailPath(id)}
-      state={{
-        listSearch: location.search,
-        listBase: AVERIAS_ADMIN_HISTORIAL_PATH,
-      }}
+      state={listState}
     >
-      Ver detalle <IconArrowRight size={18} aria-hidden="true" />
+      <IconEye size={16} aria-hidden="true" />
+      Ver detalle
     </Link>
   )
 
@@ -37,9 +41,16 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
       AVERIA_UNAVAILABLE_LABEL,
     )
 
+  const prioridadClass = (prioridad: string | null) => {
+    if (!prioridad) {
+      return 'averias-admin__muted'
+    }
+    return `averias-admin__badge averias-admin__badge--prioridad averias-admin__badge--flat is-${prioridad.toLowerCase()}`
+  }
+
   return (
-    <>
-      <div className="table-responsive averias-admin__table overflow-x-auto">
+    <div className="averias-admin__list-card averias-admin__list-card--historial min-w-0 overflow-hidden rounded-3xl border border-[#d7e5f1] bg-white shadow-[0_4px_14px_rgba(30,90,156,0.05)]">
+      <div className="table-responsive averias-admin__table averias-admin__historial-table overflow-x-auto">
         <table>
           <caption className="visually-hidden">Historial de averías</caption>
           <thead>
@@ -59,7 +70,13 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
             {items.map((item) => (
               <tr key={item.id}>
                 <td>
-                  <span className="averias-admin__codigo">{item.codigoSeguimiento}</span>
+                  <Link
+                    to={averiasAdminDetailPath(item.id)}
+                    state={listState}
+                    className="averias-admin__codigo averias-admin__codigo-link no-underline"
+                  >
+                    {item.codigoSeguimiento}
+                  </Link>
                 </td>
                 <td>
                   {formatAveriaAdminDateTimeOrUnavailable(
@@ -67,9 +84,9 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
                     AVERIA_UNAVAILABLE_LABEL,
                   )}
                 </td>
-                <td>{item.sectorComunidad}</td>
+                <td className="font-semibold text-[#1a2f42]">{item.sectorComunidad}</td>
                 <td>
-                  <AveriaStatusBadge estado={item.estado} />
+                  <AveriaStatusBadge estado={item.estado} variant="flat" />
                 </td>
                 <td>
                   <span className={item.tipoAveria ? undefined : 'averias-admin__muted'}>
@@ -77,13 +94,7 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
                   </span>
                 </td>
                 <td>
-                  <span
-                    className={
-                      item.prioridad
-                        ? `averias-admin__badge averias-admin__badge--prioridad is-${item.prioridad.toLowerCase()}`
-                        : 'averias-admin__muted'
-                    }
-                  >
+                  <span className={prioridadClass(item.prioridad)}>
                     {getHistorialPrioridadLabel(item.prioridad)}
                   </span>
                 </td>
@@ -104,12 +115,18 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
         </table>
       </div>
 
-      <ul className="averias-admin__cards">
+      <ul className="averias-admin__cards averias-admin__historial-cards">
         {items.map((item) => (
           <li className="averias-admin__card" key={`card-${item.id}`}>
             <header className="averias-admin__card-head">
-              <span className="averias-admin__codigo">{item.codigoSeguimiento}</span>
-              <AveriaStatusBadge estado={item.estado} />
+              <Link
+                to={averiasAdminDetailPath(item.id)}
+                state={listState}
+                className="averias-admin__codigo averias-admin__codigo-link no-underline"
+              >
+                {item.codigoSeguimiento}
+              </Link>
+              <AveriaStatusBadge estado={item.estado} variant="flat" />
             </header>
             <dl className="averias-admin__card-meta">
               <div>
@@ -146,7 +163,9 @@ const AveriasHistorialTable = ({ items }: AveriasHistorialTableProps) => {
           </li>
         ))}
       </ul>
-    </>
+
+      {footer ? <div className="averias-admin__list-footer">{footer}</div> : null}
+    </div>
   )
 }
 

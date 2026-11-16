@@ -35,7 +35,7 @@ describe('alertasReposicionUtils', () => {
     expect(formatAlertaEstado('EN_GESTION')).toBe('En gestión')
     expect(formatAlertaEstado('RESUELTA')).toBe('Resuelta')
     expect(getAlertaResponsable({ ...alerta, idUsuarioGestiona: null, usuarioGestiona: null })).toBe('—')
-    expect(siguienteEstadoAlerta('PENDIENTE')).toBe('EN_GESTION')
+    expect(siguienteEstadoAlerta('PENDIENTE')).toBeNull()
     expect(siguienteEstadoAlerta('EN_GESTION')).toBe('RESUELTA')
     expect(siguienteEstadoAlerta('RESUELTA')).toBeNull()
     expect(puedeGenerarReposicionDesdeAlerta('PENDIENTE')).toBe(true)

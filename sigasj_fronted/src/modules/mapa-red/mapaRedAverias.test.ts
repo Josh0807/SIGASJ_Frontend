@@ -57,10 +57,37 @@ describe('mapaRedAverias', () => {
 
     const demo = applyDemoGeoAverias([sinCoords, conCoords], true)
     expect(demo[0].coords).not.toBeNull()
-    expect(demo[0].coords!.lat).toBeCloseTo(MAPA_RED_CENTER[0] + 0.00135, 5)
+    expect(demo[0].coords!.lat).toBeGreaterThan(MAPA_RED_CENTER[0] - 0.02)
+    expect(demo[0].coords!.lat).toBeLessThan(MAPA_RED_CENTER[0] + 0.02)
     expect(demo[1].coords).toEqual({ lat: 10.22, lng: -85.55 })
 
     const normal = applyDemoGeoAverias([sinCoords], false)
     expect(normal[0].coords).toBeNull()
+  })
+
+  it('demoGeo reparte averías del mismo sector en puntos distintos', () => {
+    const sameSector = [
+      toAveriaMapaItem(baseItem({ id: 21, sectorComunidad: 'Sector Norte' })),
+      toAveriaMapaItem(baseItem({ id: 22, sectorComunidad: 'Sector Norte' })),
+      toAveriaMapaItem(baseItem({ id: 23, sectorComunidad: 'Sector Norte' })),
+    ]
+    const demo = applyDemoGeoAverias(sameSector, true)
+    const keys = new Set(
+      demo.map((item) => `${item.coords!.lat.toFixed(6)},${item.coords!.lng.toFixed(6)}`),
+    )
+    expect(keys.size).toBe(3)
+  })
+
+  it('demoGeo separa sectores en anclas distintas', () => {
+    const mixed = [
+      toAveriaMapaItem(baseItem({ id: 31, sectorComunidad: 'Sector Centro' })),
+      toAveriaMapaItem(baseItem({ id: 32, sectorComunidad: 'Sector Norte' })),
+    ]
+    const demo = applyDemoGeoAverias(mixed, true)
+    const dist = Math.hypot(
+      demo[0].coords!.lat - demo[1].coords!.lat,
+      demo[0].coords!.lng - demo[1].coords!.lng,
+    )
+    expect(dist).toBeGreaterThan(0.001)
   })
 })

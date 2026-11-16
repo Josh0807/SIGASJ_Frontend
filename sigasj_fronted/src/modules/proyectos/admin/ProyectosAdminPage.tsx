@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import {
+  IconBuildingBridge,
+  IconFolderPlus,
+  IconSearch,
+} from '@tabler/icons-react'
 import { UNAUTHORIZED_ROUTE_PATH } from '../../../app/router/routePaths'
-import { Button } from '../../../shared/ui/Button'
-import { PageHeader } from '../../../shared/ui/PageHeader'
 import {
   ESTADO_PROYECTO_OPTIONS,
   type EstadoProyecto,
@@ -97,7 +100,6 @@ const ProyectosAdminPage = () => {
     }
   }
 
-
   const totalPages = listado.totalPages
   const hasActiveFilters =
     Boolean(nombreInput.trim()) || estado !== EMPTY_FILTER || activo !== EMPTY_FILTER
@@ -117,23 +119,39 @@ const ProyectosAdminPage = () => {
 
   return (
     <main className="gallery-admin proyectos-admin admin-content-modern">
-      <div className="gallery-admin__shell sigasj-stack gap-4">
-        <PageHeader
-          title="Gestión de Proyectos"
-          description="Consulte los proyectos institucionales, filtre por nombre, estado de ejecución y visibilidad pública."
-          actions={
-            <>
-              <Button to="/admin/dashboard" variant="secondary" size="sm">
-                Volver inicio
-              </Button>
-              <Button to={PROYECTOS_ADMIN_NEW_PATH} size="sm">
-                Nuevo proyecto
-              </Button>
-            </>
-          }
-        />
+      <div className="gallery-admin__shell sigasj-stack">
+        <header className="gallery-admin__header">
+          <div className="gallery-admin__header-copy">
+            <span className="gallery-admin__header-icon" aria-hidden="true">
+              <IconBuildingBridge size={22} stroke={2.1} />
+            </span>
+            <div>
+              <p className="gallery-admin__eyebrow">Inventario institucional · Administración</p>
+              <h1>Gestión de Proyectos</h1>
+              <p>
+                Administre obras y mejoras de la ASADA: estado de ejecución,
+                portada, galería y visibilidad en el sitio público.
+              </p>
+            </div>
+          </div>
+          <div className="gallery-admin__header-actions">
+            <Link className="gallery-admin__link admin-modern-home-link" to="/admin/dashboard">
+              Volver inicio
+            </Link>
+            <Link
+              className="gallery-admin__button gallery-admin__button--primary"
+              to={PROYECTOS_ADMIN_NEW_PATH}
+            >
+              <IconFolderPlus size={18} aria-hidden="true" />
+              Nuevo proyecto
+            </Link>
+          </div>
+        </header>
 
-        <section className="gallery-admin__filters w-full" aria-label="Búsqueda y filtros">
+        <section
+          className="gallery-admin__filters gallery-admin__filters--gallery"
+          aria-label="Búsqueda y filtros"
+        >
           <form
             className="admin-compact-filters"
             role="search"
@@ -142,19 +160,28 @@ const ProyectosAdminPage = () => {
               applyNombreSearch(nombreInput)
             }}
           >
-            <label className="gallery-admin__field" htmlFor={NOMBRE_SEARCH_INPUT_ID}>
+            <label
+              className="gallery-admin__field gallery-admin__field--search"
+              htmlFor={NOMBRE_SEARCH_INPUT_ID}
+            >
               <span>Buscar por nombre</span>
-              <input
-                id={NOMBRE_SEARCH_INPUT_ID}
-                name="nombre"
-                type="search"
-                maxLength={200}
-                value={nombreInput}
-                onChange={(event) => setNombreInput(event.target.value)}
-                placeholder="Ej. acueducto, tanque…"
-              />
+              <span className="gallery-admin__search-control">
+                <IconSearch size={17} aria-hidden="true" />
+                <input
+                  id={NOMBRE_SEARCH_INPUT_ID}
+                  name="nombre"
+                  type="search"
+                  maxLength={200}
+                  value={nombreInput}
+                  onChange={(event) => setNombreInput(event.target.value)}
+                  placeholder="Ej. acueducto, tanque…"
+                />
+              </span>
             </label>
-            <label className="gallery-admin__field" htmlFor={ESTADO_FILTER_ID}>
+            <label
+              className="gallery-admin__field gallery-admin__field--status"
+              htmlFor={ESTADO_FILTER_ID}
+            >
               <span>Estado</span>
               <select
                 id={ESTADO_FILTER_ID}
@@ -173,7 +200,10 @@ const ProyectosAdminPage = () => {
                 ))}
               </select>
             </label>
-            <label className="gallery-admin__field" htmlFor={ACTIVO_FILTER_ID}>
+            <label
+              className="gallery-admin__field gallery-admin__field--status"
+              htmlFor={ACTIVO_FILTER_ID}
+            >
               <span>Visibilidad</span>
               <select
                 id={ACTIVO_FILTER_ID}
@@ -189,6 +219,10 @@ const ProyectosAdminPage = () => {
                 <option value="false">Inactivos</option>
               </select>
             </label>
+            <div className="gallery-admin__filter-summary" aria-live="polite">
+              <strong>{loading ? '…' : listado.total}</strong>
+              <span>{listado.total === 1 ? 'proyecto' : 'proyectos'}</span>
+            </div>
             {hasActiveFilters ? (
               <p className="gallery-admin__filter-reset">
                 <button
@@ -204,12 +238,17 @@ const ProyectosAdminPage = () => {
         </section>
 
         {actionError ? (
-          <div className="gallery-admin__error" role="alert" style={{ marginBottom: '16px' }}>
-            <p>{actionError}</p>
-            <button type="button" onClick={() => setActionError(null)}>
+          <p className="gallery-admin__banner gallery-admin__banner--error" role="alert">
+            {actionError}
+            {' '}
+            <button
+              type="button"
+              className="gallery-admin__button"
+              onClick={() => setActionError(null)}
+            >
               Cerrar
             </button>
-          </div>
+          </p>
         ) : null}
 
         <section aria-label="Listado de proyectos">
@@ -227,7 +266,6 @@ const ProyectosAdminPage = () => {
             />
           </ProyectosAdminQueryStates>
         </section>
-
 
         {loading || error ? null : (
           <ProyectosAdminPagination

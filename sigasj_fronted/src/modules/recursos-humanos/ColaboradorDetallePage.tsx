@@ -28,7 +28,10 @@ import {
   colaboradorErrorMessage,
   esNoAutenticado,
   esReintentable,
+  etiquetaJornada,
+  etiquetaModalidadPago,
   formatearFechaAuditoria,
+  formatearFechaIngreso,
   nombreCompleto,
 } from './colaboradorForm'
 import {
@@ -65,25 +68,65 @@ function Dato({
   children: ReactNode
 }) {
   return (
-    <div className="group grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-1 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50/80 px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#bfe3fa] hover:shadow-[0_8px_20px_rgba(30,90,156,0.08)]">
-      <span className="mt-0.5 grid size-9 place-items-center rounded-xl bg-[#eaf6ff] text-[#1e5a9c] transition-colors group-hover:bg-[#d9effc]">
+    <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 rounded-2xl border border-[#d7e5f1] bg-[#fbfdff] px-4 py-3.5 transition hover:border-[#b9d0e6] hover:bg-white">
+      <span className="mt-0.5 grid size-9 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
         {icon}
       </span>
       <div className="min-w-0">
-        <dt className="text-[0.7rem] font-extrabold uppercase tracking-[0.08em] text-slate-500 transition-colors group-hover:text-[#1e5a9c]">
+        <dt className="text-[0.7rem] font-bold uppercase tracking-[0.06em] text-slate-500">
           {label}
         </dt>
-        <dd className="m-0 break-words font-bold text-[#073b73]">{children}</dd>
+        <dd className="m-0 break-words text-sm font-semibold text-[#123f70]">{children}</dd>
       </div>
     </div>
   )
 }
 
+function SectionCard({
+  title,
+  icon,
+  description,
+  children,
+}: {
+  title: string
+  icon: ReactNode
+  description?: string
+  children: ReactNode
+}) {
+  return (
+    <section className="grid gap-5 rounded-3xl border border-[#d7e5f1] bg-white p-5 shadow-[0_4px_14px_rgba(30,90,156,0.05)] sm:gap-6 sm:p-7">
+      <div className="flex items-start gap-3 border-b border-[#e8f1f8] pb-4">
+        <span
+          className="grid size-10 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]"
+          aria-hidden="true"
+        >
+          {icon}
+        </span>
+        <div className="min-w-0">
+          <h2 className="m-0 text-lg font-extrabold tracking-tight text-[#123f70] sm:text-xl">
+            {title}
+          </h2>
+          {description ? (
+            <p className="m-0 mt-1 text-sm text-slate-500">{description}</p>
+          ) : null}
+        </div>
+      </div>
+      {children}
+    </section>
+  )
+}
+
+const iniciales = (nombre: string, apellidos: string) => {
+  const a = nombre.trim().charAt(0)
+  const b = apellidos.trim().charAt(0)
+  return `${a}${b}`.toUpperCase() || '?'
+}
+
 const tabClass = (active: boolean) =>
-  `group inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition-all duration-200 sm:flex-none sm:min-w-[11rem] sm:px-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97] ${
+  `inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] sm:flex-none sm:min-w-[10.5rem] ${
     active
-      ? 'border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)] hover:-translate-y-0.5 hover:from-blue-800 hover:to-sky-600 hover:shadow-[0_14px_28px_rgba(30,90,156,0.34)]'
-      : 'border border-[#bfe3fa] bg-white text-[#1e5a9c] shadow-[0_4px_12px_rgba(30,90,156,0.08)] hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:shadow-[0_8px_18px_rgba(30,90,156,0.14)]'
+      ? 'bg-[#1e5a9c] text-white shadow-[0_6px_16px_rgba(30,90,156,0.22)]'
+      : 'border border-[#d7e5f1] bg-white text-[#1e5a9c] hover:border-[#1e5a9c] hover:bg-[#f3f9fd]'
   }`
 
 const badgeEventoClass = (tipo: TipoEventoHistorialRrhh) => {
@@ -93,11 +136,10 @@ const badgeEventoClass = (tipo: TipoEventoHistorialRrhh) => {
 }
 
 const primaryBtnClass =
-  'group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-blue-700 to-sky-500 px-5 py-3 font-extrabold text-white no-underline shadow-[0_10px_22px_rgba(30,90,156,0.28)] transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-800 hover:to-sky-600 hover:text-white hover:shadow-[0_14px_28px_rgba(30,90,156,0.34)] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97]'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-transparent bg-[#1e5a9c] px-5 py-2.5 font-bold text-white no-underline shadow-[0_6px_16px_rgba(30,90,156,0.2)] transition hover:bg-[#174f87] hover:text-white hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c]'
 
 const secondaryBtnClass =
-  'group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#bfe3fa] bg-white px-5 py-3 font-extrabold text-[#1e5a9c] no-underline shadow-[0_4px_12px_rgba(30,90,156,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-[#eaf6ff] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c] active:translate-y-0 active:scale-[0.97]'
-
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-[#d7e5f1] bg-white px-5 py-2.5 font-bold text-[#1e5a9c] no-underline transition hover:border-[#1e5a9c] hover:bg-[#f3f9fd] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e5a9c]'
 export default function ColaboradorDetallePage() {
   const { id } = useParams()
   const colaboradorId = Number(id)
@@ -272,37 +314,42 @@ export default function ColaboradorDetallePage() {
             </div>
           ) : null}
 
-          <header className="flex flex-col gap-6 overflow-visible rounded-2xl border border-white/80 bg-gradient-to-br from-white via-white to-sky-50/70 px-5 py-6 shadow-[0_16px_40px_rgba(30,90,156,0.10)] ring-1 ring-sky-100 sm:rounded-3xl sm:p-8 xl:flex-row xl:items-center xl:justify-between">
+          <header className="flex flex-col gap-5 rounded-3xl border border-[#d7e5f1] bg-white p-5 shadow-[0_4px_14px_rgba(30,90,156,0.05)] sm:p-7 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex min-w-0 items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#1e5a9c] to-sky-600 text-white shadow-[0_10px_22px_rgba(30,90,156,0.28)]">
-                <IconUser size={28} aria-hidden="true" />
+              <span
+                className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#1e5a9c] text-base font-extrabold tracking-wide text-white shadow-[0_8px_18px_rgba(30,90,156,0.22)]"
+                aria-hidden="true"
+              >
+                {iniciales(colaborador.nombre, colaborador.apellidos)}
               </span>
               <div className="min-w-0">
-                <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[#1e5a9c]">
+                <p className="mb-1 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-[#1e5a9c]">
                   {RRHH_TITLE} · Detalle
                 </p>
-                <h1 className="m-0 break-words text-2xl font-black tracking-tight text-[#1e5a9c] sm:text-3xl">
+                <h1 className="m-0 break-words text-2xl font-extrabold tracking-tight text-[#123f70] sm:text-[1.75rem]">
                   {nombreCompleto(colaborador)}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-slate-500">
-                  <span className="font-semibold">{colaborador.cargo}</span>
+                  <span className="font-semibold text-[#1a2f42]">{colaborador.cargo}</span>
                   <span aria-hidden="true">·</span>
                   <EstadoBadge activo={colaborador.activo} />
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-[0_8px_24px_rgba(30,90,156,0.07)] backdrop-blur-sm">
+            <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-[#e8f1f8] bg-[#f7fbfe] p-2.5">
               <Link to={colaboradorEditPath(colaborador.id)} className={primaryBtnClass}>
-                <IconPencil
-                  className="transition-transform duration-200 group-hover:-rotate-6"
-                  size={19}
-                  aria-hidden="true"
-                />
+                <IconPencil size={18} aria-hidden="true" />
                 Editar
               </Link>
 
-              <span className="hidden h-8 w-px bg-slate-200 sm:block" aria-hidden="true" />
+              <Link
+                to={colaboradorHistorialPath(colaborador.id)}
+                className={secondaryBtnClass}
+              >
+                <IconHistory size={18} aria-hidden="true" />
+                Historial
+              </Link>
 
               <CambiarEstadoColaborador
                 colaborador={colaborador}
@@ -323,7 +370,7 @@ export default function ColaboradorDetallePage() {
           </header>
 
           <nav
-            className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-[0_8px_24px_rgba(30,90,156,0.07)] backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center"
+            className="flex flex-col gap-2 rounded-3xl border border-[#d7e5f1] bg-white p-2.5 shadow-[0_4px_14px_rgba(30,90,156,0.05)] sm:flex-row sm:flex-wrap sm:items-center"
             aria-label="Secciones del colaborador"
           >
             <button
@@ -356,136 +403,112 @@ export default function ColaboradorDetallePage() {
           </nav>
 
           {tab === 'informacion' ? (
-            <section className="grid gap-6 rounded-2xl border border-white/80 bg-white px-5 py-6 shadow-[0_16px_38px_rgba(30,90,156,0.09)] ring-1 ring-sky-100 sm:rounded-3xl sm:p-8">
-              <div className="flex items-center gap-3 border-b border-[#d7e5f1] pb-4">
-                <span
-                  className="grid size-9 place-items-center rounded-xl bg-[#eaf6ff] text-[#1e5a9c]"
-                  aria-hidden="true"
-                >
-                  <IconInfoCircle size={20} />
-                </span>
-                <h2 className="m-0 text-xl font-black tracking-tight text-[#073b73]">
-                  Información del colaborador
-                </h2>
-              </div>
+            <div className="grid gap-5">
+              <SectionCard
+                title="Información del colaborador"
+                icon={<IconInfoCircle size={20} />}
+              >
+                <div className="grid gap-5 lg:grid-cols-[11rem_minmax(0,1fr)] lg:items-start">
+                  <div className="grid place-items-center rounded-3xl border border-[#d7e5f1] bg-[#f7fbfe] p-5">
+                    <span
+                      className="grid size-24 place-items-center rounded-full bg-[#1e5a9c] text-2xl font-extrabold tracking-wide text-white shadow-[0_8px_18px_rgba(30,90,156,0.2)]"
+                      aria-hidden="true"
+                    >
+                      {iniciales(colaborador.nombre, colaborador.apellidos)}
+                    </span>
+                  </div>
 
-              <div className="grid gap-5 lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-start">
-                <div className="grid place-items-center rounded-2xl border border-[#d7e5f1] bg-gradient-to-br from-[#eaf6ff] to-white p-6">
-                  <span className="grid size-28 place-items-center rounded-full bg-white text-[#1e5a9c] shadow-[0_8px_20px_rgba(30,90,156,0.12)] ring-4 ring-[#d9effc]">
-                    <IconUser size={48} aria-hidden="true" />
-                  </span>
+                  <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    <Dato label="Cédula" icon={<IconId size={18} aria-hidden="true" />}>
+                      {colaborador.cedula}
+                    </Dato>
+                    <Dato label="Nombre" icon={<IconUser size={18} aria-hidden="true" />}>
+                      {colaborador.nombre}
+                    </Dato>
+                    <Dato label="Apellidos" icon={<IconUser size={18} aria-hidden="true" />}>
+                      {colaborador.apellidos}
+                    </Dato>
+                    <Dato
+                      label="Correo electrónico"
+                      icon={<IconMail size={18} aria-hidden="true" />}
+                    >
+                      <span className="break-all">{colaborador.correoElectronico}</span>
+                    </Dato>
+                    <Dato label="Cargo" icon={<IconBriefcase size={18} aria-hidden="true" />}>
+                      {colaborador.cargo}
+                    </Dato>
+                    <Dato label="Estado" icon={<IconUserCircle size={18} aria-hidden="true" />}>
+                      <EstadoBadge activo={colaborador.activo} />
+                    </Dato>
+                    <Dato
+                      label="Cuenta de usuario"
+                      icon={<IconKey size={18} aria-hidden="true" />}
+                    >
+                      {colaborador.usuario
+                        ? `${colaborador.usuario.nombre} · ${colaborador.usuario.correo}`
+                        : 'Sin cuenta vinculada'}
+                    </Dato>
+                    <Dato label="Registrado" icon={<IconCalendar size={18} aria-hidden="true" />}>
+                      {formatearFechaAuditoria(colaborador.createdAt)}
+                    </Dato>
+                    <Dato
+                      label="Última actualización"
+                      icon={<IconCalendar size={18} aria-hidden="true" />}
+                    >
+                      {formatearFechaAuditoria(colaborador.updatedAt)}
+                    </Dato>
+                  </dl>
                 </div>
+              </SectionCard>
 
+              <SectionCard
+                title="Información laboral"
+                icon={<IconBriefcase size={20} />}
+                description="Expediente laboral distinto de la fecha de registro en SIGASJ."
+              >
                 <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  <Dato label="Cédula" icon={<IconId size={18} aria-hidden="true" />}>
-                    {colaborador.cedula}
-                  </Dato>
-                  <Dato label="Nombre" icon={<IconUser size={18} aria-hidden="true" />}>
-                    {colaborador.nombre}
-                  </Dato>
-                  <Dato label="Apellidos" icon={<IconUser size={18} aria-hidden="true" />}>
-                    {colaborador.apellidos}
-                  </Dato>
                   <Dato
-                    label="Correo electrónico"
-                    icon={<IconMail size={18} aria-hidden="true" />}
-                  >
-                    {colaborador.correoElectronico}
-                  </Dato>
-                  <Dato label="Cargo" icon={<IconBriefcase size={18} aria-hidden="true" />}>
-                    {colaborador.cargo}
-                  </Dato>
-                  <Dato label="Estado" icon={<IconUserCircle size={18} aria-hidden="true" />}>
-                    <EstadoBadge activo={colaborador.activo} />
-                  </Dato>
-                  <Dato
-                    label="Cuenta de usuario"
-                    icon={<IconKey size={18} aria-hidden="true" />}
-                  >
-                    {colaborador.usuario
-                      ? `${colaborador.usuario.nombre} · ${colaborador.usuario.correo}`
-                      : 'Sin cuenta vinculada'}
-                  </Dato>
-                  <Dato label="Registrado" icon={<IconCalendar size={18} aria-hidden="true" />}>
-                    {formatearFechaAuditoria(colaborador.createdAt)}
-                  </Dato>
-                  <Dato
-                    label="Última actualización"
+                    label="Fecha de ingreso"
                     icon={<IconCalendar size={18} aria-hidden="true" />}
                   >
-                    {formatearFechaAuditoria(colaborador.updatedAt)}
+                    {formatearFechaIngreso(colaborador.fechaIngreso)}
+                  </Dato>
+                  <Dato
+                    label="Antigüedad"
+                    icon={<IconTimeline size={18} aria-hidden="true" />}
+                  >
+                    {colaborador.antiguedad?.etiqueta ?? 'Sin fecha de ingreso'}
+                  </Dato>
+                  <Dato
+                    label="Jornada laboral"
+                    icon={<IconClockHour4 size={18} aria-hidden="true" />}
+                  >
+                    {etiquetaJornada(colaborador.jornadaLaboral)}
+                  </Dato>
+                  <Dato
+                    label="Días laborales habituales"
+                    icon={<IconCalendar size={18} aria-hidden="true" />}
+                  >
+                    {colaborador.diasLaboralesHabituales != null
+                      ? `${colaborador.diasLaboralesHabituales} por semana`
+                      : '—'}
+                  </Dato>
+                  <Dato
+                    label="Modalidad de pago"
+                    icon={<IconCoin size={18} aria-hidden="true" />}
+                  >
+                    {etiquetaModalidadPago(colaborador.modalidadPago)}
                   </Dato>
                 </dl>
-              </div>
-            </section>
+              </SectionCard>
+            </div>
           ) : null}
 
-
-              <div className="flex items-center gap-3 border-b border-[#d7e5f1] pb-4 pt-2">
-                <span
-                  className="grid size-9 place-items-center rounded-xl bg-[#eaf6ff] text-[#1e5a9c]"
-                  aria-hidden="true"
-                >
-                  <IconBriefcase size={20} />
-                </span>
-                <div>
-                  <h2 className="m-0 text-xl font-black tracking-tight text-[#073b73]">
-                    Información laboral
-                  </h2>
-                  <p className="m-0 mt-1 text-sm text-slate-500">
-                    Expediente laboral distinto de la fecha de registro en SIGASJ.
-                  </p>
-                </div>
-              </div>
-
-              <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <Dato
-                  label="Fecha de ingreso"
-                  icon={<IconCalendar size={18} aria-hidden="true" />}
-                >
-                  {formatearFechaIngreso(colaborador.fechaIngreso)}
-                </Dato>
-                <Dato
-                  label="Antigüedad"
-                  icon={<IconTimeline size={18} aria-hidden="true" />}
-                >
-                  {colaborador.antiguedad?.etiqueta ?? 'Sin fecha de ingreso'}
-                </Dato>
-                <Dato
-                  label="Jornada laboral"
-                  icon={<IconClockHour4 size={18} aria-hidden="true" />}
-                >
-                  {etiquetaJornada(colaborador.jornadaLaboral)}
-                </Dato>
-                <Dato
-                  label="Días laborales habituales"
-                  icon={<IconCalendar size={18} aria-hidden="true" />}
-                >
-                  {colaborador.diasLaboralesHabituales != null
-                    ? `${colaborador.diasLaboralesHabituales} por semana`
-                    : '—'}
-                </Dato>
-                <Dato
-                  label="Modalidad de pago"
-                  icon={<IconCoin size={18} aria-hidden="true" />}
-                >
-                  {etiquetaModalidadPago(colaborador.modalidadPago)}
-                </Dato>
-              </dl>
           {tab === 'asignacion' ? (
-            <section className="grid gap-6 rounded-2xl border border-white/80 bg-white px-5 py-6 shadow-[0_16px_38px_rgba(30,90,156,0.09)] ring-1 ring-sky-100 sm:rounded-3xl sm:p-8">
-              <div className="flex items-center gap-3 border-b border-[#d7e5f1] pb-4">
-                <span
-                  className="grid size-9 place-items-center rounded-xl bg-[#eaf6ff] text-[#1e5a9c]"
-                  aria-hidden="true"
-                >
-                  <IconKey size={20} />
-                </span>
-                <h2 className="m-0 text-xl font-black tracking-tight text-[#073b73]">
-                  Asignación y permisos
-                </h2>
-              </div>
-
+            <SectionCard
+              title="Asignación y permisos"
+              icon={<IconKey size={20} />}
+            >
               <dl className="m-0 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <Dato label="Cargo" icon={<IconBriefcase size={18} aria-hidden="true" />}>
                   {colaborador.cargo}
@@ -506,55 +529,50 @@ export default function ColaboradorDetallePage() {
               <div className="grid gap-3 sm:grid-cols-3">
                 <Link
                   to={`${PERMISOS_PATH}?colaboradorId=${colaborador.id}`}
-                  className="group flex min-h-14 items-center gap-3 rounded-2xl border border-[#bfe3fa] bg-gradient-to-br from-white to-[#eaf6ff] px-4 font-extrabold text-[#1e5a9c] no-underline shadow-[0_6px_16px_rgba(30,90,156,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(30,90,156,0.14)] hover:no-underline"
+                  className="flex min-h-14 items-center gap-3 rounded-2xl border border-[#d7e5f1] bg-[#f7fbfe] px-4 font-bold text-[#1e5a9c] no-underline transition hover:border-[#1e5a9c] hover:bg-white hover:no-underline"
                 >
-                  <span className="grid size-10 place-items-center rounded-xl bg-white text-[#1e5a9c] shadow-sm">
+                  <span className="grid size-10 place-items-center rounded-2xl bg-white text-[#1e5a9c] shadow-sm">
                     <IconKey size={20} aria-hidden="true" />
                   </span>
                   Permisos
                 </Link>
                 <Link
                   to={vacacionesColaboradorPath(colaborador.id)}
-                  className="group flex min-h-14 items-center gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50 px-4 font-extrabold text-emerald-800 no-underline shadow-[0_6px_16px_rgba(5,150,105,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(5,150,105,0.14)] hover:no-underline"
+                  className="flex min-h-14 items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 font-bold text-emerald-800 no-underline transition hover:border-emerald-400 hover:bg-white hover:no-underline"
                 >
-                  <span className="grid size-10 place-items-center rounded-xl bg-white text-emerald-700 shadow-sm">
+                  <span className="grid size-10 place-items-center rounded-2xl bg-white text-emerald-700 shadow-sm">
                     <IconBeach size={20} aria-hidden="true" />
                   </span>
                   Vacaciones
                 </Link>
                 <Link
                   to={`${INCAPACIDADES_PATH}?colaboradorId=${colaborador.id}`}
-                  className="group flex min-h-14 items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-br from-white to-amber-50 px-4 font-extrabold text-amber-900 no-underline shadow-[0_6px_16px_rgba(217,119,6,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(217,119,6,0.14)] hover:no-underline"
+                  className="flex min-h-14 items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 font-bold text-amber-900 no-underline transition hover:border-amber-400 hover:bg-white hover:no-underline"
                 >
-                  <span className="grid size-10 place-items-center rounded-xl bg-white text-amber-800 shadow-sm">
+                  <span className="grid size-10 place-items-center rounded-2xl bg-white text-amber-800 shadow-sm">
                     <IconCalendarOff size={20} aria-hidden="true" />
                   </span>
                   Incapacidades
                 </Link>
               </div>
-            </section>
+            </SectionCard>
           ) : null}
 
           {tab === 'historial' ? (
-            <section className="grid gap-5 rounded-2xl border border-white/80 bg-white px-5 py-6 shadow-[0_16px_38px_rgba(30,90,156,0.09)] ring-1 ring-sky-100 sm:rounded-3xl sm:p-8">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d7e5f1] pb-4">
-                <div className="flex items-center gap-3">
-                  <span
-                    className="grid size-9 place-items-center rounded-xl bg-[#eaf6ff] text-[#1e5a9c]"
-                    aria-hidden="true"
-                  >
-                    <IconHistory size={20} />
-                  </span>
-                  <h2 className="m-0 text-xl font-black tracking-tight text-[#073b73]">
-                    Historial del colaborador
-                  </h2>
-                </div>
+            <SectionCard
+              title="Historial del colaborador"
+              icon={<IconHistory size={20} />}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="m-0 text-sm text-slate-500">
+                  Últimos eventos registrados para este colaborador.
+                </p>
                 <Link
                   to={colaboradorHistorialPath(colaborador.id)}
                   className={secondaryBtnClass}
                 >
                   <IconHistory size={18} aria-hidden="true" />
-                  Historial
+                  Historial completo
                 </Link>
               </div>
 
@@ -578,7 +596,7 @@ export default function ColaboradorDetallePage() {
                   {historialEstado.reintentable ? (
                     <button
                       type="button"
-                      className={secondaryBtnClass + ' w-fit'}
+                      className={`${secondaryBtnClass} w-fit`}
                       onClick={() => setHistorialRecarga((n) => n + 1)}
                     >
                       <IconRefresh size={18} aria-hidden="true" />
@@ -595,7 +613,7 @@ export default function ColaboradorDetallePage() {
                   {historial.slice(0, 6).map((evento) => (
                     <li
                       key={`${evento.tipo}-${evento.id}`}
-                      className="grid gap-2 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50/80 px-4 py-3.5 shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
+                      className="grid gap-2 rounded-2xl border border-[#d7e5f1] bg-[#fbfdff] px-4 py-3.5"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span
@@ -607,7 +625,7 @@ export default function ColaboradorDetallePage() {
                           {formatearFechaEvento(evento.fecha)}
                         </time>
                       </div>
-                      <p className="m-0 font-bold text-[#073b73]">
+                      <p className="m-0 font-semibold text-[#123f70]">
                         {detalleEventoHistorial(evento)}
                       </p>
                     </li>
@@ -620,15 +638,11 @@ export default function ColaboradorDetallePage() {
                   to={colaboradorHistorialPath(colaborador.id)}
                   className={primaryBtnClass}
                 >
-                  <IconHistory
-                    className="transition-transform group-hover:scale-110"
-                    size={19}
-                    aria-hidden="true"
-                  />
+                  <IconHistory size={18} aria-hidden="true" />
                   Ver historial completo
                 </Link>
               </div>
-            </section>
+            </SectionCard>
           ) : null}
         </>
       )}

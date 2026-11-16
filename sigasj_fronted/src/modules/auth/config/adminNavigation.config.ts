@@ -152,7 +152,8 @@ export const ADMIN_MODULE_ACCESS: AdminModuleAccessDefinition[] = [
       InternalAdminRoleName.Secretaria,
     ],
     requiredPermissions: ['fault_reports.read'],
-    availableInNav: true,
+    // Vive embebido en el dashboard; no se publica como módulo del menú.
+    availableInNav: false,
   },
   {
     segment: 'actividades',

@@ -123,8 +123,14 @@ const ProyectosAdminEditPage = () => {
     }
   }
 
+  const showEditorChrome =
+    Boolean(detail) && !detailLoading && !detailMissing && !detailError
+
   return (
-    <ProyectosAdminFormPageLayout>
+    <ProyectosAdminFormPageLayout
+      mode={showEditorChrome ? 'edit' : undefined}
+      projectName={detail?.nombre}
+    >
       {detailLoading ? (
         <p className="gallery-admin__empty" role="status">
           Cargando proyecto…
@@ -163,19 +169,24 @@ const ProyectosAdminEditPage = () => {
 
       {detail && formInitialValues && !detailLoading && !detailMissing ? (
         <>
-          <ProyectosAdminForm
-            mode="edit"
-            initialValues={formInitialValues}
-            onSubmit={handleSave}
-            onCancel={closeForm}
-          />
+          <section
+            className="gallery-admin__editor"
+            aria-labelledby="proyecto-editor-title"
+          >
+            <ProyectosAdminForm
+              mode="edit"
+              initialValues={formInitialValues}
+              onSubmit={handleSave}
+              onCancel={closeForm}
+            />
+          </section>
           <ProyectoImagenesGaleria
             proyecto={detail}
+            showCoverSection={false}
             onProyectoUpdated={(updated) => setDetail(updated)}
           />
         </>
       ) : null}
-
     </ProyectosAdminFormPageLayout>
   )
 }

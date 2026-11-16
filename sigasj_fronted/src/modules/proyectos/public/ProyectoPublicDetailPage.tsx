@@ -198,6 +198,10 @@ const ProyectoPublicDetailPage = () => {
     altText:
       img.textoAlternativo ||
       `Fotografía adicional ${index + 1} del proyecto ${proyecto?.nombre || ''}`,
+    title: proyecto?.nombre || 'Proyecto',
+    description:
+      img.textoAlternativo ||
+      `Fotografía ${index + 1} de ${imagenes.length}`,
   }))
 
   return (

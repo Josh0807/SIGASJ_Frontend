@@ -1,3 +1,10 @@
+import {
+  IconBuildingBridge,
+  IconCalendar,
+  IconEye,
+  IconPhoto,
+  IconUserCog,
+} from '@tabler/icons-react'
 import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import { ESTADO_PROYECTO_LABELS } from '../types/estadoProyecto'
 import { formatProyectoAdminDate } from './formatProyectoAdminDate'
@@ -19,15 +26,51 @@ const ProyectosAdminDetailView = ({ proyecto }: ProyectosAdminDetailViewProps) =
   const visibilidad = proyecto.activo ? 'Activo' : 'Inactivo'
   const estadoLabel =
     ESTADO_PROYECTO_LABELS[proyecto.estado] ?? proyecto.estado
-  const imagenPrincipal = resolveBackendAssetUrl(proyecto.imagenPrincipal) ?? proyecto.imagenPrincipal?.trim()
+  const imagenPrincipal =
+    resolveBackendAssetUrl(proyecto.imagenPrincipal) ??
+    proyecto.imagenPrincipal?.trim()
 
   return (
     <article
       className="proyectos-admin__detail"
       aria-label="Detalle del proyecto"
     >
-      <h2>Detalle del proyecto</h2>
-      <dl>
+      <header className="proyectos-admin__detail-hero">
+        <div className="proyectos-admin__detail-hero-copy">
+          <p className="proyectos-admin__detail-eyebrow">
+            <IconBuildingBridge size={16} aria-hidden="true" />
+            Proyecto #{proyecto.id}
+          </p>
+          <h2>Detalle del proyecto</h2>
+          <p className="proyectos-admin__detail-title">{textOrEmpty(proyecto.nombre)}</p>
+          <p className="proyectos-admin__detail-lead">
+            {textOrEmpty(proyecto.descripcion)}
+          </p>
+          <ul className="gallery-admin__badges proyectos-admin__detail-badges">
+            <li>{estadoLabel}</li>
+            <li className={proyecto.activo ? 'is-active' : 'is-inactive'}>
+              {visibilidad}
+            </li>
+          </ul>
+        </div>
+        <div className="proyectos-admin__detail-cover">
+          {imagenPrincipal ? (
+            <div className="gallery-admin__thumb proyectos-admin__principal">
+              <img
+                src={imagenPrincipal}
+                alt={`Imagen principal de ${proyecto.nombre}`}
+              />
+            </div>
+          ) : (
+            <div className="proyectos-admin__detail-cover-empty" aria-hidden="true">
+              <IconPhoto size={36} />
+              <span>Sin portada</span>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <dl className="proyectos-admin__detail-grid">
         <div>
           <dt>ID</dt>
           <dd>{proyecto.id}</dd>
@@ -36,16 +79,26 @@ const ProyectosAdminDetailView = ({ proyecto }: ProyectosAdminDetailViewProps) =
           <dt>Nombre</dt>
           <dd>{textOrEmpty(proyecto.nombre)}</dd>
         </div>
-        <div>
+        <div className="proyectos-admin__detail-wide">
           <dt>Descripción</dt>
           <dd>{textOrEmpty(proyecto.descripcion)}</dd>
         </div>
         <div>
-          <dt>Encargado de realización</dt>
+          <dt>
+            <span className="proyectos-admin__detail-dt">
+              <IconUserCog size={15} aria-hidden="true" />
+              Encargado de realización
+            </span>
+          </dt>
           <dd>{textOrEmpty(proyecto.encargadoRealizacion)}</dd>
         </div>
         <div>
-          <dt>Duración</dt>
+          <dt>
+            <span className="proyectos-admin__detail-dt">
+              <IconCalendar size={15} aria-hidden="true" />
+              Duración
+            </span>
+          </dt>
           <dd>{textOrEmpty(proyecto.duracion)}</dd>
         </div>
         <div>
@@ -72,7 +125,12 @@ const ProyectosAdminDetailView = ({ proyecto }: ProyectosAdminDetailViewProps) =
           </dd>
         </div>
         <div>
-          <dt>Visibilidad</dt>
+          <dt>
+            <span className="proyectos-admin__detail-dt">
+              <IconEye size={15} aria-hidden="true" />
+              Visibilidad
+            </span>
+          </dt>
           <dd>
             <ul className="gallery-admin__badges">
               <li className={proyecto.activo ? 'is-active' : 'is-inactive'}>
@@ -91,8 +149,17 @@ const ProyectosAdminDetailView = ({ proyecto }: ProyectosAdminDetailViewProps) =
         </div>
       </dl>
 
-      <section aria-label="Galería">
-        <h3>Galería</h3>
+      <section
+        className="proyectos-admin__detail-gallery"
+        aria-label="Galería"
+      >
+        <div className="proyectos-admin__detail-gallery-head">
+          <h3>
+            <IconPhoto size={18} aria-hidden="true" />
+            Galería
+          </h3>
+          <p>Fotografías adicionales asociadas al proyecto.</p>
+        </div>
         <ProyectosAdminDetailGallery imagenes={proyecto.imagenes} />
       </section>
     </article>

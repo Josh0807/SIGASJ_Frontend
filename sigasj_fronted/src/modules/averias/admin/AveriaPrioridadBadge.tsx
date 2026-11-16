@@ -16,13 +16,16 @@ const AveriaPrioridadBadge = ({ prioridad }: AveriaPrioridadBadgeProps) => {
   const label = getPrioridadLabel(prioridad)
   const key = prioridad?.trim().toUpperCase() ?? ''
   const modifier = PRIORIDAD_MODIFIERS[key] ?? 'is-sin-asignar'
+  const showIcon = Boolean(PRIORIDAD_MODIFIERS[key])
 
   return (
     <span
       className={`averias-admin__prioridad-pill ${modifier}`}
       aria-label={`Prioridad: ${label}`}
     >
-      <IconAlertTriangle size={14} stroke={2} aria-hidden="true" />
+      {showIcon ? (
+        <IconAlertTriangle size={14} stroke={2} aria-hidden="true" />
+      ) : null}
       {label}
     </span>
   )

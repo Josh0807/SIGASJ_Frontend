@@ -33,7 +33,7 @@ const AveriasAdminPagination = ({
 
   return (
     <nav
-      className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-500 sm:flex-row sm:px-6"
+      className="flex flex-col items-center justify-between gap-3 px-1 py-1 text-sm text-slate-500 sm:flex-row"
       aria-label="Paginación de averías"
     >
       <p className="m-0">
@@ -42,7 +42,7 @@ const AveriasAdminPagination = ({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-10 items-center gap-1 rounded-2xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
           disabled={!canGoPrevious || loading}
           onClick={() => onPageChange(page - 1)}
         >
@@ -54,7 +54,7 @@ const AveriasAdminPagination = ({
         </span>
         <button
           type="button"
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-10 items-center gap-1 rounded-2xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-blue-300 hover:text-[#1e5a9c] disabled:cursor-not-allowed disabled:opacity-40"
           disabled={!canGoNext || loading}
           onClick={() => onPageChange(page + 1)}
         >

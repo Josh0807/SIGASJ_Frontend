@@ -216,26 +216,79 @@ describe('ProyectoImagenesGaleria', () => {
     expect(onProyectoUpdated).toHaveBeenCalledWith(updated)
   })
 
-  it('muestra el orden de galería sin controles de reordenamiento en la UI actual', async () => {
-    const spy = vi.spyOn(proyectosApi, 'reorderProyectoImagenes')
+  it('permite reordenar fotografías arrastrando con el mouse', async () => {
+    const updated = proyectoMock({
+      imagenes: [
+        {
+          id: 102,
+          url: 'https://example.com/photo2.jpg',
+          descripcion: 'Foto 2',
+          orden: 1,
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+        {
+          id: 101,
+          url: 'https://example.com/photo1.jpg',
+          descripcion: 'Foto 1',
+          orden: 2,
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+      ],
+    })
+    const spy = vi
+      .spyOn(proyectosApi, 'reorderProyectoImagenes')
+      .mockResolvedValue(updated)
+    const onProyectoUpdated = vi.fn()
 
     await act(async () => {
       root.render(
         <ProyectoImagenesGaleria
           proyecto={proyectoMock()}
-          onProyectoUpdated={() => {}}
+          onProyectoUpdated={onProyectoUpdated}
         />,
       )
     })
 
-    expect(container.textContent).toContain('Orden #1')
-    expect(container.textContent).toContain('Orden #2')
+    expect(container.textContent).toContain(
+      'Arrastre las tarjetas para cambiar el orden',
+    )
+    const cards = container.querySelectorAll(
+      '.proyecto-imagenes-galeria__item-card',
+    )
+    expect(cards.length).toBe(2)
+    expect((cards[0] as HTMLElement).draggable).toBe(true)
     expect(
-      Array.from(container.querySelectorAll('button')).some(
-        (btn) => btn.textContent === 'Bajar' || btn.textContent === 'Subir',
-      ),
-    ).toBe(false)
-    expect(spy).not.toHaveBeenCalled()
+      container.querySelectorAll('.proyecto-imagenes-galeria__drag-handle')
+        .length,
+    ).toBe(2)
+
+    const dataTransfer = {
+      effectAllowed: 'none',
+      dropEffect: 'none',
+      setData: vi.fn(),
+      getData: vi.fn(() => '101'),
+    }
+
+    const fireDrag = (type: string, target: Element) => {
+      const event = new Event(type, {
+        bubbles: true,
+        cancelable: true,
+      }) as DragEvent
+      Object.defineProperty(event, 'dataTransfer', { value: dataTransfer })
+      target.dispatchEvent(event)
+    }
+
+    await act(async () => {
+      fireDrag('dragstart', cards[0])
+      fireDrag('dragover', cards[1])
+      fireDrag('drop', cards[1])
+    })
+
+    expect(spy).toHaveBeenCalledWith(10, [
+      { id: 102, orden: 1 },
+      { id: 101, orden: 2 },
+    ])
+    expect(onProyectoUpdated).toHaveBeenCalledWith(updated)
   })
 
   it('muestra error cuando un archivo seleccionado no cumple con las validaciones', async () => {

@@ -4,7 +4,7 @@ import MapaRedPanel from './MapaRedPanel'
 export default function MapaRedPage() {
   return (
     <main aria-labelledby="mapa-red-title">
-      <MapaRedPanel showPageTitle detailHref="/admin/averias" />
+      <MapaRedPanel showPageTitle />
     </main>
   )
 }

@@ -78,4 +78,5 @@ export const getSageSuggestionsForPath = (pathname: string): SageSuggestion[] =>
   }).slice(0, 4)
 }
 
-export const SAGE_GREETING = 'Hola, soy Sage. ¿En qué te ayudo?'
+export const SAGE_GREETING =
+  'Hola, soy Sage. Puedo orientarte sobre cualquier módulo del panel: averías, asociados, inventario, solicitudes, RRHH, proyectos y más. ¿Qué necesitas hacer?'

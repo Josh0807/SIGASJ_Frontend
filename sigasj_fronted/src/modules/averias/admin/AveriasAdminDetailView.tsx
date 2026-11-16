@@ -48,7 +48,9 @@ const AveriasAdminDetailView = ({
           aria-labelledby="averia-reportante-heading"
         >
           <h2 id="averia-reportante-heading">
-            <IconUser size={20} aria-hidden="true" />
+            <span className="averias-admin__section-icon" aria-hidden="true">
+              <IconUser size={18} />
+            </span>
             Datos del reportante
           </h2>
           <dl className="averias-admin__fields averias-admin__ficha-filas">
@@ -99,7 +101,9 @@ const AveriasAdminDetailView = ({
           aria-labelledby="averia-gestion-heading"
         >
           <h2 id="averia-gestion-heading">
-            <IconClipboardList size={20} aria-hidden="true" />
+            <span className="averias-admin__section-icon" aria-hidden="true">
+              <IconClipboardList size={18} />
+            </span>
             Gestión de la avería
           </h2>
           <AveriasAdminGestionControls
@@ -113,7 +117,9 @@ const AveriasAdminDetailView = ({
           aria-labelledby="averia-ubicacion-heading"
         >
           <h2 id="averia-ubicacion-heading">
-            <IconMapPin size={20} aria-hidden="true" />
+            <span className="averias-admin__section-icon" aria-hidden="true">
+              <IconMapPin size={18} />
+            </span>
             Ubicación y descripción
           </h2>
           <dl className="averias-admin__fields averias-admin__fields--ubicacion">
@@ -146,7 +152,9 @@ const AveriasAdminDetailView = ({
           aria-labelledby="averia-asignacion-heading"
         >
           <h2 id="averia-asignacion-heading">
-            <IconUserPlus size={20} aria-hidden="true" />
+            <span className="averias-admin__section-icon" aria-hidden="true">
+              <IconUserPlus size={18} />
+            </span>
             Asignación de avería
           </h2>
           <AveriasAdminAsignacionControls
@@ -165,7 +173,9 @@ const AveriasAdminDetailView = ({
         aria-labelledby="averia-obs-heading"
       >
         <h2 id="averia-obs-heading">
-          <IconMessageCircle size={20} aria-hidden="true" />
+          <span className="averias-admin__section-icon" aria-hidden="true">
+            <IconMessageCircle size={18} />
+          </span>
           Observaciones y seguimiento
         </h2>
         {hasObservaciones ? (

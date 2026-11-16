@@ -7,3 +7,6 @@ export const ACTIVIDADES_ADMIN_PATHS = {
   dashboard: `${ACTIVIDADES_ADMIN_BASE_PATH}/dashboard`,
   reportes: `${ACTIVIDADES_ADMIN_BASE_PATH}/reportes`,
 } as const
+
+export const actividadAdminDetallePath = (actividadId: number | string) =>
+  `${ACTIVIDADES_ADMIN_BASE_PATH}/${actividadId}`

@@ -31,6 +31,7 @@ const ICONS = {
   solicitudes: IconFileText,
   rrhh: IconBriefcase2,
   averias: IconTool,
+  'mapa-red': IconMap2,
   actividades: IconClipboardCheck,
   'actividades-fontanero': IconChecklist,
   reportes: IconChartHistogram,

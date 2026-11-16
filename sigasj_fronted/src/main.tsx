@@ -9,6 +9,8 @@ import './shared/styles/tailwind.css'
 import './shared/styles/admin-surfaces.css'
 import './modules/dashboard/styles/vision-ui.css'
 import './modules/dashboard/styles/admin-dashboard.css'
+/* Bordes redondos globales (todos los módulos). */
+import './shared/styles/asada-rounded.css'
 import App from './app/App.tsx'
 
 createRoot(document.getElementById('root')!).render(

@@ -160,34 +160,68 @@ export const formatFechaReporte = (iso: string): string => {
 }
 
 /**
- * Solo para pruebas visuales (`?demoGeo=1`).
- * No sustituye coordenadas reales validadas por la ASADA.
+ * Anclas demo por sector DENTRO del casco de San Juan (plaza / iglesia / cuadrante).
+ * Offsets cortos (~80–350 m) para no salir del pueblo. Solo visualización.
+ *
+ * Referencia: centro ASADA = plaza de deportes / casco (MAPA_RED_CENTER).
  */
-const DEMO_OFFSETS: AveriaMapaCoords[] = [
-  { lat: 0.00135, lng: 0.0011 },
-  { lat: 0.00095, lng: -0.00145 },
-  { lat: -0.00115, lng: 0.00085 },
-  { lat: -0.00075, lng: -0.0012 },
-  { lat: 0.00155, lng: -0.00035 },
-  { lat: -0.0014, lng: 0.00135 },
-  { lat: 0.00045, lng: 0.00165 },
-  { lat: 0.0011, lng: -0.00095 },
-]
+const SECTOR_DEMO_BASE: Record<SectorId, AveriaMapaCoords> = {
+  // Casco / plaza / iglesia
+  centro: { lat: 0.00055, lng: -0.0002 },
+  // Este del cuadrante
+  'las-palmas': { lat: 0.00035, lng: 0.00215 },
+  // Norte hacia la iglesia / salida norte
+  norte: { lat: 0.00205, lng: -0.00055 },
+  // Sur-este del cruce principal
+  'el-cruce': { lat: -0.00185, lng: 0.00155 },
+  // Oeste / suroeste del casco
+  'la-esperanza': { lat: -0.00145, lng: -0.00205 },
+}
 
+/** Centro visual demo de un sector (para enfocar el mapa al seleccionarlo). */
+export const getDemoSectorCenter = (sectorId: SectorId): AveriaMapaCoords => {
+  const base = SECTOR_DEMO_BASE[sectorId]
+  return {
+    lat: MAPA_RED_CENTER[0] + base.lat,
+    lng: MAPA_RED_CENTER[1] + base.lng,
+  }
+}
+
+const demoCoordsForAveria = (
+  item: AveriaMapaItem,
+  indexInSector: number,
+): AveriaMapaCoords => {
+  const base = item.sectorId
+    ? SECTOR_DEMO_BASE[item.sectorId]
+    : { lat: 0.0008, lng: 0.0009 }
+  // Espiral corta: separa pines sin sacar el punto de San Juan.
+  const angle = indexInSector * 2.2 + (item.id % 11) * 0.37
+  const radius = 0.00028 + (indexInSector % 4) * 0.00018
+  return {
+    lat: MAPA_RED_CENTER[0] + base.lat + Math.sin(angle) * radius,
+    lng: MAPA_RED_CENTER[1] + base.lng + Math.cos(angle) * radius,
+  }
+}
+
+/**
+ * Asigna coordenadas de visualización a averías activas sin lat/lng.
+ * Reparte por sector y evita apilar varios pines en el mismo punto.
+ */
 export const applyDemoGeoAverias = (
   items: AveriaMapaItem[],
   enabled: boolean,
 ): AveriaMapaItem[] => {
   if (!enabled) return items
-  return items.map((item, index) => {
+  const sectorCursor = new Map<string, number>()
+
+  return items.map((item) => {
     if (item.coords) return item
-    const offset = DEMO_OFFSETS[index % DEMO_OFFSETS.length]
+    const key = item.sectorId ?? `id:${item.id}`
+    const indexInSector = sectorCursor.get(key) ?? 0
+    sectorCursor.set(key, indexInSector + 1)
     return {
       ...item,
-      coords: {
-        lat: MAPA_RED_CENTER[0] + offset.lat,
-        lng: MAPA_RED_CENTER[1] + offset.lng,
-      },
+      coords: demoCoordsForAveria(item, indexInSector),
     }
   })
 }
