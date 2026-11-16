@@ -201,7 +201,7 @@ const SelectField = <T extends string>({
 
 const CambioTitularPage = () => {
   const [values, setValues] = useState<CambioTitularFormValues>(initialValues)
-  const [result, setResult] = usePersistedSolicitudResult('cambio-titular')
+  const [result, setResult, resetResult] = usePersistedSolicitudResult('cambio-titular')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDate = useMemo(() => hoyEnAsada(), [])
 
@@ -228,6 +228,12 @@ const CambioTitularPage = () => {
     } catch (error) {
       setSubmitError(getCambioTitularErrorMessage(error))
     }
+  }
+
+  const handleNuevaSolicitud = () => {
+    setValues({ ...initialValues, documentos: [] })
+    setSubmitError(null)
+    resetResult()
   }
 
   const solicitanteStep = (
@@ -596,8 +602,15 @@ const CambioTitularPage = () => {
                       aria-hidden="true"
                     />
                   </Link>
+                  <button
+                    className="transparency-motion-button inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover"
+                    type="button"
+                    onClick={handleNuevaSolicitud}
+                  >
+                    Realizar otra solicitud
+                  </button>
                   <Link
-                    className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline sm:ml-2"
+                    className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline"
                     to="/"
                   >
                     <IconHome size={19} aria-hidden="true" /> Volver al inicio

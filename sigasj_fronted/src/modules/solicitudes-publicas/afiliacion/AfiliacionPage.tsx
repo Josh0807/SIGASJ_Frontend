@@ -105,7 +105,7 @@ const TextField = ({
 
 const AfiliacionPage = () => {
   const [values, setValues] = useState<AfiliacionFormValues>(initialValues)
-  const [result, setResult] = usePersistedSolicitudResult('afiliacion')
+  const [result, setResult, resetResult] = usePersistedSolicitudResult('afiliacion')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const requestDateLabel = useMemo(() => formatearFechaAsada(hoyEnAsada()), [])
 
@@ -133,6 +133,12 @@ const AfiliacionPage = () => {
     } catch (error) {
       setSubmitError(getAfiliacionErrorMessage(error))
     }
+  }
+
+  const handleNuevaSolicitud = () => {
+    setValues(initialValues())
+    setSubmitError(null)
+    resetResult()
   }
 
   const personalesStep = (
@@ -538,8 +544,11 @@ const AfiliacionPage = () => {
                       aria-hidden="true"
                     />
                   </Link>
+                  <button className="transparency-motion-button inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover" type="button" onClick={handleNuevaSolicitud}>
+                    Realizar otra solicitud
+                  </button>
                   <Link
-                    className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline sm:ml-2"
+                    className="transparency-motion-button inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-sigasj-border-strong bg-sigasj-surface px-6 font-semibold text-sigasj-primary-hover no-underline"
                     to="/"
                   >
                     <IconHome size={19} aria-hidden="true" /> Volver al inicio
