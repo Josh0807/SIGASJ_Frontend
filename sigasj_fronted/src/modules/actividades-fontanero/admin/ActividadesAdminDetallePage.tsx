@@ -42,8 +42,10 @@ const ActividadesAdminDetallePage = () => {
   const [actividad, setActividad] = useState<ActividadFontaneroRegistrada | null>(
     null,
   )
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(idValido)
+  const [error, setError] = useState<string | null>(
+    idValido ? null : ACTIVITY_FEEDBACK_MESSAGES.notFound,
+  )
   const [unauthorized, setUnauthorized] = useState(false)
   const [forbidden, setForbidden] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
@@ -59,16 +61,10 @@ const ActividadesAdminDetallePage = () => {
 
   useEffect(() => {
     if (!idValido) {
-      setLoading(false)
-      setError(ACTIVITY_FEEDBACK_MESSAGES.notFound)
-      setActividad(null)
       return
     }
 
     let active = true
-    setLoading(true)
-    setError(null)
-
     void getActividadAdminDetalle(parsedId)
       .then((detalle) => {
         if (!active) return
@@ -212,7 +208,11 @@ const ActividadesAdminDetallePage = () => {
                 variant="secondary"
                 size="sm"
                 className="justify-self-start"
-                onClick={() => setReloadKey((key) => key + 1)}
+                onClick={() => {
+                  setLoading(true)
+                  setError(null)
+                  setReloadKey((key) => key + 1)
+                }}
               >
                 {ADMIN_COPY.retry}
               </Button>

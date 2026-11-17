@@ -90,7 +90,8 @@ export default function UsuariosAdminPage() {
   }, [])
 
   useEffect(() => {
-    void load()
+    const frame = window.requestAnimationFrame(() => void load())
+    return () => window.cancelAnimationFrame(frame)
   }, [load])
 
   const filtered = useMemo(() => {

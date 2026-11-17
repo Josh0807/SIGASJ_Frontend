@@ -43,6 +43,7 @@ const AnnouncementsCarousel = ({
   const touchEndYRef = useRef<number | null>(null)
 
   const total = announcements.length
+  const currentIndex = total > 0 ? wrapIndex(activeIndex, total) : 0
   const visibleCount = Math.min(slidesPerView, Math.max(total, 1))
   const canNavigate = total > visibleCount || total > 1
   const isAutoplayStopped = paused || reducedMotion || pageHidden || !canNavigate
@@ -70,11 +71,6 @@ const AnnouncementsCarousel = ({
     return () => document.removeEventListener('visibilitychange', sync)
   }, [])
 
-  useEffect(() => {
-    if (total === 0) return
-    setActiveIndex((index) => wrapIndex(index, total))
-  }, [total])
-
   const bumpCycle = useCallback(() => {
     setCycleKey((key) => key + 1)
   }, [])
@@ -90,14 +86,14 @@ const AnnouncementsCarousel = ({
   )
 
   const handlePrev = useCallback(() => {
-    goTo(activeIndex - 1, true)
-  }, [activeIndex, goTo])
+    goTo(currentIndex - 1, true)
+  }, [currentIndex, goTo])
 
   const handleNext = useCallback(
     (fromUser = false) => {
-      goTo(activeIndex + 1, fromUser)
+      goTo(currentIndex + 1, fromUser)
     },
-    [activeIndex, goTo],
+    [currentIndex, goTo],
   )
 
   useEffect(() => {
@@ -112,17 +108,17 @@ const AnnouncementsCarousel = ({
   const visibleAnnouncements = useMemo(() => {
     if (total === 0) return []
     return Array.from({ length: visibleCount }, (_, offset) => {
-      const index = wrapIndex(activeIndex + offset, total)
+      const index = wrapIndex(currentIndex + offset, total)
       return { announcement: announcements[index], index }
     })
-  }, [activeIndex, announcements, total, visibleCount])
+  }, [announcements, currentIndex, total, visibleCount])
 
   const statusLabel = useMemo(() => {
     if (total === 0) return ''
-    if (visibleCount === 1) return `${activeIndex + 1} / ${total}`
-    const last = wrapIndex(activeIndex + visibleCount - 1, total) + 1
+    if (visibleCount === 1) return `${currentIndex + 1} / ${total}`
+    const last = wrapIndex(currentIndex + visibleCount - 1, total) + 1
     return `${activeIndex + 1}–${last} / ${total}`
-  }, [activeIndex, total, visibleCount])
+  }, [activeIndex, currentIndex, total, visibleCount])
 
   const handleTouchStart = (event: TouchEvent) => {
     const touch = event.targetTouches?.[0] || event.touches?.[0]
@@ -211,7 +207,7 @@ const AnnouncementsCarousel = ({
           aria-live="polite"
         >
           <div
-            key={activeIndex}
+            key={currentIndex}
             className={`grid gap-4 ${visibleCount > 1 ? 'grid-cols-2 max-[640px]:grid-cols-1' : 'grid-cols-1'} ${
               !reducedMotion && slideAnim ? 'announcements-carousel__pair' : ''
             }`}
@@ -261,12 +257,12 @@ const AnnouncementsCarousel = ({
                 key={`announcement-dot-${announcement.id}`}
                 type="button"
                 className={`h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300 ${
-                  index === activeIndex
+                  index === currentIndex
                     ? 'w-7 bg-sigasj-primary'
                     : 'w-2.5 bg-sigasj-border hover:bg-sigasj-border-strong'
                 }`}
                 aria-label={`Ir al comunicado ${index + 1}`}
-                aria-current={index === activeIndex ? 'true' : undefined}
+                aria-current={index === currentIndex ? 'true' : undefined}
                 onClick={() => goTo(index, true)}
               />
             ))}

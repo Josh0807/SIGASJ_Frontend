@@ -67,13 +67,6 @@ const GalleryLightbox = ({
   const isZoomed = zoom > ZOOM_MIN + 0.01
   const zoomPercent = Math.round(zoom * 100)
 
-  zoomRef.current = zoom
-  panRef.current = pan
-  activeIndexRef.current = activeIndex
-  photosLengthRef.current = photos.length
-  onCloseRef.current = onClose
-  onNavigateRef.current = onNavigate
-
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -101,7 +94,6 @@ const GalleryLightbox = ({
   }, [])
 
   const resetViewRef = useRef(resetView)
-  resetViewRef.current = resetView
 
   const setZoomLevel = useCallback((nextRaw: number) => {
     const next = clampZoom(nextRaw)
@@ -121,13 +113,24 @@ const GalleryLightbox = ({
   )
 
   const zoomByRef = useRef(zoomBy)
-  zoomByRef.current = zoomBy
+
+  useEffect(() => {
+    zoomRef.current = zoom
+    panRef.current = pan
+    activeIndexRef.current = activeIndex
+    photosLengthRef.current = photos.length
+    onCloseRef.current = onClose
+    onNavigateRef.current = onNavigate
+    resetViewRef.current = resetView
+    zoomByRef.current = zoomBy
+  }, [activeIndex, onClose, onNavigate, pan, photos.length, resetView, zoom, zoomBy])
 
   const zoomIn = useCallback(() => zoomBy(ZOOM_STEP), [zoomBy])
   const zoomOut = useCallback(() => zoomBy(-ZOOM_STEP), [zoomBy])
 
   useEffect(() => {
-    resetView()
+    const frame = window.requestAnimationFrame(resetView)
+    return () => window.cancelAnimationFrame(frame)
   }, [activeIndex, resetView])
 
   useEffect(() => {

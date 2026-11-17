@@ -164,7 +164,7 @@ export default function SolicitarAusenciaForm({
     ? FONTANERO_SOLICITAR_VACACIONES_TITLE
     : FONTANERO_SOLICITAR_PERMISO_TITLE
   const [values, setValues] = useState<FormValues>(() => ({
-    correo: '',
+    correo: user?.email?.trim().toLowerCase() || '',
     fechaInicio: fechaInicioPorDefecto(),
     fechaFin: '',
     motivo: '',
@@ -190,12 +190,6 @@ export default function SolicitarAusenciaForm({
     balance != null &&
     diasSolicitados > 0 &&
     diasSolicitados > balance.diasDisponibles
-
-  useEffect(() => {
-    const correoSesion = user?.email?.trim().toLowerCase() || ''
-    if (!correoSesion) return
-    setValues((prev) => (prev.correo.trim() ? prev : { ...prev, correo: correoSesion }))
-  }, [user?.email])
 
   useEffect(() => {
     if (!esVacaciones) return

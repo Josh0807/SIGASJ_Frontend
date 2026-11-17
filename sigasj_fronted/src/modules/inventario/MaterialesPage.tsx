@@ -96,7 +96,7 @@ export default function MaterialesPage() {
     activos: null,
     stockBajo: null,
     solicitudes: null,
-    loading: false,
+    loading: true,
     error: null,
   })
   const [actionMessage, setActionMessage] = useState<{
@@ -179,19 +179,10 @@ export default function MaterialesPage() {
 
   useEffect(() => {
     if (!canManage && currentRole !== InternalAdminRoleName.Secretaria) {
-      setKpi({
-        total: null,
-        activos: null,
-        stockBajo: null,
-        solicitudes: null,
-        loading: false,
-        error: null,
-      })
       return
     }
     let cancelled = false
-    setKpi((prev) => ({ ...prev, loading: true, error: null }))
-    ;(async () => {
+    void (async () => {
       try {
         const reporte = await getReporteInventarioAdmin()
         let solicitudes: number | null = null
@@ -242,15 +233,10 @@ export default function MaterialesPage() {
 
   useEffect(() => {
     if (!selected || !canViewMoves) {
-      setMoves([])
-      setMovesError(null)
-      setMovesLoading(false)
       return
     }
     let cancelled = false
-    setMovesLoading(true)
-    setMovesError(null)
-    getMovimientosAdmin({ idMaterial: selected.id, page: 1, limit: 5 })
+    void getMovimientosAdmin({ idMaterial: selected.id, page: 1, limit: 5 })
       .then((response) => {
         if (cancelled) return
         setMoves(response.data)
@@ -266,14 +252,6 @@ export default function MaterialesPage() {
       cancelled = true
     }
   }, [selected, canViewMoves])
-
-  useEffect(() => {
-    if (selectedId == null) return
-    if (!result.data.some((item) => item.id === selectedId)) {
-      setSelectedId(null)
-      setDetailOpen(false)
-    }
-  }, [result.data, selectedId])
 
   const handleStateChange = async (material: Material, nextActivo: boolean) => {
     if (changingId !== null) return
@@ -307,6 +285,8 @@ export default function MaterialesPage() {
   }
 
   const openDetail = (material: Material) => {
+    setMovesLoading(canViewMoves)
+    setMovesError(null)
     setSelectedId(material.id)
     setDetailOpen(true)
   }

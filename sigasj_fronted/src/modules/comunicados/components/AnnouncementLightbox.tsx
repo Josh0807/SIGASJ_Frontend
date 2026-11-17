@@ -102,13 +102,6 @@ const AnnouncementLightbox = ({
       : description
   const isZoomed = zoom > ZOOM_MIN + 0.01
 
-  zoomRef.current = zoom
-  panRef.current = pan
-  activeIndexRef.current = activeIndex
-  itemsLengthRef.current = items.length
-  onCloseRef.current = onClose
-  onNavigateRef.current = onNavigate
-
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -136,7 +129,6 @@ const AnnouncementLightbox = ({
   }, [])
 
   const resetViewRef = useRef(resetView)
-  resetViewRef.current = resetView
 
   const setZoomLevel = useCallback((nextRaw: number) => {
     const next = clampZoom(nextRaw)
@@ -156,14 +148,27 @@ const AnnouncementLightbox = ({
   )
 
   const zoomByRef = useRef(zoomBy)
-  zoomByRef.current = zoomBy
+
+  useEffect(() => {
+    zoomRef.current = zoom
+    panRef.current = pan
+    activeIndexRef.current = activeIndex
+    itemsLengthRef.current = items.length
+    onCloseRef.current = onClose
+    onNavigateRef.current = onNavigate
+    resetViewRef.current = resetView
+    zoomByRef.current = zoomBy
+  }, [activeIndex, items.length, onClose, onNavigate, pan, resetView, zoom, zoomBy])
 
   const zoomIn = useCallback(() => zoomBy(ZOOM_STEP), [zoomBy])
   const zoomOut = useCallback(() => zoomBy(-ZOOM_STEP), [zoomBy])
 
   useEffect(() => {
-    setDescriptionExpanded(false)
-    resetView()
+    const frame = window.requestAnimationFrame(() => {
+      setDescriptionExpanded(false)
+      resetView()
+    })
+    return () => window.cancelAnimationFrame(frame)
   }, [activeIndex, resetView])
 
   useEffect(() => {

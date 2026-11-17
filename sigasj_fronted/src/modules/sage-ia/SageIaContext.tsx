@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -15,30 +13,11 @@ import {
   type SageStatus,
 } from './sageIaApi'
 import { SAGE_GREETING, getSageSuggestionsForPath } from './sageIaSuggestions'
-
-export type SageMessage = {
-  id: string
-  role: 'user' | 'assistant'
-  text: string
-  source?: 'ai' | 'demo'
-}
-
-type SageIaContextValue = {
-  open: boolean
-  minimized: boolean
-  busy: boolean
-  messages: SageMessage[]
-  status: SageStatus
-  suggestions: ReturnType<typeof getSageSuggestionsForPath>
-  modulePath: string
-  openPanel: () => void
-  closePanel: () => void
-  minimizePanel: () => void
-  restorePanel: () => void
-  sendMessage: (text: string) => Promise<void>
-}
-
-const SageIaContext = createContext<SageIaContextValue | null>(null)
+import {
+  SageIaContext,
+  type SageIaContextValue,
+  type SageMessage,
+} from './sageIaContextValue'
 
 const makeId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -167,12 +146,4 @@ export const SageIaProvider = ({ children }: { children: ReactNode }) => {
   )
 
   return <SageIaContext.Provider value={value}>{children}</SageIaContext.Provider>
-}
-
-export const useSageIa = () => {
-  const ctx = useContext(SageIaContext)
-  if (!ctx) {
-    throw new Error('useSageIa debe usarse dentro de SageIaProvider')
-  }
-  return ctx
 }

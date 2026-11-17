@@ -56,6 +56,7 @@ const GallerySection = ({
   const showLoading = useDefaultItems && status === 'loading'
   const showError = useDefaultItems && status === 'error'
   const total = photos.length
+  const currentCarouselIndex = total > 0 ? wrapIndex(carouselIndex, total) : 0
   const visibleCount = Math.min(photosPerView, Math.max(total, 1))
   const canMove = total > visibleCount || total > 1
   const isAutoplayStopped = paused || reducedMotion || pageHidden || !canMove
@@ -83,11 +84,6 @@ const GallerySection = ({
     return () => document.removeEventListener('visibilitychange', sync)
   }, [])
 
-  useEffect(() => {
-    if (total === 0) return
-    setCarouselIndex((index) => wrapIndex(index, total))
-  }, [total])
-
   const bumpCycle = useCallback(() => {
     setCycleKey((key) => key + 1)
   }, [])
@@ -106,14 +102,14 @@ const GallerySection = ({
   )
 
   const handlePrev = useCallback(() => {
-    goToCarouselIndex(carouselIndex - 1, true)
-  }, [carouselIndex, goToCarouselIndex])
+    goToCarouselIndex(currentCarouselIndex - 1, true)
+  }, [currentCarouselIndex, goToCarouselIndex])
 
   const handleNext = useCallback(
     (fromUser = false) => {
-      goToCarouselIndex(carouselIndex + 1, fromUser)
+      goToCarouselIndex(currentCarouselIndex + 1, fromUser)
     },
-    [carouselIndex, goToCarouselIndex],
+    [currentCarouselIndex, goToCarouselIndex],
   )
 
   useEffect(() => {
@@ -128,17 +124,17 @@ const GallerySection = ({
   const visiblePhotos = useMemo(() => {
     if (total === 0) return []
     return Array.from({ length: visibleCount }, (_, offset) => {
-      const index = wrapIndex(carouselIndex + offset, total)
+      const index = wrapIndex(currentCarouselIndex + offset, total)
       return { photo: photos[index], index }
     })
-  }, [carouselIndex, photos, total, visibleCount])
+  }, [currentCarouselIndex, photos, total, visibleCount])
 
   const statusLabel = useMemo(() => {
     if (total === 0) return ''
-    if (visibleCount === 1) return `${carouselIndex + 1} / ${total}`
-    const last = wrapIndex(carouselIndex + visibleCount - 1, total) + 1
+    if (visibleCount === 1) return `${currentCarouselIndex + 1} / ${total}`
+    const last = wrapIndex(currentCarouselIndex + visibleCount - 1, total) + 1
     return `${carouselIndex + 1}–${last} / ${total}`
-  }, [carouselIndex, total, visibleCount])
+  }, [carouselIndex, currentCarouselIndex, total, visibleCount])
 
   const handleTouchStart = (event: TouchEvent) => {
     const touch = event.targetTouches?.[0] || event.touches?.[0]
@@ -266,7 +262,7 @@ const GallerySection = ({
                 onTouchEnd={handleTouchEnd}
               >
                 <div
-                  key={carouselIndex}
+                  key={currentCarouselIndex}
                   className={`grid gap-4 ${
                     visibleCount > 1
                       ? 'grid-cols-2 max-[640px]:grid-cols-1'
@@ -310,12 +306,12 @@ const GallerySection = ({
                     key={`gallery-dot-${photo.id}`}
                     type="button"
                     className={`h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300 ${
-                      index === carouselIndex
+                      index === currentCarouselIndex
                         ? 'is-active w-7 bg-sigasj-primary'
                         : 'w-2.5 bg-sigasj-border hover:bg-sigasj-border-strong'
                     }`}
                     aria-label={`Ir al grupo ${index + 1}`}
-                    aria-current={index === carouselIndex ? 'true' : undefined}
+                    aria-current={index === currentCarouselIndex ? 'true' : undefined}
                     onClick={() => goToCarouselIndex(index, true)}
                   />
                 ))}

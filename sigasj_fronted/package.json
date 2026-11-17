@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:roles": "vitest run src/app/router/adminRoleAccess.test.tsx src/modules/auth/utils/roleAccessMatrix.test.ts src/modules/auth/utils/backendRoleAuthorization.test.ts",
-    "test:qa": "vitest run src/app/router/qaPanelAcceptance.test.tsx src/app/router/adminDirectAccess.test.tsx src/app/router/adminRoleAccess.test.tsx src/modules/admin-panel/components/adminMenuNavigation.test.tsx",
+    "test:qa": "vitest run src/app/router/routeConfig.test.ts src/modules/auth src/services/http/httpClient.test.ts src/modules/solicitudes-publicas src/modules/averias src/modules/inventario",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots",
     "preview": "vite preview"
@@ -49,14 +49,17 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
     "babel-plugin-react-compiler": "^1.0.0",
-    "eslint": "^10.8.0",
+    "eslint": "^10.15.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
     "jsdom": "^29.1.1",
     "typescript": "~6.0.2",
-    "typescript-eslint": "^8.65.0",
-    "vite": "^8.2.0",
-    "vitest": "^4.1.10"
+    "typescript-eslint": "^8.73.0",
+    "vite": "^8.3.8",
+    "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "undici": "7.30.1"
   }
 }

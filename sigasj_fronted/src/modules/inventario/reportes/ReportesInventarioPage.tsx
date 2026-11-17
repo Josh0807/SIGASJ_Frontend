@@ -62,6 +62,7 @@ const toAppliedFilters = (draft: DraftFilters): ReporteInventarioFilters => ({
 })
 
 export default function ReportesInventarioPage() {
+  const [reportGeneratedAt] = useState(() => Date.now())
   const [draft, setDraft] = useState<DraftFilters>(EMPTY_DRAFT)
   const [applied, setApplied] = useState<ReporteInventarioFilters>({})
   const [clientError, setClientError] = useState('')
@@ -399,7 +400,7 @@ export default function ReportesInventarioPage() {
                 </thead>
                 <tbody>
                   {reporte.proximosVencer.map((item) => {
-                    const dias = Math.ceil((new Date(item.fechaVencimiento).getTime() - Date.now()) / 86_400_000)
+                    const dias = Math.ceil((new Date(item.fechaVencimiento).getTime() - reportGeneratedAt) / 86_400_000)
                     const urgente = dias <= 30
                     return (
                       <tr key={item.id}>

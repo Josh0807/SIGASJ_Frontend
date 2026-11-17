@@ -29,7 +29,8 @@ const ContactoAdminPage = () => {
   }, [])
 
   useEffect(() => {
-    void loadContacto()
+    const frame = window.requestAnimationFrame(() => void loadContacto())
+    return () => window.cancelAnimationFrame(frame)
   }, [loadContacto])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { IconMinus, IconSend, IconX } from '@tabler/icons-react'
 import SageGotin from './SageGotin'
-import { useSageIa } from './SageIaContext'
+import { useSageIa } from './useSageIa'
 
 const SageIaPanel = () => {
   const {
