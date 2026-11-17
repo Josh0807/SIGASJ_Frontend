@@ -14,9 +14,9 @@ import { useNavigate } from 'react-router-dom'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   Alert,
+  Badge,
   Button,
   EmptyState,
-  MetricPill,
   PageHeader,
 } from '../../../shared/ui'
 import { InventoryFormField } from '../InventoryFormField'
@@ -222,11 +222,9 @@ export default function MovimientosPage() {
           ) : null}
 
           {!loading && !error ? (
-            <MetricPill
-              label={total === 1 ? 'movimiento' : 'movimientos'}
-              value={total}
-              role="status"
-            />
+            <Badge tone="success" role="status">
+              {total} {total === 1 ? 'movimiento' : 'movimientos'}
+            </Badge>
           ) : null}
         </div>
       </section>

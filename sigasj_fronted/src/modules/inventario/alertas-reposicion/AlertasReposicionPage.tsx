@@ -13,9 +13,9 @@ import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   Alert,
+  Badge,
   Button,
   EmptyState,
-  MetricPill,
   PageHeader,
 } from '../../../shared/ui'
 import { InventoryFormField } from '../InventoryFormField'
@@ -225,12 +225,9 @@ export default function AlertasReposicionPage() {
           </InventoryFormField>
 
           {!loading && !error ? (
-            <MetricPill
-              label={total === 1 ? 'alerta' : 'alertas'}
-              value={total}
-              tone={total === 0 ? 'quiet' : 'danger'}
-              role="status"
-            />
+            <Badge tone={total === 0 ? 'neutral' : 'warning'} role="status">
+              {total} {total === 1 ? 'alerta' : 'alertas'}
+            </Badge>
           ) : null}
         </div>
       </section>

@@ -12,7 +12,6 @@ import {
   Badge,
   Button,
   EmptyState,
-  MetricPill,
   PageHeader,
 } from '../../../shared/ui'
 import {
@@ -112,16 +111,11 @@ export default function ProveedoresPage() {
         description="Registre y mantenga actualizados los datos de contacto de sus proveedores."
         actions={
           <>
-            <MetricPill
-              label="proveedores"
-              value={result.total}
-              role="status"
-            />
-            <Button
-              to={MATERIALES_PATH}
-              variant="secondary"
-              leftIcon={<IconPackage size={18} aria-hidden="true" />}
-            >
+            <Badge tone="success" role="status">
+              {result.total}{' '}
+              {result.total === 1 ? 'proveedor' : 'proveedores'}
+            </Badge>
+            <Button to={MATERIALES_PATH} variant="secondary">
               Materiales
             </Button>
             {canManage ? (

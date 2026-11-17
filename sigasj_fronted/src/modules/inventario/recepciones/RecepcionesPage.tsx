@@ -10,9 +10,9 @@ import { useNavigate } from 'react-router-dom'
 import { ADMIN_COPY } from '../../../shared/admin/adminCopy'
 import {
   Alert,
+  Badge,
   Button,
   EmptyState,
-  MetricPill,
   PageHeader,
 } from '../../../shared/ui'
 import { MATERIALES_PATH, REPOSICIONES_PATH, recepcionDetailPath } from '../inventarioPaths'
@@ -132,11 +132,9 @@ export default function RecepcionesPage() {
             </div>
           </div>
           <div className="inv-status-bar__aside">
-            <MetricPill
-              label={total === 1 ? 'compra' : 'compras'}
-              value={total}
-              tone={total === 0 ? 'quiet' : 'primary'}
-            />
+            <Badge tone="success" role="status">
+              {total} {total === 1 ? 'compra' : 'compras'}
+            </Badge>
           </div>
         </div>
       ) : null}

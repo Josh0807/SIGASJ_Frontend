@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import {
   IconAlertTriangle,
   IconAlignLeft,
@@ -15,7 +15,8 @@ import {
   IconToggleRight,
   IconTruckDelivery,
 } from '@tabler/icons-react'
-import { Button } from '../../shared/ui'
+import { Alert, Button, Card } from '../../shared/ui'
+import { InventoryFormField, InventoryFormHeading } from './InventoryFormField'
 import { MATERIALES_PATH } from './inventarioPaths'
 import { focusFirstInvalidInventoryField } from './focusFirstInvalidInventoryField'
 import { validateMaterial, type MaterialFormErrors } from './materialFormUtils'
@@ -133,149 +134,133 @@ export default function MaterialForm({
     }
   }
 
-  const field = (
-    name: keyof MaterialFormValues,
-    label: string,
-    icon: ReactNode,
-    input: ReactNode,
-    full = false,
-  ) => (
-    <label className={full ? 'materials-admin__form-full' : undefined}>
-      <span>{label}</span>
-      <span className="provider-admin__control">
-        {icon}
-        {input}
-      </span>
-      {errors[name] && (
-        <small className="materials-admin__field-error" role="alert">
-          {errors[name]}
-        </small>
-      )}
-    </label>
-  )
-
   return (
     <>
-      {submitError && (
-        <div className="materials-admin__error" role="alert">
+      {submitError ? (
+        <Alert tone="danger" title="No se pudo guardar">
           {submitError}
-        </div>
-      )}
-      <form
-        className="materials-admin__form provider-admin__form w-full max-w-3xl !rounded-[13px] !border-sigasj-border !bg-white !shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
-        noValidate
-        onSubmit={handleSubmit}
-      >
-        <div className="provider-admin__form-heading">
-          <span>
-            <IconPackage size={25} aria-hidden="true" />
-          </span>
-          <div>
-            <h2>{mode === 'create' ? 'Información del material' : 'Ficha del material'}</h2>
-            <p>Los campos marcados con * son obligatorios. Categoría y proveedor son requeridos.</p>
-          </div>
-        </div>
-        {field(
-          'nombre',
-          'Nombre *',
-          <IconPackage size={20} aria-hidden="true" />,
-          <input
-            autoFocus={mode === 'create'}
-            value={values.nombre}
-            maxLength={150}
-            placeholder="Ej. Válvula de 1/2 pulgada"
-            aria-invalid={Boolean(errors.nombre)}
-            onChange={(e) => update('nombre', e.target.value)}
-          />,
-        )}
-        {field(
-          'unidadMedida',
-          'Unidad de medida *',
-          <IconRulerMeasure size={20} aria-hidden="true" />,
-          <input
-            value={values.unidadMedida}
-            maxLength={50}
-            placeholder="Ej. unidad, metro, litro"
-            aria-invalid={Boolean(errors.unidadMedida)}
-            onChange={(e) => update('unidadMedida', e.target.value)}
-          />,
-        )}
-        {field(
-          'descripcion',
-          'Descripción',
-          <IconAlignLeft size={20} aria-hidden="true" />,
-          <textarea
-            value={values.descripcion}
-            maxLength={1000}
-            placeholder="Detalle opcional del material y su uso en bodega"
-            aria-invalid={Boolean(errors.descripcion)}
-            onChange={(e) => update('descripcion', e.target.value)}
-          />,
-          true,
-        )}
-        {field(
-          'ubicacion',
-          'Ubicación',
-          <IconMapPin size={20} aria-hidden="true" />,
-          <input
-            value={values.ubicacion}
-            maxLength={150}
-            placeholder="Ej. Estante A-3"
-            aria-invalid={Boolean(errors.ubicacion)}
-            onChange={(e) => update('ubicacion', e.target.value)}
-          />,
-        )}
-        {field(
-          'stockMinimo',
-          'Stock mínimo de alerta *',
-          <IconAlertTriangle size={20} aria-hidden="true" />,
-          <input
-            value={values.stockMinimo}
-            type="number"
-            min="0"
-            step="1"
-            placeholder="0"
-            aria-invalid={Boolean(errors.stockMinimo)}
-            onChange={(e) => update('stockMinimo', e.target.value)}
-          />,
-        )}
-        {field(
-          'precioUnitario',
-          'Precio unitario',
-          <IconCurrencyDollar size={20} aria-hidden="true" />,
-          <input
-            value={values.precioUnitario}
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Ej. 1250.00"
-            aria-invalid={Boolean(errors.precioUnitario)}
-            onChange={(e) => update('precioUnitario', e.target.value)}
-          />,
-        )}
-        {field(
-          'categoriaId',
-          'Categoría *',
-          <IconTag size={20} aria-hidden="true" />,
-          <select
-            value={values.categoriaId}
-            disabled={loadingCategorias}
-            aria-invalid={Boolean(errors.categoriaId)}
-            onChange={(e) => update('categoriaId', e.target.value)}
+        </Alert>
+      ) : null}
+      <Card as="section" padded className="!p-5 sm:!p-6 lg:!p-8">
+        <form
+          className="grid w-full gap-x-7 gap-y-6 lg:grid-cols-2"
+          noValidate
+          onSubmit={handleSubmit}
+        >
+          <InventoryFormHeading
+            icon={<IconPackage size={25} aria-hidden="true" />}
+            title={mode === 'create' ? 'Información del material' : 'Ficha del material'}
+            description="Los campos marcados con * son obligatorios. Categoría y proveedor son requeridos."
+          />
+          <InventoryFormField
+            label="Nombre *"
+            icon={<IconPackage size={20} aria-hidden="true" />}
+            error={errors.nombre}
           >
-            <option value="">Seleccione una categoría</option>
-            {categoryOptions.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.nombre}
-                {item.activo ? '' : ' (inactiva · actual)'}
-                {item.requiereFechaVencimiento ? ' · con vencimiento' : ''}
-              </option>
-            ))}
-          </select>,
-        )}
-        {values.categoriaId ? (
-          <div
-            className={`materials-admin__form-full rounded-xl border px-4 py-3.5 ${
+            <input
+              autoFocus={mode === 'create'}
+              value={values.nombre}
+              maxLength={150}
+              placeholder="Ej. Válvula de 1/2 pulgada"
+              aria-invalid={Boolean(errors.nombre)}
+              onChange={(e) => update('nombre', e.target.value)}
+            />
+          </InventoryFormField>
+          <InventoryFormField
+            label="Unidad de medida *"
+            icon={<IconRulerMeasure size={20} aria-hidden="true" />}
+            error={errors.unidadMedida}
+          >
+            <input
+              value={values.unidadMedida}
+              maxLength={50}
+              placeholder="Ej. unidad, metro, litro"
+              aria-invalid={Boolean(errors.unidadMedida)}
+              onChange={(e) => update('unidadMedida', e.target.value)}
+            />
+          </InventoryFormField>
+          <InventoryFormField
+            label="Descripción"
+            icon={<IconAlignLeft size={20} aria-hidden="true" />}
+            error={errors.descripcion}
+            full
+            multiline
+          >
+            <textarea
+              value={values.descripcion}
+              maxLength={1000}
+              placeholder="Detalle opcional del material y su uso en bodega"
+              aria-invalid={Boolean(errors.descripcion)}
+              onChange={(e) => update('descripcion', e.target.value)}
+            />
+          </InventoryFormField>
+          <InventoryFormField
+            label="Ubicación"
+            icon={<IconMapPin size={20} aria-hidden="true" />}
+            error={errors.ubicacion}
+          >
+            <input
+              value={values.ubicacion}
+              maxLength={150}
+              placeholder="Ej. Estante A-3"
+              aria-invalid={Boolean(errors.ubicacion)}
+              onChange={(e) => update('ubicacion', e.target.value)}
+            />
+          </InventoryFormField>
+          <InventoryFormField
+            label="Stock mínimo de alerta *"
+            icon={<IconAlertTriangle size={20} aria-hidden="true" />}
+            error={errors.stockMinimo}
+          >
+            <input
+              value={values.stockMinimo}
+              type="number"
+              min="0"
+              step="1"
+              placeholder="0"
+              aria-invalid={Boolean(errors.stockMinimo)}
+              onChange={(e) => update('stockMinimo', e.target.value)}
+            />
+          </InventoryFormField>
+          <InventoryFormField
+            label="Precio unitario"
+            icon={<IconCurrencyDollar size={20} aria-hidden="true" />}
+            error={errors.precioUnitario}
+          >
+            <input
+              value={values.precioUnitario}
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Ej. 1250.00"
+              aria-invalid={Boolean(errors.precioUnitario)}
+              onChange={(e) => update('precioUnitario', e.target.value)}
+            />
+          </InventoryFormField>
+          <InventoryFormField
+            label="Categoría *"
+            icon={<IconTag size={20} aria-hidden="true" />}
+            error={errors.categoriaId}
+          >
+            <select
+              value={values.categoriaId}
+              disabled={loadingCategorias}
+              aria-invalid={Boolean(errors.categoriaId)}
+              onChange={(e) => update('categoriaId', e.target.value)}
+            >
+              <option value="">Seleccione una categoría</option>
+              {categoryOptions.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.nombre}
+                  {item.activo ? '' : ' (inactiva · actual)'}
+                  {item.requiereFechaVencimiento ? ' · con vencimiento' : ''}
+                </option>
+              ))}
+            </select>
+          </InventoryFormField>
+          {values.categoriaId ? (
+            <div
+              className={`col-span-full rounded-xl border px-4 py-3.5 ${
               requiereVencimientoPorCategoria
                 ? 'border-amber-200 bg-amber-50'
                 : 'border-slate-200 bg-[#f4f8fc]'
@@ -307,28 +292,30 @@ export default function MaterialForm({
             </p>
           </div>
         ) : null}
-        {requiereVencimientoPorCategoria
-          ? field(
-              'fechaVencimiento',
-              'Fecha de vencimiento *',
-              <IconCalendarTime size={20} aria-hidden="true" />,
-              <input
-                value={values.fechaVencimiento}
-                type="date"
-                aria-invalid={Boolean(errors.fechaVencimiento)}
-                onChange={(e) => update('fechaVencimiento', e.target.value)}
-              />,
-            )
-          : null}
-        <p className="provider-admin__form-note materials-admin__form-full">
+        {requiereVencimientoPorCategoria ? (
+          <InventoryFormField
+            label="Fecha de vencimiento *"
+            icon={<IconCalendarTime size={20} aria-hidden="true" />}
+            error={errors.fechaVencimiento}
+          >
+            <input
+              value={values.fechaVencimiento}
+              type="date"
+              aria-invalid={Boolean(errors.fechaVencimiento)}
+              onChange={(e) => update('fechaVencimiento', e.target.value)}
+            />
+          </InventoryFormField>
+        ) : null}
+        <p className="col-span-full text-sm leading-6 text-slate-500">
           {mode === 'create'
             ? 'El stock mínimo es el umbral de alerta. La existencia física inicia en 0 y solo cambia con entradas o salidas de bodega. El vencimiento lo define la categoría del material.'
             : 'El stock mínimo es el umbral de alerta. La existencia física no se edita aquí. El vencimiento lo define la categoría.'}
         </p>
-        {field(
-          'proveedorId',
-          'Proveedor principal *',
-          <IconBuildingStore size={20} aria-hidden="true" />,
+        <InventoryFormField
+          label="Proveedor principal *"
+          icon={<IconBuildingStore size={20} aria-hidden="true" />}
+          error={errors.proveedorId}
+        >
           <select
             value={values.proveedorId}
             disabled={loadingProveedores}
@@ -346,70 +333,78 @@ export default function MaterialForm({
                 {item.activo ? '' : ' (inactivo · actual)'}
               </option>
             ))}
-          </select>,
-        )}
-        {loadingCategorias && (
-          <p className="provider-admin__form-note" role="status">
+          </select>
+        </InventoryFormField>
+        {loadingCategorias ? (
+          <p className="col-span-full text-sm text-slate-500" role="status">
             Cargando categorías disponibles…
           </p>
-        )}
-        {categoriasError && (
-          <div className="materials-admin__category-error materials-admin__form-full" role="alert">
-            No fue posible cargar las categorías.{' '}
-            <button type="button" onClick={refetchCategorias}>
-              Reintentar
-            </button>
-          </div>
-        )}
-        {loadingProveedores && (
-          <p className="provider-admin__form-note" role="status">
+        ) : null}
+        {categoriasError ? (
+          <Alert className="col-span-full" tone="danger" title="No fue posible cargar las categorías">
+            <div className="mt-2">
+              <Button type="button" variant="secondary" size="sm" onClick={refetchCategorias}>
+                Reintentar
+              </Button>
+            </div>
+          </Alert>
+        ) : null}
+        {loadingProveedores ? (
+          <p className="col-span-full text-sm text-slate-500" role="status">
             Cargando proveedores disponibles…
           </p>
-        )}
-        {proveedoresError && (
-          <div className="materials-admin__category-error materials-admin__form-full" role="alert">
-            No fue posible cargar los proveedores.{' '}
-            <button type="button" onClick={refetchProveedores}>
-              Reintentar
-            </button>
-          </div>
-        )}
-        {mode === 'edit' &&
-          field(
-            'activo',
-            'Estado',
-            <IconToggleRight size={20} aria-hidden="true" />,
+        ) : null}
+        {proveedoresError ? (
+          <Alert className="col-span-full" tone="danger" title="No fue posible cargar los proveedores">
+            <div className="mt-2">
+              <Button type="button" variant="secondary" size="sm" onClick={refetchProveedores}>
+                Reintentar
+              </Button>
+            </div>
+          </Alert>
+        ) : null}
+        {mode === 'edit' ? (
+          <InventoryFormField
+            label="Estado"
+            icon={<IconToggleRight size={20} aria-hidden="true" />}
+          >
             <select
               value={String(values.activo)}
               onChange={(e) => update('activo', e.target.value === 'true')}
             >
               <option value="true">Activo</option>
               <option value="false">Inactivo</option>
-            </select>,
-          )}
-        {mode === 'edit' && (
-          <label className="materials-admin__form-full">
-            <span>Existencia actual</span>
-            <span className="provider-admin__control">
-              <IconStack2 size={20} aria-hidden="true" />
-              <input value={stockActual ?? 0} disabled readOnly />
-            </span>
-            <small>Solo cambia mediante entradas y salidas de inventario.</small>
-          </label>
-        )}
-        {mode === 'create' && (
-          <div className="materials-admin__form-full" style={{ borderTop: '1px solid var(--color-border, #e2e8f0)', paddingTop: '1.25rem', display: 'grid', gap: '0.5rem' }}>
-            <div className="provider-admin__form-heading" style={{ marginBottom: 0 }}>
-              <span><IconTruckDelivery size={25} aria-hidden="true" /></span>
-              <div>
-                <h2 style={{ margin: 0 }}>Existencia inicial <span style={{ fontWeight: 400, fontSize: '0.85em', opacity: 0.65 }}>(opcional)</span></h2>
-                <p style={{ margin: 0 }}>Si ya tiene unidades en bodega, ingréselas aquí para no tener que ir a "Registrar entrada" por separado.</p>
-              </div>
-            </div>
-            {field(
-              'cantidadInicial',
-              'Cantidad inicial en bodega',
-              <IconStack2 size={20} aria-hidden="true" />,
+            </select>
+          </InventoryFormField>
+        ) : null}
+        {mode === 'edit' ? (
+          <InventoryFormField
+            label="Existencia actual"
+            icon={<IconStack2 size={20} aria-hidden="true" />}
+            full
+            hint={
+              <small className="text-sm text-slate-500">
+                Solo cambia mediante entradas y salidas de inventario.
+              </small>
+            }
+          >
+            <input value={stockActual ?? 0} disabled readOnly />
+          </InventoryFormField>
+        ) : null}
+        {mode === 'create' ? (
+          <div className="col-span-full grid gap-6 border-t border-slate-100 pt-6">
+            <InventoryFormHeading
+              className="border-0 pb-0"
+              icon={<IconTruckDelivery size={25} aria-hidden="true" />}
+              title="Existencia inicial (opcional)"
+              description='Si ya tiene unidades en bodega, ingréselas aquí para no tener que ir a "Registrar entrada" por separado.'
+            />
+            <InventoryFormField
+              label="Cantidad inicial en bodega"
+              icon={<IconStack2 size={20} aria-hidden="true" />}
+              error={errors.cantidadInicial}
+              full
+            >
               <input
                 type="number"
                 inputMode="numeric"
@@ -419,14 +414,16 @@ export default function MaterialForm({
                 placeholder="Ej. 10 — déjelo vacío si es 0"
                 aria-invalid={Boolean(errors.cantidadInicial)}
                 onChange={(e) => update('cantidadInicial', e.target.value)}
-              />,
-            )}
+              />
+            </InventoryFormField>
           </div>
-        )}
-        <div className="materials-admin__form-actions">
+        ) : null}
+        <div className="col-span-full mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
           <Button
             type="submit"
             variant="primary"
+            size="lg"
+            className="w-full sm:w-auto"
             disabled={saving}
             loading={saving}
             leftIcon={<IconDeviceFloppy size={19} aria-hidden="true" />}
@@ -436,12 +433,15 @@ export default function MaterialForm({
           <Button
             to={MATERIALES_PATH}
             variant="secondary"
+            size="lg"
+            className="w-full sm:w-auto"
             leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
           >
             Volver al catálogo
           </Button>
         </div>
-    </form>
-  </>
+        </form>
+      </Card>
+    </>
   )
 }

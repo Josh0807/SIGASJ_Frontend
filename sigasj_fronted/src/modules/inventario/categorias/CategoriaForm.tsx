@@ -7,7 +7,7 @@ import {
   IconDeviceFloppy,
   IconTag,
 } from '@tabler/icons-react'
-import { Button } from '../../../shared/ui'
+import { Alert, Button, Card } from '../../../shared/ui'
 import FormSuccessResult from '../../../shared/components/FormSuccessResult'
 import { CATEGORIAS_PATH } from '../inventarioPaths'
 import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryField'
@@ -78,14 +78,15 @@ export default function CategoriaForm({
 
   return (
     <>
-      {message ? (
-        message.error ? (
-          <div className="materials-admin__error" role="alert">
-            {message.text}
-          </div>
-        ) : (
+      {message?.error ? (
+        <Alert tone="danger" title="No se pudo guardar">
+          {message.text}
+        </Alert>
+      ) : null}
+      {message && !message.error ? (
+        <Card as="section" padded className="!p-5 sm:!p-6">
           <FormSuccessResult
-            className="category-admin__success !max-w-3xl !gap-3 !overflow-hidden !rounded-[13px] !border-sigasj-border !bg-white !p-6 !shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
+            className="!gap-3 !border-0 !bg-transparent !p-0 !shadow-none"
             icon={<IconCircleCheckFilled size={30} />}
             title={message.text}
             description="La categoría ya está disponible para clasificar los materiales del inventario."
@@ -99,13 +100,14 @@ export default function CategoriaForm({
               </Button>
             }
           />
-        )
+        </Card>
       ) : null}
-      <form
-        className="materials-admin__form provider-admin__form category-admin__form w-full max-w-3xl !rounded-[13px] !border-sigasj-border !bg-white !shadow-[0_4px_14px_rgba(30,90,156,0.05)]"
-        noValidate
-        onSubmit={submit}
-      >
+      <Card as="section" padded className="!p-5 sm:!p-6 lg:!p-8">
+        <form
+          className="grid w-full gap-x-7 gap-y-6 lg:grid-cols-2"
+          noValidate
+          onSubmit={submit}
+        >
         <InventoryFormHeading
           icon={<IconTag size={25} aria-hidden="true" />}
           title={
@@ -134,7 +136,8 @@ export default function CategoriaForm({
           icon={<IconAlignLeft size={20} aria-hidden="true" />}
           error={errors.descripcion}
           full
-          hint={<small>{values.descripcion.length}/500 caracteres</small>}
+          multiline
+          hint={<small className="text-sm text-slate-500">{values.descripcion.length}/500 caracteres</small>}
         >
           <textarea
             value={values.descripcion}
@@ -145,7 +148,7 @@ export default function CategoriaForm({
           />
         </InventoryFormField>
 
-        <label className="materials-admin__form-full flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3.5">
+        <label className="col-span-full flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3.5">
           <input
             type="checkbox"
             className="mt-1 size-4 accent-blue-600"
@@ -172,10 +175,12 @@ export default function CategoriaForm({
           </span>
         </label>
 
-        <div className="materials-admin__form-actions">
+        <div className="col-span-full mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 lg:pt-7">
           <Button
             type="submit"
             variant="primary"
+            size="lg"
+            className="w-full sm:w-auto"
             disabled={saving}
             loading={saving}
             leftIcon={<IconDeviceFloppy size={19} aria-hidden="true" />}
@@ -189,12 +194,15 @@ export default function CategoriaForm({
           <Button
             to={CATEGORIAS_PATH}
             variant="secondary"
+            size="lg"
+            className="w-full sm:w-auto"
             leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
           >
             Volver al listado
           </Button>
         </div>
-      </form>
+        </form>
+      </Card>
     </>
   )
 }

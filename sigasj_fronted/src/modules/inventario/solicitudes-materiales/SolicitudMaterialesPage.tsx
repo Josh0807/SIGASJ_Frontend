@@ -10,7 +10,6 @@ import {
   IconNote,
   IconPackage,
   IconPlus,
-  IconTrash,
   IconUser,
 } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router-dom'
@@ -19,6 +18,7 @@ import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
 import { getMateriales } from '../materialesApi'
 import type { Material } from '../types'
+import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { createSolicitudMateriales } from './solicitudesMaterialesApi'
 import {
   createEmptyMaterialRow,
@@ -159,7 +159,7 @@ export default function SolicitudMaterialesPage() {
   if (created) {
     return (
       <AdminShell
-        className="material-request material-request--success mx-auto max-w-4xl gap-5 sm:gap-6"
+        className="mx-auto max-w-4xl gap-5 sm:gap-6"
         aria-labelledby="solicitud-title"
       >
         <PageHeader
@@ -184,7 +184,7 @@ export default function SolicitudMaterialesPage() {
             </p>
           ) : null}
         </Alert>
-        <div className="material-request__success-actions flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {returnToAveria ? (
             <Button to={returnToAveria} variant="primary">
               Volver a la avería
@@ -211,19 +211,11 @@ export default function SolicitudMaterialesPage() {
   }
 
   return (
-    <AdminShell
-      className="material-request gap-5 sm:gap-6"
-      aria-labelledby="solicitud-title"
-    >
+    <AdminShell className="gap-5 sm:gap-6" aria-labelledby="solicitud-title">
       <PageHeader
         id="solicitud-title"
         eyebrow="Inventario · Fontanero"
-        title={
-          <span className="inline-flex items-center gap-2">
-            <IconPackage size={22} aria-hidden="true" />
-            Nueva solicitud de materiales
-          </span>
-        }
+        title="Nueva solicitud de materiales"
         description="Seleccione los materiales requeridos. Esta solicitud no descuenta ni reserva existencias."
         actions={
           <Button
@@ -237,8 +229,8 @@ export default function SolicitudMaterialesPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-        <Card padded className="material-request__identity flex items-center gap-3">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-sigasj-primary text-white">
+        <Card padded className="flex items-center gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#eaf6ff] text-[#1e5a9c]">
             <IconUser size={20} stroke={2} aria-hidden="true" />
           </span>
           <div className="min-w-0 grid gap-0.5">
@@ -259,17 +251,17 @@ export default function SolicitudMaterialesPage() {
       {idAveria ? (
         <Card
           padded
-          className="material-request__averia grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+          className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
           aria-label="Avería relacionada"
         >
-          <div className="!grid !gap-1">
-            <span className="!text-xs !font-extrabold !uppercase !tracking-[0.09em] !text-[#1e5a9c]">
+          <div className="grid gap-1">
+            <span className="text-xs font-extrabold uppercase tracking-[0.09em] text-[#1e5a9c]">
               Avería relacionada
             </span>
-            <strong className="!text-xl !font-black !tracking-[-0.015em] !text-[#1e5a9c]">
+            <strong className="text-xl font-black tracking-tight text-[#1e5a9c]">
               {referenciaAveria || `Avería #${idAveria}`}
             </strong>
-            <small className="!text-sm !font-medium !text-slate-500">
+            <small className="text-sm font-medium text-slate-500">
               Identificador #{idAveria}
             </small>
           </div>
@@ -281,121 +273,116 @@ export default function SolicitudMaterialesPage() {
         </Card>
       ) : null}
 
-      <Card padded className="material-request__form provider-admin__form w-full max-w-none">
-        <form
-          className="grid gap-6"
-          onSubmit={submit}
-          noValidate
-        >
-        <div className="provider-admin__form-heading flex items-start gap-4 border-b border-sigasj-border pb-5">
-          <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-sigasj-primary text-white sm:size-14">
-            <IconClipboardList size={24} aria-hidden="true" />
-          </span>
-          <div className="min-w-0">
-            <h2 className="m-0 text-lg font-extrabold text-sigasj-ink">
-              Detalle de la solicitud
-            </h2>
-            <p className="m-0 mt-1 text-sm leading-relaxed text-sigasj-muted">
-              Agregue materiales y una observación. Enviar no modifica el stock.
-            </p>
-          </div>
-        </div>
+      <Card as="section" padded className="!p-5 sm:!p-6 lg:!p-8">
+        <form className="grid w-full gap-6" onSubmit={submit} noValidate>
+          <InventoryFormHeading
+            icon={<IconClipboardList size={24} aria-hidden="true" />}
+            title="Detalle de la solicitud"
+            description="Agregue materiales y una observación. Enviar no modifica el stock."
+          />
 
-        {submitError || hasSolicitudMaterialesErrors(errors) ? (
-          <div
-            className="material-request__alert !rounded-2xl"
-            ref={errorSummaryRef}
-            tabIndex={-1}
-            role="alert"
-          >
-            <strong>No se pudo enviar la solicitud.</strong>
-            <span>{submitError || errors.form || 'Revise los campos marcados.'}</span>
-          </div>
-        ) : null}
+          {submitError || hasSolicitudMaterialesErrors(errors) ? (
+            <Alert
+              ref={errorSummaryRef}
+              tabIndex={-1}
+              tone="danger"
+              title="No se pudo enviar la solicitud."
+              className="col-span-full"
+            >
+              {submitError || errors.form || 'Revise los campos marcados.'}
+            </Alert>
+          ) : null}
 
-        <div className="material-request__section-heading !flex !flex-wrap !items-center !justify-between !gap-3 !rounded-2xl !border !border-[#e8f1f8] !bg-[#f7fbff] !p-4 sm:!p-5">
-          <div>
-            <h2 className="!m-0 !text-base !font-extrabold !text-[#1e5a9c]">
-              Materiales requeridos
-            </h2>
-            <p className="!m-0 !mt-0.5 !text-sm !text-slate-600">
-              Agregue uno o varios materiales y su cantidad.
-            </p>
+          <div className="col-span-full flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="m-0 text-base font-extrabold text-[#1e5a9c]">
+                Materiales requeridos
+              </h3>
+              <p className="m-0 mt-0.5 text-sm text-slate-600">
+                Agregue uno o varios materiales y su cantidad.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={() =>
+                setRows((current) => [...current, createEmptyMaterialRow()])
+              }
+              disabled={
+                loading ||
+                materials.length === 0 ||
+                selectedIds.size >= materials.length
+              }
+              leftIcon={<IconPlus size={19} aria-hidden="true" />}
+            >
+              Agregar material
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={() =>
-              setRows((current) => [...current, createEmptyMaterialRow()])
-            }
-            disabled={
-              loading ||
-              materials.length === 0 ||
-              selectedIds.size >= materials.length
-            }
-            leftIcon={<IconPlus size={19} aria-hidden="true" />}
-          >
-            Agregar material
-          </Button>
-        </div>
 
-        {loading ? (
-          <div className="material-request__state !rounded-2xl" role="status">
-            <span className="material-request__spinner" />
-            Consultando materiales activos…
-          </div>
-        ) : null}
-        {loadError ? (
-          <div className="material-request__alert !rounded-2xl" role="alert">
-            <span>{loadError}</span>
-            <button type="button" onClick={() => void loadMaterials()}>
-              Reintentar
-            </button>
-          </div>
-        ) : null}
-        {!loading && !loadError && materials.length === 0 ? (
-          <div className="material-request__state !rounded-2xl">
-            No hay materiales activos disponibles.
-          </div>
-        ) : null}
-
-        <div className="material-request__rows !gap-4">
-          {rows.map((row, index) => {
-            const selectedMaterial = materials.find(
-              (material) => String(material.id) === row.materialId,
-            )
-            const rowErrors = errors.rows[row.key] ?? {}
-            return (
-              <fieldset
-                className="material-request__row !grid !gap-4 !rounded-[1.25rem] !border !border-[#d7e8f7] !bg-gradient-to-br !from-white !to-[#f5faff] !p-4 !pt-[3.75rem] !shadow-[0_8px_22px_rgba(30,90,156,0.06)] max-[760px]:!grid-cols-1 min-[761px]:!grid-cols-[minmax(0,1.35fr)_minmax(11rem,0.7fr)_minmax(0,1fr)] min-[761px]:!gap-4 min-[761px]:!p-5 min-[761px]:!pt-[4rem]"
-                key={row.key}
-                disabled={submitting || loading || Boolean(loadError)}
-              >
-                <legend className="material-request__row-top !border-b !border-[#e8f1f8]">
-                  <span className="!inline-flex !items-center !gap-2 !rounded-full !border !border-[#cfe4f7] !bg-[#eaf6ff] !px-3 !py-1 !text-xs !font-extrabold !text-[#1e5a9c]">
-                    <IconPackage size={14} aria-hidden="true" />
-                    Material {index + 1}
-                  </span>
-                  <button
+          {loading ? (
+            <Alert tone="info" className="col-span-full" role="status">
+              Consultando materiales activos…
+            </Alert>
+          ) : null}
+          {loadError ? (
+            <Alert tone="danger" className="col-span-full" role="alert">
+              <span className="grid gap-3">
+                <span>{loadError}</span>
+                <span>
+                  <Button
                     type="button"
-                    className="material-request__remove !rounded-xl"
-                    onClick={() => removeRow(row.key)}
-                    aria-label={`Eliminar material ${index + 1}`}
-                    disabled={submitting}
-                    title="Eliminar material"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => void loadMaterials()}
                   >
-                    <IconTrash size={18} aria-hidden="true" />
-                    <span>Eliminar</span>
-                  </button>
-                </legend>
+                    Reintentar
+                  </Button>
+                </span>
+              </span>
+            </Alert>
+          ) : null}
+          {!loading && !loadError && materials.length === 0 ? (
+            <Alert tone="warning" className="col-span-full">
+              No hay materiales activos disponibles.
+            </Alert>
+          ) : null}
 
-                <label className="material-request__material-field ![grid-column:auto] !grid !gap-1.5 sm:![grid-column:auto]">
-                  <span className="!inline-flex !items-center !gap-1 !text-sm !font-bold !text-[#1e5a9c]">
-                    Material <strong className="!text-rose-500" aria-hidden="true">*</strong>
-                  </span>
-                  <span className="provider-admin__control !rounded-xl !border !border-[#cfe4f7] !bg-white !shadow-sm">
-                    <IconPackage size={20} aria-hidden="true" />
+          <div className="col-span-full grid gap-4">
+            {rows.map((row, index) => {
+              const selectedMaterial = materials.find(
+                (material) => String(material.id) === row.materialId,
+              )
+              const rowErrors = errors.rows[row.key] ?? {}
+              return (
+                <fieldset
+                  key={row.key}
+                  disabled={submitting || loading || Boolean(loadError)}
+                  className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-3 lg:p-5"
+                >
+                  <div className="col-span-full flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#cfe4f7] bg-[#eaf6ff] px-3 py-1 text-xs font-extrabold text-[#1e5a9c]">
+                      <IconPackage size={14} aria-hidden="true" />
+                      Material {index + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={() => removeRow(row.key)}
+                      disabled={submitting}
+                      aria-label={`Eliminar material ${index + 1}`}
+                      title="Eliminar material"
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+
+                  <InventoryFormField
+                    label="Material *"
+                    icon={<IconPackage size={20} aria-hidden="true" />}
+                    error={rowErrors.materialId}
+                  >
                     <select
                       value={row.materialId}
                       onChange={(event) =>
@@ -422,75 +409,64 @@ export default function SolicitudMaterialesPage() {
                         </option>
                       ))}
                     </select>
-                  </span>
-                  {rowErrors.materialId ? (
-                    <small
-                      id={`${row.key}-material-error`}
-                      className="material-request__field-error"
-                    >
-                      {rowErrors.materialId}
-                    </small>
-                  ) : null}
-                </label>
+                  </InventoryFormField>
 
-                <label className="material-request__quantity-field !grid !gap-1.5">
-                  <span className="!inline-flex !items-center !gap-1 !text-sm !font-bold !text-[#1e5a9c]">
-                    Cantidad <strong className="!text-rose-500" aria-hidden="true">*</strong>
-                  </span>
-                  <div className="material-request__quantity !rounded-xl !shadow-sm">
-                    <button
-                      type="button"
-                      className="material-request__step"
-                      aria-label={`Disminuir cantidad del material ${index + 1}`}
-                      onClick={() => stepCantidad(row.key, -1)}
-                    >
-                      <IconMinus size={16} aria-hidden="true" />
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      step="1"
-                      inputMode="numeric"
-                      value={row.cantidad}
-                      onChange={(event) =>
-                        updateRow(row.key, 'cantidad', event.target.value)
-                      }
-                      aria-invalid={Boolean(rowErrors.cantidad)}
-                      aria-describedby={
-                        rowErrors.cantidad
-                          ? `${row.key}-cantidad-error`
-                          : undefined
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="material-request__step"
-                      aria-label={`Aumentar cantidad del material ${index + 1}`}
-                      onClick={() => stepCantidad(row.key, 1)}
-                    >
-                      <IconPlus size={16} aria-hidden="true" />
-                    </button>
-                    <span className="material-request__unit">
-                      {selectedMaterial?.unidadMedida || 'unidad'}
-                    </span>
-                  </div>
-                  {rowErrors.cantidad ? (
-                    <small
-                      id={`${row.key}-cantidad-error`}
-                      className="material-request__field-error"
-                    >
-                      {rowErrors.cantidad}
-                    </small>
-                  ) : null}
-                </label>
+                  <label className="grid min-w-0 gap-2.5">
+                    <span className="text-sm font-bold text-[#163f6b]">Cantidad *</span>
+                    <div className="flex min-h-14 items-center gap-1 rounded-xl border border-slate-200 bg-white px-1 sm:px-2">
+                      <button
+                        type="button"
+                        className="grid size-10 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                        aria-label={`Disminuir cantidad del material ${index + 1}`}
+                        onClick={() => stepCantidad(row.key, -1)}
+                      >
+                        <IconMinus size={16} aria-hidden="true" />
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        inputMode="numeric"
+                        className="min-w-0 flex-1 border-0 bg-transparent py-3 text-center text-slate-800 outline-none"
+                        value={row.cantidad}
+                        onChange={(event) =>
+                          updateRow(row.key, 'cantidad', event.target.value)
+                        }
+                        aria-invalid={Boolean(rowErrors.cantidad)}
+                        aria-describedby={
+                          rowErrors.cantidad
+                            ? `${row.key}-cantidad-error`
+                            : undefined
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="grid size-10 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                        aria-label={`Aumentar cantidad del material ${index + 1}`}
+                        onClick={() => stepCantidad(row.key, 1)}
+                      >
+                        <IconPlus size={16} aria-hidden="true" />
+                      </button>
+                      <span className="shrink-0 pr-2 text-sm font-medium text-slate-500">
+                        {selectedMaterial?.unidadMedida || 'unidad'}
+                      </span>
+                    </div>
+                    {rowErrors.cantidad ? (
+                      <small
+                        id={`${row.key}-cantidad-error`}
+                        className="font-semibold text-red-600"
+                        role="alert"
+                      >
+                        {rowErrors.cantidad}
+                      </small>
+                    ) : null}
+                  </label>
 
-                <label className="material-request__note-field !grid !gap-1.5">
-                  <span className="!inline-flex !items-baseline !gap-2 !text-sm !font-bold !text-[#1e5a9c]">
-                    Nota del material{' '}
-                    <small className="!font-medium !text-slate-500">(opcional)</small>
-                  </span>
-                  <span className="provider-admin__control !rounded-xl !border !border-[#cfe4f7] !bg-white !shadow-sm">
-                    <IconNote size={20} aria-hidden="true" />
+                  <InventoryFormField
+                    label="Nota del material (opcional)"
+                    icon={<IconNote size={20} aria-hidden="true" />}
+                    error={rowErrors.observacion}
+                  >
                     <input
                       maxLength={255}
                       value={row.observacion}
@@ -500,35 +476,36 @@ export default function SolicitudMaterialesPage() {
                       placeholder="Ej. Para tubería principal"
                       aria-invalid={Boolean(rowErrors.observacion)}
                     />
-                  </span>
-                  {rowErrors.observacion ? (
-                    <small className="material-request__field-error">
-                      {rowErrors.observacion}
-                    </small>
-                  ) : null}
-                </label>
-              </fieldset>
-            )
-          })}
-        </div>
+                  </InventoryFormField>
+                </fieldset>
+              )
+            })}
+          </div>
 
-        {rows.length === 0 ? (
-          <button
-            type="button"
-            className="material-request__empty-add !rounded-2xl"
-            onClick={() => setRows([createEmptyMaterialRow()])}
+          {rows.length === 0 ? (
+            <Button
+              type="button"
+              variant="secondary"
+              className="col-span-full w-full sm:w-auto"
+              onClick={() => setRows([createEmptyMaterialRow()])}
+              leftIcon={<IconPlus size={19} aria-hidden="true" />}
+            >
+              Agregar el primer material
+            </Button>
+          ) : null}
+
+          <InventoryFormField
+            label="Observación general (opcional)"
+            icon={<IconAlignLeft size={20} aria-hidden="true" />}
+            error={errors.motivo}
+            full
+            multiline
+            hint={
+              <span className="text-xs font-medium text-slate-500">
+                {motivo.length}/1000
+              </span>
+            }
           >
-            <IconPlus size={19} aria-hidden="true" /> Agregar el primer material
-          </button>
-        ) : null}
-
-        <label className="material-request__motive col-span-full !grid !gap-2 !rounded-2xl !border !border-[#e8f1f8] !bg-[#f7fbff] !p-4 sm:!p-5">
-          <span className="!inline-flex !items-baseline !gap-2 !text-sm !font-bold !text-[#1e5a9c]">
-            Observación general{' '}
-            <small className="!font-medium !text-slate-500">(opcional)</small>
-          </span>
-          <span className="provider-admin__control !rounded-xl !border !border-[#cfe4f7] !bg-white !shadow-sm">
-            <IconAlignLeft size={20} aria-hidden="true" />
             <textarea
               value={motivo}
               onChange={(event) => {
@@ -539,38 +516,33 @@ export default function SolicitudMaterialesPage() {
               placeholder="Describa para qué necesita estos materiales."
               aria-invalid={Boolean(errors.motivo)}
             />
-          </span>
-          <span className="material-request__counter">{motivo.length}/1000</span>
-          {errors.motivo ? (
-            <small className="material-request__field-error">{errors.motivo}</small>
-          ) : null}
-        </label>
+          </InventoryFormField>
 
-        <footer className="material-request__actions col-span-full !flex !flex-col !gap-4 !border-t !border-slate-100 !pt-5 sm:!flex-row sm:!items-center sm:!justify-between">
-          <p className="!m-0 !rounded-xl !border !border-amber-100 !bg-amber-50/80 !px-3.5 !py-2.5 !text-sm !text-amber-900">
-            <strong>Importante:</strong> enviar esta solicitud no modifica el stock.
-          </p>
-          <div className="!flex !flex-wrap !items-center !justify-end !gap-3 max-[700px]:!w-full max-[700px]:!flex-col [&>*]:max-[700px]:!w-full">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={
-                submitting || loading || Boolean(loadError) || materials.length === 0
-              }
-              loading={submitting}
-              leftIcon={<IconDeviceFloppy size={19} aria-hidden="true" />}
-            >
-              {submitting ? 'Enviando…' : 'Enviar solicitud'}
-            </Button>
-            <Button
-              to={SOLICITUDES_MATERIALES_PATH}
-              variant="secondary"
-              leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
-            >
-              Volver a mis solicitudes
-            </Button>
+          <div className="col-span-full flex flex-col gap-4 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="m-0 rounded-xl border border-amber-100 bg-amber-50/80 px-3.5 py-2.5 text-sm text-amber-900">
+              <strong>Importante:</strong> enviar esta solicitud no modifica el stock.
+            </p>
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={
+                  submitting || loading || Boolean(loadError) || materials.length === 0
+                }
+                loading={submitting}
+                leftIcon={<IconDeviceFloppy size={19} aria-hidden="true" />}
+              >
+                {submitting ? 'Enviando…' : 'Enviar solicitud'}
+              </Button>
+              <Button
+                to={SOLICITUDES_MATERIALES_PATH}
+                variant="secondary"
+                leftIcon={<IconArrowLeft size={19} aria-hidden="true" />}
+              >
+                Volver a mis solicitudes
+              </Button>
+            </div>
           </div>
-        </footer>
         </form>
       </Card>
     </AdminShell>

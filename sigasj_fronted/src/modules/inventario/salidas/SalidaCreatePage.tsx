@@ -17,7 +17,7 @@ import { focusFirstInvalidInventoryField } from '../focusFirstInvalidInventoryFi
 import { InventoryFormField, InventoryFormHeading } from '../InventoryFormField'
 import { useAuth } from '../../auth/components/AuthContext'
 import { resolveAuthUserDisplayName } from '../../auth/utils/authUserDisplay'
-import { AdminShell, Alert, Badge, Button, PageHeader } from '../../../shared/ui'
+import { AdminShell, Alert, Badge, Button, Card, PageHeader } from '../../../shared/ui'
 import { MATERIALES_PATH } from '../inventarioPaths'
 import { readSafeAveriaReturnPath } from '../../averias/inventario/averiaInventarioPaths'
 import { useMateriales } from '../useMateriales'
@@ -280,11 +280,12 @@ export default function SalidaCreatePage() {
         </Alert>
       ) : null}
 
-      <form
-        className="provider-admin__form admin-modern-form inventory-entry__form grid w-full max-w-none grid-cols-1 gap-[18px] md:grid-cols-2"
-        noValidate
-        onSubmit={submit}
-      >
+      <Card as="section" padded className="!p-5 sm:!p-6 lg:!p-8">
+        <form
+          className="inventory-entry__form grid w-full gap-x-7 gap-y-6 lg:grid-cols-2"
+          noValidate
+          onSubmit={submit}
+        >
         <InventoryFormHeading
           icon={<IconTruckReturn size={22} aria-hidden="true" />}
           title="Datos de la salida"
@@ -313,7 +314,7 @@ export default function SalidaCreatePage() {
         </InventoryFormField>
 
         {loading ? (
-          <p className="provider-admin__form-note" role="status">
+          <p className="col-span-full text-sm text-slate-500" role="status">
             Cargando materiales disponibles…
           </p>
         ) : null}
@@ -338,10 +339,7 @@ export default function SalidaCreatePage() {
         ) : null}
 
         {materialListTruncated ? (
-          <p
-            className="provider-admin__form-note col-span-full"
-            role="note"
-          >
+          <p className="col-span-full text-sm text-slate-500" role="note">
             Se muestran los primeros {materiales.data.length} materiales. Si no
             encuentra el material, use el buscador del catálogo.
           </p>
@@ -472,7 +470,8 @@ export default function SalidaCreatePage() {
           icon={<IconAlignLeft size={20} aria-hidden="true" />}
           error={errors.observacion}
           full
-          hint={<small>{values.observacion.length}/1000 caracteres</small>}
+          multiline
+          hint={<small className="text-sm text-slate-500">{values.observacion.length}/1000 caracteres</small>}
         >
           <textarea
             value={values.observacion}
@@ -500,7 +499,7 @@ export default function SalidaCreatePage() {
           </Badge>
         </div>
 
-        <div className="col-span-full flex flex-wrap justify-end gap-2 border-t border-[#e0edf6] pt-5">
+        <div className="col-span-full mt-1 flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:flex-wrap sm:justify-end sm:items-center sm:gap-4 lg:pt-7">
           <Button
             type="submit"
             leftIcon={<IconDeviceFloppy size={18} aria-hidden="true" />}
@@ -522,7 +521,8 @@ export default function SalidaCreatePage() {
             Volver al catálogo
           </Button>
         </div>
-    </form>
+        </form>
+      </Card>
     </AdminShell>
   )
 }
