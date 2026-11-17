@@ -281,7 +281,7 @@ export default function SalidaCreatePage() {
       ) : null}
 
       <form
-        className="provider-admin__form admin-modern-form inventory-entry__form grid w-full max-w-3xl grid-cols-1 gap-[18px] md:grid-cols-2"
+        className="provider-admin__form admin-modern-form inventory-entry__form grid w-full max-w-none grid-cols-1 gap-[18px] md:grid-cols-2"
         noValidate
         onSubmit={submit}
       >

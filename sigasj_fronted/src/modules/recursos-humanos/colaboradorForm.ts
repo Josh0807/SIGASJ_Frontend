@@ -122,20 +122,30 @@ export function validateColaborador(values: ColaboradorFormValues): ColaboradorF
   }
 
   const fechaIngreso = values.fechaIngreso.trim()
-  if (fechaIngreso) {
-    if (!esFechaCalendario(fechaIngreso)) {
-      errors.fechaIngreso = 'Use el formato AAAA-MM-DD.'
-    } else if (fechaIngreso > hoyEnAsada()) {
-      errors.fechaIngreso = 'La fecha de ingreso no puede ser futura.'
-    }
+  if (!fechaIngreso) {
+    errors.fechaIngreso = 'La fecha de ingreso es obligatoria.'
+  } else if (!esFechaCalendario(fechaIngreso)) {
+    errors.fechaIngreso = 'Use el formato AAAA-MM-DD.'
+  } else if (fechaIngreso > hoyEnAsada()) {
+    errors.fechaIngreso = 'La fecha de ingreso no puede ser futura.'
+  }
+
+  if (!values.jornadaLaboral) {
+    errors.jornadaLaboral = 'Seleccione la jornada laboral.'
   }
 
   const dias = values.diasLaboralesHabituales.trim()
-  if (dias) {
+  if (!dias) {
+    errors.diasLaboralesHabituales = 'Indique los días laborales habituales (1–7).'
+  } else {
     const n = Number(dias)
     if (!Number.isInteger(n) || n < 1 || n > 7) {
       errors.diasLaboralesHabituales = 'Indique un número entre 1 y 7.'
     }
+  }
+
+  if (!values.modalidadPago) {
+    errors.modalidadPago = 'Seleccione la modalidad de pago.'
   }
 
   return errors

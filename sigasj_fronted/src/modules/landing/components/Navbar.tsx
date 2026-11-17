@@ -4,6 +4,7 @@ import type { NavbarProps } from '../types/NavbarProps'
 import {
   COMPLAINTS_HREF,
   GALLERY_HREF,
+  PROJECTS_HREF,
   TRANSPARENCY_HREF,
 } from '../config/landingAnchors'
 import { useLandingActiveNav } from '../hooks/useLandingActiveNav'
@@ -15,6 +16,7 @@ const dropdownItems: NavigationItem[] = [
   { label: 'Sobre nosotros', href: '#sobre-nosotros' },
   { label: 'Transparencia', href: TRANSPARENCY_HREF },
   { label: 'Sugerencias y Quejas', href: COMPLAINTS_HREF },
+  { label: 'Proyectos', href: PROJECTS_HREF },
   { label: 'Galería', href: GALLERY_HREF },
 ]
 

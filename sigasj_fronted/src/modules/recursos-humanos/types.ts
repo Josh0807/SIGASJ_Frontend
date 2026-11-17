@@ -199,8 +199,17 @@ export type MovimientoVacaciones = {
   signoAjuste?: 1 | -1 | null
   fecha: string
   observaciones: string | null
+  periodoId?: string | null
   colaborador?: PermisoColaboradorResumen | null
   createdAt: string
+}
+
+export type AlertaVacaciones = {
+  tipo: 'PERIODO_PENDIENTE_DISFRUTE' | 'PLAZO_LEGAL_OTORGAMIENTO'
+  mensaje: string
+  periodoId: string
+  fechaAdquisicion: string
+  venceEl: string
 }
 
 export type BalanceVacaciones = {
@@ -211,6 +220,13 @@ export type BalanceVacaciones = {
   diasAjusteNeto: number
   diasDisponibles: number
   totalMovimientos: number
+  diasPorPeriodo?: number
+  periodosAdquiridos?: Array<{
+    periodoId: string
+    fechaAdquisicion: string
+    cantidadDias: number
+  }>
+  alertas?: AlertaVacaciones[]
 }
 
 export type MovimientosVacacionesListado = {

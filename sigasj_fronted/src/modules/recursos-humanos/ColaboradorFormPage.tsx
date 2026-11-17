@@ -376,8 +376,8 @@ export default function ColaboradorFormPage() {
                   Información laboral
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Fecha de ingreso real, jornada y modalidad de pago. Opcional para registros
-                  antiguos; la antigüedad se calcula automáticamente.
+                  Fecha de ingreso real, jornada y modalidad de pago. Obligatorios para el cálculo de
+                  vacaciones (2 semanas por cada 50 semanas). La antigüedad se calcula automáticamente.
                 </p>
               </div>
             </div>

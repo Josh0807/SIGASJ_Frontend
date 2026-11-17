@@ -158,6 +158,34 @@ export default function VacacionesSaldoPanel({
           />
         </dl>
       </div>
+
+      {balance.periodosAdquiridos && balance.periodosAdquiridos.length > 0 ? (
+        <p className="m-0 text-sm font-semibold text-[color:var(--asada-muted,#5b7390)]">
+          Periodos adquiridos (50 semanas):{' '}
+          {balance.periodosAdquiridos.map((p) => p.periodoId).join(', ')}
+          {typeof balance.diasPorPeriodo === 'number'
+            ? ` · ${balance.diasPorPeriodo} días por periodo`
+            : null}
+        </p>
+      ) : null}
+
+      {balance.alertas && balance.alertas.length > 0 ? (
+        <ul className="m-0 grid list-none gap-2 p-0" aria-label="Alertas de vacaciones">
+          {balance.alertas.map((alerta) => (
+            <li
+              key={`${alerta.tipo}-${alerta.periodoId}-${alerta.venceEl}`}
+              className={`rounded-xl border px-3.5 py-2.5 text-sm font-semibold ${
+                alerta.tipo === 'PLAZO_LEGAL_OTORGAMIENTO'
+                  ? 'border-amber-300 bg-amber-50 text-amber-950'
+                  : 'border-sky-200 bg-sky-50 text-sky-950'
+              }`}
+              role="status"
+            >
+              {alerta.mensaje}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   )
 }
