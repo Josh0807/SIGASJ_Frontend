@@ -15,16 +15,26 @@ const valid = {
   correoElectronico: ' Juan@Example.com ',
   puestoId: '3',
   usuarioId: '',
-  fechaIngreso: '',
-  jornadaLaboral: '' as const,
-  diasLaboralesHabituales: '',
-  modalidadPago: '' as const,
+  fechaIngreso: '2020-03-15',
+  jornadaLaboral: 'COMPLETA' as const,
+  diasLaboralesHabituales: '5',
+  modalidadPago: 'MENSUAL' as const,
 }
 
 describe('formulario de colaborador', () => {
   it('exige todos los campos obligatorios', () => {
     expect(Object.keys(validateColaborador(EMPTY_COLABORADOR_VALUES)).sort()).toEqual(
-      ['apellidos', 'cedula', 'correoElectronico', 'nombre', 'puestoId'].sort(),
+      [
+        'apellidos',
+        'cedula',
+        'correoElectronico',
+        'diasLaboralesHabituales',
+        'fechaIngreso',
+        'jornadaLaboral',
+        'modalidadPago',
+        'nombre',
+        'puestoId',
+      ].sort(),
     )
   })
 
@@ -49,6 +59,10 @@ describe('formulario de colaborador', () => {
       cedula: '1-1111-1111',
       correoElectronico: 'juan@example.com',
       puestoId: 3,
+      fechaIngreso: '2020-03-15',
+      jornadaLaboral: 'COMPLETA',
+      diasLaboralesHabituales: 5,
+      modalidadPago: 'MENSUAL',
     })
     expect(toColaboradorPayload(valid, 'editar').usuarioId).toBeNull()
     expect(toColaboradorPayload({ ...valid, usuarioId: '7' }, 'crear').usuarioId).toBe(7)
@@ -91,7 +105,18 @@ describe('formulario de colaborador', () => {
       diasLaboralesHabituales: 5,
       modalidadPago: 'MENSUAL',
     })
-    expect(toColaboradorPayload(valid, 'editar')).toMatchObject({
+    expect(
+      toColaboradorPayload(
+        {
+          ...valid,
+          fechaIngreso: '',
+          jornadaLaboral: '',
+          diasLaboralesHabituales: '',
+          modalidadPago: '',
+        },
+        'editar',
+      ),
+    ).toMatchObject({
       fechaIngreso: null,
       jornadaLaboral: null,
       diasLaboralesHabituales: null,

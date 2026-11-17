@@ -109,7 +109,7 @@ export default function EntradaCreatePage() {
       </div>
     )}
     {uploadedDocuments.length > 0 && <section className="inventory-entry__uploaded" aria-label="Documentos adjuntos"><h2>Documentos adjuntos</h2><ul>{uploadedDocuments.map((document) => <li key={document.id}><span>{document.nombreOriginal}</span><button type="button" onClick={() => void abrirDocumentoEntrada(document.rutaReferenciaArchivo)}>Ver documento</button></li>)}</ul></section>}
-    <form className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-3xl" noValidate onSubmit={submit}>
+    <form className="materials-admin__form provider-admin__form inventory-entry__form w-full max-w-none" noValidate onSubmit={submit}>
       <InventoryFormHeading icon={<IconTruckDelivery size={25} aria-hidden="true" />} title="Datos de la entrada" description="Indique el material recibido. Las existencias las actualiza el servidor." />
       <InventoryFormField label="Material recibido *" icon={<IconPackage size={20} aria-hidden="true" />} error={errors.materialId}>
         <select value={values.materialId} disabled={loadingMateriales || Boolean(materialesError)} aria-invalid={Boolean(errors.materialId)} onChange={(event) => update('materialId', event.target.value)}>

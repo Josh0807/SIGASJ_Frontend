@@ -6,6 +6,8 @@ export interface HeroSectionProps {
   imageAlt?: string
   reportLabel?: string
   reportHref?: string
+  receiptsLabel?: string
+  receiptsHref?: string
   announcementsLabel?: string
   announcementsHref?: string
 }

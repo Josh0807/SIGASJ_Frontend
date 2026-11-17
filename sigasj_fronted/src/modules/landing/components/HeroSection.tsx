@@ -1,4 +1,4 @@
-import { IconArrowRight, IconTool } from '@tabler/icons-react'
+import { IconArrowRight, IconReceipt, IconTool } from '@tabler/icons-react'
 import heroImage from '../../../assets/Hero1.webp'
 import type { HeroSectionProps } from '../types/HeroSectionProps'
 import { ANNOUNCEMENTS_HREF } from '../config/landingAnchors'
@@ -6,6 +6,7 @@ import { REPORTAR_AVERIA_ROUTE_PATH } from '../../../app/router/routePaths'
 import { Button } from '../../../shared/ui'
 
 const REPORT_FAULTS_HREF = REPORTAR_AVERIA_ROUTE_PATH
+const RECEIPTS_HREF = '/consulta-recibo'
 
 const HeroSection = ({
   id = 'inicio',
@@ -14,6 +15,8 @@ const HeroSection = ({
   imageSrc = heroImage,
   reportLabel = 'Reportar una avería',
   reportHref = REPORT_FAULTS_HREF,
+  receiptsLabel = 'Consultar recibo',
+  receiptsHref = RECEIPTS_HREF,
   announcementsLabel = 'Ver comunicados',
   announcementsHref = ANNOUNCEMENTS_HREF,
 }: HeroSectionProps) => (
@@ -53,13 +56,23 @@ const HeroSection = ({
         >
           <Button
             to={reportHref}
-            variant="primary"
+            variant="secondary"
             size="md"
             leftIcon={<IconTool size={18} stroke={1.9} aria-hidden="true" />}
             rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
-            className="landing-lift-button landing-lift-button--solid public-hero__cta max-[520px]:w-full"
+            className="landing-lift-button public-hero__cta max-[520px]:w-full border-white/75 bg-white/15 text-white shadow-none hover:border-white hover:bg-white/25 hover:text-white"
           >
             {reportLabel}
+          </Button>
+          <Button
+            to={receiptsHref}
+            variant="secondary"
+            size="md"
+            leftIcon={<IconReceipt size={18} stroke={1.9} aria-hidden="true" />}
+            rightIcon={<IconArrowRight size={18} stroke={1.9} aria-hidden="true" />}
+            className="landing-lift-button public-hero__cta max-[520px]:w-full border-white/75 bg-white/15 text-white shadow-none hover:border-white hover:bg-white/25 hover:text-white"
+          >
+            {receiptsLabel}
           </Button>
           <Button
             href={announcementsHref}

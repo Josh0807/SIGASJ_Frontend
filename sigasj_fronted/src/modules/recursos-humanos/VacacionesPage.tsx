@@ -730,6 +730,9 @@ export default function VacacionesPage() {
                     <th scope="col" className="px-5 py-3">
                       Tipo
                     </th>
+                    <th scope="col" className="px-5 py-3">
+                      Periodo
+                    </th>
                     <th scope="col" className="px-5 py-3 text-right">
                       Días
                     </th>
@@ -768,6 +771,14 @@ export default function VacacionesPage() {
                         >
                           {tipoMovimientoLabel(movimiento.tipo)}
                         </Badge>
+                      </td>
+                      <td className="flex items-center justify-between gap-3 md:table-cell md:px-5 md:py-3.5">
+                        <span className="text-[0.68rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted md:hidden">
+                          Periodo
+                        </span>
+                        <span className="font-semibold tabular-nums text-sigasj-ink">
+                          {movimiento.periodoId ?? '—'}
+                        </span>
                       </td>
                       <td className="flex items-center justify-between gap-3 md:table-cell md:px-5 md:py-3.5 md:text-right">
                         <span className="text-[0.68rem] font-bold uppercase tracking-[0.06em] text-sigasj-muted md:hidden">
