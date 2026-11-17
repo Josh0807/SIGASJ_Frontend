@@ -1,37 +1,34 @@
-import { resolveBackendAssetUrl } from '../../../services/http/assetUrl'
 import type { DocumentoActividadRegistrado } from '../types/actividadFontaneroApi'
 
-const toUploadsPath = (ruta: string, actividadId: number) => {
-  const trimmed = ruta.replace(/^\/+/, '')
-  const storedApi = trimmed.match(
-    /^(?:api\/v1\/)?fontanero\/actividades\/(\d+)\/documentos\/([^/?#]+)$/i,
-  )
-  if (storedApi) {
-    return `/uploads/actividades-fontanero/${storedApi[1]}/${storedApi[2]}`
-  }
+const SAFE_FILENAME = /^[^/?#\\]+$/
 
-  if (/^uploads\//i.test(trimmed) || /^api\/v1\/uploads\//i.test(trimmed)) {
-    return `/${trimmed.replace(/^api\/v1\//i, '')}`
-  }
-
-  const filename = trimmed.split('/').pop()
-  if (filename && actividadId > 0 && !trimmed.includes('/')) {
-    return `/uploads/actividades-fontanero/${actividadId}/${filename}`
-  }
-
-  return `/${trimmed}`
-}
-
-export const evidenciaActividadPublicUrl = (
+export const evidenciaActividadEndpoint = (
   rutaReferenciaArchivo: string,
   actividadId: number,
-): string => {
-  if (/^https?:\/\//i.test(rutaReferenciaArchivo)) {
-    return rutaReferenciaArchivo
+): string | null => {
+  const value = rutaReferenciaArchivo.trim()
+  if (!value || value.includes('..')) return null
+  let path = value
+  if (/^https?:\/\//i.test(value)) {
+    try {
+      const url = new URL(value)
+      path = `${url.pathname}${url.search}`
+    } catch {
+      return null
+    }
   }
-
-  const uploadsPath = toUploadsPath(rutaReferenciaArchivo, actividadId)
-  return resolveBackendAssetUrl(uploadsPath) ?? uploadsPath
+  path = `/${path.replace(/^\/+/, '')}`.replace(/^\/api\/v1(?=\/)/i, '')
+  const barePath = path.split(/[?#]/, 1)[0]
+  const route = barePath.match(
+    /^\/(?:fontanero|admin)\/actividades(?:-fontanero)?\/(\d+)\/documentos\/([^/]+)$/i,
+  )
+  const upload = barePath.match(/^\/uploads\/actividades-fontanero\/(\d+)\/([^/]+)$/i)
+  if (route && SAFE_FILENAME.test(route[2])) return path
+  if (upload && SAFE_FILENAME.test(upload[2])) return path
+  if (actividadId > 0 && SAFE_FILENAME.test(value)) {
+    return `/fontanero/actividades/${actividadId}/documentos/${encodeURIComponent(value)}`
+  }
+  return null
 }
 
 export const esEvidenciaImagen = (

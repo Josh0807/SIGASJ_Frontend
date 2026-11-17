@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -16,11 +17,9 @@ import {
   IconZoomReset,
 } from '@tabler/icons-react'
 import type { DocumentoActividadRegistrado } from '../types/actividadFontaneroApi'
-import {
-  esEvidenciaImagen,
-  evidenciaActividadPublicUrl,
-} from '../utils/evidenciaActividadUrl'
+import { esEvidenciaImagen } from '../utils/evidenciaActividadUrl'
 import { crearMiniaturaEvidencia } from '../utils/evidenciaMiniatura'
+import { getEvidenciaActividadBlob } from '../services/evidenciaActividadApi'
 
 const ZOOM_MIN = 1
 const ZOOM_MAX = 5
@@ -34,56 +33,34 @@ const wrapIndex = (index: number, total: number) =>
 
 const FotoMiniatura = ({
   src,
+  error,
   disabled,
   onOpen,
 }: {
-  src: string
+  src?: string
+  error?: string
   disabled?: boolean
   onOpen: () => void
 }) => {
-  const [thumb, setThumb] = useState<string | null>(null)
-
-  useEffect(() => {
-    let active = true
-    let created: string | null = null
-
-    crearMiniaturaEvidencia(src)
-      .then((url) => {
-        if (!active) {
-          URL.revokeObjectURL(url)
-          return
-        }
-        created = url
-        setThumb(url)
-      })
-      .catch(() => {
-        if (active) {
-          setThumb(src)
-        }
-      })
-
-    return () => {
-      active = false
-      if (created) {
-        URL.revokeObjectURL(created)
-      }
-    }
-  }, [src])
-
   return (
     <button
       type="button"
       className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-[13px] border-0 bg-sigasj-surface-soft p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sigasj-primary disabled:cursor-default"
       onClick={onOpen}
-      disabled={disabled}
+      disabled={disabled || !src}
+      aria-label={error ?? (src ? 'Ampliar fotografía' : 'Cargando fotografía')}
     >
-      {thumb ? (
+      {src ? (
         <img
-          src={thumb}
+          src={src}
           alt=""
           decoding="async"
           className="absolute inset-0 size-full object-cover transition duration-500 ease-out hover:scale-[1.03]"
         />
+      ) : error ? (
+        <span className="absolute inset-0 flex items-center justify-center px-3 text-center text-xs font-semibold text-sigasj-danger" role="alert">
+          {error}
+        </span>
       ) : (
         <span
           className="absolute inset-0 animate-pulse bg-sigasj-surface-soft motion-reduce:animate-none"
@@ -111,8 +88,54 @@ const EvidenciaFotoGaleria = ({
   emptyLabel = 'Sin fotos adjuntas.',
   onDelete,
 }: EvidenciaFotoGaleriaProps) => {
-  const fotos = documentos.filter(esEvidenciaImagen)
+  const fotos = useMemo(() => documentos.filter(esEvidenciaImagen), [documentos])
+  const galleryKey = `${actividadId}:${fotos.map((foto) => `${foto.id}:${foto.rutaReferenciaArchivo}`).join('|')}`
+  const [assets, setAssets] = useState<{
+    key: string
+    values: Record<number, { url?: string; thumb?: string; error?: string }>
+  }>({ key: '', values: {} })
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const objectUrls: string[] = []
+    void Promise.all(fotos.map(async (foto) => {
+      try {
+        const blob = await getEvidenciaActividadBlob(
+          foto.rutaReferenciaArchivo,
+          actividadId || foto.actividadId,
+          controller.signal,
+        )
+        const url = URL.createObjectURL(blob)
+        objectUrls.push(url)
+        let thumb = url
+        try {
+          thumb = await crearMiniaturaEvidencia(blob)
+          objectUrls.push(thumb)
+        } catch {
+          // Keep the authenticated full-size Blob as thumbnail fallback.
+        }
+        return [foto.id, { url, thumb }] as const
+      } catch (error) {
+        if (controller.signal.aborted) return null
+        return [foto.id, {
+          error: error instanceof Error ? error.message : 'No se pudo cargar la fotografía.',
+        }] as const
+      }
+    })).then((entries) => {
+      if (controller.signal.aborted) return
+      setAssets({
+        key: galleryKey,
+        values: Object.fromEntries(entries.filter((entry) => entry !== null)),
+      })
+    })
+    return () => {
+      controller.abort()
+      objectUrls.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [actividadId, fotos, galleryKey])
+
+  const currentAssets = assets.key === galleryKey ? assets.values : {}
 
   const closeRef = useRef<HTMLButtonElement>(null)
   const mediaRef = useRef<HTMLDivElement>(null)
@@ -137,12 +160,8 @@ const EvidenciaFotoGaleria = ({
   const hasMany = fotos.length > 1
   const isZoomed = zoom > ZOOM_MIN + 0.01
   const zoomPercent = Math.round(zoom * 100)
-  const selectedUrl = selected
-    ? evidenciaActividadPublicUrl(
-        selected.rutaReferenciaArchivo,
-        actividadId || selected.actividadId,
-      )
-    : ''
+  const selectedAsset = selected ? currentAssets[selected.id] : undefined
+  const selectedUrl = selectedAsset?.url
 
   const resetView = useCallback(() => {
     zoomRef.current = ZOOM_MIN
@@ -385,11 +404,6 @@ const EvidenciaFotoGaleria = ({
     <>
       <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(148px,100%),1fr))] gap-3 p-0 sm:gap-3.5">
         {documentos.map((documento) => {
-          const href = evidenciaActividadPublicUrl(
-            documento.rutaReferenciaArchivo,
-            actividadId || documento.actividadId,
-          )
-
           if (!esEvidenciaImagen(documento)) {
             return (
               <li
@@ -409,11 +423,13 @@ const EvidenciaFotoGaleria = ({
           }
 
           const photoIndex = fotos.findIndex((foto) => foto.id === documento.id)
+          const asset = currentAssets[documento.id]
 
           return (
             <li key={documento.id} className="min-w-0">
               <FotoMiniatura
-                src={href}
+                src={asset?.thumb}
+                error={asset?.error}
                 disabled={disabled}
                 onOpen={() => setActiveIndex(photoIndex >= 0 ? photoIndex : 0)}
               />
@@ -463,7 +479,7 @@ const EvidenciaFotoGaleria = ({
                       key={selected.id}
                       className={`announcement-lightbox__stage${reducedMotion ? '' : ' announcement-lightbox__stage--enter'}`}
                     >
-                      <img
+                      {selectedUrl ? <img
                         src={selectedUrl}
                         alt={selected.nombreOriginal || 'Evidencia fotográfica'}
                         className="announcement-lightbox__image"
@@ -473,7 +489,11 @@ const EvidenciaFotoGaleria = ({
                         style={{
                           transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
                         }}
-                      />
+                      /> : (
+                        <p className="px-6 text-center font-semibold text-white" role="status">
+                          {selectedAsset?.error ?? 'Cargando fotografía…'}
+                        </p>
+                      )}
                     </div>
 
                     <div
