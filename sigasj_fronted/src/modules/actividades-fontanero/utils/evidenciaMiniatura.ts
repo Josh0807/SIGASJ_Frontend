@@ -21,13 +21,7 @@ const drawMiniatura = async (source: ImageBitmap | HTMLImageElement) => {
   return URL.createObjectURL(blob)
 }
 
-export const crearMiniaturaEvidencia = async (src: string): Promise<string> => {
-  const response = await fetch(src)
-  if (!response.ok) {
-    throw new Error('No se pudo leer la evidencia')
-  }
-  const blob = await response.blob()
-
+export const crearMiniaturaEvidencia = async (blob: Blob): Promise<string> => {
   if (typeof createImageBitmap === 'function') {
     const original = await createImageBitmap(blob)
     try {
@@ -37,11 +31,16 @@ export const crearMiniaturaEvidencia = async (src: string): Promise<string> => {
     }
   }
 
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const element = new Image()
-    element.onload = () => resolve(element)
-    element.onerror = () => reject(new Error('No se pudo leer la evidencia'))
-    element.src = URL.createObjectURL(blob)
-  })
-  return drawMiniatura(image)
+  const sourceUrl = URL.createObjectURL(blob)
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image()
+      element.onload = () => resolve(element)
+      element.onerror = () => reject(new Error('No se pudo leer la evidencia'))
+      element.src = sourceUrl
+    })
+    return await drawMiniatura(image)
+  } finally {
+    URL.revokeObjectURL(sourceUrl)
+  }
 }
