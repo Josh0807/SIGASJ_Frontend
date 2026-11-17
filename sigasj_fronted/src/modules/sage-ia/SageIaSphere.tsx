@@ -1,5 +1,5 @@
 import SageGotin from './SageGotin'
-import { useSageIa } from './SageIaContext'
+import { useSageIa } from './useSageIa'
 
 const SageIaSphere = () => {
   const { open, minimized, openPanel, restorePanel } = useSageIa()

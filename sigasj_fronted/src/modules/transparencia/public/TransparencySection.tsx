@@ -42,6 +42,7 @@ const TransparencySection = ({
   const total = publications.length
 
   const [activeIndex, setActiveIndex] = useState(0)
+  const currentIndex = total > 0 ? ((activeIndex % total) + total) % total : 0
   const [reducedMotion, setReducedMotion] = useState(false)
   const [paused, setPaused] = useState(false)
   const [pageHidden, setPageHidden] = useState(false)
@@ -69,10 +70,6 @@ const TransparencySection = ({
     return () => document.removeEventListener('visibilitychange', sync)
   }, [])
 
-  useEffect(() => {
-    if (activeIndex >= total) setActiveIndex(0)
-  }, [activeIndex, total])
-
   const bumpCycle = useCallback(() => {
     setCycleKey((key) => key + 1)
   }, [])
@@ -88,12 +85,12 @@ const TransparencySection = ({
   )
 
   const handlePrev = useCallback(() => {
-    goTo(activeIndex - 1, true)
-  }, [activeIndex, goTo])
+    goTo(currentIndex - 1, true)
+  }, [currentIndex, goTo])
 
   const handleNext = useCallback(() => {
-    goTo(activeIndex + 1, true)
-  }, [activeIndex, goTo])
+    goTo(currentIndex + 1, true)
+  }, [currentIndex, goTo])
 
   useEffect(() => {
     if (!useCarousel || paused || reducedMotion || pageHidden || total < 2) return
@@ -239,16 +236,16 @@ const TransparencySection = ({
                 {/* Altura reservada con la carta activa (invisible). */}
                 <div className="pointer-events-none mx-auto w-[min(100%,24.5rem)] opacity-0" aria-hidden="true">
                   <TransparencyCard
-                    id={publications[activeIndex].id}
-                    name={publications[activeIndex].name}
-                    description={publications[activeIndex].description}
-                    fileUrl={publications[activeIndex].fileUrl}
-                    fileType={publications[activeIndex].fileType}
+                    id={publications[currentIndex].id}
+                    name={publications[currentIndex].name}
+                    description={publications[currentIndex].description}
+                    fileUrl={publications[currentIndex].fileUrl}
+                    fileType={publications[currentIndex].fileType}
                   />
                 </div>
 
                 {publications.map((publication, index) => {
-                  const offset = wrappedOffset(index, activeIndex, total)
+                  const offset = wrappedOffset(index, currentIndex, total)
                   const abs = Math.abs(offset)
                   // Centro + vecinos: se ven los documentos de atrás en la pila.
                   if (abs > 2) return null
@@ -339,19 +336,19 @@ const TransparencySection = ({
                   key={publication.id}
                   type="button"
                   className={`h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300 ${
-                    index === activeIndex
+                    index === currentIndex
                       ? 'w-7 bg-sigasj-primary'
                       : 'w-2.5 bg-sigasj-border hover:bg-sigasj-border-strong'
                   }`}
                   aria-label={`Ir al documento ${index + 1}`}
-                  aria-current={index === activeIndex ? 'true' : undefined}
+                  aria-current={index === currentIndex ? 'true' : undefined}
                   onClick={() => goTo(index, true)}
                 />
               ))}
             </div>
 
             <p className="sr-only" aria-live="polite">
-              {activeIndex + 1} / {total}
+              {currentIndex + 1} / {total}
             </p>
           </div>
         ) : hasPublications ? (

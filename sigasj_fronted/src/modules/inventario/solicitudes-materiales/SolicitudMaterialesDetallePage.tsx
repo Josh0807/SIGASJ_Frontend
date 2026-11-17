@@ -86,22 +86,19 @@ export default function SolicitudMaterialesDetallePage() {
 
   const handleCancelar = async () => {
     if (cancelBusy || !request) return
-    let active = true
     setCancelBusy(true)
     setCancelError('')
     try {
       await cancelarMiSolicitudMateriales(request.id)
-      if (active) setReloadKey((value) => value + 1)
+      setReloadKey((value) => value + 1)
     } catch (requestError) {
-      if (!active) return
       if (getHttpErrorStatus(requestError) === 401) {
         navigate('/login', { replace: true })
         return
       }
       setCancelError('No fue posible cancelar la solicitud. Intente nuevamente.')
     } finally {
-      if (active) setCancelBusy(false)
-      active = false
+      setCancelBusy(false)
     }
   }
 

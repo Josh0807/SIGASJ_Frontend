@@ -144,11 +144,6 @@ const EvidenciaFotoGaleria = ({
       )
     : ''
 
-  zoomRef.current = zoom
-  panRef.current = pan
-  activeIndexRef.current = activeIndex
-  fotosLengthRef.current = fotos.length
-
   const resetView = useCallback(() => {
     zoomRef.current = ZOOM_MIN
     panRef.current = { x: 0, y: 0 }
@@ -159,7 +154,6 @@ const EvidenciaFotoGaleria = ({
   }, [])
 
   const resetViewRef = useRef(resetView)
-  resetViewRef.current = resetView
 
   const setZoomLevel = useCallback((nextRaw: number) => {
     const next = clampZoom(nextRaw)
@@ -179,7 +173,6 @@ const EvidenciaFotoGaleria = ({
   )
 
   const zoomByRef = useRef(zoomBy)
-  zoomByRef.current = zoomBy
 
   const closeViewer = useCallback(() => {
     resetView()
@@ -187,15 +180,21 @@ const EvidenciaFotoGaleria = ({
   }, [resetView])
 
   const closeViewerRef = useRef(closeViewer)
-  closeViewerRef.current = closeViewer
 
-  const goTo = useCallback(
-    (index: number) => {
-      if (fotos.length <= 1) return
-      setActiveIndex(wrapIndex(index, fotos.length))
-    },
-    [fotos.length],
-  )
+  useEffect(() => {
+    zoomRef.current = zoom
+    panRef.current = pan
+    activeIndexRef.current = activeIndex
+    fotosLengthRef.current = fotos.length
+    resetViewRef.current = resetView
+    zoomByRef.current = zoomBy
+    closeViewerRef.current = closeViewer
+  }, [activeIndex, closeViewer, fotos.length, pan, resetView, zoom, zoomBy])
+
+  const goTo = (index: number) => {
+    if (fotos.length <= 1) return
+    setActiveIndex(wrapIndex(index, fotos.length))
+  }
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return
@@ -208,18 +207,21 @@ const EvidenciaFotoGaleria = ({
 
   useEffect(() => {
     if (activeIndex === null) return
-    resetView()
+    const frame = window.requestAnimationFrame(resetView)
+    return () => window.cancelAnimationFrame(frame)
   }, [activeIndex, resetView])
 
   useEffect(() => {
     if (activeIndex === null) return
+    let nextIndex: number | null | undefined
     if (fotos.length === 0) {
-      setActiveIndex(null)
-      return
+      nextIndex = null
+    } else if (activeIndex >= fotos.length) {
+      nextIndex = fotos.length - 1
     }
-    if (activeIndex >= fotos.length) {
-      setActiveIndex(fotos.length - 1)
-    }
+    if (nextIndex === undefined) return
+    const frame = window.requestAnimationFrame(() => setActiveIndex(nextIndex))
+    return () => window.cancelAnimationFrame(frame)
   }, [activeIndex, fotos.length])
 
   useEffect(() => {

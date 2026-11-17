@@ -74,18 +74,23 @@ const ProyectoImagenesGaleria = ({
   )
 
   useEffect(() => {
-    setImagenesOrdenadas(sortImagenes(proyecto.imagenes || []))
+    const frame = window.requestAnimationFrame(() =>
+      setImagenesOrdenadas(sortImagenes(proyecto.imagenes || [])),
+    )
+    return () => window.cancelAnimationFrame(frame)
   }, [proyecto.id, imagenesFirma, proyecto.imagenes])
 
   useEffect(() => {
     if (viewerIndex === null) return
+    let nextIndex: number | null | undefined
     if (imagenesOrdenadas.length === 0) {
-      setViewerIndex(null)
-      return
+      nextIndex = null
+    } else if (viewerIndex >= imagenesOrdenadas.length) {
+      nextIndex = imagenesOrdenadas.length - 1
     }
-    if (viewerIndex >= imagenesOrdenadas.length) {
-      setViewerIndex(imagenesOrdenadas.length - 1)
-    }
+    if (nextIndex === undefined) return
+    const frame = window.requestAnimationFrame(() => setViewerIndex(nextIndex))
+    return () => window.cancelAnimationFrame(frame)
   }, [viewerIndex, imagenesOrdenadas.length])
 
   const viewerImage =

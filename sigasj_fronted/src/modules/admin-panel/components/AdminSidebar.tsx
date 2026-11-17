@@ -108,7 +108,9 @@ const AdminSidebar = ({
     }
   }, [isDrawer, isOpen])
 
-  let ausenciaGroupRendered = false
+  const ausenciaGroupIndex = items.findIndex(({ path }) =>
+    FONTANERO_AUSENCIA_NAV_PATHS.has(path),
+  )
 
   return (
   <aside
@@ -140,12 +142,11 @@ const AdminSidebar = ({
       </button>
     </div>
     <nav className="admin-sidebar__nav min-h-0" aria-label="Navegación administrativa">
-      {items.map(({ path, title, icon }) => {
+      {items.map(({ path, title, icon }, itemIndex) => {
         if (FONTANERO_AUSENCIA_NAV_PATHS.has(path)) {
-          if (ausenciaGroupRendered) {
+          if (itemIndex !== ausenciaGroupIndex) {
             return null
           }
-          ausenciaGroupRendered = true
           return (
             <div className="grid gap-1" key="fontanero-ausencias">
               <div className="relative grid">

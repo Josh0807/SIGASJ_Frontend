@@ -116,14 +116,17 @@ export default function FechaFeriadoPicker({
   const [vistaY, setVistaY] = useState(inicial.y)
   const [vistaM, setVistaM] = useState(inicial.m)
 
-  useEffect(() => {
-    if (!abierto) return
+  const togglePicker = () => {
+    if (!abierto) {
     const p = parseIso(value) ?? parseIso(min ?? '') ?? parseIso(hoyIso())
-    if (p) {
-      setVistaY(p.y)
-      setVistaM(p.m)
+      if (p) {
+        setVistaY(p.y)
+        setVistaM(p.m)
+      }
+      setHoverFeriado(null)
     }
-  }, [abierto, value, min])
+    setAbierto((current) => !current)
+  }
 
   const posicionarPanel = () => {
     const trigger = triggerRef.current
@@ -163,7 +166,6 @@ export default function FechaFeriadoPicker({
 
   useEffect(() => {
     if (!abierto) return undefined
-    setHoverFeriado(null)
     const onDoc = (event: MouseEvent) => {
       const target = event.target as Node
       if (
@@ -290,7 +292,7 @@ export default function FechaFeriadoPicker({
   const onTriggerKey = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      setAbierto((v) => !v)
+      togglePicker()
     }
   }
 
@@ -351,7 +353,7 @@ export default function FechaFeriadoPicker({
         aria-controls={panelId}
         aria-invalid={Boolean(error)}
         aria-label={label}
-        onClick={() => setAbierto((v) => !v)}
+        onClick={togglePicker}
         onKeyDown={onTriggerKey}
       >
         <IconCalendarEvent

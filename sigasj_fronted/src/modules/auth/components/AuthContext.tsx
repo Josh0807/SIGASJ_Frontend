@@ -108,7 +108,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false
     const token = getAccessToken()?.trim()
     if (!token) {
-      setIsLoading(false)
       return
     }
 

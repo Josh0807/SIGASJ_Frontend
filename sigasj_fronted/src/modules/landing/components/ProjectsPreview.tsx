@@ -146,6 +146,7 @@ const ProjectsPreview = ({
   const total = proyectos.length
 
   const [activeIndex, setActiveIndex] = useState(0)
+  const currentIndex = total > 0 ? ((activeIndex % total) + total) % total : 0
   const [reducedMotion, setReducedMotion] = useState(false)
   const [paused, setPaused] = useState(false)
   const [pageHidden, setPageHidden] = useState(false)
@@ -173,10 +174,6 @@ const ProjectsPreview = ({
     return () => document.removeEventListener('visibilitychange', sync)
   }, [])
 
-  useEffect(() => {
-    if (activeIndex >= total) setActiveIndex(0)
-  }, [activeIndex, total])
-
   const bumpCycle = useCallback(() => {
     setCycleKey((key) => key + 1)
   }, [])
@@ -192,12 +189,12 @@ const ProjectsPreview = ({
   )
 
   const handlePrev = useCallback(() => {
-    goTo(activeIndex - 1, true)
-  }, [activeIndex, goTo])
+    goTo(currentIndex - 1, true)
+  }, [currentIndex, goTo])
 
   const handleNext = useCallback(() => {
-    goTo(activeIndex + 1, true)
-  }, [activeIndex, goTo])
+    goTo(currentIndex + 1, true)
+  }, [currentIndex, goTo])
 
   useEffect(() => {
     if (!useCarousel || paused || reducedMotion || pageHidden || total < 2) return
@@ -345,11 +342,11 @@ const ProjectsPreview = ({
                   className="pointer-events-none mx-auto w-[min(100%,24.5rem)] opacity-0"
                   aria-hidden="true"
                 >
-                  <ProjectCard proyecto={proyectos[activeIndex]} />
+                  <ProjectCard proyecto={proyectos[currentIndex]} />
                 </div>
 
                 {proyectos.map((proyecto, index) => {
-                  const offset = wrappedOffset(index, activeIndex, total)
+                  const offset = wrappedOffset(index, currentIndex, total)
                   const abs = Math.abs(offset)
                   if (abs > 2) return null
 
@@ -430,12 +427,12 @@ const ProjectsPreview = ({
                   key={proyecto.id}
                   type="button"
                   className={`projects-preview__dot h-1.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300 ${
-                    index === activeIndex
+                    index === currentIndex
                       ? 'is-active w-7 bg-sigasj-primary'
                       : 'w-2.5 bg-sigasj-border hover:bg-sigasj-border-strong'
                   }`}
                   aria-label={`Ir al proyecto ${index + 1}`}
-                  aria-current={index === activeIndex ? 'true' : undefined}
+                  aria-current={index === currentIndex ? 'true' : undefined}
                   onClick={() => goTo(index, true)}
                 />
               ))}
@@ -445,7 +442,7 @@ const ProjectsPreview = ({
               className="projects-preview__page-indicator sr-only"
               aria-live="polite"
             >
-              {activeIndex + 1} / {total}
+              {currentIndex + 1} / {total}
             </p>
           </div>
         ) : hasProyectos ? (

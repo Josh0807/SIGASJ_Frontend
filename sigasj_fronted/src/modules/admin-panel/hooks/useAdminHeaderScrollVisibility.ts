@@ -13,15 +13,11 @@ const prefersReducedMotion = () =>
  */
 export const useAdminHeaderScrollVisibility = (forceVisible = false) => {
   const { pathname } = useLocation()
-  const [hidden, setHidden] = useState(false)
-
-  useEffect(() => {
-    setHidden(false)
-  }, [pathname])
+  const [visibility, setVisibility] = useState({ pathname, hidden: false })
+  const hidden = visibility.pathname === pathname && visibility.hidden
 
   useEffect(() => {
     if (forceVisible || typeof window === 'undefined') {
-      setHidden(false)
       return undefined
     }
 
@@ -29,20 +25,20 @@ export const useAdminHeaderScrollVisibility = (forceVisible = false) => {
 
     const onScroll = () => {
       if (prefersReducedMotion()) {
-        setHidden(false)
+        setVisibility({ pathname, hidden: false })
         return
       }
       const y = window.scrollY || document.documentElement.scrollTop || 0
       const delta = y - lastY
       lastY = y
       if (y <= TOP_REVEAL_PX) {
-        setHidden(false)
+        setVisibility({ pathname, hidden: false })
         return
       }
       if (delta > DELTA_PX) {
-        setHidden(true)
+        setVisibility({ pathname, hidden: true })
       } else if (delta < -DELTA_PX) {
-        setHidden(false)
+        setVisibility({ pathname, hidden: false })
       }
     }
 

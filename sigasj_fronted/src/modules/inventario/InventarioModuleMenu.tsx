@@ -68,21 +68,26 @@ export default function InventarioModuleMenu({
   const isAdmin = role === InternalAdminRoleName.Administradora
   const isSecretaria = role === InternalAdminRoleName.Secretaria
   const isFontanero = role === InternalAdminRoleName.Fontanero
-  const [moreOpen, setMoreOpen] = useState(false)
+  const locationKey = `${location.pathname}${location.search}`
+  const [moreState, setMoreState] = useState({ key: locationKey, open: false })
+  const moreOpen = moreState.key === locationKey && moreState.open
+  const setMoreOpen = (next: boolean | ((current: boolean) => boolean)) => {
+    setMoreState((current) => ({
+      key: locationKey,
+      open: typeof next === 'function' ? next(current.open) : next,
+    }))
+  }
   const moreRef = useRef<HTMLDivElement>(null)
   const moreId = useId()
 
   useEffect(() => {
-    setMoreOpen(false)
-  }, [location.pathname, location.search])
-
-  useEffect(() => {
     if (!moreOpen) return
+    const closeMore = () => setMoreState({ key: locationKey, open: false })
     const onPointer = (event: MouseEvent) => {
-      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false)
+      if (!moreRef.current?.contains(event.target as Node)) closeMore()
     }
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMoreOpen(false)
+      if (event.key === 'Escape') closeMore()
     }
     document.addEventListener('mousedown', onPointer)
     document.addEventListener('keydown', onKey)
@@ -90,7 +95,7 @@ export default function InventarioModuleMenu({
       document.removeEventListener('mousedown', onPointer)
       document.removeEventListener('keydown', onKey)
     }
-  }, [moreOpen])
+  }, [locationKey, moreOpen])
 
   const tabs: NavItem[] = []
 

@@ -300,7 +300,7 @@ export default function MapaRedMap({
   demoGeo = false,
   className = '',
 }: MapaRedMapProps) {
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [layersOpen, setLayersOpen] = useState(false)
   const [basemap, setBasemap] = useState<BasemapMode>('hibrido')
   const [layers, setLayers] = useState<LayerToggles>({
@@ -360,10 +360,6 @@ export default function MapaRedMap({
       }),
     [],
   )
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const sectorBoundaries = useMemo(() => {
     const features = SECTORES_CATALOGO.filter((s) => s.limiteGeoJson != null).map(
