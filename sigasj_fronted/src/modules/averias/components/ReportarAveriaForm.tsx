@@ -9,7 +9,6 @@ import {
   PUBLIC_AVERIA_FIELD_ORDER,
   type PublicAveriaFormErrors,
   type PublicAveriaFormValues,
-  type PublicAveriaTextField,
 } from '../types/publicAveriaForm'
 import { parsePublicAveriaSubmitError } from '../utils/parsePublicAveriaSubmitError'
 import { toCreatePublicAveriaPayload } from '../utils/toCreatePublicAveriaPayload'
@@ -36,9 +35,6 @@ export default function ReportarAveriaForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedReport, setSubmittedReport] = useState<PublicAveriaConfirmation | null>(null)
   const [cedulaMensaje, setCedulaMensaje] = useState<string | null>(null)
-  const [geoStatus, setGeoStatus] = useState<
-    'idle' | 'loading' | 'ok' | 'denied' | 'unavailable' | 'error'
-  >('idle')
   const consultaCedulaRef = useRef(0)
   const cedulaTimerRef = useRef<number | null>(null)
   const ultimaCedulaConsultadaRef = useRef('')
@@ -53,7 +49,7 @@ export default function ReportarAveriaForm() {
     }
   }, [])
 
-  const update = (name: PublicAveriaTextField, value: string) => {
+  const update = (name: keyof PublicAveriaFormValues, value: string) => {
     const nextValue =
       name === 'identificacionReportante'
         ? limitarCedulaFisica(value)
@@ -134,56 +130,6 @@ export default function ReportarAveriaForm() {
     }
   }
 
-  const capturarUbicacionGps = () => {
-    if (!navigator.geolocation) {
-      setGeoStatus('unavailable')
-      return
-    }
-    setGeoStatus('loading')
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        if (!mountedRef.current) return
-        setValues((current) => ({
-          ...current,
-          latitud: position.coords.latitude,
-          longitud: position.coords.longitude,
-        }))
-        setGeoStatus('ok')
-      },
-      (error) => {
-        if (!mountedRef.current) return
-        setValues((current) => ({
-          ...current,
-          latitud: null,
-          longitud: null,
-        }))
-        if (error.code === error.PERMISSION_DENIED) {
-          setGeoStatus('denied')
-          return
-        }
-        if (error.code === error.POSITION_UNAVAILABLE) {
-          setGeoStatus('unavailable')
-          return
-        }
-        setGeoStatus('error')
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15_000,
-        maximumAge: 60_000,
-      },
-    )
-  }
-
-  const limpiarUbicacionGps = () => {
-    setValues((current) => ({
-      ...current,
-      latitud: null,
-      longitud: null,
-    }))
-    setGeoStatus('idle')
-  }
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (submittingRef.current) {
@@ -213,7 +159,6 @@ export default function ReportarAveriaForm() {
       setValues(EMPTY_PUBLIC_AVERIA_FORM)
       setErrors({})
       setFormError(null)
-      setGeoStatus('idle')
       queueMicrotask(() => confirmationRef.current?.focus())
     } catch (error) {
       if (!mountedRef.current) {
@@ -239,22 +184,8 @@ export default function ReportarAveriaForm() {
     }
   }
 
-  const errorId = (name: PublicAveriaTextField) =>
+  const errorId = (name: keyof PublicAveriaFormValues) =>
     errors[name] ? `${fieldId(idPrefix, name)}-error` : undefined
-
-  const geoHelpId = `${idPrefix}-geo-help`
-  const geoMessage =
-    geoStatus === 'loading'
-      ? 'Obteniendo su ubicación…'
-      : geoStatus === 'ok' && values.latitud != null && values.longitud != null
-        ? `Ubicación capturada (${values.latitud.toFixed(5)}, ${values.longitud.toFixed(5)}).`
-        : geoStatus === 'denied'
-          ? 'Permiso de ubicación denegado. Puede continuar solo con la dirección escrita.'
-          : geoStatus === 'unavailable'
-            ? 'Este dispositivo no puede leer GPS. Continúe con la dirección escrita.'
-            : geoStatus === 'error'
-              ? 'No se pudo leer la ubicación. Intente de nuevo o continúe con la dirección.'
-              : 'Opcional. Ayuda a ubicar la avería en el mapa operativo.'
 
   const formErrorId = formError ? `${idPrefix}-form-error` : undefined
 
@@ -507,45 +438,11 @@ export default function ReportarAveriaForm() {
                 <small id={errorId('ubicacion')} className="public-averia-form__error" role="alert">
                   {errors.ubicacion}
                 </small>
-              ) : null}
-            </div>
-
-            <div className="public-averia-form__field">
-              <span className="public-averia-form__label-row">
-                <span>Ubicación GPS</span>
-                <span className="public-averia-form__optional">Opcional</span>
-              </span>
-              <div className="public-averia-form__geo-actions">
-                <button
-                  type="button"
-                  className="public-averia-form__geo-btn"
-                  onClick={capturarUbicacionGps}
-                  disabled={isSubmitting || geoStatus === 'loading'}
-                  aria-describedby={geoHelpId}
-                >
-                  {geoStatus === 'loading' ? 'Capturando…' : 'Usar mi ubicación'}
-                </button>
-                {values.latitud != null && values.longitud != null ? (
-                  <button
-                    type="button"
-                    className="public-averia-form__geo-btn public-averia-form__geo-btn--ghost"
-                    onClick={limpiarUbicacionGps}
-                    disabled={isSubmitting}
-                  >
-                    Quitar GPS
-                  </button>
-                ) : null}
-              </div>
-              <small
-                id={geoHelpId}
-                className={
-                  geoStatus === 'denied' || geoStatus === 'error'
-                    ? 'public-averia-form__error'
-                    : 'public-averia-form__help'
-                }
-              >
-                {geoMessage}
-              </small>
+              ) : (
+                <small className="public-averia-form__help">
+                  Dirección en San Juan. Se usa junto al sector para ubicarla en el mapa.
+                </small>
+              )}
             </div>
 
             <div className="public-averia-form__field">
@@ -563,12 +460,17 @@ export default function ReportarAveriaForm() {
                 aria-describedby={errorId('sectorComunidad')}
                 value={values.sectorComunidad}
                 onChange={(event) => update('sectorComunidad', event.target.value)}
+                placeholder="Ej. Sector Centro, Norte, Las Palmas…"
               />
               {errors.sectorComunidad ? (
                 <small id={errorId('sectorComunidad')} className="public-averia-form__error" role="alert">
                   {errors.sectorComunidad}
                 </small>
-              ) : null}
+              ) : (
+                <small className="public-averia-form__help">
+                  Sector de San Juan (Centro, Norte, Las Palmas, El Cruce, La Esperanza).
+                </small>
+              )}
             </div>
 
             <div className="public-averia-form__field">

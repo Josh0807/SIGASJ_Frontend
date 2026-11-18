@@ -6,18 +6,10 @@ export type PublicAveriaFormValues = {
   ubicacion: string
   sectorComunidad: string
   descripcion: string
-  /** Coordenadas GPS opcionales capturadas en el dispositivo. */
-  latitud: number | null
-  longitud: number | null
 }
 
-export type PublicAveriaTextField = Exclude<
-  keyof PublicAveriaFormValues,
-  'latitud' | 'longitud'
->
-
 export type PublicAveriaFormErrors = Partial<
-  Record<PublicAveriaTextField, string>
+  Record<keyof PublicAveriaFormValues, string>
 >
 
 export const EMPTY_PUBLIC_AVERIA_FORM: PublicAveriaFormValues = {
@@ -28,11 +20,9 @@ export const EMPTY_PUBLIC_AVERIA_FORM: PublicAveriaFormValues = {
   ubicacion: '',
   sectorComunidad: '',
   descripcion: '',
-  latitud: null,
-  longitud: null,
 }
 
-export const PUBLIC_AVERIA_FIELD_ORDER: PublicAveriaTextField[] = [
+export const PUBLIC_AVERIA_FIELD_ORDER: (keyof PublicAveriaFormValues)[] = [
   'nombreReportante',
   'identificacionReportante',
   'telefonoReportante',

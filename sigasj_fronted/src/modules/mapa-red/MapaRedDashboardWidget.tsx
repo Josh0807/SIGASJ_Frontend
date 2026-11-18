@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import './mapa-red.css'
-import { MAPA_RED_CENTER, hasGeoInfrastructure } from './mapaRedGeo'
+import { hasGeoInfrastructure } from './mapaRedGeo'
 import { MAPA_RED_PATH, MAPA_RED_TITLE } from './mapaRedPaths'
 
 /** Acceso rápido al mapa GIS (sin cifras ni geometrías inventadas). */
@@ -13,8 +13,8 @@ export default function MapaRedDashboardWidget() {
         <div>
           <h2 id="mapa-red-widget-title">{MAPA_RED_TITLE}</h2>
           <p>
-            Base OpenStreetMap centrada en San Juan, Santa Cruz
-            ({MAPA_RED_CENTER[0].toFixed(4)}, {MAPA_RED_CENTER[1].toFixed(4)}).
+            Mapa operativo de San Juan, Santa Cruz: sectores y averías por
+            dirección reportada.
           </p>
         </div>
         <Link className="mapa-red-widget__link" to={MAPA_RED_PATH}>

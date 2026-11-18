@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
+  applySectorUbicacionGeoAverias,
+  coordsFromSectorUbicacion,
   countAveriasBySector,
-  extractAveriaCoords,
   filterAveriasBySector,
   matchSectorIdFromComunidad,
   toAveriaMapaItem,
 } from './mapaRedAverias'
 import type { AveriaListItem } from '../averias/admin/types'
+import { MAPA_RED_CENTER } from './mapaRedGeo'
 
 const baseItem = (overrides: Partial<AveriaListItem> = {}): AveriaListItem => ({
   id: 1,
@@ -23,134 +25,100 @@ const baseItem = (overrides: Partial<AveriaListItem> = {}): AveriaListItem => ({
   ...overrides,
 })
 
-describe('mapaRedAverias — sector y coordenadas reales', () => {
-  it('relaciona sectorComunidad con el catálogo (alias y variantes)', () => {
+describe('mapaRedAverias — solo direcciones en San Juan', () => {
+  it('relaciona sector y pistas de ubicación', () => {
     expect(matchSectorIdFromComunidad('Sector Centro')).toBe('centro')
-    expect(matchSectorIdFromComunidad('centro')).toBe('centro')
-    expect(matchSectorIdFromComunidad('Las Palmas')).toBe('las-palmas')
-    expect(matchSectorIdFromComunidad('Sector Norte')).toBe('norte')
-    expect(matchSectorIdFromComunidad('El Cruce')).toBe('el-cruce')
-    expect(matchSectorIdFromComunidad('La Esperanza')).toBe('la-esperanza')
-    expect(matchSectorIdFromComunidad('San Juan')).toBeNull()
-  })
-
-  it('no inventa coordenadas desde dirección textual', () => {
-    const item = toAveriaMapaItem(baseItem())
-    expect(item.coords).toBeNull()
-    expect(item.coordsSource).toBeNull()
-    expect(item.sectorId).toBe('centro')
+    expect(matchSectorIdFromComunidad('Centro')).toBe('centro')
+    expect(matchSectorIdFromComunidad('San Juan')).toBe('centro')
     expect(
-      extractAveriaCoords(baseItem() as AveriaListItem & Record<string, unknown>),
-    ).toBeNull()
+      matchSectorIdFromComunidad('Comunidad', '200 m norte, Sector El Cruce'),
+    ).toBe('el-cruce')
   })
 
-  it('acepta coordenadas válidas de Costa Rica y marca origen real', () => {
-    const withCoords = {
-      ...baseItem({
-        id: 7,
-        sectorComunidad: 'Sector Norte',
-        latitud: 10.2205,
-        longitud: -85.5571,
-      }),
-    }
-    const mapped = toAveriaMapaItem(withCoords)
-    expect(mapped.sectorId).toBe('norte')
-    expect(mapped.coords).toEqual({ lat: 10.2205, lng: -85.5571 })
-    expect(mapped.coordsSource).toBe('real')
-  })
-
-  it('rechaza coordenadas fuera de rango o fuera de Costa Rica', () => {
-    expect(
-      extractAveriaCoords({
-        ...baseItem(),
-        latitud: 91,
-        longitud: -85.55,
-      } as AveriaListItem & Record<string, unknown>),
-    ).toBeNull()
-
-    expect(
-      extractAveriaCoords({
-        ...baseItem(),
-        latitud: 40.4,
-        longitud: -3.7,
-      } as AveriaListItem & Record<string, unknown>),
-    ).toBeNull()
-
-    expect(
-      extractAveriaCoords({
-        ...baseItem(),
-        latitud: 10.22,
-        longitud: null,
-      } as AveriaListItem & Record<string, unknown>),
-    ).toBeNull()
-  })
-
-  it('filtra y cuenta averías por sector usando solo GPS real', () => {
-    const items = [
-      toAveriaMapaItem(
-        baseItem({
-          id: 1,
-          sectorComunidad: 'Sector Centro',
-          latitud: 10.2188,
-          longitud: -85.5565,
-        }),
-      ),
-      toAveriaMapaItem(
-        baseItem({
-          id: 2,
-          sectorComunidad: 'Sector Norte',
-          latitud: 10.221,
-          longitud: -85.557,
-        }),
-      ),
-      toAveriaMapaItem(
-        baseItem({
-          id: 3,
-          sectorComunidad: 'Sector Centro',
-          // sin coords: cuenta por sector, pero no aparece en mapa
-        }),
-      ),
-      toAveriaMapaItem(
-        baseItem({
-          id: 4,
-          sectorComunidad: 'San Juan',
-          latitud: 10.219,
-          longitud: -85.555,
-        }),
-      ),
-    ]
-
-    const counts = countAveriasBySector(items)
-    expect(counts.centro).toBe(2)
-    expect(counts.norte).toBe(1)
-    expect(counts['las-palmas']).toBe(0)
-
-    const centro = filterAveriasBySector(items, 'centro')
-    expect(centro.map((a) => a.id)).toEqual([1, 3])
-
-    const conGps = items.filter((item) => item.coords != null)
-    expect(conGps).toHaveLength(3)
-    expect(conGps.every((item) => item.coordsSource === 'real')).toBe(true)
-    expect(conGps.find((item) => item.id === 4)?.sectorId).toBeNull()
-  })
-
-  it('mantiene sector y coords independientes (sector textual + GPS del reporte)', () => {
+  it('ignora lat/lng del payload y ubica solo por dirección', () => {
     const item = toAveriaMapaItem(
       baseItem({
-        id: 50,
-        sectorComunidad: 'Las Palmas',
-        latitud: 10.2192,
-        longitud: -85.5548,
-        codigoSeguimiento: 'AV-2026-0050',
+        latitud: 10.2188,
+        longitud: -85.5565,
+        ubicacion: '200 m este del tanque',
       }),
     )
+    expect(item.coords).toBeNull()
+    expect(item.coordsSource).toBeNull()
 
-    expect(item).toMatchObject({
-      codigoSeguimiento: 'AV-2026-0050',
-      sectorId: 'las-palmas',
-      sectorComunidad: 'Las Palmas',
-      coordsSource: 'real',
-      coords: { lat: 10.2192, lng: -85.5548 },
-    })
+    const placed = applySectorUbicacionGeoAverias([item])
+    expect(placed[0].coordsSource).toBe('sector')
+    expect(placed[0].coords).not.toBeNull()
+    expect(placed[0].coords).not.toEqual({ lat: 10.2188, lng: -85.5565 })
+  })
+
+  it('coloca averías por sector + ubicación específica', () => {
+    const a = toAveriaMapaItem(
+      baseItem({
+        id: 10,
+        sectorComunidad: 'Sector Norte',
+        ubicacion: 'Frente a la escuela',
+      }),
+    )
+    const b = toAveriaMapaItem(
+      baseItem({
+        id: 11,
+        sectorComunidad: 'Sector Norte',
+        ubicacion: '50 m sur del tanque',
+      }),
+    )
+    const placed = applySectorUbicacionGeoAverias([a, b])
+    expect(placed[0].coords).not.toEqual(placed[1].coords)
+    expect(placed[0].coords!.lat).toBeGreaterThan(MAPA_RED_CENTER[0] - 0.01)
+    expect(placed[0].coords!.lat).toBeLessThan(MAPA_RED_CENTER[0] + 0.01)
+  })
+
+  it('misma dirección produce el mismo punto', () => {
+    const item = toAveriaMapaItem(
+      baseItem({
+        id: 21,
+        sectorComunidad: 'Las Palmas',
+        ubicacion: 'Calle principal, casa esquinera',
+      }),
+    )
+    expect(coordsFromSectorUbicacion(item, 0)).toEqual(
+      coordsFromSectorUbicacion(item, 0),
+    )
+  })
+
+  it('separa sectores distintos con la misma dirección textual', () => {
+    const placed = applySectorUbicacionGeoAverias([
+      toAveriaMapaItem(
+        baseItem({
+          id: 40,
+          sectorComunidad: 'Sector Norte',
+          ubicacion: 'Frente a la pulpería',
+        }),
+      ),
+      toAveriaMapaItem(
+        baseItem({
+          id: 41,
+          sectorComunidad: 'El Cruce',
+          ubicacion: 'Frente a la pulpería',
+        }),
+      ),
+    ])
+    const dist = Math.hypot(
+      placed[0].coords!.lat - placed[1].coords!.lat,
+      placed[0].coords!.lng - placed[1].coords!.lng,
+    )
+    expect(dist).toBeGreaterThan(0.001)
+  })
+
+  it('cuenta y filtra por sector de San Juan', () => {
+    const items = applySectorUbicacionGeoAverias([
+      toAveriaMapaItem(baseItem({ id: 1, sectorComunidad: 'Sector Centro' })),
+      toAveriaMapaItem(baseItem({ id: 2, sectorComunidad: 'Sector Norte' })),
+      toAveriaMapaItem(baseItem({ id: 3, sectorComunidad: 'Centro' })),
+    ])
+    expect(countAveriasBySector(items).centro).toBe(2)
+    expect(countAveriasBySector(items).norte).toBe(1)
+    expect(filterAveriasBySector(items, 'centro')).toHaveLength(2)
+    expect(items.every((item) => item.coords != null)).toBe(true)
   })
 })

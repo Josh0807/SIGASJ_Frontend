@@ -6,7 +6,7 @@ const optionalTrimmed = (value: string): string | undefined => {
   return trimmed ? trimmed : undefined
 }
 
-/** Mapeo explícito al DTO público. Nunca incluye campos administrativos. */
+/** Mapeo explícito al DTO público. Nunca incluye campos administrativos ni GPS. */
 export function toCreatePublicAveriaPayload(
   values: PublicAveriaFormValues,
 ): CreatePublicAveriaPayload {
@@ -22,18 +22,6 @@ export function toCreatePublicAveriaPayload(
   const correoReportante = optionalTrimmed(values.correoReportante)
   if (correoReportante) {
     payload.correoReportante = correoReportante
-  }
-
-  const lat = values.latitud
-  const lng = values.longitud
-  if (
-    typeof lat === 'number' &&
-    typeof lng === 'number' &&
-    Number.isFinite(lat) &&
-    Number.isFinite(lng)
-  ) {
-    payload.latitud = lat
-    payload.longitud = lng
   }
 
   return payload

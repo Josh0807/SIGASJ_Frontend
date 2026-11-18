@@ -110,10 +110,7 @@ const AveriasFontaneroDetailView = ({
   const puedeRegistrar = puedeRegistrarObservacionAveria(estado)
   const puedeCalificar = puedeCalificarAveria(estado)
   const enlaceTelefono = telefonoHref(averia.telefonoReportante)
-  const enlaceMapas = mapasHref(averia.ubicacion, {
-    latitud: averia.latitud,
-    longitud: averia.longitud,
-  })
+  const enlaceMapas = mapasHref(averia.ubicacion)
   const [resolverOpen, setResolverOpen] = useState(false)
   const [iniciarError, setIniciarError] = useState<string | null>(null)
   const [iniciando, setIniciando] = useState(false)
