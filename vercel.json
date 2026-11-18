@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "installCommand": "npm ci",
-  "buildCommand": "node scripts/check-render-api-url.cjs && npm run build",
-  "outputDirectory": "dist",
+  "installCommand": "npm ci --prefix sigasj_fronted",
+  "buildCommand": "node sigasj_fronted/scripts/check-render-api-url.cjs && npm run build --prefix sigasj_fronted",
+  "outputDirectory": "sigasj_fronted/dist",
   "rewrites": [
     {
       "source": "/(.*)",
