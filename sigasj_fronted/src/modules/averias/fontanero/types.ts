@@ -17,6 +17,8 @@ export type AveriaFontaneroListItem = {
   estado: EstadoAveria | string
   sectorComunidad: string
   ubicacion: string
+  latitud?: number | null
+  longitud?: number | null
   descripcion: string
   tipoAveria: string
   prioridad: string
@@ -40,6 +42,8 @@ export type AveriaFontaneroDetail = {
   estado: EstadoAveria | string
   sectorComunidad: string
   ubicacion: string
+  latitud?: number | null
+  longitud?: number | null
   descripcion: string
   nombreReportante: string
   telefonoReportante: string

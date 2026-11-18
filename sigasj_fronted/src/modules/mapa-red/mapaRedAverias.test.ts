@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
-  applyDemoGeoAverias,
-  extractAveriaCoords,
+  applySectorUbicacionGeoAverias,
+  coordsFromSectorUbicacion,
+  countAveriasBySector,
+  filterAveriasBySector,
   matchSectorIdFromComunidad,
   toAveriaMapaItem,
 } from './mapaRedAverias'
@@ -23,71 +25,100 @@ const baseItem = (overrides: Partial<AveriaListItem> = {}): AveriaListItem => ({
   ...overrides,
 })
 
-describe('mapaRedAverias', () => {
-  it('relaciona sectorComunidad con el catálogo sin inventar geometría', () => {
+describe('mapaRedAverias — solo direcciones en San Juan', () => {
+  it('relaciona sector y pistas de ubicación', () => {
     expect(matchSectorIdFromComunidad('Sector Centro')).toBe('centro')
-    expect(matchSectorIdFromComunidad('Las Palmas')).toBe('las-palmas')
-    expect(matchSectorIdFromComunidad('San Juan')).toBeNull()
+    expect(matchSectorIdFromComunidad('Centro')).toBe('centro')
+    expect(matchSectorIdFromComunidad('San Juan')).toBe('centro')
+    expect(
+      matchSectorIdFromComunidad('Comunidad', '200 m norte, Sector El Cruce'),
+    ).toBe('el-cruce')
   })
 
-  it('no inventa coordenadas desde dirección textual', () => {
-    const item = toAveriaMapaItem(baseItem())
-    expect(item.coords).toBeNull()
-    expect(extractAveriaCoords(baseItem() as AveriaListItem & Record<string, unknown>)).toBeNull()
-  })
-
-  it('acepta coordenadas válidas si el payload las trae', () => {
-    const withCoords = {
-      ...baseItem(),
-      latitud: 10.2188,
-      longitud: -85.5565,
-    } as AveriaListItem & Record<string, unknown>
-    expect(extractAveriaCoords(withCoords)).toEqual({
-      lat: 10.2188,
-      lng: -85.5565,
-    })
-  })
-
-  it('demoGeo asigna puntos rojos de prueba sin tocar coords reales', () => {
-    const sinCoords = toAveriaMapaItem(baseItem({ id: 10 }))
-    const conCoords = toAveriaMapaItem({
-      ...baseItem({ id: 11 }),
-      ...({ latitud: 10.22, longitud: -85.55 } as object),
-    } as AveriaListItem)
-
-    const demo = applyDemoGeoAverias([sinCoords, conCoords], true)
-    expect(demo[0].coords).not.toBeNull()
-    expect(demo[0].coords!.lat).toBeGreaterThan(MAPA_RED_CENTER[0] - 0.02)
-    expect(demo[0].coords!.lat).toBeLessThan(MAPA_RED_CENTER[0] + 0.02)
-    expect(demo[1].coords).toEqual({ lat: 10.22, lng: -85.55 })
-
-    const normal = applyDemoGeoAverias([sinCoords], false)
-    expect(normal[0].coords).toBeNull()
-  })
-
-  it('demoGeo reparte averías del mismo sector en puntos distintos', () => {
-    const sameSector = [
-      toAveriaMapaItem(baseItem({ id: 21, sectorComunidad: 'Sector Norte' })),
-      toAveriaMapaItem(baseItem({ id: 22, sectorComunidad: 'Sector Norte' })),
-      toAveriaMapaItem(baseItem({ id: 23, sectorComunidad: 'Sector Norte' })),
-    ]
-    const demo = applyDemoGeoAverias(sameSector, true)
-    const keys = new Set(
-      demo.map((item) => `${item.coords!.lat.toFixed(6)},${item.coords!.lng.toFixed(6)}`),
+  it('ignora lat/lng del payload y ubica solo por dirección', () => {
+    const item = toAveriaMapaItem(
+      baseItem({
+        latitud: 10.2188,
+        longitud: -85.5565,
+        ubicacion: '200 m este del tanque',
+      }),
     )
-    expect(keys.size).toBe(3)
+    expect(item.coords).toBeNull()
+    expect(item.coordsSource).toBeNull()
+
+    const placed = applySectorUbicacionGeoAverias([item])
+    expect(placed[0].coordsSource).toBe('sector')
+    expect(placed[0].coords).not.toBeNull()
+    expect(placed[0].coords).not.toEqual({ lat: 10.2188, lng: -85.5565 })
   })
 
-  it('demoGeo separa sectores en anclas distintas', () => {
-    const mixed = [
-      toAveriaMapaItem(baseItem({ id: 31, sectorComunidad: 'Sector Centro' })),
-      toAveriaMapaItem(baseItem({ id: 32, sectorComunidad: 'Sector Norte' })),
-    ]
-    const demo = applyDemoGeoAverias(mixed, true)
+  it('coloca averías por sector + ubicación específica', () => {
+    const a = toAveriaMapaItem(
+      baseItem({
+        id: 10,
+        sectorComunidad: 'Sector Norte',
+        ubicacion: 'Frente a la escuela',
+      }),
+    )
+    const b = toAveriaMapaItem(
+      baseItem({
+        id: 11,
+        sectorComunidad: 'Sector Norte',
+        ubicacion: '50 m sur del tanque',
+      }),
+    )
+    const placed = applySectorUbicacionGeoAverias([a, b])
+    expect(placed[0].coords).not.toEqual(placed[1].coords)
+    expect(placed[0].coords!.lat).toBeGreaterThan(MAPA_RED_CENTER[0] - 0.01)
+    expect(placed[0].coords!.lat).toBeLessThan(MAPA_RED_CENTER[0] + 0.01)
+  })
+
+  it('misma dirección produce el mismo punto', () => {
+    const item = toAveriaMapaItem(
+      baseItem({
+        id: 21,
+        sectorComunidad: 'Las Palmas',
+        ubicacion: 'Calle principal, casa esquinera',
+      }),
+    )
+    expect(coordsFromSectorUbicacion(item, 0)).toEqual(
+      coordsFromSectorUbicacion(item, 0),
+    )
+  })
+
+  it('separa sectores distintos con la misma dirección textual', () => {
+    const placed = applySectorUbicacionGeoAverias([
+      toAveriaMapaItem(
+        baseItem({
+          id: 40,
+          sectorComunidad: 'Sector Norte',
+          ubicacion: 'Frente a la pulpería',
+        }),
+      ),
+      toAveriaMapaItem(
+        baseItem({
+          id: 41,
+          sectorComunidad: 'El Cruce',
+          ubicacion: 'Frente a la pulpería',
+        }),
+      ),
+    ])
     const dist = Math.hypot(
-      demo[0].coords!.lat - demo[1].coords!.lat,
-      demo[0].coords!.lng - demo[1].coords!.lng,
+      placed[0].coords!.lat - placed[1].coords!.lat,
+      placed[0].coords!.lng - placed[1].coords!.lng,
     )
     expect(dist).toBeGreaterThan(0.001)
+  })
+
+  it('cuenta y filtra por sector de San Juan', () => {
+    const items = applySectorUbicacionGeoAverias([
+      toAveriaMapaItem(baseItem({ id: 1, sectorComunidad: 'Sector Centro' })),
+      toAveriaMapaItem(baseItem({ id: 2, sectorComunidad: 'Sector Norte' })),
+      toAveriaMapaItem(baseItem({ id: 3, sectorComunidad: 'Centro' })),
+    ])
+    expect(countAveriasBySector(items).centro).toBe(2)
+    expect(countAveriasBySector(items).norte).toBe(1)
+    expect(filterAveriasBySector(items, 'centro')).toHaveLength(2)
+    expect(items.every((item) => item.coords != null)).toBe(true)
   })
 })

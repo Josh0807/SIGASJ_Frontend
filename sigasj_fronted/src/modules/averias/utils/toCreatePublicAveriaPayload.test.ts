@@ -30,6 +30,8 @@ describe('toCreatePublicAveriaPayload', () => {
       descripcion: 'Fuga visible en la tubería.',
     })
     expect(payload).not.toHaveProperty('correoReportante')
+    expect(payload).not.toHaveProperty('latitud')
+    expect(payload).not.toHaveProperty('longitud')
 
     for (const key of PUBLIC_AVERIA_ADMIN_PAYLOAD_KEYS) {
       expect(payload).not.toHaveProperty(key)

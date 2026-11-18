@@ -9,9 +9,9 @@ export default function MapaRedPage() {
       <PageHeader
         id="mapa-red-title"
         title={MAPA_RED_TITLE}
-        description="Sectores, averías activas y estado de la red en San Juan de Santa Cruz."
+        description="Operación clara de San Juan: sectores, direcciones reportadas y estado de la red en un solo vistazo."
       />
-      <MapaRedPanel />
+      <MapaRedPanel className="mapa-red--showcase" hideShellTitle />
     </AdminShell>
   )
 }

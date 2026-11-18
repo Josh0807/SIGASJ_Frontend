@@ -15,10 +15,14 @@ export function telefonoHref(telefono: string | null | undefined): string | null
   return `tel:${destino}`
 }
 
+/** Abre Maps con la dirección textual (San Juan / sector + ubicación). */
 export function mapasHref(ubicacion: string | null | undefined): string | null {
   const texto = ubicacion?.trim() ?? ''
   if (UBICACION_VACIA.has(texto.toLowerCase())) {
     return null
   }
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(texto)}`
+  const query = /san\s*juan/i.test(texto)
+    ? texto
+    : `${texto}, San Juan, Santa Cruz, Guanacaste, Costa Rica`
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 }

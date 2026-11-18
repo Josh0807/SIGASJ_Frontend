@@ -61,8 +61,26 @@ export const MAPA_RED_CENTER: [number, number] = [
 /** Zoom cercano para apreciar casas y vegetación en satélite/híbrido. */
 export const MAPA_RED_DEFAULT_ZOOM = 17
 
-export const MAPA_RED_MIN_ZOOM = 13
+/** Impide alejarse del casco de San Juan. */
+export const MAPA_RED_MIN_ZOOM = 15
 export const MAPA_RED_MAX_ZOOM = 19
+
+/**
+ * Ventana geográfica alrededor de San Juan (no permite panear fuera del pueblo).
+ * ~±0.028° ≈ 3 km alrededor del centro ASADA.
+ */
+const MAPA_RED_BOUNDS_PAD = 0.028
+
+export const MAPA_RED_MAX_BOUNDS: [[number, number], [number, number]] = [
+  [
+    MAPA_RED_CENTER[0] - MAPA_RED_BOUNDS_PAD,
+    MAPA_RED_CENTER[1] - MAPA_RED_BOUNDS_PAD,
+  ],
+  [
+    MAPA_RED_CENTER[0] + MAPA_RED_BOUNDS_PAD,
+    MAPA_RED_CENTER[1] + MAPA_RED_BOUNDS_PAD,
+  ],
+]
 
 /**
  * Catálogo operativo de sectores conocidos por la ASADA.

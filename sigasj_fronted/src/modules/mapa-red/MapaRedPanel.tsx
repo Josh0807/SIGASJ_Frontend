@@ -2,21 +2,21 @@ import {
   IconAlertTriangle,
   IconMapPin,
   IconRefresh,
-  IconSearch,
 } from '@tabler/icons-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ADMIN_COPY } from '../../shared/admin/adminCopy'
-import { Alert, Button } from '../../shared/ui'
+import { Alert, Button, EmptyState } from '../../shared/ui'
 import './mapa-red.css'
 import MapaRedMap from './MapaRedMap'
 import {
-  applyDemoGeoAverias,
+  applySectorUbicacionGeoAverias,
   countAveriasBySector,
   filterAveriasBySector,
+  formatFechaReporte,
 } from './mapaRedAverias'
 import {
   SECTORES_CATALOGO,
-  buscarSectores,
   sectorPorId,
   type SectorId,
 } from './mapaRedGeo'
@@ -38,7 +38,7 @@ export default function MapaRedPanel({
   className = '',
 }: MapaRedPanelProps) {
   const [selectedId, setSelectedId] = useState<SectorId>('centro')
-  const [query, setQuery] = useState('')
+  const [selectedAveriaId, setSelectedAveriaId] = useState<number | null>(null)
 
   const {
     averias: averiasRaw,
@@ -50,13 +50,12 @@ export default function MapaRedPanel({
     refetch,
   } = useMapaRedAveriasActivas()
 
-  /** Puntos rojos automáticos para averías activas. Al resolverse dejan de aparecer. */
+  /** Puntos por sector + dirección en San Juan (sin coordenadas GPS). */
   const averias = useMemo(
-    () => applyDemoGeoAverias(averiasRaw, true),
+    () => applySectorUbicacionGeoAverias(averiasRaw),
     [averiasRaw],
   )
 
-  const matches = useMemo(() => buscarSectores(query), [query])
   const selected = sectorPorId(selectedId)
 
   const countsBySector = useMemo(() => countAveriasBySector(averias), [averias])
@@ -82,10 +81,18 @@ export default function MapaRedPanel({
     [countsBySector],
   )
 
-  const onSearchChange = (value: string) => {
-    setQuery(value)
-    const found = buscarSectores(value)
-    if (found.length === 1) setSelectedId(found[0].id)
+  useEffect(() => {
+    if (
+      selectedAveriaId != null &&
+      !sectorAverias.some((item) => item.id === selectedAveriaId)
+    ) {
+      setSelectedAveriaId(null)
+    }
+  }, [sectorAverias, selectedAveriaId])
+
+  const selectSector = (id: SectorId) => {
+    setSelectedId(id)
+    setSelectedAveriaId(null)
   }
 
   const updatedLabel =
@@ -109,22 +116,44 @@ export default function MapaRedPanel({
         className={showPageTitle ? 'mapa-red__stage' : 'mapa-red__shell'}
         aria-label={MAPA_RED_TITLE}
       >
-        <div className="mapa-red__shell-head">
-          {!showPageTitle && !hideShellTitle ? (
-            <h2 className="mapa-red__shell-title">
-              {MAPA_RED_TITLE} – San Juan
-            </h2>
-          ) : null}
-          <label className="mapa-red__shell-search">
-            <IconSearch size={17} color="#94a3b8" aria-hidden="true" />
-            <input
-              type="search"
-              placeholder="Buscar sector…"
-              value={query}
-              onChange={(event) => onSearchChange(event.target.value)}
-              aria-label="Buscar sector"
-            />
-          </label>
+        {!showPageTitle && !hideShellTitle ? (
+          <h2 className="mapa-red__shell-title">
+            {MAPA_RED_TITLE} – San Juan
+          </h2>
+        ) : null}
+
+        <div className="mapa-red__toolbar">
+          <div className="mapa-red__sectors" role="listbox" aria-label="Sectores">
+            {SECTORES_CATALOGO.map((sector) => {
+              const active = selectedId === sector.id
+              const alertCount = countsBySector[sector.id]
+              return (
+                <button
+                  key={sector.id}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  className={`mapa-red__sector-chip${active ? ' is-active' : ''}${
+                    alertCount > 0 ? ' has-alert' : ''
+                  }`}
+                  style={
+                    alertCount > 0
+                      ? { ['--sector-color' as string]: '#dc2626' }
+                      : { ['--sector-color' as string]: sector.color }
+                  }
+                  onClick={() => selectSector(sector.id)}
+                >
+                  <IconMapPin size={14} aria-hidden="true" />
+                  {sector.nombre.replace('Sector ', '')}
+                  {alertCount > 0 ? (
+                    <span className="mapa-red__sector-badge" aria-label={`${alertCount} averías`}>
+                      {alertCount}
+                    </span>
+                  ) : null}
+                </button>
+              )
+            })}
+          </div>
           <div className="mapa-red__refresh-wrap">
             {updatedLabel ? (
               <span className="mapa-red__updated">{updatedLabel}</span>
@@ -148,39 +177,6 @@ export default function MapaRedPanel({
               Actualizar
             </Button>
           </div>
-        </div>
-
-        <div className="mapa-red__sectors" role="listbox" aria-label="Sectores">
-          {SECTORES_CATALOGO.map((sector) => {
-            const dimmed = query.trim() && !matches.some((m) => m.id === sector.id)
-            const active = selectedId === sector.id
-            const alertCount = countsBySector[sector.id]
-            return (
-              <button
-                key={sector.id}
-                type="button"
-                role="option"
-                aria-selected={active}
-                className={`mapa-red__sector-chip${active ? ' is-active' : ''}${
-                  dimmed ? ' is-dim' : ''
-                }${alertCount > 0 ? ' has-alert' : ''}`}
-                style={
-                  alertCount > 0
-                    ? { ['--sector-color' as string]: '#dc2626' }
-                    : { ['--sector-color' as string]: sector.color }
-                }
-                onClick={() => setSelectedId(sector.id)}
-              >
-                <IconMapPin size={14} aria-hidden="true" />
-                {sector.nombre.replace('Sector ', '')}
-                {alertCount > 0 ? (
-                  <span className="mapa-red__sector-badge" aria-label={`${alertCount} averías`}>
-                    {alertCount}
-                  </span>
-                ) : null}
-              </button>
-            )
-          })}
         </div>
 
         {error || unauthorized || forbidden ? (
@@ -208,50 +204,109 @@ export default function MapaRedPanel({
           <div className={`mapa-red__map-card${hasAlert ? ' mapa-red__map-card--alert' : ''}`}>
             <MapaRedMap
               selectedSectorId={selectedId}
-              onSelectSector={setSelectedId}
+              onSelectSector={selectSector}
               averiasGeo={averiasConCoords}
+              selectedAveriaId={selectedAveriaId}
+              onSelectAveria={setSelectedAveriaId}
               sectoresAfectadosIds={sectoresAfectadosConLimite}
-              demoGeo
+              demoGeo={false}
             />
           </div>
 
           <aside
             className={`mapa-red__detail-card${hasAlert ? ' mapa-red__detail-card--alert' : ''}`}
-            aria-label="Información operativa de la red"
+            aria-label="Averías del sector"
           >
             <div className="mapa-red__info-head">
               <div>
                 <h3 className="mapa-red__info-title">{selected.nombre}</h3>
+                <p className="mapa-red__info-sub">
+                  Averías activas ubicadas por dirección en San Juan
+                </p>
               </div>
               {hasAlert ? (
                 <span className="mapa-red__info-alert-pill">
                   <IconAlertTriangle size={14} aria-hidden="true" />
-                  Avería activa
+                  {sectorAverias.length} activa
+                  {sectorAverias.length === 1 ? '' : 's'}
                 </span>
               ) : (
                 <span className="mapa-red__info-ok-pill">Sin alertas</span>
               )}
             </div>
 
-            <div className="mapa-red__stat-grid" aria-label="Resumen de averías">
-              <div className="mapa-red__stat">
-                <span>Averías activas</span>
+            <div className="mapa-red__stat-row" aria-label="Resumen de averías">
+              <div className="mapa-red__stat mapa-red__stat--compact">
+                <span>Activas</span>
                 <strong>{loading && !averias.length ? '…' : averias.length}</strong>
               </div>
               <div
-                className={`mapa-red__stat${sectoresAfectadosIdsCount ? ' is-alert' : ''}`}
+                className={`mapa-red__stat mapa-red__stat--compact${sectoresAfectadosIdsCount ? ' is-alert' : ''}`}
               >
-                <span>Sectores afectados</span>
+                <span>Sectores</span>
                 <strong>{sectoresAfectadosIdsCount}</strong>
               </div>
-              <div className={`mapa-red__stat${hasAlert ? ' is-alert' : ''}`}>
+              <div
+                className={`mapa-red__stat mapa-red__stat--compact${hasAlert ? ' is-alert' : ''}`}
+              >
                 <span>En este sector</span>
                 <strong>{sectorAverias.length}</strong>
               </div>
-              <div className="mapa-red__stat">
-                <span>Puntos en mapa</span>
-                <strong>{averiasConCoords.length}</strong>
-              </div>
+            </div>
+
+            <div className="mapa-red__averia-panel">
+              {loading && !averias.length ? (
+                <p className="mapa-red__averia-empty">Cargando averías…</p>
+              ) : sectorAverias.length === 0 ? (
+                <EmptyState
+                  className="mapa-red__empty"
+                  icon={<IconMapPin size={22} aria-hidden="true" />}
+                  title={
+                    averias.length === 0
+                      ? 'Sin averías activas'
+                      : 'Sin averías en este sector'
+                  }
+                  description={
+                    averias.length === 0
+                      ? 'Cuando se reporte una avería con sector y dirección, aparecerá aquí y en el mapa.'
+                      : 'Elija otro sector o actualice para ver reportes nuevos.'
+                  }
+                />
+              ) : (
+                <ul className="mapa-red__averia-list">
+                  {sectorAverias.map((averia) => {
+                    const active = selectedAveriaId === averia.id
+                    return (
+                      <li key={averia.id}>
+                        <button
+                          type="button"
+                          className={`mapa-red__averia-item${active ? ' is-selected' : ''}`}
+                          onClick={() => setSelectedAveriaId(averia.id)}
+                          aria-pressed={active}
+                        >
+                          <span className="mapa-red__averia-code">
+                            {averia.codigoSeguimiento}
+                          </span>
+                          <span className="mapa-red__averia-addr">
+                            {averia.ubicacion}
+                          </span>
+                          <span className="mapa-red__averia-meta">
+                            {averia.estadoLabel}
+                            {' · '}
+                            {formatFechaReporte(averia.fechaReporte)}
+                          </span>
+                        </button>
+                        <Link
+                          className="mapa-red__averia-link"
+                          to={averia.detailPath}
+                        >
+                          Detalle
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </div>
           </aside>
         </div>

@@ -204,12 +204,13 @@ const AveriasAdminAsignacionControls = ({
               }
               disabled={busy}
               aria-busy={assigning}
+              aria-label="Seleccionar fontanero"
               onChange={(event) =>
                 selectFontaneroIdFromString(event.target.value)
               }
             >
               <option value="" disabled>
-                Seleccione un fontanero
+                Elegir fontanero
               </option>
               {fontaneros.map((fontanero) => (
                 <option key={fontanero.id} value={String(fontanero.id)}>

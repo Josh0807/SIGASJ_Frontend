@@ -6,7 +6,7 @@ const optionalTrimmed = (value: string): string | undefined => {
   return trimmed ? trimmed : undefined
 }
 
-/** Mapeo explícito al DTO público. Nunca incluye campos administrativos. */
+/** Mapeo explícito al DTO público. Nunca incluye campos administrativos ni GPS. */
 export function toCreatePublicAveriaPayload(
   values: PublicAveriaFormValues,
 ): CreatePublicAveriaPayload {

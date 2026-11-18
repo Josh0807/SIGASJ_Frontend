@@ -438,7 +438,11 @@ export default function ReportarAveriaForm() {
                 <small id={errorId('ubicacion')} className="public-averia-form__error" role="alert">
                   {errors.ubicacion}
                 </small>
-              ) : null}
+              ) : (
+                <small className="public-averia-form__help">
+                  Dirección en San Juan. Se usa junto al sector para ubicarla en el mapa.
+                </small>
+              )}
             </div>
 
             <div className="public-averia-form__field">
@@ -456,12 +460,17 @@ export default function ReportarAveriaForm() {
                 aria-describedby={errorId('sectorComunidad')}
                 value={values.sectorComunidad}
                 onChange={(event) => update('sectorComunidad', event.target.value)}
+                placeholder="Ej. Sector Centro, Norte, Las Palmas…"
               />
               {errors.sectorComunidad ? (
                 <small id={errorId('sectorComunidad')} className="public-averia-form__error" role="alert">
                   {errors.sectorComunidad}
                 </small>
-              ) : null}
+              ) : (
+                <small className="public-averia-form__help">
+                  Sector de San Juan (Centro, Norte, Las Palmas, El Cruce, La Esperanza).
+                </small>
+              )}
             </div>
 
             <div className="public-averia-form__field">

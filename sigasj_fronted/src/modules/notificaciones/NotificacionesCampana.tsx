@@ -31,7 +31,7 @@ import { rutaNotificacionCampana } from './rutaNotificacionCampana'
 import { useNotificacionesAveria } from './useNotificacionesAveria'
 
 function NotificacionIcon({ kind }: { kind: NotificacionVisualKind }) {
-  const props = { size: 18, stroke: 1.85, 'aria-hidden': true as const }
+  const props = { size: 16, stroke: 1.9, 'aria-hidden': true as const }
   switch (kind) {
     case 'reposicion':
       return <IconAlertTriangle {...props} />
@@ -82,7 +82,7 @@ const NotificacionesCampana = () => {
     const rect = trigger.getBoundingClientRect()
     const gutter = 8
     const viewportWidth = document.documentElement.clientWidth
-    const width = Math.min(380, viewportWidth - gutter * 2)
+    const width = Math.min(340, viewportWidth - gutter * 2)
     const left = Math.min(
       Math.max(gutter, rect.right - width),
       Math.max(gutter, viewportWidth - width - gutter),
@@ -169,11 +169,16 @@ const NotificacionesCampana = () => {
               />
             ) : null}
             <span className="notificaciones-campana__title">{titulo}</span>
+            {timeLabel && !mensaje ? (
+              <span className="notificaciones-campana__meta notificaciones-campana__meta--inline">
+                {timeLabel}
+              </span>
+            ) : null}
           </span>
           {mensaje ? (
             <span className="notificaciones-campana__message">{mensaje}</span>
           ) : null}
-          {timeLabel ? (
+          {timeLabel && mensaje ? (
             <span className="notificaciones-campana__meta">{timeLabel}</span>
           ) : null}
         </span>

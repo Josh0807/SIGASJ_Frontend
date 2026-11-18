@@ -31,6 +31,7 @@ import {
   HIDRANTES_GEOJSON,
   MAPA_RED_CENTER,
   MAPA_RED_DEFAULT_ZOOM,
+  MAPA_RED_MAX_BOUNDS,
   MAPA_RED_MAX_ZOOM,
   MAPA_RED_MIN_ZOOM,
   SECTORES_CATALOGO,
@@ -53,8 +54,11 @@ import {
 type MapaRedMapProps = {
   selectedSectorId: SectorId
   onSelectSector: (id: SectorId) => void
-  /** Averías activas con coordenadas válidas (o demoGeo). */
+  /** Averías activas ubicadas por sector + dirección en San Juan. */
   averiasGeo?: AveriaMapaItem[]
+  /** Avería enfocada desde el panel lateral. */
+  selectedAveriaId?: number | null
+  onSelectAveria?: (id: number | null) => void
   /** Sectores con avería activa y límite GeoJSON validado. */
   sectoresAfectadosIds?: SectorId[]
   /** Modo prueba visual; no altera leyenda productiva. */
@@ -75,19 +79,15 @@ type LayerToggles = {
 type BasemapMode = 'hibrido' | 'satelite' | 'calles'
 
 const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-const OSM_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
 /** Imagen aérea real (casas, techos, vegetación). */
 const ESRI_IMAGERY_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 const ESRI_IMAGERY_LABELS_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
-const ESRI_ATTRIBUTION =
-  'Tiles &copy; <a href="https://www.esri.com/">Esri</a> — Source: Esri, Maxar, Earthstar Geographics'
 
-const ALERT_PIN_HTML = `
-  <div class="mapa-red__alert-pin">
+const alertPinHtml = (selected = false) => `
+  <div class="mapa-red__alert-pin${selected ? ' is-selected' : ''}">
     <span class="mapa-red__alert-pin-halo"></span>
     <span class="mapa-red__alert-pin-body" aria-hidden="true"></span>
   </div>
@@ -128,13 +128,16 @@ function MapResizeSync() {
 function AveriasMapCamera({
   sector,
   averias,
+  selectedAveriaId,
 }: {
   sector: SectorCatalogo
   averias: AveriaMapaItem[]
+  selectedAveriaId?: number | null
 }) {
   const map = useMap()
   const prevSectorId = useRef<SectorId | null>(null)
   const prevAveriasKey = useRef('')
+  const prevSelectedId = useRef<number | null>(null)
 
   // Carga / Actualizar: encuadrar TODOS los pines para que se vean.
   useEffect(() => {
@@ -197,7 +200,74 @@ function AveriasMapCamera({
     map.flyTo([center.lat, center.lng], 17.5, { duration: 0.7 })
   }, [map, sector, averias])
 
+  // Lista lateral: enfocar la avería elegida.
+  useEffect(() => {
+    if (selectedAveriaId == null) {
+      prevSelectedId.current = null
+      return
+    }
+    if (prevSelectedId.current === selectedAveriaId) return
+    prevSelectedId.current = selectedAveriaId
+    const target = averias.find((item) => item.id === selectedAveriaId)
+    if (!target?.coords) return
+    map.flyTo([target.coords.lat, target.coords.lng], 18, { duration: 0.55 })
+  }, [map, averias, selectedAveriaId])
+
   return null
+}
+
+function AveriaMarker({
+  averia,
+  selected,
+  icon,
+  selectedIcon,
+  onSelect,
+}: {
+  averia: AveriaMapaItem
+  selected: boolean
+  icon: L.DivIcon
+  selectedIcon: L.DivIcon
+  onSelect: () => void
+}) {
+  const markerRef = useRef<L.Marker | null>(null)
+
+  useEffect(() => {
+    if (!selected) return
+    const marker = markerRef.current
+    if (!marker) return
+    marker.openPopup()
+  }, [selected])
+
+  if (!averia.coords) return null
+
+  return (
+    <Marker
+      ref={markerRef}
+      position={[averia.coords.lat, averia.coords.lng]}
+      icon={selected ? selectedIcon : icon}
+      zIndexOffset={selected ? 800 : 0}
+      eventHandlers={{ click: onSelect }}
+    >
+      <Popup className="mapa-red__popup mapa-red__popup--alert">
+        <div className="mapa-red__popup-body">
+          <strong>{averia.ubicacion}</strong>
+          <span className="mapa-red__popup-meta">
+            {averia.codigoSeguimiento}
+            {averia.sectorComunidad ? ` · ${averia.sectorComunidad}` : ''}
+          </span>
+          <span>
+            {averia.estadoLabel}
+            {averia.prioridad ? ` · ${averia.prioridad}` : ''}
+          </span>
+          <span>{averia.descripcion}</span>
+          <span>{formatFechaReporte(averia.fechaReporte)}</span>
+          <Link className="mapa-red__popup-link" to={averia.detailPath}>
+            Ver detalle
+          </Link>
+        </div>
+      </Popup>
+    </Marker>
+  )
 }
 
 function MapToolbar({
@@ -296,6 +366,8 @@ export default function MapaRedMap({
   selectedSectorId,
   onSelectSector,
   averiasGeo = [],
+  selectedAveriaId = null,
+  onSelectAveria,
   sectoresAfectadosIds = [],
   demoGeo = false,
   className = '',
@@ -353,10 +425,22 @@ export default function MapaRedMap({
     () =>
       L.divIcon({
         className: 'mapa-red__alert-marker',
-        html: ALERT_PIN_HTML,
+        html: alertPinHtml(false),
         iconSize: [36, 44],
         iconAnchor: [18, 40],
         popupAnchor: [0, -36],
+      }),
+    [],
+  )
+
+  const alertIconSelected = useMemo(
+    () =>
+      L.divIcon({
+        className: 'mapa-red__alert-marker',
+        html: alertPinHtml(true),
+        iconSize: [42, 50],
+        iconAnchor: [21, 46],
+        popupAnchor: [0, -40],
       }),
     [],
   )
@@ -400,24 +484,27 @@ export default function MapaRedMap({
         zoom={MAPA_RED_DEFAULT_ZOOM}
         minZoom={MAPA_RED_MIN_ZOOM}
         maxZoom={MAPA_RED_MAX_ZOOM}
+        maxBounds={MAPA_RED_MAX_BOUNDS}
+        maxBoundsViscosity={1}
         scrollWheelZoom
         zoomControl={false}
         className="mapa-red__leaflet"
-        attributionControl
+        attributionControl={false}
       >
         {basemap === 'calles' ? (
-          <TileLayer key="osm" attribution={OSM_ATTRIBUTION} url={OSM_URL} />
+          <TileLayer key="osm" attribution="" url={OSM_URL} />
         ) : (
           <>
             <TileLayer
               key="esri-imagery"
-              attribution={ESRI_ATTRIBUTION}
+              attribution=""
               url={ESRI_IMAGERY_URL}
               maxZoom={19}
             />
             {basemap === 'hibrido' ? (
               <TileLayer
                 key="esri-labels"
+                attribution=""
                 url={ESRI_IMAGERY_LABELS_URL}
                 opacity={0.95}
                 maxZoom={19}
@@ -427,7 +514,11 @@ export default function MapaRedMap({
         )}
         <ZoomControl position="topleft" />
         <MapResizeSync />
-        <AveriasMapCamera sector={selected} averias={geoAverias} />
+        <AveriasMapCamera
+          sector={selected}
+          averias={geoAverias}
+          selectedAveriaId={selectedAveriaId}
+        />
         <MapToolbar
           layersOpen={layersOpen}
           onToggleLayers={() => setLayersOpen((open) => !open)}
@@ -440,7 +531,7 @@ export default function MapaRedMap({
             <Popup className="mapa-red__popup">
               <div className="mapa-red__popup-body">
                 <strong>ASADA San Juan</strong>
-                <span>Referencia comunitaria pública</span>
+                <span>Oficina / referencia comunitaria</span>
                 <em>No es un nodo de la red de agua</em>
               </div>
             </Popup>
@@ -492,36 +583,19 @@ export default function MapaRedMap({
         ) : null}
 
         {layers.averias
-          ? geoAverias.map((averia) =>
-              averia.coords ? (
-                <Marker
-                  key={averia.id}
-                  position={[averia.coords.lat, averia.coords.lng]}
-                  icon={alertIcon}
-                  eventHandlers={{
-                    click: () => {
-                      if (averia.sectorId) onSelectSector(averia.sectorId)
-                    },
-                  }}
-                >
-                  <Popup className="mapa-red__popup mapa-red__popup--alert">
-                    <div className="mapa-red__popup-body">
-                      <strong>{averia.codigoSeguimiento}</strong>
-                      <span>
-                        {averia.estadoLabel}
-                        {averia.prioridad ? ` · ${averia.prioridad}` : ''}
-                      </span>
-                      <span>{averia.descripcion}</span>
-                      <span>{averia.ubicacion}</span>
-                      <span>{formatFechaReporte(averia.fechaReporte)}</span>
-                      <Link className="mapa-red__popup-link" to={averia.detailPath}>
-                        Ver detalle
-                      </Link>
-                    </div>
-                  </Popup>
-                </Marker>
-              ) : null,
-            )
+          ? geoAverias.map((averia) => (
+              <AveriaMarker
+                key={averia.id}
+                averia={averia}
+                selected={selectedAveriaId === averia.id}
+                icon={alertIcon}
+                selectedIcon={alertIconSelected}
+                onSelect={() => {
+                  if (averia.sectorId) onSelectSector(averia.sectorId)
+                  onSelectAveria?.(averia.id)
+                }}
+              />
+            ))
           : null}
 
         {hasPipes && layers.tuberias ? (
