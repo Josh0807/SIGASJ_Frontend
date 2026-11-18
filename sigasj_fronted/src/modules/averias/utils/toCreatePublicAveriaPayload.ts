@@ -24,5 +24,17 @@ export function toCreatePublicAveriaPayload(
     payload.correoReportante = correoReportante
   }
 
+  const lat = values.latitud
+  const lng = values.longitud
+  if (
+    typeof lat === 'number' &&
+    typeof lng === 'number' &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lng)
+  ) {
+    payload.latitud = lat
+    payload.longitud = lng
+  }
+
   return payload
 }

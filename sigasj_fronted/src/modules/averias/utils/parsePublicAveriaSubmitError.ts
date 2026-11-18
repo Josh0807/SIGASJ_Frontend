@@ -1,4 +1,7 @@
-import type { PublicAveriaFormErrors, PublicAveriaFormValues } from '../types/publicAveriaForm'
+import type {
+  PublicAveriaFormErrors,
+  PublicAveriaTextField,
+} from '../types/publicAveriaForm'
 
 export const PUBLIC_AVERIA_NETWORK_ERROR =
   'No fue posible enviar el reporte en este momento. Verifique su conexión e intente nuevamente.'
@@ -20,7 +23,7 @@ const HTTP_ERROR_PATTERN = /^HTTP (\d+):\s*([\s\S]*)$/
 const TECHNICAL_PATTERN =
   /\b(QueryFailedError|EntityNotFoundError|TypeORMError|TypeORM|SQL Exception|SQL Server|SQL|stack|constraint|INSERT|UPDATE|DELETE|SELECT|driverError|ECONNREFUSED|Exception:|\.ts:\d+|\.js:\d+)\b/i
 
-const FIELD_MATCHERS: { field: keyof PublicAveriaFormValues; pattern: RegExp }[] = [
+const FIELD_MATCHERS: { field: PublicAveriaTextField; pattern: RegExp }[] = [
   { field: 'identificacionReportante', pattern: /identificaci[oó]n|c[eé]dula/i },
   { field: 'correoReportante', pattern: /correo|email/i },
   { field: 'telefonoReportante', pattern: /tel[eé]fono/i },
@@ -93,7 +96,7 @@ const toMessageList = (detail: string): string[] => {
     .filter(Boolean)
 }
 
-const matchField = (message: string): keyof PublicAveriaFormValues | null =>
+const matchField = (message: string): PublicAveriaTextField | null =>
   FIELD_MATCHERS.find(({ pattern }) => pattern.test(message))?.field ?? null
 
 const toValidationError = (detail: string): PublicAveriaSubmitError => {

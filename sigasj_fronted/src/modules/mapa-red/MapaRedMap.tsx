@@ -31,6 +31,7 @@ import {
   HIDRANTES_GEOJSON,
   MAPA_RED_CENTER,
   MAPA_RED_DEFAULT_ZOOM,
+  MAPA_RED_MAX_BOUNDS,
   MAPA_RED_MAX_ZOOM,
   MAPA_RED_MIN_ZOOM,
   SECTORES_CATALOGO,
@@ -53,7 +54,7 @@ import {
 type MapaRedMapProps = {
   selectedSectorId: SectorId
   onSelectSector: (id: SectorId) => void
-  /** Averías activas con coordenadas válidas (o demoGeo). */
+  /** Averías activas con coordenadas GPS reales del reporte. */
   averiasGeo?: AveriaMapaItem[]
   /** Sectores con avería activa y límite GeoJSON validado. */
   sectoresAfectadosIds?: SectorId[]
@@ -75,16 +76,12 @@ type LayerToggles = {
 type BasemapMode = 'hibrido' | 'satelite' | 'calles'
 
 const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-const OSM_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
 /** Imagen aérea real (casas, techos, vegetación). */
 const ESRI_IMAGERY_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 const ESRI_IMAGERY_LABELS_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
-const ESRI_ATTRIBUTION =
-  'Tiles &copy; <a href="https://www.esri.com/">Esri</a> — Source: Esri, Maxar, Earthstar Geographics'
 
 const ALERT_PIN_HTML = `
   <div class="mapa-red__alert-pin">
@@ -400,24 +397,27 @@ export default function MapaRedMap({
         zoom={MAPA_RED_DEFAULT_ZOOM}
         minZoom={MAPA_RED_MIN_ZOOM}
         maxZoom={MAPA_RED_MAX_ZOOM}
+        maxBounds={MAPA_RED_MAX_BOUNDS}
+        maxBoundsViscosity={1}
         scrollWheelZoom
         zoomControl={false}
         className="mapa-red__leaflet"
-        attributionControl
+        attributionControl={false}
       >
         {basemap === 'calles' ? (
-          <TileLayer key="osm" attribution={OSM_ATTRIBUTION} url={OSM_URL} />
+          <TileLayer key="osm" attribution="" url={OSM_URL} />
         ) : (
           <>
             <TileLayer
               key="esri-imagery"
-              attribution={ESRI_ATTRIBUTION}
+              attribution=""
               url={ESRI_IMAGERY_URL}
               maxZoom={19}
             />
             {basemap === 'hibrido' ? (
               <TileLayer
                 key="esri-labels"
+                attribution=""
                 url={ESRI_IMAGERY_LABELS_URL}
                 opacity={0.95}
                 maxZoom={19}

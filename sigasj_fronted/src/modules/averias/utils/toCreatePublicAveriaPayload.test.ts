@@ -47,4 +47,25 @@ describe('toCreatePublicAveriaPayload', () => {
       descripcion: 'Fuga visible en la tubería.',
     })
   })
+
+  it('incluye latitud/longitud solo cuando el par es válido', () => {
+    expect(
+      toCreatePublicAveriaPayload({
+        ...filled,
+        latitud: 10.2188,
+        longitud: -85.5565,
+      }),
+    ).toMatchObject({
+      latitud: 10.2188,
+      longitud: -85.5565,
+    })
+
+    expect(
+      toCreatePublicAveriaPayload({
+        ...filled,
+        latitud: 10.2188,
+        longitud: null,
+      }),
+    ).not.toHaveProperty('latitud')
+  })
 })

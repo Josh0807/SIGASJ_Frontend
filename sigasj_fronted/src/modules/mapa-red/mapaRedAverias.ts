@@ -35,6 +35,8 @@ export type AveriaMapaItem = {
   fechaReporte: string
   /** Solo si el backend envía coordenadas válidas. */
   coords: AveriaMapaCoords | null
+  /** Origen del punto: real del reporte o demo de visualización. */
+  coordsSource: 'real' | 'demo' | null
   /** Relación textual con catálogo de sectores (puede ser null). */
   sectorId: SectorId | null
   detailPath: string
@@ -89,8 +91,8 @@ export const matchSectorIdFromComunidad = (
 }
 
 /**
- * Lee coordenadas solo si vienen en el payload.
- * Hoy Averia no persiste lat/lng; esto prepara el mapa sin inventar puntos.
+ * Lee coordenadas solo si vienen en el payload del backend.
+ * No inventa puntos desde la dirección textual.
  */
 export const extractAveriaCoords = (
   item: AveriaListItem & Record<string, unknown>,
@@ -112,6 +114,9 @@ export const toAveriaMapaItem = (item: AveriaListItem): AveriaMapaItem => {
   const estado = String(item.estado ?? '')
   const estadoLabel =
     ESTADO_AVERIA_LABELS[estado as EstadoAveria] ?? (estado || 'Sin estado')
+  const coords = extractAveriaCoords(
+    item as AveriaListItem & Record<string, unknown>,
+  )
 
   return {
     id: item.id,
@@ -123,7 +128,8 @@ export const toAveriaMapaItem = (item: AveriaListItem): AveriaMapaItem => {
     ubicacion: item.ubicacion,
     sectorComunidad: item.sectorComunidad,
     fechaReporte: item.fechaReporte,
-    coords: extractAveriaCoords(item as AveriaListItem & Record<string, unknown>),
+    coords,
+    coordsSource: coords ? 'real' : null,
     sectorId: matchSectorIdFromComunidad(item.sectorComunidad),
     detailPath: `${AVERIAS_ADMIN_PATH}/${item.id}`,
   }
@@ -205,7 +211,7 @@ const demoCoordsForAveria = (
 
 /**
  * Asigna coordenadas de visualización a averías activas sin lat/lng.
- * Reparte por sector y evita apilar varios pines en el mismo punto.
+ * Conserva coords reales del reporte; solo inventa demo para las que faltan.
  */
 export const applyDemoGeoAverias = (
   items: AveriaMapaItem[],
@@ -215,13 +221,24 @@ export const applyDemoGeoAverias = (
   const sectorCursor = new Map<string, number>()
 
   return items.map((item) => {
-    if (item.coords) return item
+    if (item.coords && item.coordsSource === 'real') return item
+    if (item.coords && item.coordsSource == null) {
+      return { ...item, coordsSource: 'real' }
+    }
     const key = item.sectorId ?? `id:${item.id}`
     const indexInSector = sectorCursor.get(key) ?? 0
     sectorCursor.set(key, indexInSector + 1)
     return {
       ...item,
       coords: demoCoordsForAveria(item, indexInSector),
+      coordsSource: 'demo',
     }
   })
+}
+
+/** true cuando todos los pines visibles son inventados (ninguno trae GPS real). */
+export const areAllAveriasDemoGeo = (items: AveriaMapaItem[]): boolean => {
+  const withCoords = items.filter((item) => item.coords != null)
+  if (withCoords.length === 0) return false
+  return withCoords.every((item) => item.coordsSource === 'demo')
 }

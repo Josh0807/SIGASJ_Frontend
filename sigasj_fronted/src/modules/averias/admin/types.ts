@@ -76,6 +76,9 @@ export type AveriaListItem = {
   nombreReportante: string
   sectorComunidad: string
   ubicacion: string
+  /** GPS opcional del reporte (WGS84). */
+  latitud?: number | null
+  longitud?: number | null
   descripcion: string
   estado: EstadoAveria | string
   prioridad: string | null
@@ -137,6 +140,8 @@ export type AveriaDetail = {
   abonado: AveriaAdminAbonado | null
   sectorComunidad: string
   ubicacion: string
+  latitud?: number | null
+  longitud?: number | null
   descripcion: string
   fontanero: AveriaAdminFontanero | null
   ayudante?: AveriaAdminFontanero | null

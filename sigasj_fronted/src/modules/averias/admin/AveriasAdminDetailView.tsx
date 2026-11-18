@@ -135,6 +135,23 @@ const AveriasAdminDetailView = ({
             >
               {averia.ubicacion}
             </AveriasDetailField>
+            {averia.latitud != null &&
+            averia.longitud != null &&
+            Number.isFinite(averia.latitud) &&
+            Number.isFinite(averia.longitud) ? (
+              <AveriasDetailField
+                label="Coordenadas GPS"
+                icon={<IconMapPin size={14} stroke={1.75} />}
+              >
+                <a
+                  href={`https://www.google.com/maps?q=${averia.latitud},${averia.longitud}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {averia.latitud.toFixed(6)}, {averia.longitud.toFixed(6)}
+                </a>
+              </AveriasDetailField>
+            ) : null}
             <AveriasDetailField
               label="Descripción"
               multiline

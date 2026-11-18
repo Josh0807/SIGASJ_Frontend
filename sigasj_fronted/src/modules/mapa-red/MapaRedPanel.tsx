@@ -10,7 +10,6 @@ import { Alert, Button } from '../../shared/ui'
 import './mapa-red.css'
 import MapaRedMap from './MapaRedMap'
 import {
-  applyDemoGeoAverias,
   countAveriasBySector,
   filterAveriasBySector,
 } from './mapaRedAverias'
@@ -50,11 +49,8 @@ export default function MapaRedPanel({
     refetch,
   } = useMapaRedAveriasActivas()
 
-  /** Puntos rojos automáticos para averías activas. Al resolverse dejan de aparecer. */
-  const averias = useMemo(
-    () => applyDemoGeoAverias(averiasRaw, true),
-    [averiasRaw],
-  )
+  /** Solo averías con GPS real del reporte; sin puntos demo. */
+  const averias = averiasRaw
 
   const matches = useMemo(() => buscarSectores(query), [query])
   const selected = sectorPorId(selectedId)
@@ -211,7 +207,7 @@ export default function MapaRedPanel({
               onSelectSector={setSelectedId}
               averiasGeo={averiasConCoords}
               sectoresAfectadosIds={sectoresAfectadosConLimite}
-              demoGeo
+              demoGeo={false}
             />
           </div>
 

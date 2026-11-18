@@ -6,6 +6,9 @@ export type CreatePublicAveriaPayload = {
   sectorComunidad: string
   descripcion: string
   correoReportante?: string
+  /** WGS84 opcional; solo se envían juntos. */
+  latitud?: number
+  longitud?: number
 }
 
 export type RegistroPublicoAveriaData = {

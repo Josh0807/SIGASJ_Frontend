@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
-  applyDemoGeoAverias,
+  countAveriasBySector,
   extractAveriaCoords,
+  filterAveriasBySector,
   matchSectorIdFromComunidad,
   toAveriaMapaItem,
 } from './mapaRedAverias'
 import type { AveriaListItem } from '../averias/admin/types'
-import { MAPA_RED_CENTER } from './mapaRedGeo'
 
 const baseItem = (overrides: Partial<AveriaListItem> = {}): AveriaListItem => ({
   id: 1,
@@ -23,71 +23,134 @@ const baseItem = (overrides: Partial<AveriaListItem> = {}): AveriaListItem => ({
   ...overrides,
 })
 
-describe('mapaRedAverias', () => {
-  it('relaciona sectorComunidad con el catálogo sin inventar geometría', () => {
+describe('mapaRedAverias — sector y coordenadas reales', () => {
+  it('relaciona sectorComunidad con el catálogo (alias y variantes)', () => {
     expect(matchSectorIdFromComunidad('Sector Centro')).toBe('centro')
+    expect(matchSectorIdFromComunidad('centro')).toBe('centro')
     expect(matchSectorIdFromComunidad('Las Palmas')).toBe('las-palmas')
+    expect(matchSectorIdFromComunidad('Sector Norte')).toBe('norte')
+    expect(matchSectorIdFromComunidad('El Cruce')).toBe('el-cruce')
+    expect(matchSectorIdFromComunidad('La Esperanza')).toBe('la-esperanza')
     expect(matchSectorIdFromComunidad('San Juan')).toBeNull()
   })
 
   it('no inventa coordenadas desde dirección textual', () => {
     const item = toAveriaMapaItem(baseItem())
     expect(item.coords).toBeNull()
-    expect(extractAveriaCoords(baseItem() as AveriaListItem & Record<string, unknown>)).toBeNull()
+    expect(item.coordsSource).toBeNull()
+    expect(item.sectorId).toBe('centro')
+    expect(
+      extractAveriaCoords(baseItem() as AveriaListItem & Record<string, unknown>),
+    ).toBeNull()
   })
 
-  it('acepta coordenadas válidas si el payload las trae', () => {
+  it('acepta coordenadas válidas de Costa Rica y marca origen real', () => {
     const withCoords = {
-      ...baseItem(),
-      latitud: 10.2188,
-      longitud: -85.5565,
-    } as AveriaListItem & Record<string, unknown>
-    expect(extractAveriaCoords(withCoords)).toEqual({
-      lat: 10.2188,
-      lng: -85.5565,
+      ...baseItem({
+        id: 7,
+        sectorComunidad: 'Sector Norte',
+        latitud: 10.2205,
+        longitud: -85.5571,
+      }),
+    }
+    const mapped = toAveriaMapaItem(withCoords)
+    expect(mapped.sectorId).toBe('norte')
+    expect(mapped.coords).toEqual({ lat: 10.2205, lng: -85.5571 })
+    expect(mapped.coordsSource).toBe('real')
+  })
+
+  it('rechaza coordenadas fuera de rango o fuera de Costa Rica', () => {
+    expect(
+      extractAveriaCoords({
+        ...baseItem(),
+        latitud: 91,
+        longitud: -85.55,
+      } as AveriaListItem & Record<string, unknown>),
+    ).toBeNull()
+
+    expect(
+      extractAveriaCoords({
+        ...baseItem(),
+        latitud: 40.4,
+        longitud: -3.7,
+      } as AveriaListItem & Record<string, unknown>),
+    ).toBeNull()
+
+    expect(
+      extractAveriaCoords({
+        ...baseItem(),
+        latitud: 10.22,
+        longitud: null,
+      } as AveriaListItem & Record<string, unknown>),
+    ).toBeNull()
+  })
+
+  it('filtra y cuenta averías por sector usando solo GPS real', () => {
+    const items = [
+      toAveriaMapaItem(
+        baseItem({
+          id: 1,
+          sectorComunidad: 'Sector Centro',
+          latitud: 10.2188,
+          longitud: -85.5565,
+        }),
+      ),
+      toAveriaMapaItem(
+        baseItem({
+          id: 2,
+          sectorComunidad: 'Sector Norte',
+          latitud: 10.221,
+          longitud: -85.557,
+        }),
+      ),
+      toAveriaMapaItem(
+        baseItem({
+          id: 3,
+          sectorComunidad: 'Sector Centro',
+          // sin coords: cuenta por sector, pero no aparece en mapa
+        }),
+      ),
+      toAveriaMapaItem(
+        baseItem({
+          id: 4,
+          sectorComunidad: 'San Juan',
+          latitud: 10.219,
+          longitud: -85.555,
+        }),
+      ),
+    ]
+
+    const counts = countAveriasBySector(items)
+    expect(counts.centro).toBe(2)
+    expect(counts.norte).toBe(1)
+    expect(counts['las-palmas']).toBe(0)
+
+    const centro = filterAveriasBySector(items, 'centro')
+    expect(centro.map((a) => a.id)).toEqual([1, 3])
+
+    const conGps = items.filter((item) => item.coords != null)
+    expect(conGps).toHaveLength(3)
+    expect(conGps.every((item) => item.coordsSource === 'real')).toBe(true)
+    expect(conGps.find((item) => item.id === 4)?.sectorId).toBeNull()
+  })
+
+  it('mantiene sector y coords independientes (sector textual + GPS del reporte)', () => {
+    const item = toAveriaMapaItem(
+      baseItem({
+        id: 50,
+        sectorComunidad: 'Las Palmas',
+        latitud: 10.2192,
+        longitud: -85.5548,
+        codigoSeguimiento: 'AV-2026-0050',
+      }),
+    )
+
+    expect(item).toMatchObject({
+      codigoSeguimiento: 'AV-2026-0050',
+      sectorId: 'las-palmas',
+      sectorComunidad: 'Las Palmas',
+      coordsSource: 'real',
+      coords: { lat: 10.2192, lng: -85.5548 },
     })
-  })
-
-  it('demoGeo asigna puntos rojos de prueba sin tocar coords reales', () => {
-    const sinCoords = toAveriaMapaItem(baseItem({ id: 10 }))
-    const conCoords = toAveriaMapaItem({
-      ...baseItem({ id: 11 }),
-      ...({ latitud: 10.22, longitud: -85.55 } as object),
-    } as AveriaListItem)
-
-    const demo = applyDemoGeoAverias([sinCoords, conCoords], true)
-    expect(demo[0].coords).not.toBeNull()
-    expect(demo[0].coords!.lat).toBeGreaterThan(MAPA_RED_CENTER[0] - 0.02)
-    expect(demo[0].coords!.lat).toBeLessThan(MAPA_RED_CENTER[0] + 0.02)
-    expect(demo[1].coords).toEqual({ lat: 10.22, lng: -85.55 })
-
-    const normal = applyDemoGeoAverias([sinCoords], false)
-    expect(normal[0].coords).toBeNull()
-  })
-
-  it('demoGeo reparte averías del mismo sector en puntos distintos', () => {
-    const sameSector = [
-      toAveriaMapaItem(baseItem({ id: 21, sectorComunidad: 'Sector Norte' })),
-      toAveriaMapaItem(baseItem({ id: 22, sectorComunidad: 'Sector Norte' })),
-      toAveriaMapaItem(baseItem({ id: 23, sectorComunidad: 'Sector Norte' })),
-    ]
-    const demo = applyDemoGeoAverias(sameSector, true)
-    const keys = new Set(
-      demo.map((item) => `${item.coords!.lat.toFixed(6)},${item.coords!.lng.toFixed(6)}`),
-    )
-    expect(keys.size).toBe(3)
-  })
-
-  it('demoGeo separa sectores en anclas distintas', () => {
-    const mixed = [
-      toAveriaMapaItem(baseItem({ id: 31, sectorComunidad: 'Sector Centro' })),
-      toAveriaMapaItem(baseItem({ id: 32, sectorComunidad: 'Sector Norte' })),
-    ]
-    const demo = applyDemoGeoAverias(mixed, true)
-    const dist = Math.hypot(
-      demo[0].coords!.lat - demo[1].coords!.lat,
-      demo[0].coords!.lng - demo[1].coords!.lng,
-    )
-    expect(dist).toBeGreaterThan(0.001)
   })
 })
